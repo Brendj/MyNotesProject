@@ -16,6 +16,7 @@ import org.w3c.dom.Node;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Set;
 
 /**
@@ -27,28 +28,8 @@ import java.util.Set;
  */
 public class GoodRequest extends DistributedObject {
 
-    private Set<StateChange> stateChangeInternal;
-    private Set<GoodRequestPosition> goodRequestPositionInternal;
-
-    public Set<GoodRequestPosition> getGoodRequestPositionInternal() {
-        return goodRequestPositionInternal;
-    }
-
-    public void setGoodRequestPositionInternal(Set<GoodRequestPosition> goodRequestPositionInternal) {
-        this.goodRequestPositionInternal = goodRequestPositionInternal;
-    }
-
-    public Set<StateChange> getStateChangeInternal() {
-        return stateChangeInternal;
-    }
-
-    public void setStateChangeInternal(Set<StateChange> stateChangeInternal) {
-        this.stateChangeInternal = stateChangeInternal;
-    }
-
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        //Staff st = DAOService.getInstance().findDistributedObjectByRefGUID(Staff.class, guidOfStaff);
         Staff st  = (Staff) DAOUtils.findDistributedObjectByRefGUID(session, guidOfStaff);
         if(st==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setStaff(st);
@@ -59,7 +40,7 @@ public class GoodRequest extends DistributedObject {
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element,"Date", getDateFormat().format(dateOfGoodsRequest));
         setAttribute(element,"Number", number);
-        setAttribute(element,"State", state);
+        setAttribute(element,"State",state.ordinal());
         setAttribute(element,"DoneDate", getDateFormat().format(doneDate));
         setAttribute(element,"Comment", comment);
         setAttribute(element, "GuidOfStaff", staff.getGuid());
@@ -73,14 +54,14 @@ public class GoodRequest extends DistributedObject {
         String stringNumber = getStringAttributeValue(node, "Number", 128);
         if(stringNumber != null) setNumber(stringNumber);
         Integer integerState = getIntegerAttributeValue(node,"State");
-        if(integerState != null) setState(integerState);
+        if(integerState != null) setState(RequestState.values()[integerState]);
         if(dateDateOfGoodsRequest!=null) setDateOfGoodsRequest(dateDateOfGoodsRequest);
         Date dateDoneDate = getDateTimeAttributeValue(node, "DoneDate");
         if(dateDoneDate!=null) setDoneDate(dateDoneDate);
         String stringComment = getStringAttributeValue(node, "Comment", 128);
         if(stringComment != null) setComment(stringComment);
         guidOfStaff = getStringAttributeValue(node,"GuidOfStaff",36);
-        setSendAll(SendToAssociatedOrgs.SendToAll);
+        setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
     }
 
@@ -96,23 +77,44 @@ public class GoodRequest extends DistributedObject {
 
     private Date dateOfGoodsRequest;
     private String number;
-    private Integer state;
     private Date doneDate;
     private String comment;
     private String guidOfStaff;
     private Staff staff;
-    public static final String[] GOOD_REQUEST_STATES = {"Создан", "К исполнению", "Выполнен"};
+    private RequestState state;
+    private Set<StateChange> stateChangeInternal;
+    private Set<GoodRequestPosition> goodRequestPositionInternal;
 
-    public String getStateSelect() {
-        if (state != null) {
-            return GOOD_REQUEST_STATES[state];
-        } else {
-            return "";
-        }
+    public RequestState getState() {
+        return state;
     }
 
-    public String[] getGoodRequestStates() {
-        return GOOD_REQUEST_STATES;
+    public void setState(RequestState state) {
+        this.state = state;
+    }
+
+    public void setIntState(Integer value) {
+        this.state = RequestState.values()[value];
+    }
+
+    public Integer getIntState() {
+        return this.state.ordinal();
+    }
+
+    Set<GoodRequestPosition> getGoodRequestPositionInternal() {
+        return goodRequestPositionInternal;
+    }
+
+    void setGoodRequestPositionInternal(Set<GoodRequestPosition> goodRequestPositionInternal) {
+        this.goodRequestPositionInternal = goodRequestPositionInternal;
+    }
+
+    Set<StateChange> getStateChangeInternal() {
+        return stateChangeInternal;
+    }
+
+    void setStateChangeInternal(Set<StateChange> stateChangeInternal) {
+        this.stateChangeInternal = stateChangeInternal;
     }
 
     public String getGuidOfStaff() {
@@ -147,14 +149,6 @@ public class GoodRequest extends DistributedObject {
         this.doneDate = doneDate;
     }
 
-    public Integer getState() {
-        return state;
-    }
-
-    public void setState(Integer state) {
-        this.state = state;
-    }
-
     public String getNumber() {
         return number;
     }
@@ -187,6 +181,7 @@ public class GoodRequest extends DistributedObject {
         return formatDate(doneDate);
     }
 
+    //TODO: убрать у класса родителя уже есь подобные методы
     private String formatDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
         if (date != null) {

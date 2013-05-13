@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import org.hibernate.type.EnumType;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -39,14 +41,25 @@ public class Order{
     private Contragent contragent;
     private int state;
     private Long confirmerId;
+    private Date orderDate;
+    private String comments;
+    private OrderTypeEnumType orderType;
+
+    public OrderTypeEnumType getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(OrderTypeEnumType orderType) {
+        this.orderType = orderType;
+    }
 
     protected Order() {
         // For Hibernate only
     }
 
     public Order(CompositeIdOfOrder compositeIdOfOrder, long idOfCashier, long socDiscount, Long trdDiscount, long grantSum, long rSum,
-            Date createTime, long sumByCard, long sumByCash, Client client, Card card, AccountTransaction transaction,
-            POS pos, Contragent contragent) {
+            Date createTime, Date orderDate, long sumByCard, long sumByCash, String comments, Client client, Card card, AccountTransaction transaction,
+            POS pos, Contragent contragent, OrderTypeEnumType orderType) {
         this.compositeIdOfOrder = compositeIdOfOrder;
         this.idOfCashier = idOfCashier;
         this.socDiscount = socDiscount;
@@ -54,6 +67,7 @@ public class Order{
         this.grantSum = grantSum;
         this.rSum = rSum;
         this.createTime = createTime;
+        this.orderDate = orderDate;
         this.sumByCard = sumByCard;
         this.sumByCash = sumByCash;
         this.client = client;
@@ -61,6 +75,8 @@ public class Order{
         this.transaction = transaction;
         this.pos = pos;
         this.contragent = contragent;
+        this.comments = comments;
+        this.orderType = orderType;
     }
 
     public CompositeIdOfOrder getCompositeIdOfOrder() {
@@ -80,40 +96,20 @@ public class Order{
         this.confirmerId = confirmerId;
     }
 
-    public Org getOrg() {
-        return org;
+    public String getComments() {
+        return comments;
     }
 
-    private void setOrg(Org org) {
-        // For Hibernate only
-        this.org = org;
+    protected void setComments(String comments) {
+        this.comments = comments;
     }
 
-    public Card getCard() {
-        return card;
+    public Date getOrderDate() {
+        return orderDate;
     }
 
-    private void setCard(Card card) {
-        // For Hibernate only
-        this.card = card;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
-    private void setClient(Client client) {
-        // For Hibernate only
-        this.client = client;
-    }
-
-    public AccountTransaction getTransaction() {
-        return transaction;
-    }
-
-    private void setTransaction(AccountTransaction accountTransaction) {
-        // For Hibernate only
-        this.transaction = accountTransaction;
+    protected void setOrderDate(Date orderDate) {
+        this.orderDate = orderDate;
     }
 
     public Long getIdOfCashier() {
@@ -186,6 +182,50 @@ public class Order{
         this.sumByCash = sumByCash;
     }
 
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
+    public Org getOrg() {
+        return org;
+    }
+
+    private void setOrg(Org org) {
+        // For Hibernate only
+        this.org = org;
+    }
+
+    public Card getCard() {
+        return card;
+    }
+
+    private void setCard(Card card) {
+        // For Hibernate only
+        this.card = card;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    private void setClient(Client client) {
+        // For Hibernate only
+        this.client = client;
+    }
+
+    public AccountTransaction getTransaction() {
+        return transaction;
+    }
+
+    private void setTransaction(AccountTransaction accountTransaction) {
+        // For Hibernate only
+        this.transaction = accountTransaction;
+    }
+
     public POS getPos() {
         return pos;
     }
@@ -200,14 +240,6 @@ public class Order{
 
     public void setContragent(Contragent contragent) {
         this.contragent = contragent;
-    }
-
-    public int getState() {
-        return state;
-    }
-
-    public void setState(int state) {
-        this.state = state;
     }
 
     private Set<OrderDetail> getOrderDetailsInternal() {

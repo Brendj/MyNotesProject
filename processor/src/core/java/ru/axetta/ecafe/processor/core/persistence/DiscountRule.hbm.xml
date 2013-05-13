@@ -34,6 +34,9 @@
         <property name="operationOr" column="OperationOr" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
 
+        <property name="complexesMap" column="ComplexesMap" type="string" length="512"/>
+
+
         <property name="categoryDiscounts" column="CategoriesDiscounts" type="string" length="64" not-null="true" />
 
         <!-- Cвязь многие ко многим между таблицами DiscountRules и CategoryDiscountRule -->

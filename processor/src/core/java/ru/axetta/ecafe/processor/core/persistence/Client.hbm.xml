@@ -57,7 +57,7 @@
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="discountMode" column="DiscountMode" type="integer" not-null="true"/>
         <property name="balance" column="Balance" type="long" not-null="true" update="false"/>
-        <property name="limit" column='"Limit"' type="long" not-null="true"/>
+        <property name="limit" column="Limits" type="long" not-null="true"/>
         <property name="expenditureLimit" column="ExpenditureLimit" type="long" not-null="true"/>
         <property name="categoriesDiscounts" column="CategoriesDiscounts" type="string" not-null="true"/>
         <property name="san" column="San" type="string" length="11" not-null="false"/>

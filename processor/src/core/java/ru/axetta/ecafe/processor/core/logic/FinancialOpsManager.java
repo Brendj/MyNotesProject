@@ -132,8 +132,8 @@ public class FinancialOpsManager {
 
         Order order = new Order(new CompositeIdOfOrder(idOfOrg, payment.getIdOfOrder()), payment.getIdOfCashier(),
                 payment.getSocDiscount(), payment.getTrdDiscount(), payment.getGrant(), payment.getRSum(),
-                payment.getTime(), payment.getSumByCard(), payment.getSumByCash(), client, card, orderTransaction, pos,
-                supplier);
+                payment.getTime(),payment.getOrderDate(), payment.getSumByCard(), payment.getSumByCash(),payment.getComments(), client, card, orderTransaction, pos,
+                supplier, payment.getOrderType());
 
         Long sumByCard = order.getSumByCard();
         Long budgetSum = order.getSocDiscount() + order.getGrantSum();

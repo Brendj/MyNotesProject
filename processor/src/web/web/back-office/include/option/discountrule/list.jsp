@@ -33,16 +33,16 @@
                 <rich:column rowspan="2" headerClass="center-aligned-column">
                     <h:outputText value="Тип условия" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column colspan="10" headerClass="center-aligned-column" width="200%">
+                <%--<rich:column colspan="10" headerClass="center-aligned-column" width="200%">
                     <h:outputText value="Комплексы" escape="true" styleClass="column-header"/>
-                </rich:column>
+                </rich:column>--%>
                 <rich:column rowspan="2" headerClass="center-aligned-column">
                     <h:outputText value="Редактировать" escape="true" styleClass="column-header"/>
                 </rich:column>
                 <rich:column rowspan="2" headerClass="center-aligned-column">
                     <h:outputText value="Удалить" escape="true" styleClass="column-header"/>
                 </rich:column>
-                <rich:column headerClass="center-aligned-column"  breakBefore="true" width="200%">
+                <%--<rich:column headerClass="center-aligned-column"  breakBefore="true" width="200%">
                     <h:outputText value="0" escape="true" styleClass="column-header"/>
                 </rich:column>
                 <rich:column headerClass="center-aligned-column" >
@@ -71,7 +71,7 @@
                 </rich:column>
                 <rich:column headerClass="center-aligned-column">
                     <h:outputText value="9" escape="true" styleClass="column-header"/>
-                </rich:column>
+                </rich:column>--%>
             </rich:columnGroup>
         </f:facet>
         <rich:column >
@@ -86,13 +86,13 @@
         <rich:column>
             <h:outputText styleClass="output-text" value="#{item.categoryDiscounts}" />
         </rich:column>
-           <rich:column>
-               <h:outputText styleClass="output-text" value="#{item.categoryOrgs}" />
-           </rich:column>
+        <rich:column>
+            <h:outputText styleClass="output-text" value="#{item.categoryOrgs}" />
+        </rich:column>
         <rich:column>
             <h:outputText value="#{item.operationor?'ИЛИ':'И'}"/>
         </rich:column>
-        <rich:column>
+     <%--   <rich:column>
             <h:outputText styleClass="output-text" value="#{item.complex0}" />
         </rich:column>
         <rich:column>
@@ -121,7 +121,7 @@
         </rich:column>
         <rich:column>
             <h:outputText styleClass="output-text" value="#{item.complex9}" />
-        </rich:column>
+        </rich:column>--%>
         <rich:column>
             <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{ruleEditPage.show}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />

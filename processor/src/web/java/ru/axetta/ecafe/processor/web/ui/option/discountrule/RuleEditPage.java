@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.*;
@@ -36,22 +38,36 @@ import java.util.*;
 public class RuleEditPage extends BasicWorkspacePage implements CategoryListSelectPage.CompleteHandlerList, CategoryOrgListSelectPage.CompleteHandlerList{
 
     private String description;
-    private boolean complex0;
-    private boolean complex1;
-    private boolean complex2;
-    private boolean complex3;
-    private boolean complex4;
-    private boolean complex5;
-    private boolean complex6;
-    private boolean complex7;
-    private boolean complex8;
-    private boolean complex9;
     private int priority;
     private boolean operationor;
     private String categoryDiscounts;
     private List<Long> idOfCategoryList = new ArrayList<Long>();
     private String filter = "Не выбрано";
     private Set<CategoryDiscount> categoryDiscountSet;
+
+    private Integer[] selectedComplexIds;
+
+    public Integer[] getSelectedComplexIds() {
+        return selectedComplexIds;
+    }
+
+    public void setSelectedComplexIds(Integer[] selectedComplexIds) {
+        this.selectedComplexIds = selectedComplexIds;
+    }
+
+    public Object testCheckValues(){
+        printMessage(Arrays.toString(selectedComplexIds));
+        return null;
+    }
+
+    public List<SelectItem> getAvailableComplexs() {
+        List<SelectItem> list = new ArrayList<SelectItem>(50);
+        for (int i=0;i<50;i++) {
+            SelectItem selectItem = new SelectItem(i,"Комплекс "+i);
+            list.add(selectItem);
+        }
+        return list;
+    }
 
     public String getIdOfCategoryOrgListString() {
         return idOfCategoryOrgList.toString().replaceAll("[^(0-9-),]","");
@@ -113,86 +129,6 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         this.description = description;
     }
 
-    public boolean getComplex0() {
-        return complex0;
-    }
-
-    public void setComplex0(boolean complex0) {
-        this.complex0 = complex0;
-    }
-
-    public boolean getComplex1() {
-        return complex1;
-    }
-
-    public void setComplex1(boolean complex1) {
-        this.complex1 = complex1;
-    }
-
-    public boolean getComplex2() {
-        return complex2;
-    }
-
-    public void setComplex2(boolean complex2) {
-        this.complex2 = complex2;
-    }
-
-    public boolean getComplex3() {
-        return complex3;
-    }
-
-    public void setComplex3(boolean complex3) {
-        this.complex3 = complex3;
-    }
-
-    public boolean getComplex4() {
-        return complex4;
-    }
-
-    public void setComplex4(boolean complex4) {
-        this.complex4 = complex4;
-    }
-
-    public boolean getComplex5() {
-        return complex5;
-    }
-
-    public void setComplex5(boolean complex5) {
-        this.complex5 = complex5;
-    }
-
-    public boolean getComplex6() {
-        return complex6;
-    }
-
-    public void setComplex6(boolean complex6) {
-        this.complex6 = complex6;
-    }
-
-    public boolean getComplex7() {
-        return complex7;
-    }
-
-    public void setComplex7(boolean complex7) {
-        this.complex7 = complex7;
-    }
-
-    public boolean getComplex8() {
-        return complex8;
-    }
-
-    public void setComplex8(boolean complex8) {
-        this.complex8 = complex8;
-    }
-
-    public boolean getComplex9() {
-        return complex9;
-    }
-
-    public void setComplex9(boolean complex9) {
-        this.complex9 = complex9;
-    }
-
     public void completeCategoryListSelection(Map<Long, String> categoryMap) throws Exception {
         //To change body of implemented methods use File | Settings | File Templates.
         if(null != categoryMap) {
@@ -246,16 +182,21 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         //CategoryDiscount categoryDiscount = (CategoryDiscount) persistenceSession.load(CategoryDiscount.class, this.categorydiscount.getIdOfCategory());
        // entity.setCategoryDiscount(categoryDiscount);
         entity.setDescription(description);
-        entity.setComplex0(complex0?1:0);
-        entity.setComplex1(complex1?1:0);
-        entity.setComplex2(complex2?1:0);
-        entity.setComplex3(complex3?1:0);
-        entity.setComplex4(complex4?1:0);
-        entity.setComplex5(complex5?1:0);
-        entity.setComplex6(complex6?1:0);
-        entity.setComplex7(complex7?1:0);
-        entity.setComplex8(complex8?1:0);
-        entity.setComplex9(complex9?1:0);
+
+        List<Integer> selectedComplex = Arrays.asList(selectedComplexIds);
+        entity.setComplex0(selectedComplex.contains(0)?1:0);
+        entity.setComplex1(selectedComplex.contains(1) ? 1 : 0);
+        entity.setComplex2(selectedComplex.contains(2) ? 1 : 0);
+        entity.setComplex3(selectedComplex.contains(3) ? 1 : 0);
+        entity.setComplex4(selectedComplex.contains(4) ? 1 : 0);
+        entity.setComplex5(selectedComplex.contains(5) ? 1 : 0);
+        entity.setComplex6(selectedComplex.contains(6) ? 1 : 0);
+        entity.setComplex7(selectedComplex.contains(7) ? 1 : 0);
+        entity.setComplex8(selectedComplex.contains(8) ? 1 : 0);
+        entity.setComplex9(selectedComplex.contains(9) ? 1 : 0);
+        DiscountRule.ComplexBuilder complexBuilder = new DiscountRule.ComplexBuilder(selectedComplex);
+        entity.setComplexesMap(complexBuilder.toString());
+
         entity.setPriority(priority);
         entity.setOperationOr(operationor);
         //entity.setCategoryDiscounts(categoryDiscounts);
@@ -295,16 +236,30 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
 
     private void fill(DiscountRule discountRule) throws Exception {
         this.description = discountRule.getDescription();
-        this.complex0 = discountRule.getComplex0()>0;
-        this.complex1 = discountRule.getComplex1()>0;
-        this.complex2 = discountRule.getComplex2()>0;
-        this.complex3 = discountRule.getComplex3()>0;
-        this.complex4 = discountRule.getComplex4()>0;
-        this.complex5 = discountRule.getComplex5()>0;
-        this.complex6 = discountRule.getComplex6()>0;
-        this.complex7 = discountRule.getComplex7()>0;
-        this.complex8 = discountRule.getComplex8()>0;
-        this.complex9 = discountRule.getComplex9()>0;
+
+        List<Integer> comls = new ArrayList<Integer>();
+        if(StringUtils.isEmpty(discountRule.getComplexesMap())){
+            if(discountRule.getComplex0()>0) comls.add(0);
+            if(discountRule.getComplex1()>0) comls.add(1);
+            if(discountRule.getComplex2()>0) comls.add(2);
+            if(discountRule.getComplex3()>0) comls.add(3);
+            if(discountRule.getComplex4()>0) comls.add(4);
+            if(discountRule.getComplex5()>0) comls.add(5);
+            if(discountRule.getComplex6()>0) comls.add(6);
+            if(discountRule.getComplex7()>0) comls.add(7);
+            if(discountRule.getComplex8()>0) comls.add(8);
+            if(discountRule.getComplex9()>0) comls.add(9);
+        } else {
+            DiscountRule.ComplexBuilder complexBuilder = new DiscountRule.ComplexBuilder(discountRule.getComplexesMap());
+            Map<Integer, Integer> map = complexBuilder.getMap();
+            for (Integer key: map.keySet()){
+                if(map.get(key)>0) comls.add(key);
+            }
+        }
+
+        Integer[] temp = new Integer[comls.size()];
+        this.selectedComplexIds = comls.toArray(temp);
+
         this.priority = discountRule.getPriority();
 
         this.idOfCategoryList.clear();

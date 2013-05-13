@@ -1,9 +1,14 @@
 package ru.axetta.ecafe.processor.web.ui.org.goodRequest;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequest;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.RequestState;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +19,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -26,30 +32,24 @@ public class GoodRequestListPage extends BasicWorkspacePage {
     private Date baseDate = DateUtils.addMonths(new Date(), -1);
     private Date endDate = new Date();
     private Integer deletedState = 2;
-    private List<Integer> stateList = new ArrayList<Integer>();
+    private List<RequestState> stateList = new ArrayList<RequestState>();
+    private Integer[] requestState;
+    private SelectItem[] stateSelectItemList;
+    private static RequestState[] requestStates = RequestState.values();
 
-    SelectItem[] stateSelectItemList;
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    public GoodRequestListPage() {
-        super();
-        stateSelectItemList = new SelectItem[GoodRequest.GOOD_REQUEST_STATES.length];
-        for (int i = 0; i < GoodRequest.GOOD_REQUEST_STATES.length; i++) {
-            stateSelectItemList[i] = new SelectItem(i, GoodRequest.GOOD_REQUEST_STATES[i]);
-        }
-    }
+    @Autowired
+    private GoodRequestService goodRequestService;
 
     @Override
     public void onShow() {
+        stateSelectItemList = new SelectItem[requestStates.length];
+        for (int i = 0; i < requestStates.length; i++) {
+            stateSelectItemList[i] = new SelectItem(i, requestStates[i].toString());
+        }
         baseDate = DateUtils.addMonths(new Date(), -1);
         endDate = new Date();
         deletedState = 2;
         stateList.clear();
-        for (int i = 0; i < GoodRequest.GOOD_REQUEST_STATES.length; i++) {
-            stateList.add(i);
-        }
     }
 
     public Object onSearch() throws Exception{
@@ -62,32 +62,12 @@ public class GoodRequestListPage extends BasicWorkspacePage {
         return null;
     }
 
-    @Transactional
     public void reload() throws Exception{
-        String where = "(createdDate between " +  baseDate.getTime() + " and " + endDate.getTime() + ")";
-        if (idOfOrg != null) {
-            where = (where.equals("")?"":where + " and ") + "orgowner=" + idOfOrg;
+        stateList.clear();
+        for (Integer i: requestState){
+            stateList.add(RequestState.values()[i]);
         }
-        if ((stateList != null) && !stateList.isEmpty()) {
-            where = (where.equals("")?"":where + " and (");
-            for (Integer state : stateList) {
-                if (state != null) {
-                    where += "state=" + state + " or ";
-                }
-            }
-            where = where.substring(0,where.length() - 4);
-            where += ")";
-        }
-        if (deletedState != 2) {
-            boolean deletedFlag = false;
-            if (deletedState == 1) {
-                deletedFlag = true;
-            }
-            where = (where.equals("")?"":where + " and ") + "deletedstate=" + deletedFlag;
-        }
-        where = (where.equals("")?"":" where ") + where;
-        TypedQuery<GoodRequest> query = entityManager.createQuery("from GoodRequest" + where, GoodRequest.class);
-        goodRequestList = query.getResultList();
+        goodRequestList = goodRequestService.findByFilter(idOfOrg,stateList,baseDate,endDate,deletedState);
     }
 
     public String getPageTitle() {
@@ -125,12 +105,20 @@ public class GoodRequestListPage extends BasicWorkspacePage {
             } else {
                 filter.append(", только со статусами ");
             }
-            for (int i = 0; i < stateList.size(); i++) {
-                filter.append("\"" + GoodRequest.GOOD_REQUEST_STATES[stateList.get(i)] + "\", ");
+            for (RequestState aStateList : stateList) {
+                filter.append("\"").append(requestStates[aStateList.ordinal()].toString()).append("\", ");
             }
             filter = new StringBuffer().append(filter.substring(0, filter.length() - 2));
         }
         return filter.toString();
+    }
+
+    public Integer[] getRequestState() {
+        return requestState;
+    }
+
+    public void setRequestState(Integer[] requestState) {
+        this.requestState = requestState;
     }
 
     public Long getIdOfOrg() {
@@ -171,18 +159,6 @@ public class GoodRequestListPage extends BasicWorkspacePage {
 
     public void setDeletedState(Integer deletedState) {
         this.deletedState = deletedState;
-    }
-
-    public List<Integer> getStateList() {
-        return stateList;
-    }
-
-    public void setStateList(List<Integer> stateList) {
-        this.stateList = stateList;
-    }
-
-    public int getStatesListSize() {
-        return GoodRequest.GOOD_REQUEST_STATES.length;
     }
 
 }

@@ -21,6 +21,8 @@ public class OrderDetail {
     public static final int STATE_COMMITED=0, STATE_CANCELED=1;
 
     public static final int TYPE_DISH_ITEM = 0;
+    public static final int TYPE_COMPLEX_MIN = 50;
+    public static final int TYPE_COMPLEX_MAX = 99;
     public static final int TYPE_COMPLEX_0 = 50;
     public static final int TYPE_COMPLEX_1 = 51;
     public static final int TYPE_COMPLEX_2 = 52;
@@ -31,6 +33,8 @@ public class OrderDetail {
     public static final int TYPE_COMPLEX_7 = 57;
     public static final int TYPE_COMPLEX_8 = 58;
     public static final int TYPE_COMPLEX_9 = 59;
+    public static final int TYPE_COMPLEX_ITEM_MIN = 150;
+    public static final int TYPE_COMPLEX_ITEM_MAX = 199;
     public static final int TYPE_COMPLEX_ITEM_0 = 150;
     public static final int TYPE_COMPLEX_ITEM_1 = 151;
     public static final int TYPE_COMPLEX_ITEM_2 = 152;

@@ -1512,6 +1512,15 @@ public class SyncResponse {
             private int priority;
             private String categoryDiscounts;
             private Boolean operationor;
+            private String complexesMap;
+
+            public String getComplexesMap() {
+                return complexesMap;
+            }
+
+            public void setComplexesMap(String complexesMap) {
+                this.complexesMap = complexesMap;
+            }
 
             public Boolean getOperationor() {
                 return operationor;
@@ -1546,12 +1555,13 @@ public class SyncResponse {
                 this.complex9 = discountRule.getComplex9();
                 this.priority = discountRule.getPriority();
                 this.operationor = discountRule.getOperationOr();
+                this.complexesMap = discountRule.getComplexesMap();
             }
 
 
             public DCRI(long idOfRule, String description, String categoryDiscounts, int complex0, int complex1,
                     int complex2, int complex3, int complex4, int complex5, int complex6, int complex7, int complex8,
-                    int complex9, int priority, Boolean operationor) {
+                    int complex9, int priority, Boolean operationor, String complexesMap) {
                 this.idOfRule = idOfRule;
                 this.description = description;
                 this.categoryDiscounts = categoryDiscounts;
@@ -1567,6 +1577,7 @@ public class SyncResponse {
                 this.complex9 = complex9;
                 this.priority = priority;
                 this.operationor = operationor;
+                this.complexesMap = complexesMap;
             }
 
             public long getIdOfRule() {
@@ -1634,6 +1645,9 @@ public class SyncResponse {
                 element.setAttribute("Complex9", Integer.toString(this.complex9));
                 element.setAttribute("Priority", Integer.toString(this.priority));
                 element.setAttribute("OperationOr", Boolean.toString(this.operationor));
+                if(StringUtils.isNotEmpty(complexesMap)){
+                    element.setAttribute("ComplexesMap", this.complexesMap);
+                }
                 return element;
             }
 
@@ -1643,7 +1657,8 @@ public class SyncResponse {
                         + ", description='" + description + '\'' + ", complex0=" + complex0 + ", complex1=" + complex1
                         + ", complex2=" + complex2 + ", complex3=" + complex3 + ", complex4=" + complex4 + ", complex5="
                         + complex5 + ", complex6=" + complex6 + ", complex7=" + complex7 + ", complex8=" + complex8
-                        + ", complex9=" + complex9 + ", priority=" + priority +", operationor=" + operationor +'}';
+                        + ", complex9=" + complex9 + ", priority=" + priority +", operationor=" +operationor
+                        +", complexesMap=\'" +complexesMap  +'\'' +'}';
             }
         }
 

@@ -5,20 +5,21 @@
 package ru.axetta.ecafe.processor.core.daoservices.order;
 
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.PartGroupItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampItem;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -34,45 +35,90 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         String sql;
         sql = "select g.pathPart3 as level1, g.pathPart4 as level2, sum(details.qty) as qty, ord.createTime as date" +
                 " from OrderDetail details left join details.good g left join details.order ord " +
-                " where g is not null and details.org.idOfOrg=:idOfOrg and ord.createTime between :begin and :end" +
+                " where g is not null and details.org.idOfOrg=:idOfOrg and ord.createTime between :begin and :end and " +
+                " details.socDiscount>0 and ord.orderType in :orderTypes" +
                 " group by ord.createTime, g.fullName, details.qty";
         Query query = getSession().createQuery(sql);
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("begin",start);
         query.setParameter("end",end);
+        Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>(3);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.DEFAULT);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.UNKNOWN);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN);
+        query.setParameterList("orderTypes", orderTypeEnumTypeSet);
         query.setResultTransformer(Transformers.aliasToBean(RegisterStampItem.class));
         return (List<RegisterStampItem>) query.list();
     }
 
     @SuppressWarnings("unchecked")
-    public List<PartGroupItem> getCountGroup(Long idOfOrg, Date start, Date end){
-        String sql;
-        sql = "select count(g.pathPart3) as numCount, g.pathPart3 as name " +
-                " from OrderDetail details left join details.good g left join details.order ord " +
-                " where g is not null and details.org.idOfOrg=:idOfOrg and ord.createTime between :begin and :end" +
-                " group by g.pathPart3 ";
-        Query query = getSession().createQuery(sql);
-        query.setParameter("idOfOrg",idOfOrg);
-        query.setParameter("begin",start);
-        query.setParameter("end", end);
-        query.setResultTransformer(Transformers.aliasToBean(PartGroupItem.class));
-        return (List<PartGroupItem>) query.list();
+    public Long findNotNullGoodsFullNameByOrgByDayAndGoodEq(Long idOfOrg, Date start, String part4) {
+        String sql ="select sum(orderdetail.qty) from cf_orders cforder" +
+                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
+                "   and orderdetail.idoforder = cforder.idoforder" +
+                " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
+                " where cforder.createddate between :start and :end and orderdetail.socdiscount>0 and" +
+                " cforder.idoforg=:idoforg and split_part(good.fullname, '/', 4) like '"+part4+"'" +
+                " and cforder.ordertype in (0,1,4) "+
+                " group by orderdetail.qty ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idoforg",idOfOrg);
+        query.setParameter("start",start.getTime());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+        calendar.add(Calendar.DATE, 1);
+        query.setParameter("end",calendar.getTimeInMillis());
+        List list = query.list();
+        if(list==null || list.isEmpty()){
+            return  0L;
+        } else {
+            return new Long(list.get(0).toString());
+        }
     }
 
     @SuppressWarnings("unchecked")
-    public List<PartGroupItem> getCountSubGroup(Long idOfOrg, Date start, Date end, String partName){
-        String sql;
-        sql = "select count(g.pathPart4) as numCount, g.pathPart4 as name " +
-                " from OrderDetail details left join details.good g left join details.order ord " +
-                " where g.pathPart3=:partName and g is not null and details.org.idOfOrg=:idOfOrg and ord.createTime between :begin and :end" +
-                " group by g.pathPart4 ";
+    public Long findNotNullGoodsFullNameByOrgByDailySampleAndGoodEq(Long idOfOrg, Date start, Date end, String part4) {
+        String sql ="select sum(orderdetail.qty) from cf_orders cforder" +
+                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
+                "   and orderdetail.idoforder = cforder.idoforder" +
+                " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
+                " where cforder.createddate between :start and :end and orderdetail.socdiscount>0 and" +
+                " cforder.idoforg=:idoforg and split_part(good.fullname, '/', 4) like '"+part4+"'" +
+                " and cforder.ordertype in (5) "+
+                " group by orderdetail.qty ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idoforg",idOfOrg);
+        query.setParameter("start",start.getTime());
+        query.setParameter("end",end.getTime());
+        List list = query.list();
+        if(list==null || list.isEmpty()){
+            return  0L;
+        } else {
+            return new Long(list.get(0).toString());
+        }
+    }
+
+    public List<Long> findAllIdOfGoods() {
+        return null;
+    }
+
+    /* получаем список всех  */
+    @SuppressWarnings("unchecked")
+    public List<GoodItem> findAllGoods(Long idOfOrg){
+        Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>(3);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.DEFAULT);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.UNKNOWN);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.DAILY_SAMPLE);
+        String sql = "select good.globalId as globalId, good.pathPart3 as pathPart3, good.pathPart4 as pathPart4, good.fullName as fullName "
+                + " from OrderDetail details "
+                + " left join details.good good left join details.order ord left join ord.org o"
+                + " where ord.orderType in :orderType and details.good is not null and o.idOfOrg=:idOfOrg";
         Query query = getSession().createQuery(sql);
-        query.setParameter("partName",partName);
+        query.setParameterList("orderType",orderTypeEnumTypeSet);
         query.setParameter("idOfOrg",idOfOrg);
-        query.setParameter("begin",start);
-        query.setParameter("end", end);
-        query.setResultTransformer(Transformers.aliasToBean(PartGroupItem.class));
-        return (List<PartGroupItem>) query.list();
+        query.setResultTransformer(Transformers.aliasToBean(GoodItem.class));
+        return  (List<GoodItem>) query.list();
     }
 
 }

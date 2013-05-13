@@ -654,9 +654,9 @@ public class Processor implements SyncProcessor,
 
     private static SyncRequest.PaymentRegistry.Payment.Purchase findPurchase(
             SyncRequest.PaymentRegistry.Payment payment, Long idOfOrderDetail) throws Exception {
-        Enumeration<SyncRequest.PaymentRegistry.Payment.Purchase> purchases = payment.getPurchases();
-        while (purchases.hasMoreElements()) {
-            SyncRequest.PaymentRegistry.Payment.Purchase purchase = purchases.nextElement();
+        Iterator<SyncRequest.PaymentRegistry.Payment.Purchase> purchases = payment.getPurchases();
+        while (purchases.hasNext()) {
+            SyncRequest.PaymentRegistry.Payment.Purchase purchase = purchases.next();
             if (idOfOrderDetail.equals(purchase.getIdOfOrderDetail())) {
                 return purchase;
             }
@@ -873,9 +873,9 @@ public class Processor implements SyncProcessor,
             long totalPurchaseDiscount = 0;
             long totalPurchaseRSum = 0;
             // Register order details (purchase)
-            Enumeration<SyncRequest.PaymentRegistry.Payment.Purchase> purchases = payment.getPurchases();
-            while (purchases.hasMoreElements()) {
-                SyncRequest.PaymentRegistry.Payment.Purchase purchase = purchases.nextElement();
+            Iterator<SyncRequest.PaymentRegistry.Payment.Purchase> purchases = payment.getPurchases();
+            while (purchases.hasNext()) {
+                SyncRequest.PaymentRegistry.Payment.Purchase purchase = purchases.next();
                 if (null != DAOUtils.findOrderDetail(persistenceSession,
                         new CompositeIdOfOrderDetail(idOfOrg, purchase.getIdOfOrderDetail()))) {
                     return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 120, String.format(
@@ -2114,11 +2114,6 @@ public class Processor implements SyncProcessor,
         return resEnterEvents;
     }
 
-    /* private static String createKey(String author, String title, String title2, String publisher)
-           throws NoSuchAlgorithmException {
-       return CryptoUtils.MD5(author + title + title2 + publisher);
-   } */
-
     private SyncResponse.ResCategoriesDiscountsAndRules processCategoriesDiscountsAndRules(Long idOfOrg) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -2181,37 +2176,14 @@ public class Processor implements SyncProcessor,
             Criteria criteria = persistenceSession.createCriteria(CategoryDiscount.class);
 
 
-            List<CategoryDiscount> categoryDiscounts = criteria.list();
+            List<CategoryDiscount> categoryDiscounts = (List<CategoryDiscount>) criteria.list();
             for (CategoryDiscount categoryDiscount : categoryDiscounts) {
                 SyncResponse.ResCategoriesDiscountsAndRules.DCI dci = new SyncResponse.ResCategoriesDiscountsAndRules.DCI(
                         categoryDiscount.getIdOfCategoryDiscount(), categoryDiscount.getCategoryName(),
                         categoryDiscount.getCategoryType().getValue(), categoryDiscount.getDiscountRules());
                 resCategoriesDiscountsAndRules.addDCI(dci);
             }
-            /*
-         criteria = persistenceSession.createCriteria(DiscountRule.class);
-         List<DiscountRule> discountRules = criteria.list();
-         for (DiscountRule discountRule : discountRules) {
-             SyncResponse.ResCategoriesDiscountsAndRules.DCRI dcri =
-                     new SyncResponse.ResCategoriesDiscountsAndRules.DCRI(
-                             discountRule.getIdOfRule(),
-                             discountRule.getDescription(),
-                             discountRule.getCategoryDiscounts(),
-                             discountRule.getComplex0(),
-                             discountRule.getComplex1(),
-                             discountRule.getComplex2(),
-                             discountRule.getComplex3(),
-                             discountRule.getComplex4(),
-                             discountRule.getComplex5(),
-                             discountRule.getComplex6(),
-                             discountRule.getComplex7(),
-                             discountRule.getComplex8(),
-                             discountRule.getComplex9(),
-                             discountRule.getPriority(),
-                             discountRule.isOperationOr());
-             resCategoriesDiscountsAndRules.addDCRI(dcri);
-         }
-            */
+
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -2375,64 +2347,6 @@ public class Processor implements SyncProcessor,
         }
     }
 
-    /* public void changePaymentOrderStatus(Long idOfContragent, Long idOfClientPaymentOrder, int orderStatus,
-            Long contragentSum, String idOfPayment) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug(String.format(
-                    "IdOfContragent: %d, IdOfClientPaymentOrder: %d, OrderStatus: %d, ContragentSum: %d, IdOfPayment: %s",
-                    idOfContragent, idOfClientPaymentOrder, orderStatus, contragentSum, idOfPayment));
-        }
-        if (!(ClientPaymentOrder.ORDER_STATUS_TRANSFER_ACCEPTED == orderStatus
-                || ClientPaymentOrder.ORDER_STATUS_TRANSFER_COMPLETED == orderStatus)) {
-            throw new IllegalArgumentException(String.format("Anacceptable OrderStatus: %d", orderStatus));
-        }
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = persistenceSessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-
-            ClientPaymentOrder clientPaymentOrder = DAOUtils
-                    .getClientPaymentOrderReference(persistenceSession, idOfClientPaymentOrder);
-            if (!idOfContragent.equals(clientPaymentOrder.getContragent().getIdOfContragent())) {
-                throw new IllegalArgumentException(String.format(
-                        "Contragent doesn't own this order, IdOfCOntragnet: %d, ClientPaymentOrder is: %s",
-                        idOfContragent, clientPaymentOrder));
-            }
-            if (!contragentSum.equals(clientPaymentOrder.getContragentSum())) {
-                logger.warn(
-                        String.format("Invalid sum: %d, ClientPaymentOrder: %s", contragentSum, clientPaymentOrder));
-                //throw new IllegalArgumentException(
-                //        String.format("Invalid sum: %d, ClientPaymentOrder: %s", contragentSum, clientPaymentOrder));
-            }
-            if (clientPaymentOrder.canApplyOrderStatus(orderStatus)) {
-                clientPaymentOrder.setOrderStatus(orderStatus);
-                clientPaymentOrder.setIdOfPayment(idOfPayment);
-                persistenceSession.update(clientPaymentOrder);
-                if (ClientPaymentOrder.ORDER_STATUS_TRANSFER_COMPLETED == orderStatus) {
-                    Client client = clientPaymentOrder.getClient();
-                    // Ищем подходящую карту
-                    //Card paymentCard = client.findActiveCard(persistenceSession, null);
-                    //if (null == paymentCard) {
-                    //    // Нет карты, подходящей для зачисления платежа
-                    //    throw new IllegalArgumentException(String.format(
-                    //            "Card approaching for transfer not found, IdOfContragent == %s, IdOfClient == %s",
-                    //            clientPaymentOrder.getContragent().getIdOfContragent(), client.getIdOfClient()));
-                    //}
-                    RuntimeContext.getFinancialOpsManager()
-                            .createClientPaymentWithOrder(persistenceSession, clientPaymentOrder, client);
-                }
-            }
-
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-    }
-*/
     private static void processSyncDiaryTimesheetDayValue(Session persistenceSession, Org organization, Date date,
             SyncRequest.ReqDiary.ReqDiaryTimesheet.ReqDiaryValue reqDiaryValue, String parsedDayValueType,
             String parsedDayValue) throws Exception {
@@ -2695,9 +2609,9 @@ public class Processor implements SyncProcessor,
     private String[] generatePaymentNotificationParams(Session session, Client client, SyncRequest.PaymentRegistry.Payment payment) {
         long complexes = 0L;
         long others = 0L;
-        Enumeration<SyncRequest.PaymentRegistry.Payment.Purchase> purchases = payment.getPurchases();
-        while (purchases.hasMoreElements()) {
-            SyncRequest.PaymentRegistry.Payment.Purchase purchase = purchases.nextElement();
+        Iterator<SyncRequest.PaymentRegistry.Payment.Purchase> purchases = payment.getPurchases();
+        while (purchases.hasNext()) {
+            SyncRequest.PaymentRegistry.Payment.Purchase purchase = purchases.next();
             if (purchase.getType() >= OrderDetail.TYPE_COMPLEX_0 && purchase.getType() <= OrderDetail.TYPE_COMPLEX_9) {
                 complexes += purchase.getSocDiscount() + purchase.getRPrice();
             } else {

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync;
 
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
+import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 
@@ -55,9 +56,15 @@ public class SyncRequest {
         return node.getTextContent();
     }
 
-    //public int getType() {
-    //    return type;
-    //}
+    private static String getStringValueNullSafe(NamedNodeMap namedNodeMap, String name, int length) throws Exception {
+        Node node = namedNodeMap.getNamedItem(name);
+        if (null == node) {
+            return null;
+        }
+        String result = node.getTextContent();
+        if(result.length()>length) return result.substring(0, length);
+        return result;
+    }
 
     public static class PaymentRegistry {
 
@@ -90,6 +97,7 @@ public class SyncRequest {
                         if (menuOutput == null) {
                             menuOutput = "";
                         }
+
                         int type = 0; // свободный выбор
                         String typeStr = getStringValueNullSafe(namedNodeMap, "T");
                         if (typeStr != null) {
@@ -132,7 +140,8 @@ public class SyncRequest {
                 private final String guidOfGoods;
 
                 public Purchase(long discount, long socDiscount, long idOfOrderDetail, String name, long qty,
-                        long rPrice, String rootMenu, String menuOutput, int type, String menuGroup, int menuOrigin, String itemCode, String guidOfGoods) {
+                        long rPrice, String rootMenu, String menuOutput, int type, String menuGroup, int menuOrigin,
+                        String itemCode, String guidOfGoods) {
                     this.discount = discount;
                     this.socDiscount = socDiscount;
                     this.idOfOrderDetail = idOfOrderDetail;
@@ -221,6 +230,14 @@ public class SyncRequest {
                     NamedNodeMap namedNodeMap = paymentNode.getAttributes();
                     Long cardNo = getLongValueNullSafe(namedNodeMap, "CardNo");
                     Date date = loadContext.timeFormat.parse(namedNodeMap.getNamedItem("Date").getTextContent());
+                    /* поддержка версий которые не высылают OrderDate в эту колонку записываются дата из колоки Date */
+                    String orderDateStr = getStringValueNullSafe(namedNodeMap,"OrderDate");
+                    Date orderDate = null;
+                    if (orderDateStr == null) {
+                        orderDate = date;
+                    } else {
+                        loadContext.timeFormat.parse(orderDateStr);
+                    }
                     Long socDiscount = 0L;
                     Long trdDiscount = 0L;
                     long rSum = getLongValue(namedNodeMap, "rSum");
@@ -261,14 +278,25 @@ public class SyncRequest {
                         }
                         purchaseNode = purchaseNode.getNextSibling();
                     }
-                    return new Payment(cardNo, date, socDiscount, trdDiscount, grant, idOfClient, idOfOrder,
-                            idOfCashier, sumByCard, sumByCash, rSum, idOfPOS,confirmerId, purchases);
+
+                    String comments = getStringValueNullSafe(namedNodeMap,"Comments",90);
+
+                    // тип по умолчанию
+                    int orderType = 1;
+                    String orderTypeStr = getStringValueNullSafe(namedNodeMap, "OrderType");
+                    if (orderTypeStr != null) {
+                        orderType = Integer.parseInt(orderTypeStr);
+                    }
+
+                    return new Payment(cardNo, date, orderDate, socDiscount, trdDiscount, grant, idOfClient, idOfOrder,
+                            idOfCashier, sumByCard, sumByCash, rSum, idOfPOS,confirmerId,comments, OrderTypeEnumType.fromInteger(orderType), purchases);
                 }
 
             }
 
             private final Long cardNo;
             private final Date time;
+            private final Date orderDate;
             private final Long socDiscount;
             private final Long trdDiscount;
             private final Long confirmerId;
@@ -280,13 +308,16 @@ public class SyncRequest {
             private final long sumByCash;
             private final long rSum;
             private final Long idOfPOS;
+            private final String comments;
+            private final OrderTypeEnumType orderType;
             private final List<Purchase> purchases;
 
-            public Payment(Long cardNo, Date time, long socDiscount, long trdDiscount, long grant, Long idOfClient,
+            public Payment(Long cardNo, Date time, Date orderDate, long socDiscount, long trdDiscount, long grant, Long idOfClient,
                     long idOfOrder, long idOfCashier, long sumByCard, long sumByCash, long rSum, Long idOfPOS, Long confirmerId,
-                    List<Purchase> purchases) {
+                    String comments, OrderTypeEnumType orderType, List<Purchase> purchases) {
                 this.cardNo = cardNo;
                 this.time = time;
+                this.orderDate = orderDate;
                 this.socDiscount = socDiscount;
                 this.trdDiscount = trdDiscount;
                 this.confirmerId = confirmerId;
@@ -298,6 +329,8 @@ public class SyncRequest {
                 this.sumByCash = sumByCash;
                 this.rSum = rSum;
                 this.idOfPOS = idOfPOS;
+                this.comments = comments;
+                this.orderType = orderType;
                 this.purchases = purchases;
             }
 
@@ -353,8 +386,20 @@ public class SyncRequest {
                 return idOfPOS;
             }
 
-            public Enumeration<Purchase> getPurchases() {
-                return Collections.enumeration(purchases);
+            public Date getOrderDate() {
+                return orderDate;
+            }
+
+            public String getComments() {
+                return comments;
+            }
+
+            public Iterator<Purchase> getPurchases() {
+                return purchases.iterator();
+            }
+
+            public OrderTypeEnumType getOrderType() {
+                return orderType;
             }
 
             @Override
@@ -1710,37 +1755,18 @@ public class SyncRequest {
             public ClientRegistryRequest build(Node clientRegistryRequestNode) throws Exception {
                 long currentVersion = Long.parseLong(
                         clientRegistryRequestNode.getAttributes().getNamedItem("CurrentVersion").getTextContent());
-                Node friendlyOrganizationNode = clientRegistryRequestNode.getAttributes().getNamedItem("friendlyOrganization");
-                Map<Long, Long> idOfFriendlyOrganization = new HashMap<Long, Long>();
-                if(friendlyOrganizationNode!=null){
-                    StrTokenizer tokenizer = new StrTokenizer(friendlyOrganizationNode.getTextContent(),";");
-                    tokenizer.getTokenList();
-                    for(Object obj: tokenizer.getTokenList()){
-                        String str = (String) obj;
-                        String[] arr= str.split("=");
-                        try{
-                            idOfFriendlyOrganization.put(Long.parseLong(arr[0]), Long.parseLong(arr[1]));
-                        } catch (Exception e){}
-                    }
-                }
-                return new ClientRegistryRequest(currentVersion, idOfFriendlyOrganization);
+                return new ClientRegistryRequest(currentVersion);
             }
         }
 
         private final long currentVersion;
-        private final Map<Long,Long> idOfFriendlyOrganization;
 
-        public ClientRegistryRequest(long currentVersion, Map<Long, Long> idOfFriendlyOrganization) {
+        public ClientRegistryRequest(long currentVersion) {
             this.currentVersion = currentVersion;
-            this.idOfFriendlyOrganization = idOfFriendlyOrganization;
         }
 
         public long getCurrentVersion() {
             return currentVersion;
-        }
-
-        public Map<Long, Long> getIdOfFriendlyOrganization() {
-            return idOfFriendlyOrganization;
         }
 
         @Override

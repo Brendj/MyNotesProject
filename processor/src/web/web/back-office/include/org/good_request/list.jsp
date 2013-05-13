@@ -34,9 +34,7 @@
                 </h:selectOneMenu>
 
                 <h:outputText value="Выводить только со статусами" styleClass="output-text" escape="true"/>
-                <h:selectManyListbox id="selectStateMenu" size="#{goodRequestListPage.statesListSize}"
-                                     converter="javax.faces.Integer" value="#{goodRequestListPage.stateList}"
-                                     style="width: 250px;">
+                <h:selectManyListbox id="selectStateMenu" value="#{goodRequestListPage.requestState}">
                     <f:selectItems value="#{goodRequestListPage.stateSelectItemList}"/>
                 </h:selectManyListbox>
 
@@ -59,67 +57,71 @@
         </f:facet>
     </a4j:status>
 
-    <rich:dataTable id="goodRequestListTable" width="700" var="goodRequest" value="#{goodRequestListPage.goodRequestList}" rendered="#{!goodRequestListPage.emptyGoodRequestList}"
-                    rows="20" rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer">
-        <rich:column  headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText value="№" styleClass="output-text" escape="true"/>
-            </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{row+1}"
-                             action="#{goodRequestPositionListPage.onSearch}" styleClass="command-link">
-                <f:setPropertyActionListener value="#{goodRequest.globalId}" target="#{goodRequestPositionListPage.idOfGoodRequest}" />
-            </a4j:commandLink>
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText value="Дата создания" styleClass="output-text" escape="true"/>
-            </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{goodRequest.createdDateFormatted}"
-                             action="#{goodRequestPositionListPage.onSearch}" styleClass="command-link">
-                <f:setPropertyActionListener value="#{goodRequest.globalId}" target="#{goodRequestPositionListPage.idOfGoodRequest}" />
-            </a4j:commandLink>
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText value="Дата последнего обновления" styleClass="output-text" escape="true"/>
-            </f:facet>
-            <h:outputText styleClass="output-text" value="#{goodRequest.lastUpdateFormatted}" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText value="Заявка отозвана" styleClass="output-text" escape="true"/>
-            </f:facet>
-            <h:selectBooleanCheckbox value="#{goodRequest.deletedState}" readonly="true" disabled="true"/>
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText value="Дата удаления" styleClass="output-text" escape="true"/>
-            </f:facet>
-            <h:outputText styleClass="output-text" value="#{goodRequest.deleteDateFormatted}" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText value="Состояние заявки" styleClass="output-text" escape="true"/>
-            </f:facet>
-            <h:outputText styleClass="output-text" value="#{goodRequest.stateSelect}" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText value="Дата исполнения заявки" styleClass="output-text" escape="true"/>
-            </f:facet>
-            <h:outputText styleClass="output-text" value="#{goodRequest.doneDateFormatted}" />
-        </rich:column>
-        <f:facet name="footer">
-            <rich:datascroller for="goodRequestListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
-                               stepControls="auto" boundaryControls="hide">
-                <f:facet name="previous">
-                    <h:graphicImage value="/images/16x16/left-arrow.png" />
+
+    <h:panelGrid id="goodRequestListPanel">
+        <h:outputText styleClass="output-text" value="Нет данных для отображения" rendered="#{goodRequestListPage.emptyGoodRequestList}"/>
+        <rich:dataTable id="goodRequestListTable" width="700" var="goodRequest" value="#{goodRequestListPage.goodRequestList}" rendered="#{!goodRequestListPage.emptyGoodRequestList}"
+                        rows="20" rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer">
+            <rich:column  headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="№" styleClass="output-text" escape="true"/>
                 </f:facet>
-                <f:facet name="next">
-                    <h:graphicImage value="/images/16x16/right-arrow.png" />
+                <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{row+1}"
+                                 action="#{goodRequestPositionListPage.onSearch}" styleClass="command-link">
+                    <f:setPropertyActionListener value="#{goodRequest.globalId}" target="#{goodRequestPositionListPage.idOfGoodRequest}" />
+                </a4j:commandLink>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="Дата создания" styleClass="output-text" escape="true"/>
                 </f:facet>
-            </rich:datascroller>
-        </f:facet>
-    </rich:dataTable>
+                <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{goodRequest.createdDateFormatted}"
+                                 action="#{goodRequestPositionListPage.onSearch}" styleClass="command-link">
+                    <f:setPropertyActionListener value="#{goodRequest.globalId}" target="#{goodRequestPositionListPage.idOfGoodRequest}" />
+                </a4j:commandLink>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="Дата последнего обновления" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{goodRequest.lastUpdateFormatted}" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="Заявка отозвана" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <h:selectBooleanCheckbox value="#{goodRequest.deletedState}" readonly="true" disabled="true"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="Дата удаления" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{goodRequest.deleteDateFormatted}" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="Состояние заявки" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{goodRequest.state}" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="Дата исполнения заявки" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{goodRequest.doneDateFormatted}" />
+            </rich:column>
+            <f:facet name="footer">
+                <rich:datascroller for="goodRequestListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                                   stepControls="auto" boundaryControls="hide">
+                    <f:facet name="previous">
+                        <h:graphicImage value="/images/16x16/left-arrow.png" />
+                    </f:facet>
+                    <f:facet name="next">
+                        <h:graphicImage value="/images/16x16/right-arrow.png" />
+                    </f:facet>
+                </rich:datascroller>
+            </f:facet>
+        </rich:dataTable>
+    </h:panelGrid>
 
 </h:panelGrid>
