@@ -759,16 +759,19 @@
     <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"
                         label="Отчет по продажам" action="#{mainPage.showSalesReportPage}" reRender="workspaceForm" />
 
-    <!-- внесено изменние -->
     <rich:panelMenuItem id="enterEventReportMenuItem" binding="#{mainPage.enterEventReportPage.mainMenuComponent}"
                         label="Отчет по турникетам" action="#{mainPage.showEnterEventReportPage}"
                         reRender="workspaceForm" />
-    <!-- внесено изменние -->
 
     <%--@elvariable id="contragentCompletionReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ContragentCompletionReportPage"--%>
     <rich:panelMenuItem id="contragentCompletionReportMenuItem"
                         binding="#{contragentCompletionReportPage.mainMenuComponent}" label="Отчет по пополнениям"
                         action="#{contragentCompletionReportPage.show}" reRender="workspaceForm" />
+
+    <%--@elvariable id="registerStampPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampPage"--%>
+    <rich:panelMenuItem id="registerStampReportMenuItem"
+                        binding="#{registerStampPage.mainMenuComponent}" label="Реестр талонов"
+                        action="#{registerStampPage.show}" reRender="workspaceForm" />
 
     <rich:panelMenuItem id="clientReportMenuItem" binding="#{mainPage.clientReportPage.mainMenuComponent}"
                         label="Отчет по учащимся" action="#{mainPage.showClientReportPage}" reRender="workspaceForm" />
