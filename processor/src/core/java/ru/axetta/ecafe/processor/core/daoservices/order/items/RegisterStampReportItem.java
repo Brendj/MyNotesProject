@@ -9,19 +9,17 @@ import java.util.Date;
  * Time: 15:26
  * To change this template use File | Settings | File Templates.
  */
-public class RegisterStampItem {
+public class RegisterStampReportItem {
     private String level1;
     private String level2;
     private Long qty;
-    private Date date;
-    private String name;
+    private String date;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public RegisterStampReportItem(String level1, String level2, Long qty, String date) {
+        this.level1 = level1;
+        this.level2 = level2;
+        this.qty = qty;
+        this.date = date;
     }
 
     public String getLevel1() {
@@ -48,11 +46,11 @@ public class RegisterStampItem {
         this.qty = qty;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 }

@@ -8,13 +8,16 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampItem;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampReportItem;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DateFormat;
 import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -66,9 +69,31 @@ public class RegisterStampReport extends BasicReportForOrgJob {
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             OrderDetailsDAOService service = new OrderDetailsDAOService();
             service.setSession(session);
+            DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
             List<GoodItem> allGoods = service.findAllGoods(org.getIdOfOrg());
-
-            return new JRBeanCollectionDataSource(service.findNotNullGoodsFullNameByOrg(org.getIdOfOrg(),startTime, endTime));
+            List<RegisterStampReportItem> result = new ArrayList<RegisterStampReportItem>();
+            calendar.setTime(startTime);
+            do{
+                String date = timeFormat.format(calendar.getTime());
+                for (GoodItem goodItem: allGoods){
+                    Long val = service.findNotNullGoodsFullNameByOrgByDayAndGoodEq(org.getIdOfOrg(),calendar.getTime(), goodItem.getFullName());
+                    RegisterStampReportItem item = new RegisterStampReportItem(goodItem.getPathPart3(),goodItem.getPathPart4(),val,date);
+                    RegisterStampReportItem total = new RegisterStampReportItem(goodItem.getPathPart3(),goodItem.getPathPart4(),val,"77777");
+                    RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem.getPathPart3(),goodItem.getPathPart4(),val,"99999");
+                    result.add(allTotal);
+                    result.add(item);
+                    result.add(total);
+                }
+                calendar.add(Calendar.DATE,1);
+            } while (!endTime.equals(calendar.getTime()));
+            for (GoodItem goodItem: allGoods){
+                Long val = service.findNotNullGoodsFullNameByOrgByDailySampleAndGoodEq(org.getIdOfOrg(),startTime, endTime, goodItem.getFullName());
+                RegisterStampReportItem dailySampleItem = new RegisterStampReportItem(goodItem.getPathPart3(),goodItem.getPathPart4(),val,"88888");
+                RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem.getPathPart3(),goodItem.getPathPart4(),val,"99999");
+                result.add(allTotal);
+                result.add(dailySampleItem);
+            }
+            return new JRBeanCollectionDataSource(result);
         }
     }
 
