@@ -6,6 +6,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgShortItem;
+import ru.axetta.ecafe.processor.web.ui.report.online.register.stamp.*;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -28,9 +29,44 @@ import java.util.*;
  */
 @Component
 @Scope("session")
-public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler{
+public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler, Visitor<String> {
 
     private final static Logger logger = LoggerFactory.getLogger(RegisterStampPage.class);
+
+    @Override
+    public Visitor<String> visitTree(Tree<String> tree) {
+        return new RegisterStampPage(lvl1, lvl2, lvlBottom);
+    }
+
+    @Override
+    public void visitData(Tree<String> parent, String data) {
+        int level = parent.getLevel();
+        switch (level){
+            case 3: lvl1.add(new HashMap.SimpleImmutableEntry<String, Tree>(data,parent)); break;
+            case 4: lvl2.add(new HashMap.SimpleImmutableEntry<String, Tree>(data,parent)); break;
+        }
+
+        if(parent.getChildCount()<1){
+            lvlBottom.add(new HashMap.SimpleImmutableEntry<String, Tree>(data, parent));
+        }
+    }
+
+    public Integer getLastLvlElements(){
+        int size = 0;
+        for (Map.Entry<String,Tree> entry: lvl1){
+            if(entry.getValue().getChildCount()==0) size++;
+        }
+        return lvl2.size() + size;
+    }
+
+    public RegisterStampPage() {}
+
+    public RegisterStampPage(List<Map.Entry<String, Tree>> lvl1, List<Map.Entry<String, Tree>> lvl2,
+            List<Map.Entry<String, Tree>> lvlBottom) {
+        this.lvl1 = lvl1;
+        this.lvl2 = lvl2;
+        this.lvlBottom = lvlBottom;
+    }
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -39,11 +75,13 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
     private Date end;
     private final OrderDetailsDAOService service = new OrderDetailsDAOService();
     private List<RegisterStampPageItem> pageItems = new ArrayList<RegisterStampPageItem>();
-    private List<GoodItem> allGoods = new ArrayList<GoodItem>();
+    private List<GoodItem> allGoods = new LinkedList<GoodItem>();
+    private HashMap<String, Integer> allGoodsPath3 = new HashMap<String, Integer>();
+    private HashMap<String, Integer> allGoodsPath2 = new HashMap<String, Integer>();
 
-    public List<GoodItem> getAllGoods() {
-        return allGoods;
-    }
+    private List<Map.Entry<String,Tree>> lvl1 = new ArrayList<Map.Entry<String, Tree>>();
+    private List<Map.Entry<String,Tree>> lvl2 = new ArrayList<Map.Entry<String, Tree>>();
+    private List<Map.Entry<String,Tree>> lvlBottom = new ArrayList<Map.Entry<String, Tree>>();
 
     @Override
     public void onShow() throws Exception {
@@ -74,6 +112,19 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
         return null;
     }
 
+    public List<Map.Entry<String, Tree>> getLvl1() {
+        return lvl1;
+    }
+
+    public List<Map.Entry<String, Tree>> getLvl2() {
+        return lvl2;
+    }
+
+    public List<Map.Entry<String, Tree>> getLvlBottom() {
+        return lvlBottom;
+    }
+
+
     @Override
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
         if (null != idOfOrg) {
@@ -83,12 +134,24 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
             org.setOfficialName(organization.getOfficialName());
             org.setShortName(organization.getShortName());
             List<GoodItem> goods = service.findAllGoods(organization.getIdOfOrg());
-            Set<GoodItem> goodItemSet = new TreeSet<GoodItem>();
-            for (GoodItem item: goods){
-                goodItemSet.add(item);
+            allGoods = goods;
+            Tree<String> forest = new Tree<String>("Количество", 0, null);
+            Tree<String> current = forest;
+            List<String> namesList = new ArrayList<String>();
+            lvl1 = new ArrayList<Map.Entry<String, Tree>>();
+            lvl2 = new ArrayList<Map.Entry<String, Tree>>();
+            lvlBottom = new ArrayList<Map.Entry<String, Tree>>();
+            for(GoodItem item: goods){
+                namesList.add(item.getFullName());
             }
-            allGoods = new ArrayList<GoodItem>(goodItemSet);
-            Collections.reverse(allGoods);
+            for (String tree : namesList) {
+                Tree<String> root = current;
+                for (String data : tree.split("/")) {
+                    current = current.child(data, tree);
+                }
+                current = root;
+            }
+            forest.accept(this);
         }
     }
 
@@ -96,30 +159,26 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
         Calendar calendar = Calendar.getInstance();
         DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
         calendar.setTime(start);
-        RegisterStampPageItem total = new RegisterStampPageItem(allGoods);
-        RegisterStampPageItem allTotal = new RegisterStampPageItem(allGoods);
-        total.date = "Итого";
-        allTotal.date = "Всего кол-во:";
+        RegisterStampPageItem total = new RegisterStampPageItem("Итого", allGoods);
+        RegisterStampPageItem allTotal = new RegisterStampPageItem("Всего кол-во:", allGoods);
         do{
             String date = timeFormat.format(calendar.getTime());
-            RegisterStampPageItem item = new RegisterStampPageItem(allGoods);
-            item.date = date;
-            for (String l: item.map.keySet()){
+            RegisterStampPageItem item = new RegisterStampPageItem(date, allGoods);
+            for (String l: item.getSetKey()){
                 Long val = service.findNotNullGoodsFullNameByOrgByDayAndGoodEq(org.getIdOfOrg(),calendar.getTime(), l);
-                item.map.put(l,val+item.map.get(l));
-                total.map.put(l, val + total.map.get(l));
-                allTotal.map.put(l, val + allTotal.map.get(l));
+                item.addValue(l, val);
+                total.addValue(l, val);
+                allTotal.addValue(l, val);
             }
             pageItems.add(item);
             calendar.add(Calendar.DATE,1);
         } while (!end.equals(calendar.getTime()));
         pageItems.add(total);
-        RegisterStampPageItem dailySampleItem = new RegisterStampPageItem(allGoods);
-        dailySampleItem.date = "Суточная проба";
-        for (String l: dailySampleItem.map.keySet()){
+        RegisterStampPageItem dailySampleItem = new RegisterStampPageItem("Суточная проба", allGoods);
+        for (String l: dailySampleItem.getSetKey()){
             Long val = service.findNotNullGoodsFullNameByOrgByDailySampleAndGoodEq(org.getIdOfOrg(),start, end, l);
-            dailySampleItem.map.put(l, val + dailySampleItem.map.get(l));
-            allTotal.map.put(l, val + allTotal.map.get(l));
+            dailySampleItem.addValue(l, val);
+            allTotal.addValue(l, val);
         }
         pageItems.add(dailySampleItem);
         pageItems.add(allTotal);
@@ -162,33 +221,4 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
         return "report/online/registerstamp_report";
     }
 
-    public int getGoodSetCount() {
-        return allGoods.size();
-    }
-
-    public static class RegisterStampPageItem{
-
-        private String date;
-        private HashMap<String,Long> map = new HashMap<String, Long>();
-
-        public RegisterStampPageItem(List<GoodItem> goods) {
-            for (GoodItem good: goods){
-                map.put(good.getPathPart4(),0L);
-            }
-        }
-
-        public List<String> getSetKey(){
-            return new ArrayList<String>(map.keySet());
-        }
-
-        public Long getValue(String id) {
-            return map.get(id);
-        }
-
-        public String getDate() {
-            return date;
-        }
-
-
-    }
 }

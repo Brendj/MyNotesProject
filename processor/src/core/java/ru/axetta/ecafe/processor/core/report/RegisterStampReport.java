@@ -6,6 +6,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampItem;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
@@ -65,6 +66,8 @@ public class RegisterStampReport extends BasicReportForOrgJob {
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             OrderDetailsDAOService service = new OrderDetailsDAOService();
             service.setSession(session);
+            List<GoodItem> allGoods = service.findAllGoods(org.getIdOfOrg());
+
             return new JRBeanCollectionDataSource(service.findNotNullGoodsFullNameByOrg(org.getIdOfOrg(),startTime, endTime));
         }
     }

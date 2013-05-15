@@ -14,6 +14,7 @@ public class RegisterStampItem {
     private String level2;
     private Long qty;
     private Date date;
+    private Date name;
 
     public String getLevel1() {
         return level1;

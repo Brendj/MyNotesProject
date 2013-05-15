@@ -19,6 +19,8 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -33,7 +35,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
     @SuppressWarnings("unchecked")
     public List<RegisterStampItem> findNotNullGoodsFullNameByOrg(Long idOfOrg, Date start, Date end){
         String sql;
-        sql = "select g.pathPart3 as level1, g.pathPart4 as level2, sum(details.qty) as qty, ord.createTime as date" +
+        sql = "select g.pathPart3 as level1, g.pathPart4 as level2, sum(details.qty) as qty, ord.createTime as date, g.fullName as name" +
                 " from OrderDetail details left join details.good g left join details.order ord " +
                 " where g is not null and details.org.idOfOrg=:idOfOrg and ord.createTime between :begin and :end and " +
                 " details.socDiscount>0 and ord.orderType in :orderTypes" +
@@ -52,13 +54,13 @@ public class OrderDetailsDAOService extends AbstractDAOService {
     }
 
     @SuppressWarnings("unchecked")
-    public Long findNotNullGoodsFullNameByOrgByDayAndGoodEq(Long idOfOrg, Date start, String part4) {
+    public Long findNotNullGoodsFullNameByOrgByDayAndGoodEq(Long idOfOrg, Date start, String fullname) {
         String sql ="select sum(orderdetail.qty) from cf_orders cforder" +
                 " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
                 "   and orderdetail.idoforder = cforder.idoforder" +
                 " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
-                " where cforder.createddate between :start and :end and orderdetail.socdiscount>0 and" +
-                " cforder.idoforg=:idoforg and split_part(good.fullname, '/', 4) like '"+part4+"'" +
+                " where cforder.createddate>=:start and cforder.createddate<:end and orderdetail.socdiscount>0 and" +
+                " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"'" +
                 " and cforder.ordertype in (0,1,4) "+
                 " group by orderdetail.qty ";
         Query query = getSession().createSQLQuery(sql);
@@ -67,7 +69,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(start);
         calendar.add(Calendar.DATE, 1);
-        query.setParameter("end",calendar.getTimeInMillis());
+        query.setParameter("end",calendar.getTimeInMillis()-1);
         List list = query.list();
         if(list==null || list.isEmpty()){
             return  0L;
@@ -77,13 +79,14 @@ public class OrderDetailsDAOService extends AbstractDAOService {
     }
 
     @SuppressWarnings("unchecked")
-    public Long findNotNullGoodsFullNameByOrgByDailySampleAndGoodEq(Long idOfOrg, Date start, Date end, String part4) {
+    public Long findNotNullGoodsFullNameByOrgByDailySampleAndGoodEq(Long idOfOrg, Date start, Date end, String fullname) {
         String sql ="select sum(orderdetail.qty) from cf_orders cforder" +
                 " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
                 "   and orderdetail.idoforder = cforder.idoforder" +
                 " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
                 " where cforder.createddate between :start and :end and orderdetail.socdiscount>0 and" +
-                " cforder.idoforg=:idoforg and split_part(good.fullname, '/', 4) like '"+part4+"'" +
+                //" cforder.idoforg=:idoforg and split_part(good.fullname, '/', 4) like '"+part4+"'" +
+                " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"'" +
                 " and cforder.ordertype in (5) "+
                 " group by orderdetail.qty ";
         Query query = getSession().createSQLQuery(sql);
@@ -98,10 +101,6 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         }
     }
 
-    public List<Long> findAllIdOfGoods() {
-        return null;
-    }
-
     /* получаем список всех  */
     @SuppressWarnings("unchecked")
     public List<GoodItem> findAllGoods(Long idOfOrg){
@@ -110,7 +109,8 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         orderTypeEnumTypeSet.add(OrderTypeEnumType.UNKNOWN);
         orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN);
         orderTypeEnumTypeSet.add(OrderTypeEnumType.DAILY_SAMPLE);
-        String sql = "select good.globalId as globalId, good.pathPart3 as pathPart3, good.pathPart4 as pathPart4, good.fullName as fullName "
+        String sql = "select distinct good.globalId as globalId, good.pathPart3 as pathPart3, "
+                + "good.pathPart4 as pathPart4,good.pathPart2 as pathPart2, good.fullName as fullName "
                 + " from OrderDetail details "
                 + " left join details.good good left join details.order ord left join ord.org o"
                 + " where ord.orderType in :orderType and details.good is not null and o.idOfOrg=:idOfOrg";
@@ -120,5 +120,13 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         query.setResultTransformer(Transformers.aliasToBean(GoodItem.class));
         return  (List<GoodItem>) query.list();
     }
+
+    //public List<String> fetchDataList(List<Good> list){
+    //    Set<String> set = new  TreeSet<String>();
+    //    for (Good item: list){
+    //        set.add(item.ge());
+    //    }
+    //    return new ArrayList<String>(set);
+    //}
 
 }

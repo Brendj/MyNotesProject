@@ -14,6 +14,7 @@ package ru.axetta.ecafe.processor.core.daoservices.order.items;
 public class GoodItem implements Comparable<GoodItem>{
 
     private Long globalId;
+    private String pathPart2;
     private String pathPart3;
     private String pathPart4;
     private String fullName;
@@ -24,6 +25,14 @@ public class GoodItem implements Comparable<GoodItem>{
 
     public void setGlobalId(Long globalId) {
         this.globalId = globalId;
+    }
+
+    public String getPathPart2() {
+        return pathPart2;
+    }
+
+    public void setPathPart2(String pathPart2) {
+        this.pathPart2 = pathPart2;
     }
 
     public String getPathPart3() {
