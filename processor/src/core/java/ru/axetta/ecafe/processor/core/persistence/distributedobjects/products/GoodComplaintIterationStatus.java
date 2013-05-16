@@ -10,6 +10,10 @@ public enum GoodComplaintIterationStatus {
     private Integer statusNumber;
     private String title;
 
+    GoodComplaintIterationStatus () {
+
+    }
+
     GoodComplaintIterationStatus(Integer statusNumber, String title) {
         this.statusNumber = statusNumber;
         this.title = title;

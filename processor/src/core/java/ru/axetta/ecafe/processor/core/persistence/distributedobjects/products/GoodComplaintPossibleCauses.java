@@ -12,6 +12,10 @@ public enum GoodComplaintPossibleCauses {
     private Integer causeNumber;
     private String title;
 
+    GoodComplaintPossibleCauses () {
+
+    }
+
     GoodComplaintPossibleCauses(Integer causeNumber, String title) {
         this.causeNumber = causeNumber;
         this.title = title;
