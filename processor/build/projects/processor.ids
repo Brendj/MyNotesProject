@@ -470,7 +470,7 @@
       <column name="lastfreepaytime" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
       <column name="discountmode" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4"/>
       <column name="balance" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
-      <column name="Limit" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="limits" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
       <column name="expenditurelimit" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" def="MTAwMDA="/>
       <column name="categoriesdiscounts" sqlType="varchar" length="60" precision="0" nullable="false" jdbcType="12" def="Jyc="/>
       <column name="san" sqlType="varchar" length="11" precision="0" nullable="true" jdbcType="12"/>
@@ -2020,6 +2020,9 @@
       <column name="sumbycash" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
       <column name="state" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" def="MA=="/>
       <column name="confirmerid" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
+      <column name="orderdate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" def="MA=="/>
+      <column name="comments" sqlType="varchar" length="90" precision="0" nullable="true" jdbcType="12" def="Jyc="/>
+      <column name="ordertype" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" def="MQ=="/>
       <primary-key name="cf_orders_pk" columns="idoforg,idoforder"/>
       <foreign-key name="cf_orders_idofcard_fk" columns="idofcard" ref-table="cf_cards" ref-schema="public" ref-catalog="" ref-columns="idofcard" update-rule="3" delete-rule="3" deferrability="2"/>
       <foreign-key name="cf_orders_idofclient_fk" columns="idofclient" ref-table="cf_clients" ref-schema="public" ref-catalog="" ref-columns="idofclient" update-rule="3" delete-rule="3" deferrability="2"/>

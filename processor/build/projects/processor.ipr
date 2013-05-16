@@ -466,7 +466,7 @@
     </copyright>
     <module2copyright />
   </component>
-  <component name="DataSourceManagerImpl" format="xml" hash="725028576">
+  <component name="DataSourceManagerImpl" format="xml" hash="268193470">
     <data-source source="LOCAL" name="Moscow Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
       <identifier-quote-string>&quot;</identifier-quote-string>
       <synchronize>true</synchronize>
@@ -518,6 +518,17 @@
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/menu/view.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/menu/details.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/menu/exchange.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/menu/load_menu.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/settings/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/settings/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/settings/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/settings/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/good_request/list.jsp" />
   </component>
   <component name="FacetAutodetectingManager">
     <autodetection-disabled>
