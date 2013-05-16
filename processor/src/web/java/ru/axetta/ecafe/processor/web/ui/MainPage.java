@@ -274,6 +274,7 @@ public class MainPage {
     // Modal pages
     private final OrgSelectPage orgSelectPage = new OrgSelectPage();
     private final OrgListSelectPage orgListSelectPage = new OrgListSelectPage();
+    private final OrgListSelectPage contragentOrgListSelectPage = new OrgListSelectPage();
     private final ContragentSelectPage contragentSelectPage = new ContragentSelectPage();
     private final ClientSelectPage clientSelectPage = new ClientSelectPage();
     private final ClientGroupSelectPage clientGroupSelectPage = new ClientGroupSelectPage();
@@ -326,6 +327,7 @@ public class MainPage {
 
     private final ClientPaymentsPage clientPaymentsReportPage = new ClientPaymentsPage();
     private final GoodRequestsReportPage goodRequestsReportPage = new GoodRequestsReportPage();
+    private final DeliveredServicesReportPage deliveredServicesReportPage = new DeliveredServicesReportPage ();
 
     public BasicWorkspacePage getGoodGroupPage() {
         return goodGroupPage;
@@ -1385,6 +1387,10 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         return orgSelectPage;
     }
 
+    public OrgListSelectPage getContragentOrgListSelectPage() {
+        return contragentOrgListSelectPage;
+    }
+
     public OrgListSelectPage getOrgListSelectPage() {
         return orgListSelectPage;
     }
@@ -1540,6 +1546,42 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
     public void setOrgFilterOfSelectOrgListSelectPage(String orgFilterOfSelectOrgListSelectPage) {
         this.orgFilterOfSelectOrgListSelectPage = orgFilterOfSelectOrgListSelectPage;
     }
+
+    /*public Object showContragentOrgListSelectPage() {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                contragentOrgListSelectPage.setFilterMode(2);
+                contragentOrgListSelectPage.onShow();
+                if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
+                    contragentOrgListSelectPage.fill(persistenceSession);
+                } else {
+                    contragentOrgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage);
+                }
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                contragentOrgListSelectPage.pushCompleteHandlerList((OrgListSelectPage.CompleteHandlerList) currentTopMostPage);
+                modalPages.push(contragentOrgListSelectPage);
+            } catch (Exception e) {
+                logger.error("Failed to fill org selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора организации", null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+
+
+            }
+        }
+        return null;
+    }*/
 
     public Object showOrgListSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
@@ -4912,6 +4954,51 @@ public Long getSelectedIdOfReportRule() {
         return clientPaymentsReportPage;
     }
 
+    public DeliveredServicesReportPage getDeliveredServicesReportPage() {
+        return deliveredServicesReportPage;
+    }
+
+    public Object showDeliveredServicesReportPage () {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = deliveredServicesReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set sales report page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по предоставленным услугам",
+                            null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object buildDeliveredServicesReport() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            deliveredServicesReportPage.buildReport(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to build sales report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
+    }
+
     // baybikov (06.10.2011)
     public GoodRequestsReportPage getGoodRequestReportPage() {
         return goodRequestsReportPage;
@@ -4924,7 +5011,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по продажам",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по запрошенным товарам",
                             null));
         }
         updateSelectedMainMenu();

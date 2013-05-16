@@ -141,7 +141,8 @@ public class ReportJobConstants {
             new ReportHint(ContragentPaymentReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(ContragentCompletionReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(HalfYearSummaryReport.class.getCanonicalName(), new int[]{}),
-            new ReportHint(BeneficiarySummaryReport.class.getCanonicalName(), new int[]{})
+            new ReportHint(BeneficiarySummaryReport.class.getCanonicalName(), new int[]{}),
+            new ReportHint(DeliveredServicesReport.class.getCanonicalName(), new int[]{})
     };
 
     private ReportJobConstants() {
