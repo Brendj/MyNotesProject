@@ -22,7 +22,7 @@
 
         <h:outputText styleClass="output-text" escape="true" value="Организация" />
         <h:panelGroup>
-            <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+            <a4j:commandButton value="..." action="#{mainPage.goodRequestReportPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" />
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.goodRequestReportPage.filter}}" />
@@ -30,10 +30,10 @@
 
         <h:outputText styleClass="output-text" escape="true" value="Поставщик" />
         <h:panelGroup>
-            <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+            <a4j:commandButton value="..." action="#{mainPage.goodRequestReportPage.showContragentListSelectPage}" reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" />
-            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.goodRequestReportPage.filter}}" />
+            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.goodRequestReportPage.contragentFileter}}" />
         </h:panelGroup>
 
         <h:outputText escape="true" value="Скрывать даты с пустыми значениями"

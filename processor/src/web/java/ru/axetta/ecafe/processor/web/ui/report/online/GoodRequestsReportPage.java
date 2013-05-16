@@ -4,7 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.GoodRequestsReport;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.hibernate.Session;
 
@@ -15,7 +17,7 @@ import org.hibernate.Session;
  * Time: 16:47
  * To change this template use File | Settings | File Templates.
  */
-public class GoodRequestsReportPage extends OnlineReportPage {
+public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
     private GoodRequestsReport goodRequests;
     private String goodName;
     private Boolean hideMissedColumns;
@@ -44,9 +46,19 @@ public class GoodRequestsReportPage extends OnlineReportPage {
         this.goodName = goodName;
     }
 
+    public void showOrgListSelectPage () {
+        setSelectIdOfOrgList(true);
+        MainPage.getSessionInstance().showOrgListSelectPage();
+    }
+
+    public void showContragentListSelectPage () {
+        setSelectIdOfOrgList(false);
+        MainPage.getSessionInstance().showOrgListSelectPage();
+    }
+
     public void buildReport(Session session) throws Exception {
         GoodRequestsReport.Builder reportBuilder = new GoodRequestsReport.Builder();
-        this.goodRequests = reportBuilder.build(session, hideMissedColumns, goodName, startDate, endDate, idOfOrgList, idOfOrgList);
+        this.goodRequests = reportBuilder.build(session, hideMissedColumns, goodName, startDate, endDate, idOfOrgList, idOfContragentOrgList);
     }
 
 }

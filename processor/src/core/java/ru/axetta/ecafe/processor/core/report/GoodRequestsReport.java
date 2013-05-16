@@ -73,7 +73,7 @@ public class GoodRequestsReport extends BasicReport {
                 orgCondition = orgCondition + ")) ";
             }
             String suppliersCondition = "";
-            /*if (!idOfSupplierList.isEmpty()) {
+            if (!idOfSupplierList.isEmpty()) {
                 // Обработать лист с организациями
                 suppliersCondition = " and (cf_orgs.defaultsupplier in (";
                 for (Long idOfOrg : idOfSupplierList) {
@@ -83,7 +83,7 @@ public class GoodRequestsReport extends BasicReport {
                     suppliersCondition = suppliersCondition.concat("" +idOfOrg);
                 }
                 suppliersCondition = suppliersCondition + ")) ";
-            }*/
+            }
 
             long startDateLong = startDate.getTime();
             long endDateLong = endDate.getTime();
