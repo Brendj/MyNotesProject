@@ -37,7 +37,7 @@
         <property name="sumByCash" column="SumByCash" type="long" not-null="true" update="false"/>
         <property name="state" column="State" type="int" not-null="true" update="true"/>
 
-        <!--<property name="comments" column="Comments" type="string" length="90"/>-->
+        <property name="comments" column="Comments" type="string" length="90"/>
 
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
                      insert="false" update="false"/>

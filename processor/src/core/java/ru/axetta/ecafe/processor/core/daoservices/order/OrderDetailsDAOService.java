@@ -33,6 +33,7 @@ import java.util.*;
 public class OrderDetailsDAOService extends AbstractDAOService {
 
     @SuppressWarnings("unchecked")
+    @Deprecated
     public List<RegisterStampItem> findNotNullGoodsFullNameByOrg(Long idOfOrg, Date start, Date end){
         String sql;
         sql = "select g.pathPart3 as level1, g.pathPart4 as level2, sum(details.qty) as qty, ord.createTime as date, g.fullName as name" +
@@ -120,13 +121,5 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         query.setResultTransformer(Transformers.aliasToBean(GoodItem.class));
         return  (List<GoodItem>) query.list();
     }
-
-    //public List<String> fetchDataList(List<Good> list){
-    //    Set<String> set = new  TreeSet<String>();
-    //    for (Good item: list){
-    //        set.add(item.ge());
-    //    }
-    //    return new ArrayList<String>(set);
-    //}
 
 }

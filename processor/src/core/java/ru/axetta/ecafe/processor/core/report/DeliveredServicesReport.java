@@ -122,15 +122,15 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                                 + "cf_orgs.address, "
                                 + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') "
                             + "from cf_orgs "
-                            + "join cf_goods on cf_goods.orgowner=cf_orgs.idoforg "
-                            + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
-                            + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg and cf_orderdetails.idofgood=cf_goods.idofgood "
-                            + "where cf_orders.createddate between :start and :end "
+                    + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
+                    + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
+                    + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
+                            + "where cf_orderdetails.socdiscount>0 and cf_orders.createddate between :start and :end "
                             + "group by cf_orgs.officialname, level1, level2, level3, level4, price, address "
                             + "order by cf_orgs.officialname, level1, level2, level3, level4";
             Query query = session.createSQLQuery(sql);//.createQuery(sql);
-            //query.setParameter("start",start.getTime());
-            query.setParameter("start",1357171200000L);
+            query.setParameter("start",start.getTime());
+            //query.setParameter("start",1357171200000L);
             query.setParameter("end",end.getTime());
 
             List<DeliveredServicesItem> result = new ArrayList <DeliveredServicesItem> ();
@@ -146,7 +146,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                 long price = ((BigInteger) e[6]).longValue();
                 long summary = ((BigInteger) e[7]).longValue();
                 String address = (String) e[8];
-                String orgNum = (String) e[9];
+                String orgNum = (e[9]==null?"" :(String) e[9]);
                 DeliveredServicesItem item = new DeliveredServicesItem ();
                 item.setOfficialname(officialname);
                 item.setLevel1(level1);
@@ -165,36 +165,29 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
     }
 
 
-    public DeliveredServicesReport() {
-        //this.items = Collections.emptyList();
-        //logger.info("create empty constructor");
-    }
+    public DeliveredServicesReport() {}
 
 
     public DeliveredServicesReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
             Date endTime, List<DeliveredServicesItem> items) {
         super(generateTime, generateDuration, print, startTime, endTime);
         this.items = items;
-        logger.info("create constructor");
     }
 
 
     public DeliveredServicesReport(Date generateTime, long generateDuration, Date startTime,
             Date endTime, List<DeliveredServicesItem> items) {
         this.items = items;
-        logger.info("create constructor");
     }
 
 
     @Override
     public BasicReportForAllOrgJob createInstance() {
-        logger.info("create instance");
         return new DeliveredServicesReport();  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
     public BasicReportForAllOrgJob.Builder createBuilder(String templateFilename) {
-        logger.info("create builder");
         return new Builder(templateFilename);
     }
 

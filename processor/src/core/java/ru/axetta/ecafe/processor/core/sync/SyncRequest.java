@@ -236,7 +236,7 @@ public class SyncRequest {
                     if (orderDateStr == null) {
                         orderDate = date;
                     } else {
-                        loadContext.timeFormat.parse(orderDateStr);
+                        orderDate = loadContext.timeFormat.parse(orderDateStr);
                     }
                     Long socDiscount = 0L;
                     Long trdDiscount = 0L;

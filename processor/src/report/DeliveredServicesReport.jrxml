@@ -8,9 +8,9 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
-	<property name="ireport.zoom" value="1.331000000000001"/>
-	<property name="ireport.x" value="297"/>
-	<property name="ireport.y" value="169"/>
+	<property name="ireport.zoom" value="0.826446280991736"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -95,6 +95,29 @@
 	<detail>
 		<band/>
 	</detail>
+	<lastPageFooter>
+		<band height="50">
+			<staticText>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="1" y="0" width="339" height="20"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[Составил_________________( Исполнитель)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c60a78d9-5fe5-40a1-9c40-c3f67161c809" x="464" y="0" width="376" height="20"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[Проверил ________________ (Получатель услуг)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="93d15a6e-b020-4510-b4c7-843c0e7dacfa" x="78" y="21" width="137" height="20"/>
+				<textElement/>
+				<text><![CDATA[      М.П.]]></text>
+			</staticText>
+		</band>
+	</lastPageFooter>
 	<summary>
 		<band height="538">
 			<crosstab>
@@ -102,35 +125,35 @@
 				<crosstabHeaderCell>
 					<cellContents>
 						<staticText>
-							<reportElement uuid="c9125e88-ea17-46ac-8d8c-22131cde38b9" style="Crosstab Data Text" x="57" y="0" width="307" height="200"/>
+							<reportElement uuid="c9125e88-ea17-46ac-8d8c-22131cde38b9" x="57" y="0" width="307" height="200"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[Полное уставное наименование учреждения]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="4c6e5bda-b80a-4a68-93a1-aee0813b6f8f" style="Crosstab Data Text" x="565" y="0" width="34" height="200"/>
+							<reportElement uuid="4c6e5bda-b80a-4a68-93a1-aee0813b6f8f" x="565" y="0" width="35" height="200"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
 								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[Тип пищеблока СД/БР/С]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="b861a8c4-10e6-49e5-95d5-95c4e8a2d43c" style="Crosstab Data Text" x="362" y="0" width="51" height="200"/>
+							<reportElement uuid="b861a8c4-10e6-49e5-95d5-95c4e8a2d43c" x="364" y="0" width="50" height="200"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[№ ОУ]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="f72f0771-e234-4d74-926b-42a6c043bc2c" style="Crosstab Data Text" x="413" y="0" width="152" height="200"/>
+							<reportElement uuid="f72f0771-e234-4d74-926b-42a6c043bc2c" x="424" y="0" width="131" height="200"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[Адрес учреждения (пищеблока)]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="e8716d14-fee0-48f5-9209-e97562c4ace2" style="Crosstab Data Text" x="0" y="0" width="57" height="200"/>
+							<reportElement uuid="e8716d14-fee0-48f5-9209-e97562c4ace2" x="0" y="0" width="57" height="200"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
@@ -138,13 +161,13 @@
 						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
-				<rowGroup name="orgnumleft" width="57" totalPosition="End">
+				<rowGroup name="orgnumleft" width="58" totalPosition="End">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{orgnum}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents>
-							<textField>
+							<textField isBlankWhenNull="true">
 								<reportElement uuid="d1a7178f-1888-4c17-91cb-0ab7c85b4751" x="0" y="0" width="57" height="39"/>
 								<textElement/>
 								<textFieldExpression><![CDATA[$V{orgnumleft}]]></textFieldExpression>
@@ -152,7 +175,7 @@
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents backcolor="#00FFFF" mode="Opaque">
+						<cellContents backcolor="#CCFFFF" mode="Opaque">
 							<box>
 								<pen lineColor="#CCFFFF"/>
 								<topPen lineColor="#CCFFFF"/>
@@ -161,8 +184,8 @@
 								<rightPen lineColor="#CCFFFF"/>
 							</box>
 							<staticText>
-								<reportElement uuid="bf0254e7-daa1-4224-b5bd-0fdcca63207c" x="0" y="0" width="599" height="39"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<reportElement uuid="bf0254e7-daa1-4224-b5bd-0fdcca63207c" x="0" y="0" width="600" height="39"/>
+								<textElement verticalAlignment="Middle"/>
 								<text><![CDATA[Итого]]></text>
 							</staticText>
 						</cellContents>
@@ -182,7 +205,7 @@
 								<rightPen lineWidth="0.0"/>
 							</box>
 							<textField>
-								<reportElement uuid="c697688d-36f0-44f3-be57-5924ce8a227e" x="1" y="0" width="305" height="39"/>
+								<reportElement uuid="c697688d-36f0-44f3-be57-5924ce8a227e" x="0" y="1" width="306" height="38"/>
 								<textElement/>
 								<textFieldExpression><![CDATA[$V{officialname}]]></textFieldExpression>
 							</textField>
@@ -209,7 +232,7 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents>
-							<textField>
+							<textField isBlankWhenNull="true">
 								<reportElement uuid="5581cb8c-e153-4443-a7c2-4d1f03834d8f" x="0" y="0" width="50" height="39"/>
 								<textElement/>
 								<textFieldExpression><![CDATA[$V{orgnum}]]></textFieldExpression>
@@ -508,7 +531,7 @@
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell height="39" rowTotalGroup="orgnumleft">
-					<cellContents backcolor="#00FFFF" mode="Opaque">
+					<cellContents backcolor="#CCFFFF" mode="Opaque">
 						<textField>
 							<reportElement uuid="16a9febd-610d-4306-93b2-49a28ea20df8" x="0" y="0" width="50" height="39"/>
 							<textElement/>
@@ -533,7 +556,7 @@
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell height="39" rowTotalGroup="orgnumleft" columnTotalGroup="level4">
-					<cellContents backcolor="#00FFFF" mode="Opaque">
+					<cellContents backcolor="#CCFFFF" mode="Opaque">
 						<textField>
 							<reportElement uuid="605f706a-1391-4b8f-bcb7-af9f9a24be51" x="0" y="0" width="73" height="39"/>
 							<textElement/>
@@ -545,26 +568,6 @@
 		</band>
 	</summary>
 	<noData>
-		<band height="57">
-			<staticText>
-				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="0" y="16" width="302" height="20"/>
-				<textElement>
-					<font size="14"/>
-				</textElement>
-				<text><![CDATA[Составил_________________( Исполнитель)]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="c60a78d9-5fe5-40a1-9c40-c3f67161c809" x="463" y="16" width="339" height="20"/>
-				<textElement>
-					<font size="14"/>
-				</textElement>
-				<text><![CDATA[Проверил ________________ (Получатель услуг)]]></text>
-			</staticText>
-			<staticText>
-				<reportElement uuid="93d15a6e-b020-4510-b4c7-843c0e7dacfa" x="77" y="37" width="100" height="20"/>
-				<textElement/>
-				<text><![CDATA[      М.П.]]></text>
-			</staticText>
-		</band>
+		<band height="57"/>
 	</noData>
 </jasperReport>
