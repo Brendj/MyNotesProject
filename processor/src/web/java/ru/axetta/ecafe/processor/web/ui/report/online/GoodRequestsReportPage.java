@@ -21,6 +21,10 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
     private GoodRequestsReport goodRequests;
     private String goodName;
     private Boolean hideMissedColumns;
+    private boolean showCreated;
+    private boolean showFollow;
+    private boolean showCompleted;
+    private boolean showAll = true;
 
     public String getPageFilename() {
         return "report/online/good_requests_report";
@@ -46,6 +50,46 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
         this.goodName = goodName;
     }
 
+    public GoodRequestsReport getGoodRequests() {
+        return goodRequests;
+    }
+
+    public void setGoodRequests(GoodRequestsReport goodRequests) {
+        this.goodRequests = goodRequests;
+    }
+
+    public boolean isShowCreated() {
+        return showCreated;
+    }
+
+    public void setShowCreated(boolean showCreated) {
+        this.showCreated = showCreated;
+    }
+
+    public boolean isShowFollow() {
+        return showFollow;
+    }
+
+    public void setShowFollow(boolean showFollow) {
+        this.showFollow = showFollow;
+    }
+
+    public boolean isShowCompleted() {
+        return showCompleted;
+    }
+
+    public void setShowCompleted(boolean showCompleted) {
+        this.showCompleted = showCompleted;
+    }
+
+    public boolean isShowAll() {
+        return showAll;
+    }
+
+    public void setShowAll(boolean showAll) {
+        this.showAll = showAll;
+    }
+
     public void showOrgListSelectPage () {
         setSelectIdOfOrgList(true);
         MainPage.getSessionInstance().showOrgListSelectPage();
@@ -58,7 +102,8 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
 
     public void buildReport(Session session) throws Exception {
         GoodRequestsReport.Builder reportBuilder = new GoodRequestsReport.Builder();
-        this.goodRequests = reportBuilder.build(session, hideMissedColumns, goodName, startDate, endDate, idOfOrgList, idOfContragentOrgList);
+        this.goodRequests = reportBuilder.build(session, hideMissedColumns, goodName, startDate, endDate, idOfOrgList, idOfContragentOrgList,
+                                                showCreated, showFollow, showCompleted, showAll);
     }
 
 }
