@@ -93,7 +93,7 @@ public class GoodRequestsReport extends BasicReport {
             String sql = "select requests.org, requests.orgFull, requests.good, requests.d, int8(sum(requests.cnt)) "+
                          "from (select substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') as org, cf_orgs.officialname as orgFull, "+
                          "             cf_goods.fullname as good , date_trunc('day', to_timestamp(cf_goods_requests.createddate / 1000)) as d, "+
-                         "             cf_goods_requests_positions.totalcount / 100 as cnt "+
+                         "             cf_goods_requests_positions.totalcount / 1000 as cnt "+
                          "      from cf_goods_requests "+
                          "      left join cf_orgs on cf_orgs.idoforg=cf_goods_requests.orgowner "+
                          "      left join cf_goods_requests_positions on cf_goods_requests.idofgoodsrequest=cf_goods_requests_positions.idofgoodsrequest "+
