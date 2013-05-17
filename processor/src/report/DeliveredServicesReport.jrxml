@@ -125,35 +125,35 @@
 				<crosstabHeaderCell>
 					<cellContents>
 						<staticText>
-							<reportElement uuid="c9125e88-ea17-46ac-8d8c-22131cde38b9" x="57" y="0" width="307" height="200"/>
+							<reportElement uuid="c9125e88-ea17-46ac-8d8c-22131cde38b9" style="Crosstab Data Text" x="58" y="0" width="306" height="200"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[Полное уставное наименование учреждения]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="4c6e5bda-b80a-4a68-93a1-aee0813b6f8f" x="565" y="0" width="35" height="200"/>
+							<reportElement uuid="4c6e5bda-b80a-4a68-93a1-aee0813b6f8f" style="Crosstab Data Text" x="565" y="0" width="35" height="200"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
 								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[Тип пищеблока СД/БР/С]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="b861a8c4-10e6-49e5-95d5-95c4e8a2d43c" x="364" y="0" width="50" height="200"/>
+							<reportElement uuid="b861a8c4-10e6-49e5-95d5-95c4e8a2d43c" style="Crosstab Data Text" x="364" y="0" width="50" height="200"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[№ ОУ]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="f72f0771-e234-4d74-926b-42a6c043bc2c" x="424" y="0" width="131" height="200"/>
+							<reportElement uuid="f72f0771-e234-4d74-926b-42a6c043bc2c" style="Crosstab Data Text" x="414" y="0" width="151" height="200"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[Адрес учреждения (пищеблока)]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="e8716d14-fee0-48f5-9209-e97562c4ace2" x="0" y="0" width="57" height="200"/>
+							<reportElement uuid="e8716d14-fee0-48f5-9209-e97562c4ace2" style="Crosstab Data Text" x="0" y="0" width="57" height="200"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font isBold="true"/>
 							</textElement>
@@ -168,7 +168,7 @@
 					<crosstabRowHeader>
 						<cellContents>
 							<textField isBlankWhenNull="true">
-								<reportElement uuid="d1a7178f-1888-4c17-91cb-0ab7c85b4751" x="0" y="0" width="57" height="39"/>
+								<reportElement uuid="d1a7178f-1888-4c17-91cb-0ab7c85b4751" style="Crosstab Data Text" x="0" y="0" width="57" height="39"/>
 								<textElement/>
 								<textFieldExpression><![CDATA[$V{orgnumleft}]]></textFieldExpression>
 							</textField>
@@ -184,7 +184,7 @@
 								<rightPen lineColor="#CCFFFF"/>
 							</box>
 							<staticText>
-								<reportElement uuid="bf0254e7-daa1-4224-b5bd-0fdcca63207c" x="0" y="0" width="600" height="39"/>
+								<reportElement uuid="bf0254e7-daa1-4224-b5bd-0fdcca63207c" style="Crosstab Data Text" x="0" y="0" width="600" height="39"/>
 								<textElement verticalAlignment="Middle"/>
 								<text><![CDATA[Итого]]></text>
 							</staticText>
@@ -205,8 +205,8 @@
 								<rightPen lineWidth="0.0"/>
 							</box>
 							<textField>
-								<reportElement uuid="c697688d-36f0-44f3-be57-5924ce8a227e" x="0" y="1" width="306" height="38"/>
-								<textElement/>
+								<reportElement uuid="c697688d-36f0-44f3-be57-5924ce8a227e" style="Crosstab Data Text" x="0" y="0" width="306" height="39"/>
+								<textElement textAlignment="Left"/>
 								<textFieldExpression><![CDATA[$V{officialname}]]></textFieldExpression>
 							</textField>
 						</cellContents>
@@ -233,7 +233,7 @@
 					<crosstabRowHeader>
 						<cellContents>
 							<textField isBlankWhenNull="true">
-								<reportElement uuid="5581cb8c-e153-4443-a7c2-4d1f03834d8f" x="0" y="0" width="50" height="39"/>
+								<reportElement uuid="5581cb8c-e153-4443-a7c2-4d1f03834d8f" style="Crosstab Data Text" x="0" y="0" width="50" height="39"/>
 								<textElement/>
 								<textFieldExpression><![CDATA[$V{orgnum}]]></textFieldExpression>
 							</textField>
@@ -250,8 +250,8 @@
 					<crosstabRowHeader>
 						<cellContents>
 							<textField>
-								<reportElement uuid="9dd3f8a1-2535-4535-b965-f8d5fab41b4f" x="0" y="0" width="151" height="39"/>
-								<textElement/>
+								<reportElement uuid="9dd3f8a1-2535-4535-b965-f8d5fab41b4f" style="Crosstab Data Text" x="0" y="0" width="151" height="39"/>
+								<textElement textAlignment="Left"/>
 								<textFieldExpression><![CDATA[$V{address}]]></textFieldExpression>
 							</textField>
 						</cellContents>
@@ -267,8 +267,8 @@
 					<crosstabRowHeader>
 						<cellContents>
 							<textField>
-								<reportElement uuid="52987828-1751-4f53-8c37-51b3a4637501" x="0" y="0" width="35" height="39"/>
-								<textElement/>
+								<reportElement uuid="52987828-1751-4f53-8c37-51b3a4637501" style="Crosstab Data Text" x="0" y="0" width="35" height="39"/>
+								<textElement textAlignment="Center"/>
 								<textFieldExpression><![CDATA[$V{level2}]]></textFieldExpression>
 							</textField>
 						</cellContents>
@@ -287,7 +287,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField>
-								<reportElement uuid="aad9e225-5c15-4a16-95c1-65ebc6fd721a" x="0" y="0" width="150" height="30"/>
+								<reportElement uuid="aad9e225-5c15-4a16-95c1-65ebc6fd721a" style="Crosstab Data Text" x="0" y="0" width="296" height="30"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="10" isBold="true"/>
 								</textElement>
@@ -296,28 +296,28 @@
 						</cellContents>
 					</crosstabColumnHeader>
 					<crosstabTotalColumnHeader>
-						<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<cellContents backcolor="#CCFFCC" mode="Opaque">
 							<box>
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<staticText>
-								<reportElement uuid="2be002da-118d-4ced-9e43-cfbafc6dd2ef" style="Crosstab Data Text" x="0" y="0" width="50" height="30"/>
+								<reportElement uuid="2be002da-118d-4ced-9e43-cfbafc6dd2ef" style="Crosstab Data Text" x="0" y="0" width="74" height="200" forecolor="#FF0000"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="10"/>
+									<font size="10" isBold="true"/>
 								</textElement>
-								<text><![CDATA[Total level1]]></text>
+								<text><![CDATA[ИТОГО]]></text>
 							</staticText>
 						</cellContents>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
-				<columnGroup name="level3" height="30">
+				<columnGroup name="level3" height="30" totalPosition="End">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{level3}]]></bucketExpression>
 					</bucket>
 					<crosstabColumnHeader>
 						<cellContents backcolor="#CCFFCC" mode="Opaque" style="Crosstab Data Text">
 							<textField>
-								<reportElement uuid="f3e06a87-12d0-4c32-b4ea-723540e6de75" x="0" y="0" width="150" height="30"/>
+								<reportElement uuid="f3e06a87-12d0-4c32-b4ea-723540e6de75" style="Crosstab Data Text" x="0" y="0" width="223" height="30"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="10" isBold="true"/>
 								</textElement>
@@ -326,7 +326,15 @@
 						</cellContents>
 					</crosstabColumnHeader>
 					<crosstabTotalColumnHeader>
-						<cellContents/>
+						<cellContents>
+							<staticText>
+								<reportElement uuid="70f8df3f-4676-4775-a0e0-2a2ee42418b9" style="Crosstab Data Text" x="0" y="0" width="73" height="170"/>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[ИТОГО]]></text>
+							</staticText>
+						</cellContents>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
 				<columnGroup name="level4" height="140" totalPosition="End">
@@ -336,28 +344,28 @@
 					<crosstabColumnHeader>
 						<cellContents backcolor="#CCFFCC" mode="Opaque" style="Crosstab Data Text">
 							<textField>
-								<reportElement uuid="530ffe55-9682-4887-8687-2a9d49925b01" x="0" y="0" width="150" height="35"/>
+								<reportElement uuid="530ffe55-9682-4887-8687-2a9d49925b01" style="Crosstab Data Text" x="0" y="0" width="150" height="35"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="10" isBold="true"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{level4}]]></textFieldExpression>
 							</textField>
 							<staticText>
-								<reportElement uuid="3ed50168-7c39-4497-9241-3692c6e01764" x="0" y="35" width="50" height="105"/>
+								<reportElement uuid="3ed50168-7c39-4497-9241-3692c6e01764" style="Crosstab Data Text" x="0" y="35" width="50" height="105"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
 									<font size="10"/>
 								</textElement>
 								<text><![CDATA[Кол-во рационов (шт.) ]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="612b9cc0-5242-4497-97cd-9152c1cc77d9" x="50" y="35" width="50" height="105"/>
+								<reportElement uuid="612b9cc0-5242-4497-97cd-9152c1cc77d9" style="Crosstab Data Text" x="50" y="35" width="50" height="105"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
 									<font size="10"/>
 								</textElement>
 								<text><![CDATA[Цена]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="7ce7c756-3ec8-490e-943e-7b03afa9a9e7" mode="Opaque" x="100" y="35" width="50" height="105" backcolor="#FFCCCC"/>
+								<reportElement uuid="7ce7c756-3ec8-490e-943e-7b03afa9a9e7" style="Crosstab Data Text" mode="Opaque" x="100" y="35" width="50" height="105" backcolor="#FFCCCC"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle" rotation="Left">
 									<font size="10"/>
 								</textElement>
@@ -368,7 +376,7 @@
 					<crosstabTotalColumnHeader>
 						<cellContents backcolor="#CCFFCC" mode="Opaque" style="Crosstab Data Text">
 							<staticText>
-								<reportElement uuid="3581983f-4c20-4596-84be-b294937055e9" x="0" y="0" width="73" height="140"/>
+								<reportElement uuid="3581983f-4c20-4596-84be-b294937055e9" style="Crosstab Data Text" x="0" y="0" width="73" height="140"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
@@ -392,21 +400,21 @@
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField>
-							<reportElement uuid="cfc4e52f-fb25-408e-9cb4-36a854d0829f" x="50" y="0" width="50" height="39"/>
+							<reportElement uuid="cfc4e52f-fb25-408e-9cb4-36a854d0829f" style="Crosstab Data Text" x="50" y="0" width="50" height="39"/>
 							<textElement>
 								<font size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{priceMeasure}]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement uuid="18941ecf-8931-4610-9307-8e58bbb004b5" x="0" y="0" width="50" height="39"/>
+							<reportElement uuid="18941ecf-8931-4610-9307-8e58bbb004b5" style="Crosstab Data Text" x="0" y="0" width="50" height="39"/>
 							<textElement>
 								<font size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{countMeasure}]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement uuid="ee364554-408e-4d79-9b36-5bc97734af18" x="100" y="0" width="50" height="39"/>
+							<reportElement uuid="ee364554-408e-4d79-9b36-5bc97734af18" style="Crosstab Data Text" x="100" y="0" width="50" height="39"/>
 							<textElement>
 								<font size="10"/>
 							</textElement>
@@ -442,17 +450,17 @@
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="50" height="25" columnTotalGroup="level1">
-					<cellContents backcolor="#BFE1FF" mode="Opaque">
+				<crosstabCell width="74" height="67" columnTotalGroup="level1">
+					<cellContents backcolor="#CCFFCC" mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField>
-							<reportElement uuid="e956b014-5a33-49e7-b87b-6528bdd62c37" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<reportElement uuid="e956b014-5a33-49e7-b87b-6528bdd62c37" style="Crosstab Data Text" x="0" y="0" width="74" height="39"/>
 							<textElement>
 								<font size="10"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{priceMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{summaryMeasure}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -470,8 +478,14 @@
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell columnTotalGroup="level3">
-					<cellContents/>
+				<crosstabCell width="73" height="39" columnTotalGroup="level3">
+					<cellContents>
+						<textField>
+							<reportElement uuid="578be2cd-b18e-418b-8888-3ba256d74d3a" style="Crosstab Data Text" x="0" y="0" width="73" height="39"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{summaryMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
 				</crosstabCell>
 				<crosstabCell rowTotalGroup="officialname" columnTotalGroup="level3">
 					<cellContents/>
@@ -479,7 +493,7 @@
 				<crosstabCell width="73" height="39" columnTotalGroup="level4">
 					<cellContents>
 						<textField>
-							<reportElement uuid="04d0267f-e7d8-4098-ab8e-ec8c3d678643" x="0" y="0" width="73" height="39"/>
+							<reportElement uuid="04d0267f-e7d8-4098-ab8e-ec8c3d678643" style="Crosstab Data Text" x="0" y="0" width="73" height="39"/>
 							<textElement/>
 							<textFieldExpression><![CDATA[$V{summaryMeasure}]]></textFieldExpression>
 						</textField>
@@ -533,32 +547,44 @@
 				<crosstabCell height="39" rowTotalGroup="orgnumleft">
 					<cellContents backcolor="#CCFFFF" mode="Opaque">
 						<textField>
-							<reportElement uuid="16a9febd-610d-4306-93b2-49a28ea20df8" x="0" y="0" width="50" height="39"/>
+							<reportElement uuid="16a9febd-610d-4306-93b2-49a28ea20df8" style="Crosstab Data Text" x="0" y="0" width="50" height="39"/>
 							<textElement/>
 							<textFieldExpression><![CDATA[$V{countMeasure}]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement uuid="f6febe95-53f9-42ad-a277-6b61d109388b" x="100" y="0" width="50" height="39"/>
+							<reportElement uuid="f6febe95-53f9-42ad-a277-6b61d109388b" style="Crosstab Data Text" x="100" y="0" width="50" height="39"/>
 							<textElement/>
 							<textFieldExpression><![CDATA[$V{summaryMeasure}]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement uuid="39b6de86-7a4f-4a55-b8e7-528ba045d05c" x="50" y="0" width="50" height="39"/>
+							<reportElement uuid="39b6de86-7a4f-4a55-b8e7-528ba045d05c" style="Crosstab Data Text" x="50" y="0" width="50" height="39"/>
 							<textElement/>
 							<textFieldExpression><![CDATA[$V{priceMeasure}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell rowTotalGroup="orgnumleft" columnTotalGroup="level1">
-					<cellContents/>
+				<crosstabCell width="74" height="39" rowTotalGroup="orgnumleft" columnTotalGroup="level1">
+					<cellContents backcolor="#CCFFFF" mode="Opaque">
+						<textField>
+							<reportElement uuid="34c7dc0c-c5f4-4d88-a679-11c480bb6929" style="Crosstab Data Text" x="0" y="0" width="74" height="39"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{summaryMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
 				</crosstabCell>
-				<crosstabCell rowTotalGroup="orgnumleft" columnTotalGroup="level3">
-					<cellContents/>
+				<crosstabCell width="73" height="39" rowTotalGroup="orgnumleft" columnTotalGroup="level3">
+					<cellContents backcolor="#CCFFFF" mode="Opaque">
+						<textField>
+							<reportElement uuid="720499ed-edaf-45e3-9f6d-38e2d150ff2e" style="Crosstab Data Text" x="0" y="0" width="73" height="39"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{summaryMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
 				</crosstabCell>
 				<crosstabCell height="39" rowTotalGroup="orgnumleft" columnTotalGroup="level4">
 					<cellContents backcolor="#CCFFFF" mode="Opaque">
 						<textField>
-							<reportElement uuid="605f706a-1391-4b8f-bcb7-af9f9a24be51" x="0" y="0" width="73" height="39"/>
+							<reportElement uuid="605f706a-1391-4b8f-bcb7-af9f9a24be51" style="Crosstab Data Text" x="0" y="0" width="73" height="39"/>
 							<textElement/>
 							<textFieldExpression><![CDATA[$V{summaryMeasure}]]></textFieldExpression>
 						</textField>
