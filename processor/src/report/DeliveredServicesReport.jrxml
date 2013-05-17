@@ -277,7 +277,7 @@
 						<cellContents/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
-				<columnGroup name="level1" height="30">
+				<columnGroup name="level1" height="30" headerPosition="Stretch">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{level1}]]></bucketExpression>
 					</bucket>
