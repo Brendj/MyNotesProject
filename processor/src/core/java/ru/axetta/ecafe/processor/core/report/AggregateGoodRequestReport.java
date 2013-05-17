@@ -66,7 +66,7 @@ public class AggregateGoodRequestReport extends BasicReport {
 
                 SupplierDetails supplierDetails = new SupplierDetails();
                 supplierDetails.setIdOfSupplier(idOfSupplierOrg);
-                supplierDetails.setNameOfSupplier(supplierOrg.getOfficialName());
+                supplierDetails.setNameOfSupplier(supplierOrg.getShortName());
 
                 String where;
                 where = " where (createdDate between " +  startDate.getTime() + " and " + endDate.getTime();

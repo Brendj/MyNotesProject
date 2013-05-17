@@ -43,9 +43,6 @@
                         footerClass="data-table-footer">
             <f:facet name="header">
                 <rich:columnGroup>
-                    <rich:column rowspan="2">
-                        <h:outputText styleClass="column-header" value="№"/>
-                    </rich:column>
                     <rich:column colspan="2">
                         <h:outputText styleClass="column-header" value="Поставщик"/>
                     </rich:column>
@@ -53,7 +50,7 @@
                         <h:outputText styleClass="column-header" value="Заявки"/>
                     </rich:column>
                     <rich:column breakBefore="true">
-                        <h:outputText styleClass="column-header" value="ID поставщика"/>
+                        <h:outputText styleClass="column-header" value="ID"/>
                     </rich:column>
                     <rich:column>
                         <h:outputText styleClass="column-header" value="Название поставщика"/>
@@ -65,7 +62,7 @@
                         <h:outputText styleClass="column-header" value="Общее количество заказов"/>
                     </rich:column>
                     <rich:column>
-                        <h:outputText styleClass="column-header" value="ID учреждения"/>
+                        <h:outputText styleClass="column-header" value="ID"/>
                     </rich:column>
                     <rich:column>
                         <h:outputText styleClass="column-header" value="Название учреждения"/>
@@ -82,17 +79,12 @@
             <rich:subTable id="aggregateGoodRequestSubTable" var="items"
                     value="#{itemGroups.itemsList}"
                     rowKeyVar="subTableRow">
-                    <%--onRowMouseOver="this.style.backgroundColor='#F1F1F1'"--%>
-                    <%--onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">--%>
-                <rich:column>
-                    <h:outputText value="#{subTableRow}"/>
-                </rich:column>
                 <rich:column rowspan="#{items.productDetails.supplierDetails.rowCount}"
                              rendered="#{items.productDetails.supplierDetails.rendered(subTableRow)}">
                     <h:outputText value="#{items.productDetails.supplierDetails.idOfSupplier}" escape="true"/>
                 </rich:column>
                 <rich:column rowspan="#{items.productDetails.supplierDetails.rowCount}"
-                             rendered="#{items.productDetails.supplierDetails.rendered(subTableRow)}">
+                             rendered="#{items.productDetails.supplierDetails.rendered(subTableRow)}" styleClass="valign">
                     <h:outputText value="#{items.productDetails.supplierDetails.nameOfSupplier}" escape="true"/>
                 </rich:column>
                 <rich:column rowspan="#{items.productDetails.rowCount}"
@@ -110,7 +102,9 @@
                     <h:outputText value="#{items.nameOfOrg}" escape="true"/>
                 </rich:column>
                 <rich:column>
-                    <h:outputText value="#{items.productCount}" escape="true"/>
+                    <h:outputText value="#{items.productCount / 1000}" escape="true">
+                        <f:convertNumber pattern="#0"/>
+                    </h:outputText>
                 </rich:column>
                 <rich:column>
                     <h:outputText value="#{items.dateOfExecutionFormatted}" escape="true"/>
