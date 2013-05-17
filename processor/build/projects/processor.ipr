@@ -529,6 +529,11 @@
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/create.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/select.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/good_request/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/good_request/positions.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/question_edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/question_view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/questions_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/questions_load.jsp" />
   </component>
   <component name="FacetAutodetectingManager">
     <autodetection-disabled>
