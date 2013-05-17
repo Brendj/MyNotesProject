@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.RequestState;
+
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -96,7 +98,9 @@ public class GoodRequestsReport extends BasicReport {
                          "      left join cf_orgs on cf_orgs.idoforg=cf_goods_requests.orgowner "+
                          "      left join cf_goods_requests_positions on cf_goods_requests.idofgoodsrequest=cf_goods_requests_positions.idofgoodsrequest "+
                          "      join cf_goods on cf_goods.idofgood=cf_goods_requests_positions.idofgood "+
-                         "      where cf_orgs.officialname<> '' and (cf_goods_requests.createddate between " + startDateLong + " and " + endDateLong + ")"+
+                         "      where cf_orgs.officialname<> '' " +
+                         "            (cf_goods_requests.state="+ RequestState.COMPLETED.ordinal() +" or cf_goods_requests.state=" + RequestState.FOLLOW.ordinal() + ") and " +
+            "            and (cf_goods_requests.createddate between " + startDateLong + " and " + endDateLong + ") "+
                          "            " + goodCondition +
                          "            " + orgCondition +
                          "            " + suppliersCondition + ") as requests "+
