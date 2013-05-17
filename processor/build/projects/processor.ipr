@@ -534,6 +534,12 @@
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/question_view.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/questions_list.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/questions_load.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/question_confirm.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/select_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/order_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/balance_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/distribution_rules.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/edit.jsp" />
   </component>
   <component name="FacetAutodetectingManager">
     <autodetection-disabled>
