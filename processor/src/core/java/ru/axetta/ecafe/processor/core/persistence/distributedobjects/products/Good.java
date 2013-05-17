@@ -27,43 +27,6 @@ import java.util.Set;
  */
 public class Good extends DistributedObject {
 
-    private String pathPart1;
-    private String pathPart2;
-    private String pathPart3;
-    private String pathPart4;
-
-    public String getPathPart4() {
-        return pathPart4;
-    }
-
-    public void setPathPart4(String pathPart4) {
-        this.pathPart4 = pathPart4;
-    }
-
-    public String getPathPart3() {
-        return pathPart3;
-    }
-
-    public void setPathPart3(String pathPart3) {
-        this.pathPart3 = pathPart3;
-    }
-
-    public String getPathPart2() {
-        return pathPart2;
-    }
-
-    public void setPathPart2(String pathPart2) {
-        this.pathPart2 = pathPart2;
-    }
-
-    public String getPathPart1() {
-        return pathPart1;
-    }
-
-    public void setPathPart1(String pathPart1) {
-        this.pathPart1 = pathPart1;
-    }
-
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGG);
@@ -75,8 +38,6 @@ public class Good extends DistributedObject {
         if(p != null) setProduct(p);
         if(tm != null) setTechnologicalMap(tm);
 
-        //DistributedObjectException distributedObjectException = new DistributedObjectException("BasicGood NOT_FOUND_VALUE");
-        //distributedObjectException.setData(guidOfBasicGood);
         GoodsBasicBasket basicGood = DAOUtils.findBasicGood(session, guidOfBasicGood);
         if (basicGood != null) {
             setBasicGood(basicGood);

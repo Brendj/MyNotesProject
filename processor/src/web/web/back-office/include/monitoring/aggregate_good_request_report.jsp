@@ -76,40 +76,38 @@
                 </rich:columnGroup>
             </f:facet>
 
-            <rich:subTable id="aggregateGoodRequestSubTable" var="items"
-                    value="#{itemGroups.itemsList}"
-                    rowKeyVar="subTableRow">
-                <rich:column rowspan="#{items.productDetails.supplierDetails.rowCount}"
-                             rendered="#{items.productDetails.supplierDetails.rendered(subTableRow)}">
-                    <h:outputText value="#{items.productDetails.supplierDetails.idOfSupplier}" escape="true"/>
-                </rich:column>
-                <rich:column rowspan="#{items.productDetails.supplierDetails.rowCount}"
-                             rendered="#{items.productDetails.supplierDetails.rendered(subTableRow)}" styleClass="valign">
-                    <h:outputText value="#{items.productDetails.supplierDetails.nameOfSupplier}" escape="true"/>
-                </rich:column>
-                <rich:column rowspan="#{items.productDetails.rowCount}"
-                             rendered="#{items.productDetails.rendered(subTableRow)}">
-                    <h:outputText value="#{items.productDetails.nameOfProduct}" escape="true"/>
-                </rich:column>
-                <rich:column rowspan="#{items.productDetails.rowCount}"
-                             rendered="#{items.productDetails.rendered(subTableRow)}">
-                    <h:outputText value="#{items.productDetails.totalCount}" escape="true"/>
-                </rich:column>
-                <rich:column>
-                    <h:outputText value="#{items.idOfOrg}" escape="true"/>
-                </rich:column>
-                <rich:column>
-                    <h:outputText value="#{items.nameOfOrg}" escape="true"/>
-                </rich:column>
-                <rich:column>
-                    <h:outputText value="#{items.productCount / 1000}" escape="true">
-                        <f:convertNumber pattern="#0"/>
-                    </h:outputText>
-                </rich:column>
-                <rich:column>
-                    <h:outputText value="#{items.dateOfExecutionFormatted}" escape="true"/>
-                </rich:column>
-            </rich:subTable>
+            <%--<rich:subTable id="aggregateGoodRequestSubTable" var="items"--%>
+                    <%--value="#{itemGroups.itemsList}"--%>
+                    <%--rowKeyVar="subTableRow">--%>
+                <%--<rich:column rowspan="#{items.productDetails.supplierDetails.rowCount}">--%>
+                    <%--<h:outputText value="#{items.productDetails.supplierDetails.idOfSupplier}" escape="true"/>--%>
+                <%--</rich:column>--%>
+                <%--<rich:column rowspan="#{items.productDetails.supplierDetails.rowCount}" styleClass="valign">--%>
+                    <%--<h:outputText value="#{items.productDetails.supplierDetails.nameOfSupplier}" escape="true"/>--%>
+                <%--</rich:column>--%>
+                <%--<rich:column rowspan="#{items.productDetails.rowCount}">--%>
+                    <%--<h:outputText value="#{items.productDetails.nameOfProduct}" escape="true"/>--%>
+                <%--</rich:column>--%>
+                <%--<rich:column rowspan="#{items.productDetails.rowCount}">--%>
+                    <%--<h:outputText value="#{items.productDetails.totalCount/1000}" escape="true">--%>
+                        <%--<f:convertNumber pattern="#0"/>--%>
+                    <%--</h:outputText>--%>
+                <%--</rich:column>--%>
+                <%--<rich:column>--%>
+                    <%--<h:outputText value="#{items.idOfOrg}" escape="true"/>--%>
+                <%--</rich:column>--%>
+                <%--<rich:column>--%>
+                    <%--<h:outputText value="#{items.nameOfOrg}" escape="true"/>--%>
+                <%--</rich:column>--%>
+                <%--<rich:column>--%>
+                    <%--<h:outputText value="#{items.productCount / 1000}" escape="true">--%>
+                        <%--<f:convertNumber pattern="#0"/>--%>
+                    <%--</h:outputText>--%>
+                <%--</rich:column>--%>
+                <%--<rich:column>--%>
+                    <%--<h:outputText value="#{items.dateOfExecutionFormatted}" escape="true"/>--%>
+                <%--</rich:column>--%>
+            <%--</rich:subTable>--%>
 
             <rich:column colspan="9">
                 <rich:spacer/>
