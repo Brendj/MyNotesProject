@@ -244,6 +244,11 @@ public class MskNSIService {
             orgInfo.shortName = qr.getQrValue().get(1);
             orgInfo.address = qr.getQrValue().get(2);
             orgInfo.number = Org.extractOrgNumberFromName(orgInfo.shortName);
+
+            orgInfo.guid = orgInfo.guid == null ? null : orgInfo.guid.trim();
+            orgInfo.shortName = orgInfo.shortName == null ? null : orgInfo.shortName.trim();
+            orgInfo.address = orgInfo.address == null ? null : orgInfo.address.trim();
+
             list.add(orgInfo);
         }
         return list;
@@ -282,6 +287,12 @@ public class MskNSIService {
             pupilInfo.guid = qr.getQrValue().get(3);
             pupilInfo.birthDate = qr.getQrValue().get(4);
             pupilInfo.group = getGroup(qr.getQrValue().get(5), qr.getQrValue().get(6));
+
+            pupilInfo.familyName = pupilInfo.familyName == null ? null : pupilInfo.familyName.trim();
+            pupilInfo.firstName = pupilInfo.firstName == null ? null : pupilInfo.firstName.trim();
+            pupilInfo.secondName = pupilInfo.secondName == null ? null : pupilInfo.secondName.trim();
+            pupilInfo.guid = pupilInfo.guid == null ? null : pupilInfo.guid.trim();
+            pupilInfo.group = pupilInfo.group == null ? null : pupilInfo.group.trim();
             
             list.add(pupilInfo);
         }
@@ -323,6 +334,13 @@ public class MskNSIService {
             pupilInfo.created = qr.getQrValue().get(6) != null && !qr.getQrValue().get(6).equals("");
             pupilInfo.deleted = qr.getQrValue().get(7) != null && !qr.getQrValue().get(7).equals("");
             pupilInfo.guidOfOrg = qr.getQrValue().get(9);
+
+            pupilInfo.familyName = pupilInfo.familyName == null ? null : pupilInfo.familyName.trim();
+            pupilInfo.firstName = pupilInfo.firstName == null ? null : pupilInfo.firstName.trim();
+            pupilInfo.secondName = pupilInfo.secondName == null ? null : pupilInfo.secondName.trim();
+            pupilInfo.guid = pupilInfo.guid == null ? null : pupilInfo.guid.trim();
+            pupilInfo.group = pupilInfo.group == null ? null : pupilInfo.group.trim();
+
             list.add(pupilInfo);
         }
         return list;
