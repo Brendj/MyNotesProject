@@ -50,7 +50,8 @@ public class GoodRequestsReport extends BasicReport {
     public static class Builder {
 
         public GoodRequestsReport build(Session session, Boolean hideMissedColumns, String goodName,
-                                        Date startDate, Date endDate, List<Long> idOfOrgList, List <Long> idOfSupplierList)
+                                        Date startDate, Date endDate, List<Long> idOfOrgList, List <Long> idOfSupplierList,
+                                        boolean showCreated, boolean showFollow, boolean showCompleted, boolean showAll)
                 throws Exception {
             Date generateTime = new Date();
             List<RequestItem> items = new LinkedList<RequestItem>();
@@ -62,6 +63,29 @@ public class GoodRequestsReport extends BasicReport {
                 goodCondition = " and (cf_goods.fullname like '%" + goodName + "%')";
             }
 
+            String stateCondition = "";
+            if (!showAll && showCompleted) {
+                stateCondition = " (cf_goods_requests.state=" + RequestState.COMPLETED.ordinal();
+            }
+            if (!showAll && showCreated) {
+                if (stateCondition.length() < 1) {
+                    stateCondition = "(";
+                } else {
+                    stateCondition = stateCondition + " OR ";
+                }
+                stateCondition = stateCondition + "cf_goods_requests.state=" + RequestState.CREATED.ordinal();
+            }
+            if (!showAll && showFollow) {
+                if (stateCondition.length() < 1) {
+                    stateCondition = "(";
+                } else {
+                    stateCondition = stateCondition + " OR ";
+                }
+                stateCondition = stateCondition + "cf_goods_requests.state=" + RequestState.FOLLOW.ordinal();
+            }
+            if (stateCondition.length() > 0) {
+                stateCondition = stateCondition + ") and ";
+            }
             String orgCondition = "";
             if (!idOfOrgList.isEmpty()) {
                 // Обработать лист с организациями
@@ -98,9 +122,9 @@ public class GoodRequestsReport extends BasicReport {
                          "      left join cf_orgs on cf_orgs.idoforg=cf_goods_requests.orgowner "+
                          "      left join cf_goods_requests_positions on cf_goods_requests.idofgoodsrequest=cf_goods_requests_positions.idofgoodsrequest "+
                          "      join cf_goods on cf_goods.idofgood=cf_goods_requests_positions.idofgood "+
-                         "      where cf_orgs.officialname<> '' " +
-                         "            (cf_goods_requests.state="+ RequestState.COMPLETED.ordinal() +" or cf_goods_requests.state=" + RequestState.FOLLOW.ordinal() + ") and " +
-            "            and (cf_goods_requests.createddate between " + startDateLong + " and " + endDateLong + ") "+
+                         "      where cf_orgs.officialname<> '' and " +
+                         "            " + stateCondition +
+                         "            (cf_goods_requests.createddate between " + startDateLong + " and " + endDateLong + ") "+
                          "            " + goodCondition +
                          "            " + orgCondition +
                          "            " + suppliersCondition + ") as requests "+
@@ -122,7 +146,7 @@ public class GoodRequestsReport extends BasicReport {
                 String orgFull  = ((String) entry [1]).trim ();
                 String good     = ((String) entry [2]).trim ();
                 long date       = ((Timestamp) entry [3]).getTime();
-                long value      = ((BigInteger) entry [4]).longValue();
+                int value       = ((BigInteger) entry [4]).intValue();
 
                 if (!prevOrg.equals(org) || !prevGood.equals(good)) {
                     item = new RequestItem(org, orgFull, good, report);
@@ -332,9 +356,10 @@ public class GoodRequestsReport extends BasicReport {
                 cal.set(Calendar.YEAR, firstDate.get(Calendar.YEAR));
                 clearCalendarTime(cal);
 
-                return "" + new BigDecimal(values.get(cal.getTimeInMillis()).getValue()).setScale(1, BigDecimal.ROUND_HALF_DOWN);
+                //return "" + new BigDecimal(values.get(cal.getTimeInMillis()).getValue()).setScale(1, BigDecimal.ROUND_HALF_DOWN);
+                return "" + new BigDecimal(values.get(cal.getTimeInMillis()).getValue()).setScale(0, BigDecimal.ROUND_HALF_DOWN);
             } catch ( Exception e) {
-                return "0.0";
+                return "0";
             }
         }
 
@@ -386,17 +411,17 @@ public class GoodRequestsReport extends BasicReport {
 
 
     public static class RequestValue {
-        private double value;
+        private int value;
 
-        public RequestValue (double value) {
+        public RequestValue (int value) {
             this.value = value;
         }
 
-        public double getValue () {
+        public int getValue () {
             return value;
         }
 
-        public void setValue (double value) {
+        public void setValue (int value) {
             this.value = value;
         }
     }
