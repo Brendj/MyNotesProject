@@ -29,15 +29,14 @@ public class GoodRequestPosition extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-       // GoodRequest gr = DAOService.getInstance().findDistributedObjectByRefGUID(GoodRequest.class, guidOfGR);
         GoodRequest gr =  (GoodRequest) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGR);
         if(gr==null) throw new DistributedObjectException("NOT_FOUND_VALUE GoodRequest");
         setGoodRequest(gr);
-        //Good g = DAOService.getInstance().findDistributedObjectByRefGUID(Good.class, guidOfG);
-        //Product p = DAOService.getInstance().findDistributedObjectByRefGUID(Product.class, guidOfP);
         Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfG);
         Product p =(Product) DAOUtils.findDistributedObjectByRefGUID(session, guidOfP);
-        if(g==null && p==null) throw new DistributedObjectException("NOT_FOUND_VALUE Product or Good");
+        if(g==null && p==null) {
+            throw new DistributedObjectException("NOT_FOUND_VALUE Product or Good");
+        }
         if(g!=null) setGood(g);
         if(p!=null) setProduct(p);
     }
@@ -66,7 +65,7 @@ public class GoodRequestPosition extends DistributedObject {
         guidOfGR = getStringAttributeValue(node,"GuidOfGoodsRequest",36);
         guidOfG = getStringAttributeValue(node,"GuidOfGoods",36);
         guidOfP = getStringAttributeValue(node,"GuidOfBaseProduct",36);
-        setSendAll(SendToAssociatedOrgs.SendToAll);
+        setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
     }
     @Override

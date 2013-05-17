@@ -32,27 +32,27 @@ import java.util.*;
  */
 public class OrderDetailsDAOService extends AbstractDAOService {
 
-    @SuppressWarnings("unchecked")
-    @Deprecated
-    public List<RegisterStampItem> findNotNullGoodsFullNameByOrg(Long idOfOrg, Date start, Date end){
-        String sql;
-        sql = "select g.pathPart3 as level1, g.pathPart4 as level2, sum(details.qty) as qty, ord.createTime as date, g.fullName as name" +
-                " from OrderDetail details left join details.good g left join details.order ord " +
-                " where g is not null and details.org.idOfOrg=:idOfOrg and ord.createTime between :begin and :end and " +
-                " details.socDiscount>0 and ord.orderType in :orderTypes" +
-                " group by ord.createTime, g.fullName, details.qty";
-        Query query = getSession().createQuery(sql);
-        query.setParameter("idOfOrg",idOfOrg);
-        query.setParameter("begin",start);
-        query.setParameter("end",end);
-        Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>(3);
-        orderTypeEnumTypeSet.add(OrderTypeEnumType.DEFAULT);
-        orderTypeEnumTypeSet.add(OrderTypeEnumType.UNKNOWN);
-        orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN);
-        query.setParameterList("orderTypes", orderTypeEnumTypeSet);
-        query.setResultTransformer(Transformers.aliasToBean(RegisterStampItem.class));
-        return (List<RegisterStampItem>) query.list();
-    }
+    //@SuppressWarnings("unchecked")
+    //@Deprecated
+    //public List<RegisterStampItem> findNotNullGoodsFullNameByOrg(Long idOfOrg, Date start, Date end){
+    //    String sql;
+    //    sql = "select g.pathPart3 as level1, g.pathPart4 as level2, sum(details.qty) as qty, ord.createTime as date, g.fullName as name" +
+    //            " from OrderDetail details left join details.good g left join details.order ord " +
+    //            " where g is not null and details.org.idOfOrg=:idOfOrg and ord.createTime between :begin and :end and " +
+    //            " details.socDiscount>0 and ord.orderType in :orderTypes" +
+    //            " group by ord.createTime, g.fullName, details.qty";
+    //    Query query = getSession().createQuery(sql);
+    //    query.setParameter("idOfOrg",idOfOrg);
+    //    query.setParameter("begin",start);
+    //    query.setParameter("end",end);
+    //    Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>(3);
+    //    orderTypeEnumTypeSet.add(OrderTypeEnumType.DEFAULT);
+    //    orderTypeEnumTypeSet.add(OrderTypeEnumType.UNKNOWN);
+    //    orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN);
+    //    query.setParameterList("orderTypes", orderTypeEnumTypeSet);
+    //    query.setResultTransformer(Transformers.aliasToBean(RegisterStampItem.class));
+    //    return (List<RegisterStampItem>) query.list();
+    //}
 
     @SuppressWarnings("unchecked")
     public Long findNotNullGoodsFullNameByOrgByDayAndGoodEq(Long idOfOrg, Date start, String fullname) {
@@ -61,11 +61,14 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 "   and orderdetail.idoforder = cforder.idoforder" +
                 " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
                 " where cforder.createddate>=:start and cforder.createddate<:end and orderdetail.socdiscount>0 and" +
-                " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"'" +
-                " and cforder.ordertype in (0,1,4) "+
+                " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"' and " +
+                " orderdetail.menutype between :mintype and :maxtype and " +
+                " cforder.ordertype in (0,1,4) " +
                 " group by orderdetail.qty ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idoforg",idOfOrg);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
         query.setParameter("start",start.getTime());
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(start);
@@ -87,13 +90,16 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
                 " where cforder.createddate between :start and :end and orderdetail.socdiscount>0 and" +
                 //" cforder.idoforg=:idoforg and split_part(good.fullname, '/', 4) like '"+part4+"'" +
-                " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"'" +
-                " and cforder.ordertype in (5) "+
+                " orderdetail.menutype between :mintype and :maxtype and " +
+                " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"' and" +
+                " cforder.ordertype in (5) "+
                 " group by orderdetail.qty ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idoforg",idOfOrg);
         query.setParameter("start",start.getTime());
         query.setParameter("end",end.getTime());
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
         List list = query.list();
         if(list==null || list.isEmpty()){
             return  0L;
@@ -113,11 +119,14 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         String sql = "select distinct good.globalId as globalId, good.pathPart3 as pathPart3, "
                 + "good.pathPart4 as pathPart4,good.pathPart2 as pathPart2, good.fullName as fullName "
                 + " from OrderDetail details "
-                + " left join details.good good left join details.order ord left join ord.org o"
-                + " where ord.orderType in :orderType and details.good is not null and o.idOfOrg=:idOfOrg";
+                + " left join details.good good left join details.order ord left join ord.org o "
+                + " where ord.orderType in :orderType and details.good is not null and o.idOfOrg=:idOfOrg and "
+                + " details.menuType between :mintype and :maxtype ";
         Query query = getSession().createQuery(sql);
         query.setParameterList("orderType",orderTypeEnumTypeSet);
         query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
         query.setResultTransformer(Transformers.aliasToBean(GoodItem.class));
         return  (List<GoodItem>) query.list();
     }

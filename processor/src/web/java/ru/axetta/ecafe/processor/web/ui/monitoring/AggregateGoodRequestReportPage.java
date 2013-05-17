@@ -53,7 +53,7 @@ public class AggregateGoodRequestReportPage extends OnlineReportPage {
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
         } catch (Exception e) {
-            logger.error("Failed to build aggregate good request reprot", e);
+            logger.error("Failed to build aggregate good request report", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
         } finally {
