@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.SchedulerJob;
 import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
@@ -1064,6 +1066,19 @@ public class AutoReportGenerator {
         if (path==null) return null;
         if (!path.endsWith("/") && !path.endsWith("\\")) path+='/';
         return path;
+    }
+
+    public static String getReportsTemplateFilePathWithDb (/*Session session*/) {
+        /*RuntimeContext.getInstance().getPropertiesValue(AUTO_REPORT_PARAM_BASE + ".path");
+
+        Criteria criteria = session.createCriteria(Option.class);
+        criteria.add(Restrictions.eq("id", 1L));
+        Option op = (Option) criteria.uniqueResult();
+        String path = op.getOptionText();
+        if (path==null) return null;
+        if (!path.endsWith("/") && !path.endsWith("\\")) path+='/';
+        return path;*/
+        return "\\processor\\templates\\";
     }
 
 }

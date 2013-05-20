@@ -11,6 +11,9 @@ import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.hibernate.Session;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 /**
  * Created with IntelliJ IDEA.
  * User: chirikov
@@ -22,6 +25,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage {
     private DeliveredServicesReport deliveredServices;
     private String goodName;
     private Boolean hideMissedColumns;
+    private String htmlReport;
 
     public String getPageFilename() {
         return "report/online/delivered_services_report";
@@ -31,9 +35,16 @@ public class DeliveredServicesReportPage extends OnlineReportPage {
         return deliveredServices;
     }
 
+    public String getHtmlReport() {
+        return htmlReport;
+    }
+
     public void buildReport(Session session) throws Exception {
+        Calendar cal = new GregorianCalendar();
+        cal.setTimeInMillis(System.currentTimeMillis());
         DeliveredServicesReport.Builder reportBuilder = new DeliveredServicesReport.Builder();
-        this.deliveredServices = reportBuilder.build(session, startDate, endDate, null);
+        this.deliveredServices = reportBuilder.build(session, startDate, endDate, cal);
+        htmlReport = deliveredServices.getHtmlReport();
     }
 
 }

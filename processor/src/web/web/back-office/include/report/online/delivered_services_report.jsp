@@ -29,38 +29,25 @@
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid">
         <%-- не показывать пустую таблицу --%>
-        <c:if test="${not empty mainPage.deliveredServicesReportPage.deliveredServicesReport && not empty mainPage.deliveredServicesReportPage.deliveredServicesReport.items}" >
+        <c:if test="${not empty mainPage.deliveredServicesReportPage.deliveredServicesReport && not empty mainPage.deliveredServicesReportPage.deliveredServicesReport.htmlReport}" >
             <h:outputText escape="true" value="Отчет по заявкам организаций" styleClass="output-text" />
-            <rich:dataTable id="deliveredServicesReportTable" value="#{mainPage.deliveredServicesReportPage.deliveredServicesReport.items}"
+
+            <f:verbatim>
+                <style type="text/css">
+                    div.htmlReportContent :empty {
+                        display: none;
+                    }
+                </style>
+                <div class="htmlReportContent">
+                ${mainPage.deliveredServicesReportPage.deliveredServicesReport.htmlReport}
+                </div>
+            </f:verbatim>
+
+            <%--<rich:dataTable id="deliveredServicesReportTable" value="#{mainPage.deliveredServicesReportPage.deliveredServicesReport.items}"
                             var="it" rowKeyVar="row" rows="10" footerClass="data-table-footer"
                             columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
 
 
-                <f:facet name="header">
-                    <rich:columnGroup>
-                        <rich:column rowspan="3">
-                            <h:outputText value="Полное уставное наименование учреждения"/>
-                        </rich:column>
-                        <rich:column colspan="1" rowspan="3">
-                            <h:outputText value="уровень 1"/>
-                        </rich:column>
-
-                        <rich:column breakBefore="true" rendered="false">
-                            <rich:spacer />
-                        </rich:column>
-                        <rich:columns colspan="1" rowspan="1">
-                            <h:outputText value="уровень 2"/>
-                        </rich:columns>
-
-                        <rich:column breakBefore="true" rendered="false">
-                            <rich:spacer />
-                        </rich:column>
-                        <rich:columns colspan="1">
-                            <h:outputText value="уровень 3"/>
-                        </rich:columns>
-
-                    </rich:columnGroup>
-                </f:facet>
 
 
                 <f:facet name="footer">
@@ -74,7 +61,7 @@
                         </f:facet>
                     </rich:datascroller>
                 </f:facet>
-            </rich:dataTable>
+            </rich:dataTable>  --%>
         </c:if>
         <!--<h:commandButton value="Выгрузить в CSV" action="#{mainPage.showSalesCSVList}" styleClass="command-button" />-->
     </h:panelGrid>

@@ -4,10 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.JRHtmlExporter;
+import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampItem;
@@ -19,6 +19,10 @@ import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.math.BigInteger;
 import java.text.DateFormatSymbols;
 import java.util.*;
@@ -31,44 +35,48 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class DeliveredServicesReport extends BasicReportForAllOrgJob {
+
     private final static Logger logger = LoggerFactory.getLogger(DeliveredServicesReport.class);
 
     private List<DeliveredServicesItem> items;
     private Date startDate;
     private Date endDate;
+    private String htmlReport;
 
     private static final String ORG_NUM = "Номер ОУ";
     private static final String ORG_NAME = "Наименование ОУ";
     private static final String GOOD_NAME = "Товар";
-    private static final List <String> DEFAULT_COLUMNS = new ArrayList<String>();
-    static
-    {
+    private static final List<String> DEFAULT_COLUMNS = new ArrayList<String>();
+
+    static {
         DEFAULT_COLUMNS.add(ORG_NUM);
         DEFAULT_COLUMNS.add(ORG_NAME);
         DEFAULT_COLUMNS.add(GOOD_NAME);
     }
 
 
-
-    public List<DeliveredServicesItem> getItems () {
+    public List<DeliveredServicesItem> getItems() {
         return items;
     }
 
 
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
+
     }
 
 
     public static class Builder implements BasicReportForAllOrgJob.Builder {
 
         private final String templateFilename;
+        private boolean exportToHTML = false;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
         }
 
         public Builder() {
-            this.templateFilename = null;
+            templateFilename = AutoReportGenerator.getReportsTemplateFilePathWithDb() + DeliveredServicesReport.class.getSimpleName() + ".jasper";
+            exportToHTML = true;
         }
 
         @Override
@@ -91,49 +99,52 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
 
             Date generateEndTime = new Date();
             List<DeliveredServicesItem> items = findNotNullGoodsFullNameByOrg(session, startTime, endTime);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
+                    createDataSource(session, startTime, endTime, (Calendar) calendar.clone(), parameterMap, items));
             //  Если имя шаблона присутствует, значит строится для джаспера
-            if (templateFilename != null) {
-                JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                        createDataSource(session, startTime, endTime, (Calendar) calendar.clone(), parameterMap,
-                                         items));
+            if (!exportToHTML) {
                 return new DeliveredServicesReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                         jasperPrint, startTime, endTime, null);
             } else {
-                return new DeliveredServicesReport(generateTime, generateEndTime.getTime() - generateTime.getTime(), startTime,
-                        endTime, items);
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                JRHtmlExporter exporter = new JRHtmlExporter();
+                exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+                exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
+                exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
+                exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
+                exporter.exportReport();
+                return new DeliveredServicesReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
+                        startTime, endTime, items).setHtmlReport (os.toString("UTF-8"));
             }
         }
 
-        private JRDataSource createDataSource(Session session, Date startTime, Date endTime,
-                Calendar calendar, Map<String, Object> parameterMap, List<DeliveredServicesItem> items) throws Exception {
+        private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Calendar calendar,
+                Map<String, Object> parameterMap, List<DeliveredServicesItem> items) throws Exception {
             return new JRBeanCollectionDataSource(items);
         }
 
 
-        public List<DeliveredServicesItem> findNotNullGoodsFullNameByOrg(Session session, Date start, Date end){
-            String sql =    "select cf_orgs.officialname, "
-                                + "split_part(cf_goods.fullname, '/', 1) as level1, "
-                                + "split_part(cf_goods.fullname, '/', 2) as level2, "
-                                + "split_part(cf_goods.fullname, '/', 3) as level3, "
-                                + "split_part(cf_goods.fullname, '/', 4) as level4, "
-                                + "count(cf_orders.idoforder) as cnt, "
-                                + "cf_orderdetails.rprice price, "
-                                + "count(cf_orders.idoforder) * cf_orderdetails.rprice as sum, "
-                                + "cf_orgs.address, "
-                                + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') "
-                            + "from cf_orgs "
-                    + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
+        public List<DeliveredServicesItem> findNotNullGoodsFullNameByOrg(Session session, Date start, Date end) {
+            String sql = "select cf_orgs.officialname, " + "split_part(cf_goods.fullname, '/', 1) as level1, "
+                    + "split_part(cf_goods.fullname, '/', 2) as level2, "
+                    + "split_part(cf_goods.fullname, '/', 3) as level3, "
+                    + "split_part(cf_goods.fullname, '/', 4) as level4, " + "count(cf_orders.idoforder) as cnt, "
+                    + "cf_orderdetails.rprice price, " + "count(cf_orders.idoforder) * cf_orderdetails.rprice as sum, "
+                    + "cf_orgs.address, " + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') "
+                    + "from cf_orgs " + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
                     + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
                     + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
-                            + "where cf_orderdetails.socdiscount>0 and cf_orders.createddate between :start and :end "
-                            + "group by cf_orgs.officialname, level1, level2, level3, level4, price, address "
-                            + "order by cf_orgs.officialname, level1, level2, level3, level4";
+                    + "where cf_orderdetails.socdiscount>0 and cf_orders.createddate between :start and :end "
+                    + "group by cf_orgs.officialname, level1, level2, level3, level4, price, address "
+                    + "order by cf_orgs.officialname, level1, level2, level3, level4";
             Query query = session.createSQLQuery(sql);//.createQuery(sql);
-            query.setParameter("start",start.getTime());
+            query.setParameter("start", start.getTime());
             //query.setParameter("start",1357171200000L);
-            query.setParameter("end",end.getTime());
+            query.setParameter("end", end.getTime());
 
-            List<DeliveredServicesItem> result = new ArrayList <DeliveredServicesItem> ();
+            List<DeliveredServicesItem> result = new ArrayList<DeliveredServicesItem>();
             List res = query.list();
             for (Object entry : res) {
                 Object e[] = (Object[]) entry;
@@ -146,8 +157,8 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                 long price = ((BigInteger) e[6]).longValue();
                 long summary = ((BigInteger) e[7]).longValue();
                 String address = (String) e[8];
-                String orgNum = (e[9]==null?"" :(String) e[9]);
-                DeliveredServicesItem item = new DeliveredServicesItem ();
+                String orgNum = (e[9] == null ? "" : (String) e[9]);
+                DeliveredServicesItem item = new DeliveredServicesItem();
                 item.setOfficialname(officialname);
                 item.setLevel1(level1);
                 item.setLevel2(level2);
@@ -165,7 +176,8 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
     }
 
 
-    public DeliveredServicesReport() {}
+    public DeliveredServicesReport() {
+    }
 
 
     public DeliveredServicesReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
@@ -174,9 +186,17 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
         this.items = items;
     }
 
+    public String getHtmlReport() {
+        return htmlReport;
+    }
 
-    public DeliveredServicesReport(Date generateTime, long generateDuration, Date startTime,
-            Date endTime, List<DeliveredServicesItem> items) {
+    public DeliveredServicesReport setHtmlReport(String htmlReport) {
+        this.htmlReport = htmlReport;
+        return this;
+    }
+
+    public DeliveredServicesReport(Date generateTime, long generateDuration, Date startTime, Date endTime,
+            List<DeliveredServicesItem> items) {
         this.items = items;
     }
 
@@ -199,5 +219,20 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
     @Override
     public int getDefaultReportPeriod() {
         return REPORT_PERIOD_PREV_MONTH;
+    }
+
+    public class JasperStringOutputStream extends OutputStream {
+
+        private StringBuilder string = new StringBuilder();
+
+        @Override
+        public void write(int b) throws IOException {
+            this.string.append((char) b);
+        }
+
+        //Netbeans IDE automatically overrides this toString()
+        public String toString() {
+            return this.string.toString();
+        }
     }
 }
