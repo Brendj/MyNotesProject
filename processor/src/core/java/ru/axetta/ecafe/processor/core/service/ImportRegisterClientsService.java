@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -51,6 +52,7 @@ public class ImportRegisterClientsService {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImportRegisterClientsService.class);
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private static final String ORG_SYNC_MARKER = "СИНХРОНИЗАЦИЯ_РЕЕСТРЫ";
+    private static final int MAX_ATTEMPTS = 5;
 
 
     public static boolean isOn() {
@@ -91,17 +93,31 @@ public class ImportRegisterClientsService {
         List<Org> orgs = DAOService.getInstance().getOrderedSynchOrgsList();
 
 
+        boolean allOperationsAreFinished = true;
         for (Org org : orgs) {
-            try {
-                if (org.getTag() == null || !org.getTag().toUpperCase().contains(ORG_SYNC_MARKER)) {
-                    continue;
+            int attempt = 0;
+            while (attempt < MAX_ATTEMPTS) {
+                try {
+                    if (org.getTag() == null || !org.getTag().toUpperCase().contains(ORG_SYNC_MARKER)) {
+                        continue;
+                    }
+                    RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).loadClients(lastUpd, org);
+                    break;
+                } catch (SocketTimeoutException ste) {
+                    attempt++;
+                } catch (Exception e) {
+                    logger.error("Ошибка при синхронизации с Реестрами для организации: " + org.getIdOfOrg(), e);
                 }
-                RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).loadClients(lastUpd, org);
-            } catch (Exception e) {
-                logger.error("Ошибка при синхронизации с Реестрами для организации: " + org.getIdOfOrg(), e);
+            }
+            if (attempt >= MAX_ATTEMPTS) {
+                allOperationsAreFinished = false;
+                logger.error("Неудалось подключиться к сервису, превышено максимальное количество попыток (" + MAX_ATTEMPTS +")");
             }
         }
-        setLastUpdateDate(new Date(System.currentTimeMillis()));
+        //  Если была хотя бы одна неудачная загрузка данных с сервиса, время последный синхронизации не обновляем!
+        //if (allOperationsAreFinished) {
+            setLastUpdateDate(new Date(System.currentTimeMillis()));
+        //}
     }
 
 
