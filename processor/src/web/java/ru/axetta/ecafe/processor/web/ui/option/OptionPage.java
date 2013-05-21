@@ -75,6 +75,7 @@ public class OptionPage extends BasicWorkspacePage {
     private String RNIPPaymentsStore;
     private Boolean syncRegisterIsTestingService;
     private Boolean syncRegisterLogging;
+    private Integer syncRegisterMaxAttempts;
 
 
     @PersistenceContext
@@ -395,6 +396,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.syncRegisterLogging = syncRegisterLogging;
     }
 
+    public Integer getSyncRegisterMaxAttempts() {
+        return syncRegisterMaxAttempts;
+    }
+
+    public void setSyncRegisterMaxAttempts(Integer syncRegisterMaxAttempts) {
+        this.syncRegisterMaxAttempts = syncRegisterMaxAttempts;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -444,6 +453,7 @@ public class OptionPage extends BasicWorkspacePage {
         RNIPPaymentsStore = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_STORE_NAME);
         syncRegisterIsTestingService = runtimeContext.getOptionValueBool(Option.OPTION_MSK_NSI_USE_TESTING_SERVICE);
         syncRegisterLogging = runtimeContext.getOptionValueBool(Option.OPTION_MSK_NSI_LOG);
+        syncRegisterMaxAttempts = runtimeContext.getOptionValueInt(Option.OPTION_MSK_NSI_MAX_ATTEMPTS);
 
         bankListPage.onShow();
 
@@ -527,6 +537,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_PASSWORD, syncRegisterPassword);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_COMPANY, syncRegisterCompany);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_LOG, syncRegisterLogging);
+            runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_MAX_ATTEMPTS, syncRegisterMaxAttempts);
             runtimeContext.setOptionValue(Option.OPTION_DISABLE_SMSNOTIFY_EDIT_IN_CLIENT_ROOM, disableSMSNotifyEditInClientRoom);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_ON, importRNIPPayments);
             runtimeContext.setOptionValue(Option.OPTION_SEND_PAYMENT_NOTIFY_SMS_ON, sendSMSPaymentNotification);

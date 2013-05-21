@@ -52,7 +52,6 @@ public class ImportRegisterClientsService {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImportRegisterClientsService.class);
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private static final String ORG_SYNC_MARKER = "СИНХРОНИЗАЦИЯ_РЕЕСТРЫ";
-    private static final int MAX_ATTEMPTS = 5;
 
 
     public static boolean isOn() {
@@ -93,25 +92,28 @@ public class ImportRegisterClientsService {
         List<Org> orgs = DAOService.getInstance().getOrderedSynchOrgsList();
 
 
+        int maxAttempts = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_MSK_NSI_MAX_ATTEMPTS);
         boolean allOperationsAreFinished = true;
         for (Org org : orgs) {
+            if (org.getTag() == null || !org.getTag().toUpperCase().contains(ORG_SYNC_MARKER)) {
+                continue;
+            }
             int attempt = 0;
-            while (attempt < MAX_ATTEMPTS) {
+            while (attempt < maxAttempts) {
                 try {
-                    if (org.getTag() == null || !org.getTag().toUpperCase().contains(ORG_SYNC_MARKER)) {
-                        continue;
-                    }
                     RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).loadClients(lastUpd, org);
                     break;
                 } catch (SocketTimeoutException ste) {
-                    attempt++;
                 } catch (Exception e) {
                     logger.error("Ошибка при синхронизации с Реестрами для организации: " + org.getIdOfOrg(), e);
+                    break;
+                } finally {
+                    attempt++;
                 }
             }
-            if (attempt >= MAX_ATTEMPTS) {
+            if (attempt >= maxAttempts) {
                 allOperationsAreFinished = false;
-                logger.error("Неудалось подключиться к сервису, превышено максимальное количество попыток (" + MAX_ATTEMPTS +")");
+                logger.error("Неудалось подключиться к сервису, превышено максимальное количество попыток (" + maxAttempts +")");
             }
         }
         //  Если была хотя бы одна неудачная загрузка данных с сервиса, время последный синхронизации не обновляем!

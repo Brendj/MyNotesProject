@@ -223,6 +223,8 @@
                     <h:inputText value="#{optionPage.syncRegisterCompany}" styleClass="input-text" size="40" />
                     <h:outputText escape="true" value="Вести лог синхронизации" styleClass="output-text" />
                     <h:selectBooleanCheckbox value="#{optionPage.syncRegisterLogging}" styleClass="output-text" />
+                    <h:outputText escape="true" value="Количество попыток" styleClass="output-text" />
+                    <h:inputText value="#{optionPage.syncRegisterMaxAttempts}" styleClass="input-text" size="5" />
                 </h:panelGrid>
             </rich:panel>
 

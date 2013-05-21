@@ -84,7 +84,8 @@ public class Option {
             OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS=100033,
             OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD=100034,
             OPTION_MSK_NSI_USE_TESTING_SERVICE=100035,
-            OPTION_MSK_NSI_LOG=100036
+            OPTION_MSK_NSI_LOG=100036,
+            OPTION_MSK_NSI_MAX_ATTEMPTS=100037
     ;
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -127,7 +128,8 @@ public class Option {
             OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS, "test",
             OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD, "test",
             OPTION_MSK_NSI_USE_TESTING_SERVICE, "0",
-            OPTION_MSK_NSI_LOG, "0"
+            OPTION_MSK_NSI_LOG, "0",
+            OPTION_MSK_NSI_MAX_ATTEMPTS, "5"
 };
 
     private Long idOfOption;
