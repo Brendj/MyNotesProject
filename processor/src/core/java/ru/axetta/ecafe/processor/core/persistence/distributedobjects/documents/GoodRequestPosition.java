@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -57,7 +58,7 @@ public class GoodRequestPosition extends DistributedObject {
         Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
         if(longOrgOwner != null) setOrgOwner(longOrgOwner);
         Integer integerUnitsScale = getIntegerAttributeValue(node, "UnitsScale");
-        if(integerUnitsScale!=null) setUnitsScale(integerUnitsScale);
+        if(integerUnitsScale!=null) setUnitsScale(UnitScale.fromInteger(integerUnitsScale));
         Long longTotalCount = getLongAttributeValue(node, "TotalCount");
         if(longTotalCount != null) setTotalCount(longTotalCount);
         Long longNetWeight = getLongAttributeValue(node, "NetWeight");
@@ -76,7 +77,7 @@ public class GoodRequestPosition extends DistributedObject {
         setTotalCount(((GoodRequestPosition) distributedObject).getTotalCount());
     }
 
-    private Integer unitsScale;
+    private UnitScale unitsScale;
     private Long totalCount;
     private Long netWeight;
     private Product product;
@@ -150,20 +151,29 @@ public class GoodRequestPosition extends DistributedObject {
         this.totalCount = totalCount;
     }
 
-    public Integer getUnitsScale() {
+    public String getTotalCountPattern(){
+        //if(unitsScale>1){
+        //    return "#0";
+        //} else {
+            return "#0.000";
+        //}
+    }
+
+    public UnitScale getUnitsScale() {
         return unitsScale;
     }
 
-    public void setUnitsScale(Integer unitsScale) {
+    public void setUnitsScale(UnitScale unitsScale) {
         this.unitsScale = unitsScale;
     }
 
     public String getUnitsScaleValue() {
-        if ((unitsScale != null) && (unitsScale >= 0) && (unitsScale <= UNIT_SCALES.length)) {
-            return UNIT_SCALES[unitsScale];
-        } else {
-            return "";
-        }
+        //if ((unitsScale != null) && (unitsScale >= 0) && (unitsScale <= UNIT_SCALES.length)) {
+        //    return UNIT_SCALES[unitsScale];
+        //} else {
+        //    return "";
+        //}
+        return unitsScale.toString();
     }
 
     public String getCurrentElementValue() {

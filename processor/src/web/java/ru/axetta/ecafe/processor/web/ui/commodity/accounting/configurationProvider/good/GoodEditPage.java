@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good;
 
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,6 +61,7 @@ public class GoodEditPage extends BasicWorkspacePage implements GoodGroupSelect,
     private SelectedGoodGroupPage selectedGoodGroupPage;
     @Autowired
     private GoodListPage goodListPage;
+    private Integer unitScale;
 
     @Override
     public void onShow() throws Exception {
@@ -73,12 +76,17 @@ public class GoodEditPage extends BasicWorkspacePage implements GoodGroupSelect,
         if(currentGood.getProduct()!=null){
             currentProduct = currentGood.getProduct();
         }
-        this.selectItemList = new LinkedList<SelectItem>();
-        this.selectItemList.add(new SelectItem(0,Good.UNIT_SCALES[currentGood.getUnitsScale()]));
-        for (Integer i=0;i<Good.UNIT_SCALES.length; i++){
-            if(!i.equals(currentGood.getUnitsScale())) {
-                this.selectItemList.add(new SelectItem(i,Good.UNIT_SCALES[i]));
-            }
+        unitScale = currentGood.getUnitsScale().ordinal();
+        this.selectItemList = new ArrayList<SelectItem>();
+        //this.selectItemList.add(new SelectItem(0,Good.UNIT_SCALES[currentGood.getUnitsScale()]));
+        //this.selectItemList.add(new SelectItem(currentGood.getUnitsScale().ordinal(),currentGood.getUnitsScale().toString()));
+        //for (Integer i=0;i<Good.UNIT_SCALES.length; i++){
+        //    if(!i.equals(currentGood.getUnitsScale())) {
+        //        this.selectItemList.add(new SelectItem(i,Good.UNIT_SCALES[i]));
+        //    }
+        //}
+        for (UnitScale unitScale: UnitScale.values()){
+            this.selectItemList.add(new SelectItem(unitScale.ordinal(),unitScale.toString()));
         }
     }
 
@@ -94,6 +102,7 @@ public class GoodEditPage extends BasicWorkspacePage implements GoodGroupSelect,
             //}
             //Product p = entityManager.find(Product.class, currentProduct.getGlobalId());
             Good g = entityManager.find(Good.class, currentGood.getGlobalId());
+            currentGood.setUnitsScale(UnitScale.fromInteger(unitScale));
             g.fill(currentGood);
             g.setLastUpdate(new Date());
             g.setDeletedState(currentGood.getDeletedState());
@@ -180,6 +189,14 @@ public class GoodEditPage extends BasicWorkspacePage implements GoodGroupSelect,
 
     public String getPageFilename() {
         return "commodity_accounting/configuration_provider/good/edit";
+    }
+
+    public Integer getUnitScale() {
+        return unitScale;
+    }
+
+    public void setUnitScale(Integer unitScale) {
+        this.unitScale = unitScale;
     }
 
     public GoodGroup getCurrentGoodGroup() {

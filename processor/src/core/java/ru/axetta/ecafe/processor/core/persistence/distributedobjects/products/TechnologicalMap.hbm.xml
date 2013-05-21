@@ -31,7 +31,7 @@
         </property>
 
         <property name="nameOfTechnologicalMap" column="NameOfTechnologicalMap" type="string" length="128" />
-        <property name="numberOfTechnologicalMap" column="NumberOfTechnologicalMap" type="long"/>
+        <property name="numberOfTechnologicalMap" column="NumberOfTechnologicalMap" type="string" length="128"/>
         <property name="technologyOfPreparation" column="TechnologyOfPreparation" type="string" length="4096" />
         <property name="tempOfPreparation" column="TempOfPreparation" type="string" length="128" />
         <property name="lifeTime" column="LifeTime" type="integer" />

@@ -38,7 +38,7 @@ public class GoodsBasicBasketDataElement {
         this.guid = goodsBasicBasket.getGuid();
         this.nameOfGood = goodsBasicBasket.getNameOfGood();
         this.netWeight = goodsBasicBasket.getNetWeight();
-        this.unitsScale = goodsBasicBasket.getUnitsScale();
+        this.unitsScale = goodsBasicBasket.getUnitsScale().ordinal();
     }
 
     public String getGuid() {

@@ -99,7 +99,7 @@
             <f:facet name="header">
                 <h:outputText value="Единица измерения" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{good.unitScaleString}" />
+            <h:outputText styleClass="output-text" value="#{good.unitsScale}" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

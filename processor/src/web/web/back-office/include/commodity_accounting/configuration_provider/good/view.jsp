@@ -38,7 +38,7 @@
         <h:outputText escape="true" value="Код" styleClass="output-text" />
         <h:inputText value="#{goodViewPage.currentGood.goodsCode}" maxlength="128" readonly="true" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Единица измерения" styleClass="output-text" />
-        <h:inputText value="#{goodViewPage.currentGood.unitScaleString}" maxlength="128" readonly="true" styleClass="input-text long-field" />
+        <h:inputText value="#{goodViewPage.currentGood.unitsScale}" maxlength="128" readonly="true" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Масса нетто" styleClass="output-text" />
         <h:inputText value="#{goodViewPage.currentGood.netWeight}" maxlength="32" readonly="true" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Срок годности (в минутах)" styleClass="output-text" />

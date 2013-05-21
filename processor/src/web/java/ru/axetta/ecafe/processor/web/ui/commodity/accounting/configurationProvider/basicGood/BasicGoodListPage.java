@@ -2,6 +2,7 @@ package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvi
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -169,9 +170,12 @@ public class BasicGoodListPage extends BasicWorkspacePage {
     public List<SelectItem> getUnitsScaleSelectItemList() {
         if (unitsScaleSelectItemList == null) {
             unitsScaleSelectItemList = new ArrayList<SelectItem>();
-            for (int i = 0; i < Good.UNIT_SCALES.length; i++) {
-                unitsScaleSelectItemList.add(new SelectItem(i, Good.UNIT_SCALES[i]));
+            for (UnitScale unitScale: UnitScale.values()){
+                this.unitsScaleSelectItemList.add(new SelectItem(unitScale.ordinal(),unitScale.toString()));
             }
+            //for (int i = 0; i < Good.UNIT_SCALES.length; i++) {
+            //    unitsScaleSelectItemList.add(new SelectItem(i, Good.UNIT_SCALES[i]));
+            //}
         }
         return unitsScaleSelectItemList;
     }

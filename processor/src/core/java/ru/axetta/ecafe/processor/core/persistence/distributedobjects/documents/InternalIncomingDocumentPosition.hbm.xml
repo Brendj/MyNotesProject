@@ -33,7 +33,13 @@
         <property name="orgOwner" column="OrgOwner" type="long"/>
         <property name="goodsCreationDate" column="GoodsCreationDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="lifeTime" column="LifeTime" type="long"/>
-        <property name="unitsScale" column="UnitsScale" type="long"/>
+        <!--<property name="unitsScale" column="UnitsScale" type="long"/>-->
+        <property name="unitsScale" column="UnitsScale">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale</param>
+                <param name="type">4</param>
+            </type>
+        </property>
         <property name="totalCount" column="TotalCount" type="long"/>
         <property name="netWeight" column="NetWeight" type="long"/>
         <property name="incomingPrice" column="IncomingPrice" type="long"/>

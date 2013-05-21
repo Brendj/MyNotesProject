@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good;
 
 
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -50,6 +51,7 @@ public class GoodCreatePage extends BasicWorkspacePage implements GoodGroupSelec
     private TechnologicalMapPanel technologicalMapPanel;
     @Autowired
     private DAOService daoService;
+    private Integer unitsScale;
 
     @Override
     public void onShow() throws Exception {
@@ -62,9 +64,12 @@ public class GoodCreatePage extends BasicWorkspacePage implements GoodGroupSelec
         currentTechnologicalMap =null;
         currentGoodGroup = null;
         this.selectItemList = new LinkedList<SelectItem>();
-        for (Integer i=0;i<Good.UNIT_SCALES.length; i++){
-            this.selectItemList.add(new SelectItem(i,Good.UNIT_SCALES[i]));
+        for (UnitScale unitScale: UnitScale.values()){
+            this.selectItemList.add(new SelectItem(unitScale.ordinal(),unitScale.toString()));
         }
+        //for (Integer i=0;i< UnitScale.values().length; i++){
+        //    this.selectItemList.add(new SelectItem(i,Good.UNIT_SCALES[i]));
+        //}
     }
 
     public Object onSave(){
@@ -84,6 +89,7 @@ public class GoodCreatePage extends BasicWorkspacePage implements GoodGroupSelec
             good.setCreatedDate(new Date());
             good.setDeletedState(true);
             good.setGuid(UUID.randomUUID().toString());
+            good.setUnitsScale(UnitScale.fromInteger(unitsScale));
             good.setGlobalVersion(daoService.updateVersionByDistributedObjects(Good.class.getSimpleName()));
             good.setOrgOwner(currentGoodGroup.getOrgOwner());
 
@@ -182,5 +188,13 @@ public class GoodCreatePage extends BasicWorkspacePage implements GoodGroupSelec
 
     public void setSelectItemList(List<SelectItem> selectItemList) {
         this.selectItemList = selectItemList;
+    }
+
+    public Integer getUnitsScale() {
+        return unitsScale;
+    }
+
+    public void setUnitsScale(Integer unitsScale) {
+        this.unitsScale = unitsScale;
     }
 }

@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TradeMaterialGood;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -45,7 +46,7 @@ public class InternalIncomingDocumentPosition extends DistributedObject {
     @Override
     protected void appendAttributes(Element element) {
         setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"UnitsScale", unitsScale);
+        setAttribute(element,"UnitsScale", unitsScale.ordinal());
         setAttribute(element,"TotalCount", totalCount);
         setAttribute(element, "NetWeight", netWeight);
         setAttribute(element,"GoodsCreationDate", getDateFormat().format(goodsCreationDate));
@@ -63,8 +64,8 @@ public class InternalIncomingDocumentPosition extends DistributedObject {
         if(longOrgOwner != null) setOrgOwner(longOrgOwner);
         Date dateOfGoodsCreationDate = getDateTimeAttributeValue(node, "GoodsCreationDate");
         if(dateOfGoodsCreationDate != null) setGoodsCreationDate(dateOfGoodsCreationDate);
-        Long integerUnitsScale = getLongAttributeValue(node, "UnitsScale");
-        if(integerUnitsScale != null) setUnitsScale(integerUnitsScale);
+        Integer integerUnitsScale = getIntegerAttributeValue(node, "UnitsScale");
+        if(integerUnitsScale != null) setUnitsScale(UnitScale.fromInteger(integerUnitsScale));
         Long longTotalCount = getLongAttributeValue(node, "TotalCount");
         if(longTotalCount != null) setTotalCount(longTotalCount);
         Long longNetWeight = getLongAttributeValue(node, "NetWeight");
@@ -96,7 +97,7 @@ public class InternalIncomingDocumentPosition extends DistributedObject {
 
     private Date goodsCreationDate;
     private Long lifeTime;
-    private Long unitsScale;
+    private UnitScale unitsScale;
     private Long totalCount;
     private Long netWeight;
     private Long incomingPrice;
@@ -188,11 +189,11 @@ public class InternalIncomingDocumentPosition extends DistributedObject {
         this.totalCount = totalCount;
     }
 
-    public Long getUnitsScale() {
+    public UnitScale getUnitsScale() {
         return unitsScale;
     }
 
-    public void setUnitsScale(Long unitsScale) {
+    public void setUnitsScale(UnitScale unitsScale) {
         this.unitsScale = unitsScale;
     }
 

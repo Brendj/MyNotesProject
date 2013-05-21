@@ -43,7 +43,8 @@ public class ActOfWayBillDifferencePositionItem extends AbstractEntityItem<ActOf
         actOfWayBillDifference = entity.getActOfWayBillDifference();
         goodsCreationDate = entity.getGoodsCreationDate();
         lifeTime = entity.getLifeTime();
-        unitsScale = ActOfWayBillDifferencePosition.UNIT_SCALES[entity.getUnitsScale()];
+        //unitsScale = ActOfWayBillDifferencePosition.UNIT_SCALES[entity.getUnitsScale()];
+        unitsScale = entity.getUnitsScale().toString();
         totalCount = entity.getTotalCount();
         netWeight = entity.getNetWeight();
         grossWeight = entity.getGrossWeight();

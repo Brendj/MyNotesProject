@@ -86,7 +86,7 @@
                 <h:outputText escape="true" value="Количество единиц" />
             </f:facet>
             <h:outputText styleClass="output-text" value="#{wayBillPosition.totalCount/1000}">
-                <f:convertNumber pattern="#0.000"/>
+                <f:convertNumber pattern="#0"/>
             </h:outputText>
         </rich:column>
         <rich:column headerClass="column-header" sortBy="#{wayBillPosition.netWeight}">

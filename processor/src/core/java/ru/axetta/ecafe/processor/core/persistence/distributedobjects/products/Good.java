@@ -8,11 +8,13 @@ import ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
 import org.hibernate.Session;
+import org.hibernate.type.EnumType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -50,7 +52,7 @@ public class Good extends DistributedObject {
         setAttribute(element,"Name", nameOfGood);
         setAttribute(element, "FullName", fullName);
         setAttribute(element,"GoodsCode", goodsCode);
-        setAttribute(element,"UnitsScale", unitsScale);
+        setAttribute(element,"UnitsScale", unitsScale.ordinal());
         setAttribute(element,"NetWeight", netWeight);
         setAttribute(element,"LifeTime", lifeTime);
         setAttribute(element,"Margin", margin);
@@ -82,7 +84,7 @@ public class Good extends DistributedObject {
         String stringGoodsCode = getStringAttributeValue(node,"GoodsCode",32);
         if(stringGoodsCode!=null) setGoodsCode(stringGoodsCode);
         Integer integerUnitsScale = getIntegerAttributeValue(node,"UnitsScale");
-        if(integerUnitsScale!=null) setUnitsScale(integerUnitsScale);
+        if(integerUnitsScale!=null) setUnitsScale(UnitScale.fromInteger(integerUnitsScale));
         Long longNetWeight = getLongAttributeValue(node, "NetWeight");
         if( longNetWeight != null) setNetWeight(longNetWeight);
         Long longLifeTime = getLongAttributeValue(node, "LifeTime");
@@ -116,12 +118,14 @@ public class Good extends DistributedObject {
             }
         }
         setGoodsCode(((Good) distributedObject).getGoodsCode());
-        setUnitsScale(((Good) distributedObject).getUnitsScale());
         setNetWeight(((Good) distributedObject).getNetWeight());
         setLifeTime(((Good) distributedObject).getLifeTime());
         setMargin(((Good) distributedObject).getMargin());
+        setUnitsScale(((Good)distributedObject).getUnitsScale());
     }
-    public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
+
+    //public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
+
     private Set<TradeMaterialGood> tradeMaterialGoodInternal;
     private Set<ProhibitionExclusion> prohibitionExclusionInternal;
     private Set<Prohibition> prohibitionInternal;
@@ -220,7 +224,6 @@ public class Good extends DistributedObject {
     private String nameOfGood;
     private String fullName;
     private String goodsCode;
-    private Integer unitsScale;
     private Long netWeight;
     private Long lifeTime;
     private Long margin;
@@ -236,6 +239,16 @@ public class Good extends DistributedObject {
     private User userCreate;
     private User userEdit;
     private User userDelete;
+    private UnitScale unitsScale;
+
+    public UnitScale getUnitsScale() {
+        return unitsScale;
+    }
+
+    public void setUnitsScale(UnitScale unitsScale) {
+        this.unitsScale = unitsScale;
+    }
+
 
     public GoodsBasicBasket getBasicGood() {
         return basicGood;
@@ -325,14 +338,6 @@ public class Good extends DistributedObject {
         this.netWeight = netWeight;
     }
 
-    public Integer getUnitsScale() {
-        return unitsScale;
-    }
-
-    public void setUnitsScale(Integer unitsScale) {
-        this.unitsScale = unitsScale;
-    }
-
     public String getGoodsCode() {
         return goodsCode;
     }
@@ -381,7 +386,7 @@ public class Good extends DistributedObject {
         this.userDelete = userDelete;
     }
 
-    public String getUnitScaleString(){
-        return UNIT_SCALES[unitsScale];
-    }
+    //public String getUnitScaleString(){
+    //    return UNIT_SCALES[unitsScale];
+    //}
 }

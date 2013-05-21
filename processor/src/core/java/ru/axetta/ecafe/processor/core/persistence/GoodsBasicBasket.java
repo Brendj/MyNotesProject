@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodBasicBasketPrice;
 
@@ -18,7 +19,7 @@ public class GoodsBasicBasket {
     private Date createdDate;
     private Date lastUpdate;
     private String nameOfGood;
-    private Integer unitsScale;
+    private UnitScale unitsScale;
     private Long netWeight;
     private GoodBasicBasketPrice goodBasicBasketPrice;
     private Set<Good> good;
@@ -53,7 +54,7 @@ public class GoodsBasicBasket {
     }
 
     public GoodsBasicBasket(Long idOfBasicGood, String guid, Date createdDate, Date lastUpdate, String nameOfGood,
-            Integer unitsScale, Long netWeight) {
+            UnitScale unitsScale, Long netWeight) {
         this.idOfBasicGood = idOfBasicGood;
         this.guid = guid;
         this.createdDate = createdDate;
@@ -64,10 +65,11 @@ public class GoodsBasicBasket {
     }
 
     public String getUnitsScaleString() {
-        if (unitsScale >= 0 && unitsScale < Good.UNIT_SCALES.length) {
-            return Good.UNIT_SCALES[unitsScale];
-        }
-        return "";
+        //if (unitsScale >= 0 && unitsScale < Good.UNIT_SCALES.length) {
+        //    return Good.UNIT_SCALES[unitsScale];
+        //}
+        //return "";
+        return unitsScale.toString();
     }
 
     public Long getIdOfBasicGood() {
@@ -118,11 +120,11 @@ public class GoodsBasicBasket {
         this.nameOfGood = nameOfGood;
     }
 
-    public Integer getUnitsScale() {
+    public UnitScale getUnitsScale() {
         return unitsScale;
     }
 
-    public void setUnitsScale(Integer unitsScale) {
+    public void setUnitsScale(UnitScale unitsScale) {
         this.unitsScale = unitsScale;
     }
 

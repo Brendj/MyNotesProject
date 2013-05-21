@@ -47,7 +47,8 @@ public class WayBillPositionItem extends AbstractEntityItem<WayBillPosition> {
         wayBill = entity.getWayBill();
         goodsCreationDate = entity.getGoodsCreationDate();
         lifeTime = entity.getLifeTime();
-        unitsScale = WayBillPosition.UNIT_SCALES[entity.getUnitsScale()];
+        //unitsScale = WayBillPosition.UNIT_SCALES[entity.getUnitsScale()];
+        unitsScale = entity.getUnitsScale().toString();
         totalCount = entity.getTotalCount();
         netWeight = entity.getNetWeight();
         grossWeight = entity.getGrossWeight();

@@ -50,7 +50,7 @@
         <h:outputText escape="true" value="Код" styleClass="output-text" />
         <h:inputText value="#{goodEditPage.currentGood.goodsCode}" maxlength="128" styleClass="input-text long-field" />
         <h:outputText escape="true" value="Единица измерения" styleClass="output-text" />
-        <h:selectOneMenu value="#{goodEditPage.currentGood.unitsScale}">
+        <h:selectOneMenu value="#{goodEditPage.unitScale}">
             <f:selectItems value="#{goodEditPage.selectItemList}"/>
         </h:selectOneMenu>
         <h:outputText escape="true" value="Масса нетто" styleClass="output-text" />

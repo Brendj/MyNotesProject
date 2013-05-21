@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -26,7 +27,7 @@ import java.util.Date;
  */
 public class WayBillPosition extends DistributedObject {
 
-    public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
+    //public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
@@ -43,7 +44,7 @@ public class WayBillPosition extends DistributedObject {
     @Override
     protected void appendAttributes(Element element) {
         setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"UnitsScale", unitsScale);
+        setAttribute(element,"UnitsScale", unitsScale.ordinal());
         setAttribute(element,"TotalCount", totalCount);
         setAttribute(element, "NetWeight", netWeight);
         setAttribute(element,"GrossWeight", grossWeight);
@@ -60,7 +61,7 @@ public class WayBillPosition extends DistributedObject {
         Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
         if(longOrgOwner != null) setOrgOwner(longOrgOwner);
         Integer integerUnitsScale = getIntegerAttributeValue(node, "UnitsScale");
-        if(integerUnitsScale != null) setUnitsScale(integerUnitsScale);
+        if(integerUnitsScale != null) setUnitsScale(UnitScale.fromInteger(integerUnitsScale));
         Long longTotalCount = getLongAttributeValue(node, "TotalCount");
         if(longTotalCount != null) setTotalCount(longTotalCount);
         Long longNetWeight = getLongAttributeValue(node, "NetWeight");
@@ -94,7 +95,7 @@ public class WayBillPosition extends DistributedObject {
         setNds(((WayBillPosition) distributedObject).getNds());
     }
 
-    private Integer unitsScale;
+    private UnitScale unitsScale;
     private Long totalCount;
     private Long netWeight;
     private Long grossWeight;
@@ -107,11 +108,11 @@ public class WayBillPosition extends DistributedObject {
     private WayBill wayBill;
     private String guidOfWB;
 
-    public Integer getUnitsScale() {
+    public UnitScale getUnitsScale() {
         return unitsScale;
     }
 
-    public void setUnitsScale(Integer unitsScale) {
+    public void setUnitsScale(UnitScale unitsScale) {
         this.unitsScale = unitsScale;
     }
 
@@ -198,6 +199,14 @@ public class WayBillPosition extends DistributedObject {
     public Long getTotalCount() {
         return totalCount;
     }
+
+    //public String getTotalCountPattern(){
+    //    if(unitsScale>1){
+    //        return "#0";
+    //    } else {
+    //        return "#0.000";
+    //    }
+    //}
 
     public void setTotalCount(Long totalCount) {
         this.totalCount = totalCount;

@@ -94,7 +94,7 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
             setNameOfTechnologicalMap(stringNameOfTechnologicalMap);
         }
 
-        Long numberOfTechnologicalMap = getLongAttributeValue(node, "Number");
+        String numberOfTechnologicalMap = getStringAttributeValue(node, "Number", 128);
         if (numberOfTechnologicalMap != null) {
             setNumberOfTechnologicalMap(numberOfTechnologicalMap);
         }
@@ -201,7 +201,7 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
     /*  private String groupName;*/
     private String nameOfTechnologicalMap;
 
-    private Long numberOfTechnologicalMap;
+    private String numberOfTechnologicalMap;
 
     //Технология приготовления
     private String technologyOfPreparation;
@@ -294,11 +294,11 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
         this.nameOfTechnologicalMap = nameOfTechnologicalMap;
     }
 
-    public Long getNumberOfTechnologicalMap() {
+    public String getNumberOfTechnologicalMap() {
         return numberOfTechnologicalMap;
     }
 
-    public void setNumberOfTechnologicalMap(Long numberOfTechnologicalMap) {
+    public void setNumberOfTechnologicalMap(String numberOfTechnologicalMap) {
         this.numberOfTechnologicalMap = numberOfTechnologicalMap;
     }
 

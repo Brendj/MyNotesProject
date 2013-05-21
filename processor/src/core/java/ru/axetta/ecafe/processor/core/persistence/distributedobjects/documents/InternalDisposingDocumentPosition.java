@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TradeMaterialGood;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -41,7 +42,7 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
     @Override
     protected void appendAttributes(Element element) {
         setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element, "UnitsScale", unitsScale);
+        setAttribute(element, "UnitsScale", unitsScale.ordinal());
         setAttribute(element, "TotalCount", totalCount);
         setAttribute(element, "NetWeight", netWeight);
         setAttribute(element, "DisposePrice", disposePrice);
@@ -56,7 +57,7 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
         Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
         if(longOrgOwner != null) setOrgOwner(longOrgOwner);
         Integer integerUnitsScale = getIntegerAttributeValue(node,"UnitsScale");
-        if(integerUnitsScale!=null) setUnitsScale(integerUnitsScale);
+        if(integerUnitsScale!=null) setUnitsScale(UnitScale.fromInteger(integerUnitsScale));
         Long longTotalCount = getLongAttributeValue(node,"TotalCount");
         if(longTotalCount!=null) setTotalCount(longTotalCount);
         Long longNetWeight = getLongAttributeValue(node,"NetWeight");
@@ -82,7 +83,7 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
         setNds(((InternalDisposingDocumentPosition) distributedObject).getNds());
     }
 
-    private Integer unitsScale;
+    private UnitScale unitsScale;
     private Long totalCount;
     private Long netWeight;
     private Long disposePrice;
@@ -174,11 +175,11 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
         this.totalCount = totalCount;
     }
 
-    public Integer getUnitsScale() {
+    public UnitScale getUnitsScale() {
         return unitsScale;
     }
 
-    public void setUnitsScale(Integer unitsScale) {
+    public void setUnitsScale(UnitScale unitsScale) {
         this.unitsScale = unitsScale;
     }
 }

@@ -34,7 +34,13 @@
         <property name="nameOfGood" column="NameOfGood" type="string" length="512" not-null="true"/>
         <property name="fullName" column="FullName" type="string" length="1024"/>
         <property name="goodsCode" column="GoodsCode" type="string" length="32" not-null="true"/>
-        <property name="unitsScale" column="UnitsScale" type="integer" not-null="true"/>
+        <!--<property name="unitsScale" column="UnitsScale" type="integer" not-null="true"/>-->
+        <property name="unitsScale" column="UnitsScale">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale</param>
+                <param name="type">4</param>
+            </type>
+        </property>
         <property name="netWeight" column="NetWeight" type="long"  not-null="true"/>
         <property name="lifeTime" column="LifeTime" type="long"/>
         <property name="margin" column="Margin" type="long"/>

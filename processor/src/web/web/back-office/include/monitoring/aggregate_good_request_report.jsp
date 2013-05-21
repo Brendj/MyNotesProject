@@ -76,43 +76,44 @@
                 </rich:columnGroup>
             </f:facet>
 
-            <%--<rich:subTable id="aggregateGoodRequestSubTable" var="items"--%>
-                    <%--value="#{itemGroups.itemsList}"--%>
-                    <%--rowKeyVar="subTableRow">--%>
-                <%--<rich:column rowspan="#{items.productDetails.supplierDetails.rowCount}">--%>
-                    <%--<h:outputText value="#{items.productDetails.supplierDetails.idOfSupplier}" escape="true"/>--%>
-                <%--</rich:column>--%>
-                <%--<rich:column rowspan="#{items.productDetails.supplierDetails.rowCount}" styleClass="valign">--%>
-                    <%--<h:outputText value="#{items.productDetails.supplierDetails.nameOfSupplier}" escape="true"/>--%>
-                <%--</rich:column>--%>
-                <%--<rich:column rowspan="#{items.productDetails.rowCount}">--%>
-                    <%--<h:outputText value="#{items.productDetails.nameOfProduct}" escape="true"/>--%>
-                <%--</rich:column>--%>
-                <%--<rich:column rowspan="#{items.productDetails.rowCount}">--%>
-                    <%--<h:outputText value="#{items.productDetails.totalCount/1000}" escape="true">--%>
-                        <%--<f:convertNumber pattern="#0"/>--%>
-                    <%--</h:outputText>--%>
-                <%--</rich:column>--%>
-                <%--<rich:column>--%>
-                    <%--<h:outputText value="#{items.idOfOrg}" escape="true"/>--%>
-                <%--</rich:column>--%>
-                <%--<rich:column>--%>
-                    <%--<h:outputText value="#{items.nameOfOrg}" escape="true"/>--%>
-                <%--</rich:column>--%>
-                <%--<rich:column>--%>
-                    <%--<h:outputText value="#{items.productCount / 1000}" escape="true">--%>
-                        <%--<f:convertNumber pattern="#0"/>--%>
-                    <%--</h:outputText>--%>
-                <%--</rich:column>--%>
-                <%--<rich:column>--%>
-                    <%--<h:outputText value="#{items.dateOfExecutionFormatted}" escape="true"/>--%>
-                <%--</rich:column>--%>
-            <%--</rich:subTable>--%>
+            <rich:subTable id="aggregateGoodRequestSubTable" var="items"
+                    value="#{itemGroups.itemsList}"
+                    rowKeyVar="subTableRow" onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
+                    onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
+                <rich:column>
+                    <h:outputText value="#{items.productDetails.supplierDetails.idOfSupplier}" escape="true"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{items.productDetails.supplierDetails.nameOfSupplier}" escape="true"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{items.productDetails.nameOfProduct}" escape="true"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{items.productDetails.totalCount/1000}" escape="true">
+                        <f:convertNumber pattern="#0"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{items.idOfOrg}" escape="true"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{items.nameOfOrg}" escape="true"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{items.productCount / 1000}" escape="true">
+                        <f:convertNumber pattern="#0"/>
+                    </h:outputText>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{items.dateOfExecutionFormatted}" escape="true"/>
+                </rich:column>
+            </rich:subTable>
 
-            <rich:column colspan="9">
+          <%--  <rich:column colspan="9">
                 <rich:spacer/>
             </rich:column>
-
+--%>
             <f:facet name="footer">
                 <rich:datascroller for="aggregateGoodRequestTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
                                    stepControls="auto" boundaryControls="hide">

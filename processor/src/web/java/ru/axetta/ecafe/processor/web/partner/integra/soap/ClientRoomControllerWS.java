@@ -718,7 +718,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             listOfGoodsExt.setOrgOwner(good.getOrgOwner());
                             listOfGoodsExt.setNameOfGood(good.getNameOfGood());
                             listOfGoodsExt.setFullName(good.getFullName());
-                            listOfGoodsExt.setUnitsScale(good.getUnitsScale());
+                            listOfGoodsExt.setUnitsScale(good.getUnitsScale().ordinal());
                             listOfGoodsExt.setNetWeight(good.getNetWeight());
                             listOfGoodsExt.setLifetime(good.getLifeTime());
                             listOfGoodsExt.setMargin(good.getMargin());
