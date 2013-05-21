@@ -29,6 +29,43 @@ import java.util.Set;
  */
 public class Good extends DistributedObject {
 
+    private String pathPart1;
+    private String pathPart2;
+    private String pathPart3;
+    private String pathPart4;
+
+    String getPathPart4() {
+        return pathPart4;
+    }
+
+    void setPathPart4(String pathPart4) {
+        this.pathPart4 = pathPart4;
+    }
+
+    String getPathPart3() {
+        return pathPart3;
+    }
+
+    void setPathPart3(String pathPart3) {
+        this.pathPart3 = pathPart3;
+    }
+
+    String getPathPart2() {
+        return pathPart2;
+    }
+
+    void setPathPart2(String pathPart2) {
+        this.pathPart2 = pathPart2;
+    }
+
+    String getPathPart1() {
+        return pathPart1;
+    }
+
+    void setPathPart1(String pathPart1) {
+        this.pathPart1 = pathPart1;
+    }
+
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGG);

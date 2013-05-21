@@ -33,6 +33,12 @@
         <property name="orgOwner" column="OrgOwner" type="long"/>
         <property name="nameOfGood" column="NameOfGood" type="string" length="512" not-null="true"/>
         <property name="fullName" column="FullName" type="string" length="1024"/>
+
+        <property name="pathPart1" formula="split_part(FullName, '/', 1)" lazy="true" type="java.lang.String"/>
+        <property name="pathPart2" formula="split_part(FullName, '/', 2)" lazy="true" type="java.lang.String"/>
+        <property name="pathPart3" formula="split_part(FullName, '/', 3)" lazy="true" type="java.lang.String"/>
+        <property name="pathPart4" formula="split_part(FullName, '/', 4)" lazy="true" type="java.lang.String"/>
+
         <property name="goodsCode" column="GoodsCode" type="string" length="32" not-null="true"/>
         <!--<property name="unitsScale" column="UnitsScale" type="integer" not-null="true"/>-->
         <property name="unitsScale" column="UnitsScale">

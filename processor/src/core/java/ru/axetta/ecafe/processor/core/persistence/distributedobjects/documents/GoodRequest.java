@@ -165,31 +165,4 @@ public class GoodRequest extends DistributedObject {
         this.dateOfGoodsRequest = dateOfGoodsRequest;
     }
 
-    public String getCreatedDateFormatted() {
-        return formatDate(createdDate);
-    }
-
-    public String getLastUpdateFormatted() {
-        return formatDate(lastUpdate);
-    }
-
-    public String getDeleteDateFormatted() {
-        return formatDate(deleteDate);
-    }
-
-    public String getDoneDateFormatted() {
-        return formatDate(doneDate);
-    }
-
-    //TODO: убрать у класса родителя уже есь подобные методы
-    private String formatDate(Date date) {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
-        if (date != null) {
-            String result = sdf.format(date);
-            return result;
-        } else {
-            return null;
-        }
-    }
-
 }

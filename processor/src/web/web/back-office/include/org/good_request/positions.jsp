@@ -38,7 +38,10 @@
             <f:facet name="header">
                 <h:outputText value="Количество" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{goodRequestPosition.totalCount/1000}">
+            <h:outputText styleClass="output-text" value="#{goodRequestPosition.totalCount/1000}" rendered="#{goodRequestPosition.floatScale}">
+                <f:convertNumber pattern="#0"/>
+            </h:outputText>
+            <h:outputText styleClass="output-text" value="#{goodRequestPosition.totalCount/1000}" rendered="#{!goodRequestPosition.floatScale}">
                 <f:convertNumber pattern="#0.000"/>
             </h:outputText>
         </rich:column>
@@ -46,7 +49,7 @@
             <f:facet name="header">
                 <h:outputText value="Единица измерения" styleClass="output-text" escape="true"/>
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{goodRequestPosition.unitsScaleValue}" />
+            <h:outputText styleClass="output-text" value="#{goodRequestPosition.unitsScale}" />
         </rich:column>
         <rich:column  headerClass="column-header">
             <f:facet name="header">

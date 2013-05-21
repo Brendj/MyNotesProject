@@ -26,7 +26,7 @@ import org.w3c.dom.Node;
  */
 public class GoodRequestPosition extends DistributedObject {
 
-    public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
+    //public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
@@ -45,7 +45,7 @@ public class GoodRequestPosition extends DistributedObject {
     @Override
     protected void appendAttributes(Element element) {
         setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"UnitsScale", unitsScale);
+        setAttribute(element,"UnitsScale", unitsScale.ordinal());
         setAttribute(element,"TotalCount", totalCount);
         setAttribute(element,"NetWeight", netWeight);
         setAttribute(element,"GuidOfGoodsRequest", goodRequest.getGuid());
@@ -151,29 +151,20 @@ public class GoodRequestPosition extends DistributedObject {
         this.totalCount = totalCount;
     }
 
-    public String getTotalCountPattern(){
-        //if(unitsScale>1){
-        //    return "#0";
-        //} else {
-            return "#0.000";
-        //}
-    }
-
     public UnitScale getUnitsScale() {
         return unitsScale;
     }
 
-    public void setUnitsScale(UnitScale unitsScale) {
-        this.unitsScale = unitsScale;
+    public Boolean getFloatScale(){
+        if(unitsScale.equals(UnitScale.UNITS) || unitsScale.equals(UnitScale.PORTIONS)){
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public String getUnitsScaleValue() {
-        //if ((unitsScale != null) && (unitsScale >= 0) && (unitsScale <= UNIT_SCALES.length)) {
-        //    return UNIT_SCALES[unitsScale];
-        //} else {
-        //    return "";
-        //}
-        return unitsScale.toString();
+    public void setUnitsScale(UnitScale unitsScale) {
+        this.unitsScale = unitsScale;
     }
 
     public String getCurrentElementValue() {

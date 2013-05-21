@@ -39,7 +39,7 @@ public class GoodRequestPositionListPage extends BasicWorkspacePage {
     public void reload() throws Exception {
         String where = "idofgoodsrequest=" + idOfGoodRequest;
         where = (where.equals("")?"":" where ") + where;
-        TypedQuery<GoodRequestPosition> query = entityManager.createQuery("from GoodRequestPosition" + where, GoodRequestPosition.class);
+        TypedQuery<GoodRequestPosition> query = entityManager.createQuery("from GoodRequestPosition " + where, GoodRequestPosition.class);
         goodRequestPositionList = query.getResultList();
     }
 
