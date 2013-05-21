@@ -432,6 +432,9 @@
   </component>
   <component name="CompilerConfiguration">
     <option name="DEFAULT_COMPILER" value="Javac" />
+    <excludeFromCompile>
+      <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/batch_expire_edit.jsp" />
+    </excludeFromCompile>
     <resourceExtensions>
       <entry name=".+\.(properties|xml|html|dtd|tld)" />
       <entry name=".+\.(gif|png|jpeg|jpg)" />
@@ -540,6 +543,21 @@
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/balance_report.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/distribution_rules.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/load_file.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/operation_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/batch_expire_edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/refund.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/sms_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/load_file.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/select_group.jsp" />
   </component>
   <component name="FacetAutodetectingManager">
     <autodetection-disabled>
