@@ -113,6 +113,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                 exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
                 exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
                 exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
+                exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
                 exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
                 exporter.exportReport();
                 return new DeliveredServicesReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
