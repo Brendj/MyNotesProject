@@ -46,24 +46,6 @@
                       styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.goodRequestReportPage.hideMissedColumns}" styleClass="output-text" />
 
-        <%--<h:outputText escape="true" value="Отображать созданные заявки"
-                      styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{mainPage.goodRequestReportPage.showCreated}" styleClass="output-text" />
-
-        <h:outputText escape="true" value="Отображать заявки к исполнению"
-                      styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{mainPage.goodRequestReportPage.showFollow}" styleClass="output-text" />
-
-        <h:outputText escape="true" value="Отображать закрытые заявки"
-                      styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{mainPage.goodRequestReportPage.showCompleted}" styleClass="output-text" />
-
-        <h:outputText escape="true" value="Отображать все заявки"
-                      styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{mainPage.goodRequestReportPage.showAll}" styleClass="output-text" />  --%>
-
-
-
         <h:outputText escape="true" value="Фильтр по заявкам"
                       styleClass="output-text" />
         <h:selectOneMenu value="#{mainPage.goodRequestReportPage.requestsFilter}" converter="javax.faces.Integer"
@@ -73,9 +55,6 @@
             <f:selectItem itemValue="2" itemLabel="Отображать закрытые заявки"/>
             <f:selectItem itemValue="3" itemLabel="Отображать все заявки"/>
         </h:selectOneMenu>
-
-
-
 
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildGoodRequestReport}"
                            reRender="mainMenu, workspaceTogglePanel, goodRequestsReportTable"

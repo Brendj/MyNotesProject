@@ -709,11 +709,6 @@
                         label="Отчет по показателям цен и продаж" action="#{aggregateCostsAndSalesReportPage.show}"
                         reRender="workspaceForm" />
 
-    <%--@elvariable id="aggregateGoodRequestReportPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.AggregateGoodRequestReportPage"--%>
-    <rich:panelMenuItem id="aggregateGoodRequestReportMenuItem"
-                        binding="#{aggregateGoodRequestReportPage.mainMenuComponent}" label="Сводный отчет по заякам"
-                        action="#{aggregateGoodRequestReportPage.show}" reRender="workspaceForm" />
-
     <rich:panelMenuItem id="projectStateMenuItem" label="Ключевые показатели"
                         onclick="window.open('/processor/back-office/project_state.jsp', 'Ключевые показатели')" />
 </rich:panelMenuGroup>
@@ -755,6 +750,19 @@
                             action="#{mainPage.showOrgDiscountsReportPage}" reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
+    <rich:panelMenuGroup id="goodRequestsGroupMenu" binding="#{mainPage.goodGroupsGroupPage.mainMenuComponent}"
+                         label="Отчет по заявкам">
+        <a4j:support event="onclick" action="#{mainPage.showGoodRequestsGroupMenu}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="goodRequestReportMenuItem"
+                            binding="#{mainPage.goodRequestReportPage.mainMenuComponent}" label="Сводный отчет по заявкам"
+                            action="#{mainPage.showGoodRequestReportPage}" reRender="workspaceForm" />
+
+        <%--@elvariable id="aggregateGoodRequestReportPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.AggregateGoodRequestReportPage"--%>
+        <rich:panelMenuItem id="aggregateGoodRequestReportMenuItem"
+                            binding="#{aggregateGoodRequestReportPage.mainMenuComponent}" label="Детальный отчет по заякам"
+                            action="#{aggregateGoodRequestReportPage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"
                         label="Отчет по продажам" action="#{mainPage.showSalesReportPage}" reRender="workspaceForm" />
@@ -791,9 +799,6 @@
     <rich:panelMenuItem id="clientPaymentsReportMenuItem"
                         binding="#{mainPage.clientPaymentsReportPage.mainMenuComponent}" label="Отчет по начислениям"
                         action="#{mainPage.showClientPaymentsReportPage}" reRender="workspaceForm" />
-    <rich:panelMenuItem id="goodRequestReportMenuItem"
-                        binding="#{mainPage.goodRequestReportPage.mainMenuComponent}" label="Отчет по заявкам организаций"
-                        action="#{mainPage.showGoodRequestReportPage}" reRender="workspaceForm" />
     <rich:panelMenuItem id="deliveredServicesReportMenuItem"
                         binding="#{mainPage.deliveredServicesReportPage.mainMenuComponent}" label="Отчет по предоставленным услугам"
                         action="#{mainPage.showDeliveredServicesReportPage}" reRender="workspaceForm" />

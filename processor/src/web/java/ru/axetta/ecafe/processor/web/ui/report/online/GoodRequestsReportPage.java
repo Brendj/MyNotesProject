@@ -21,9 +21,6 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
     private GoodRequestsReport goodRequests;
     private String goodName;
     private Boolean hideMissedColumns;
-    private boolean showCreated;
-    private boolean showFollow;
-    private boolean showCompleted;
     private boolean showAll = true;
     private int requestsFilter = 3;
 
@@ -65,30 +62,6 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
 
     public void setGoodRequests(GoodRequestsReport goodRequests) {
         this.goodRequests = goodRequests;
-    }
-
-    public boolean isShowCreated() {
-        return showCreated;
-    }
-
-    public void setShowCreated(boolean showCreated) {
-        this.showCreated = showCreated;
-    }
-
-    public boolean isShowFollow() {
-        return showFollow;
-    }
-
-    public void setShowFollow(boolean showFollow) {
-        this.showFollow = showFollow;
-    }
-
-    public boolean isShowCompleted() {
-        return showCompleted;
-    }
-
-    public void setShowCompleted(boolean showCompleted) {
-        this.showCompleted = showCompleted;
     }
 
     public boolean isShowAll() {
