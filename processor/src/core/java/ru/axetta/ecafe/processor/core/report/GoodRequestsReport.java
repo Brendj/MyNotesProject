@@ -94,7 +94,7 @@ public class GoodRequestsReport extends BasicReport {
             String suppliersCondition = "";
             if (!idOfSupplierList.isEmpty()) {
                 // Обработать лист с организациями
-                suppliersCondition = " and (cf_orgs.defaultsupplier in (";
+                suppliersCondition = " and (cf_menuexchangerules.idofsourceorg in (";
                 for (Long idOfOrg : idOfSupplierList) {
                     if (!suppliersCondition.endsWith("(")) {
                         suppliersCondition = suppliersCondition.concat(", ");
@@ -115,6 +115,7 @@ public class GoodRequestsReport extends BasicReport {
                          "      left join cf_orgs on cf_orgs.idoforg=cf_goods_requests.orgowner "+
                          "      left join cf_goods_requests_positions on cf_goods_requests.idofgoodsrequest=cf_goods_requests_positions.idofgoodsrequest "+
                          "      join cf_goods on cf_goods.idofgood=cf_goods_requests_positions.idofgood "+
+                         "      " + (suppliersCondition.length() < 1 ? "" : "join cf_menuexchangerules on idofdestorg=cf_orgs.idoforg ") +
                          "      where cf_orgs.officialname<> '' and " +
                          "            " + stateCondition +
                          "            (cf_goods_requests.donedate between " + startDateLong + " and " + endDateLong + ") "+
@@ -349,7 +350,7 @@ public class GoodRequestsReport extends BasicReport {
                 Calendar cal = getColumnDate (colName);
                 //  Проверяем, является ли текущий столбец сегодняшней датой, и если да, то добавляем задний фон
                 if (now.getTimeInMillis() == cal.getTimeInMillis()) {
-                    style = "background-color: #2EC754; ";
+                    style = "background-color: lightgreen; ";
                 }
 
                 return style;
