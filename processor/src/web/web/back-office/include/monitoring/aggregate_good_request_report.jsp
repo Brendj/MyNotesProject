@@ -27,7 +27,7 @@
 
             <h:outputText styleClass="output-text" escape="true" value=" {#{aggregateGoodRequestReportPage.filter}}" />
         </h:panelGrid>
-        <a4j:commandButton value="Генерировать отчет" action="#{aggregateGoodRequestReportPage.buildReport}"
+        <a4j:commandButton value="Генерировать отчет" action="#{aggregateGoodRequestReportPage.generateReport}"
                            reRender="mainMenu, workspaceTogglePanel, aggregateGoodRequestTable"
                            styleClass="command-button" status="sReportGenerateStatus" />
         <a4j:status id="sReportGenerateStatus">
@@ -37,86 +37,82 @@
         </a4j:status>
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-div">
-        <rich:dataTable id="aggregateGoodRequestTable" var="itemGroups"
-                        value="#{aggregateGoodRequestReportPage.aggregateGoodRequestReport.itemGroupsList}"
-                        rowKeyVar="row" rows="1"
+        <rich:dataTable id="aggregateGoodRequestTable" var="items"
+                        value="#{aggregateGoodRequestReportPage.aggregateGoodRequestReportItems}"
                         footerClass="data-table-footer">
             <f:facet name="header">
                 <rich:columnGroup>
-                    <rich:column colspan="2">
-                        <h:outputText styleClass="column-header" value="Поставщик"/>
+                    <rich:column rowspan="2">
+                        <h:outputText value="№ заявки"/>
                     </rich:column>
-                    <rich:column colspan="6">
-                        <h:outputText styleClass="column-header" value="Заявки"/>
+                    <rich:column colspan="2">
+                        <h:outputText value="Поставщик"/>
+                    </rich:column>
+                    <rich:column colspan="3">
+                        <h:outputText value="Получатель"/>
+                    </rich:column>
+                    <rich:column rowspan="2">
+                        <h:outputText value="Товар/продукт"/>
+                    </rich:column>
+                    <rich:column rowspan="2">
+                        <h:outputText value="Колво-заказов"/>
+                    </rich:column>
+                    <rich:column rowspan="2">
+                        <h:outputText value="Дата к исполнению"/>
                     </rich:column>
                     <rich:column breakBefore="true">
-                        <h:outputText styleClass="column-header" value="ID"/>
+                        <h:outputText value="ID"/>
                     </rich:column>
                     <rich:column>
-                        <h:outputText styleClass="column-header" value="Название поставщика"/>
+                        <h:outputText value="Наименование"/>
                     </rich:column>
                     <rich:column>
-                        <h:outputText styleClass="column-header" value="Товар/продукт"/>
+                        <h:outputText value="ID"/>
                     </rich:column>
                     <rich:column>
-                        <h:outputText styleClass="column-header" value="Общее количество заказов"/>
+                        <h:outputText value="№ ОУ"/>
                     </rich:column>
                     <rich:column>
-                        <h:outputText styleClass="column-header" value="ID"/>
-                    </rich:column>
-                    <rich:column>
-                        <h:outputText styleClass="column-header" value="Название учреждения"/>
-                    </rich:column>
-                    <rich:column>
-                        <h:outputText styleClass="column-header" value="Кол-во заказов"/>
-                    </rich:column>
-                    <rich:column>
-                        <h:outputText styleClass="column-header" value="Дата к исполнению"/>
+                        <h:outputText value="Наименование"/>
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>
-
-            <rich:subTable id="aggregateGoodRequestSubTable" var="items"
-                    value="#{itemGroups.itemsList}"
-                    rowKeyVar="subTableRow" onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
-                    onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
+            <rich:column rowspan="#{items.commoditiesCounts}">
+                <h:outputText value="#{items.number}"/>
+            </rich:column>
+            <rich:column rowspan="#{items.commoditiesCounts}">
+                <h:outputText value="#{items.idOfSupplier}"/>
+            </rich:column>
+            <rich:column rowspan="#{items.commoditiesCounts}">
+                <h:outputText value="#{items.supplierName}"/>
+            </rich:column>
+            <rich:column rowspan="#{items.commoditiesCounts}">
+                <h:outputText value="#{items.idOfEducation}"/>
+            </rich:column>
+            <rich:column rowspan="#{items.commoditiesCounts}">
+                <h:outputText value="#{items.educationNumber}"/>
+            </rich:column>
+            <rich:column rowspan="#{items.commoditiesCounts}">
+                <h:outputText value="#{items.educationName}"/>
+            </rich:column>
+            <rich:column rowspan="1" style="height: 0 !important; line-height: 0;padding: 0;margin: 0; border: 0">
+            </rich:column>
+            <rich:column rowspan="1" style="height: 0 !important; line-height: 0;padding: 0;margin: 0; border: 0">
+            </rich:column>
+            <rich:column rowspan="#{items.commoditiesCounts}">
+                <h:outputText value="#{items.doneDate}" converter="timeConverter"/>
+            </rich:column>
+            <rich:subTable value="#{items.commodities}" var="commodity">
                 <rich:column>
-                    <h:outputText value="#{items.productDetails.supplierDetails.idOfSupplier}" escape="true"/>
+                    <h:outputText value="#{commodity.name}"/>
                 </rich:column>
                 <rich:column>
-                    <h:outputText value="#{items.productDetails.supplierDetails.nameOfSupplier}" escape="true"/>
-                </rich:column>
-                <rich:column>
-                    <h:outputText value="#{items.productDetails.nameOfProduct}" escape="true"/>
-                </rich:column>
-                <rich:column>
-                    <h:outputText value="#{items.productDetails.totalCount/1000}" escape="true">
-                        <f:convertNumber pattern="#0"/>
-                    </h:outputText>
-                </rich:column>
-                <rich:column>
-                    <h:outputText value="#{items.idOfOrg}" escape="true"/>
-                </rich:column>
-                <rich:column>
-                    <h:outputText value="#{items.nameOfOrg}" escape="true"/>
-                </rich:column>
-                <rich:column>
-                    <h:outputText value="#{items.productCount / 1000}" escape="true">
-                        <f:convertNumber pattern="#0"/>
-                    </h:outputText>
-                </rich:column>
-                <rich:column>
-                    <h:outputText value="#{items.dateOfExecutionFormatted}" escape="true"/>
+                    <h:outputText value="#{commodity.totalCount}"/>
                 </rich:column>
             </rich:subTable>
-
-          <%--  <rich:column colspan="9">
-                <rich:spacer/>
-            </rich:column>
---%>
             <f:facet name="footer">
                 <rich:datascroller for="aggregateGoodRequestTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
-                                   stepControls="auto" boundaryControls="hide">
+                                   stepControls="auto" boundaryControls="hide" rendered="#{not empty aggregateGoodRequestReportPage.aggregateGoodRequestReportItems}">
                     <f:facet name="previous">
                         <h:graphicImage value="/images/16x16/left-arrow.png" />
                     </f:facet>
@@ -127,6 +123,7 @@
             </f:facet>
         </rich:dataTable>
     </h:panelGrid>
+
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>
