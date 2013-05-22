@@ -25,9 +25,18 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
     private boolean showFollow;
     private boolean showCompleted;
     private boolean showAll = true;
+    private int requestsFilter;
 
     public String getPageFilename() {
         return "report/online/good_requests_report";
+    }
+
+    public int getRequestsFilter() {
+        return requestsFilter;
+    }
+
+    public void setRequestsFilter(int requestsFilter) {
+        this.requestsFilter = requestsFilter;
     }
 
     public GoodRequestsReport getGoodRequestsReport() {
@@ -103,7 +112,7 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
     public void buildReport(Session session) throws Exception {
         GoodRequestsReport.Builder reportBuilder = new GoodRequestsReport.Builder();
         this.goodRequests = reportBuilder.build(session, hideMissedColumns, goodName, startDate, endDate, idOfOrgList, idOfContragentOrgList,
-                                                showCreated, showFollow, showCompleted, showAll);
+                                                requestsFilter);
     }
 
 }

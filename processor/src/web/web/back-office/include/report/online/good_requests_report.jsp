@@ -11,12 +11,6 @@
 
 <h:panelGrid id="goodRequestReportPanelGrid" binding="#{mainPage.goodRequestReportPage.pageComponent}" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
-        <rich:calendar value="#{mainPage.goodRequestReportPage.startDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
-        <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
-        <rich:calendar value="#{mainPage.goodRequestReportPage.endDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
         <h:outputText styleClass="output-text" escape="true" value="Товар" />
         <h:inputText value="#{mainPage.goodRequestReportPage.goodName}" styleClass="input-text" size="50" />
 
@@ -24,7 +18,9 @@
         <h:panelGroup>
             <a4j:commandButton value="..." action="#{mainPage.goodRequestReportPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" />
+                               styleClass="command-link" style="width: 25px;" >
+                <f:setPropertyActionListener value="0" target="#{mainPage.orgListSelectPage.filterMode}" />
+            </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.goodRequestReportPage.filter}}" />
         </h:panelGroup>
 
@@ -32,15 +28,24 @@
         <h:panelGroup>
             <a4j:commandButton value="..." action="#{mainPage.goodRequestReportPage.showContragentListSelectPage}" reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" />
-            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.goodRequestReportPage.contragentFileter}}" />
+                               styleClass="command-link" style="width: 25px;" >
+                <f:setPropertyActionListener value="2" target="#{mainPage.orgListSelectPage.filterMode}" />
+            </a4j:commandButton>
+            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.goodRequestReportPage.contragentFilter}}" />
         </h:panelGroup>
+
+        <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
+        <rich:calendar value="#{mainPage.goodRequestReportPage.startDate}" datePattern="dd.MM.yyyy"
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+        <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
+        <rich:calendar value="#{mainPage.goodRequestReportPage.endDate}" datePattern="dd.MM.yyyy"
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
         <h:outputText escape="true" value="Скрывать даты с пустыми значениями"
                       styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.goodRequestReportPage.hideMissedColumns}" styleClass="output-text" />
 
-        <h:outputText escape="true" value="Отображать созданные заявки"
+        <%--<h:outputText escape="true" value="Отображать созданные заявки"
                       styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.goodRequestReportPage.showCreated}" styleClass="output-text" />
 
@@ -54,7 +59,21 @@
 
         <h:outputText escape="true" value="Отображать все заявки"
                       styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{mainPage.goodRequestReportPage.showAll}" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.goodRequestReportPage.showAll}" styleClass="output-text" />  --%>
+
+
+
+        <t:panelGroup colspan="2">
+            <h:selectOneRadio value="#{mainPage.goodRequestReportPage.requestsFilter}" converter="javax.faces.Integer"
+                              styleClass="output-text" layout="pageDirection"  >
+                <f:selectItem itemValue="0" itemLabel="Отображать созданные заявки"/>
+                <f:selectItem itemValue="1" itemLabel="Отображать заявки к исполнению"/>
+                <f:selectItem itemValue="2" itemLabel="Отображать закрытые заявки"/>
+                <f:selectItem itemValue="3" itemLabel="Отображать все заявки"/>
+            </h:selectOneRadio>
+        </t:panelGroup>
+
+
 
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildGoodRequestReport}"
                            reRender="mainMenu, workspaceTogglePanel, goodRequestsReportTable"

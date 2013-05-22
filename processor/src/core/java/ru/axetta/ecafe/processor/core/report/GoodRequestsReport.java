@@ -51,7 +51,7 @@ public class GoodRequestsReport extends BasicReport {
 
         public GoodRequestsReport build(Session session, Boolean hideMissedColumns, String goodName,
                                         Date startDate, Date endDate, List<Long> idOfOrgList, List <Long> idOfSupplierList,
-                                        boolean showCreated, boolean showFollow, boolean showCompleted, boolean showAll)
+                                        int requestsFilter)
                 throws Exception {
             Date generateTime = new Date();
             List<RequestItem> items = new LinkedList<RequestItem>();
@@ -64,27 +64,18 @@ public class GoodRequestsReport extends BasicReport {
             }
 
             String stateCondition = "";
-            if (!showAll && showCompleted) {
-                stateCondition = " (cf_goods_requests.state=" + RequestState.COMPLETED.ordinal();
-            }
-            if (!showAll && showCreated) {
-                if (stateCondition.length() < 1) {
-                    stateCondition = "(";
-                } else {
-                    stateCondition = stateCondition + " OR ";
-                }
-                stateCondition = stateCondition + "cf_goods_requests.state=" + RequestState.CREATED.ordinal();
-            }
-            if (!showAll && showFollow) {
-                if (stateCondition.length() < 1) {
-                    stateCondition = "(";
-                } else {
-                    stateCondition = stateCondition + " OR ";
-                }
-                stateCondition = stateCondition + "cf_goods_requests.state=" + RequestState.FOLLOW.ordinal();
-            }
-            if (stateCondition.length() > 0) {
-                stateCondition = stateCondition + ") and ";
+            switch (requestsFilter) {
+                case 0:
+                    stateCondition = " cf_goods_requests.state=" + RequestState.CREATED.ordinal() + " AND ";
+                    break;
+                case 1:
+                    stateCondition = " cf_goods_requests.state=" + RequestState.FOLLOW.ordinal() + " AND ";
+                    break;
+                case 2:
+                    stateCondition = " cf_goods_requests.state=" + RequestState.COMPLETED.ordinal() + " AND ";
+                    break;
+                default:
+                    break;
             }
             String orgCondition = "";
             if (!idOfOrgList.isEmpty()) {
