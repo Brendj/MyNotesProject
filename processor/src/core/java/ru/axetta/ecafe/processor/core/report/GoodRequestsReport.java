@@ -24,6 +24,8 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class GoodRequestsReport extends BasicReport {
+    public static final String OVERALL_TITLE = "ИТОГО";
+    public static final String OVERALL_ALL_TITLE = "ВСЕГО";
     private static final DateFormat MONTHLY_DATE_FORMAT = new SimpleDateFormat("dd.MM");
     private static final DateFormat DAILY_DATE_FORMAT = new SimpleDateFormat("dd");
     private final List<RequestItem> items;
@@ -107,7 +109,7 @@ public class GoodRequestsReport extends BasicReport {
 
             String sql = "select requests.org, requests.orgFull, requests.good, requests.d, int8(sum(requests.cnt)) "+
                          "from (select substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') as org, cf_orgs.officialname as orgFull, "+
-                         "             cf_goods.fullname as good , date_trunc('day', to_timestamp(cf_goods_requests.createddate / 1000)) as d, "+
+                         "             cf_goods.fullname as good , date_trunc('day', to_timestamp(cf_goods_requests.donedate / 1000)) as d, "+
                          "             cf_goods_requests_positions.totalcount / 1000 as cnt "+
                          "      from cf_goods_requests "+
                          "      left join cf_orgs on cf_orgs.idoforg=cf_goods_requests.orgowner "+
@@ -115,7 +117,7 @@ public class GoodRequestsReport extends BasicReport {
                          "      join cf_goods on cf_goods.idofgood=cf_goods_requests_positions.idofgood "+
                          "      where cf_orgs.officialname<> '' and " +
                          "            " + stateCondition +
-                         "            (cf_goods_requests.createddate between " + startDateLong + " and " + endDateLong + ") "+
+                         "            (cf_goods_requests.donedate between " + startDateLong + " and " + endDateLong + ") "+
                          "            " + goodCondition +
                          "            " + orgCondition +
                          "            " + suppliersCondition + ") as requests "+
@@ -127,7 +129,7 @@ public class GoodRequestsReport extends BasicReport {
             RequestItem item = null;
 
             Map <String, RequestItem> totalItems = new TreeMap <String, RequestItem>();
-            RequestItem overallItem = new TotalItem("ИТОГО", "", "ВСЕГО", report);
+            RequestItem overallItem = new TotalItem(OVERALL_TITLE, "", OVERALL_ALL_TITLE, report);
 
             Query query = session.createSQLQuery(sql);
             List res = query.list();
@@ -150,7 +152,7 @@ public class GoodRequestsReport extends BasicReport {
                 //  Получаем итоговый элемент по данному товару, чтобы добавить в него количество от текущей записи
                 RequestItem totalItem = totalItems.get(good);
                 if (totalItem == null) {
-                    totalItem = new TotalItem("ИТОГО", "", good, report);
+                    totalItem = new TotalItem(OVERALL_TITLE, "", good, report);
                     totalItems.put(good, totalItem);
                 }
                 totalItem.addValue(date, new RequestValue(value));      //  Добавляем в итог по товару
@@ -317,6 +319,46 @@ public class GoodRequestsReport extends BasicReport {
         }
 
 
+        public String getStyle (String colName) {
+            String style = "";
+
+            try
+            {
+                if (org.equals(OVERALL_TITLE)) {
+                    style = style + "font-weight: bold; ";
+                }
+                if (good.equals(OVERALL_ALL_TITLE)) {
+                    style = style + "color: #10185C; ";
+                }
+
+                return style;
+            } catch ( Exception e) {
+                return "";
+            }
+        }
+
+
+        public String getBackgoundColor (String colName) {
+            String style = "";
+
+            try
+            {
+                Calendar now = new GregorianCalendar();
+                now.setTimeInMillis(System.currentTimeMillis());
+                clearCalendarTime(now);
+                Calendar cal = getColumnDate (colName);
+                //  Проверяем, является ли текущий столбец сегодняшней датой, и если да, то добавляем задний фон
+                if (now.getTimeInMillis() == cal.getTimeInMillis()) {
+                    style = "background-color: #2EC754; ";
+                }
+
+                return style;
+            } catch ( Exception e) {
+                return "";
+            }
+        }
+
+
         public String getValue (String colName) {
             //  Если это значение по умолчанию, то не делаем проверку по месяцам
             String val = getDefaultValue (colName, report);
@@ -326,26 +368,7 @@ public class GoodRequestsReport extends BasicReport {
 
             try
                 {
-                //  Если это не столбец по умолчанию, значит это дата - берем значение из массива, используя дату
-                //  Используем дату от первого значений - нам понадоббятся его месяц и год
-                Calendar firstDate = new GregorianCalendar();
-                firstDate.setTimeInMillis(values.keySet().iterator().next());
-                Calendar cal = new GregorianCalendar();
-                int day = -1;
-                int month = -1;
-                if (colName.indexOf(".") > 0) {
-                    //  определяем есть ли месяц - если есть, значит будем использовать месяц + день
-                    day = Integer.parseInt(colName.substring(0, colName.indexOf(".")));
-                    month = Integer.parseInt(colName.substring(colName.indexOf(".") + 1)) - 1;
-                } else {
-                    //  если месяца нет, то получаем его у первого значения
-                    day = Integer.parseInt(colName);
-                    month = firstDate.get(Calendar.MONTH);
-                }
-                cal.set(Calendar.DAY_OF_MONTH, day);
-                cal.set(Calendar.MONTH, month);
-                cal.set(Calendar.YEAR, firstDate.get(Calendar.YEAR));
-                clearCalendarTime(cal);
+                Calendar cal = getColumnDate (colName);
 
                 //return "" + new BigDecimal(values.get(cal.getTimeInMillis()).getValue()).setScale(1, BigDecimal.ROUND_HALF_DOWN);
                 return "" + new BigDecimal(values.get(cal.getTimeInMillis()).getValue()).setScale(0, BigDecimal.ROUND_HALF_DOWN);
@@ -379,6 +402,32 @@ public class GoodRequestsReport extends BasicReport {
             }
             return null;
         }
+
+
+        private Calendar getColumnDate (String colName) {
+            //  Если это не столбец по умолчанию, значит это дата - берем значение из массива, используя дату
+            //  Используем дату от первого значений - нам понадоббятся его месяц и год
+            Calendar firstDate = new GregorianCalendar();
+            firstDate.setTimeInMillis(values.keySet().iterator().next());
+            Calendar cal = new GregorianCalendar();
+            int day = -1;
+            int month = -1;
+            if (colName.indexOf(".") > 0) {
+                //  определяем есть ли месяц - если есть, значит будем использовать месяц + день
+                day = Integer.parseInt(colName.substring(0, colName.indexOf(".")));
+                month = Integer.parseInt(colName.substring(colName.indexOf(".") + 1)) - 1;
+            } else {
+                //  если месяца нет, то получаем его у первого значения
+                day = Integer.parseInt(colName);
+                month = firstDate.get(Calendar.MONTH);
+            }
+            cal.set(Calendar.DAY_OF_MONTH, day);
+            cal.set(Calendar.MONTH, month);
+            cal.set(Calendar.YEAR, firstDate.get(Calendar.YEAR));
+            clearCalendarTime(cal);
+            return cal;
+        }
+
 
         public static void clearCalendarTime (Calendar cal) {
             cal.set(Calendar.HOUR_OF_DAY, 0);

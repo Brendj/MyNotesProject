@@ -25,7 +25,7 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
     private boolean showFollow;
     private boolean showCompleted;
     private boolean showAll = true;
-    private int requestsFilter;
+    private int requestsFilter = 3;
 
     public String getPageFilename() {
         return "report/online/good_requests_report";

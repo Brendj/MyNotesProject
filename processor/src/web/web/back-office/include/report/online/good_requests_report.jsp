@@ -11,8 +11,16 @@
 
 <h:panelGrid id="goodRequestReportPanelGrid" binding="#{mainPage.goodRequestReportPage.pageComponent}" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText styleClass="output-text" escape="true" value="Товар" />
-        <h:inputText value="#{mainPage.goodRequestReportPage.goodName}" styleClass="input-text" size="50" />
+
+        <h:outputText styleClass="output-text" escape="true" value="Поставщик" />
+        <h:panelGroup>
+            <a4j:commandButton value="..." action="#{mainPage.goodRequestReportPage.showContragentListSelectPage}" reRender="modalOrgListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;" >
+                <f:setPropertyActionListener value="2" target="#{mainPage.orgListSelectPage.filterMode}" />
+            </a4j:commandButton>
+            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.goodRequestReportPage.contragentFilter}}" />
+        </h:panelGroup>
 
         <h:outputText styleClass="output-text" escape="true" value="Организация" />
         <h:panelGroup>
@@ -24,15 +32,8 @@
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.goodRequestReportPage.filter}}" />
         </h:panelGroup>
 
-        <h:outputText styleClass="output-text" escape="true" value="Поставщик" />
-        <h:panelGroup>
-            <a4j:commandButton value="..." action="#{mainPage.goodRequestReportPage.showContragentListSelectPage}" reRender="modalOrgListSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" >
-                <f:setPropertyActionListener value="2" target="#{mainPage.orgListSelectPage.filterMode}" />
-            </a4j:commandButton>
-            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.goodRequestReportPage.contragentFilter}}" />
-        </h:panelGroup>
+        <h:outputText styleClass="output-text" escape="true" value="Фильтр по товару" />
+        <h:inputText value="#{mainPage.goodRequestReportPage.goodName}" styleClass="input-text" size="50" />
 
         <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
         <rich:calendar value="#{mainPage.goodRequestReportPage.startDate}" datePattern="dd.MM.yyyy"
@@ -63,15 +64,16 @@
 
 
 
-        <t:panelGroup colspan="2">
-            <h:selectOneRadio value="#{mainPage.goodRequestReportPage.requestsFilter}" converter="javax.faces.Integer"
-                              styleClass="output-text" layout="pageDirection"  >
-                <f:selectItem itemValue="0" itemLabel="Отображать созданные заявки"/>
-                <f:selectItem itemValue="1" itemLabel="Отображать заявки к исполнению"/>
-                <f:selectItem itemValue="2" itemLabel="Отображать закрытые заявки"/>
-                <f:selectItem itemValue="3" itemLabel="Отображать все заявки"/>
-            </h:selectOneRadio>
-        </t:panelGroup>
+        <h:outputText escape="true" value="Фильтр по заявкам"
+                      styleClass="output-text" />
+        <h:selectOneMenu value="#{mainPage.goodRequestReportPage.requestsFilter}" converter="javax.faces.Integer"
+                          styleClass="output-text" >
+            <f:selectItem itemValue="0" itemLabel="Отображать созданные заявки"/>
+            <f:selectItem itemValue="1" itemLabel="Отображать заявки к исполнению"/>
+            <f:selectItem itemValue="2" itemLabel="Отображать закрытые заявки"/>
+            <f:selectItem itemValue="3" itemLabel="Отображать все заявки"/>
+        </h:selectOneMenu>
+
 
 
 
@@ -102,11 +104,11 @@
 
             <c:if test="${req.values == null}">
                 <rich:columns value="#{mainPage.goodRequestReportPage.goodRequestsReport.columnNames}"
-                              var="columnName" styleClass="left-aligned-column" index="ind" headerClass="center-aligned-column" >
+                              var="columnName" styleClass="left-aligned-column" index="ind" headerClass="center-aligned-column" style="#{req.getBackgoundColor(columnName)}" >
                     <f:facet name="header" >
                         <h:outputText escape="true" value="#{columnName}" />
                     </f:facet>
-                    <h:outputText style="float: left;" escape="true" value="#{req.getValue(columnName)}" styleClass="output-text" />
+                    <h:outputText style="float: left; #{req.getStyle(columnName)}" escape="true" value="#{req.getValue(columnName)}" styleClass="output-text" />
                 </rich:columns>
             </c:if>
 
