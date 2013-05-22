@@ -2,7 +2,7 @@
  * Copyright (c) 2013. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.report.online.register.stamp;
+package ru.axetta.ecafe.processor.web.ui.report.online.items.stamp;
 
 /**
  * Created with IntelliJ IDEA.
@@ -11,7 +11,7 @@ package ru.axetta.ecafe.processor.web.ui.report.online.register.stamp;
  * Time: 14:51
  * To change this template use File | Settings | File Templates.
  */
-public interface Visitable<T> {
-
-    void accept(Visitor<T> visitor);
+public interface Visitor<T> {
+    Visitor<T> visitTree(Tree<T> tree);
+    void visitData(Tree<T> parent, T data);
 }

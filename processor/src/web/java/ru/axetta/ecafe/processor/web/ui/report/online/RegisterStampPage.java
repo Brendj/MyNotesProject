@@ -6,7 +6,9 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgShortItem;
-import ru.axetta.ecafe.processor.web.ui.report.online.register.stamp.*;
+import ru.axetta.ecafe.processor.web.ui.report.online.items.stamp.RegisterStampPageItem;
+import ru.axetta.ecafe.processor.web.ui.report.online.items.stamp.Tree;
+import ru.axetta.ecafe.processor.web.ui.report.online.items.stamp.Visitor;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;

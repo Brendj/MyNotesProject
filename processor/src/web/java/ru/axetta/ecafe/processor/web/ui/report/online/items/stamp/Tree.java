@@ -2,7 +2,7 @@
  * Copyright (c) 2013. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.report.online.register.stamp;
+package ru.axetta.ecafe.processor.web.ui.report.online.items.stamp;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

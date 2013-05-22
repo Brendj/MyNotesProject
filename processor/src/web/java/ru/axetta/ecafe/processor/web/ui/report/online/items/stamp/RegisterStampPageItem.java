@@ -1,4 +1,4 @@
-package ru.axetta.ecafe.processor.web.ui.report.online.register.stamp;
+package ru.axetta.ecafe.processor.web.ui.report.online.items.stamp;
 
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 
