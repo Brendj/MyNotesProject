@@ -21,7 +21,7 @@ import java.util.GregorianCalendar;
  * Time: 16:47
  * To change this template use File | Settings | File Templates.
  */
-public class DeliveredServicesReportPage extends OnlineReportPage {
+public class DeliveredServicesReportPage extends OnlineReportWithContragentPage {
     private DeliveredServicesReport deliveredServices;
     private String goodName;
     private Boolean hideMissedColumns;
@@ -39,11 +39,16 @@ public class DeliveredServicesReportPage extends OnlineReportPage {
         return htmlReport;
     }
 
+    public void showContragentListSelectPage () {
+        setSelectIdOfOrgList(false);
+        MainPage.getSessionInstance().showOrgListSelectPage();
+    }
+
     public void buildReport(Session session) throws Exception {
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(System.currentTimeMillis());
         DeliveredServicesReport.Builder reportBuilder = new DeliveredServicesReport.Builder();
-        this.deliveredServices = reportBuilder.build(session, startDate, endDate, cal);
+        this.deliveredServices = reportBuilder.build(session, startDate, endDate, cal, idOfContragentOrgList);
         htmlReport = deliveredServices.getHtmlReport();
     }
 

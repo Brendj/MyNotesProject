@@ -18,6 +18,16 @@
         <rich:calendar value="#{mainPage.deliveredServicesReportPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
+        <h:outputText styleClass="output-text" escape="true" value="Поставщик" />
+        <h:panelGroup>
+            <a4j:commandButton value="..." action="#{mainPage.deliveredServicesReportPage.showContragentListSelectPage}" reRender="modalOrgListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;" >
+                <f:setPropertyActionListener value="2" target="#{mainPage.orgListSelectPage.filterMode}" />
+            </a4j:commandButton>
+            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.deliveredServicesReportPage.contragentFilter}}" />
+        </h:panelGroup>
+
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildDeliveredServicesReport}"
                            reRender="mainMenu, workspaceTogglePanel, deliveredServicesReportTable"
                            styleClass="command-button" status="reportGenerateStatus" />

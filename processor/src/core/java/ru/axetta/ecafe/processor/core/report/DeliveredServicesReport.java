@@ -80,7 +80,13 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
         }
 
         @Override
-        public DeliveredServicesReport build(Session session, Date startTime, Date endTime, Calendar calendar)
+        public DeliveredServicesReport build(Session session, Date startTime, Date endTime,
+                Calendar calendar) throws Exception {
+            return build (session, startTime, endTime, calendar, Collections.EMPTY_LIST);
+        }
+
+        public DeliveredServicesReport build(Session session, Date startTime, Date endTime,
+                                             Calendar calendar, List<Long> contragents)
                 throws Exception {
             Date generateTime = new Date();
 
@@ -98,7 +104,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
 
 
             Date generateEndTime = new Date();
-            List<DeliveredServicesItem> items = findNotNullGoodsFullNameByOrg(session, startTime, endTime);
+            List<DeliveredServicesItem> items = findNotNullGoodsFullNameByOrg(session, startTime, endTime, contragents);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, startTime, endTime, (Calendar) calendar.clone(), parameterMap, items));
             //  Если имя шаблона присутствует, значит строится для джаспера
@@ -127,7 +133,17 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
         }
 
 
-        public List<DeliveredServicesItem> findNotNullGoodsFullNameByOrg(Session session, Date start, Date end) {
+        public List<DeliveredServicesItem> findNotNullGoodsFullNameByOrg(Session session, Date start, Date end, List<Long> contragents) {
+            String contragentCondition = "";
+            if (contragents != null && contragents.size() > 0) {
+                for (Long id : contragents) {
+                    if (contragentCondition.length() > 0) {
+                        contragentCondition = contragentCondition + " OR ";
+                    }
+                contragentCondition = contragentCondition + " cf_menuexchangerules.idofsourceorg=" + id;
+                }
+            contragentCondition = "(" + contragentCondition + ") AND ";
+            }
             String sql = "select cf_orgs.officialname, " + "split_part(cf_goods.fullname, '/', 1) as level1, "
                     + "split_part(cf_goods.fullname, '/', 2) as level2, "
                     + "split_part(cf_goods.fullname, '/', 3) as level3, "
@@ -137,7 +153,8 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                     + "from cf_orgs " + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
                     + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
                     + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
-                    + "where cf_orderdetails.socdiscount>0 and cf_orders.createddate between :start and :end "
+                    + "join cf_menuexchangerules on idofdestorg=cf_orgs.idoforg "
+                    + "where cf_orderdetails.socdiscount>0 and " + contragentCondition + " cf_orders.createddate between :start and :end "
                     + "group by cf_orgs.officialname, level1, level2, level3, level4, price, address "
                     + "order by cf_orgs.officialname, level1, level2, level3, level4";
             Query query = session.createSQLQuery(sql);//.createQuery(sql);
