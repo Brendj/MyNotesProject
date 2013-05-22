@@ -189,9 +189,7 @@ public class AggregateGoodRequestReport extends BasicReport {
     public AggregateGoodRequestReport(Date generateTime, long generateDuration, List<RequestItemGroups> itemGroupsList) {
         super(generateTime, generateDuration);
         this.itemGroupsList = itemGroupsList;
-
     }
-
 
     public List<RequestItemGroups> getItemGroupsList() {
         return itemGroupsList;

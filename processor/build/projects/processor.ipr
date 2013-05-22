@@ -1077,7 +1077,6 @@
     <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.36-2.2.37.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.37-2.2.38.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.38-2.2.39.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.39-2.2.40.sql" dialect="PostgreSQL" />
   </component>
   <component name="SvnBranchConfigurationManager">
     <option name="myConfigurationMap">
