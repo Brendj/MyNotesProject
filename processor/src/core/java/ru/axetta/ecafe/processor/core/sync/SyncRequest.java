@@ -1634,7 +1634,7 @@ public class SyncRequest {
                     if (loadContext.protoVersion >= 5) {
                         childNode = itemNode.getFirstChild();
                         while (null != childNode) {
-                            if (Node.ELEMENT_NODE == childNode.getNodeType() && childNode.getNodeName().equals("CML")) {
+                            if (Node.ELEMENT_NODE == childNode.getNodeType() && (childNode.getNodeName().equals("CML") || childNode.getNodeName().equals("CML2"))) {
                                 ReqComplexInfo reqComplexInfo = reqComplexInfoBuilder
                                         .build(childNode, reqMenuDetailMap);
                                 reqComplexInfos.add(reqComplexInfo);
