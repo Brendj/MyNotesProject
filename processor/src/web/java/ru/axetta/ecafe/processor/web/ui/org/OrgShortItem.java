@@ -22,6 +22,12 @@ public class OrgShortItem {
         selected = false;
     }
 
+    public OrgShortItem(Long idOfOrg, String shortName, String officialName) {
+        this.idOfOrg = idOfOrg;
+        this.shortName = shortName;
+        this.officialName = officialName;
+    }
+
     public Long getIdOfOrg() {
         return idOfOrg;
     }
