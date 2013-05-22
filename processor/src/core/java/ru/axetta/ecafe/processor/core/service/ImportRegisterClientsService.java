@@ -255,7 +255,7 @@ public class ImportRegisterClientsService {
         reesterValue = emptyIfNull(reesterValue);
         currentValue = emptyIfNull(currentValue);
         fieldConfig.setValue(fieldID, reesterValue);
-        return doClientUpdate || !currentValue.equals(reesterValue);
+        return doClientUpdate || !currentValue.trim().equals(reesterValue.trim());
     }
 
     private String emptyIfNull(String str) {
