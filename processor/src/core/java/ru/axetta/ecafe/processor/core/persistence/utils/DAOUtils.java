@@ -15,14 +15,14 @@ import ru.axetta.ecafe.util.DigitalSignatureUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.*;
+import org.hibernate.Query;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.*;
@@ -397,18 +397,36 @@ public class DAOUtils {
 
     public static Long findClientByFullName(EntityManager em, Org organization, String surname, String firstName, String secondName)
             throws Exception {
-        javax.persistence.Query query = em.createQuery(
-                "select idOfClient from Client client where (client.org = :org) and "
-                + "(trim(upper(client.person.surname)) = :surname) and "
-                + "(trim(upper(client.person.firstName)) = :firstName) and (trim(upper(client.person.secondName)) = :secondName)");
-        query.setParameter("org", organization);
-        query.setParameter("surname", StringUtils.upperCase(surname).trim());
-        query.setParameter("firstName", StringUtils.upperCase(firstName).trim());
-        query.setParameter("secondName", StringUtils.upperCase(secondName).trim());
-        query.setMaxResults(2);
-        if (query.getResultList().isEmpty()) return findClientByFullNameInFriendlyOrgs (em, organization, surname, firstName, secondName);
-        if (query.getResultList().size()==2) return -1L;
-        return (Long)query.getResultList().get(0);
+
+
+        javax.persistence.Query q = em.createNativeQuery("select cf_clients.idofclient, cf_clients.idoforg "+
+                "from cf_clients "+
+                "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "+
+                "where trim(upper(cf_persons.Surname))=:surname and trim(upper(cf_persons.FirstName))=:firstName and trim(upper(cf_persons.SecondName))=:secondName and "+
+                "(cf_clients.idoforg in (select cf_friendly_organization.friendlyorg from cf_friendly_organization where cf_friendly_organization.currentorg=:org))");
+        q.setParameter("org", organization.getIdOfOrg());
+        q.setParameter("surname", StringUtils.upperCase(surname).trim());
+        q.setParameter("firstName", StringUtils.upperCase(firstName).trim());
+        q.setParameter("secondName", StringUtils.upperCase(secondName).trim());
+        q.setMaxResults(2);
+        List res = q.getResultList();
+        if (res.isEmpty()) return null;
+        if (res.size()==2) return -1L;
+        return (Long)res.get(0);
+
+
+        /*javax.persistence.Query query = em.createQuery(
+               "select idOfClient from Client client where (client.org = :org) and "
+               + "(trim(upper(client.person.surname)) = :surname) and "
+               + "(trim(upper(client.person.firstName)) = :firstName) and (trim(upper(client.person.secondName)) = :secondName)");
+       query.setParameter("org", organization);
+       query.setParameter("surname", StringUtils.upperCase(surname).trim());
+       query.setParameter("firstName", StringUtils.upperCase(firstName).trim());
+       query.setParameter("secondName", StringUtils.upperCase(secondName).trim());
+       query.setMaxResults(2);
+       if (query.getResultList().isEmpty()) return findClientByFullNameInFriendlyOrgs (em, organization, surname, firstName, secondName);
+       if (query.getResultList().size()==2) return -1L;
+       return (Long)query.getResultList().get(0);*/
     }
 
     public static Long findClientByFullNameInFriendlyOrgs(EntityManager em, Org organization, String surname, String firstName, String secondName)
