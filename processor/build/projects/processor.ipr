@@ -469,7 +469,7 @@
     </copyright>
     <module2copyright />
   </component>
-  <component name="DataSourceManagerImpl" format="xml" hash="268193470">
+  <component name="DataSourceManagerImpl" format="xml" hash="2531547270">
     <data-source source="LOCAL" name="Moscow Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
       <identifier-quote-string>&quot;</identifier-quote-string>
       <synchronize>true</synchronize>
@@ -497,6 +497,21 @@
       <libraries>
         <library>
           <url>jar://D:/home/java/testing/report/lib/postgresql-9.1-901.jdbc4.jar!/</url>
+        </library>
+      </libraries>
+    </data-source>
+    <data-source source="LOCAL" name="Local MoscowDB" product="PostgreSQL" version="9.1.1" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="cedfba61-0f44-4ced-9708-18045311d229">
+      <identifier-quote-string>&quot;</identifier-quote-string>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/moscow</jdbc-url>
+      <user-name>postgres</user-name>
+      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+      <schema-pattern>moscow.public</schema-pattern>
+      <default-schemas>moscow.public</default-schemas>
+      <libraries>
+        <library>
+          <url>jar://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar!/</url>
         </library>
       </libraries>
     </data-source>
@@ -558,6 +573,20 @@
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/sms_list.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/load_file.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/select_group.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/contract_build.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/operation_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/balance_transfer.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/batch_limit_edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/client_migration.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/load_update_file.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/confirm_client_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/user/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/user/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/user/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/user/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/option.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/categoryorg/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/categoryorg/list.jsp" />
   </component>
   <component name="FacetAutodetectingManager">
     <autodetection-disabled>
