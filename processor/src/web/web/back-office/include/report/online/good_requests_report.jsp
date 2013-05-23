@@ -67,7 +67,7 @@
         <c:if test="${not empty mainPage.goodRequestReportPage.goodRequestsReport && not empty mainPage.goodRequestReportPage.goodRequestsReport.goodRequestItems}" >
         <h:outputText escape="true" value="Отчет по заявкам организаций" styleClass="output-text" />
         <rich:dataTable id="goodRequestsReportTable" value="#{mainPage.goodRequestReportPage.goodRequestsReport.goodRequestItems}"
-                        var="req" rowKeyVar="row" rows="10" footerClass="data-table-footer"
+                        var="req" rowKeyVar="row" footerClass="data-table-footer"
                         columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
 
 

@@ -14,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Scope("session")
@@ -39,10 +37,13 @@ public class AggregateGoodRequestReportPage extends OnlineReportWithContragentPa
     private List<AggregateGoodRequestReportItem> aggregateGoodRequestReportItems = new ArrayList<AggregateGoodRequestReportItem>();
 
     public Object generateReport(){
+        localCalendar.setTime(endDate);
+        localCalendar.add(Calendar.DAY_OF_MONTH,1);
+        Date end = localCalendar.getTime();
         if(idOfOrgList==null || idOfOrgList.isEmpty()){
-            aggregateGoodRequestReportItems = service.fetchAggregateGoodRequestReportItems(idOfContragentOrgList, startDate, endDate);
+            aggregateGoodRequestReportItems = service.fetchAggregateGoodRequestReportItems(idOfContragentOrgList, startDate, end);
         } else {
-            aggregateGoodRequestReportItems = service.fetchAggregateGoodRequestReportItems(idOfContragentOrgList, idOfOrgList, startDate, endDate);
+            aggregateGoodRequestReportItems = service.fetchAggregateGoodRequestReportItems(idOfContragentOrgList, idOfOrgList, startDate, end);
         }
         return null;
     }

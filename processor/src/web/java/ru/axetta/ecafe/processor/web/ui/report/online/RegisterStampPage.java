@@ -90,7 +90,9 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
         service.setSession((Session) entityManager.getDelegate());
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.DAY_OF_MONTH,1);
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
         end = calendar.getTime();
+        calendar.set(Calendar.DAY_OF_MONTH,1);
         calendar.add(Calendar.MONTH, -1);
         start = calendar.getTime();
         clear();
@@ -163,7 +165,7 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
         calendar.setTime(start);
         RegisterStampPageItem total = new RegisterStampPageItem("Итого", allGoods);
         RegisterStampPageItem allTotal = new RegisterStampPageItem("Всего кол-во:", allGoods);
-        do{
+        while (!end.equals(calendar.getTime())){
             String date = timeFormat.format(calendar.getTime());
             RegisterStampPageItem item = new RegisterStampPageItem(date, allGoods);
             for (String l: item.getSetKey()){
@@ -174,7 +176,7 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
             }
             pageItems.add(item);
             calendar.add(Calendar.DATE,1);
-        } while (!end.equals(calendar.getTime()));
+        }
         pageItems.add(total);
         RegisterStampPageItem dailySampleItem = new RegisterStampPageItem("Суточная проба", allGoods);
         for (String l: dailySampleItem.getSetKey()){

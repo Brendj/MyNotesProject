@@ -37,6 +37,7 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
 
         localCalendar.setTime(this.startDate);
         localCalendar.add(Calendar.MONTH, 1);
+        localCalendar.add(Calendar.DAY_OF_MONTH, -1);
         this.endDate = localCalendar.getTime();
 
     }

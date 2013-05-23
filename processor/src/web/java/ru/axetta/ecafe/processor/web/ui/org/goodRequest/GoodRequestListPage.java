@@ -18,10 +18,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Component
 @Scope("session")
@@ -67,7 +64,11 @@ public class GoodRequestListPage extends BasicWorkspacePage {
         for (Integer i: requestState){
             stateList.add(RequestState.values()[i]);
         }
-        goodRequestList = goodRequestService.findByFilter(idOfOrg,stateList,baseDate,endDate,deletedState);
+        Calendar localCalendar = Calendar.getInstance();
+        localCalendar.setTime(endDate);
+        localCalendar.add(Calendar.DAY_OF_MONTH,1);
+        Date end = localCalendar.getTime();
+        goodRequestList = goodRequestService.findByFilter(idOfOrg,stateList,baseDate,end,deletedState);
     }
 
     public String getPageTitle() {

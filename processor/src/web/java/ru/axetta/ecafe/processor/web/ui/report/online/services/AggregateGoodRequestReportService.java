@@ -71,7 +71,7 @@ public class AggregateGoodRequestReportService {
                         + "                from GoodRequest request"
                         + "                join request.goodRequestPositionInternal position"
                         + "                right join position.product product"
-                        + "                where request.orgOwner = :eduid and request.state = :state and request.state "
+                        + "                where request.orgOwner = :eduid and request.state = :state "
                         + "                and request.doneDate between :startDate and :endDate "
                         + "                order by request.doneDate desc";
                 query = session.createQuery(sql);
@@ -93,6 +93,8 @@ public class AggregateGoodRequestReportService {
                 query = session.createQuery(sql);
                 query.setParameter("eduid", edu.getIdOfOrg());
                 query.setParameter("state", RequestState.FOLLOW);
+                query.setParameter("startDate", startDate);
+                query.setParameter("endDate", endDate);
                 List requestsProducts = query.list();
                 if(!(requestsProducts==null || requestsProducts.isEmpty())){
                     requests.addAll(requestsProducts);
@@ -205,6 +207,8 @@ public class AggregateGoodRequestReportService {
                 query = session.createQuery(sql);
                 query.setParameter("eduid", edu.getIdOfOrg());
                 query.setParameter("state", RequestState.FOLLOW);
+                query.setParameter("startDate", startDate);
+                query.setParameter("endDate", endDate);
                 List requestsProducts = query.list();
                 if(!(requestsProducts==null || requestsProducts.isEmpty())){
                     requests.addAll(requestsProducts);

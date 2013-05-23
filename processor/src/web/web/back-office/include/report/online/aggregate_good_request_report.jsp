@@ -110,7 +110,7 @@
             <rich:column rowspan="1" style="height: 0 !important; line-height: 0;padding: 0;margin: 0; border: 0">
             </rich:column>
             <rich:column rowspan="#{items.commoditiesCounts}">
-                <h:outputText value="#{items.doneDate}" converter="timeConverter"/>
+                <h:outputText value="#{items.doneDate}" converter="dateConverter"/>
             </rich:column>
             <rich:subTable value="#{items.commodities}" var="commodity"
                       columnClasses="center-aligned-column, right-aligned-column">
