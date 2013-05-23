@@ -2052,13 +2052,24 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             EnterEventItem enterEventItem = objectFactory.createEnterEventItem();
             enterEventItem.setDateTime(toXmlDateTime(enterEvent.getEvtDateTime()));
             calendar.setTime(enterEvent.getEvtDateTime());
-            enterEventItem.setDay(calendar.get(Calendar.DAY_OF_WEEK) - 1);
+            enterEventItem.setDay(translateDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK)));
             enterEventItem.setEnterName(enterEvent.getEnterName());
             enterEventItem.setDirection(enterEvent.getPassDirection());
             enterEventItem.setTemporaryCard(enterEvent.getIdOfTempCard() != null ? 1 : 0);
             enterEventList.getE().add(enterEventItem);
         }
         data.setEnterEventList(enterEventList);
+    }
+
+    private Integer translateDayOfWeek(int i) {
+        if (i==Calendar.MONDAY) return 0;
+        else if (i==Calendar.TUESDAY) return 1;
+        else if (i==Calendar.WEDNESDAY) return 2;
+        else if (i==Calendar.THURSDAY) return 3;
+        else if (i==Calendar.FRIDAY) return 4;
+        else if (i==Calendar.SATURDAY) return 5;
+        else if (i==Calendar.SUNDAY) return 6;
+        return -1;
     }
 
     @Override
