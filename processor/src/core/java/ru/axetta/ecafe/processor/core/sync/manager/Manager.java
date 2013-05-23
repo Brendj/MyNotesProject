@@ -103,6 +103,7 @@ public class Manager {
                     while (node != null) {
                         if (Node.ELEMENT_NODE == node.getNodeType()) {
                             DistributedObject distributedObject = createDistributedObject(currentObject);
+                            distributedObject.setIdOfSyncOrg(idOfOrg);
                             distributedObject.setTimeFormat(timeFormat);
                             distributedObject.setDateOnlyFormat(dateOnlyFormat);
                             try{

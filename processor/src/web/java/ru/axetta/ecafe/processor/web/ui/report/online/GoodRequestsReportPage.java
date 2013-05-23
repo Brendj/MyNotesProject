@@ -19,7 +19,6 @@ import org.hibernate.Session;
  */
 public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
     private GoodRequestsReport goodRequests;
-    private String goodName;
     private Boolean hideMissedColumns;
     private boolean showAll = true;
     private int requestsFilter = 3;
@@ -46,14 +45,6 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
 
     public void setHideMissedColumns(Boolean hideMissedColumns) {
         this.hideMissedColumns = hideMissedColumns;
-    }
-
-    public String getGoodName() {
-        return goodName;
-    }
-
-    public void setGoodName(String goodName) {
-        this.goodName = goodName;
     }
 
     public GoodRequestsReport getGoodRequests() {
@@ -84,7 +75,7 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
 
     public void buildReport(Session session) throws Exception {
         GoodRequestsReport.Builder reportBuilder = new GoodRequestsReport.Builder();
-        this.goodRequests = reportBuilder.build(session, hideMissedColumns, goodName, startDate, endDate, idOfOrgList, idOfContragentOrgList,
+        this.goodRequests = reportBuilder.build(session, hideMissedColumns, startDate, endDate, idOfOrgList, idOfContragentOrgList,
                                                 requestsFilter);
     }
 

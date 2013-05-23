@@ -587,6 +587,16 @@
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/option.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/categoryorg/edit.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/categoryorg/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/categoryorg/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/categoryorg/select_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/licinfo.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/MainPage.java" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/discountrule/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/discountrule/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/discountrule/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/discountrule/select_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/categorydiscount/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/categorydiscount/list.jsp" />
   </component>
   <component name="FacetAutodetectingManager">
     <autodetection-disabled>

@@ -61,7 +61,7 @@ public class InternalIncomingDocument extends DistributedObject {
 
         //Staff st = DAOService.getInstance().findDistributedObjectByRefGUID(Staff.class,guidOfS);
         Staff st  = (Staff) DAOUtils.findDistributedObjectByRefGUID(session, guidOfS);
-        if(st==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(st==null) throw new DistributedObjectException("NOT_FOUND_VALUE Staff");
         setStaff(st);
     }
 

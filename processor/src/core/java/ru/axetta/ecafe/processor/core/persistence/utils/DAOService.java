@@ -45,6 +45,13 @@ public class DAOService {
         return RuntimeContext.getAppContext().getBean(DAOService.class);
     }
 
+    public Boolean isMenuExchange(Long idOfOrg){
+        TypedQuery<Long> query = em.createQuery("select idOfSourceOrg from MenuExchangeRule where idOfSourceOrg = :idOfSourceOrg",Long.class);
+        query.setParameter("idOfSourceOrg",idOfOrg);
+        List<Long> list = query.getResultList();
+        return !list.isEmpty();
+    }
+
     @Transactional
     @SuppressWarnings("unchecked")
     public List<ECafeSettings> geteCafeSettingses(final Long idOfOrg,final SettingsIds settingsIds,final Boolean deleted) {

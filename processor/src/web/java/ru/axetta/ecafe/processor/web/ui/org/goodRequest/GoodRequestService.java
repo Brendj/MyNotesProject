@@ -37,7 +37,7 @@ public class GoodRequestService {
     public List<GoodRequest> findByFilter(Long idOfOrg, List<RequestState> stateList, Date startDate,Date endDate,  Integer deletedState){
         Session session =  (Session) entityManager.getDelegate();
         Criteria criteria = session.createCriteria(GoodRequest.class);
-        criteria.add(Restrictions.between("createdDate", startDate, endDate));
+        criteria.add(Restrictions.between("doneDate", startDate, endDate));
         if (deletedState != 2) {
             boolean deletedFlag = false;
             if (deletedState == 1) {

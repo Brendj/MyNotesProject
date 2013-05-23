@@ -22,7 +22,7 @@ public class OnlineReportWithContragentPage extends OnlineReportPage {
     protected String contragentFileter = "Не выбрано";
     protected List<Long> idOfContragentOrgList = new ArrayList<Long>();
 
-    OnlineReportWithContragentPage (){
+    protected OnlineReportWithContragentPage(){
         super();
     }
 

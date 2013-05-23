@@ -138,7 +138,11 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
 
         public Item(Client client) {
             this.idOfClient = client.getIdOfClient();
-            this.guid = client.getClientGUID();
+            if(client.getClientGUID()==null){
+                this.guid = "";
+            } else {
+                this.guid = client.getClientGUID();
+            }
             this.org = new OrgItem(client.getOrg());
             this.person = new PersonItem(client.getPerson());
             this.contractPerson = new PersonItem(client.getContractPerson());

@@ -17,16 +17,26 @@
         <h:outputText escape="true" value="Конечная дата" styleClass="output-text" />
         <rich:calendar value="#{aggregateGoodRequestReportPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
-        <h:outputText escape="true" value="Организация" styleClass="output-text" />
-        <h:panelGrid styleClass="borderless-grid" columns="2">
-            <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+
+        <h:outputText styleClass="output-text" escape="true" value="Поставщик" />
+        <h:panelGroup>
+            <a4j:commandButton value="..." action="#{aggregateGoodRequestReportPage.showSourceListSelectPage}" reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;">
+                               styleClass="command-link" style="width: 25px;" >
                 <f:setPropertyActionListener value="2" target="#{mainPage.orgListSelectPage.filterMode}" />
             </a4j:commandButton>
+            <h:outputText styleClass="output-text" escape="true" value="{#{aggregateGoodRequestReportPage.contragentFileter}}" />
+        </h:panelGroup>
 
+        <h:outputText styleClass="output-text" escape="true" value="Организация" />
+        <h:panelGroup>
+            <a4j:commandButton value="..." action="#{aggregateGoodRequestReportPage.showEducationListSelectPage}" reRender="modalOrgListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;" >
+                <f:setPropertyActionListener value="0" target="#{mainPage.orgListSelectPage.filterMode}" />
+            </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" value=" {#{aggregateGoodRequestReportPage.filter}}" />
-        </h:panelGrid>
+        </h:panelGroup>
         <a4j:commandButton value="Генерировать отчет" action="#{aggregateGoodRequestReportPage.generateReport}"
                            reRender="mainMenu, workspaceTogglePanel, aggregateGoodRequestTable"
                            styleClass="command-button" status="sReportGenerateStatus" />
@@ -55,7 +65,7 @@
                         <h:outputText value="Товар/продукт"/>
                     </rich:column>
                     <rich:column rowspan="2">
-                        <h:outputText value="Колво-заказов"/>
+                        <h:outputText value="Количество заказов"/>
                     </rich:column>
                     <rich:column rowspan="2">
                         <h:outputText value="Дата к исполнению"/>
@@ -102,7 +112,8 @@
             <rich:column rowspan="#{items.commoditiesCounts}">
                 <h:outputText value="#{items.doneDate}" converter="timeConverter"/>
             </rich:column>
-            <rich:subTable value="#{items.commodities}" var="commodity">
+            <rich:subTable value="#{items.commodities}" var="commodity"
+                      columnClasses="center-aligned-column, right-aligned-column">
                 <rich:column>
                     <h:outputText value="#{commodity.name}"/>
                 </rich:column>

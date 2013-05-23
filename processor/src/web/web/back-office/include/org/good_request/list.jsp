@@ -17,7 +17,7 @@
                                 eventsQueue="mainFormEventsQueue" opened="true" headerClass="filter-panel-header">
             <h:panelGrid columns="2" styleClass="borderless-grid">
 
-                <h:outputText escape="true" value="Базовая дата" styleClass="output-text" />
+                <h:outputText escape="true" value="Начальная дата" styleClass="output-text" />
                 <rich:calendar value="#{goodRequestListPage.baseDate}" datePattern="dd.MM.yyyy"
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 

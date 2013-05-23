@@ -49,7 +49,13 @@ public class GoodRequest extends DistributedObject {
     @Override
     protected GoodRequest parseAttributes(Node node) throws Exception {
         Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
+        if(longOrgOwner != null){
+            if(DAOService.getInstance().isMenuExchange(getIdOfSyncOrg())){
+                /* случай когда требование создает поставщик */
+                throw new  DistributedObjectException("NOT_CREATED_A_GOOD_REQUEST_BECAUSE_YOU_HAVE_NO_RIGHT");
+            }
+            setOrgOwner(longOrgOwner);
+        }
         Date dateDateOfGoodsRequest = getDateTimeAttributeValue(node, "Date");
         String stringNumber = getStringAttributeValue(node, "Number", 128);
         if(stringNumber != null) setNumber(stringNumber);

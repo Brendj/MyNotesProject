@@ -32,9 +32,6 @@
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.goodRequestReportPage.filter}}" />
         </h:panelGroup>
 
-        <h:outputText styleClass="output-text" escape="true" value="Фильтр по товару" />
-        <h:inputText value="#{mainPage.goodRequestReportPage.goodName}" styleClass="input-text" size="50" />
-
         <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
         <rich:calendar value="#{mainPage.goodRequestReportPage.startDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
@@ -92,7 +89,8 @@
             </c:if>
 
 
-            <f:facet name="footer">
+           <%-- ECAFE-961
+           <f:facet name="footer">
                 <rich:datascroller for="goodRequestsReportTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
                                    stepControls="auto" boundaryControls="hide">
                     <f:facet name="previous">
@@ -102,7 +100,7 @@
                         <h:graphicImage value="/images/16x16/right-arrow.png" />
                     </f:facet>
                 </rich:datascroller>
-            </f:facet>
+            </f:facet>--%>
         </rich:dataTable>
         </c:if>
         <!--<h:commandButton value="Выгрузить в CSV" action="#{mainPage.showSalesCSVList}" styleClass="command-button" />-->

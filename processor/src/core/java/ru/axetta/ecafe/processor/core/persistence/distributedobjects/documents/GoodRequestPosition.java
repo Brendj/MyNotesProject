@@ -26,17 +26,15 @@ import org.w3c.dom.Node;
  */
 public class GoodRequestPosition extends DistributedObject {
 
-    //public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
-
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         GoodRequest gr =  (GoodRequest) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGR);
-        if(gr==null) throw new DistributedObjectException("NOT_FOUND_VALUE GoodRequest");
+        if(gr==null) throw new DistributedObjectException("NOT_FOUND_VALUE GOOD_REQUEST");
         setGoodRequest(gr);
         Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfG);
         Product p =(Product) DAOUtils.findDistributedObjectByRefGUID(session, guidOfP);
         if(g==null && p==null) {
-            throw new DistributedObjectException("NOT_FOUND_VALUE Product or Good");
+            throw new DistributedObjectException("NOT_FOUND_VALUE PRODUCT OR GOOD");
         }
         if(g!=null) setGood(g);
         if(p!=null) setProduct(p);

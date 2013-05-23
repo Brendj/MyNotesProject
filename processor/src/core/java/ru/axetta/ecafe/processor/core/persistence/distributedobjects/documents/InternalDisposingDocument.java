@@ -57,11 +57,9 @@ public class InternalDisposingDocument extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        //Staff st = DAOService.getInstance().findDistributedObjectByRefGUID(Staff.class, guidOfSt);
         Staff st = (Staff) DAOUtils.findDistributedObjectByRefGUID(session, guidOfSt);
-        if(st==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(st==null) throw new DistributedObjectException("NOT_FOUND_VALUE Staff");
         setStaff(st);
-        //ActOfInventarization ai = DAOService.getInstance().findDistributedObjectByRefGUID(ActOfInventarization.class, guidOfAI);
         ActOfInventarization ai = (ActOfInventarization) DAOUtils.findDistributedObjectByRefGUID(session, guidOfAI);
         if(ai!=null) setActOfInventarization(ai);
     }

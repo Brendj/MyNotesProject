@@ -376,4 +376,15 @@ public abstract class DistributedObject{
                 ", className=" + getClass().getSimpleName() +
                 '}';
     }
+
+    /* идентификатор синхронизируемой организации*/
+    private Long idOfSyncOrg;
+
+    public Long getIdOfSyncOrg() {
+        return idOfSyncOrg;
+    }
+
+    public void setIdOfSyncOrg(Long idOfSyncOrg) {
+        this.idOfSyncOrg = idOfSyncOrg;
+    }
 }

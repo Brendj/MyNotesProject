@@ -51,7 +51,7 @@ public class GoodRequestsReport extends BasicReport {
 
     public static class Builder {
 
-        public GoodRequestsReport build(Session session, Boolean hideMissedColumns, String goodName,
+        public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
                                         Date startDate, Date endDate, List<Long> idOfOrgList, List <Long> idOfSupplierList,
                                         int requestsFilter)
                 throws Exception {
@@ -61,9 +61,6 @@ public class GoodRequestsReport extends BasicReport {
                     hideMissedColumns, startDate, endDate, items);
 
             String goodCondition = "";
-            if (goodName != null && goodName.length() > 0) {
-                goodCondition = " and (cf_goods.fullname like '%" + goodName + "%')";
-            }
 
             String stateCondition = "";
             switch (requestsFilter) {

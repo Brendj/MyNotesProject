@@ -28,22 +28,19 @@ public class StateChange extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        //WayBill wb = DAOService.getInstance().findDistributedObjectByRefGUID(WayBill.class,guidOfWB);
-        //InternalDisposingDocument idd = DAOService.getInstance().findDistributedObjectByRefGUID(InternalDisposingDocument.class,guidOfIDD);
-        //GoodRequest gr = DAOService.getInstance().findDistributedObjectByRefGUID(GoodRequest.class,guidOfGR);
-        //InternalIncomingDocument iid = DAOService.getInstance().findDistributedObjectByRefGUID(InternalIncomingDocument.class,guidOfIID);
         WayBill wb = (WayBill) DAOUtils.findDistributedObjectByRefGUID(session, guidOfWB);
         InternalDisposingDocument idd = (InternalDisposingDocument) DAOUtils.findDistributedObjectByRefGUID(session, guidOfIDD);
         GoodRequest gr = (GoodRequest) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGR);
         InternalIncomingDocument iid = (InternalIncomingDocument) DAOUtils.findDistributedObjectByRefGUID(session, guidOfIID);
-        if(wb == null && idd == null && gr==null && iid==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(wb == null && idd == null && gr==null && iid==null){
+            throw new DistributedObjectException("NOT_FOUND_VALUE WayBill or InternalDisposingDocument or GoodRequest or InternalIncomingDocument");
+        }
         if(wb!=null) setWayBill(wb);
         if(idd!=null) setInternalDisposingDocument(idd);
         if(gr!=null) setGoodRequest(gr);
         if(iid!=null) setInternalIncomingDocument(iid);
-        //Staff st = DAOService.getInstance().findDistributedObjectByRefGUID(Staff.class,guidOfS);
         Staff st = (Staff) DAOUtils.findDistributedObjectByRefGUID(session, guidOfS);
-        if(st==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(st==null) throw new DistributedObjectException("NOT_FOUND_VALUE Staff");
         setStaff(st);
 
     }

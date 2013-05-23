@@ -27,17 +27,13 @@ import java.util.Date;
  */
 public class WayBillPosition extends DistributedObject {
 
-    //public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
-
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        //Good g = DAOService.getInstance().findDistributedObjectByRefGUID(Good.class, guidOfG);
         Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfG);
-        if(g==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(g==null) throw new DistributedObjectException("NOT_FOUND_VALUE Good");
         setGood(g);
-        //WayBill wb = DAOService.getInstance().findDistributedObjectByRefGUID(WayBill.class, guidOfWB);
         WayBill wb = (WayBill) DAOUtils.findDistributedObjectByRefGUID(session, guidOfWB);
-        if(wb==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(wb==null) throw new DistributedObjectException("NOT_FOUND_VALUE WayBill");
         setWayBill(wb);
     }
 

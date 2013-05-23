@@ -25,7 +25,6 @@ import java.util.Set;
  */
 public class WayBill extends DistributedObject {
 
-    //public static String[] STATES = {"Новая", "Отгружена", "Получена", "Получена с расхождениями"};
     public static String[] STATES = {"Создан", "К исполнению", "Выполнен"};
     private Set<WayBillPosition> wayBillPositionInternal;
     private Set<StateChange> stateChangeInternal;
@@ -58,7 +57,7 @@ public class WayBill extends DistributedObject {
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         Staff st = (Staff) DAOUtils.findDistributedObjectByRefGUID(session, guidOfSt);
-        if(st==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(st==null) throw new DistributedObjectException("NOT_FOUND_VALUE Staff");
         setStaff(st);
         ActOfWayBillDifference awd = (ActOfWayBillDifference) DAOUtils.findDistributedObjectByRefGUID(session, guidOfAWD);
         if(awd!=null) setActOfWayBillDifference(awd);

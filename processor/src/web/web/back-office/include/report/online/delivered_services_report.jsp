@@ -25,7 +25,7 @@
                                styleClass="command-link" style="width: 25px;" >
                 <f:setPropertyActionListener value="2" target="#{mainPage.orgListSelectPage.filterMode}" />
             </a4j:commandButton>
-            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.deliveredServicesReportPage.contragentFilter}}" />
+            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.deliveredServicesReportPage.contragentFileter}}" />
         </h:panelGroup>
 
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildDeliveredServicesReport}"
