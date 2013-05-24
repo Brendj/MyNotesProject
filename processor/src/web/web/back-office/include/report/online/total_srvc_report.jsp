@@ -29,7 +29,7 @@
     <h:panelGrid styleClass="borderless-grid">
         <h:outputText escape="true" value="Свод по услугам" styleClass="output-text" />
         <rich:dataTable id="itemsReportTable" value="#{totalServicesReportPage.totalReport.items}"
-                        var="item" rowKeyVar="row" rows="10" footerClass="data-table-footer"
+                        var="item" rowKeyVar="row" rows="20" footerClass="data-table-footer"
                         columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
             <f:facet name="header">
                 <rich:columnGroup>
