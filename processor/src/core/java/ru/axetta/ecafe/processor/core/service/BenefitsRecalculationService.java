@@ -11,12 +11,16 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.hibernate.Session;
+import org.hibernate.jdbc.Work;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -32,6 +36,10 @@ public class BenefitsRecalculationService {
     private static final String SELECT_ORGS_SQL =
             "select cf_discountrules.idofrule, cf_discountrules_categorydiscounts.idofcategorydiscount, cf_discountrules_categoryorg.idofcategoryorg, "
                     + "       cf_discountrules.priority, cf_discountrules.operationor, complex0, complex1, complex2, complex3, complex4, complex5, complex6, complex7, complex8, complex9 "
+                    + "       complex10, complex11, complex12, complex13, complex14, complex15, complex16, complex17, complex18, complex19, "
+                    + "       complex20, complex21, complex22, complex23, complex24, complex25, complex26, complex27, complex28, complex29, "
+                    + "       complex30, complex31, complex32, complex33, complex34, complex35, complex36, complex37, complex38, complex39, "
+                    + "       complex40, complex41, complex42, complex43, complex44, complex45, complex46, complex47, complex48, complex49 "
                     + "from cf_discountrules "
                     + "left join cf_discountrules_categorydiscounts on cf_discountrules.idofrule=cf_discountrules_categorydiscounts.idofrule "
                     + "left join cf_discountrules_categoryorg on cf_discountrules.idofrule=cf_discountrules_categoryorg.idofrule "
@@ -53,7 +61,7 @@ public class BenefitsRecalculationService {
                     + "where CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 and cf_clients.idOfClientGroup<:leavingClientGroup "
                     //+ "and cf_clients.idofclient=1244 "  Для проверок, не удалять
                     + "order by idofclient, 3";
-    private static final String INSERT_SQL = "INSERT INTO cf_clientscomplexdiscounts (createdate, idofclient, idofrule, idofcategoryorg, priority, operationar, idofcomplex) values (:createdate, :idofclient, :idofrule, :idofcategoryorg, :priority, :operationor, :idofcomplex)";
+    private static final String INSERT_SQL = "INSERT INTO cf_clientscomplexdiscounts (createdate, idofclient, idofrule, idofcategoryorg, priority, operationar, idofcomplex) values (?, ?, ?, ?, ?, ?, ?)";
     private static final String DELETE_SQL = "DELETE FROM cf_clientscomplexdiscounts ";//WHERE createdate=:createdate";
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BIDataExportService.class);
 
@@ -95,7 +103,7 @@ public class BenefitsRecalculationService {
             cal.set(Calendar.SECOND, 0);
             cal.set(Calendar.MINUTE, 0);
             cal.set(Calendar.HOUR, 0);
-            org.hibernate.Query ins = session.createSQLQuery(INSERT_SQL);
+            //org.hibernate.Query ins = session.createSQLQuery(INSERT_SQL);
             org.hibernate.Query org = session.createSQLQuery(SELECT_ORGS_SQL);
             org.hibernate.Query sel = session.createSQLQuery(SELECT_CLIENTS_SQL);
             org.hibernate.Query del = session.createSQLQuery(DELETE_SQL);
@@ -142,36 +150,8 @@ public class BenefitsRecalculationService {
             Calendar calendar = new GregorianCalendar();
             calendar.setTimeInMillis(System.currentTimeMillis());
             resultList = sel.list();
-            prevID = 0L;
-            CheckoutClient cl = null;
-            for (Object entry : resultList) {
-                Object e[] = (Object[]) entry;
-                long clientID = ((BigInteger) e[0]).longValue();
-                long orgCategoryID = e[1] == null ? -1L : ((BigInteger) e[1]).longValue();
-                long categoryID = e[2] == null ? -1L : ((BigInteger) e[2]).longValue();
 
-
-                if (clientID != prevID) {
-                    if (cl != null) {
-                        DiscountRule clientRules[] = getClientRule(cl, descRules);
-                        if (clientRules != null && clientRules.length > 0) {
-                            insertRuleIntoDb(ins, cl, clientRules, calendar);
-                        }
-                    }
-
-                    prevID = clientID;
-                    cl = new CheckoutClient(clientID, orgCategoryID);
-                }
-
-                cl.addCategory(categoryID);
-            }
-
-            if (cl != null) {
-                DiscountRule clientRules[] = getClientRule(cl, descRules);
-                if (clientRules != null && clientRules.length > 0) {
-                    insertRuleIntoDb(ins, cl, clientRules, calendar);
-                }
-            }
+            session.doWork(new InsertWork(resultList, descRules, calendar));
         } catch (Exception e) {
             logger.error("Failed to recalculate benefits", e);
         }
@@ -213,27 +193,33 @@ public class BenefitsRecalculationService {
     }
 
 
-    public void insertRuleIntoDb(org.hibernate.Query ins, CheckoutClient cl, DiscountRule rules[], Calendar cal)
-            throws Exception {
+    public long insertRuleIntoDb(PreparedStatement pstmt, CheckoutClient cl, DiscountRule rules[], Calendar cal, long inserts)
+            throws SQLException {
         try {
             for (DiscountRule r : rules) {
                 if (r.complexes == null || r.complexes.size() < 1) {
                     continue;
                 }
-                ins.setLong("createdate", cal.getTimeInMillis());
-                ins.setLong("idofclient", cl.id);
-                ins.setLong("idofrule", r.id);
-                ins.setInteger("priority", r.priority);
-                ins.setInteger("operationor", r.operationor);
-                ins.setLong("idofcategoryorg", cl.orgCategoryID == -1L ? 0 : cl.orgCategoryID);
+
+                pstmt.setLong(1, cal.getTimeInMillis());
+                pstmt.setLong(2, cl.id);
+                pstmt.setLong(3, r.id);
+                pstmt.setLong(4, cl.orgCategoryID == -1L ? 0 : cl.orgCategoryID);
+                pstmt.setInt(5, r.priority);
+                pstmt.setInt(6, r.operationor);
                 for (Integer idofcomplex : r.complexes) {
-                    ins.setInteger("idofcomplex", idofcomplex);
-                    ins.executeUpdate();
+                    pstmt.setInt(7, idofcomplex);
+                    pstmt.addBatch();
+                    inserts++;
                 }
             }
+        return inserts;
+        } catch (SQLException sqle) {
+            throw sqle;
         } catch (Exception e) {
-            throw e;
+            logger.error("Failed to insert entry into batch", e);
         }
+    return inserts;
     }
 
 
@@ -295,6 +281,60 @@ public class BenefitsRecalculationService {
                 categories.put(orgCategoryID, cats);
             }
             cats.add(categoryID);
+        }
+    }
+
+    public class InsertWork implements Work {
+        private final List resultList;
+        private Map<Integer, List<DiscountRule>> descRules;
+        private Calendar calendar;
+
+        public InsertWork (List resultList, Map<Integer, List<DiscountRule>> descRules, Calendar calendar) {
+            this.resultList = resultList;
+            this.descRules = descRules;
+            this.calendar = calendar;
+        }
+
+        @Override
+        public void execute(Connection connection) throws SQLException {
+            long inserts = 0;
+            long prevID = 0L;
+            CheckoutClient cl = null;
+            PreparedStatement pstmt = connection.prepareStatement(INSERT_SQL);
+            for (Object entry : resultList) {
+                Object e[] = (Object[]) entry;
+                long clientID = ((BigInteger) e[0]).longValue();
+                long orgCategoryID = e[1] == null ? -1L : ((BigInteger) e[1]).longValue();
+                long categoryID = e[2] == null ? -1L : ((BigInteger) e[2]).longValue();
+
+
+                if (clientID != prevID) {
+                    if (cl != null) {
+                        DiscountRule clientRules[] = getClientRule(cl, descRules);
+                        if (clientRules != null && clientRules.length > 0) {
+                            inserts = insertRuleIntoDb(pstmt, cl, clientRules, calendar, inserts);
+                        }
+                    }
+
+                    prevID = clientID;
+                    cl = new CheckoutClient(clientID, orgCategoryID);
+                }
+                if (inserts > 1000) {
+                    inserts = 0;
+                    pstmt.executeBatch();
+                }
+
+                cl.addCategory(categoryID);
+            }
+
+
+            if (cl != null) {
+                DiscountRule clientRules[] = getClientRule(cl, descRules);
+                if (clientRules != null && clientRules.length > 0) {
+                    insertRuleIntoDb(pstmt, cl, clientRules, calendar, inserts);
+                }
+            }
+        pstmt.executeBatch();
         }
     }
 }

@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
 import ru.axetta.ecafe.processor.core.service.BIDataExportService;
+import ru.axetta.ecafe.processor.core.service.BenefitsRecalculationService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -28,6 +29,11 @@ public class OtherActionsPage extends BasicWorkspacePage {
     public void runImportRegisterClients() throws Exception {
         RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).run(); //DEF
         printMessage("Импорт клиентов из Реестров выполнен");
+    }
+
+    public void runBenefitsRecalculation() throws Exception {
+        RuntimeContext.getAppContext().getBean(BenefitsRecalculationService.class).run(); //DEF
+        printMessage("Запустить пересчет льготных правил выполнен");
     }
 
     @Override

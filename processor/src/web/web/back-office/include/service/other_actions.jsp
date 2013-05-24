@@ -18,6 +18,9 @@
     <a4j:commandButton value="Запустить синхронизацию с Реестрами" action="#{otherActionsPage.runImportRegisterClients}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
+    <a4j:commandButton value="Запустить пересчет льготных правил" action="#{otherActionsPage.runBenefitsRecalculation}"
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>

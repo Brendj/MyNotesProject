@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfContragentClientAccount;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Function;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
@@ -20,6 +21,7 @@ import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountDeletePage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFileLoadPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountListPage;
 import ru.axetta.ecafe.processor.web.ui.client.*;
+import ru.axetta.ecafe.processor.web.ui.contract.ContractSelectPage;
 import ru.axetta.ecafe.processor.web.ui.monitoring.StatusSyncReportPage;
 import ru.axetta.ecafe.processor.web.ui.monitoring.SyncReportPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.*;
@@ -61,10 +63,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -276,6 +275,7 @@ public class MainPage {
     private final OrgListSelectPage orgListSelectPage = new OrgListSelectPage();
     private final OrgListSelectPage contragentOrgListSelectPage = new OrgListSelectPage();
     private final ContragentSelectPage contragentSelectPage = new ContragentSelectPage();
+    private final ContractSelectPage contractSelectPage = new ContractSelectPage();
     private final ClientSelectPage clientSelectPage = new ClientSelectPage();
     private final ClientGroupSelectPage clientGroupSelectPage = new ClientGroupSelectPage();
 
@@ -329,6 +329,7 @@ public class MainPage {
     private final ClientPaymentsPage clientPaymentsReportPage = new ClientPaymentsPage();
     private final GoodRequestsReportPage goodRequestsReportPage = new GoodRequestsReportPage();
     private final DeliveredServicesReportPage deliveredServicesReportPage = new DeliveredServicesReportPage ();
+    private final ClientsBenefitsReportPage clientsBenefitsReportPage = new ClientsBenefitsReportPage ();
 
     public BasicWorkspacePage getGoodGroupPage() {
         return goodGroupPage;
@@ -2065,6 +2066,10 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         return contragentSelectPage;
     }
 
+    public ContractSelectPage getContractSelectPage () {
+        return contractSelectPage;
+    }
+
     private int multiContrFlag = 0;
 
     public void setMultiContrFlag(int multiContrFlag) {
@@ -2075,6 +2080,44 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
 
     public void setClassTypes(String classTypes) {
         this.classTypes = classTypes;
+    }
+
+    public Object showContractSelectPage () {
+        return showContractSelectPage (null);
+    }
+
+    public Object showContractSelectPage (String contragentName) {
+
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof ContractSelectPage.CompleteHandler
+                || currentTopMostPage instanceof ContractSelectPage) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                contractSelectPage.fill(persistenceSession, multiContrFlag, classTypes, contragentName);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                if (currentTopMostPage instanceof ContractSelectPage.CompleteHandler) {
+                    contractSelectPage.pushCompleteHandler((ContractSelectPage.CompleteHandler) currentTopMostPage);
+                    modalPages.push(contractSelectPage);
+                }
+            } catch (Exception e) {
+                logger.error("Failed to fill contract selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора контракта", null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+
+
+            }
+        }
+        return null;
     }
 
     public Object showContragentSelectPage() {
@@ -2133,6 +2176,38 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             
         }
     }*/
+
+
+    public Object completeContractSelection () {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            contractSelectPage.completeContractSelection(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == contractSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete contract selection", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора контракта", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
+
+    }
 
     public Object completeContragentSelection() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -2779,6 +2854,10 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
 
         }
         return null;
+    }
+
+    public BasicPage popModal () {
+        return modalPages.pop();
     }
 
     public ContractBuildPage getContractBuildPage() {
@@ -4968,6 +5047,51 @@ public Long getSelectedIdOfReportRule() {
 
     public DeliveredServicesReportPage getDeliveredServicesReportPage() {
         return deliveredServicesReportPage;
+    }
+
+    public ClientsBenefitsReportPage getClientsBenefitsReportPage() {
+        return clientsBenefitsReportPage;
+    }
+
+    public Object showClientsBenefitsReportPage () {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = clientsBenefitsReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set sales report page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по количеству льгот",
+                            null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object buildClientsBenefitsReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            clientsBenefitsReportPage.buildReport(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to build sales report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
     }
 
     public Object showDeliveredServicesReportPage () {
@@ -7432,7 +7556,9 @@ public User getCurrentUser() throws Exception {
         modalPages.push(modalPage);
     }
     public void registerModalPageHide(BasicPage modalPage) {
-        if (modalPages.peek().equals(modalPage)) modalPages.pop();
+        if (modalPages.peek().equals(modalPage)) {
+            modalPages.pop();
+        }
     }
 
     public UvDeletePage getOpenedDeletePage() {
