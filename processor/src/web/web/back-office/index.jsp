@@ -105,6 +105,10 @@
         <c:import url="include/contragent/select.jsp" />
     </f:subview>
 
+    <f:subview id="contractSelectSubView">
+        <c:import url="include/contract/select.jsp" />
+    </f:subview>
+
     <f:subview id="clientSelectSubView">
         <c:import url="include/client/select.jsp" />
     </f:subview>

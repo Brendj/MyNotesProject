@@ -11,10 +11,15 @@ import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampItem;
+import ru.axetta.ecafe.processor.core.persistence.Contract;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,19 +80,19 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
         }
 
         public Builder() {
-            templateFilename = AutoReportGenerator.getReportsTemplateFilePathWithDb() + DeliveredServicesReport.class.getSimpleName() + ".jasper";
+            templateFilename = AutoReportGenerator.getReportsTemplateFilePathWithDb() + DeliveredServicesReport.class
+                    .getSimpleName() + ".jasper";
             exportToHTML = true;
         }
 
         @Override
-        public DeliveredServicesReport build(Session session, Date startTime, Date endTime,
-                Calendar calendar) throws Exception {
-            return build (session, startTime, endTime, calendar, Collections.EMPTY_LIST);
+        public DeliveredServicesReport build(Session session, Date startTime, Date endTime, Calendar calendar)
+                throws Exception {
+            return build(session, startTime, endTime, calendar, null, null);
         }
 
-        public DeliveredServicesReport build(Session session, Date startTime, Date endTime,
-                                             Calendar calendar, List<Long> contragents)
-                throws Exception {
+        public DeliveredServicesReport build(Session session, Date startTime, Date endTime, Calendar calendar,
+                Long contragent, Long contract) throws Exception {
             Date generateTime = new Date();
 
 
@@ -104,7 +109,8 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
 
 
             Date generateEndTime = new Date();
-            List<DeliveredServicesItem> items = findNotNullGoodsFullNameByOrg(session, startTime, endTime, contragents);
+            List<DeliveredServicesItem> items = findNotNullGoodsFullNameByOrg(session, startTime, endTime, contragent,
+                    contract);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, startTime, endTime, (Calendar) calendar.clone(), parameterMap, items));
             //  Если имя шаблона присутствует, значит строится для джаспера
@@ -123,7 +129,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                 exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
                 exporter.exportReport();
                 return new DeliveredServicesReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
-                        startTime, endTime, items).setHtmlReport (os.toString("UTF-8"));
+                        startTime, endTime, items).setHtmlReport(os.toString("UTF-8"));
             }
         }
 
@@ -133,17 +139,46 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
         }
 
 
-        public List<DeliveredServicesItem> findNotNullGoodsFullNameByOrg(Session session, Date start, Date end, List<Long> contragents) {
+        public List<DeliveredServicesItem> findNotNullGoodsFullNameByOrg(Session session, Date start, Date end,
+                Long contragent, Long contract) {
             String contragentCondition = "";
-            if (contragents != null && contragents.size() > 0) {
-                for (Long id : contragents) {
-                    if (contragentCondition.length() > 0) {
-                        contragentCondition = contragentCondition + " OR ";
-                    }
-                contragentCondition = contragentCondition + " cf_menuexchangerules.idofsourceorg=" + id;
-                }
-            contragentCondition = "(" + contragentCondition + ") AND ";
+            if (contragent != null) {
+                contragentCondition = "(cf_orgs.defaultsupplier=" + contragent + ") AND ";
             }
+
+            String contractOrgsCondition = "";
+            if (contract != null) {
+                //  Вытаскиваем те орги, которые привязаны к контракту и устанавливаем их как ограничения. !Будет заменено!
+                Query query = session.createSQLQuery("select idoforg from cf_orgs where idofcontract=:contract");//.createQuery(sql);
+                query.setParameter("contract", contract);
+                List res = query.list();
+                for (Object entry : res) {
+                    Long org = ((BigInteger) entry).longValue();
+                    if (contractOrgsCondition.length() > 0) {
+                        contractOrgsCondition = contractOrgsCondition.concat(", ");
+                    }
+                    contractOrgsCondition = contractOrgsCondition.concat("" + org);
+                }
+
+                //  Берем даты начала и окончания контракта, если они выходят за рамки выбранных пользователем дат, то
+                //  ограничиваем временные рамки
+                Criteria contractCriteria = session.createCriteria(Contract.class);
+                contractCriteria.add(Restrictions.eq("idOfContract", contract));
+                Contract c = (Contract) contractCriteria.uniqueResult();
+                if (c.getDateOfConclusion().getTime() > start.getTime()) {
+                    start.setTime(c.getDateOfConclusion().getTime());
+                }
+                if (c.getDateOfClosing().getTime() < end.getTime()) {
+                    end.setTime(c.getDateOfClosing().getTime());
+                }
+            }
+            if (contractOrgsCondition.length() > 0) {
+                contractOrgsCondition = " cf_orgs.idoforg in (" + contractOrgsCondition + ") and ";
+            }
+
+
+
+
             String sql = "select cf_orgs.officialname, " + "split_part(cf_goods.fullname, '/', 1) as level1, "
                     + "split_part(cf_goods.fullname, '/', 2) as level2, "
                     + "split_part(cf_goods.fullname, '/', 3) as level3, "
@@ -153,8 +188,8 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                     + "from cf_orgs " + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
                     + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
                     + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
-                    + "join cf_menuexchangerules on idofdestorg=cf_orgs.idoforg "
-                    + "where cf_orderdetails.socdiscount>0 and " + contragentCondition + " cf_orders.createddate between :start and :end "
+                    + "where cf_orderdetails.socdiscount>0 and " + contragentCondition + contractOrgsCondition
+                    + " cf_orders.createddate between :start and :end "
                     + "group by cf_orgs.officialname, level1, level2, level3, level4, price, address "
                     + "order by cf_orgs.officialname, level1, level2, level3, level4";
             Query query = session.createSQLQuery(sql);//.createQuery(sql);

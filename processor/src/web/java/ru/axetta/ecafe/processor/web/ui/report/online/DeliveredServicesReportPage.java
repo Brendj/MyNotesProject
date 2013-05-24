@@ -4,10 +4,12 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.DeliveredServicesReport;
-import ru.axetta.ecafe.processor.core.report.GoodRequestsReport;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
+import ru.axetta.ecafe.processor.web.ui.contract.ContractFilter;
+import ru.axetta.ecafe.processor.web.ui.contract.ContractSelectPage;
+import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
 import org.hibernate.Session;
 
@@ -21,11 +23,14 @@ import java.util.GregorianCalendar;
  * Time: 16:47
  * To change this template use File | Settings | File Templates.
  */
-public class DeliveredServicesReportPage extends OnlineReportWithContragentPage {
+public class DeliveredServicesReportPage extends OnlineReportPage
+        implements ContragentSelectPage.CompleteHandler, ContractSelectPage.CompleteHandler {
     private DeliveredServicesReport deliveredServices;
     private String goodName;
     private Boolean hideMissedColumns;
     private String htmlReport;
+    private final CCAccountFilter contragentFilter = new CCAccountFilter();
+    private final ContractFilter contractFilter= new ContractFilter();
 
     public String getPageFilename() {
         return "report/online/delivered_services_report";
@@ -39,16 +44,33 @@ public class DeliveredServicesReportPage extends OnlineReportWithContragentPage 
         return htmlReport;
     }
 
-    public void showContragentListSelectPage () {
-        setSelectIdOfOrgList(false);
-        MainPage.getSessionInstance().showOrgListSelectPage();
+    public CCAccountFilter getContragentFilter() {
+        return contragentFilter;
+    }
+
+    public ContractFilter getContractFilter() {
+        return contractFilter;
+    }
+
+    public void showContractSelectPage () {
+        MainPage.getSessionInstance().showContractSelectPage  (this.contragentFilter.getContragent().getContragentName());
+    }
+
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
+        contragentFilter.completeContragentSelection(session, idOfContragent);
+    }
+
+    public void completeContractSelection(Session session, Long idOfContract, int multiContrFlag, String classTypes) throws Exception {
+        this.contractFilter.completeContractSelection(session, idOfContract, multiContrFlag, classTypes);
     }
 
     public void buildReport(Session session) throws Exception {
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(System.currentTimeMillis());
         DeliveredServicesReport.Builder reportBuilder = new DeliveredServicesReport.Builder();
-        this.deliveredServices = reportBuilder.build(session, startDate, endDate, cal, idOfContragentOrgList);
+        this.deliveredServices = reportBuilder.build(session, startDate, endDate, cal,
+                                                    contragentFilter.getContragent().getIdOfContragent(),
+                                                    contractFilter.getContract().getIdOfContract());
         htmlReport = deliveredServices.getHtmlReport();
     }
 

@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class OnlineReportWithContragentPage extends OnlineReportPage {
     protected boolean selectIdOfOrgList = true;                         //  Флаг того какой массив сейчас заполнять: оргов (true) или контрагетов (false)
-    protected String contragentFileter = "Не выбрано";
+    protected String contragentFilter = "Не выбрано";
     protected List<Long> idOfContragentOrgList = new ArrayList<Long>();
 
     protected OnlineReportWithContragentPage(){
@@ -42,8 +42,8 @@ public class OnlineReportWithContragentPage extends OnlineReportPage {
         }
     }
 
-    public String getContragentFileter() {
-        return contragentFileter;
+    public String getContragentFilter() {
+        return contragentFilter;
     }
 
     public void completeOrgListSelection(Map<Long, String> orgMap) throws HibernateException {
@@ -54,14 +54,14 @@ public class OnlineReportWithContragentPage extends OnlineReportPage {
             if (orgMap != null) {
                 idOfContragentOrgList = new ArrayList<Long>();
                 if (orgMap.isEmpty())
-                    contragentFileter = "Не выбрано";
+                    contragentFilter = "Не выбрано";
                 else {
-                    contragentFileter = "";
+                    contragentFilter = "";
                     for(Long idOfOrg : orgMap.keySet()) {
                         idOfContragentOrgList.add(idOfOrg);
-                        contragentFileter = contragentFileter.concat(orgMap.get(idOfOrg) + "; ");
+                        contragentFilter = contragentFilter.concat(orgMap.get(idOfOrg) + "; ");
                     }
-                    contragentFileter = contragentFileter.substring(0, contragentFileter.length() - 1);
+                    contragentFilter = contragentFilter.substring(0, contragentFilter.length() - 1);
                 }
             }
         }
