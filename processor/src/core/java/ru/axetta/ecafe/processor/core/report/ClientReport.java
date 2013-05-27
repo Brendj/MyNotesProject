@@ -100,7 +100,7 @@ public class ClientReport extends BasicReport {
         private Long clientWithNullBalanceCount; // Количество детей у которых баланс равен нулю
         private Long clientWithNegativeBalanceCount; // Количество детей у которых баланс меньше нуля
         private String balanceSum; // Сумма денег на их картах
-        private String posBalanceSum; // Cумма положительных балансов
+        private String posBalanceSum; // Сумма положительных балансов
         private String negBalanceSum; // Сумма отрицательных балансов
 
         public ClientItem(Long idOfOrg, String officialName, Long clientCount, Long clientWithPositiveBalanceCount,

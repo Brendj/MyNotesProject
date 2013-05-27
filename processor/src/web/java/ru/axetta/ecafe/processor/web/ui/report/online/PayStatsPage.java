@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.CurrencyConverter;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -15,6 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpSession;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,6 +31,7 @@ public class PayStatsPage extends BasicWorkspacePage {
 
     @Autowired
     DAOService daoService;
+    private Calendar localCalendar;
 
     @Override
     public String getPageFilename() {
@@ -35,6 +40,10 @@ public class PayStatsPage extends BasicWorkspacePage {
 
     @Override
     public void onShow() throws Exception {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        localCalendar = runtimeContext
+                .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
     }
 
     public String getFromDateAsString() {
@@ -120,6 +129,10 @@ public class PayStatsPage extends BasicWorkspacePage {
     }
 
     public void setToDate(Date toDate) {
-        this.toDate = toDate;
+        localCalendar.setTime(toDate);
+        localCalendar.add(Calendar.DAY_OF_MONTH,1);
+        localCalendar.add(Calendar.SECOND, -1);
+        this.toDate = localCalendar.getTime();
+        //this.toDate = toDate;
     }
 }

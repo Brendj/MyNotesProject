@@ -16,6 +16,8 @@ import org.hibernate.Session;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.print.attribute.standard.Severity;
+import javax.servlet.http.HttpSession;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -34,6 +36,8 @@ public class ReportJobViewPage extends BasicWorkspacePage {
     private boolean enabled;
     private Date generateStartDate;
     private Date generateEndDate;
+    private Calendar localCalendar;
+    private RuntimeContext runtimeContext;
 
     public String getPageFilename() {
         return "report/job/view";
@@ -72,20 +76,26 @@ public class ReportJobViewPage extends BasicWorkspacePage {
     }
 
     public void setGenerateEndDate(Date generateEndDate) {
-        this.generateEndDate = generateEndDate;
+        if(generateEndDate!=null){
+            localCalendar.setTime(generateEndDate);
+            localCalendar.add(Calendar.DAY_OF_MONTH,1);
+            localCalendar.add(Calendar.SECOND, -1);
+            this.generateEndDate = localCalendar.getTime();
+        } else {
+            this.generateEndDate = generateEndDate;
+        }
     }
 
     public Object triggerJob() throws Exception {
-        FacesContext fc = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
         try {
-            runtimeContext = RuntimeContext.getInstance();
-            if (generateStartDate!=null && generateEndDate==null) {
+            if(generateStartDate==null) throw new Exception("Не задан период выборки");
+            if (generateEndDate==null) {
                 generateEndDate = CalendarUtils.addDays(generateStartDate, 1);
             }
             runtimeContext.getAutoReportGenerator().triggerJob(idOfSchedulerJob, generateStartDate, generateEndDate);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Задача запущена успешно перейдите во вкладку Репозиторий отчетов/Просмотр и дождитесь результата работы", ""));
         } catch (Exception e) {
-            fc.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка: "+e.toString(), ""));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка: "+(e.getMessage()==null?e.toString():e.getMessage()), ""));
         }
         return null;
     }
@@ -97,5 +107,9 @@ public class ReportJobViewPage extends BasicWorkspacePage {
         this.reportType = AutoReportGenerator.getReportType(schedulerJob.getJobClass());
         this.cronExpression = schedulerJob.getCronExpression();
         this.enabled = schedulerJob.isEnabled();
+        runtimeContext = RuntimeContext.getInstance();
+        localCalendar = runtimeContext
+                .getDefaultLocalCalendar((HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(false));
+
     }
 }

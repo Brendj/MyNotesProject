@@ -65,10 +65,8 @@ public class DeliveredServicesReportPage extends OnlineReportPage
     }
 
     public void buildReport(Session session) throws Exception {
-        Calendar cal = new GregorianCalendar();
-        cal.setTimeInMillis(System.currentTimeMillis());
         DeliveredServicesReport.Builder reportBuilder = new DeliveredServicesReport.Builder();
-        this.deliveredServices = reportBuilder.build(session, startDate, endDate, cal,
+        this.deliveredServices = reportBuilder.build(session, startDate, endDate, localCalendar,
                                                     contragentFilter.getContragent().getIdOfContragent(),
                                                     contractFilter.getContract().getIdOfContract());
         htmlReport = deliveredServices.getHtmlReport();

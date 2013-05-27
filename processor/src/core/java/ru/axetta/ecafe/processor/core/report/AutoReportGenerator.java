@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
 import ru.axetta.ecafe.processor.core.report.msc.BeneficiarySummaryReport;
 import ru.axetta.ecafe.processor.core.report.msc.HalfYearSummaryReport;
 import ru.axetta.ecafe.processor.core.report.msc.MscSalesReport;
+import ru.axetta.ecafe.processor.core.utils.ExecutorServiceWrappedJob;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.io.FilenameUtils;
@@ -44,11 +45,11 @@ import java.util.concurrent.ExecutorService;
 public class AutoReportGenerator {
 
     static class ReportDef {
-        Class buildJobClass;
-        Class reportClass;
+        Class<? extends ExecutorServiceWrappedJob> buildJobClass;
+        Class<? extends BasicReport> reportClass;
         JobDetailCreator jobDetailCreator;
 
-        ReportDef(Class reportClass, Class buildJobClass, JobDetailCreator jobDetailCreator) {
+        ReportDef(Class<? extends BasicReport> reportClass, Class<? extends ExecutorServiceWrappedJob> buildJobClass, JobDetailCreator jobDetailCreator) {
             this.buildJobClass = buildJobClass;
             this.jobDetailCreator = jobDetailCreator;
             this.reportClass = reportClass;
@@ -802,6 +803,7 @@ public class AutoReportGenerator {
     public static String getReportType(String reportJobClass) {
         for (ReportDef r : REPORT_DEFS) {
             if (r.buildJobClass.getCanonicalName().equals(reportJobClass)) return r.reportClass.getCanonicalName();
+
         }
         return null;
     }
@@ -1038,14 +1040,13 @@ public class AutoReportGenerator {
 
     private void triggerJob(String jobName, Date startDate, Date endDate) throws Exception {
         JobDetail jobDetail=this.scheduler.getJobDetail(jobName, Scheduler.DEFAULT_GROUP);
+        if(jobDetail == null) throw new Exception(String.format("Задача с именем '%s' не найдена попробуйте перезапустить сервер", jobName));
         if (startDate!=null) {
-            if (jobDetail!=null) {
-                Object executeEnvironmentObject = jobDetail.getJobDataMap().put(BasicReportJob.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, startDate);
-                if (executeEnvironmentObject!=null && executeEnvironmentObject instanceof BasicReportJob.AutoReportBuildJob.ExecuteEnvironment) {
-                    BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = (BasicReportJob.AutoReportBuildJob.ExecuteEnvironment)executeEnvironmentObject;
-                    executeEnvironment.setStartDate(startDate);
-                    executeEnvironment.setEndDate(endDate);
-                }
+            Object executeEnvironmentObject = jobDetail.getJobDataMap().put(BasicReportJob.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, startDate);
+            if (executeEnvironmentObject!=null && executeEnvironmentObject instanceof BasicReportJob.AutoReportBuildJob.ExecuteEnvironment) {
+                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = (BasicReportJob.AutoReportBuildJob.ExecuteEnvironment)executeEnvironmentObject;
+                executeEnvironment.setStartDate(startDate);
+                executeEnvironment.setEndDate(endDate);
             }
         }
         this.scheduler.triggerJob(jobName, Scheduler.DEFAULT_GROUP);

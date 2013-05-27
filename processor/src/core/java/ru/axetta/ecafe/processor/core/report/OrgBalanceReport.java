@@ -503,161 +503,158 @@ public class OrgBalanceReport extends BasicReport {
         private static void writeReportDocumentTo(OrgBalanceReport report, OutputStream outputStream,
                 DateFormat dateFormat) throws Exception {
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
-            try {
-                String payFormUrl = runtimeContext.getPayformUrl(), payFormGroupUrl = runtimeContext.getPayformGroupUrl();
-                Writer writer = new OutputStreamWriter(outputStream, "utf-8");
-                writer.write("<html>");
-                writer.write("<head>");
-                writer.write("<title>");
-                OrgItem org = report.getOrg();
-                writer.write(StringEscapeUtils.escapeHtml(
-                        String.format("Отчет по балансу по организации \"%s\"", org.getShortName())));
-                writer.write("</title>");
-                writer.write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
-                writer.write("<meta http-equiv=\"Content-Language\" content=\"ru\">");
-                writer.write("</head>");
-                writer.write("<body>");
+            String payFormUrl = runtimeContext.getPayformUrl(), payFormGroupUrl = runtimeContext.getPayformGroupUrl();
+            Writer writer = new OutputStreamWriter(outputStream, "utf-8");
+            writer.write("<html>");
+            writer.write("<head>");
+            writer.write("<title>");
+            OrgItem org = report.getOrg();
+            writer.write(StringEscapeUtils.escapeHtml(
+                    String.format("Отчет по балансу по организации \"%s\"", org.getShortName())));
+            writer.write("</title>");
+            writer.write("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
+            writer.write("<meta http-equiv=\"Content-Language\" content=\"ru\">");
+            writer.write("</head>");
+            writer.write("<body>");
 
-                writer.write("<table>");
-                writer.write("<tr>");
-                writer.write("<td align=\"center\">");
-                writer.write(StringEscapeUtils.escapeHtml(String.format("Отчет по балансу по организации \"%s\" на %s",
-                        StringUtils.defaultString(org.getShortName()), dateFormat.format(report.getBaseTime()))));
-                writer.write("</td>");
-                writer.write("</tr>");
+            writer.write("<table>");
+            writer.write("<tr>");
+            writer.write("<td align=\"center\">");
+            writer.write(StringEscapeUtils.escapeHtml(String.format("Отчет по балансу по организации \"%s\" на %s",
+                    StringUtils.defaultString(org.getShortName()), dateFormat.format(report.getBaseTime()))));
+            writer.write("</td>");
+            writer.write("</tr>");
 
-                writer.write("<tr>");
-                writer.write("<td>");
-                writer.write("<table>");
+            writer.write("<tr>");
+            writer.write("<td>");
+            writer.write("<table>");
 
-                writer.write("<tr>");
-                writer.write("<td colspan=\"4\"/>");
-                writer.write("<td>");
-                writer.write(StringEscapeUtils.escapeHtml("Платежи"));
-                writer.write("</td>");
-                writer.write("<td>");
-                writer.write(StringEscapeUtils.escapeHtml("Покупки по картам"));
-                writer.write("</td>");
-                writer.write("<td>");
-                writer.write(StringEscapeUtils.escapeHtml("Баланс по картам"));
-                writer.write("</td>");
-                writer.write("<td>");
-                writer.write(StringEscapeUtils.escapeHtml("Квитанция на пополнение счета"));
-                writer.write("</td>");
-                writer.write("</tr>");
+            writer.write("<tr>");
+            writer.write("<td colspan=\"4\"/>");
+            writer.write("<td>");
+            writer.write(StringEscapeUtils.escapeHtml("Платежи"));
+            writer.write("</td>");
+            writer.write("<td>");
+            writer.write(StringEscapeUtils.escapeHtml("Покупки по картам"));
+            writer.write("</td>");
+            writer.write("<td>");
+            writer.write(StringEscapeUtils.escapeHtml("Баланс по картам"));
+            writer.write("</td>");
+            writer.write("<td>");
+            writer.write(StringEscapeUtils.escapeHtml("Квитанция на пополнение счета"));
+            writer.write("</td>");
+            writer.write("</tr>");
 
+            writer.write("<tr>");
+            writer.write("<td colspan=\"4\">");
+            writer.write(StringEscapeUtils.escapeHtml(org.getShortName()));
+            writer.write("</td>");
+            writer.write("<td align=\"right\">");
+            writer.write(StringEscapeUtils.escapeHtml(
+                    CurrencyStringUtils.copecksToRubles(org.getTotalClientPaymentSum())));
+            writer.write("</td>");
+            writer.write("<td align=\"right\">");
+            writer.write(StringEscapeUtils.escapeHtml(
+                    CurrencyStringUtils.copecksToRubles(org.getTotalOrderSumByCard())));
+            writer.write("</td>");
+            writer.write("<td align=\"right\">");
+            writer.write(StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(org.getTotalBalance())));
+            writer.write("</td>");
+            writer.write("<td/>");
+            writer.write("</tr>");
+
+            for (ClientGroupItem clientGroup : org.getClientGroups()) {
                 writer.write("<tr>");
                 writer.write("<td colspan=\"4\">");
-                writer.write(StringEscapeUtils.escapeHtml(org.getShortName()));
+                writer.write(StringEscapeUtils.escapeHtml(StringUtils.defaultString(clientGroup.getGroupName())));
                 writer.write("</td>");
                 writer.write("<td align=\"right\">");
                 writer.write(StringEscapeUtils.escapeHtml(
-                        CurrencyStringUtils.copecksToRubles(org.getTotalClientPaymentSum())));
+                        CurrencyStringUtils.copecksToRubles(clientGroup.getTotalClientPaymentSum())));
                 writer.write("</td>");
                 writer.write("<td align=\"right\">");
                 writer.write(StringEscapeUtils.escapeHtml(
-                        CurrencyStringUtils.copecksToRubles(org.getTotalOrderSumByCard())));
+                        CurrencyStringUtils.copecksToRubles(clientGroup.getTotalOrderSumByCard())));
                 writer.write("</td>");
                 writer.write("<td align=\"right\">");
-                writer.write(StringEscapeUtils.escapeHtml(CurrencyStringUtils.copecksToRubles(org.getTotalBalance())));
+                writer.write(StringEscapeUtils.escapeHtml(
+                        CurrencyStringUtils.copecksToRubles(clientGroup.getTotalBalance())));
                 writer.write("</td>");
-                writer.write("<td/>");
-                writer.write("</tr>");
-
-                for (ClientGroupItem clientGroup : org.getClientGroups()) {
-                    writer.write("<tr>");
-                    writer.write("<td colspan=\"4\">");
-                    writer.write(StringEscapeUtils.escapeHtml(StringUtils.defaultString(clientGroup.getGroupName())));
-                    writer.write("</td>");
-                    writer.write("<td align=\"right\">");
-                    writer.write(StringEscapeUtils.escapeHtml(
-                            CurrencyStringUtils.copecksToRubles(clientGroup.getTotalClientPaymentSum())));
-                    writer.write("</td>");
-                    writer.write("<td align=\"right\">");
-                    writer.write(StringEscapeUtils.escapeHtml(
-                            CurrencyStringUtils.copecksToRubles(clientGroup.getTotalOrderSumByCard())));
-                    writer.write("</td>");
-                    writer.write("<td align=\"right\">");
-                    writer.write(StringEscapeUtils.escapeHtml(
-                            CurrencyStringUtils.copecksToRubles(clientGroup.getTotalBalance())));
-                    writer.write("</td>");
-                    writer.write("<td>");
-                    int nClientsWithDebt = clientGroup.getClientsWithDebtCount();
-                    if (nClientsWithDebt!=0) {
-                        String clientGroupDebtPayFormUrl = String.format(payFormGroupUrl, org.getIdOfOrg(), clientGroup.getIdOfClientGroup(), "true");
-                        writer.write(
-                                String.format("<a href=\"%s\">%s</a>", StringEscapeUtils.escapeHtml(clientGroupDebtPayFormUrl),
-                                        StringEscapeUtils.escapeHtml(" [квитанции по должникам ("+nClientsWithDebt+")] ")));
-                    }
-                    String clientGroupDebtPayFormUrl = String.format(payFormGroupUrl, org.getIdOfOrg(), clientGroup.getIdOfClientGroup(), "false");
+                writer.write("<td>");
+                int nClientsWithDebt = clientGroup.getClientsWithDebtCount();
+                if (nClientsWithDebt!=0) {
+                    String clientGroupDebtPayFormUrl = String.format(payFormGroupUrl, org.getIdOfOrg(), clientGroup.getIdOfClientGroup(), "true");
                     writer.write(
                             String.format("<a href=\"%s\">%s</a>", StringEscapeUtils.escapeHtml(clientGroupDebtPayFormUrl),
-                                    StringEscapeUtils.escapeHtml(" [квитанции ("+clientGroup.getClients().size()+")] ")));
+                                    StringEscapeUtils.escapeHtml(" [квитанции по должникам ("+nClientsWithDebt+")] ")));
+                }
+                String clientGroupDebtPayFormUrl = String.format(payFormGroupUrl, org.getIdOfOrg(), clientGroup.getIdOfClientGroup(), "false");
+                writer.write(
+                        String.format("<a href=\"%s\">%s</a>", StringEscapeUtils.escapeHtml(clientGroupDebtPayFormUrl),
+                                StringEscapeUtils.escapeHtml(" [квитанции ("+clientGroup.getClients().size()+")] ")));
+                writer.write("</td>");
+                writer.write("</tr>");
+
+                for (ClientItem client : clientGroup.getClients()) {
+                    writer.write("<tr>");
+                    writer.write("<td align=\"right\">");
+                    writer.write(StringEscapeUtils.escapeHtml(ContractIdFormat.format(client.getContractId())));
+                    writer.write("</td>");
+                    PersonItem person = client.getPerson();
+                    writer.write("<td>");
+                    writer.write(StringEscapeUtils.escapeHtml(person.getSurname()));
+                    writer.write("</td>");
+                    writer.write("<td>");
+                    writer.write(StringEscapeUtils.escapeHtml(person.getFirstName()));
+                    writer.write("</td>");
+                    writer.write("<td>");
+                    writer.write(StringEscapeUtils.escapeHtml(person.getSecondName()));
+                    writer.write("</td>");
+                    writer.write("<td align=\"right\">");
+                    writer.write(StringEscapeUtils.escapeHtml(
+                            CurrencyStringUtils.copecksToRubles(client.getTotalClientPaymentSum())));
+                    writer.write("</td>");
+                    writer.write("<td align=\"right\">");
+                    writer.write(StringEscapeUtils.escapeHtml(
+                            CurrencyStringUtils.copecksToRubles(client.getTotalOrderSumByCard())));
+                    writer.write("</td>");
+                    writer.write("<td align=\"right\">");
+                    writer.write(StringEscapeUtils.escapeHtml(
+                            CurrencyStringUtils.copecksToRubles(client.getTotalBalance())));
+                    writer.write("</td>");
+                    writer.write("<td>");
+                    if (client.getTotalBalance() < 0) {
+                        String clientPayFormUrl = String.format(payFormUrl, client.getContractId().toString());
+                        writer.write(String.format("<a href=\"%s\">%s</a>",
+                                StringEscapeUtils.escapeHtml(clientPayFormUrl),
+                                StringEscapeUtils.escapeHtml("квитанция")));
+                    }
                     writer.write("</td>");
                     writer.write("</tr>");
-
-                    for (ClientItem client : clientGroup.getClients()) {
-                        writer.write("<tr>");
-                        writer.write("<td align=\"right\">");
-                        writer.write(StringEscapeUtils.escapeHtml(ContractIdFormat.format(client.getContractId())));
-                        writer.write("</td>");
-                        PersonItem person = client.getPerson();
-                        writer.write("<td>");
-                        writer.write(StringEscapeUtils.escapeHtml(person.getSurname()));
-                        writer.write("</td>");
-                        writer.write("<td>");
-                        writer.write(StringEscapeUtils.escapeHtml(person.getFirstName()));
-                        writer.write("</td>");
-                        writer.write("<td>");
-                        writer.write(StringEscapeUtils.escapeHtml(person.getSecondName()));
-                        writer.write("</td>");
-                        writer.write("<td align=\"right\">");
-                        writer.write(StringEscapeUtils.escapeHtml(
-                                CurrencyStringUtils.copecksToRubles(client.getTotalClientPaymentSum())));
-                        writer.write("</td>");
-                        writer.write("<td align=\"right\">");
-                        writer.write(StringEscapeUtils.escapeHtml(
-                                CurrencyStringUtils.copecksToRubles(client.getTotalOrderSumByCard())));
-                        writer.write("</td>");
-                        writer.write("<td align=\"right\">");
-                        writer.write(StringEscapeUtils.escapeHtml(
-                                CurrencyStringUtils.copecksToRubles(client.getTotalBalance())));
-                        writer.write("</td>");
-                        writer.write("<td>");
-                        if (client.getTotalBalance() < 0) {
-                            String clientPayFormUrl = String.format(payFormUrl, client.getContractId().toString());
-                            writer.write(String.format("<a href=\"%s\">%s</a>",
-                                    StringEscapeUtils.escapeHtml(clientPayFormUrl),
-                                    StringEscapeUtils.escapeHtml("квитанция")));
-                        }
-                        writer.write("</td>");
-                        writer.write("</tr>");
-                    }
                 }
-
-                writer.write("</table>");
-                writer.write("</td>");
-                writer.write("</tr>");
-
-                writer.write("</table>");
-
-                writer.write("<tr>");
-                writer.write("<td>");
-                writer.write(StringEscapeUtils.escapeHtml(
-                        String.format("Продолжительность формирования отчета %d мс", report.getGenerateDuration())));
-                writer.write("</td>");
-                writer.write("</tr>");
-
-                writer.write("</body>");
-                writer.write("</html>");
-                writer.flush();
-            } finally {
             }
+
+            writer.write("</table>");
+            writer.write("</td>");
+            writer.write("</tr>");
+
+            writer.write("</table>");
+
+            writer.write("<tr>");
+            writer.write("<td>");
+            writer.write(StringEscapeUtils.escapeHtml(
+                    String.format("Продолжительность формирования отчета %d мс", report.getGenerateDuration())));
+            writer.write("</td>");
+            writer.write("</tr>");
+
+            writer.write("</body>");
+            writer.write("</html>");
+            writer.flush();
         }
 
     }
 
-    private static class DocumentBuilderCallback implements BasicReport.DocumentBuilderCallback {
+    static class DocumentBuilderCallback implements BasicReport.DocumentBuilderCallback {
 
         public String getReportDistinctText(BasicReport report) {
             OrgBalanceReport orgBalanceReport = (OrgBalanceReport) report;

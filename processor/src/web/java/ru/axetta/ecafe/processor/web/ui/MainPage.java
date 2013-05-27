@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui;
 
+import net.sf.jasperreports.engine.JRException;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfContragentClientAccount;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
@@ -59,10 +61,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpSession;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -5122,6 +5121,10 @@ public Long getSelectedIdOfReportRule() {
             persistenceTransaction = null;
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+        } catch (JRException fnfe) {
+            logger.error("Failed to build Delivered report", fnfe);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета не найден файл шаблона: " + fnfe.getCause().getMessage(), null));
         } catch (Exception e) {
             logger.error("Failed to build sales report", e);
             facesContext.addMessage(null,
@@ -5129,8 +5132,6 @@ public Long getSelectedIdOfReportRule() {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-
-
         }
         return null;
     }

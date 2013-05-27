@@ -9,6 +9,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampItem;
 import ru.axetta.ecafe.processor.core.persistence.Contract;
@@ -80,8 +81,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
         }
 
         public Builder() {
-            templateFilename = AutoReportGenerator.getReportsTemplateFilePathWithDb() + DeliveredServicesReport.class
-                    .getSimpleName() + ".jasper";
+            templateFilename = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath() + DeliveredServicesReport.class.getSimpleName() + ".jasper";
             exportToHTML = true;
         }
 
@@ -111,8 +111,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
             Date generateEndTime = new Date();
             List<DeliveredServicesItem> items = findNotNullGoodsFullNameByOrg(session, startTime, endTime, contragent,
                     contract);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, startTime, endTime, (Calendar) calendar.clone(), parameterMap, items));
+            JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,createDataSource(session, startTime, endTime, (Calendar) calendar.clone(), parameterMap, items));
             //  Если имя шаблона присутствует, значит строится для джаспера
             if (!exportToHTML) {
                 return new DeliveredServicesReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
@@ -148,7 +147,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
 
             String contractOrgsCondition = "";
             if (contract != null) {
-                //  Вытаскиваем те орги, которые привязаны к контракту и устанавливаем их как ограничения. !Будет заменено!
+                //  Вытаскиваем те оргии, которые привязаны к контракту и устанавливаем их как ограничения. !Будет заменено!
                 Query query = session.createSQLQuery("select idoforg from cf_orgs where idofcontract=:contract");//.createQuery(sql);
                 query.setParameter("contract", contract);
                 List res = query.list();

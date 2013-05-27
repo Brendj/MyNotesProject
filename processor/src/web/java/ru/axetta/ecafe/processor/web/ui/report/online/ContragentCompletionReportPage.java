@@ -45,6 +45,7 @@ public class ContragentCompletionReportPage extends BasicWorkspacePage implement
     private List<Contragent> contragentList;
     private Contragent defaultSupplier;
     private Integer contragentListCount = 0;
+    private Calendar localCalendar;
 
     @Override
     public void onShow() throws Exception {
@@ -53,15 +54,17 @@ public class ContragentCompletionReportPage extends BasicWorkspacePage implement
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         contragentListCount = contragentList.size();
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        Calendar localCalendar = runtimeContext
+        localCalendar = runtimeContext
                 .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
 
         localCalendar.setTime(new Date());
-        this.endDate = DateUtils.truncate(localCalendar, Calendar.DAY_OF_MONTH).getTime();
 
-        localCalendar.setTime(this.endDate);
-        localCalendar.add(Calendar.DAY_OF_MONTH, -1);
-        this.startDate = localCalendar.getTime();
+        this.startDate = DateUtils.truncate(localCalendar, Calendar.DAY_OF_MONTH).getTime();
+        localCalendar.setTime(this.startDate);
+
+        localCalendar.add(Calendar.DAY_OF_MONTH, 1);
+        localCalendar.add(Calendar.SECOND, -1);
+        this.endDate = localCalendar.getTime();
     }
 
     public Object generate(){
@@ -114,6 +117,10 @@ public class ContragentCompletionReportPage extends BasicWorkspacePage implement
     }
 
     public void setEndDate(Date endDate) {
+        localCalendar.setTime(endDate);
+        localCalendar.add(Calendar.DAY_OF_MONTH,1);
+        localCalendar.add(Calendar.SECOND, -1);
+        this.endDate = localCalendar.getTime();
         this.endDate = endDate;
     }
 

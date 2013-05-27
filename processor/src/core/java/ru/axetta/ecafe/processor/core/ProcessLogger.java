@@ -21,6 +21,8 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,6 +40,7 @@ public class ProcessLogger implements SyncLogger, PaymentLogger, IntegroLogger {
     private final String paymentResponseLogPath;
     private final String intgeroRequestLogPath;
     private final String intgeroResponseLogPath;
+    private final SimpleDateFormat dateFormat;
 
     public ProcessLogger(String syncRequestLogPath, String syncResponseLogPath, String paymentRequestLogPath,
             String paymentResponseLogPath, String intgeroRequestLogPath, String intgeroResponseLogPath) {
@@ -47,13 +50,19 @@ public class ProcessLogger implements SyncLogger, PaymentLogger, IntegroLogger {
         this.paymentResponseLogPath = paymentResponseLogPath;
         this.intgeroRequestLogPath = intgeroRequestLogPath;
         this.intgeroResponseLogPath = intgeroResponseLogPath;
+        this.dateFormat = new SimpleDateFormat("yyyy-MM-dd");
     }
 
     @Override
     public void registerIntegroRequest(Document requestDocument, long idOfOrg, String idOfSync) {
         if (intgeroRequestLogPath==null) return;
         try {
-            File file = createFile(intgeroRequestLogPath, idOfOrg, idOfSync, "in");
+            String datePath = String.format("%s/%s/", intgeroRequestLogPath, dateFormat.format(new Date()));
+            File syncResponseLogPathDay = new File(datePath);
+            if(!syncResponseLogPathDay.exists()){
+                boolean result = syncResponseLogPathDay.mkdir();
+            }
+            File file = createFile(datePath, idOfOrg, idOfSync, "in");
             FileOutputStream outputStream = new FileOutputStream(file);
             try {
                 writeDocument(requestDocument, outputStream);
@@ -70,7 +79,12 @@ public class ProcessLogger implements SyncLogger, PaymentLogger, IntegroLogger {
     public void registerIntegroResponse(Document responseDocument, long idOfOrg, String idOfSync) {
         if (intgeroResponseLogPath==null) return;
         try {
-            File file = createFile(intgeroResponseLogPath, idOfOrg, idOfSync, "out");
+            String datePath = String.format("%s/%s/", intgeroResponseLogPath, dateFormat.format(new Date()));
+            File syncResponseLogPathDay = new File(datePath);
+            if(!syncResponseLogPathDay.exists()){
+                boolean result = syncResponseLogPathDay.mkdir();
+            }
+            File file = createFile(datePath, idOfOrg, idOfSync, "in");
             FileOutputStream outputStream = new FileOutputStream(file);
             try {
                 writeDocument(responseDocument, outputStream);
@@ -85,7 +99,13 @@ public class ProcessLogger implements SyncLogger, PaymentLogger, IntegroLogger {
 
     public void registerSyncRequest(Document requestDocument, long idOfOrg, String idOfSync) {
         try {
-            File file = createFile(syncRequestLogPath, idOfOrg, idOfSync, "in");
+            String datePath = String.format("%s/%s/", syncRequestLogPath, dateFormat.format(new Date()));
+            File syncResponseLogPathDay = new File(datePath);
+            if(!syncResponseLogPathDay.exists()){
+                boolean result = syncResponseLogPathDay.mkdir();
+            }
+            File file = createFile(datePath, idOfOrg, idOfSync, "in");
+            //File file = createFile(syncRequestLogPath, idOfOrg, idOfSync, "in");
             FileOutputStream outputStream = new FileOutputStream(file);
             try {
                 writeDocument(requestDocument, outputStream);
@@ -100,7 +120,12 @@ public class ProcessLogger implements SyncLogger, PaymentLogger, IntegroLogger {
 
     public void registerSyncResponse(Document responseDocument, long idOfOrg, String idOfSync) {
         try {
-            File file = createFile(syncResponseLogPath, idOfOrg, idOfSync, "out");
+            String datePath = String.format("%s/%s/", syncResponseLogPath, dateFormat.format(new Date()));
+            File syncResponseLogPathDay = new File(datePath);
+            if(!syncResponseLogPathDay.exists()){
+                boolean result = syncResponseLogPathDay.mkdir();
+            }
+            File file = createFile(datePath, idOfOrg, idOfSync, "out");
             FileOutputStream outputStream = new FileOutputStream(file);
             try {
                 writeDocument(responseDocument, outputStream);
@@ -115,7 +140,12 @@ public class ProcessLogger implements SyncLogger, PaymentLogger, IntegroLogger {
 
     public void registerPaymentRequest(Document requestDocument, long idOfContragent, String idOfSync) {
         try {
-            File file = createFile(paymentRequestLogPath, idOfContragent, idOfSync, "in");
+            String datePath = String.format("%s/%s/", paymentRequestLogPath, dateFormat.format(new Date()));
+            File syncResponseLogPathDay = new File(datePath);
+            if(!syncResponseLogPathDay.exists()){
+                boolean result = syncResponseLogPathDay.mkdir();
+            }
+            File file = createFile(datePath, idOfContragent, idOfSync, "in");
             FileOutputStream outputStream = new FileOutputStream(file);
             try {
                 writeDocument(requestDocument, outputStream);
@@ -130,7 +160,12 @@ public class ProcessLogger implements SyncLogger, PaymentLogger, IntegroLogger {
 
     public void registerPaymentResponse(Document responseDocument, long idOfContragent, String idOfSync) {
         try {
-            File file = createFile(paymentResponseLogPath, idOfContragent, idOfSync, "out");
+            String datePath = String.format("%s/%s/", paymentResponseLogPath, dateFormat.format(new Date()));
+            File syncResponseLogPathDay = new File(datePath);
+            if(!syncResponseLogPathDay.exists()){
+                boolean result = syncResponseLogPathDay.mkdir();
+            }
+            File file = createFile(datePath, idOfContragent, idOfSync, "out");
             FileOutputStream outputStream = new FileOutputStream(file);
             try {
                 writeDocument(responseDocument, outputStream);

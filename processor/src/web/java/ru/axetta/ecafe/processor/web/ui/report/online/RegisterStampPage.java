@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -10,14 +11,17 @@ import ru.axetta.ecafe.processor.web.ui.report.online.items.stamp.RegisterStampP
 import ru.axetta.ecafe.processor.web.ui.report.online.items.stamp.Tree;
 import ru.axetta.ecafe.processor.web.ui.report.online.items.stamp.Visitor;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.servlet.http.HttpSession;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -78,23 +82,35 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
     private final OrderDetailsDAOService service = new OrderDetailsDAOService();
     private List<RegisterStampPageItem> pageItems = new ArrayList<RegisterStampPageItem>();
     private List<GoodItem> allGoods = new LinkedList<GoodItem>();
-    private HashMap<String, Integer> allGoodsPath3 = new HashMap<String, Integer>();
-    private HashMap<String, Integer> allGoodsPath2 = new HashMap<String, Integer>();
 
     private List<Map.Entry<String,Tree>> lvl1 = new ArrayList<Map.Entry<String, Tree>>();
     private List<Map.Entry<String,Tree>> lvl2 = new ArrayList<Map.Entry<String, Tree>>();
     private List<Map.Entry<String,Tree>> lvlBottom = new ArrayList<Map.Entry<String, Tree>>();
+    protected Calendar localCalendar;
 
     @Override
     public void onShow() throws Exception {
         service.setSession((Session) entityManager.getDelegate());
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.DAY_OF_MONTH,1);
-        calendar.add(Calendar.DAY_OF_MONTH, -1);
-        end = calendar.getTime();
-        calendar.set(Calendar.DAY_OF_MONTH,1);
-        calendar.add(Calendar.MONTH, -1);
-        start = calendar.getTime();
+        //Calendar calendar = Calendar.getInstance();
+        //calendar.set(Calendar.DAY_OF_MONTH,1);
+        //calendar.add(Calendar.DAY_OF_MONTH, -1);
+        //end = calendar.getTime();
+        //calendar.set(Calendar.DAY_OF_MONTH,1);
+        //calendar.add(Calendar.MONTH, -1);
+        //start = calendar.getTime();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        localCalendar = runtimeContext
+                .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
+
+        localCalendar.setTime(new Date());
+        this.start = DateUtils.truncate(localCalendar, Calendar.MONTH).getTime();
+
+        localCalendar.setTime(this.start);
+        localCalendar.add(Calendar.MONTH, 1);
+        localCalendar.add(Calendar.SECOND, -1);
+        this.end = localCalendar.getTime();
         clear();
     }
 
@@ -165,7 +181,7 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
         calendar.setTime(start);
         RegisterStampPageItem total = new RegisterStampPageItem("Итого", allGoods);
         RegisterStampPageItem allTotal = new RegisterStampPageItem("Всего кол-во:", allGoods);
-        while (!end.equals(calendar.getTime())){
+        while (end.getTime()>calendar.getTimeInMillis()){
             String date = timeFormat.format(calendar.getTime());
             RegisterStampPageItem item = new RegisterStampPageItem(date, allGoods);
             for (String l: item.getSetKey()){
@@ -177,6 +193,8 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
             pageItems.add(item);
             calendar.add(Calendar.DATE,1);
         }
+        //while (!end.equals(calendar.getTime())){
+        //}
         pageItems.add(total);
         RegisterStampPageItem dailySampleItem = new RegisterStampPageItem("Суточная проба", allGoods);
         for (String l: dailySampleItem.getSetKey()){
@@ -217,7 +235,10 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
     }
 
     public void setEnd(Date end) {
-        this.end = end;
+        localCalendar.setTime(end);
+        localCalendar.add(Calendar.DAY_OF_MONTH,1);
+        localCalendar.add(Calendar.SECOND, -1);
+        this.end = localCalendar.getTime();
     }
 
     @Override

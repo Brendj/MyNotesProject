@@ -13,12 +13,14 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.report.*;
+import ru.axetta.ecafe.processor.core.utils.ExecutorServiceWrappedJob;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +28,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Created with IntelliJ IDEA.
@@ -236,9 +239,10 @@ public class BeneficiarySummaryReport extends BasicReportJob
     }
 
 
-    public static class Builder
+    public static class Builder extends ExecutorServiceWrappedJob
     {
         private final String templateFilename;
+
 
 
         public Builder (String templateFilename)
@@ -397,6 +401,16 @@ public class BeneficiarySummaryReport extends BasicReportJob
                 sql = sql.replaceAll ("%MONTH_END%", SQL_DATE_FORMATTER.format ((Date) params.get ("monthEnd")));
             }
             return sql;
+        }
+
+        @Override
+        protected ExecutorService getExecutorService(JobExecutionContext context) throws Exception {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+
+        @Override
+        protected Runnable getRunnable(JobExecutionContext context) throws Exception {
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
 
 
