@@ -62,7 +62,7 @@ public class GoodRequestsReport extends BasicReport {
 
             String goodCondition = "";
 
-            String stateCondition = "";
+            String stateCondition = " cf_goods_requests.deletedstate<>true and ";
             switch (requestsFilter) {
                 case 0:
                     stateCondition = " cf_goods_requests.state=" + RequestState.CREATED.ordinal() + " AND ";
