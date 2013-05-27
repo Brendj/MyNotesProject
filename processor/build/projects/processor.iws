@@ -19,8 +19,7 @@
     <option name="historyRevisionsNumber" value="4" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" readonly="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="Реализован отчет по миграции клиентов, исправлен не дочет если клиент регистрируется в другой корпус организации">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.ipr" afterPath="$PROJECT_DIR$/processor.ipr" />
+    <list default="true" readonly="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.iws" afterPath="$PROJECT_DIR$/processor.iws" />
     </list>
     <list id="e1ee075d-5eee-4550-8974-bf9883a857e2" name="Failed commit: Default" comment="В процессинге в таблице публикаций создан составной первичный ключ, изменены cущности и изменена логика синхронизации в связи с этим;" />
@@ -47,7 +46,7 @@
     <file path="/ActOfWayBillDifferencePositionListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355918761293" ignored="false" />
     <file path="/waybilldifferenceposition_acts.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369038040784" ignored="false" />
     <file path="/SyncServlet.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366630257230" ignored="false" />
-    <file path="/Dummy.txt" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369232065528" ignored="false" />
+    <file path="/Dummy.txt" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369326885175" ignored="false" />
     <file path="/TradeMaterialGoodListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355996963925" ignored="false" />
     <file path="/TradeMaterialGoodItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369037823511" ignored="false" />
     <file path="/tradematrialgoods.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369038026482" ignored="false" />
@@ -982,7 +981,7 @@
     <file path="$PROJECT_DIR$/../../../../../../updater/2013/03/updater-server-11-03/update-server/src/core/java/db/create.sql" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363594317572" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../../../updater/2013/03/updater-server-11-03/update-server/src/core/java/ru/axetta/updater/core/persistence/Event.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363595448543" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../../../updater/2013/03/updater-server-11-03/update-server/src/update-server-web/java/ru/axetta/updater/web/servlets/GetInfoServlet.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363594683330" ignored="false" />
-    <file path="/Event.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366897537296" ignored="false" />
+    <file path="/Event.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369394627133" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../../../updater/2013/03/updater-server-11-03/update-server/src/core/java/ru/axetta/updater/core/persistence/Notification.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363595408960" ignored="false" />
     <file path="/ReconciliationPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363601591730" ignored="false" />
     <file path="/update_2.2.37-2.2.38.sql" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363703507124" ignored="false" />
@@ -1135,15 +1134,15 @@
     <file path="/EventSeveritySelectItemBuilder.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366896126973" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/update-server-web/web/WEB-INF/jboss-deployment-structure.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366896968803" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/update-server-web/java/ru/axetta/updater/web/utils/Base64.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366897172264" ignored="false" />
-    <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/core/java/ru/axetta/updater/core/persistence/Event.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366897549184" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/core/java/ru/axetta/updater/core/persistence/Event.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369394658998" ignored="false" />
     <file path="/updateServerPersistenceUnit" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366897665368" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/target/out/production/core/ru/axetta/updater/core/persistence/Event.class" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366899685136" ignored="false" />
     <file path="/EventService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366900337596" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/core/test/ru/axetta/updater/core/services/EventServiceTest.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1368698842829" ignored="false" />
     <file path="/EventServiceTest.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1368698841729" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/core/test/ru/axetta/updater/core/applicationContext.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369170593673" ignored="false" />
-    <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/core/java/ru/axetta/updater/core/persistence/Site.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1368699565758" ignored="false" />
-    <file path="/Site.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1368697100260" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/core/java/ru/axetta/updater/core/persistence/Site.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369394492114" ignored="false" />
+    <file path="/Site.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369394491137" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/core/java/ru/axetta/updater/core/services/SiteService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1368698044677" ignored="false" />
     <file path="/SiteService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1368698044677" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/core/java/ru/axetta/updater/core/services/SiteServiceImpl.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1368698184921" ignored="false" />
@@ -1220,7 +1219,7 @@
     <file path="/GetInfoServlet.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1368696282140" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/core/java/ru/axetta/updater/core/repository/SiteRepository.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1368698004188" ignored="false" />
     <file path="/SiteRepository.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1368697969033" ignored="false" />
-    <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/core/java/ru/axetta/updater/core/persistence/Group.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1368699602851" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/core/java/ru/axetta/updater/core/persistence/Group.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369394611531" ignored="false" />
     <file path="/Group.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1368699589031" ignored="false" />
     <file path="/DeliveredServicesReport.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1368713158415" ignored="false" />
     <file path="/GoodRequestPosition.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369132165836" ignored="false" />
@@ -1245,6 +1244,15 @@
     <file path="/OnlineReportPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369314877468" ignored="false" />
     <file path="/client_csv_list.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369300575837" ignored="false" />
     <file path="/delivered_services_report.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369303331713" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/update-server-web/java/ru/axetta/updater/web/converters/GroupConverter.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369393516188" ignored="false" />
+    <file path="/GroupConverter.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369393509294" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/update-server-web/web/WEB-INF/pages/sites/sitelist.xhtml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369394511195" ignored="false" />
+    <file path="/sitelist.xhtml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369393701178" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/update-server-web/java/ru/axetta/updater/web/pages/sites/SitesController.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369394978750" ignored="false" />
+    <file path="/grouplist.xhtml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369395359559" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/update-server-web/web/WEB-INF/pages/sites/grouplist.xhtml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369395441318" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/core/java/ru/axetta/updater/core/persistence/Distribution.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369394605878" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/core/java/ru/axetta/updater/core/persistence/Notification.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369394651795" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -1273,42 +1281,6 @@
   </component>
   <component name="DebuggerManager">
     <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
-    <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
-      <breakpoint>
-        <option name="NOTIFY_CAUGHT" value="true" />
-        <option name="NOTIFY_UNCAUGHT" value="true" />
-        <option name="ENABLED" value="false" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="REMOVE_AFTER_HIT" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="SUSPEND" value="true" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint>
-        <option name="NOTIFY_CAUGHT" value="true" />
-        <option name="NOTIFY_UNCAUGHT" value="true" />
-        <option name="ENABLED" value="false" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="REMOVE_AFTER_HIT" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="SUSPEND" value="true" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="false" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-    </breakpoint_any>
     <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true">
       <breakpoint url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/manager/Manager.java" line="597" class="ru.axetta.ecafe.processor.core.sync.manager.Manager" package="ru.axetta.ecafe.processor.core.sync.manager">
         <option name="ENABLED" value="false" />
@@ -1446,6 +1418,42 @@
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
     </line_breakpoints>
+    <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
+      <breakpoint>
+        <option name="NOTIFY_CAUGHT" value="true" />
+        <option name="NOTIFY_UNCAUGHT" value="true" />
+        <option name="ENABLED" value="false" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint>
+        <option name="NOTIFY_CAUGHT" value="true" />
+        <option name="NOTIFY_UNCAUGHT" value="true" />
+        <option name="ENABLED" value="false" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+    </breakpoint_any>
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -1473,334 +1481,19 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="AggregateGoodRequestReportPage.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/monitoring/AggregateGoodRequestReportPage.java">
+      <file leaf-file-name="GoodRequestsReportPage.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/GoodRequestsReportPage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="40" column="32" selection-start="1513" selection-end="1513" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#1368#1400#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="list.jsp" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/good_request/list.jsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="44" column="88" selection-start="2826" selection-end="2826" vertical-scroll-proportion="-17.0">
-              <folding>
-                <marker date="1369305106670" expanded="true" signature="1998:2011" placeholder="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GoodRequestListPage.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/goodRequest/GoodRequestListPage.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="132" column="45" selection-start="4473" selection-end="4473" vertical-scroll-proportion="0.0">
+            <state line="77" column="45" selection-start="2146" selection-end="2146" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GoodRequestService.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/goodRequest/GoodRequestService.java">
+      <file leaf-file-name="GoodRequestsReport.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/GoodRequestsReport.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="36" column="29" selection-start="1053" selection-end="1053" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RegisterStampPage.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/RegisterStampPage.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="167" column="16" selection-start="6370" selection-end="6370" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#3183#3208#0" expanded="true" />
-                <element signature="e#3273#3298#0" expanded="true" />
-                <element signature="e#3368#3393#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="main_menu.jsp" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="795" column="114" selection-start="55690" selection-end="55690" vertical-scroll-proportion="-3.9607842">
-              <folding>
-                <element signature="e#88#156#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#3;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#4;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#5;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#6;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#7;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#8;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#a4j:support#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#a4j:support#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#a4j:support#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#6;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#3;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#4;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#5;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#6;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#3;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#3;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#3;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#3;tag#rich:panelMenuGroup#3;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#a4j:support#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#3;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#4;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#5;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#6;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="e#47661#47711#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#6;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#6;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#6;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#6;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#3;tag#rich:panelMenuGroup#6;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#4;tag#rich:panelMenuGroup#6;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#5;tag#rich:panelMenuGroup#6;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#3;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#4;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#5;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#6;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#7;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#9;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#10;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#8;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#8;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#9;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#9;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#9;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#a4j:support#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#9;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#9;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#9;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#9;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#3;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#a4j:support#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#a4j:support#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuGroup#6;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-                <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#6;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TotalServicesReportPage.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/TotalServicesReportPage.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="45" column="44" selection-start="1302" selection-end="1302" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TotalServicesReport.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/TotalServicesReport.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="32" column="35" selection-start="740" selection-end="740" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#0#11617#0" expanded="false" />
-                <element signature="imports" expanded="false" />
-                <element signature="e#963#981#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="EnterEvent.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/EnterEvent.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="13" selection-start="304" selection-end="304" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DiscountRule.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/DiscountRule.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="36" column="27" selection-start="996" selection-end="1008" vertical-scroll-proportion="2.184874">
+            <state line="202" column="51" selection-start="9618" selection-end="9618" vertical-scroll-proportion="0.5516129">
               <folding />
             </state>
           </provider>
@@ -1978,9 +1671,10 @@
     <subPane />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1" />
-    <option name="width" value="1362" />
-    <option name="height" value="728" />
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1696" />
+    <option name="height" value="1066" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -2401,6 +2095,70 @@
               <option name="myItemId" value="processor" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="report" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="report" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="online" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -2461,94 +2219,6 @@
               <option name="myItemId" value="java" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sync" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="sync" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="manager" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="persistence" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -2570,22 +2240,22 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane">
-        <subPane>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
-      </pane>
       <pane id="Scope">
         <subPane subId="Project Files">
           <PATH>
             <PATH_ELEMENT USER_OBJECT="Root">
               <option name="myItemId" value="" />
               <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="PackagesPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
@@ -3936,7 +3606,11 @@
       <created>1369232070100</created>
       <updated>1369232070100</updated>
     </task>
-    <option name="localTasksCounter" value="33" />
+    <task id="LOCAL-00033">
+      <created>1369326889295</created>
+      <updated>1369326889295</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
@@ -3963,36 +3637,33 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1" y="0" width="1362" height="728" extended-state="0" />
-    <editor active="false" />
+    <frame x="-8" y="-8" width="1696" height="1066" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info id="Changes" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.685413" sideWeight="0.32986537" order="23" side_tool="false" content_ui="tabs" />
-      <window_info id="JavaEE:App" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2613219" sideWeight="0.1565601" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32153845" sideWeight="0.10544816" order="6" side_tool="true" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24934725" sideWeight="0.76529163" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20195839" sideWeight="0.53362733" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.29217198" sideWeight="0.45838434" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32855567" sideWeight="0.5" order="21" side_tool="false" content_ui="tabs" />
-      <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32864138" sideWeight="0.6714443" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="JSF" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32802936" sideWeight="0.10033076" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="22" side_tool="false" content_ui="tabs" />
-      <window_info id="CDI" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32986537" sideWeight="0.98039216" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32083791" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298731" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32153845" sideWeight="0.20738137" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32855567" sideWeight="0.4853121" order="28" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28776187" sideWeight="0.32986537" order="23" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32986537" sideWeight="0.7739331" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32123962" sideWeight="0.10544816" order="6" side_tool="true" content_ui="tabs" />
+      <window_info id="JavaEE:App" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2613219" sideWeight="0.1565601" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4641676" sideWeight="0.49786097" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Hibernate Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.57772875" sideWeight="0.54161566" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20195839" sideWeight="0.53362733" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24934725" sideWeight="0.76529163" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.46637267" sideWeight="0.57711136" order="27" side_tool="false" content_ui="tabs" x="100" y="294" width="710" height="371" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21052632" sideWeight="0.30334488" order="5" side_tool="true" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40246046" sideWeight="0.57037944" order="24" side_tool="false" content_ui="tabs" />
+      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32855567" sideWeight="0.5" order="21" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.29217198" sideWeight="0.45838434" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32864138" sideWeight="0.6714443" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="22" side_tool="false" content_ui="tabs" />
+      <window_info id="JSF" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32802936" sideWeight="0.10033076" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="CDI" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32986537" sideWeight="0.98039216" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32083791" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21604279" sideWeight="0.27534685" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38188493" sideWeight="0.6697353" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32864138" sideWeight="0.7794457" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="EJB" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2613219" sideWeight="0.21940464" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3977968" sideWeight="0.74310917" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="EJB" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2613219" sideWeight="0.21940464" order="4" side_tool="true" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32864138" sideWeight="0.7794457" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298731" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25520197" sideWeight="0.71223813" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32855567" sideWeight="0.4853121" order="28" side_tool="false" content_ui="tabs" />
       <window_info id="Hibernate Tools" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Phing Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32994652" sideWeight="0.85272145" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Problems" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -4003,7 +3674,9 @@
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3897059" sideWeight="0.7794457" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="SQL" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5883134" sideWeight="0.5" order="18" side_tool="false" content_ui="tabs" />
       <window_info id="Atlassian " active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="15" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4641676" sideWeight="0.49786097" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="APIdoc" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32536522" sideWeight="0.5" order="19" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40246046" sideWeight="0.57037944" order="24" side_tool="false" content_ui="tabs" />
       <window_info id="JProfiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="simpleUML" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32950467" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="REST Client" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.963141" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
@@ -4014,6 +3687,7 @@
       <window_info id="JPA Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3290993" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="SVN Properties" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3290735" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Hibernate Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.57772875" sideWeight="0.54161566" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="RESTClient" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.86378205" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Metrics" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="20" side_tool="false" content_ui="tabs" />
       <window_info id="JSON Formatter" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
@@ -4225,71 +3899,43 @@
     </option>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/enter_event_report.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="27" column="75" selection-start="1245" selection-end="1248" vertical-scroll-proportion="-2.0098522">
-          <folding>
-            <marker date="1366007210832" expanded="true" signature="-1:-1" placeholder="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/free_complex_report.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-2.596059">
-          <folding>
-            <marker date="1366007210918" expanded="true" signature="-1:-1" placeholder="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/faces-config.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state line="54" column="75" selection-start="2082" selection-end="2082" vertical-scroll-proportion="-8.4">
           <folding />
         </state>
       </provider>
-      <provider editor-type-id="com.intellij.jsf.ui.FacesConfigEditorProvider">
+      <provider editor-type-id="com.intellij.jsf.yfilesGraph.editor.FacesNavigationFileEditorProvider">
         <state />
       </provider>
-      <provider editor-type-id="com.intellij.jsf.yfilesGraph.editor.FacesNavigationFileEditorProvider">
+      <provider editor-type-id="com.intellij.jsf.ui.FacesConfigEditorProvider">
         <state />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/converter/DateConverter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="13" selection-start="744" selection-end="744" vertical-scroll-proportion="0.33333334">
-          <folding />
-        </state>
+        <state line="28" column="13" selection-start="744" selection-end="744" vertical-scroll-proportion="0.33333334" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/good_requests_report.jsp">
       <provider selected="true" editor-type-id="text-editor">
         <state line="55" column="95" selection-start="3737" selection-end="3737" vertical-scroll-proportion="-9.692307">
-          <folding>
-            <marker date="1369312966909" expanded="true" signature="-1:-1" placeholder="{...}" />
-            <marker date="1369312966909" expanded="true" signature="-1:-1" placeholder="{...}" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/aggregate_good_request_report.jsp">
       <provider selected="true" editor-type-id="text-editor">
         <state line="39" column="101" selection-start="2980" selection-end="2980" vertical-scroll-proportion="-15.692307">
-          <folding>
-            <marker date="1369315229783" expanded="true" signature="-1:-1" placeholder="{...}" />
-            <marker date="1369315229783" expanded="true" signature="-1:-1" placeholder="{...}" />
-            <marker date="1369315229783" expanded="true" signature="-1:-1" placeholder="{...}" />
-            <marker date="1369315229783" expanded="true" signature="-1:-1" placeholder="{...}" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/good_request/list.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="44" column="88" selection-start="2826" selection-end="2826" vertical-scroll-proportion="-17.0">
+        <state line="44" column="88" selection-start="2826" selection-end="2826" vertical-scroll-proportion="0.0">
           <folding>
-            <marker date="1369305106670" expanded="true" signature="1998:2011" placeholder="{...}" />
+            <marker date="1369305106670" expanded="true" signature="-1:-1" placeholder="{...}" />
           </folding>
         </state>
       </provider>
@@ -4311,264 +3957,13 @@
     <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/monitoring/AggregateGoodRequestReportPage.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="40" column="32" selection-start="1513" selection-end="1513" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#1368#1400#0" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/RegisterStampPage.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="167" column="16" selection-start="6370" selection-end="6370" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#3183#3208#0" expanded="true" />
-            <element signature="e#3273#3298#0" expanded="true" />
-            <element signature="e#3368#3393#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="795" column="114" selection-start="55690" selection-end="55690" vertical-scroll-proportion="-3.9607842">
-          <folding>
-            <element signature="e#88#156#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#3;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#4;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#5;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#6;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#7;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#8;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#a4j:support#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#a4j:support#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#a4j:support#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#6;tag#rich:panelMenuGroup#1;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#3;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#4;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#5;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#6;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#3;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#3;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#3;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#3;tag#rich:panelMenuGroup#3;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#a4j:support#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#4;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#3;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#4;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#5;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#6;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="e#47661#47711#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#6;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#6;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#6;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#6;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#3;tag#rich:panelMenuGroup#6;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#4;tag#rich:panelMenuGroup#6;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#5;tag#rich:panelMenuGroup#6;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#3;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#4;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#5;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#6;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#7;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#9;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#10;tag#rich:panelMenuGroup#7;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#8;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#8;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#9;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#9;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#9;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#a4j:support#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#9;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#9;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#9;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#9;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#3;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#3;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#4;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#a4j:support#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#a4j:support#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#1;tag#rich:panelMenuGroup#1;tag#rich:panelMenuGroup#5;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuGroup#6;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-            <element signature="tag#rich:panelMenuItem#0;tag#rich:panelMenuGroup#6;tag#rich:panelMenuGroup#10;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/TotalServicesReportPage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="45" column="44" selection-start="1302" selection-end="1302" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
@@ -4576,11 +3971,7 @@
     <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/TotalServicesReport.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="32" column="35" selection-start="740" selection-end="740" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#0#11617#0" expanded="false" />
-            <element signature="imports" expanded="false" />
-            <element signature="e#963#981#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -4593,7 +3984,35 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/DiscountRule.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="36" column="27" selection-start="996" selection-end="1008" vertical-scroll-proportion="2.184874">
+        <state line="120" column="31" selection-start="3453" selection-end="3453" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/TotalServicesReportPage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="45" column="44" selection-start="1302" selection-end="1302" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="757" column="61" selection-start="52499" selection-end="52499" vertical-scroll-proportion="-11.115385">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/GoodRequestsReportPage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="77" column="45" selection-start="2146" selection-end="2146" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/GoodRequestsReport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="202" column="51" selection-start="9618" selection-end="9618" vertical-scroll-proportion="0.5516129">
           <folding />
         </state>
       </provider>
