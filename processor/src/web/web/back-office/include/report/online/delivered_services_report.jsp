@@ -28,7 +28,7 @@
                                styleClass="command-link" style="width: 25px;">
                 <f:setPropertyActionListener value="0"
                                              target="#{mainPage.multiContrFlag}" />
-                <f:setPropertyActionListener value=""
+                <f:setPropertyActionListener value="2,"
                                              target="#{mainPage.classTypes}" />
             </a4j:commandButton>
         </h:panelGroup>
