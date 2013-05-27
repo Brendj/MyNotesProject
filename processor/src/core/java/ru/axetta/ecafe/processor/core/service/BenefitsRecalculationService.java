@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
+import sun.awt.AppContext;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
@@ -17,6 +19,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.math.BigInteger;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -64,6 +68,9 @@ public class BenefitsRecalculationService {
     private static final String INSERT_SQL = "INSERT INTO cf_clientscomplexdiscounts (createdate, idofclient, idofrule, idofcategoryorg, priority, operationar, idofcomplex) values (?, ?, ?, ?, ?, ?, ?)";
     private static final String DELETE_SQL = "DELETE FROM cf_clientscomplexdiscounts ";//WHERE createdate=:createdate";
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BIDataExportService.class);
+    
+    @PersistenceContext
+    EntityManager em;
 
 
     public static boolean isOn() {
@@ -76,25 +83,29 @@ public class BenefitsRecalculationService {
     }
 
 
+    @Transactional
+    public void runForcibly() {
+        logger.info("Started benefits recalculation");
+        try {
+            loadData();
+        } catch (Exception e) {
+            logger.error("Failed to load data from database");
+        }
+        logger.info("Finished benefits recalculation");
+    }
+
     public void run() {
         if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
             //logger.info ("BI data export is turned off. You have to activate this tool using common Settings");
             return;
         }
 
-
-        try {
-            RuntimeContext runtimeContext = RuntimeContext.getInstance();
-            Session session = runtimeContext.createPersistenceSession();
-            loadData(session);
-        } catch (Exception e) {
-            logger.error("Failed to load data from database");
-        }
+        RuntimeContext.getAppContext().getBean(BenefitsRecalculationService.class).runForcibly();
     }
 
 
-    @Transactional
-    private void loadData(Session session) {
+    private void loadData() {
+        Session session = (Session)em.getDelegate();
         try {
             List<Integer> complexes = new ArrayList<Integer>();
             Calendar cal = new GregorianCalendar();

@@ -950,8 +950,48 @@ CREATE TABLE CF_DiscountRules (
   Complex7                  INTEGER       NOT NULL DEFAULT 0,
   Complex8                  INTEGER       NOT NULL DEFAULT 0,
   Complex9                  INTEGER       NOT NULL DEFAULT 0,
+  Complex10                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex11                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex12                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex13                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex14                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex15                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex16                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex17                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex18                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex19                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex20                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex21                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex22                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex23                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex24                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex25                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex26                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex27                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex28                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex29                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex30                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex31                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex32                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex33                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex34                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex35                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex36                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex37                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex38                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex39                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex40                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex41                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex42                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex43                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex44                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex45                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex46                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex47                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex48                 INTEGER       NOT NULL DEFAULT 0, --v41
+  Complex49                 INTEGER       NOT NULL DEFAULT 0, --v41
   Priority                  Integer       NOT NULL DEFAULT 0,
-  CategoriesDiscounts         Character     varying(64),
+  CategoriesDiscounts       Character     varying(64),
   OperationOr               integer       NOT NULL DEFAULT 0,
   CONSTRAINT CF_DiscountRules_pk PRIMARY KEY (IdOfRule)
 );

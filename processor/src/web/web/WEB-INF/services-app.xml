@@ -86,13 +86,13 @@
 
     <task:scheduler id="importRegisterClientsSchedule" pool-size="5"/>
     <task:scheduled-tasks scheduler="importRegisterClientsSchedule">
-        <task:scheduled ref="importRegisterClientsService" method="run" cron="0 15 0 ? * *" />
+        <task:scheduled ref="importRegisterClientsService" method="run" cron="0 0 4 ? * *" />
     </task:scheduled-tasks>
 
 
     <task:scheduler id="benefitsRecalculationSchedule" pool-size="5"/>
     <task:scheduled-tasks scheduler="benefitsRecalculationSchedule">
-        <task:scheduled ref="benefitsRecalculationService" method="run" fixed-delay="86400000" />
+        <task:scheduled ref="benefitsRecalculationService" method="run" cron="0 15 0 ? * *" />
     </task:scheduled-tasks>
 
 

@@ -803,7 +803,7 @@
                         binding="#{mainPage.deliveredServicesReportPage.mainMenuComponent}" label="Отчет по предоставленным услугам"
                         action="#{mainPage.showDeliveredServicesReportPage}" reRender="workspaceForm" />
     <rich:panelMenuItem id="clientsBenefitsReportMenuItem"
-                        binding="#{mainPage.clientsBenefitsReportPage.mainMenuComponent}" label="Отчет по льготам клиентов"
+                        binding="#{mainPage.clientsBenefitsReportPage.mainMenuComponent}" label="Расчет комплексов по льготным правилам"
                         action="#{mainPage.showClientsBenefitsReportPage}" reRender="workspaceForm" />
 
 </rich:panelMenuGroup>

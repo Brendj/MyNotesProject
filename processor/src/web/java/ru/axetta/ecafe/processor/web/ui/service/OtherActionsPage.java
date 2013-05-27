@@ -32,8 +32,8 @@ public class OtherActionsPage extends BasicWorkspacePage {
     }
 
     public void runBenefitsRecalculation() throws Exception {
-        RuntimeContext.getAppContext().getBean(BenefitsRecalculationService.class).run(); //DEF
-        printMessage("Запустить пересчет льготных правил выполнен");
+        RuntimeContext.getAppContext().getBean(BenefitsRecalculationService.class).runForcibly(); //DEF
+        printMessage("Пересчет льготных правил выполнен");
     }
 
     @Override
