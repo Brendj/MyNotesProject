@@ -25,6 +25,7 @@ import java.util.GregorianCalendar;
  */
 public class ClientsBenefitsReportPage extends OnlineReportPage implements OrgSelectPage.CompleteHandler {
     private ClientsBenefitsReport clientsBenefitsReport;
+    private boolean hideMissedColumns = true;
 
 
     public String getPageFilename() {
@@ -35,9 +36,17 @@ public class ClientsBenefitsReportPage extends OnlineReportPage implements OrgSe
         return clientsBenefitsReport;
     }
 
+    public boolean isHideMissedColumns() {
+        return hideMissedColumns;
+    }
+
+    public void setHideMissedColumns(boolean hideMissedColumns) {
+        this.hideMissedColumns = hideMissedColumns;
+    }
+
     public void buildReport(Session session) throws Exception {
         ClientsBenefitsReport.Builder reportBuilder = new ClientsBenefitsReport.Builder();
-        this.clientsBenefitsReport = reportBuilder.build(session, startDate, endDate, idOfOrg);
+        this.clientsBenefitsReport = reportBuilder.build(session, startDate, endDate, idOfOrg, hideMissedColumns);
     }
 
 }

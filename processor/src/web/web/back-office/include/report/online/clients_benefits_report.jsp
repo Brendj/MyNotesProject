@@ -21,6 +21,10 @@
                                styleClass="command-link" style="width: 25px;" />
         </h:panelGroup>
 
+        <h:outputText escape="true" value="Скрыть столбцы с нулевыми значениями"
+                      styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.clientsBenefitsReportPage.hideMissedColumns}" styleClass="output-text" />
+
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildClientsBenefitsReportPage }"
                            reRender="mainMenu, workspaceTogglePanel, clientsBenefitsReportTable"
                            styleClass="command-button" status="reportGenerateStatus" />

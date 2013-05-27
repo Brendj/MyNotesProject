@@ -26,11 +26,12 @@ public class ClientsBenefitsReport extends BasicReport {
     private List<String> columnNames;
     public static final String COLUMN_TITLE = "Комплекс ";
     public static final String TOTAL_CAPTION = "Итого:";
+    private boolean hideMissedColumns;
 
 
     public static class Builder {
 
-        public ClientsBenefitsReport build(Session session, Date startDate, Date endDate, Long idofOrg)
+        public ClientsBenefitsReport build(Session session, Date startDate, Date endDate, Long idofOrg, boolean hideMissedColumns)
                 throws Exception {
             Date generateTime = new Date();
             List<Entry> entries = new ArrayList<Entry>();
@@ -71,7 +72,7 @@ public class ClientsBenefitsReport extends BasicReport {
             entries.add(total);
 
 
-            return new ClientsBenefitsReport(generateTime, new Date().getTime() - generateTime.getTime(), entries);
+            return new ClientsBenefitsReport(generateTime, new Date().getTime() - generateTime.getTime(), entries, hideMissedColumns);
         }
     }
 
@@ -79,12 +80,14 @@ public class ClientsBenefitsReport extends BasicReport {
     public ClientsBenefitsReport() {
         super();
         this.items = Collections.emptyList();
+        this.hideMissedColumns = false;
     }
 
 
-    public ClientsBenefitsReport(Date generateTime, long generateDuration, List<Entry> items) {
+    public ClientsBenefitsReport(Date generateTime, long generateDuration, List<Entry> items, boolean hideMissedColumns) {
         super(generateTime, generateDuration);
         this.items = items;
+        this.hideMissedColumns = hideMissedColumns;
     }
 
     public List <String> getColumnNames () {
@@ -93,7 +96,22 @@ public class ClientsBenefitsReport extends BasicReport {
         }
         columnNames = new ArrayList <String> ();
         for (int i=0; i<50; i++) {
-            columnNames.add(COLUMN_TITLE + i);
+            // Проверяем, надо ли выводить столбец
+            boolean dataFound = false;
+            if (hideMissedColumns) {
+                for (Entry it : items) {
+                    if (it.get(COLUMN_TITLE + i) != 0L) {
+                        dataFound = true;
+                        break;
+                    }
+                }
+            } else {
+                dataFound = true;
+            }
+
+            if (dataFound) {
+                columnNames.add(COLUMN_TITLE + i);
+            }
         }
         return columnNames;
     }
