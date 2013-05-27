@@ -21,7 +21,7 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
     private GoodRequestsReport goodRequests;
     private Boolean hideMissedColumns;
     private boolean showAll = true;
-    private int requestsFilter = 3;
+    private int requestsFilter = 1;
 
     public String getPageFilename() {
         return "report/online/good_requests_report";
