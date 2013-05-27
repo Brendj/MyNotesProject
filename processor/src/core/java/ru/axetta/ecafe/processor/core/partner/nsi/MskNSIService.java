@@ -40,6 +40,7 @@ public class MskNSIService {
     public static final String COMMENT_AUTO_MODIFY = "{Изменено из Реестров %s}";
     public static final String COMMENT_AUTO_DELETED = "{Исключен по Реестру %s}";
     public static final String REPLACEMENT_REGEXP = "\\{[^}]* Реестр[^}]*\\}";
+    public static int SERVICE_ROWS_LIMIT = 3000;
 
     public static class Config {
 
@@ -235,7 +236,7 @@ public class MskNSIService {
                         + "item['РОУ XML/Дата изменения (число)']\n"
                         + "from catalog('Реестр образовательных учреждений') where \n"
                         + "item['РОУ XML/Статус записи'] not like 'Удален%' and "
-                        + "item['РОУ XML/Краткое наименование учреждения'] like '%" + orgName + "%'");
+                        + "item['РОУ XML/Краткое наименование учреждения'] like '%" + orgName + "%' limit " + SERVICE_ROWS_LIMIT);
         LinkedList<OrgInfo> list = new LinkedList<OrgInfo>();
         for (QueryResult qr : queryResults) {
             OrgInfo orgInfo = new OrgInfo();
@@ -277,6 +278,7 @@ public class MskNSIService {
         if (updateTime != null) {
             select += " and  item['" + tbl + "/Дата изменения (число)']  &gt; " + (updateTime / 1000);
         }
+        select += " limit " + SERVICE_ROWS_LIMIT;
         List<QueryResult> queryResults = executeQuery(select);
         LinkedList<PupilInfo> list = new LinkedList<PupilInfo>();
         for (QueryResult qr : queryResults) {
@@ -319,7 +321,7 @@ public class MskNSIService {
         "from catalog('Реестр обучаемых') "+
         "where "+
         "item['" + tbl + "/Статус записи'] not like 'Удален%' and "+
-        "item['" + tbl + "/GUID образовательного учреждения'] like '" + org.getGuid() + "' ";
+        "item['" + tbl + "/GUID образовательного учреждения'] like '" + org.getGuid() + "' limit " + SERVICE_ROWS_LIMIT;
 
         List<QueryResult> queryResults = executeQuery(query);
         LinkedList<ExpandedPupilInfo> list = new LinkedList<ExpandedPupilInfo>();
