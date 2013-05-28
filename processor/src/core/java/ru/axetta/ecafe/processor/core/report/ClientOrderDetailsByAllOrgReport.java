@@ -9,6 +9,8 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
+
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -31,14 +33,6 @@ public class ClientOrderDetailsByAllOrgReport extends BasicReportForAllOrgJob {
     }
 
     public static class Builder implements BasicReportForAllOrgJob.Builder{
-
-        public static HashMap<Integer, String> values = new HashMap<Integer, String>();
-        static {
-            values.put(0,"Собственное");
-            values.put(1,"Централизованное");
-            values.put(2, "Централизованное с доготовкой");
-            values.put(10,"Закупленное");
-        }
 
         /* КонтракИД, ЗаказИД, Название Блюда, ФИО клиента, Тип производсва, сумма */
         public static class ClientReportItem {
@@ -146,13 +140,15 @@ public class ClientOrderDetailsByAllOrgReport extends BasicReportForAllOrgJob {
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
 
             Query query = session.createSQLQuery("SELECT cf_orderdetails.idoforderdetail, cf_clients.contractid, cf_persons.firstname || ' ' || cf_persons.secondname || ' ' || cf_persons.surname, "
-                    + " cf_orderdetails.menuorigin, cf_orderdetails.menudetailname, cf_orderdetails.rprice, cf_orderdetails.discount, cf_orderdetails.qty"
+                    + " cf_orderdetails.menuorigin, cf_orderdetails.menudetailname, cf_orders.sumbycard, cf_orderdetails.discount, cf_orderdetails.qty "
                     + " FROM  public.cf_clients, public.cf_persons, public.cf_orders, public.cf_orderdetails "
                     + " WHERE (cf_orders.createddate>=:startTime AND cf_orders.createddate<=:endTime AND cf_orders.idoforg=cf_orderdetails.idoforg  AND "
-                    + " cf_orders.idoforder = cf_orderdetails.idoforder AND  cf_orders.idofclient = cf_clients.idofclient AND cf_persons.idofperson = cf_clients.idofperson and cf_orders.sumbycash=0);"
-                    + " ");
+                    + " cf_orders.idoforder = cf_orderdetails.idoforder AND  cf_orders.idofclient = cf_clients.idofclient AND cf_persons.idofperson = cf_clients.idofperson "
+                    + "and cf_orders.sumbycard>0 and orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype);");
             query.setParameter("startTime", startTime.getTime());
             query.setParameter("endTime", endTime.getTime());
+            query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+            query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
             List list = query.list();
             List<ClientReportItem> menuDetailsItems = new LinkedList<ClientReportItem>();
             for (Object result : list) {
@@ -166,7 +162,7 @@ public class ClientOrderDetailsByAllOrgReport extends BasicReportForAllOrgJob {
                 Float discount = Float.parseFloat(sale[6].toString()) / 100;
                 Integer quantity = (Integer) sale[7];
                 Float totalDetailSum = (price - discount) * quantity;
-                menuDetailsItems.add(new ClientReportItem(idOfOrderDetail, contractId, fullName, menuName, values.get(menuOrigin), totalDetailSum));
+                menuDetailsItems.add(new ClientReportItem(idOfOrderDetail, contractId, fullName, menuName, OrderDetail.getMenuOriginAsString(menuOrigin), totalDetailSum));
             }
             return new JRBeanCollectionDataSource(menuDetailsItems);
         }

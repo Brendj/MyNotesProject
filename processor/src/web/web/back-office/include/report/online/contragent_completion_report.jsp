@@ -101,4 +101,7 @@
             </h:outputText>
         </rich:column>
     </rich:dataTable>
+    <h:commandButton value="Выгрузить в CSV" actionListener="#{contragentCompletionReportPage.showCSVList}" styleClass="command-button" />
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
 </h:panelGrid>

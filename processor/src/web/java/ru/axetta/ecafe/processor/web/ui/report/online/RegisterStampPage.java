@@ -1,9 +1,19 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperRunManager;
+import net.sf.jasperreports.engine.export.JRCsvExporter;
+import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.report.BasicJasperReport;
+import ru.axetta.ecafe.processor.core.report.RegisterStampReport;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgShortItem;
@@ -15,12 +25,16 @@ import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -76,6 +90,11 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
 
     @PersistenceContext
     private EntityManager entityManager;
+    @Autowired
+    private RuntimeContext runtimeContext;
+    @Autowired
+    private DAOService daoService;
+
     private OrgShortItem org;
     private Date start;
     private Date end;
@@ -91,14 +110,6 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
     @Override
     public void onShow() throws Exception {
         service.setSession((Session) entityManager.getDelegate());
-        //Calendar calendar = Calendar.getInstance();
-        //calendar.set(Calendar.DAY_OF_MONTH,1);
-        //calendar.add(Calendar.DAY_OF_MONTH, -1);
-        //end = calendar.getTime();
-        //calendar.set(Calendar.DAY_OF_MONTH,1);
-        //calendar.add(Calendar.MONTH, -1);
-        //start = calendar.getTime();
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
         FacesContext facesContext = FacesContext.getCurrentInstance();
         localCalendar = runtimeContext
@@ -109,7 +120,7 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
 
         localCalendar.setTime(this.start);
         localCalendar.add(Calendar.MONTH, 1);
-        localCalendar.add(Calendar.SECOND, -1);
+        //localCalendar.add(Calendar.SECOND, -1);
         this.end = localCalendar.getTime();
         clear();
     }
@@ -144,6 +155,42 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
         return lvlBottom;
     }
 
+    public void showCSVList(ActionEvent actionEvent){
+        AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + RegisterStampReport.class.getSimpleName() + ".jasper";
+        RegisterStampReport.Builder builder = new RegisterStampReport.Builder(templateFilename);
+        builder.setOrg(daoService.getOrg(this.org.getIdOfOrg()));
+        Session session = (Session) entityManager.getDelegate();
+        try {
+            RegisterStampReport registerStampReport = (RegisterStampReport) builder.build(session,start, end, localCalendar);
+
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+
+            ServletOutputStream servletOutputStream = response.getOutputStream();
+
+            facesContext.responseComplete();
+            response.setContentType("application/csv");
+            response.setHeader("Content-disposition", "inline;filename=register_stamp.csv");
+
+            JRCsvExporter csvExporter = new JRCsvExporter();
+            csvExporter.setParameter(JRCsvExporterParameter.JASPER_PRINT, registerStampReport.getPrint());
+            csvExporter.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+            csvExporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ";");
+            csvExporter.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+            csvExporter.exportReport();
+
+            servletOutputStream.flush();
+            servletOutputStream.close();
+
+        } catch (JRException fnfe) {
+            //String message = (fnfe.getCause()==null?fnfe.getMessage():fnfe.getCause().getMessage());
+            logAndPrintMessage("Ошибка при подготовке отчета:",fnfe);
+        } catch (Exception e) {
+            logAndPrintMessage("Error generate csv file ",e);
+        }
+    }
+
 
     @Override
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
@@ -176,25 +223,22 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
     }
 
     private void refresh() throws Exception {
-        Calendar calendar = Calendar.getInstance();
         DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
-        calendar.setTime(start);
+        localCalendar.setTime(start);
         RegisterStampPageItem total = new RegisterStampPageItem("Итого", allGoods);
         RegisterStampPageItem allTotal = new RegisterStampPageItem("Всего кол-во:", allGoods);
-        while (end.getTime()>calendar.getTimeInMillis()){
-            String date = timeFormat.format(calendar.getTime());
+        while (end.getTime()>localCalendar.getTimeInMillis()){
+            String date = timeFormat.format(localCalendar.getTime());
             RegisterStampPageItem item = new RegisterStampPageItem(date, allGoods);
             for (String l: item.getSetKey()){
-                Long val = service.findNotNullGoodsFullNameByOrgByDayAndGoodEq(org.getIdOfOrg(),calendar.getTime(), l);
+                Long val = service.findNotNullGoodsFullNameByOrgByDayAndGoodEq(org.getIdOfOrg(),localCalendar.getTime(), l);
                 item.addValue(l, val);
                 total.addValue(l, val);
                 allTotal.addValue(l, val);
             }
             pageItems.add(item);
-            calendar.add(Calendar.DATE,1);
+            localCalendar.add(Calendar.DATE,1);
         }
-        //while (!end.equals(calendar.getTime())){
-        //}
         pageItems.add(total);
         RegisterStampPageItem dailySampleItem = new RegisterStampPageItem("Суточная проба", allGoods);
         for (String l: dailySampleItem.getSetKey()){

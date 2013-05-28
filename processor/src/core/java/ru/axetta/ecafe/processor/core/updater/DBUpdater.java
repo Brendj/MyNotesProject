@@ -5,6 +5,7 @@
 
 package ru.axetta.ecafe.processor.core.updater;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.SchemaVersionInfo;
 
 import java.io.*;
@@ -14,10 +15,10 @@ import java.util.List;
 import java.util.Properties;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,10 @@ public class DBUpdater {
     final static String UPDATES_ROOT="/db";
 
     @PersistenceContext
-    EntityManager em;
+    private EntityManager entityManager;
+
+    @Autowired
+    private RuntimeContext runtimeContext;
 
 
     int[] INITIAL_DB_VERSION;
@@ -60,24 +64,25 @@ public class DBUpdater {
         try {
             // Ниже скрипт может не стработать если стоит защита на внутренние таблицы баз данных
             String SQL_CHECK_TEXT_COLUMN = "SELECT attname FROM pg_attribute, pg_type WHERE typname = 'cf_schema_version_info' AND attname = 'committext'";
-            List list = em.createNativeQuery(SQL_CHECK_TEXT_COLUMN).getResultList();
+            List list = entityManager.createNativeQuery(SQL_CHECK_TEXT_COLUMN).getResultList();
             if(list!=null && list.isEmpty()){
-                em.createNativeQuery("ALTER TABLE cf_schema_version_info ADD COLUMN committext text").executeUpdate();
+                entityManager.createNativeQuery("ALTER TABLE cf_schema_version_info ADD COLUMN committext text").executeUpdate();
             }
             // Выше скрипт может не стработать если стоит защита на внутренние таблицы баз данных
             String SQL_GET_SCHEMAS="from SchemaVersionInfo order by majorVersionNum desc, middleVersionNum desc, minorVersionNum desc";
-            List schemas = em.createQuery(SQL_GET_SCHEMAS).getResultList();
+            List schemas = entityManager.createQuery(SQL_GET_SCHEMAS).getResultList();
             SchemaVersionInfo curSchemaVer = (SchemaVersionInfo)(schemas.size()==0?null:schemas.get(0));
             if (curSchemaVer !=null) {
                 logger.info("DB version: "+ curSchemaVer);
             } else {
                 logger.info(String.format("DB version not specified, inserting initial db version marker: %d.%d.%d.%d", INITIAL_DB_VERSION[0], INITIAL_DB_VERSION[1], INITIAL_DB_VERSION[2], INITIAL_DB_VERSION[3]));
                 SchemaVersionInfo initialSchemaVersionInfo = new SchemaVersionInfo(INITIAL_DB_VERSION, new Date());
-                em.persist(initialSchemaVersionInfo);
+                entityManager.persist(initialSchemaVersionInfo);
                 curSchemaVer = initialSchemaVersionInfo;
             }
             boolean bUpdated = false;
-            if (curSchemaVer !=null) {
+            /* если схема верии не пусто и если сервер запущен под MAIN узлом */
+            if (curSchemaVer !=null && runtimeContext.isMainNode()) {
                 for (;;) {
                     String curVerStr = String.format("%d.%d.%d", curSchemaVer.getMajorVersionNum(), curSchemaVer.getMiddleVersionNum(), curSchemaVer
                             .getMinorVersionNum());
@@ -92,7 +97,7 @@ public class DBUpdater {
                     String sqlFile = String.format("update_%s-%d.%d.%d.sql", curVerStr, newVer[0], newVer[1], newVer[2]);
                     InputStream in = DBUpdater.class.getResourceAsStream(UPDATES_ROOT+"/"+sqlFile);
                     if (in==null) {
-                        throw new Exception("не найден сценарий обновления базы: "+sqlFile);
+                        throw new Exception("Update data base script not found: "+sqlFile);
                     }
                     logger.info("Executing update script: "+sqlFile);
                     BufferedReader bufIn = new BufferedReader(new InputStreamReader(in, Charset.forName("UTF-8")));
@@ -124,8 +129,8 @@ public class DBUpdater {
                         if (!isQuotesOpened && sqlCmd.endsWith(";")) {
                             sqlCmd=sqlCmd.substring(0, sqlCmd.length()-1);
                             try {
-                                if (sqlCmd.toLowerCase().startsWith("select")) em.createNativeQuery(sqlCmd).getSingleResult();
-                                else em.createNativeQuery(sqlCmd).executeUpdate();
+                                if (sqlCmd.toLowerCase().startsWith("select")) entityManager.createNativeQuery(sqlCmd).getSingleResult();
+                                else entityManager.createNativeQuery(sqlCmd).executeUpdate();
                             } catch (Exception e) {
                                 throw new Exception("ошибка при выполнении сценария: "+sqlFile+" ("+sqlCmd+")", e);
                             }
@@ -134,7 +139,7 @@ public class DBUpdater {
                     }
                     SchemaVersionInfo newSchemaVer = new SchemaVersionInfo(newVer, new Date());
                     if(commitText!=null && commitText.length()>0) newSchemaVer.setCommitText(commitText.toString());
-                    em.persist(newSchemaVer);
+                    entityManager.persist(newSchemaVer);
                     curSchemaVer =newSchemaVer;
                     bUpdated = true;
                 }

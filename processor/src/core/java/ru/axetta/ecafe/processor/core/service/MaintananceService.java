@@ -23,16 +23,16 @@ import java.util.Date;
 @Component
 @Scope("singleton")
 public class MaintananceService {
-    Logger logger = LoggerFactory.getLogger(MaintananceService.class);
+    private Logger logger = LoggerFactory.getLogger(MaintananceService.class);
 
-    Date lastCleanDate;
-    Integer maintananceHour;
+    private Date lastCleanDate;
+    private Integer maintananceHour;
 
     @PersistenceContext
-    EntityManager em;
+    private EntityManager entityManager;
 
     @Autowired
-    RuntimeContext runtimeContext;
+    private RuntimeContext runtimeContext;
 
 
     @Transactional
@@ -65,18 +65,18 @@ public class MaintananceService {
         int menuExchangeDeletedCount = 0;
 
         logger.info("Cleaning menu details...");
-        Query query = em.createNativeQuery("delete from CF_MenuDetails md where md.IdOfMenu in (select m.IdOfMenu from CF_Menu m where m.MenuDate < :date)");
+        Query query = entityManager.createNativeQuery("delete from CF_MenuDetails md where md.IdOfMenu in (select m.IdOfMenu from CF_Menu m where m.MenuDate < :date)");
         long timeToClean = System.currentTimeMillis()-(long)menuDaysForDeletion*24*60*60*1000;
         query.setParameter("date", timeToClean);
         menuDetailDeletedCount = query.executeUpdate();
 
         logger.info("Cleaning menu...");
-        query = em.createNativeQuery("delete from CF_Menu m where m.MenuDate < :date");
+        query = entityManager.createNativeQuery("delete from CF_Menu m where m.MenuDate < :date");
         query.setParameter("date", timeToClean);
         menuDeletedCount = query.executeUpdate();
 
         logger.info("Cleaning menu exchange...");
-        query = em.createNativeQuery("delete from CF_MenuExchange me where me.MenuDate < :date and me.menuDate<>:nullDate");
+        query = entityManager.createNativeQuery("delete from CF_MenuExchange me where me.MenuDate < :date and me.menuDate<>:nullDate");
         query.setParameter("date", timeToClean);
         // исключаем меню с секцией Settings, у него нулевая дата
         query.setParameter("nullDate", 0);

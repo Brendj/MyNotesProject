@@ -4,7 +4,16 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.export.JRCsvExporter;
+import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.report.ContragentCompletionReport;
 import ru.axetta.ecafe.processor.core.report.DeliveredServicesReport;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
 import ru.axetta.ecafe.processor.web.ui.contract.ContractFilter;
@@ -12,7 +21,14 @@ import ru.axetta.ecafe.processor.web.ui.contract.ContractSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -62,6 +78,50 @@ public class DeliveredServicesReportPage extends OnlineReportPage
 
     public void completeContractSelection(Session session, Long idOfContract, int multiContrFlag, String classTypes) throws Exception {
         this.contractFilter.completeContractSelection(session, idOfContract, multiContrFlag, classTypes);
+    }
+
+    public void showCSVList(ActionEvent actionEvent){
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+            String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + DeliveredServicesReport.class.getSimpleName() + ".jasper";
+            DeliveredServicesReport.Builder builder = new DeliveredServicesReport.Builder(templateFilename);
+            Session session = RuntimeContext.getInstance().createPersistenceSession();
+            DeliveredServicesReport deliveredServicesReport = builder.build(session,startDate, endDate, localCalendar,contragentFilter.getContragent().getIdOfContragent(),
+                    contractFilter.getContract().getIdOfContract());
+
+            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+
+            ServletOutputStream servletOutputStream = response.getOutputStream();
+
+            facesContext.responseComplete();
+            response.setContentType("application/csv");
+            response.setHeader("Content-disposition", "inline;filename=delivered.csv");
+
+            JRCsvExporter csvExporter = new JRCsvExporter();
+            csvExporter.setParameter(JRCsvExporterParameter.JASPER_PRINT, deliveredServicesReport.getPrint());
+            csvExporter.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+            csvExporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ";");
+            csvExporter.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+            csvExporter.exportReport();
+
+            servletOutputStream.flush();
+            servletOutputStream.close();
+
+        } catch (JRException fnfe) {
+            String message = (fnfe.getCause()==null?fnfe.getMessage():fnfe.getCause().getMessage());
+            logAndPrintMessage(String.format("Ошибка при подготовке отчета не найден файл шаблона: %s", message),fnfe);
+        } catch (Exception e) {
+            getLogger().error("Failed to build sales report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, getLogger());
+            HibernateUtils.close(persistenceSession, getLogger());
+        }
     }
 
     public void buildReport(Session session) throws Exception {

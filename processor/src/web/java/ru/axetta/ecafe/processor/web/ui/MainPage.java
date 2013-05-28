@@ -5098,7 +5098,7 @@ public Long getSelectedIdOfReportRule() {
         try {
             currentWorkspacePage = deliveredServicesReportPage;
         } catch (Exception e) {
-            logger.error("Failed to set sales report page", e);
+            logger.error("Failed to set delivered report page", e);
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по предоставленным услугам",
                             null));
@@ -5123,8 +5123,10 @@ public Long getSelectedIdOfReportRule() {
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
         } catch (JRException fnfe) {
             logger.error("Failed to build Delivered report", fnfe);
+            String message = (fnfe.getCause()==null?fnfe.getMessage():fnfe.getCause().getMessage());
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета не найден файл шаблона: " + fnfe.getCause().getMessage(), null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            String.format("Ошибка при подготовке отчета не найден файл шаблона: %s", message), null));
         } catch (Exception e) {
             logger.error("Failed to build sales report", e);
             facesContext.addMessage(null,

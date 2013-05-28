@@ -690,10 +690,10 @@ public class ProjectStateReportService {
                 String value = null;
 
                 if (t.getValueType() == Integer.class) {
-                    value = "" + ((BigInteger) e[1]).intValue();
+                    value = String.format("%d", ((BigInteger) e[1]).intValue());
                 }
                 if (t.getValueType() == Double.class) {
-                    value = "" + ((BigDecimal) e[1]).doubleValue();
+                    value = String.format("%s", ((BigDecimal) e[1]).doubleValue());
                 }
                 if (t.getValueType() == String.class) {
                     value = ((String) e[1]).trim();

@@ -73,7 +73,7 @@ public class RegisterStampReport extends BasicReportForOrgJob {
             List<GoodItem> allGoods = service.findAllGoods(org.getIdOfOrg());
             List<RegisterStampReportItem> result = new ArrayList<RegisterStampReportItem>();
             calendar.setTime(startTime);
-            do{
+            while (endTime.getTime()>calendar.getTimeInMillis()){
                 String date = timeFormat.format(calendar.getTime());
                 for (GoodItem goodItem: allGoods){
                     Long val = service.findNotNullGoodsFullNameByOrgByDayAndGoodEq(org.getIdOfOrg(),calendar.getTime(), goodItem.getFullName());
@@ -85,7 +85,7 @@ public class RegisterStampReport extends BasicReportForOrgJob {
                     result.add(total);
                 }
                 calendar.add(Calendar.DATE,1);
-            } while (!endTime.equals(calendar.getTime()));
+            }
             for (GoodItem goodItem: allGoods){
                 Long val = service.findNotNullGoodsFullNameByOrgByDailySampleAndGoodEq(org.getIdOfOrg(),startTime, endTime, goodItem.getFullName());
                 RegisterStampReportItem dailySampleItem = new RegisterStampReportItem(goodItem.getPathPart3(),goodItem.getPathPart4(),val,"88888");

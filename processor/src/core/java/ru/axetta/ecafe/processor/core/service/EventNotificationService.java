@@ -30,7 +30,7 @@ import java.util.*;
 @Scope("singleton")
 public class EventNotificationService {
 
-    Logger logger = LoggerFactory.getLogger(MaintananceService.class);
+    Logger logger = LoggerFactory.getLogger(EventNotificationService.class);
 
     public static String NOTIFICATION_ENTER_EVENT = "enterEvent", NOTIFICATION_BALANCE_TOPUP = "balanceTopup", MESSAGE_LINKING_TOKEN_GENERATED = "linkingToken", MESSAGE_RESTORE_PASSWORD = "restorePassword", MESSAGE_PAYMENT = "payment";
     public static String TYPE_SMS = "sms", TYPE_EMAIL_TEXT = "email.text", TYPE_EMAIL_SUBJECT = "email.subject";
@@ -225,6 +225,7 @@ public class EventNotificationService {
             return false;
         }
         text = formatMessage(text, values);
+
         if (text.length() > 68) {
             text = text.substring(0, 67) + "..";
         }

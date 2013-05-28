@@ -67,9 +67,9 @@ public class TransactionJournalService {
     private EntityManager entityManager;
 
     @Autowired
-    RuntimeContext runtimeContext;
+    private RuntimeContext runtimeContext;
 
-    boolean isActivated;
+    private boolean isActivated;
 
     public boolean isActivated() {
         return isActivated;

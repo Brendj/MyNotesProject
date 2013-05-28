@@ -4,21 +4,34 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.export.JRCsvExporter;
+import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.contragent.*;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.report.ContragentCompletionReport;
+import ru.axetta.ecafe.processor.core.report.RegisterStampReport;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -82,6 +95,47 @@ public class ContragentCompletionReportPage extends BasicWorkspacePage implement
             }
         }
         return null;
+    }
+
+    @Autowired
+    private RuntimeContext runtimeContext;
+    @Autowired
+    private DAOService daoService;
+
+    public void showCSVList(ActionEvent actionEvent){
+        AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + ContragentCompletionReport.class.getSimpleName() + ".jasper";
+        ContragentCompletionReport.Builder builder = new ContragentCompletionReport.Builder(templateFilename);
+        builder.setContragent(defaultSupplier);
+        Session session = (Session) entityManager.getDelegate();
+        try {
+            ContragentCompletionReport contragentCompletionReport = (ContragentCompletionReport) builder.build(session,startDate, endDate, localCalendar);
+
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+
+            ServletOutputStream servletOutputStream = response.getOutputStream();
+
+            facesContext.responseComplete();
+            response.setContentType("application/csv");
+            response.setHeader("Content-disposition", "inline;filename=contragent_completion.csv");
+
+            JRCsvExporter csvExporter = new JRCsvExporter();
+            csvExporter.setParameter(JRCsvExporterParameter.JASPER_PRINT, contragentCompletionReport.getPrint());
+            csvExporter.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+            csvExporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ";");
+            csvExporter.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+            csvExporter.exportReport();
+
+            servletOutputStream.flush();
+            servletOutputStream.close();
+
+        } catch (JRException fnfe) {
+            String message = (fnfe.getCause()==null?fnfe.getMessage():fnfe.getCause().getMessage());
+            logAndPrintMessage(String.format("Ошибка при подготовке отчета не найден файл шаблона: %s", message),fnfe);
+        } catch (Exception e) {
+            logAndPrintMessage("Error generate csv file ",e);
+        }
     }
 
     public Integer getContragentListCount() {

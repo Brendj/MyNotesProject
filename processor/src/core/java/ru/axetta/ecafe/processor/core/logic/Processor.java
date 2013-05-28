@@ -2590,9 +2590,9 @@ public class Processor implements SyncProcessor,
         } else if (passDirection == EnterEvent.EXIT) {
             eventName = "Выход из школы";
         } else if (passDirection == EnterEvent.RE_ENTRY) {
-            eventName = "Повторный вход в школу";
+            eventName = "Вход в школу";
         } else if (passDirection == EnterEvent.RE_EXIT) {
-            eventName = "Повторный выход из школы";
+            eventName = "Выход из школы";
         }
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(eventDate);
