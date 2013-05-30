@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.GoodRequestsReport;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
@@ -22,9 +21,18 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
     private Boolean hideMissedColumns;
     private boolean showAll = true;
     private int requestsFilter = 1;
+    private String goodName;
 
     public String getPageFilename() {
         return "report/online/good_requests_report";
+    }
+
+    public String getGoodName() {
+        return goodName;
+    }
+
+    public void setGoodName(String goodName) {
+        this.goodName = goodName;
     }
 
     public int getRequestsFilter() {
@@ -75,8 +83,8 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
 
     public void buildReport(Session session) throws Exception {
         GoodRequestsReport.Builder reportBuilder = new GoodRequestsReport.Builder();
-        this.goodRequests = reportBuilder.build(session, hideMissedColumns, startDate, endDate, idOfOrgList, idOfContragentOrgList,
-                                                requestsFilter);
+        this.goodRequests = reportBuilder.build(session, hideMissedColumns, startDate, endDate,
+                                                idOfOrgList, idOfContragentOrgList, requestsFilter, goodName);
     }
 
 }
