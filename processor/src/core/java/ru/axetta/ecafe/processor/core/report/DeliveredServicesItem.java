@@ -22,6 +22,7 @@ public class DeliveredServicesItem {
     private String officialname;
     private String orgnum;
     private String address;
+    private long idoforg;
 
     public String getLevel1() {
         return level1;
@@ -105,5 +106,13 @@ public class DeliveredServicesItem {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public long getIdoforg() {
+        return idoforg;
+    }
+
+    public void setIdoforg(long idoforg) {
+        this.idoforg = idoforg;
     }
 }

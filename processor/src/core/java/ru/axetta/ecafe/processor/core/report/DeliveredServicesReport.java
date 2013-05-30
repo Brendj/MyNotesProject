@@ -183,14 +183,14 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                     + "split_part(cf_goods.fullname, '/', 3) as level3, "
                     + "split_part(cf_goods.fullname, '/', 4) as level4, " + "count(cf_orders.idoforder) as cnt, "
                     + "cf_orderdetails.rprice price, " + "count(cf_orders.idoforder) * cf_orderdetails.rprice as sum, "
-                    + "cf_orgs.address, " + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') "
+                    + "cf_orgs.address, " + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), cf_orgs.idoforg "
                     + "from cf_orgs " + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
                     + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
                     + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
                     + "where cf_orderdetails.socdiscount>0 and " + contragentCondition + contractOrgsCondition
                     + " cf_orders.createddate between :start and :end "
-                    + "group by cf_orgs.officialname, level1, level2, level3, level4, price, address "
-                    + "order by cf_orgs.officialname, level1, level2, level3, level4";
+                    + "group by cf_orgs.idoforg, cf_orgs.officialname, level1, level2, level3, level4, price, address "
+                    + "order by cf_orgs.idoforg, cf_orgs.officialname, level1, level2, level3, level4";
             Query query = session.createSQLQuery(sql);//.createQuery(sql);
             query.setParameter("start", start.getTime());
             //query.setParameter("start",1357171200000L);
@@ -210,6 +210,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                 long summary = ((BigInteger) e[7]).longValue();
                 String address = (String) e[8];
                 String orgNum = (e[9] == null ? "" : (String) e[9]);
+                long idoforg = ((BigInteger) e[10]).longValue();
                 DeliveredServicesItem item = new DeliveredServicesItem();
                 item.setOfficialname(officialname);
                 item.setLevel1(level1);
@@ -221,6 +222,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                 item.setSummary(summary);
                 item.setOrgnum(orgNum);
                 item.setAddress(address);
+                item.setIdoforg(idoforg);
                 result.add(item);
             }
             return result;

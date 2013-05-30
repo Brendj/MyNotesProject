@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.ui.contract;
 
 import ru.axetta.ecafe.processor.core.persistence.Contract;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 
 import org.apache.commons.lang.StringUtils;
@@ -16,6 +15,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,7 +47,10 @@ public class ContractSelectPage extends BasicPage {
 
         public Item(Contract contract) {
             this.idOfContract = contract.getIdOfContract();
-            this.contractName = contract.getContractNumber();
+            java.text.DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+            this.contractName = contract.getContractNumber() + "/" +
+                                contract.getPerformer() + "/" +
+                                df.format(contract.getDateOfConclusion());
         }
 
         public Long getIdOfContract() {

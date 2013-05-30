@@ -86,6 +86,7 @@
 	<field name="summary" class="java.lang.Long"/>
 	<field name="orgnum" class="java.lang.String"/>
 	<field name="address" class="java.lang.String"/>
+	<field name="idoforg" class="java.lang.Long"/>
 	<variable name="orgnum" class="java.lang.String">
 		<variableExpression><![CDATA[$F{orgnum}]]></variableExpression>
 	</variable>
@@ -233,8 +234,8 @@
 					</cellContents>
 				</crosstabHeaderCell>
 				<rowGroup name="unique" width="0" totalPosition="End">
-					<bucket class="java.lang.String">
-						<bucketExpression><![CDATA[$F{orgnum}+Math.random()]]></bucketExpression>
+					<bucket class="java.lang.Long">
+						<bucketExpression><![CDATA[$F{idoforg}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents>
