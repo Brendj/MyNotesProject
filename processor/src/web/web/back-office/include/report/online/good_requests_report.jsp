@@ -32,6 +32,10 @@
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.goodRequestReportPage.filter}}" />
         </h:panelGroup>
 
+        <h:outputText escape="true" value="Наименование товара"
+                      styleClass="output-text" />
+        <h:inputText value="#{mainPage.goodRequestReportPage.goodName}" styleClass="input-text" size="50" />
+
         <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
         <rich:calendar value="#{mainPage.goodRequestReportPage.startDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />

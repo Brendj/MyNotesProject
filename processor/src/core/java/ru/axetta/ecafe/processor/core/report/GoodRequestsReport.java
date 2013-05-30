@@ -53,7 +53,7 @@ public class GoodRequestsReport extends BasicReport {
 
         public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
                                         Date startDate, Date endDate, List<Long> idOfOrgList, List <Long> idOfSupplierList,
-                                        int requestsFilter)
+                                        int requestsFilter, String goodName)
                 throws Exception {
             Date generateTime = new Date();
             List<RequestItem> items = new LinkedList<RequestItem>();
@@ -61,6 +61,9 @@ public class GoodRequestsReport extends BasicReport {
                     hideMissedColumns, startDate, endDate, items);
 
             String goodCondition = "";
+            if (goodName.equals("")) {
+                goodCondition = "and cf_goods.nameofgood like '%" + goodName + "%'";
+            }
 
             String stateCondition = " cf_goods_requests.deletedstate<>true and ";
             switch (requestsFilter) {
