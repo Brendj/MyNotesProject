@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.Duration;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import java.io.ByteArrayOutputStream;
@@ -40,7 +39,7 @@ public class MskNSIService {
     public static final String COMMENT_AUTO_MODIFY = "{Изменено из Реестров %s}";
     public static final String COMMENT_AUTO_DELETED = "{Исключен по Реестру %s}";
     public static final String REPLACEMENT_REGEXP = "\\{[^}]* Реестр[^}]*\\}";
-    public static int SERVICE_ROWS_LIMIT = 3000;
+    public static int SERVICE_ROWS_LIMIT = 300;
 
     public static class Config {
 
@@ -236,7 +235,7 @@ public class MskNSIService {
                         + "item['РОУ XML/Дата изменения (число)']\n"
                         + "from catalog('Реестр образовательных учреждений') where \n"
                         + "item['РОУ XML/Статус записи'] not like 'Удален%' and "
-                        + "item['РОУ XML/Краткое наименование учреждения'] like '%" + orgName + "%' limit " + SERVICE_ROWS_LIMIT);
+                        + "item['РОУ XML/Краткое наименование учреждения'] like '%" + orgName + "%'");
         LinkedList<OrgInfo> list = new LinkedList<OrgInfo>();
         for (QueryResult qr : queryResults) {
             OrgInfo orgInfo = new OrgInfo();
@@ -321,7 +320,7 @@ public class MskNSIService {
         "from catalog('Реестр обучаемых') "+
         "where "+
         "item['" + tbl + "/Статус записи'] not like 'Удален%' and "+
-        "item['" + tbl + "/GUID образовательного учреждения'] like '" + org.getGuid() + "' limit " + SERVICE_ROWS_LIMIT;
+        "item['" + tbl + "/GUID образовательного учреждения'] like '" + org.getGuid() + "'";
 
         List<QueryResult> queryResults = executeQuery(query);
         LinkedList<ExpandedPupilInfo> list = new LinkedList<ExpandedPupilInfo>();
