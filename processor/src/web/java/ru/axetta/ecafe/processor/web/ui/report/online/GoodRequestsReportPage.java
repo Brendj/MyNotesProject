@@ -86,5 +86,4 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
         this.goodRequests = reportBuilder.build(session, hideMissedColumns, startDate, endDate,
                                                 idOfOrgList, idOfContragentOrgList, requestsFilter, goodName);
     }
-
 }
