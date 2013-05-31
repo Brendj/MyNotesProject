@@ -152,7 +152,7 @@ public class ImportRegisterClientsService {
             }
             importIteration++;
         }
-        log(synchDate + "Всего импортировано " + pupils.size() + " за " + (importIteration - 1) + " итераций импорта");
+        log(synchDate + "Всего импортировано " + pupils.size() + " за " + (importIteration) + " итераций импорта");
 
         try {
 
