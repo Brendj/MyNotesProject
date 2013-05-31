@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.core.partner.nsi;
 
 import com.sun.xml.internal.ws.client.BindingProviderProperties;
 import com.sun.xml.internal.ws.developer.JAXWSProperties;
-import generated.nsiws.*;
 import generated.nsiws.nsi.beans.Context;
 import generated.nsiws.nsi.beans.QueryResult;
 import generated.nsiws.nsi.services.NSIService;
@@ -31,10 +30,7 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
-import java.util.GregorianCalendar;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Scope("singleton")
@@ -277,6 +273,26 @@ public class MskNSIService {
     }
 
     public List<PupilInfo> getPupilsByOrgGUID(String orgGuid, String familyName, Long updateTime) throws Exception {
+        List<PupilInfo> pupils = new ArrayList<PupilInfo>();
+        int importIteration = 1;
+        while (true) {
+            List<PupilInfo> iterationPupils = null;
+            try {
+                iterationPupils = getPupilsByOrgGUID(orgGuid, familyName, updateTime, importIteration);
+            } catch (Exception e) {
+                throw e;
+            }
+            if (iterationPupils.size() > 0) {
+                pupils.addAll(iterationPupils);
+            } else {
+                break;
+            }
+        importIteration++;
+        }
+        return pupils;
+    }
+
+    public List<PupilInfo> getPupilsByOrgGUID(String orgGuid, String familyName, Long updateTime, int iteration) throws Exception {
         String tbl = getNSIWorkTable ();
         String select = "select item['" + tbl + "/Фамилия'], "
         + "item['" + tbl + "/Имя'], item['" + tbl + "/Отчество'], "
@@ -292,7 +308,7 @@ public class MskNSIService {
         if (updateTime != null) {
             select += " and  item['" + tbl + "/Дата изменения (число)']  &gt; " + (updateTime / 1000);
         }
-        List<QueryResult> queryResults = executeQuery(select);
+        List<QueryResult> queryResults = executeQuery(select, iteration);
         LinkedList<PupilInfo> list = new LinkedList<PupilInfo>();
         for (QueryResult qr : queryResults) {
             PupilInfo pupilInfo = new PupilInfo();
