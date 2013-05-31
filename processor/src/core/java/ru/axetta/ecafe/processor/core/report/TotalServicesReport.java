@@ -67,26 +67,6 @@ public class TotalServicesReport extends BasicReport {
             java.text.Format df = new SimpleDateFormat("yyyy-MM-dd");
 
             loadValue(entries, "planBenefitClientsCount", session,
-                    /*"select dat.idoforg, count(distinct dat.idofclient) "+
-                  "from ( select cf_clients.idoforg, cf_clients.idofclient "+
-                          "from cf_clients "+
-                          "where cf_clients.discountmode<>0 "+
-                          "union all "+
-                          "select cf_clients.idoforg, cf_clients.idofclient "+
-                          "from cf_clients "+
-                          "left join cf_categoryorg_orgs on cf_clients.idoforg=cf_categoryorg_orgs.idoforg "+
-                          "left join cf_clientgroups on cf_clientgroups.idofclientgroup=cf_clients.idofclientgroup AND cf_clientgroups.idoforg=cf_clients.idoforg "+
-                          "where CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() +
-                          ") as dat "+
-                  "group by dat.idoforg "+
-                  "order by dat.idoforg"
-                    "select cf_clients.idoforg, count(distinct cf_clients.idofclient) " +
-                            "from cf_clients " +
-                            "left join cf_orgs on cf_orgs.idoforg=cf_clients.idoforg " +
-                            "where cf_orgs.state=1 and cf_clients.discountmode>1 and cf_clients.idOfClientGroup<"
-                            + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " " +
-                            "group by cf_clients.idoforg " +
-                            "order by cf_clients.idoforg"*/
                                         "select cf_orgs.idoforg, count (idofclientcomplexdiscount) "
                                       + "from cf_clientscomplexdiscounts "
                                       + "left join cf_clients on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient "
