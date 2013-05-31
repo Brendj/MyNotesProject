@@ -7,6 +7,13 @@ package ru.axetta.ecafe.processor.core.partner.nsi;
 import com.sun.xml.internal.ws.client.BindingProviderProperties;
 import com.sun.xml.internal.ws.developer.JAXWSProperties;
 import generated.nsiws.*;
+import generated.nsiws.nsi.beans.Context;
+import generated.nsiws.nsi.beans.QueryResult;
+import generated.nsiws.nsi.services.NSIService;
+import generated.nsiws.nsi.services.NSIServiceService;
+import generated.nsiws.nsi.services.in.NSIRequestType;
+import generated.nsiws.nsi.services.out.NSIResponseType;
+import generated.nsiws.rev110801.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
@@ -166,6 +173,10 @@ public class MskNSIService {
     }
 
     public List<QueryResult> executeQuery(String queryText) throws Exception {
+        return executeQuery (queryText, -1);
+    }
+
+    public List<QueryResult> executeQuery(String queryText, int importIteration) throws Exception {
         init();
 
         String url = Config.getUrl();
@@ -198,6 +209,10 @@ public class MskNSIService {
         request.getMessageData().getAppData().getContext().setUser(Config.getUser());
         request.getMessageData().getAppData().getContext().setPassword(Config.getPassword());
         request.getMessageData().getAppData().getContext().setCompany(Config.getCompany());
+        if (importIteration >= 0) {
+            request.getMessageData().getAppData().setFrom(new Long(1 + SERVICE_ROWS_LIMIT * (importIteration - 1)));
+            request.getMessageData().getAppData().setLimit(SERVICE_ROWS_LIMIT * importIteration);
+        }
         request.getMessageData().getAppData().setQuery(queryText);
 
         NSIResponseType response = nsiService.getQueryResults(request);
@@ -301,7 +316,7 @@ public class MskNSIService {
     }
 
 
-    public List<ExpandedPupilInfo> getChangedClients(java.util.Date date, Org org) throws Exception {
+    public List<ExpandedPupilInfo> getChangedClients(java.util.Date date, Org org, int importIteration) throws Exception {
         /*
         От Козлова
         */
@@ -322,7 +337,7 @@ public class MskNSIService {
         "item['" + tbl + "/Статус записи'] not like 'Удален%' and "+
         "item['" + tbl + "/GUID образовательного учреждения'] like '" + org.getGuid() + "'";
 
-        List<QueryResult> queryResults = executeQuery(query);
+        List<QueryResult> queryResults = executeQuery(query, importIteration);
         LinkedList<ExpandedPupilInfo> list = new LinkedList<ExpandedPupilInfo>();
         for (QueryResult qr : queryResults) {
             ExpandedPupilInfo pupilInfo = new ExpandedPupilInfo();

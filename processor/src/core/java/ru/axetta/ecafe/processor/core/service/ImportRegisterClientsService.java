@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -131,13 +132,27 @@ public class ImportRegisterClientsService {
 
         Session session = (Session) em.getDelegate();
         org = em.merge(org);
-        List<MskNSIService.ExpandedPupilInfo> pupils = null;
-        try {
-            pupils = nsiService.getChangedClients(lastUpd, org);
-        } catch (Exception e) {
-            logger.error("Ошибка получения данных от Реестров для "+org.getOfficialName(), e);
-            return;
+        //  Итеративно загружаем клиентов, используя ограничения
+        List<MskNSIService.ExpandedPupilInfo> pupils = new ArrayList <MskNSIService.ExpandedPupilInfo> ();
+        List<MskNSIService.ExpandedPupilInfo> tempPupils = new ArrayList<MskNSIService.ExpandedPupilInfo>();
+        int importIteration = 1;
+        while (true) {
+            tempPupils.clear();
+            try {
+                tempPupils = nsiService.getChangedClients(lastUpd, org, importIteration);
+            } catch (Exception e) {
+                logger.error("Ошибка получения данных от Реестров для "+org.getOfficialName(), e);
+                return;
+            }
+            //  Если клиенты найдены, значит добавляем их в общий список и выполняем следующую итерацию, иначе - завершаем импорт
+            if (tempPupils.size() > 0) {
+                pupils.addAll(tempPupils);
+            } else {
+                break;
+            }
+            importIteration++;
         }
+        log(synchDate + "Всего импортировано " + pupils.size() + " за " + (importIteration - 1) + " итераций импорта");
 
         try {
 

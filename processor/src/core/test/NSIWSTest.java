@@ -4,7 +4,6 @@
 
 import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
-import generated.nsiws.*;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -22,6 +21,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.util.GregorianCalendar;
 import java.util.List;
+
+
+import generated.nsiws.nsi.beans.Context;
+import generated.nsiws.nsi.beans.QueryResult;
+import generated.nsiws.nsi.services.NSIService;
+import generated.nsiws.nsi.services.NSIServiceService;
+import generated.nsiws.nsi.services.in.NSIRequestType;
+import generated.nsiws.nsi.services.out.NSIResponseType;
+import generated.nsiws.rev110801.*;
 
 public class NSIWSTest {
 
