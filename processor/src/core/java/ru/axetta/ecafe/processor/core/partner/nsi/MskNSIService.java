@@ -292,7 +292,6 @@ public class MskNSIService {
         if (updateTime != null) {
             select += " and  item['" + tbl + "/Дата изменения (число)']  &gt; " + (updateTime / 1000);
         }
-        select += " limit " + SERVICE_ROWS_LIMIT;
         List<QueryResult> queryResults = executeQuery(select);
         LinkedList<PupilInfo> list = new LinkedList<PupilInfo>();
         for (QueryResult qr : queryResults) {
