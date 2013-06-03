@@ -399,7 +399,7 @@ public class DAOUtils {
             throws Exception {
 
 
-        javax.persistence.Query q = em.createNativeQuery("select cf_clients.idofclient, cf_clients.idoforg "+
+        javax.persistence.Query q = em.createNativeQuery("select cf_clients.idofclient "+
                 "from cf_clients "+
                 "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "+
                 "where trim(upper(cf_persons.Surname))=:surname and trim(upper(cf_persons.FirstName))=:firstName and trim(upper(cf_persons.SecondName))=:secondName and "+
