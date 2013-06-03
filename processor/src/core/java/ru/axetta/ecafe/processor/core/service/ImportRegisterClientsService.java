@@ -131,7 +131,7 @@ public class ImportRegisterClientsService {
         log(synchDate + "Производится синхронизация для " + org.getOfficialName());
 
         Session session = (Session) em.getDelegate();
-        org = em.merge(org);
+        org = em.find(Org.class, org.getIdOfOrg());
         //  Итеративно загружаем клиентов, используя ограничения
         List<MskNSIService.ExpandedPupilInfo> pupils = new ArrayList <MskNSIService.ExpandedPupilInfo> ();
         List<MskNSIService.ExpandedPupilInfo> tempPupils = new ArrayList<MskNSIService.ExpandedPupilInfo>();
