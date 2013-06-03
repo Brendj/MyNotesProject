@@ -501,7 +501,7 @@
 							<textElement verticalAlignment="Middle">
 								<font size="10"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{priceMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%d.%02d", $V{priceMeasure}/100, Math.abs($V{priceMeasure}%100))]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement uuid="18941ecf-8931-4610-9307-8e58bbb004b5" style="Crosstab Data Text" x="0" y="0" width="50" height="39"/>
@@ -515,7 +515,7 @@
 							<textElement verticalAlignment="Middle">
 								<font size="10"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{summaryMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%d.%02d", $V{summaryMeasure}/100, Math.abs($V{summaryMeasure}%100))]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -580,7 +580,7 @@
 						<textField>
 							<reportElement uuid="578be2cd-b18e-418b-8888-3ba256d74d3a" style="Crosstab Data Text" x="0" y="0" width="73" height="39"/>
 							<textElement verticalAlignment="Middle"/>
-							<textFieldExpression><![CDATA[$V{summaryMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%d.%02d", $V{summaryMeasure}/100, Math.abs($V{summaryMeasure}%100))]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -592,7 +592,7 @@
 						<textField>
 							<reportElement uuid="04d0267f-e7d8-4098-ab8e-ec8c3d678643" style="Crosstab Data Text" x="0" y="0" width="73" height="39"/>
 							<textElement verticalAlignment="Middle"/>
-							<textFieldExpression><![CDATA[$V{summaryMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%d.%02d", $V{summaryMeasure}/100, Math.abs($V{summaryMeasure}%100))]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -697,12 +697,12 @@
 						<textField>
 							<reportElement uuid="d707c545-f7af-4309-8ebe-c1023b523f8f" style="Crosstab Data Text" mode="Opaque" x="50" y="0" width="50" height="39" backcolor="#CCFFFF"/>
 							<textElement verticalAlignment="Middle"/>
-							<textFieldExpression><![CDATA[$V{priceMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%d.%02d", $V{priceMeasure}/100, Math.abs($V{priceMeasure}%100))]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement uuid="5f925592-758e-4be4-9a06-ae681a555ea0" style="Crosstab Data Text" mode="Opaque" x="100" y="0" width="50" height="39" backcolor="#CCFFFF"/>
 							<textElement verticalAlignment="Middle"/>
-							<textFieldExpression><![CDATA[$V{summaryMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%d.%02d", $V{summaryMeasure}/100, Math.abs($V{summaryMeasure}%100))]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -714,7 +714,7 @@
 						<textField>
 							<reportElement uuid="260b9b29-e04c-4195-80ba-0ab305cbf3da" style="Crosstab Data Text" mode="Opaque" x="0" y="0" width="73" height="39" backcolor="#CCFFFF"/>
 							<textElement verticalAlignment="Middle"/>
-							<textFieldExpression><![CDATA[$V{summaryMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%d.%02d", $V{summaryMeasure}/100, Math.abs($V{summaryMeasure}%100))]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -723,7 +723,7 @@
 						<textField>
 							<reportElement uuid="fac91d92-1347-4836-81b8-e8eeb4874b3e" style="Crosstab Data Text" mode="Opaque" x="0" y="0" width="73" height="39" backcolor="#CCFFFF"/>
 							<textElement verticalAlignment="Middle"/>
-							<textFieldExpression><![CDATA[$V{summaryMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%d.%02d", $V{summaryMeasure}/100, Math.abs($V{summaryMeasure}%100))]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
