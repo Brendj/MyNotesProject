@@ -412,7 +412,7 @@ public class DAOUtils {
         List res = q.getResultList();
         if (res.isEmpty()) return null;
         if (res.size()==2) return -1L;
-        return (Long)res.get(0);
+        return ((Number)res.get(0)).longValue();
 
 
         /*javax.persistence.Query query = em.createQuery(
@@ -442,7 +442,7 @@ public class DAOUtils {
         query.setMaxResults(2);
         if (query.getResultList().isEmpty()) return null;
         if (query.getResultList().size()==2) return -1L;
-        return (Long)query.getResultList().get(0);
+        return ((Number)query.getResultList().get(0)).longValue();
     }
 
     public static boolean existCard(Session persistenceSession, long cardPrintedNo) throws Exception {
