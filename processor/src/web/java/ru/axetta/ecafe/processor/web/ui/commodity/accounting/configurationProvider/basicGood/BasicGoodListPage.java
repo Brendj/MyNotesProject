@@ -38,6 +38,7 @@ public class BasicGoodListPage extends BasicWorkspacePage {
     private UIComponent editGoodDiv;
     private List<SelectItem> unitsScaleSelectItemList;
     private Long idOfBasicGood;
+    private Integer intUnitsScale;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -65,7 +66,7 @@ public class BasicGoodListPage extends BasicWorkspacePage {
                 printError("Поле 'Наименование' обязательное.");
                 return null;
             }
-            if (null == newBasicGood.getUnitsScale()) {
+            if (null == this.intUnitsScale) {
                 printError("Поле 'Единица измерение' обязательное.");
                 return null;
             }
@@ -77,7 +78,9 @@ public class BasicGoodListPage extends BasicWorkspacePage {
             newBasicGood.setCreatedDate(date);
             newBasicGood.setLastUpdate(date);
             newBasicGood.setGuid(UUID.randomUUID().toString());
+            newBasicGood.setUnitsScale(UnitScale.fromInteger(intUnitsScale));
             daoService.persistEntity(newBasicGood);
+            intUnitsScale = null;
             reload();
             printMessage("Базовый товар добавлен успешно");
         } catch (Exception e) {
@@ -93,7 +96,7 @@ public class BasicGoodListPage extends BasicWorkspacePage {
                 printError("Поле 'Наименование' обязательное.");
                 return null;
             }
-            if (null == editBasicGood.getUnitsScale()) {
+            if (null == this.intUnitsScale) {
                 printError("Поле 'Единица измерение' обязательное.");
                 return null;
             }
@@ -101,7 +104,9 @@ public class BasicGoodListPage extends BasicWorkspacePage {
                 printError("Поле 'Масса нетто' обязательное.");
                 return null;
             }
+            editBasicGood.setUnitsScale(UnitScale.fromInteger(intUnitsScale));
             daoService.updateGoodsBasicBasket(editBasicGood);
+            intUnitsScale = null;
             reload();
             printMessage("Изменения внесены успешно");
         } catch (Exception e) {
@@ -148,6 +153,7 @@ public class BasicGoodListPage extends BasicWorkspacePage {
     }
 
     public void setEditBasicGood(GoodsBasicBasket editBasicGood) {
+        this.intUnitsScale = editBasicGood.getUnitsScale().ordinal();
         this.editBasicGood = editBasicGood;
     }
 
@@ -184,6 +190,7 @@ public class BasicGoodListPage extends BasicWorkspacePage {
         this.unitsScaleSelectItemList = unitsScaleSelectItemList;
     }
 
+    @Deprecated
     public long getUnitsScaleSelectItemListSize() {
         return unitsScaleSelectItemList.size();
     }
@@ -207,5 +214,13 @@ public class BasicGoodListPage extends BasicWorkspacePage {
 
     public void setIdOfBasicGood(Long idOfBasicGood) {
         this.idOfBasicGood = idOfBasicGood;
+    }
+
+    public Integer getIntUnitsScale() {
+        return intUnitsScale;
+    }
+
+    public void setIntUnitsScale(Integer intUnitsScale) {
+        this.intUnitsScale = intUnitsScale;
     }
 }

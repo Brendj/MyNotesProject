@@ -132,10 +132,21 @@
                              styleClass="input-text long-field" />
 
                 <h:outputText escape="true" value="Единица измерения" styleClass="output-text required-field" />
-                <h:selectOneListbox value="#{basicGoodListPage.editBasicGood.unitsScale}"
-                                    size="#{basicGoodListPage.unitsScaleSelectItemListSize}">
+
+               <%-- <rich:comboBox enableManualInput="false" value="#{basicGoodListPage.intUnitsScale}">
+                    <a4j:support event="onselect" reRender="basicGoodListPage" />
+                    <a4j:support event="onchange" reRender="basicGoodListPage" />
+                    <f:selectItems value="#{basicGoodListPage.unitsScaleSelectItemList}"/>
+                </rich:comboBox>--%>
+
+                <h:selectOneListbox value="#{basicGoodListPage.intUnitsScale}">
                     <f:selectItems value="#{basicGoodListPage.unitsScaleSelectItemList}"/>
                 </h:selectOneListbox>
+
+               <%-- <h:selectOneListbox value="#{basicGoodListPage.editBasicGood.unitsScale}"
+                                    size="#{basicGoodListPage.unitsScaleSelectItemListSize}">
+                    <f:selectItems value="#{basicGoodListPage.unitsScaleSelectItemList}"/>
+                </h:selectOneListbox>--%>
 
                 <h:outputText escape="true" value="Масса нетто (грамм)" styleClass="output-text required-field" />
                 <h:inputText value="#{basicGoodListPage.editBasicGood.netWeight}" maxlength="128" styleClass="input-text" />
@@ -158,10 +169,13 @@
                 <h:inputText value="#{basicGoodListPage.newBasicGood.nameOfGood}" maxlength="128" styleClass="input-text long-field" />
 
                 <h:outputText escape="true" value="Единица измерения" styleClass="output-text required-field" />
-                <h:selectOneListbox value="#{basicGoodListPage.newBasicGood.unitsScale}"
-                                    size="#{basicGoodListPage.unitsScaleSelectItemListSize}">
+                <h:selectOneListbox value="#{basicGoodListPage.intUnitsScale}">
                     <f:selectItems value="#{basicGoodListPage.unitsScaleSelectItemList}"/>
                 </h:selectOneListbox>
+                <%--<h:selectOneListbox value="#{basicGoodListPage.newBasicGood.unitsScale}"--%>
+                                    <%--size="#{basicGoodListPage.unitsScaleSelectItemListSize}">--%>
+                    <%--<f:selectItems value="#{basicGoodListPage.unitsScaleSelectItemList}"/>--%>
+                <%--</h:selectOneListbox>--%>
 
                 <h:outputText escape="true" value="Масса нетто (грамм)" styleClass="output-text required-field" />
                 <h:inputText value="#{basicGoodListPage.newBasicGood.netWeight}" maxlength="128" styleClass="input-text" />
