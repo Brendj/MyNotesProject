@@ -62,13 +62,14 @@ public class Publication extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        if(!(isbn==null || isbn.isEmpty() || !validISBN)){
+        if(!(isbn==null || isbn.isEmpty() || publicationdate==null || publicationdate.isEmpty() || !validISBN)){
             Criteria criteria = session.createCriteria(Publication.class);
             criteria.add(Restrictions.eq("isbn",isbn));
+            criteria.add(Restrictions.eq("publicationdate",publicationdate));
             criteria.add(Restrictions.eq("validISBN",true));
             Publication publication = (Publication) criteria.uniqueResult();
             if(!(publication==null || publication.getDeletedState() || guid.equals(publication.getGuid()))){
-                DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication DATA_EXIST_VALUE isbn equals");
+                DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication DATA_EXIST_VALUE isbn and publicationdate equals");
                 distributedObjectException.setData(publication.getGuid());
                 throw  distributedObjectException;
             }
