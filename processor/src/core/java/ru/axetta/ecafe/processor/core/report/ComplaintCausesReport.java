@@ -84,7 +84,7 @@ public class ComplaintCausesReport extends BasicReportForOrgJob {
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
-        private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
+        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             List<ComplaintCauseReportItem> resultRows = new LinkedList<ComplaintCauseReportItem>();
             Query query = session.createSQLQuery("SELECT d.description, count(c.cause) AS cause_count"

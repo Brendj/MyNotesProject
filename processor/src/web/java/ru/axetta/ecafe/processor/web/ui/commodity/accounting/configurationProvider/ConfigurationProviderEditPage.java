@@ -83,7 +83,8 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
 
     public Object save() {
         try {
-            onSave();
+            MainPage mainPage = MainPage.getSessionInstance();
+            currentConfigurationProvider = daoService.onSave(currentConfigurationProvider, mainPage.getCurrentUser(), idOfOrgList);
             selectedConfigurationProviderGroupPage.setSelectConfigurationProvider(currentConfigurationProvider);
             printMessage("Производственная конфигурация сохранена успешно.");
         } catch (Exception e) {
@@ -93,23 +94,6 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
         return null;
     }
 
-    @Transactional
-    private void onSave() throws Exception{
-        ConfigurationProvider cp = entityManager.find(ConfigurationProvider.class, currentConfigurationProvider.getIdOfConfigurationProvider());
-        /* fill object fields */
-        cp.setName(currentConfigurationProvider.getName());
-        cp.setLastUpdate(new Date());
-        MainPage mainPage = MainPage.getSessionInstance();
-        cp.setUserEdit(mainPage.getCurrentUser());
-
-        currentConfigurationProvider = entityManager.merge(cp);
-
-        if(!this.idOfOrgList.isEmpty()){
-            for (Long idOfOrg: idOfOrgList){
-                daoService.setConfigurationProviderInOrg(idOfOrg, currentConfigurationProvider);
-            }
-        }
-    }
 
     public ConfigurationProvider getCurrentConfigurationProvider() {
         return currentConfigurationProvider;

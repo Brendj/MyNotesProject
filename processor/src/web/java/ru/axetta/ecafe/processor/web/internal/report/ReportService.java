@@ -5,10 +5,7 @@
 package ru.axetta.ecafe.processor.web.internal.report;
 
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
-import ru.axetta.ecafe.processor.core.daoservices.client.items.ClientMigrationHistoryReportItem;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TradeMaterialGood;
-import ru.axetta.ecafe.processor.web.internal.report.dataflow.ReportDataInfo;
 import ru.axetta.ecafe.processor.web.internal.report.dataflow.TradeMaterialGoodItem;
 
 import org.hibernate.Criteria;

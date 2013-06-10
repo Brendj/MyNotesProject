@@ -26,26 +26,6 @@ import java.util.Set;
  */
 public class InternalIncomingDocument extends DistributedObject {
 
-    private Set<StateChange> stateChangeInternal;
-    private Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal;
-
-    public Set<InternalIncomingDocumentPosition> getInternalIncomingDocumentPositionInternal() {
-        return internalIncomingDocumentPositionInternal;
-    }
-
-    public void setInternalIncomingDocumentPositionInternal(
-            Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal) {
-        this.internalIncomingDocumentPositionInternal = internalIncomingDocumentPositionInternal;
-    }
-
-    public Set<StateChange> getStateChangeInternal() {
-        return stateChangeInternal;
-    }
-
-    public void setStateChangeInternal(Set<StateChange> stateChangeInternal) {
-        this.stateChangeInternal = stateChangeInternal;
-    }
-
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         //WayBill wb = DAOService.getInstance().findDistributedObjectByRefGUID(WayBill.class,guidOfWB);
@@ -88,7 +68,7 @@ public class InternalIncomingDocument extends DistributedObject {
         guidOfIDD = getStringAttributeValue(node,"GuidOfDisposingDoc",36);
         guidOfAI = getStringAttributeValue(node,"GuidOfInventorizationAct",36);
         guidOfS = getStringAttributeValue(node,"GuidOfStaff",36);
-        setSendAll(SendToAssociatedOrgs.DontSend);
+        setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
     }
 
@@ -109,6 +89,25 @@ public class InternalIncomingDocument extends DistributedObject {
     private String guidOfAI;
     private WayBill wayBill;
     private String guidOfWB;
+    private Set<StateChange> stateChangeInternal;
+    private Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal;
+
+    public Set<InternalIncomingDocumentPosition> getInternalIncomingDocumentPositionInternal() {
+        return internalIncomingDocumentPositionInternal;
+    }
+
+    public void setInternalIncomingDocumentPositionInternal(
+            Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal) {
+        this.internalIncomingDocumentPositionInternal = internalIncomingDocumentPositionInternal;
+    }
+
+    public Set<StateChange> getStateChangeInternal() {
+        return stateChangeInternal;
+    }
+
+    public void setStateChangeInternal(Set<StateChange> stateChangeInternal) {
+        this.stateChangeInternal = stateChangeInternal;
+    }
 
     public String getGuidOfS() {
         return guidOfS;

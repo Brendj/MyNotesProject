@@ -8,6 +8,7 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
+<%--@elvariable id="configurationProviderDeletePage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderDeletePage"--%>
 <rich:modalPanel id="removedСonfigurationProviderItemDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
     <f:facet name="header">
         <h:outputText value="Удаление конфигурации поставщика" styleClass="output-text" />
@@ -22,13 +23,20 @@
             <tr>
                 <td style="text-align: center;">
                     <h:panelGroup styleClass="borderless-div">
-                        <a4j:commandButton value="Да" ajaxSingle="true" action="#{mainPage.removeСonfigurationProviderItem}"
+                        <a4j:commandButton value="Да" ajaxSingle="true" action="#{configurationProviderDeletePage.remove}"
                                            oncomplete="#{rich:component('removedСonfigurationProviderItemDeletePanel')}.hide();"
                                            reRender="mainMenu, configurationProviderListTable, #{mainPage.topMostPage.pageComponent.id}"
                                            styleClass="command-button" />
                         <a4j:commandButton value="Отмена" styleClass="command-button"
                                            onclick="#{rich:component('removedСonfigurationProviderItemDeletePanel')}.hide();return false;" />
                     </h:panelGroup>
+                </td>
+                <td>
+                    <h:panelGrid styleClass="borderless-grid">
+                        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                                       warnClass="warn-messages" />
+
+                    </h:panelGrid>
                 </td>
             </tr>
         </table>

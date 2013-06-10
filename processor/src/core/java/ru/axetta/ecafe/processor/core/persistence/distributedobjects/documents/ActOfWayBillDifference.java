@@ -26,26 +26,6 @@ import java.util.Set;
  */
 public class ActOfWayBillDifference extends DistributedObject {
 
-    private Set<WayBill> wayBillInternal;
-    private Set<ActOfWayBillDifferencePosition> actOfWayBillDifferencePositionInternal;
-
-    public Set<ActOfWayBillDifferencePosition> getActOfWayBillDifferencePositionInternal() {
-        return actOfWayBillDifferencePositionInternal;
-    }
-
-    public void setActOfWayBillDifferencePositionInternal(
-            Set<ActOfWayBillDifferencePosition> actOfWayBillDifferencePositionInternal) {
-        this.actOfWayBillDifferencePositionInternal = actOfWayBillDifferencePositionInternal;
-    }
-
-    public Set<WayBill> getWayBillInternal() {
-        return wayBillInternal;
-    }
-
-    public void setWayBillInternal(Set<WayBill> wayBillInternal) {
-        this.wayBillInternal = wayBillInternal;
-    }
-
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         //Staff st = DAOService.getInstance().findDistributedObjectByRefGUID(Staff.class, guidOfStaff);
@@ -86,6 +66,25 @@ public class ActOfWayBillDifference extends DistributedObject {
     private String number;
     private Staff staff;
     private String guidOfStaff;
+    private Set<WayBill> wayBillInternal;
+    private Set<ActOfWayBillDifferencePosition> actOfWayBillDifferencePositionInternal;
+
+    public Set<ActOfWayBillDifferencePosition> getActOfWayBillDifferencePositionInternal() {
+        return actOfWayBillDifferencePositionInternal;
+    }
+
+    public void setActOfWayBillDifferencePositionInternal(
+            Set<ActOfWayBillDifferencePosition> actOfWayBillDifferencePositionInternal) {
+        this.actOfWayBillDifferencePositionInternal = actOfWayBillDifferencePositionInternal;
+    }
+
+    public Set<WayBill> getWayBillInternal() {
+        return wayBillInternal;
+    }
+
+    public void setWayBillInternal(Set<WayBill> wayBillInternal) {
+        this.wayBillInternal = wayBillInternal;
+    }
 
     public String getGuidOfStaff() {
         return guidOfStaff;

@@ -116,8 +116,6 @@ public class Fund extends DistributedObject {
 
     @Override
     public String toString() {
-        return "Fund{" +
-                "fundName='" + fundName + '\'' +
-                '}';
+        return String.format("Fund{fundName='%s'}", fundName);
     }
 }

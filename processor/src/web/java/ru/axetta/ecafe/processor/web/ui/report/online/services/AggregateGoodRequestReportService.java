@@ -1,7 +1,7 @@
 package ru.axetta.ecafe.processor.web.ui.report.online.services;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.RequestState;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.DocumentState;
 import ru.axetta.ecafe.processor.web.ui.org.OrgShortItem;
 import ru.axetta.ecafe.processor.web.ui.report.online.items.good.request.AggregateGoodRequestReportItem;
 import ru.axetta.ecafe.processor.web.ui.report.online.items.good.request.Commodity;
@@ -76,7 +76,7 @@ public class AggregateGoodRequestReportService {
                         + "                order by request.doneDate desc";
                 query = session.createQuery(sql);
                 query.setParameter("eduid", edu.getIdOfOrg());
-                query.setParameter("state", RequestState.FOLLOW);
+                query.setParameter("state", DocumentState.FOLLOW);
                 query.setParameter("startDate", startDate);
                 query.setParameter("endDate", endDate);
                 List requestsGoods = query.list();
@@ -92,7 +92,7 @@ public class AggregateGoodRequestReportService {
                         + "                order by request.doneDate desc";
                 query = session.createQuery(sql);
                 query.setParameter("eduid", edu.getIdOfOrg());
-                query.setParameter("state", RequestState.FOLLOW);
+                query.setParameter("state", DocumentState.FOLLOW);
                 query.setParameter("startDate", startDate);
                 query.setParameter("endDate", endDate);
                 List requestsProducts = query.list();
@@ -190,7 +190,7 @@ public class AggregateGoodRequestReportService {
                         + "                order by request.doneDate desc";
                 query = session.createQuery(sql);
                 query.setParameter("eduid", edu.getIdOfOrg());
-                query.setParameter("state", RequestState.FOLLOW);
+                query.setParameter("state", DocumentState.FOLLOW);
                 query.setParameter("startDate", startDate);
                 query.setParameter("endDate", endDate);
                 List requestsGoods = query.list();
@@ -206,7 +206,7 @@ public class AggregateGoodRequestReportService {
                         + "                order by request.doneDate desc";
                 query = session.createQuery(sql);
                 query.setParameter("eduid", edu.getIdOfOrg());
-                query.setParameter("state", RequestState.FOLLOW);
+                query.setParameter("state", DocumentState.FOLLOW);
                 query.setParameter("startDate", startDate);
                 query.setParameter("endDate", endDate);
                 List requestsProducts = query.list();

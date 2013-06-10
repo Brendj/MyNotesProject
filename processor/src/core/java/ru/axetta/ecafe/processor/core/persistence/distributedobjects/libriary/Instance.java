@@ -50,16 +50,7 @@ public class Instance extends DistributedObject {
     }
 
     @Override
-    protected void appendAttributes(Element element) {
-        //setAttribute(element, "GuidFund", fund.getGuid());
-        //setAttribute(element, "GuidPublication", publication.getGuid());
-        //setAttribute(element, "GuidInventaryBook", inventoryBook.getGuid());
-        //setAttribute(element, "GuidKsu1Record", ksu1Record.getGuid());
-        //setAttribute(element, "GuidKsu2Record", ksu2Record.getGuid());
-        //setAttribute(element, "InGroup", inGroup);
-        //setAttribute(element, "InvNumber", invNumber);
-        //setAttribute(element, "Cost", cost);
-    }
+    protected void appendAttributes(Element element) {}
 
     @Override
     public Instance parseAttributes(Node node) throws Exception {
@@ -88,36 +79,27 @@ public class Instance extends DistributedObject {
             DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication NOT_FOUND_VALUE");
             distributedObjectException.setData(guidPublication);
             throw  distributedObjectException;
-            //throw new DistributedObjectException("NOT_FOUND_VALUE");
         } else {
             setPublication(p);
         }
 
         Fund f = (Fund) DAOUtils.findDistributedObjectByRefGUID(session, guidFund);
-        if(f==null) {
-            //throw new DistributedObjectException("NOT_FOUND_VALUE");
-        } else {
+        if(f!=null) {
             setFund(f);
         }
 
         InventoryBook ib = (InventoryBook) DAOUtils.findDistributedObjectByRefGUID(session, guidInventaryBook);
-        if(ib==null){
-            //throw new DistributedObjectException("NOT_FOUND_VALUE");
-        } else {
+        if(ib!=null){
             setInventoryBook(ib);
         }
 
         Ksu1Record ksu1 = (Ksu1Record) DAOUtils.findDistributedObjectByRefGUID(session, guidKsu1Record);
-        if(ksu1==null){
-            //throw new DistributedObjectException("NOT_FOUND_VALUE");
-        } else {
+        if(ksu1!=null){
             setKsu1Record(ksu1);
         }
 
         Ksu2Record ksu2 = (Ksu2Record) DAOUtils.findDistributedObjectByRefGUID(session, guidKsu2Record);
-        if(ksu2==null) {
-            //throw new DistributedObjectException("NOT_FOUND_VALUE");
-        } else {
+        if(ksu2!=null) {
             setKsu2Record(ksu2);
         }
     }
@@ -129,7 +111,6 @@ public class Instance extends DistributedObject {
         setInventoryBook(((Instance) distributedObject).getInventoryBook());
         setKsu1Record(((Instance) distributedObject).getKsu1Record());
         setKsu2Record(((Instance) distributedObject).getKsu2Record());
-
         setInGroup(((Instance) distributedObject).isInGroup());
         setInvNumber(((Instance)distributedObject).getInvNumber());
         setCost(((Instance) distributedObject).getCost());
@@ -199,17 +180,12 @@ public class Instance extends DistributedObject {
         this.cost = cost;
     }
 
+
     @Override
     public String toString() {
-        return "Instance{" +
-                "publication=" + publication +
-                ", inGroup=" + inGroup +
-                ", fund=" + fund +
-                ", invNumber='" + invNumber + '\'' +
-                ", inventoryBook=" + inventoryBook +
-                ", ksu1Record=" + ksu1Record +
-                ", ksu2Record=" + ksu2Record +
-                ", cost=" + cost +
-                '}';
+        return String
+                .format("Instance{publication=%s, inGroup=%s, fund=%s, invNumber='%s', inventoryBook=%s, ksu1Record=%s, ksu2Record=%s, cost=%d, guidPublication='%s', guidFund='%s', guidInventaryBook='%s', guidKsu1Record='%s', guidKsu2Record='%s', issuableInternal=%s}",
+                        publication, inGroup, fund, invNumber, inventoryBook, ksu1Record, ksu2Record, cost,
+                        guidPublication, guidFund, guidInventaryBook, guidKsu1Record, guidKsu2Record, issuableInternal);
     }
 }

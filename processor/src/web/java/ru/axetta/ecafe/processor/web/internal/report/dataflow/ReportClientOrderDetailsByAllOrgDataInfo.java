@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.internal.report.dataflow;
 
 import javax.xml.bind.annotation.*;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,10 +17,10 @@ import java.util.List;
 @XmlType(name = "", propOrder = {
         "result",
         "code",
-        "tradeMaterialGoodList"
+        "clientOrderDetailsByAllOrgList"
 })
 @XmlRootElement(name = "Data")
-public class ReportDataInfo {
+public class ReportClientOrderDetailsByAllOrgDataInfo {
 
     @XmlElement
     protected String result;
@@ -29,9 +28,9 @@ public class ReportDataInfo {
     protected Long code;
 
     @XmlElement
-    protected TradeMaterialGoodList tradeMaterialGoodList;
+    protected ClientOrderDetailsByAllOrgList clientOrderDetailsByAllOrgList;
 
-    public ReportDataInfo() {}
+    public ReportClientOrderDetailsByAllOrgDataInfo() {}
 
 
     public String getResult() {
@@ -50,11 +49,11 @@ public class ReportDataInfo {
         this.code = code;
     }
 
-    public TradeMaterialGoodList getTradeMaterialGoodList() {
-        return tradeMaterialGoodList;
+    public ClientOrderDetailsByAllOrgList getClientOrderDetailsByAllOrgList() {
+        return clientOrderDetailsByAllOrgList;
     }
 
-    public void setTradeMaterialGoodList(TradeMaterialGoodList tradeMaterialGoodList) {
-        this.tradeMaterialGoodList = tradeMaterialGoodList;
+    public void setClientOrderDetailsByAllOrgList(ClientOrderDetailsByAllOrgList clientOrderDetailsByAllOrgList) {
+        this.clientOrderDetailsByAllOrgList = clientOrderDetailsByAllOrgList;
     }
 }

@@ -6,9 +6,9 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalDisposingDocumentPosition;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalIncomingDocumentPosition;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
@@ -28,7 +28,7 @@ import java.util.Set;
  */
 public class TradeMaterialGood extends DistributedObject {
 
-    public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
+    //public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
     private Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal;
     private Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal;
 
@@ -63,7 +63,7 @@ public class TradeMaterialGood extends DistributedObject {
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element,"GoodsCreationDate", getDateFormat().format(goodsCreationDate));
         setAttribute(element,"LifeTime", lifeTime);
-        setAttribute(element,"UnitsScale", unitsScale);
+        setAttribute(element,"UnitsScale", unitScale.ordinal());
         setAttribute(element,"TotalCount", totalCount);
         setAttribute(element,"NetWeight", netWeight);
         setAttribute(element,"SelfPrice", selfPrice);
@@ -80,7 +80,7 @@ public class TradeMaterialGood extends DistributedObject {
         Long longLifeTime = getLongAttributeValue(node, "LifeTime");
         if(longLifeTime != null) setLifeTime(longLifeTime);
         Integer integerUnitsScale = getIntegerAttributeValue(node,"UnitsScale");
-        if(integerUnitsScale != null) setUnitsScale(integerUnitsScale);
+        if(integerUnitsScale != null) setUnitScale(UnitScale.fromInteger(integerUnitsScale));
         Long longTotalCount = getLongAttributeValue(node, "TotalCount");
         if(longTotalCount != null) setTotalCount(longTotalCount);
         Long longNetWeight = getLongAttributeValue(node,"NetWeight");
@@ -99,7 +99,7 @@ public class TradeMaterialGood extends DistributedObject {
         setOrgOwner(((TradeMaterialGood) distributedObject).getOrgOwner());
         setGoodsCreationDate(((TradeMaterialGood) distributedObject).getGoodsCreationDate());
         setLifeTime(((TradeMaterialGood) distributedObject).getLifeTime());
-        setUnitsScale(((TradeMaterialGood) distributedObject).getUnitsScale());
+        setUnitScale(((TradeMaterialGood) distributedObject).getUnitScale());
         setTotalCount(((TradeMaterialGood) distributedObject).getTotalCount());
         setNetWeight(((TradeMaterialGood) distributedObject).getNetWeight());
         setSelfPrice(((TradeMaterialGood) distributedObject).getSelfPrice());
@@ -110,7 +110,7 @@ public class TradeMaterialGood extends DistributedObject {
     private String guidOfG;
     private Date goodsCreationDate;
     private Long lifeTime;
-    private Integer unitsScale;
+    private UnitScale unitScale;
     private Long totalCount;
     private Long netWeight;
     private Long selfPrice;
@@ -156,12 +156,12 @@ public class TradeMaterialGood extends DistributedObject {
         this.totalCount = totalCount;
     }
 
-    public Integer getUnitsScale() {
-        return unitsScale;
+    public UnitScale getUnitScale() {
+        return unitScale;
     }
 
-    public void setUnitsScale(Integer unitsScale) {
-        this.unitsScale = unitsScale;
+    public void setUnitScale(UnitScale unitsScale) {
+        this.unitScale = unitsScale;
     }
 
     public Long getLifeTime() {

@@ -377,7 +377,6 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             return;
         long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
         for (Item item : this.items) {
-            //clientsId.add(item.getIdOfClient());
             ClientGroup clientGroup = null;
             org.hibernate.Query q;
             if (item.getClientGroupName()!=null) {

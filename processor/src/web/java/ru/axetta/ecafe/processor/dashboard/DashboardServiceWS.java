@@ -36,9 +36,8 @@ public class DashboardServiceWS extends HttpServlet implements DashboardService 
         } catch (Exception e) {
             logger.error("error in dashboardServiceBean.getInfoForDashboard", e);
             result = null;
-        } finally {
-            return result;
         }
+        return result;
     }
 
 }

@@ -59,7 +59,6 @@ public class RetirementReason extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        //setAttribute(element, "Guid", guid);
         setAttribute(element, "RetirementReasonName", retirementReasonName);
     }
 
@@ -94,9 +93,7 @@ public class RetirementReason extends DistributedObject {
 
     @Override
     public String toString() {
-        return "RetirementReason{" +
-                "retirementReasonName='" + retirementReasonName + '\'' +
-                '}';
+        return String.format("RetirementReason{retirementReasonName='%s'}", retirementReasonName);
     }
 
     @Override

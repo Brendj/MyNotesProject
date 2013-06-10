@@ -2,7 +2,7 @@
 --! после финализации они уберутся
 --! Информация для разработчика -- информация для пользователя
 
--- Пакет обновлений 2.2.40
+-- Пакет обновлений 2.2.41
 --! Добавление колонок комплексов с 10 по 49 (фактически, с 11 по 50), необходимо для BenefitsRecalculationService
 alter table CF_DiscountRules add column Complex10                  INTEGER       NOT NULL DEFAULT 0;
 alter table CF_DiscountRules add column Complex11                  INTEGER       NOT NULL DEFAULT 0;
@@ -44,3 +44,5 @@ alter table CF_DiscountRules add column Complex46                  INTEGER      
 alter table CF_DiscountRules add column Complex47                  INTEGER       NOT NULL DEFAULT 0;
 alter table CF_DiscountRules add column Complex48                  INTEGER       NOT NULL DEFAULT 0;
 alter table CF_DiscountRules add column Complex49                  INTEGER       NOT NULL DEFAULT 0;
+
+--! ФИНАЛИЗИРОВАН (Кадыров, 130526) НЕ МЕНЯТЬ

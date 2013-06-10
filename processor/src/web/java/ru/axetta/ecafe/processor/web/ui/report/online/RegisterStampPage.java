@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicJasperReport;
+import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.RegisterStampReport;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
@@ -159,7 +160,8 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + RegisterStampReport.class.getSimpleName() + ".jasper";
         RegisterStampReport.Builder builder = new RegisterStampReport.Builder(templateFilename);
-        builder.setOrg(daoService.getOrg(this.org.getIdOfOrg()));
+        Org org = daoService.getOrg(this.org.getIdOfOrg());
+        builder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
         Session session = (Session) entityManager.getDelegate();
         try {
             RegisterStampReport registerStampReport = (RegisterStampReport) builder.build(session,start, end, localCalendar);

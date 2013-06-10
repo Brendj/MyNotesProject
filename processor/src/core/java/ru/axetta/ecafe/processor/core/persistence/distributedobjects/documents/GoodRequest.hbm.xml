@@ -35,7 +35,7 @@
         <property name="number" column="NumberOfGoodsRequest" type="string" length="128" not-null="true"/>
         <property name="state" column="State">
             <type name="org.hibernate.type.EnumType">
-                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.RequestState</param>
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.DocumentState</param>
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
             </type>
         </property>

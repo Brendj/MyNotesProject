@@ -93,9 +93,7 @@ public class Source extends DistributedObject {
 
     @Override
     public String toString() {
-        return "Source{" +
-                "sourceName='" + sourceName + '\'' +
-                '}';
+        return String.format("Source{sourceName='%s'}", sourceName);
     }
 
     @Override

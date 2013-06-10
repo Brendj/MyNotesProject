@@ -69,7 +69,7 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
         guidOfIDD = getStringAttributeValue(node,"GuidOfInternalDisposingDocument",36);
         guidOfTMG = getStringAttributeValue(node,"GuidOfTradeMaterialGoods",36);
         guidOfGood = getStringAttributeValue(node,"GuidOfGoods",36);
-        setSendAll(SendToAssociatedOrgs.DontSend);
+        setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
     }
 

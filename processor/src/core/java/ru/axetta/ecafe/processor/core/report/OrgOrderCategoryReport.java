@@ -232,7 +232,7 @@ public class OrgOrderCategoryReport extends BasicReportForOrgJob {
             }
         }
 
-        private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
+        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
                 Calendar calendar) throws Exception {
             List<Row> rows = new LinkedList<Row>();
 

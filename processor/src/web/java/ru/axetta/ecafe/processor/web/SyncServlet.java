@@ -68,7 +68,8 @@ public class SyncServlet extends HttpServlet {
                 //requestData = readRequestFromFile();  /* For tests only!!! */
             } catch (Exception e) {
                 logger.error("Failed to parse request", e);
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST,"Failed to parse request: "+e.getMessage());
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                        String.format("Failed to parse request: %s", e.getMessage()));
                 return;
             }
 
@@ -85,7 +86,8 @@ public class SyncServlet extends HttpServlet {
                 idOfSync = SyncRequest.Builder.getIdOfSync(namedNodeMap);
                 syncType = SyncRequest.Builder.getSyncType(namedNodeMap);
             } catch (Exception e) {
-                logger.error("Failed to extract required packet attribute [remote address: "+request.getRemoteAddr()+"]", e);
+                logger.error(String.format("Failed to extract required packet attribute [remote address: %s]",
+                        request.getRemoteAddr()), e);
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST,"Failed to extract required packet attribute [remote address: "+request.getRemoteAddr()+"]");
                 return;
             }
@@ -111,7 +113,7 @@ public class SyncServlet extends HttpServlet {
                 return;
             }
             /* Must be FALSE for testing!!!  */
-            boolean verifySignature = true;
+            boolean verifySignature = false;
             try {
                 if (verifySignature && !DigitalSignatureUtils.verify(publicKey, requestData.document)) {
                     logger.error(String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg));
@@ -143,7 +145,8 @@ public class SyncServlet extends HttpServlet {
                 syncRequest = null;
             } catch (Exception e) {
                 logger.error("Failed to process request", e);
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"Failed to serialize response: " + e.getMessage());
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        String.format("Failed to serialize response: %s", e.getMessage()));
                 return;
             }
 
@@ -155,7 +158,8 @@ public class SyncServlet extends HttpServlet {
                 DigitalSignatureUtils.sign(runtimeContext.getSyncPrivateKey(), responseDocument);
             } catch (Exception e) {
                 logger.error("Failed to serialize response", e);
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"Failed to serialize response: "+e.getMessage());
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                        String.format("Failed to serialize response: %s", e.getMessage()));
                 return;
             }
 

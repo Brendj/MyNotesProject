@@ -18,6 +18,8 @@
 
 <%--@elvariable id="configurationProviderListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderListPage"--%>
 <%--@elvariable id="configurationProviderEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderEditPage"--%>
+<%--@elvariable id="configurationProviderViewPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderViewPage"--%>
+<%--@elvariable id="configurationProviderDeletePage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderDeletePage"--%>
 <%--@elvariable id="selectedConfigurationProviderGroupPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.SelectedConfigurationProviderGroupPage"--%>
 <h:panelGrid id="configurationProviderEditPage" binding="#{configurationProviderListPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
@@ -49,12 +51,18 @@
             <a4j:commandLink ajaxSingle="true" styleClass="command-link"
                              oncomplete="#{rich:component('removedСonfigurationProviderItemDeletePanel')}.show()">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{configurationProvider.idOfConfigurationProvider}"
-                                             target="#{mainPage.removedConfigurationProviderItemId}" />
+                <f:setPropertyActionListener value="#{configurationProvider}"
+                                             target="#{configurationProviderDeletePage.configurationProvider}" />
             </a4j:commandLink>
 
         </rich:column>
 
     </rich:dataTable>
+
+</h:panelGrid>
+
+<h:panelGrid styleClass="borderless-grid">
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
 
 </h:panelGrid>

@@ -42,7 +42,8 @@ public class WayBillItem extends AbstractEntityItem<WayBill> {
         idOfWayBill = entity.getGlobalId();
         number = entity.getNumber();
         dateOfWayBill = entity.getDateOfWayBill();
-        state = WayBill.STATES[entity.getState()];
+        //state = WayBill.STATES[entity.getState()];
+        state = entity.getState().toString();
         if(entity.getShipper()!=null){
             shipperOrg = entityManager.find(Org.class, Long.parseLong(entity.getShipper()));
         }

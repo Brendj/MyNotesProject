@@ -4,9 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.goodRequest;
 
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.DocumentState;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequest;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.RequestState;
-import ru.axetta.ecafe.processor.core.utils.Base64;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -34,7 +33,7 @@ public class GoodRequestService {
     private EntityManager entityManager;
 
     @SuppressWarnings("unchecked")
-    public List<GoodRequest> findByFilter(Long idOfOrg, List<RequestState> stateList, Date startDate,Date endDate,  Integer deletedState){
+    public List<GoodRequest> findByFilter(Long idOfOrg, List<DocumentState> stateList, Date startDate,Date endDate,  Integer deletedState){
         Session session =  (Session) entityManager.getDelegate();
         Criteria criteria = session.createCriteria(GoodRequest.class);
         criteria.add(Restrictions.between("doneDate", startDate, endDate));

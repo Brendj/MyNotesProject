@@ -105,10 +105,9 @@ public class TypeOfAccompanyingDocument extends DistributedObject {
 
     @Override
     public String toString() {
-        return "TypeOfAccompanyingDocument{" +
-                "idOfTypeOfAccompanyingDocument=" + idOfTypeOfAccompanyingDocument +
-                ", typeOfAccompanyingDocumentName='" + typeOfAccompanyingDocumentName + '\'' +
-                '}';
+        return String
+                .format("TypeOfAccompanyingDocument{idOfTypeOfAccompanyingDocument=%d, typeOfAccompanyingDocumentName='%s'}",
+                        idOfTypeOfAccompanyingDocument, typeOfAccompanyingDocumentName);
     }
 
     @Override

@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.RequestState;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.DocumentState;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -68,13 +68,13 @@ public class GoodRequestsReport extends BasicReport {
             String stateCondition = " cf_goods_requests.deletedstate<>true and ";
             switch (requestsFilter) {
                 case 0:
-                    stateCondition = " cf_goods_requests.state=" + RequestState.CREATED.ordinal() + " AND ";
+                    stateCondition = " cf_goods_requests.state=" + DocumentState.CREATED.ordinal() + " AND ";
                     break;
                 case 1:
-                    stateCondition = " cf_goods_requests.state=" + RequestState.FOLLOW.ordinal() + " AND ";
+                    stateCondition = " cf_goods_requests.state=" + DocumentState.FOLLOW.ordinal() + " AND ";
                     break;
                 case 2:
-                    stateCondition = " cf_goods_requests.state=" + RequestState.COMPLETED.ordinal() + " AND ";
+                    stateCondition = " cf_goods_requests.state=" + DocumentState.COMPLETED.ordinal() + " AND ";
                     break;
                 default:
                     break;

@@ -190,7 +190,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
-        private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
+        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap, List<String> daysOfMonth) throws Exception {
             // хешмап для хранения записей отчета по айди клиенту
             HashMap<Long, ReportItem> mapItems = new HashMap<Long, ReportItem>();
@@ -229,7 +229,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             query.setParameter("idOfOrg", org.getIdOfOrg());
 
             List resultList = query.list();
-            int i = 1; // порядковый номер записи в отчете
+            int i = 1; // порядковый номер записи в отчете не используется, данное значение jasper сам генерирует
             for (Object o : resultList) {
                 Object vals[]=(Object[])o;
                 String firstname = (String)vals[0];

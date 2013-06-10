@@ -13,25 +13,25 @@ import java.util.HashMap;
  * Time: 11:13
  * To change this template use File | Settings | File Templates.
  */
-public enum RequestState{
+public enum DocumentState {
     CREATED("Создан"),
     FOLLOW("К исполнению"),
     COMPLETED("Выполнен");
 
     private String description;
 
-    static HashMap<String, RequestState> map = new HashMap<String, RequestState>();
+    static HashMap<String, DocumentState> map = new HashMap<String, DocumentState>();
     static {
-        for (RequestState requestState: RequestState.values()){
-            map.put(requestState.toString(),requestState);
+        for (DocumentState documentState : DocumentState.values()){
+            map.put(documentState.toString(), documentState);
         }
     }
 
-    private RequestState(String description) {
+    private DocumentState(String description) {
         this.description = description;
     }
 
-    public static RequestState parse(String s){
+    public static DocumentState parse(String s){
         return map.get(s);
     }
 

@@ -137,6 +137,12 @@ public class DAOUtils {
         return (Org) persistenceSession.load(Org.class, idOfOrg);
     }
 
+    public static Long getIdOfOrg(Session persistenceSession, long idOfOrg) throws Exception {
+        Query query = persistenceSession.createQuery("select idOfOrg from Org where idOfOrg=:idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        return (Long) query.uniqueResult();
+    }
+
     public static ClientPaymentOrder getClientPaymentOrderReference(Session persistenceSession,
             Long idOfClientPaymentOrder) throws Exception {
         return (ClientPaymentOrder) persistenceSession.load(ClientPaymentOrder.class, idOfClientPaymentOrder);
@@ -150,6 +156,12 @@ public class DAOUtils {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));
         return (Card) criteria.uniqueResult();
+    }
+
+    public static CardTemp findCardTempByCardNo(Session persistenceSession, long cardNo) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(CardTemp.class);
+        criteria.add(Restrictions.eq("cardNo", cardNo));
+        return (CardTemp) criteria.uniqueResult();
     }
 
     public static Client findClientByCardNo(EntityManager em, long cardNo) throws Exception {

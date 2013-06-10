@@ -14,9 +14,7 @@ import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Set;
 
 /**
@@ -60,7 +58,7 @@ public class GoodRequest extends DistributedObject {
         String stringNumber = getStringAttributeValue(node, "Number", 128);
         if(stringNumber != null) setNumber(stringNumber);
         Integer integerState = getIntegerAttributeValue(node,"State");
-        if(integerState != null) setState(RequestState.values()[integerState]);
+        if(integerState != null) setState(DocumentState.values()[integerState]);
         if(dateDateOfGoodsRequest!=null) setDateOfGoodsRequest(dateDateOfGoodsRequest);
         Date dateDoneDate = getDateTimeAttributeValue(node, "DoneDate");
         if(dateDoneDate!=null) setDoneDate(dateDoneDate);
@@ -87,20 +85,20 @@ public class GoodRequest extends DistributedObject {
     private String comment;
     private String guidOfStaff;
     private Staff staff;
-    private RequestState state;
+    private DocumentState state;
     private Set<StateChange> stateChangeInternal;
     private Set<GoodRequestPosition> goodRequestPositionInternal;
 
-    public RequestState getState() {
+    public DocumentState getState() {
         return state;
     }
 
-    public void setState(RequestState state) {
+    public void setState(DocumentState state) {
         this.state = state;
     }
 
     public void setIntState(Integer value) {
-        this.state = RequestState.values()[value];
+        this.state = DocumentState.values()[value];
     }
 
     public Integer getIntState() {

@@ -1,22 +1,15 @@
 package ru.axetta.ecafe.processor.web.ui.org.goodRequest;
 
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.DocumentState;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequest;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.RequestState;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.model.SelectItem;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -29,19 +22,19 @@ public class GoodRequestListPage extends BasicWorkspacePage {
     private Date baseDate = DateUtils.addMonths(new Date(), -1);
     private Date endDate = new Date();
     private Integer deletedState = 2;
-    private List<RequestState> stateList = new ArrayList<RequestState>();
+    private List<DocumentState> stateList = new ArrayList<DocumentState>();
     private Integer[] requestState;
     private SelectItem[] stateSelectItemList;
-    private static RequestState[] requestStates = RequestState.values();
+    private static DocumentState[] documentStates = DocumentState.values();
 
     @Autowired
     private GoodRequestService goodRequestService;
 
     @Override
     public void onShow() {
-        stateSelectItemList = new SelectItem[requestStates.length];
-        for (int i = 0; i < requestStates.length; i++) {
-            stateSelectItemList[i] = new SelectItem(i, requestStates[i].toString());
+        stateSelectItemList = new SelectItem[documentStates.length];
+        for (int i = 0; i < documentStates.length; i++) {
+            stateSelectItemList[i] = new SelectItem(i, documentStates[i].toString());
         }
         baseDate = DateUtils.addMonths(new Date(), -1);
         endDate = new Date();
@@ -62,7 +55,7 @@ public class GoodRequestListPage extends BasicWorkspacePage {
     public void reload() throws Exception{
         stateList.clear();
         for (Integer i: requestState){
-            stateList.add(RequestState.values()[i]);
+            stateList.add(DocumentState.values()[i]);
         }
         Calendar localCalendar = Calendar.getInstance();
         localCalendar.setTime(endDate);
@@ -106,8 +99,8 @@ public class GoodRequestListPage extends BasicWorkspacePage {
             } else {
                 filter.append(", только со статусами ");
             }
-            for (RequestState aStateList : stateList) {
-                filter.append("\"").append(requestStates[aStateList.ordinal()].toString()).append("\", ");
+            for (DocumentState aStateList : stateList) {
+                filter.append("\"").append(documentStates[aStateList.ordinal()].toString()).append("\", ");
             }
             filter = new StringBuffer().append(filter.substring(0, filter.length() - 2));
         }

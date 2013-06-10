@@ -161,8 +161,6 @@ public class Good extends DistributedObject {
         setUnitsScale(((Good)distributedObject).getUnitsScale());
     }
 
-    //public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
-
     private Set<TradeMaterialGood> tradeMaterialGoodInternal;
     private Set<ProhibitionExclusion> prohibitionExclusionInternal;
     private Set<Prohibition> prohibitionInternal;

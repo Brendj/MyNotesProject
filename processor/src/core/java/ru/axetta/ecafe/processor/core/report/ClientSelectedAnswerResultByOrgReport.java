@@ -146,7 +146,7 @@ public class ClientSelectedAnswerResultByOrgReport extends BasicReportForOrgJob 
         }
 
         /* TODO: переделать запрос используфя QuestionaryService как в отчете QuestionaryResultByOrgReport*/
-        private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
+        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             List<ClientSelectedAnswerReportItem> resultRows = new ArrayList<ClientSelectedAnswerReportItem>();
             Criteria clientOrgCriteria = session.createCriteria(Client.class);

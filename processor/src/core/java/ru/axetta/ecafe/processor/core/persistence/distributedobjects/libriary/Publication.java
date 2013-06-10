@@ -62,15 +62,13 @@ public class Publication extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        //Publication publication = (Publication) DAOUtils.findDistributedObjectByRefGUID(session, guid);
-        //if(!(publication==null || publication.getDeletedState() || guid.equals(publication.getGuid()))){
         if(!(isbn==null || isbn.isEmpty() || !validISBN)){
             Criteria criteria = session.createCriteria(Publication.class);
             criteria.add(Restrictions.eq("isbn",isbn));
             criteria.add(Restrictions.eq("validISBN",true));
             Publication publication = (Publication) criteria.uniqueResult();
             if(!(publication==null || publication.getDeletedState() || guid.equals(publication.getGuid()))){
-                DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication DATA_EXIST_VALUE");
+                DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication DATA_EXIST_VALUE isbn equals");
                 distributedObjectException.setData(publication.getGuid());
                 throw  distributedObjectException;
             }
@@ -79,7 +77,7 @@ public class Publication extends DistributedObject {
             criteria.add(Restrictions.eq("hash",hash));
             Publication publication = (Publication) criteria.uniqueResult();
             if(!(publication==null || publication.getDeletedState() || guid.equals(publication.getGuid()))){
-                DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication DATA_EXIST_VALUE");
+                DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication DATA_EXIST_VALUE hash equals");
                 distributedObjectException.setData(publication.getGuid());
                 throw  distributedObjectException;
             }
@@ -128,7 +126,6 @@ public class Publication extends DistributedObject {
     protected Publication parseAttributes(Node node) throws Exception {
 
         String data = getStringAttributeValue(node, "Data", 65536);
-        //String decodedString = new String(Base64AndZip.decodeAndUngzip(data.getBytes()), "UTF-8");
         DataInputStream dataInputStream = new DataInputStream(
                 new ByteArrayInputStream(Base64AndZip.decode(data.getBytes())));
         Record record = new Record(dataInputStream);
@@ -238,14 +235,8 @@ public class Publication extends DistributedObject {
 
     @Override
     public String toString() {
-        return "Publication{" +
-                "isbn='" + isbn + '\'' +
-                ", author='" + author + '\'' +
-                ", title='" + title + '\'' +
-                ", title2='" + title2 + '\'' +
-                ", publicationdate='" + publicationdate + '\'' +
-                ", publisher='" + publisher + '\'' +
-                ", hash='" + hash + '\'' +
-                '}';
+        return String
+                .format("Publication{isbn='%s', author='%s', title='%s', title2='%s', publicationdate='%s', publisher='%s', hash='%d'}",
+                        isbn, author, title, title2, publicationdate, publisher, hash);
     }
 }

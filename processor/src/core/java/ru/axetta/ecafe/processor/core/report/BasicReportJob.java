@@ -53,7 +53,7 @@ public abstract class BasicReportJob extends BasicJasperReport {
 
     public static abstract class Builder {
         protected Contragent contragent;
-        protected Org org;
+        protected OrgShortItem org;
         
         Properties reportProperties;
 
@@ -73,17 +73,69 @@ public abstract class BasicReportJob extends BasicJasperReport {
             this.contragent = contragent;
         }
 
-        public Org getOrg() {
+        public OrgShortItem getOrg() {
             return org;
         }
 
-        public void setOrg(Org org) {
+        public void setOrg(OrgShortItem org) {
             this.org = org;
         }
 
         public abstract BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar)
                         throws Exception;
     }
+
+    public static class OrgShortItem {
+
+        private Long idOfOrg;
+        private String shortName;
+        private String officialName;
+        private Boolean selected = false;
+
+        public OrgShortItem() {
+            selected = false;
+        }
+
+        public OrgShortItem(Long idOfOrg, String shortName, String officialName) {
+            this.idOfOrg = idOfOrg;
+            this.shortName = shortName;
+            this.officialName = officialName;
+        }
+
+        public Long getIdOfOrg() {
+            return idOfOrg;
+        }
+
+        public void setIdOfOrg(Long idOfOrg) {
+            this.idOfOrg = idOfOrg;
+        }
+
+        public String getShortName() {
+            return shortName;
+        }
+
+        public void setShortName(String shortName) {
+            this.shortName = shortName;
+        }
+
+        public String getOfficialName() {
+            return officialName;
+        }
+
+        public void setOfficialName(String officialName) {
+            this.officialName = officialName;
+        }
+
+        public Boolean getSelected() {
+            return selected;
+        }
+
+        public void setSelected(Boolean selected) {
+            this.selected = selected;
+        }
+    }
+
+
 
     public abstract AutoReportRunner getAutoReportRunner();
 

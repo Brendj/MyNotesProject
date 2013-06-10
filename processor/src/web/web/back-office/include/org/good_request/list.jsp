@@ -34,7 +34,7 @@
                 </h:selectOneMenu>
 
                 <h:outputText value="Выводить только со статусами" styleClass="output-text" escape="true"/>
-                <h:selectManyListbox id="selectStateMenu" value="#{goodRequestListPage.requestState}">
+                <h:selectManyListbox id="selectStateMenu" value="#{goodRequestListPage.documentState}">
                     <f:selectItems value="#{goodRequestListPage.stateSelectItemList}"/>
                 </h:selectManyListbox>
 

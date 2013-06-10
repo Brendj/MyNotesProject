@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.daoservices.order;
 
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.ClientReportItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.PartGroupItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampItem;
@@ -107,6 +108,48 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
         query.setResultTransformer(Transformers.aliasToBean(GoodItem.class));
         return  (List<GoodItem>) query.list();
+    }
+
+    public List<ClientReportItem> fetchClientReportItem(Date startDate, Date endDate){
+
+        String sql = "select client.contractid, "
+                + " peroson.firstname || ' ' || peroson.secondname || ' ' || peroson.surname, "
+                + " detail.menuorigin, detail.menudetailname, "
+                + " (ord.sumbycard - detail.discount) * detail.qty as subsum, ord.sumbycard, "
+                + " detail.discount, detail.qty  FROM  cf_orderdetails as detail"
+                + " left join cf_orders as ord on ord.idoforg=detail.idoforg AND ord.idoforder = detail.idoforder"
+                + " left join cf_clients as client on ord.idofclient = client.idofclient   "
+                + " left join cf_persons as peroson on peroson.idofperson = client.idofperson WHERE "
+                + " ord.createddate>=:startTime AND ord.createddate<=:endTime AND "
+                + " ord.sumbycard>0 and detail.menutype>=:mintype and detail.menutype<=:maxtype "
+                + " and (ord.sumbycard - detail.discount) * detail.qty>0";
+        Query query = getSession().createSQLQuery(sql);
+        //Query query = getSession().createSQLQuery("SELECT cf_orderdetails.idoforderdetail, cf_clients.contractid, cf_persons.firstname || ' ' || cf_persons.secondname || ' ' || cf_persons.surname, "
+        //        + " cf_orderdetails.menuorigin, cf_orderdetails.menudetailname, cf_orders.sumbycard, cf_orderdetails.discount, cf_orderdetails.qty "
+        //        + " FROM  public.cf_clients, public.cf_persons, public.cf_orders, public.cf_orderdetails "
+        //        + " WHERE (cf_orders.createddate>=:startTime AND cf_orders.createddate<=:endTime AND cf_orders.idoforg=cf_orderdetails.idoforg  AND "
+        //        + " cf_orders.idoforder = cf_orderdetails.idoforder AND cf_orders.idofclient = cf_clients.idofclient AND cf_persons.idofperson = cf_clients.idofperson "
+        //        + "and cf_orders.sumbycard>0 and orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype);");
+        query.setParameter("startTime", startDate.getTime());
+        query.setParameter("endTime", endDate.getTime());
+        query.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        List list = query.list();
+        List<ClientReportItem> clientReportItems = new LinkedList<ClientReportItem>();
+        for (Object row : list) {
+            Object[] sale = (Object[]) row;
+            Long idOfOrderDetail = Long.parseLong(sale[0].toString());
+            Long contractId = Long.parseLong(sale[1].toString());
+            String fullName = sale[2].toString();
+            Integer menuOrigin = (Integer) sale[3];
+            String menuName = sale[4].toString();
+            Float price = Float.parseFloat(sale[5].toString()) / 100;
+            Float discount = Float.parseFloat(sale[6].toString()) / 100;
+            Integer quantity = (Integer) sale[7];
+            Float totalDetailSum = (price - discount) * quantity;
+            clientReportItems.add(new ClientReportItem(idOfOrderDetail, contractId, fullName, menuName, OrderDetail.getMenuOriginAsString(menuOrigin), totalDetailSum));
+        }
+        return clientReportItems;
     }
 
 }

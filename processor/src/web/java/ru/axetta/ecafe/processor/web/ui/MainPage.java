@@ -7542,7 +7542,6 @@ public User getCurrentUser() throws Exception {
         return null;
     }
 
-
     public Object showTechnologicalMapGroupPage() {
         currentWorkspacePage = technologicalMapGroupPage;
         updateSelectedMainMenu();

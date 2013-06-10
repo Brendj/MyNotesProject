@@ -24,6 +24,8 @@ public interface CardManager {
     Long createCard(Long idOfClient, long cardNo, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, Long cardPrintedNo) throws Exception;
 
+    void createTempCard(Long idOfClient, long cardNo, String cardPrintedNo) throws Exception;
+
     void updateCard(Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, String externalId) throws Exception;
 

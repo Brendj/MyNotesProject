@@ -44,13 +44,7 @@ public class Journal extends DistributedObject {
     }
 
     @Override
-    protected void appendAttributes(Element element) {
-        //setAttribute(element, "GuidFund", fund.getGuid());
-        //setAttribute(element, "GuidPublication", publication.getGuid());
-        //setAttribute(element, "IsNewspaper", isNewspaper);
-        //setAttribute(element, "MonthCount", monthCount);
-        //setAttribute(element, "Count", count);
-    }
+    protected void appendAttributes(Element element) {}
 
     @Override
     public Journal parseAttributes(Node node) throws Exception {
@@ -76,12 +70,10 @@ public class Journal extends DistributedObject {
             DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication NOT_FOUND_VALUE");
             distributedObjectException.setData(guidPublication);
             throw  distributedObjectException;
-            //throw new DistributedObjectException("NOT_FOUND_VALUE");
         }
         setPublication(p);
 
         Fund f = (Fund) DAOUtils.findDistributedObjectByRefGUID(session, guidFund);
-        //if(f==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         if(f!=null) setFund(f);
     }
 
@@ -137,12 +129,8 @@ public class Journal extends DistributedObject {
 
     @Override
     public String toString() {
-        return "Journal{" +
-                "fund=" + fund +
-                ", publication=" + publication +
-                ", isNewspaper=" + isNewspaper +
-                ", monthCount=" + monthCount +
-                ", count=" + count +
-                '}';
+        return String
+                .format("Journal{fund=%s, publication=%s, isNewspaper=%s, monthCount=%d, count=%d}", fund, publication,
+                        isNewspaper, monthCount, count);
     }
 }

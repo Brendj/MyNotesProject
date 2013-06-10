@@ -54,25 +54,16 @@ public class Ksu1Record extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException{
-        //DAOService daoService = DAOService.getInstance();
-        //setAccompanyingDocument(
-        //        daoService.findDistributedObjectByRefGUID(AccompanyingDocument.class, guidAccompanyingDocument));
         AccompanyingDocument ad = (AccompanyingDocument) DAOUtils.findDistributedObjectByRefGUID(session, guidAccompanyingDocument);
         if(ad==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setAccompanyingDocument(ad);
-        //setFund(daoService.findDistributedObjectByRefGUID(Fund.class, guidFund));
         Fund f = (Fund) DAOUtils.findDistributedObjectByRefGUID(session, guidFund);
         if(f==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setFund(f);
     }
 
     @Override
-    protected void appendAttributes(Element element) {
-        //setAttribute(element, "GuidFund", guidFund);
-        //setAttribute(element, "GuidAccompanyingDocument", guidAccompanyingDocument);
-        //setAttribute(element, "IncomeDate", incomeDate);
-        //setAttribute(element, "RecordNumber", recordNumber);
-    }
+    protected void appendAttributes(Element element) {}
 
     @Override
     public Ksu1Record parseAttributes(Node node) throws Exception {
@@ -130,11 +121,8 @@ public class Ksu1Record extends DistributedObject {
 
     @Override
     public String toString() {
-        return "Ksu1Record{" +
-                "recordNumber=" + recordNumber +
-                ", fund=" + fund +
-                ", incomeDate=" + incomeDate +
-                ", accompanyingDocument=" + accompanyingDocument +
-                '}';
+        return String
+                .format("Ksu1Record{recordNumber=%d, fund=%s, incomeDate=%s, accompanyingDocument=%s}", recordNumber,
+                        fund, incomeDate, accompanyingDocument);
     }
 }

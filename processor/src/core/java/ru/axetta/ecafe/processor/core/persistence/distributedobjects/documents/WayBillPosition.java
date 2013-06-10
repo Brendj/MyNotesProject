@@ -74,7 +74,7 @@ public class WayBillPosition extends DistributedObject {
         if(longNDS != null) setNds(longNDS);
         guidOfG = getStringAttributeValue(node,"GuidOfGoods",36);
         guidOfWB = getStringAttributeValue(node,"GuidOfWayBill",36);
-        setSendAll(SendToAssociatedOrgs.SendToAll);
+        setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
     }
 
@@ -195,14 +195,6 @@ public class WayBillPosition extends DistributedObject {
     public Long getTotalCount() {
         return totalCount;
     }
-
-    //public String getTotalCountPattern(){
-    //    if(unitsScale>1){
-    //        return "#0";
-    //    } else {
-    //        return "#0.000";
-    //    }
-    //}
 
     public void setTotalCount(Long totalCount) {
         this.totalCount = totalCount;

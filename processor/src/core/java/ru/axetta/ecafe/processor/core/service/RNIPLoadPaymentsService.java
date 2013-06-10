@@ -81,7 +81,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 @Component
 @Scope("singleton")
-    public class RNIPLoadPaymentsService {
+public class RNIPLoadPaymentsService {
 
     /**
      * Файл с документом для подписи.

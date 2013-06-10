@@ -50,8 +50,6 @@ public class LibVisit extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException{
-        //DAOService daoService = DAOService.getInstance();
-        //setClient(daoService.findClientById(idOfClient));
         if (idOfClient != null) {
             try{
                 setClient(DAOUtils.findClient(session, idOfClient));
@@ -94,10 +92,6 @@ public class LibVisit extends DistributedObject {
 
     @Override
     public String toString() {
-        return "LibVisit{" +
-                "client=" + client +
-                ", date=" + date +
-                ", source=" + source +
-                '}';
+        return String.format("LibVisit{client=%s, date=%s, source=%d}", client, date, source);
     }
 }

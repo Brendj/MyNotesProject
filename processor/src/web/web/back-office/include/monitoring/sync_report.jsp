@@ -39,20 +39,23 @@
                         columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
             <f:facet name="header">
                 <rich:columnGroup>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                    <rich:column headerClass="center-aligned-column" rowspan="2" colspan="1">
                         <h:outputText styleClass="column-header" escape="true" value="№" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="Номер учреждения" />
+                    <rich:column headerClass="center-aligned-column" rowspan="1" colspan="2">
+                        <h:outputText styleClass="column-header" escape="true" value="Учреждение" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText styleClass="column-header" escape="true" value="Название учреждения" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                    <rich:column headerClass="center-aligned-column" rowspan="2" colspan="1">
                         <h:outputText styleClass="column-header" escape="true" value="Время начала синхронизации" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" rowspan="2">
+                    <rich:column headerClass="center-aligned-column" rowspan="2" colspan="1">
                         <h:outputText styleClass="column-header" escape="true" value="Время завершения синхронизации" />
+                    </rich:column>
+                    <rich:column breakBefore="true" headerClass="center-aligned-column" rowspan="1" colspan="1">
+                        <h:outputText styleClass="column-header" escape="true" value="Идентификатор" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" rowspan="1" colspan="1">
+                        <h:outputText styleClass="column-header" escape="true" value="Наименование" />
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>

@@ -72,12 +72,12 @@ public class ReportOnNutritionByWeekReport extends BasicReportForOrgJob {
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
-        private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
+        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap, List<String> daysOfMonth) throws Exception {
             ClientDAOService clientDAOService = new ClientDAOService();
             clientDAOService.setSession(session);
             List<ReportOnNutritionResultItem> returnItems = new ArrayList<ReportOnNutritionResultItem>();
-            List<ReportOnNutritionItem> items = clientDAOService.generateReportOnNutritionByWeekReport(org, startTime, endTime);
+            List<ReportOnNutritionItem> items = clientDAOService.generateReportOnNutritionByWeekReport(org.getIdOfOrg(), startTime, endTime);
             List<ReportOnNutritionResultItem> resultItems = new ArrayList<ReportOnNutritionResultItem>();
             for (ReportOnNutritionItem clientsGroupInWeekItem: items){
                 ReportOnNutritionResultItem temp = new ReportOnNutritionResultItem(clientsGroupInWeekItem,startTime,endTime);

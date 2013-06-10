@@ -36,9 +36,9 @@
             </h:outputLink>
         </h:panelGrid>
     </h:panelGrid>
-    <h:panelGrid styleClass="borderless-grid">
-        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
+    <h:panelGrid styleClass="borderless-grid">
         <rich:simpleTogglePanel label="Ручной запуск" switchType="client"
                                 opened="false" headerClass="filter-panel-header">
             <h:panelGrid styleClass="borderless-grid" columns="2">
@@ -46,11 +46,6 @@
                 <rich:calendar value="#{mainPage.reportJobViewPage.generateStartDate}" popup="true"/>
                 <h:outputText value="Дата выборки до:" styleClass="output-text"/>
                 <rich:calendar value="#{mainPage.reportJobViewPage.generateEndDate}" popup="true"/>
-                <a4j:status id="reportGenerateStatus">
-                    <f:facet name="start">
-                        <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
-                    </f:facet>
-                </a4j:status>
             </h:panelGrid>
             <rich:spacer width="20"/>
             <a4j:commandButton value="Запустить сейчас" action="#{mainPage.reportJobViewPage.triggerJob}"

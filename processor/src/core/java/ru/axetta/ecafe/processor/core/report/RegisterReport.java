@@ -176,7 +176,7 @@ public class RegisterReport extends BasicReportForOrgJob {
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
-        private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
+        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             HashMap<Integer, RegisterReportItem> mapItems = new HashMap<Integer, RegisterReportItem>(31);
             List<RegisterReportItem> resultRows = new LinkedList<RegisterReportItem>();

@@ -44,9 +44,9 @@ public class FrontController extends HttpServlet {
     }
 
     @Resource
-    WebServiceContext wsContext;
+    private WebServiceContext wsContext;
 
-    final Logger logger = LoggerFactory.getLogger(FrontController.class);
+    private final Logger logger = LoggerFactory.getLogger(FrontController.class);
 
     @WebMethod(operationName = "test")
     public String test(@WebParam(name = "orgId") Long orgId)
@@ -54,6 +54,21 @@ public class FrontController extends HttpServlet {
         checkRequestValidity(orgId);
         return "OK";
     }
+
+    @WebMethod(operationName = "registerTempCard")
+    public void registerTempCard(@WebParam(name = "orgId") Long idOfOrg,@WebParam(name = "cardNo") Long cardNo, @WebParam(name = "cardPrintedNo") String cardPrintedNo)
+            throws FrontControllerException {
+        //checkRequestValidity(idOfOrg);
+        ///
+        try {
+            RuntimeContext.getInstance().getCardManager().createTempCard(idOfOrg, cardNo, cardPrintedNo);
+        } catch (Exception e) {
+            logger.error("Failed registerTempCard", e);
+            throw new FrontControllerException(
+                    String.format("Ошибка при регистрации времменой карты: %s", e.getMessage()), e);
+        }
+    }
+
     @WebMethod(operationName = "registerCard")
     public Long registerCard(@WebParam(name = "orgId") Long orgId, @WebParam(name = "clientId") Long clientId,
             @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "cardPrintedNo") Long cardPrintedNo,
@@ -66,7 +81,7 @@ public class FrontController extends HttpServlet {
                     validTime, Card.ISSUED_LIFE_STATE, null, issuedTime, cardPrintedNo);
         } catch (Exception e) {
             logger.error("Failed registerCard", e);
-            throw new FrontControllerException("Ошибка при регистрации карты: "+e.getMessage(), e);
+            throw new FrontControllerException(String.format("Ошибка при регистрации карты: %s", e.getMessage()), e);
         }
     }
 
@@ -164,14 +179,15 @@ public class FrontController extends HttpServlet {
         //X509Certificate cert = (X509Certificate)((WSSecurityEngineResult)wsContext.getMessageContext().get(WSS4JInInterceptor.SIGNATURE_RESULT)).get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
         if (cert==null || cert.length==0) throw new FrontControllerException("В запросе нет валидных сертификатов");
         Org org = DAOService.getInstance().getOrg(orgId);
-        if (org==null) throw new FrontControllerException("Неизвестная организация: "+orgId);
+        if (org==null) throw new FrontControllerException(String.format("Неизвестная организация: %d", orgId));
         PublicKey publicKey = null;
         try {
             publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
         } catch (Exception e) {
             throw new FrontControllerException("Внутренняя ошибка", e);
         }
-        if (!publicKey.equals(cert[0].getPublicKey())) throw new FrontControllerException("Ключ сертификата невалиден: "+orgId);
+        if (!publicKey.equals(cert[0].getPublicKey())) throw new FrontControllerException(
+                String.format("Ключ сертификата невалиден: %d", orgId));
     }
     
     @WebMethod(operationName = "generateLinkingToken")
@@ -182,10 +198,10 @@ public class FrontController extends HttpServlet {
         DAOService daoService = DAOService.getInstance();
         Client client = daoService.findClientById(idOfClient);
         if (client==null) {
-            throw new FrontControllerException("Клиент не найден: "+idOfClient);
+            throw new FrontControllerException(String.format("Клиент не найден: %d", idOfClient));
         }
         if (!daoService.doesClientBelongToFriendlyOrgs(orgId, idOfClient)) {
-            throw new FrontControllerException("Клиент "+idOfClient+" не принадлежит организации");
+            throw new FrontControllerException(String.format("Клиент %d не принадлежит организации", idOfClient));
         }
         LinkingToken linkingToken = daoService.generateLinkingToken(client);
         return linkingToken.getToken();

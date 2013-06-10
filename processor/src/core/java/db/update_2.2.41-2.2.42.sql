@@ -1,0 +1,25 @@
+--! Пока скрипт не винализирован рекоментовано писать очистку добавляемых колонок таблиц.
+--! после финализации они уберутся
+--! Информация для разработчика -- информация для пользователя
+
+-- Пакет обновлений 2.2.42
+-- Таблица регистрации временных карт
+-- CREATE TABLE cf_cards_temp (
+--   IdOfCartTemp bigserial,
+--   CardNo bigint NOT NULL,              --! номер карты
+--   IdOfOrg bigint NOT NULL,             --! идентификатор организациии
+--   CardPrintedNo character varying(24),   --! номер нанесенный на карту
+--   CONSTRAINT CardNo_Unique UNIQUE (CardNo)
+-- );
+--
+-- CREATE TABLE cf_synchistory_exceptions
+-- (
+--   idofsynchistoryexception bigserial NOT NULL,
+--   idoforg bigint NOT NULL,
+--   idofsync bigint NOT NULL,
+--   message character varying(512) NOT NULL,
+--   CONSTRAINT cf_synchistory_exceptions_pk PRIMARY KEY (idofsynchistoryexception),
+--   CONSTRAINT cf_synchistory_exceptions_organization FOREIGN KEY (idoforg) REFERENCES cf_orgs (idoforg),
+--   CONSTRAINT cf_synchistory_exceptions_sync FOREIGN KEY (idofsync) REFERENCES cf_synchistory (idofsync)
+-- );
+

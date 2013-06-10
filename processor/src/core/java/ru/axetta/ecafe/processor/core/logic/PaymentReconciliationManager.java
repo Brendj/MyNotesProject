@@ -22,7 +22,7 @@ import java.util.*;
 @Scope("singleton")
 public class PaymentReconciliationManager {
     @PersistenceContext
-    EntityManager em;
+    private EntityManager em;
     
     public static class RegistryItem {
         String dt;
@@ -32,8 +32,12 @@ public class PaymentReconciliationManager {
         
         public String getDifferencesAsString(PaymentItem pi) {
             String info="";
-            if (pi.sum!=sum) info+="Отличаются суммы: "+pi.sum+"/"+sum+";";
-            if (pi.contractId!=contractId) info+="Отличаются номера л/с: "+pi.contractId+"/"+contractId+";";
+            if (pi.sum!=sum) {
+                info= String.format("%sОтличаются суммы: %d/%d;", info, pi.sum, sum);
+            }
+            if (pi.contractId!=contractId) {
+                info= String.format("%sОтличаются номера л/с: %d/%d;", info, pi.contractId, contractId);
+            }
             return info;
         }
 
@@ -46,12 +50,8 @@ public class PaymentReconciliationManager {
 
         @Override
         public String toString() {
-            return "Запись_реестра{" +
-                    "время=" + dt +
-                    ", сумма=" + sum +
-                    ", лицевой счет=" + contractId +
-                    ", ид. платежа='" + idOfPayment + '\'' +
-                    '}';
+            return String.format("Запись_реестра{время=%s, сумма=%d, лицевой счет=%d, ид. платежа='%s'}", dt, sum,
+                    contractId, idOfPayment);
         }
     }
     public static class PaymentItem {
@@ -61,12 +61,8 @@ public class PaymentReconciliationManager {
         String idOfPayment;
         @Override
         public String toString() {
-            return "Запись_базы{" +
-                    "время=" + CalendarUtils.dateTimeToString(dt) +
-                    ", сумма=" + sum +
-                    ", лицевой счет=" + contractId +
-                    ", ид. платежа='" + idOfPayment + '\'' +
-                    '}';
+            return String.format("Запись_базы{время=%s, сумма=%d, лицевой счет=%d, ид. платежа='%s'}",
+                    CalendarUtils.dateTimeToString(dt), sum, contractId, idOfPayment);
         }
     }
     
@@ -99,13 +95,14 @@ public class PaymentReconciliationManager {
         @Override
         public String toString() {
             if (type==TYPE_REGISTRY_ITEM_NOT_FOUND) {
-                return "Не найдена запись реестра: "+registryItem;
+                return String.format("Не найдена запись реестра: %s", registryItem);
             }
             else if (type==TYPE_ATTRIBUTES_DIFFER) {
-                return "Различаются атрибуты: "+registryItem+"/"+paymentItem+": "+registryItem.getDifferencesAsString(paymentItem);
+                return String.format("Различаются атрибуты: %s/%s: %s", registryItem, paymentItem,
+                        registryItem.getDifferencesAsString(paymentItem));
             }
             else if (type==TYPE_CLIENT_PAYMENT_MISSING) {
-                return "Запись в базе не найдена в реестре: "+paymentItem;
+                return String.format("Запись в базе не найдена в реестре: %s", paymentItem);
             }
             return "Неизвестно";
         }
@@ -115,11 +112,11 @@ public class PaymentReconciliationManager {
     public LinkedList<Difference> processRegistry(long idOfContragentAgent, Long idOfContragentTsp, Date dtFrom, Date dtTo,
             List<RegistryItem> registryItems) throws Exception {
         Contragent ca = em.find(Contragent.class, idOfContragentAgent);
-        if (ca==null) throw new Exception("Контрагент не найден: "+idOfContragentAgent);
+        if (ca==null) throw new Exception(String.format("Контрагент не найден: %d", idOfContragentAgent));
         Contragent caReceiver = null;
         if (idOfContragentTsp!=null) {
             caReceiver = em.find(Contragent.class, idOfContragentTsp);
-            if (caReceiver==null) throw new Exception("Контрагент не найден: "+idOfContragentTsp);
+            if (caReceiver==null) throw new Exception(String.format("Контрагент не найден: %d", idOfContragentTsp));
         }
 
         List<Object[]> clientPayments = DAOUtils.getClientPaymentsDataForPeriod(em, dtFrom, dtTo, caReceiver);

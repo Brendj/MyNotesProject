@@ -365,6 +365,11 @@
         <location>/sessionexpired.jsp</location>
     </error-page>
 
+    <error-page>
+        <error-code>408</error-code>
+        <location>/sessionexpired.jsp</location>
+    </error-page>
+
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>/WEB-INF/services-app.xml</param-value>

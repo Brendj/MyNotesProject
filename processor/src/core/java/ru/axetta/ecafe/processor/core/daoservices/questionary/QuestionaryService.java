@@ -48,9 +48,9 @@ public class QuestionaryService {
     private QuestionaryDAOService service;
 
     @SuppressWarnings("unchecked")
-    public List<ClientAnswerByQuestionaryItem> generateReportByQuestionaryResultByOrg(Session session, Org org){
+    public List<ClientAnswerByQuestionaryItem> generateReportByQuestionaryResultByOrg(Session session, Long idOfOrg){
         Criteria criteria = session.createCriteria(ClientAnswerByQuestionary.class);
-        criteria.createAlias("client","cl").add(Restrictions.eq("cl.org",org));
+        criteria.createAlias("client","cl").createAlias("cl.org","organization").add(Restrictions.eq("organization.idOfOrg",idOfOrg));
         criteria.createAlias("answer", "a");
         criteria.createAlias("a.questionary","q");
         criteria.setProjection(Projections.projectionList()

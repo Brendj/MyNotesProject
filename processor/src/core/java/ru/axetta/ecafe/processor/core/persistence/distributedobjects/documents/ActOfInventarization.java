@@ -22,25 +22,6 @@ import java.util.Set;
  */
 public class ActOfInventarization extends DistributedObject {
 
-    private Set<InternalIncomingDocument> internalIncomingDocumentInternal;
-    private Set<InternalDisposingDocument> InternalDisposingDocumentInternal;
-
-    public Set<InternalDisposingDocument> getInternalDisposingDocumentInternal() {
-        return InternalDisposingDocumentInternal;
-    }
-
-    public void setInternalDisposingDocumentInternal(Set<InternalDisposingDocument> internalDisposingDocumentInternal) {
-        InternalDisposingDocumentInternal = internalDisposingDocumentInternal;
-    }
-
-    public Set<InternalIncomingDocument> getInternalIncomingDocumentInternal() {
-        return internalIncomingDocumentInternal;
-    }
-
-    public void setInternalIncomingDocumentInternal(Set<InternalIncomingDocument> internalIncomingDocumentInternal) {
-        this.internalIncomingDocumentInternal = internalIncomingDocumentInternal;
-    }
-
     @Override
     protected void appendAttributes(Element element) {
         setAttribute(element, "OrgOwner", orgOwner);
@@ -74,6 +55,24 @@ public class ActOfInventarization extends DistributedObject {
     private Date dateOfAct;
     private String number;
     private String commission;
+    private Set<InternalIncomingDocument> internalIncomingDocumentInternal;
+    private Set<InternalDisposingDocument> InternalDisposingDocumentInternal;
+
+    public Set<InternalDisposingDocument> getInternalDisposingDocumentInternal() {
+        return InternalDisposingDocumentInternal;
+    }
+
+    public void setInternalDisposingDocumentInternal(Set<InternalDisposingDocument> internalDisposingDocumentInternal) {
+        InternalDisposingDocumentInternal = internalDisposingDocumentInternal;
+    }
+
+    public Set<InternalIncomingDocument> getInternalIncomingDocumentInternal() {
+        return internalIncomingDocumentInternal;
+    }
+
+    public void setInternalIncomingDocumentInternal(Set<InternalIncomingDocument> internalIncomingDocumentInternal) {
+        this.internalIncomingDocumentInternal = internalIncomingDocumentInternal;
+    }
 
     public String getCommission() {
         return commission;

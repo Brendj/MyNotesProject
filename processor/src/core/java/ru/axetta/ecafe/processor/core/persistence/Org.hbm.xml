@@ -79,6 +79,11 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.SyncHistory"/>
         </set>
 
+        <!--<set name="syncHistoriesExceptionInternal" inverse="true" cascade="all">-->
+            <!--<key column="IdOfOrg"/>-->
+            <!--<one-to-many class="ru.axetta.ecafe.processor.core.persistence.SyncHistoryException"/>-->
+        <!--</set>-->
+
         <set name="ordersInternal" inverse="true" cascade="all">
             <key column="IdOfOrg"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Order"/>

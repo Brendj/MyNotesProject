@@ -117,11 +117,7 @@ public class Issuable extends DistributedObject {
 
     @Override
     public String toString() {
-        return "Issuable{" +
-                "barcode=" + barcode +
-                ", type=" + type +
-                ", instance=" + instance +
-                ", journalItem=" + journalItem +
-                '}';
+        return String.format("Issuable{barcode=%d, type=%s, instance=%s, journalItem=%s}", barcode, type, instance,
+                journalItem);
     }
 }

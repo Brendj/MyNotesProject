@@ -2161,13 +2161,11 @@ public class SyncRequest {
 
             @Override
             public String toString() {
-                return "EnterEvent{" + "idOfEnterEvent=" + idOfEnterEvent + ", idOfOrg=" + idOfOrg + ", enterName='"
-                        + enterName + '\'' + ", turnstileAddr='" + turnstileAddr + '\'' + ", passDirection="
-                        + passDirection + ", eventCode=" + eventCode + ", idOfCard=" + idOfCard + ", idOfClient="
-                        + idOfClient + ", idOfTempCard=" + idOfTempCard + ", evtDateTime=" + evtDateTime
-                        + ", idOfVisitor=" + idOfVisitor + ", visitorFullName='" + visitorFullName + '\'' + ", docType="
-                        + docType + ", docSerialNum='" + docSerialNum + '\'' + ", issueDocDate=" + issueDocDate
-                        + ", visitDateTime=" + visitDateTime + '}';
+                return String
+                        .format("EnterEvent{idOfEnterEvent=%d, idOfOrg=%d, enterName='%s', turnstileAddr='%s', passDirection=%d, eventCode=%d, idOfCard=%d, idOfClient=%d, idOfTempCard=%d, evtDateTime=%s, idOfVisitor=%d, visitorFullName='%s', docType=%d, docSerialNum='%s', issueDocDate=%s, visitDateTime=%s}",
+                                idOfEnterEvent, idOfOrg, enterName, turnstileAddr, passDirection, eventCode, idOfCard,
+                                idOfClient, idOfTempCard, evtDateTime, idOfVisitor, visitorFullName, docType,
+                                docSerialNum, issueDocDate, visitDateTime);
             }
         }
 
@@ -2309,11 +2307,13 @@ public class SyncRequest {
 
                 @Override
                 public String toString() {
-                    return "Circulation{" + "action='" + action + '\'' + ", idOfCirculation=" + idOfCirculation
-                            + ", idOfClient=" + idOfClient + ", idOfPublication=" + idOfPublication + ", idOfOrg="
-                            + idOfOrg + ", issuanceDate=" + issuanceDate + ", refundDate=" + refundDate
-                            + ", realRefundDate=" + realRefundDate + ", status=" + status + ", version=" + version
-                            + '}';
+                    return new StringBuilder().append("Circulation{").append("action='").append(action).append('\'')
+                            .append(", idOfCirculation=").append(idOfCirculation).append(", idOfClient=")
+                            .append(idOfClient).append(", idOfPublication=").append(idOfPublication)
+                            .append(", idOfOrg=").append(idOfOrg).append(", issuanceDate=").append(issuanceDate)
+                            .append(", refundDate=").append(refundDate).append(", realRefundDate=")
+                            .append(realRefundDate).append(", status=").append(status).append(", version=")
+                            .append(version).append('}').toString();
                 }
             }
 
@@ -2515,14 +2515,18 @@ public class SyncRequest {
 
                 @Override
                 public String toString() {
-                    return "Publication{" + "action='" + action + '\'' + ", idOfPublication=" + idOfPublication
-                            + ", idOfOrg=" + idOfOrg + ", recordStatus='" + recordStatus + '\'' + ", recordType='"
-                            + recordType + '\'' + ", bibliographicLevel='" + bibliographicLevel + '\''
-                            + ", hierarchicalLevel='" + hierarchicalLevel + '\'' + ", codingLevel='" + codingLevel
-                            + '\'' + ", formOfCatalogingDescription='" + formOfCatalogingDescription + '\'' + ", data='"
-                            + data + '\'' + ", author='" + author + '\'' + ", title='" + title + '\'' + ", title2='"
-                            + title2 + '\'' + ", publicationDate='" + publicationDate + '\'' + ", publisher='"
-                            + publisher + '\'' + ", version=" + version + '}';
+                    return new StringBuilder().append("Publication{").append("action='").append(action).append('\'')
+                            .append(", idOfPublication=").append(idOfPublication).append(", idOfOrg=").append(idOfOrg)
+                            .append(", recordStatus='").append(recordStatus).append('\'').append(", recordType='")
+                            .append(recordType).append('\'').append(", bibliographicLevel='").append(bibliographicLevel)
+                            .append('\'').append(", hierarchicalLevel='").append(hierarchicalLevel).append('\'')
+                            .append(", codingLevel='").append(codingLevel).append('\'')
+                            .append(", formOfCatalogingDescription='").append(formOfCatalogingDescription).append('\'')
+                            .append(", data='").append(data).append('\'').append(", author='").append(author)
+                            .append('\'').append(", title='").append(title).append('\'').append(", title2='")
+                            .append(title2).append('\'').append(", publicationDate='").append(publicationDate)
+                            .append('\'').append(", publisher='").append(publisher).append('\'').append(", version=")
+                            .append(version).append('}').toString();
                 }
             }
 
@@ -2718,16 +2722,9 @@ public class SyncRequest {
 
                 @Override
                 public String toString() {
-                    return "Publ{" +
-                            "idOfPubl=" + idOfPubl +
-                            ", isbn='" + isbn + '\'' +
-                            ", data='" + data + '\'' +
-                            ", author='" + author + '\'' +
-                            ", title='" + title + '\'' +
-                            ", title2='" + title2 + '\'' +
-                            ", publicationDate='" + publicationDate + '\'' +
-                            ", publisher='" + publisher + '\'' +
-                            '}';
+                    return String
+                            .format("Publ{idOfPubl=%d, isbn='%s', data='%s', author='%s', title='%s', title2='%s', publicationDate='%s', publisher='%s'}",
+                                    idOfPubl, isbn, data, author, title, title2, publicationDate, publisher);
                 }
             }
 

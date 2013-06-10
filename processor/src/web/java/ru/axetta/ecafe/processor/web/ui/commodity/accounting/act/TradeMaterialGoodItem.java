@@ -6,8 +6,6 @@ package ru.axetta.ecafe.processor.web.ui.commodity.accounting.act;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfInventarization;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfWayBillDifference;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TradeMaterialGood;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractEntityItem;
@@ -69,7 +67,7 @@ public class TradeMaterialGoodItem extends AbstractEntityItem<TradeMaterialGood>
         good = entity.getGood();
         goodsCreationDate = entity.getGoodsCreationDate();
         lifeTime = entity.getLifeTime();
-        unitsScale = TradeMaterialGood.UNIT_SCALES[entity.getUnitsScale()];
+        unitsScale = entity.getUnitScale().toString();//TradeMaterialGood.UNIT_SCALES[entity.getUnitScale()];
         totalCount = entity.getTotalCount();
         netWeight = entity.getNetWeight();
         nds = entity.getNds();

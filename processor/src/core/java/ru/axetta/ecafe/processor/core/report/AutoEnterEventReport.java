@@ -211,7 +211,7 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
-        private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
+        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             HashMap<Integer, HashMap<Integer, ReportItem>> mapItems = new HashMap<Integer, HashMap<Integer, ReportItem>>();
             List<ReportItem> resultRows = new LinkedList<ReportItem>();

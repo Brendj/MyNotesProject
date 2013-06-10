@@ -1698,16 +1698,12 @@ public class SyncResponse {
         }
     }
 
-    //public final static int TYPE_FULL = 0, TYPE_GET_ACC_REGISTRY = 1, TYPE_GET_CLIENTS_PARAMS=2;
-    //public final static String TYPE_NAMES[] = new String[]{"Full", "GetAccRegistry","GetClientParams"};
-
     private final SyncType syncType;
 
     public SyncType getSyncType() {
         return syncType;
     }
 
-    /*private final int type;*/
     private final Long idOfOrg;
     private final String orgName;
     private final Long idOfPacket;
@@ -1736,13 +1732,12 @@ public class SyncResponse {
         return correctingNumbersOrdersRegistry;
     }
 
-    public SyncResponse(SyncType syncType/*int type*/, Long idOfOrg, String orgName, Long idOfPacket, Long protoVersion, Date time, String options,
+    public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, Long idOfPacket, Long protoVersion, Date time, String options,
             AccRegistry accRegistry, ResPaymentRegistry resPaymentRegistry, AccIncRegistry accIncRegistry,
             ClientRegistry clientRegistry, ResOrgStructure resOrgStructure, ResMenuExchangeData resMenuExchangeData,
             ResDiary resDiary, String message, ResEnterEvents resEnterEvents, ResLibraryData resLibraryData, ResLibraryData2 resLibraryData2,
             ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules,
             CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData, QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData) {
-        /*this.type = type;*/
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;

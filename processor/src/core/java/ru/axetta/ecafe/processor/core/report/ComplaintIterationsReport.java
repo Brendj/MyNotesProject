@@ -84,7 +84,7 @@ public class ComplaintIterationsReport extends BasicReportForOrgJob {
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
-        private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
+        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             List<ComplaintIterationReportItem> resultRows = new LinkedList<ComplaintIterationReportItem>();
             Query query = session.createSQLQuery("SELECT d.description, count(i.iterationstatus) AS state_count"

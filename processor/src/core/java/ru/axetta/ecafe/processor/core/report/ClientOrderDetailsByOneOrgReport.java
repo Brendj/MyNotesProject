@@ -142,7 +142,7 @@ public class ClientOrderDetailsByOneOrgReport extends BasicReportForOrgJob {
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
-        private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
+        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             List<ClientReportItem> resultRows = new LinkedList<ClientReportItem>();
             Query query = session.createSQLQuery("SELECT cf_orderdetails.idoforderdetail, cf_clients.contractid, cf_persons.firstname || ' ' || cf_persons.secondname || ' ' || cf_persons.surname, "

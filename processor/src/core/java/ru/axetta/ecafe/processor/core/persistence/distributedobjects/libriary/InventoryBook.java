@@ -64,8 +64,6 @@ public class InventoryBook extends DistributedObject {
 
     @Override
     public String toString() {
-        return "InventoryBook{" +
-                "bookName='" + bookName + '\'' +
-                '}';
+        return String.format("InventoryBook{bookName='%s'}", bookName);
     }
 }

@@ -27,12 +27,8 @@ import java.util.Date;
  */
 public class ActOfWayBillDifferencePosition extends DistributedObject {
 
-    //public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
-
-
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        //Good g = DAOService.getInstance().findDistributedObjectByRefGUID(Good.class, guidOfG);
         Good g  = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfG);
         if(g==null) {
             DistributedObjectException distributedObjectException = new DistributedObjectException("NOT_FOUND_GOOD");
@@ -40,7 +36,6 @@ public class ActOfWayBillDifferencePosition extends DistributedObject {
             throw distributedObjectException;
         }
         setGood(g);
-        //ActOfWayBillDifference awd = DAOService.getInstance().findDistributedObjectByRefGUID(ActOfWayBillDifference.class, guidOfAWD);
         ActOfWayBillDifference awd  = (ActOfWayBillDifference) DAOUtils.findDistributedObjectByRefGUID(session, guidOfAWD);
         if(awd==null) {
             DistributedObjectException distributedObjectException = new DistributedObjectException("NOT_FOUND_"+actOfWayBillDifference.getClass().getSimpleName().toUpperCase());

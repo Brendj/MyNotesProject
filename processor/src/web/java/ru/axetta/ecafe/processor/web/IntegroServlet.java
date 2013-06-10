@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.IntegroLogger;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.response.OrgOwnerData;
@@ -81,7 +82,7 @@ public class IntegroServlet extends HttpServlet {
             logger.info(String.format("Starting synchronization with %s", request.getRemoteAddr()));
 
             IntegroLogger integroLogger = runtimeContext.getIntegroLogger();
-            Org org = null;
+            //Org org = null;
             Long idOfOrg = null;
             String  idOfSync = null;
             Node dataNode = null;
@@ -100,7 +101,8 @@ public class IntegroServlet extends HttpServlet {
                 Document requestDocument = requestData.document;
                 dataNode = requestDocument.getFirstChild();
                 NamedNodeMap namedNodeMap=dataNode.getAttributes();
-                idOfOrg = getIdOfOrg(namedNodeMap);
+                idOfOrg = findOrg(runtimeContext, getIdOfOrg(namedNodeMap));
+                if(idOfOrg == null) throw new Exception("Organization not found");
                 idOfSync = getIdOfSync(namedNodeMap);
                 integroLogger.registerIntegroRequest(requestData.document, idOfOrg, idOfSync);
             } catch (Exception e){
@@ -108,14 +110,14 @@ public class IntegroServlet extends HttpServlet {
                 return;
             }
 
-            PublicKey publicKey;
-            try {
-                org = findOrg(runtimeContext, idOfOrg);
-                publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
-            } catch (Exception e) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                return;
-            }
+            //PublicKey publicKey;
+            //try {
+            //    idOfOrg = findOrg(runtimeContext, idOfOrg);
+            //    publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
+            //} catch (Exception e) {
+            //    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            //    return;
+            //}
             /* Must be commented for testing!!!  */
            /* try {
                 if (!DigitalSignatureUtils.verify(publicKey, requestData.document)) {
@@ -250,7 +252,7 @@ public class IntegroServlet extends HttpServlet {
         return Long.parseLong(n.getTextContent());
     }
 
-    private Org findOrg(RuntimeContext runtimeContext, Long idOfOrg) throws Exception {
+    private Long findOrg(RuntimeContext runtimeContext, Long idOfOrg) throws Exception {
         PublicKey publicKey;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -259,14 +261,15 @@ public class IntegroServlet extends HttpServlet {
             // Start data model transaction
             persistenceTransaction = persistenceSession.beginTransaction();
             // Find given org
-            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
-            if (null == org) {
+            //Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+            Long ifOfOrg = DAOUtils.getIdOfOrg(persistenceSession, idOfOrg);
+            if (null == ifOfOrg) {
                 logger.error(String.format("Unknown org with IdOfOrg == %s", idOfOrg));
                 throw new NullPointerException(String.format("Unknown org with IdOfOrg == %s", idOfOrg));
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return org;
+            return ifOfOrg;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);

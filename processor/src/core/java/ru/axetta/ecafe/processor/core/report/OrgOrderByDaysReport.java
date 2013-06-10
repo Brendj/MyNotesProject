@@ -122,7 +122,7 @@ public class OrgOrderByDaysReport extends BasicReportForOrgJob {
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
-        private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
+        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             HashMap<Integer, ReportItem> mapItems = new HashMap<Integer, ReportItem>(31);
             List<ReportItem> resultRows = new LinkedList<ReportItem>();

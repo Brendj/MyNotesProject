@@ -14,6 +14,9 @@ import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 
 import java.util.*;
@@ -51,6 +54,7 @@ public abstract class BasicReportForOrgJob extends BasicReportJob {
                     transaction.begin();
                     Criteria allOrgCriteria = session.createCriteria(Org.class);
                     List allOrgs = allOrgCriteria.list();
+
                     for (Object object : allOrgs) {
                         Org org = (Org) object;
                         if (getLogger().isDebugEnabled()) {
@@ -133,8 +137,17 @@ public abstract class BasicReportForOrgJob extends BasicReportJob {
                 session = sessionFactory.openSession();
                 transaction = BasicReport.createTransaction(session);
                 transaction.begin();
-                Org org = (Org) session.get(Org.class, this.idOfOrg);
-                builder.setOrg(org);
+                //Org org = (Org) session.get(Org.class, this.idOfOrg);
+                Criteria criteria = session.createCriteria(Org.class);
+                criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
+                criteria.setProjection(Projections.projectionList()
+                        .add(Projections.property("idOfOrg"),"idOfOrg")
+                        .add(Projections.property("shortName"),"shortName")
+                        .add(Projections.property("officialName"),"officialName")
+                );
+                criteria.setResultTransformer(Transformers.aliasToBean(OrgShortItem.class));
+
+                builder.setOrg((OrgShortItem) criteria.uniqueResult());
                 builder.setReportProperties(getReportProperties());
                 BasicReportJob report = builder.build(session, startTime, endTime, calendar);
                 setGenerateTime(report.getGenerateTime());

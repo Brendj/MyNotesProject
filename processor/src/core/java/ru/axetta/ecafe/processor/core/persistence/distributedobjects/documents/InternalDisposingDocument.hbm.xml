@@ -33,7 +33,12 @@
         <property name="orgOwner" column="OrgOwner" type="long"/>
         <property name="type" column="TypeOfInternalDisposingDocument" type="integer" not-null="true"/>
         <property name="date" column="DateOfInternalDisposingDocument" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
-        <property name="state" column="State" type="integer" not-null="true"/>
+        <property name="state" column="State">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.DocumentState</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
         <property name="comments" column="Comments" type="string" length="1024" not-null="true"/>
 
         <many-to-one name="staff" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.Staff">

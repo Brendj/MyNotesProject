@@ -62,10 +62,10 @@ public class QuestionaryResultByOrgReport extends BasicReportForOrgJob {
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
-        private JRDataSource createDataSource(Session session, Org org, Date startTime, Date endTime,
+        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             QuestionaryService questionaryService = new QuestionaryService();
-            List<ClientAnswerByQuestionaryItem> clientAnswerByQuestionaryItems = questionaryService.generateReportByQuestionaryResultByOrg(session,org);
+            List<ClientAnswerByQuestionaryItem> clientAnswerByQuestionaryItems = questionaryService.generateReportByQuestionaryResultByOrg(session,org.getIdOfOrg());
             return new JRBeanCollectionDataSource(clientAnswerByQuestionaryItems);
         }
     }

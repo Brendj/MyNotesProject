@@ -25,7 +25,7 @@
 
 
     <a4j:commandButton value="Обновить" action="#{syncMonitorPage.update}"
-                       reRender="orgUnsychMonitorListTable,lastOrgUpdateTime"></a4j:commandButton>
+                       reRender="orgUnsychMonitorListTable,lastOrgUpdateTime"/>
     <a4j:status>
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />

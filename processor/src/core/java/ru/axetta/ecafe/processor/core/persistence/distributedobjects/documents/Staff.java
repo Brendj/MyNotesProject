@@ -25,54 +25,6 @@ import java.util.Set;
  */
 public class Staff extends DistributedObject {
 
-
-    private Set<InternalIncomingDocument> internalIncomingDocumentInternal;
-    private Set<WayBill> wayBillInternal;
-    private Set<StateChange> stateChangeInternal;
-    private Set<InternalDisposingDocument> internalDisposingDocumentInternal;
-    private Set<GoodRequest> goodRequestInternal;
-
-    Set<GoodRequest> getGoodRequestInternal() {
-        return goodRequestInternal;
-    }
-
-    void setGoodRequestInternal(Set<GoodRequest> goodRequestInternal) {
-        this.goodRequestInternal = goodRequestInternal;
-    }
-
-    Set<InternalDisposingDocument> getInternalDisposingDocumentInternal() {
-        return internalDisposingDocumentInternal;
-    }
-
-    void setInternalDisposingDocumentInternal(Set<InternalDisposingDocument> internalDisposingDocumentInternal) {
-        this.internalDisposingDocumentInternal = internalDisposingDocumentInternal;
-    }
-
-
-    Set<StateChange> getStateChangeInternal() {
-        return stateChangeInternal;
-    }
-
-    void setStateChangeInternal(Set<StateChange> stateChangeInternal) {
-        this.stateChangeInternal = stateChangeInternal;
-    }
-
-    Set<WayBill> getWayBillInternal() {
-        return wayBillInternal;
-    }
-
-    void setWayBillInternal(Set<WayBill> wayBillInternal) {
-        this.wayBillInternal = wayBillInternal;
-    }
-
-    Set<InternalIncomingDocument> getInternalIncomingDocumentInternal() {
-        return internalIncomingDocumentInternal;
-    }
-
-    void setInternalIncomingDocumentInternal(Set<InternalIncomingDocument> internalIncomingDocumentInternal) {
-        this.internalIncomingDocumentInternal = internalIncomingDocumentInternal;
-    }
-
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         Criteria criteria = session.createCriteria(Staff.class);
@@ -153,6 +105,52 @@ public class Staff extends DistributedObject {
     private String personalCode;
     private String rights;
     private Integer hashCode;
+    private Set<InternalIncomingDocument> internalIncomingDocumentInternal;
+    private Set<WayBill> wayBillInternal;
+    private Set<StateChange> stateChangeInternal;
+    private Set<InternalDisposingDocument> internalDisposingDocumentInternal;
+    private Set<GoodRequest> goodRequestInternal;
+
+    Set<GoodRequest> getGoodRequestInternal() {
+        return goodRequestInternal;
+    }
+
+    void setGoodRequestInternal(Set<GoodRequest> goodRequestInternal) {
+        this.goodRequestInternal = goodRequestInternal;
+    }
+
+    Set<InternalDisposingDocument> getInternalDisposingDocumentInternal() {
+        return internalDisposingDocumentInternal;
+    }
+
+    void setInternalDisposingDocumentInternal(Set<InternalDisposingDocument> internalDisposingDocumentInternal) {
+        this.internalDisposingDocumentInternal = internalDisposingDocumentInternal;
+    }
+
+
+    Set<StateChange> getStateChangeInternal() {
+        return stateChangeInternal;
+    }
+
+    void setStateChangeInternal(Set<StateChange> stateChangeInternal) {
+        this.stateChangeInternal = stateChangeInternal;
+    }
+
+    Set<WayBill> getWayBillInternal() {
+        return wayBillInternal;
+    }
+
+    void setWayBillInternal(Set<WayBill> wayBillInternal) {
+        this.wayBillInternal = wayBillInternal;
+    }
+
+    Set<InternalIncomingDocument> getInternalIncomingDocumentInternal() {
+        return internalIncomingDocumentInternal;
+    }
+
+    void setInternalIncomingDocumentInternal(Set<InternalIncomingDocument> internalIncomingDocumentInternal) {
+        this.internalIncomingDocumentInternal = internalIncomingDocumentInternal;
+    }
 
     public Integer getHashCode() {
         return hashCode;

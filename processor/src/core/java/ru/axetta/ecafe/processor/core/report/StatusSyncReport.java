@@ -10,6 +10,9 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -38,21 +41,25 @@ public class StatusSyncReport extends BasicReport {
             localCalendar.add(Calendar.DATE, 1);
             Date endDate = localCalendar.getTime();
 
+            Query q = session.createQuery("select sh.org.idOfOrg as idOfOrg, max(sh.syncEndTime) as maxsyncEndTime from SyncHistory sh where sh.syncEndTime<=:today group by idOfOrg");
+            q.setParameter("today",startDate);
+
             String preparedQuery = "select sh.IdOfOrg, max(sh.syncEndTime) "
                                  + "  from CF_SyncHistory sh "
                                  + " where sh.syncEndTime <= :today"
                                  + " group by sh.IdOfOrg";
             List resultList = null;
-            Query query = session.createSQLQuery(preparedQuery);
-            query.setLong("today", startDate.getTime());
-            resultList = query.list();
+            //Query query = session.createSQLQuery(preparedQuery);
+            //query.setLong("today", startDate.getTime());
+            resultList = q.list();
 
             Map<Long, Date> lastDateOrgMap = new HashMap<Long, Date>();
             for (Object result : resultList) {
                 Object[] syncHistory = (Object[]) result;
-                Long idOfOrg = ((BigInteger) syncHistory[0]).longValue();
-                Date lastDate = new Date(((BigInteger) syncHistory[1]).longValue());
-                lastDateOrgMap.put(idOfOrg, lastDate);
+                //Long idOfOrg = ((BigInteger) syncHistory[0]).longValue();
+                //Date lastDate = new Date(((BigInteger) syncHistory[1]).longValue());
+                //lastDateOrgMap.put(idOfOrg, lastDate);
+                lastDateOrgMap.put(Long.parseLong(syncHistory[0].toString()), (Date) syncHistory[1]);
             }
 
             preparedQuery = "select sh.IdOfOrg"
@@ -60,24 +67,38 @@ public class StatusSyncReport extends BasicReport {
                           + " where sh.syncEndTime >= :startDate "
                           + "   and sh.syncEndTime < :endDate"
                           + " group by sh.IdOfOrg";
-            resultList = null;
-            query = session.createSQLQuery(preparedQuery);
-            query.setLong("startDate", startDate.getTime());
-            query.setLong("endDate", endDate.getTime());
-            resultList = query.list();
+
+            q = session.createQuery("select sh.org.idOfOrg as idOfOrg from SyncHistory sh where sh.syncEndTime >= :startDate and sh.syncEndTime < :endDate group by idOfOrg");
+            q.setParameter("startDate", startDate);
+            q.setParameter("endDate", endDate);
+            resultList = q.list();
+            //query = session.createSQLQuery(preparedQuery);
+            //query.setLong("startDate", startDate.getTime());
+            //query.setLong("endDate", endDate.getTime());
+            //resultList = query.list();
 
             Set<Long> todayDateOrgSet = new HashSet<Long>();
             for (Object result : resultList) {
-                Long idOfOrg = ((BigInteger) result).longValue();
-                todayDateOrgSet.add(idOfOrg);
+                //Long idOfOrg = ((BigInteger) result).longValue();
+                //todayDateOrgSet.add(idOfOrg);
+                todayDateOrgSet.add(Long.parseLong(result.toString()));
             }
 
             Criteria orgCriteria = session.createCriteria(Org.class);
+            orgCriteria.setProjection(Projections.projectionList()
+                    .add(Projections.property("idOfOrg"),"idOfOrg")
+                    .add(Projections.property("shortName"),"shortName")
+                    .add(Projections.property("officialName"),"officialName")
+            );
             orgCriteria.addOrder(Order.asc("idOfOrg"));
-            List<Org> orgItems = orgCriteria.list();
+            orgCriteria.setResultTransformer(Transformers.aliasToBean(BasicReportJob.OrgShortItem.class));
+            List<BasicReportJob.OrgShortItem> orgItems = orgCriteria.list();
+            //Criteria orgCriteria = session.createCriteria(Org.class);
+            //orgCriteria.addOrder(Order.asc("idOfOrg"));
+            //List<Org> orgItems = orgCriteria.list();
 
             List<Sync> syncItems = new ArrayList<Sync>();
-            for (Org org : orgItems) {
+            for (BasicReportJob.OrgShortItem org : orgItems) {
                 boolean snchrnzd = todayDateOrgSet.contains(org.getIdOfOrg());
                 Date lastSyncTime = lastDateOrgMap.get(org.getIdOfOrg());
                 syncItems.add(new Sync(org.getIdOfOrg(), org.getOfficialName(), snchrnzd, lastSyncTime));

@@ -347,9 +347,11 @@ public class Manager {
             }
         } catch (DistributedObjectException e){
             // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю
+            // TODO: записать в журнал ошибок
             distributedObject.setDistributedObjectException(e);
             logger.error(distributedObject.toString(), e);
         } catch (Exception e){
+            // TODO: записать в журнал ошибок
             distributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
             logger.error(distributedObject.toString(), e);
         } finally {
@@ -399,7 +401,6 @@ public class Manager {
             persistenceSession = sessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            /* TODO: новый функционал  */
             Criteria criteria = persistenceSession.createCriteria(clazz);
             List classList = Arrays.asList(clazz.getInterfaces());
 
@@ -417,8 +418,11 @@ public class Manager {
                     .add(Restrictions.eq("sendAll",SendToAssociatedOrgs.SendToAll));
 
             Criterion sendToMainRestriction = Restrictions.conjunction();
+            Set<Long>  mainOrg = new TreeSet<Long>();
+            allOrg.addAll(menuExchangeRuleList);
+            allOrg.add(idOfOrg);
             sendToMainRestriction = ((Conjunction)sendToMainRestriction)
-                    .add(Restrictions.in("orgOwner",menuExchangeRuleList))
+                    .add(Restrictions.in("orgOwner",allOrg))
                     .add(Restrictions.eq("sendAll",SendToAssociatedOrgs.SendToMain));
 
             Criterion sendToSelfRestriction = Restrictions.conjunction();
@@ -449,7 +453,7 @@ public class Manager {
             }
 
             criteria.add(resultCriterion);
-            /* TODO: новый функционал  */
+
             List list = criteria.list();
             if(!(list==null || list.isEmpty())){
                 for (Object object: list){
@@ -466,6 +470,7 @@ public class Manager {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         }catch (Exception e){
+            // TODO: записать в журнал ошибок
             logger.error("Error generateResponseResult: ",e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -502,6 +507,7 @@ public class Manager {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         }catch (Exception e){
+            // TODO: записать в журнал ошибок
             logger.error("Error getDistributedObjects: ",e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);

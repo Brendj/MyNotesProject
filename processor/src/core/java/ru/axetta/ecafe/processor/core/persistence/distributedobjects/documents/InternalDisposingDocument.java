@@ -26,35 +26,6 @@ import java.util.Set;
  */
 public class InternalDisposingDocument extends DistributedObject {
 
-    private Set<StateChange> stateChangeInternal;
-    private Set<InternalIncomingDocument> internalIncomingDocumentInternal;
-    private Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal;
-
-    public Set<InternalDisposingDocumentPosition> getInternalDisposingDocumentPositionInternal() {
-        return internalDisposingDocumentPositionInternal;
-    }
-
-    public void setInternalDisposingDocumentPositionInternal(
-            Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal) {
-        this.internalDisposingDocumentPositionInternal = internalDisposingDocumentPositionInternal;
-    }
-
-    public Set<InternalIncomingDocument> getInternalIncomingDocumentInternal() {
-        return internalIncomingDocumentInternal;
-    }
-
-    public void setInternalIncomingDocumentInternal(Set<InternalIncomingDocument> internalIncomingDocumentInternal) {
-        this.internalIncomingDocumentInternal = internalIncomingDocumentInternal;
-    }
-
-    public Set<StateChange> getStateChangeInternal() {
-        return stateChangeInternal;
-    }
-
-    public void setStateChangeInternal(Set<StateChange> stateChangeInternal) {
-        this.stateChangeInternal = stateChangeInternal;
-    }
-
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         Staff st = (Staff) DAOUtils.findDistributedObjectByRefGUID(session, guidOfSt);
@@ -69,7 +40,7 @@ public class InternalDisposingDocument extends DistributedObject {
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element,"Type", type);
         setAttribute(element,"Date", getDateFormat().format(date));
-        setAttribute(element,"State", state);
+        setAttribute(element,"State", state.ordinal());
         setAttribute(element,"Comment", comments);
         setAttribute(element, "GuidOfStaff", staff.getGuid());
         if(actOfInventarization!=null) setAttribute(element, "GuidOfInventarizationAct", actOfInventarization.getGuid());
@@ -84,12 +55,12 @@ public class InternalDisposingDocument extends DistributedObject {
         Date dateOfInternalDisposingDocument = getDateTimeAttributeValue(node, "Date");
         if(dateOfInternalDisposingDocument!=null) setDate(dateOfInternalDisposingDocument);
         Integer integerState = getIntegerAttributeValue(node, "State");
-        if(integerState != null) setState(integerState);
+        if(integerState != null) setState(DocumentState.values()[integerState]);
         String stringComments = getStringAttributeValue(node,"Comment",1024);
         if(stringComments != null) setComments(stringComments);
         guidOfSt = getStringAttributeValue(node,"GuidOfStaff",36);
         guidOfAI = getStringAttributeValue(node,"GuidOfInventarizationAct",36);
-        setSendAll(SendToAssociatedOrgs.DontSend);
+        setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
     }
 
@@ -104,12 +75,15 @@ public class InternalDisposingDocument extends DistributedObject {
 
     private Integer type;
     private Date date;
-    private Integer state;
+    private DocumentState state;
     private ActOfInventarization actOfInventarization;
     private String guidOfAI;
     private Staff staff;
     private String guidOfSt;
     private String comments;
+    private Set<StateChange> stateChangeInternal;
+    private Set<InternalIncomingDocument> internalIncomingDocumentInternal;
+    private Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal;
 
     public String getComments() {
         return comments;
@@ -120,11 +94,11 @@ public class InternalDisposingDocument extends DistributedObject {
     }
 
 
-    public Integer getState() {
+    public DocumentState getState() {
         return state;
     }
 
-    public void setState(Integer state) {
+    public void setState(DocumentState state) {
         this.state = state;
     }
 
@@ -174,5 +148,30 @@ public class InternalDisposingDocument extends DistributedObject {
 
     public void setActOfInventarization(ActOfInventarization actOfInventarization) {
         this.actOfInventarization = actOfInventarization;
+    }
+
+    public Set<InternalDisposingDocumentPosition> getInternalDisposingDocumentPositionInternal() {
+        return internalDisposingDocumentPositionInternal;
+    }
+
+    public void setInternalDisposingDocumentPositionInternal(
+            Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal) {
+        this.internalDisposingDocumentPositionInternal = internalDisposingDocumentPositionInternal;
+    }
+
+    public Set<InternalIncomingDocument> getInternalIncomingDocumentInternal() {
+        return internalIncomingDocumentInternal;
+    }
+
+    public void setInternalIncomingDocumentInternal(Set<InternalIncomingDocument> internalIncomingDocumentInternal) {
+        this.internalIncomingDocumentInternal = internalIncomingDocumentInternal;
+    }
+
+    public Set<StateChange> getStateChangeInternal() {
+        return stateChangeInternal;
+    }
+
+    public void setStateChangeInternal(Set<StateChange> stateChangeInternal) {
+        this.stateChangeInternal = stateChangeInternal;
     }
 }

@@ -19,7 +19,6 @@
             </f:facet>
         </a4j:status>
     </h:panelGrid>
-    <%-- <h:panelGrid styleClass="borderless-grid" width="100%"> --%>
         <h:outputText escape="true" value="Статус синхронизации" styleClass="output-text" />
         <rich:dataTable id="statusSyncReportTable" value="#{mainPage.statusSyncReportPage.statusSyncReport.syncItems}"
                         var="statusSync" rowKeyVar="row" rows="200" footerClass="data-table-footer"

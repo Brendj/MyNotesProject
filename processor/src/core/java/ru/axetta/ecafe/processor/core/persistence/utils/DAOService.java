@@ -74,12 +74,39 @@ public class DAOService {
     }
 
     @Transactional
-    public void setConfigurationProviderInOrg(Long idOfOrg, ConfigurationProvider configurationProvider) {
+    public void setConfigurationProviderInOrg(Long idOfOrg, ConfigurationProvider configurationProvider){
         Org org = em.find(Org.class, idOfOrg);
         if (org != null) {
             org.setConfigurationProvider(configurationProvider);
             em.persist(org);
         }
+    }
+
+    @Transactional
+    public ConfigurationProvider onSave(ConfigurationProvider configurationProvider, User currentUser, List<Long> idOfOrgList) throws Exception {
+        ConfigurationProvider cp = em.find(ConfigurationProvider.class, configurationProvider.getIdOfConfigurationProvider());
+        cp.setName(configurationProvider.getName());
+        cp.setLastUpdate(new Date());
+        cp.setUserEdit(currentUser);
+        if(!cp.getOrgs().isEmpty()){
+            for (Org org: cp.getOrgs()){
+                org = em.merge(org);
+                org.setConfigurationProvider(null);
+                org = em.merge(org);
+            }
+        }
+        cp.getOrgs().clear();
+        configurationProvider = em.merge(cp);
+        if(!idOfOrgList.isEmpty()){
+            for (Long idOfOrg: idOfOrgList){
+                Org org = em.find(Org.class, idOfOrg);
+                if (org != null) {
+                    org.setConfigurationProvider(configurationProvider);
+                    em.persist(org);
+                }
+            }
+        }
+        return configurationProvider;
     }
 
     @Transactional
@@ -193,6 +220,18 @@ public class DAOService {
     public void removeProduct(Product product){
         Product p = em.merge(product);
         em.remove(p);
+    }
+
+    @Transactional
+    public Boolean isEmptyOrgConfigurationProvider(ConfigurationProvider configurationProvider){
+        ConfigurationProvider cp = em.merge(configurationProvider);
+        return cp.getOrgEmpty();
+    }
+
+    @Transactional
+    public void removeConfigurationProvider(ConfigurationProvider configurationProvider) throws Exception{
+        ConfigurationProvider cp = em.merge(configurationProvider);
+        em.remove(cp);
     }
 
     @Transactional

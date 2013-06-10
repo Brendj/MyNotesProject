@@ -51,9 +51,7 @@ public class JournalItem extends DistributedObject {
 
 
     @Override
-    protected void appendAttributes(Element element) {
-        //setAttribute(element, "Guid", guid);
-    }
+    protected void appendAttributes(Element element) {}
 
     @Override
     public JournalItem parseAttributes(Node node) throws Exception {
@@ -75,33 +73,21 @@ public class JournalItem extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        //DAOService daoService = DAOService.getInstance();
-        //setJournal(daoService.findDistributedObjectByRefGUID(Journal.class, guidJournal));
-        //setFund(daoService.findDistributedObjectByRefGUID(Fund.class, guidFund));
-
         Journal j = (Journal) DAOUtils.findDistributedObjectByRefGUID(session, guidJournal);
         if(j==null) {
             DistributedObjectException distributedObjectException =  new DistributedObjectException("Journal NOT_FOUND_VALUE");
             distributedObjectException.setData(guidJournal);
             throw  distributedObjectException;
-            //throw new DistributedObjectException("NOT_FOUND_VALUE");
         }
         setJournal(j);
-
         Fund f = (Fund) DAOUtils.findDistributedObjectByRefGUID(session, guidFund);
-        //if(f==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setFund(f);
 
         Ksu1Record ksu1 = (Ksu1Record) DAOUtils.findDistributedObjectByRefGUID(session, guidKsu1Record);
-        //if(ksu1==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setKsu1Record(ksu1);
 
         Ksu2Record ksu2 = (Ksu2Record) DAOUtils.findDistributedObjectByRefGUID(session, guidKsu2Record);
-        //if(ksu2==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setKsu2Record(ksu2);
-
-        //setKsu1Record(daoService.findDistributedObjectByRefGUID(Ksu1Record.class, guidKsu1Record));
-        //setKsu2Record(daoService.findDistributedObjectByRefGUID(Ksu2Record.class, guidKsu2Record));
     }
 
     @Override
@@ -174,14 +160,8 @@ public class JournalItem extends DistributedObject {
 
     @Override
     public String toString() {
-        return "JournalItem{" +
-                "journal=" + journal +
-                ", fund=" + fund +
-                ", ksu1Record=" + ksu1Record +
-                ", ksu2Record=" + ksu2Record +
-                ", date=" + date +
-                ", number='" + number + '\'' +
-                ", cost=" + cost +
-                '}';
+        return String
+                .format("JournalItem{journal=%s, fund=%s, ksu1Record=%s, ksu2Record=%s, date=%s, number='%s', cost=%d}",
+                        journal, fund, ksu1Record, ksu2Record, date, number, cost);
     }
 }

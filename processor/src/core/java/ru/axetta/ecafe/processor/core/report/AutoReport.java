@@ -33,6 +33,6 @@ public class AutoReport {
 
     @Override
     public String toString() {
-        return "AutoReport{" + "basicReport=" + basicReport + ", properties=" + properties + '}';
+        return String.format("AutoReport{basicReport=%s, properties=%s}", basicReport, properties);
     }
 }
