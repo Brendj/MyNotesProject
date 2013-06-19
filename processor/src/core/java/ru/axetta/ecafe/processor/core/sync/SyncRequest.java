@@ -487,11 +487,12 @@ public class SyncRequest {
                     String notifyViaSMS = getStringValueNullSafe(namedNodeMap, "NotifyViaSMS");
                     String groupName = getStringValueNullSafe(namedNodeMap, "GroupName");
                     String canConfirmGroupPayment = getStringValueNullSafe(namedNodeMap,"CanConfirmGroupPayment");
-
+                    String guid = getStringValueNullSafe(namedNodeMap, "GUID");
                     return new ClientParamItem(idOfClient, freePayCount, freePayMaxCount, lastFreePayTime,
                             discountMode, categoriesDiscounts, name, surname, secondName, address, phone,
                             mobilePhone, fax, email, remarks, notifyViaEmail==null?null:notifyViaEmail.equals("1"),
-                            notifyViaSMS==null?null:notifyViaSMS.equals("1"), groupName, canConfirmGroupPayment==null?null:canConfirmGroupPayment.equals("1"));
+                            notifyViaSMS==null?null:notifyViaSMS.equals("1"), groupName, canConfirmGroupPayment==null?null:canConfirmGroupPayment.equals("1"),
+                            guid);
                 }
 
             }
@@ -506,11 +507,12 @@ public class SyncRequest {
             private final String categoriesDiscounts;
             private final Boolean notifyViaEmail, notifyViaSMS;
             private final Boolean canConfirmGroupPayment;
+            private final String guid;
 
             public ClientParamItem(long idOfClient, int freePayCount, int freePayMaxCount, Date lastFreePayTime,
                     int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
                     String address, String phone, String mobilePhone, String fax, String email, String remarks,
-                    Boolean notifyViaEmail, Boolean notifyViaSMS, String groupName, Boolean canConfirmGroupPayment) {
+                    Boolean notifyViaEmail, Boolean notifyViaSMS, String groupName, Boolean canConfirmGroupPayment, String guid) {
                 this.idOfClient = idOfClient;
                 this.freePayCount = freePayCount;
                 this.freePayMaxCount = freePayMaxCount;
@@ -530,6 +532,7 @@ public class SyncRequest {
                 this.notifyViaSMS = notifyViaSMS;
                 this.groupName = groupName;
                 this.canConfirmGroupPayment = canConfirmGroupPayment;
+                this.guid = guid;
             }
 
             public long getIdOfClient() {
@@ -606,6 +609,10 @@ public class SyncRequest {
 
             public Boolean getCanConfirmGroupPayment() {
                 return canConfirmGroupPayment;
+            }
+
+            public String getGuid() {
+                return guid;
             }
 
             @Override

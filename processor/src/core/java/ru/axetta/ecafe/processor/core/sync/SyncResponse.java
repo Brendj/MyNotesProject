@@ -317,6 +317,7 @@ public class SyncResponse {
             private final String remarks;
             private final boolean canConfirmGroupPayment;
             private final int discountMode;
+            private final String guid;
 
             public Item(Client client) {
                 this.idOfClient = client.getIdOfClient();
@@ -340,6 +341,7 @@ public class SyncResponse {
                 this.remarks = client.getRemarks();
                 this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
                 this.discountMode = client.getDiscountMode();
+                this.guid = client.getClientGUID();
                 if (this.clientGroup!=null) this.clientGroup.getGroupName(); // lazy load
             }
 
@@ -422,6 +424,9 @@ public class SyncResponse {
                 element.setAttribute("Remarks", this.remarks);
                 if (null != this.email) {
                     element.setAttribute("Email", this.email);
+                }
+                if (null != this.guid) {
+                    element.setAttribute("GUID", this.guid);
                 }
                 element.setAttribute("ContractState", Integer.toString(this.contractState));
                 if (null != this.freePayMaxCount) {

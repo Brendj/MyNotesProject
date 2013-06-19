@@ -294,7 +294,7 @@ public class Manager {
     }
 
     private List<DistributedObject> processDistributedObjectsList(SessionFactory sessionFactory, List<DistributedObject> distributedObjects, DistributedObjectsEnum objectClass, ConfigurationProvider configurationProvider){
-        List<DistributedObject> distributedObjectList = new ArrayList<DistributedObject>(0);
+        List<DistributedObject> distributedObjectList = new ArrayList<DistributedObject>();
         if(!(distributedObjects==null || distributedObjects.isEmpty())){
             // Все объекты одного типа получают одну (новую) версию и все их изменения пишуться с этой версией.
             Long currentMaxVersion = updateVersionByDistributedObjects(sessionFactory, objectClass.name());

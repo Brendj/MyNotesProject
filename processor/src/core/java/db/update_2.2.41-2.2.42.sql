@@ -9,6 +9,10 @@
 --   CardNo bigint NOT NULL,              --! номер карты
 --   IdOfOrg bigint NOT NULL,             --! идентификатор организациии
 --   CardPrintedNo character varying(24),   --! номер нанесенный на карту
+--   Station int not null default 0,
+--   CreateDate bigint notnull
+--   CloseDate bigint
+--
 --   CONSTRAINT CardNo_Unique UNIQUE (CardNo)
 -- );
 --
@@ -22,4 +26,31 @@
 --   CONSTRAINT cf_synchistory_exceptions_organization FOREIGN KEY (idoforg) REFERENCES cf_orgs (idoforg),
 --   CONSTRAINT cf_synchistory_exceptions_sync FOREIGN KEY (idofsync) REFERENCES cf_synchistory (idofsync)
 -- );
+
+
+create or replace function generate_uuid_v4() returns VARCHAR(36) as '
+declare value VARCHAR(36);
+begin
+  value = lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
+  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
+  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
+  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
+  value = value || `-`
+  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
+  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
+  value = value || `-`
+  value = value || lpad((to_hex((ceil(random() * 255)::int & 15) | 64)), 2, `0`);
+  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
+  value = value || `-`
+  value = value || lpad((to_hex((ceil(random() * 255)::int & 63) | 128)), 2, `0`);
+  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
+  value = value || `-`
+  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
+  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
+  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
+  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
+  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
+  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
+  RETURN value::uuid;
+end;' language 'plpgsql';
 

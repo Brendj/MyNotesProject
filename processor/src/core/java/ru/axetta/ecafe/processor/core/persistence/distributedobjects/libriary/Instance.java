@@ -181,11 +181,5 @@ public class Instance extends DistributedObject {
     }
 
 
-    @Override
-    public String toString() {
-        return String
-                .format("Instance{publication=%s, inGroup=%s, fund=%s, invNumber='%s', inventoryBook=%s, ksu1Record=%s, ksu2Record=%s, cost=%d, guidPublication='%s', guidFund='%s', guidInventaryBook='%s', guidKsu1Record='%s', guidKsu2Record='%s', issuableInternal=%s}",
-                        publication, inGroup, fund, invNumber, inventoryBook, ksu1Record, ksu2Record, cost,
-                        guidPublication, guidFund, guidInventaryBook, guidKsu1Record, guidKsu2Record, issuableInternal);
-    }
+
 }
