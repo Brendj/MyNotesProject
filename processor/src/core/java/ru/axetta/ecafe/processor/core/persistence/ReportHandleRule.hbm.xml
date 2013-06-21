@@ -30,6 +30,7 @@
         <property name="route9" column="Route9" type="string" length="128"/>
         <property name="remarks" column="Remarks" type="string" length="1024"/>
         <property name="allowManualReportRun" column="AllowManualReportRun" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+
                   not-null="true"/>
         <property name="enabled" column="Enabled" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>

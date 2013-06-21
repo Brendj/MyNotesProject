@@ -32,8 +32,8 @@
                                      value="#{manualReportRunnerPage.ruleItem}" style="width:300px; height: 300px" >
                     <f:selectItems value="#{manualReportRunnerPage.ruleItems}"/>
 
-                    <a4j:support event="onselect" reRender="#{mainPage.topMostPage.pageComponent.id},manualMainParams" />
-                    <a4j:support event="onchange" reRender="#{mainPage.topMostPage.pageComponent.id},manualMainParams" />
+                    <a4j:support event="onselect" reRender="#{manualReportRunnerPage.pageComponent.id},manualMainParams" />
+                    <a4j:support event="onchange" reRender="#{manualReportRunnerPage.pageComponent.id},manualMainParams" />
                 </h:selectOneListbox>
             </h:panelGrid>
             <%--<rich:comboBox width="320" inputClass="input-text" itemClass="output-text"

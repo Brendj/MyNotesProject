@@ -22,7 +22,8 @@
         <h:outputText escape="true" value="Включено" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.reportRuleCreatePage.enabled}" styleClass="output-text" />
         <h:outputText escape="true" value="Тип отчета" styleClass="output-text" />
-        <h:selectOneMenu value="#{mainPage.reportRuleCreatePage.reportType}" styleClass="input-text">
+        <h:selectOneMenu value="#{mainPage.reportRuleCreatePage.reportType}" styleClass="input-text"
+                         valueChangeListener="#{mainPage.reportRuleCreatePage.valueChangeListener}">
             <f:selectItems value="#{mainPage.reportRuleCreatePage.reportTypeMenu.items}" />
             <a4j:support event="onchange" reRender="paramHints, templateFileSelect" />
         </h:selectOneMenu>

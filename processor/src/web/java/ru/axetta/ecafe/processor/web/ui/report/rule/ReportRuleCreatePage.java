@@ -25,6 +25,7 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -182,6 +183,13 @@ public class ReportRuleCreatePage  extends OnlineReportPage
 
     public void completeContractSelection(Session session, Long idOfContract, int multiContrFlag, String classTypes) throws Exception {
         this.contractFilter.completeContractSelection(session, idOfContract, multiContrFlag, classTypes);
+    }
+
+    public void valueChangeListener(ValueChangeEvent event) throws Exception {
+        //  Удаляем все существующие элементы
+        reportType = event.getNewValue().toString();
+        clear();
+        parseExecParams ();
     }
 
 
@@ -354,7 +362,6 @@ public class ReportRuleCreatePage  extends OnlineReportPage
     }
 
     public List<ReportRuleEditPage.Hint> getParamHints() {
-        parseExecParams ();
         return hints;
     }
 
