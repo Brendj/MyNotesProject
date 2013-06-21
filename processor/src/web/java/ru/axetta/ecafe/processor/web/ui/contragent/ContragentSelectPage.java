@@ -13,6 +13,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.Collections;
@@ -131,7 +132,7 @@ public class ContragentSelectPage extends BasicPage {
 
     private List retrieveContragents(Session session, String classTypesString) throws HibernateException {
         this.classTypesString = classTypesString;
-        Criteria criteria = session.createCriteria(Contragent.class);
+        Criteria criteria = session.createCriteria(Contragent.class).addOrder(Order.asc("contragentName"));
         if (StringUtils.isNotEmpty(filter)) {
             criteria.add(Restrictions.like("contragentName", filter, MatchMode.ANYWHERE));
         }

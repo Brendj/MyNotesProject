@@ -926,5 +926,65 @@ public class DAOService {
         return DAOUtils.findClientByGuid(em, guid);
     }
 
+    @Transactional
+    public ReportHandleRule getReportHandleRule (long idOfReportHandleRule) {
+        try {
+            Session session = (Session) em.getDelegate();
+            Criteria criteria = session.createCriteria(ReportHandleRule.class);
+            criteria.add(Restrictions.eq("idOfReportHandleRule", idOfReportHandleRule));
+            ReportHandleRule handleRule = (ReportHandleRule) criteria.uniqueResult();
+            return handleRule;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
+    @Transactional
+    public String getReportHandlerType (long idOfReportHandleRule) {
+         try {
+             Session session = (Session) em.getDelegate();
+             Criteria criteria = session.createCriteria(ReportHandleRule.class);
+             criteria.add(Restrictions.eq("idOfReportHandleRule", idOfReportHandleRule));
+             ReportHandleRule handleRule = (ReportHandleRule) criteria.uniqueResult();
+             String reportType = handleRule.findType(session);
+             return reportType;
+         } catch (Exception e) {
+             return "";
+         }
+    }
+
+    @Transactional
+    public List <ReportHandleRule> getReportHandlerRules (boolean manualAllowed) {
+        try {
+            Criteria reportRulesCriteria = ReportHandleRule.createAllReportRulesCriteria(manualAllowed ,(Session) em.getDelegate());
+            List <ReportHandleRule> rules = reportRulesCriteria.list();
+            return rules;
+        } catch (Exception e) {
+            return Collections.EMPTY_LIST;
+        }
+    }
+
+    @Transactional
+    public List<RuleCondition> getReportHandlerRules (Long ruleId) {
+        TypedQuery<RuleCondition> query = em.createQuery("from RuleCondition where IdOfReportHandleRule=:handler", RuleCondition.class);
+        query.setParameter("handler",ruleId);
+        List<RuleCondition> result = query.getResultList();
+        return result;
+    }
+
+    @Transactional
+    public Contragent getContragentById (Long idOfContragent) throws Exception {
+        return DAOUtils.findContragent ((Session) em.getDelegate(), idOfContragent);
+    }
+
+    @Transactional
+    public Contract getContractById (Long idOfContract) throws Exception {
+        return DAOUtils.findContract ((Session) em.getDelegate(), idOfContract);
+    }
+
+    @Transactional
+    public String getContractNameById (Long idOfContract) throws Exception {
+        Contract contract = DAOUtils.findContract ((Session) em.getDelegate(), idOfContract);
+        return contract.getContractNumber();
+    }
 }

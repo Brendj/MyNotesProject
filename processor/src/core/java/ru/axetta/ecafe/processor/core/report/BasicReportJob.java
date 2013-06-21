@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 
 public abstract class BasicReportJob extends BasicJasperReport {
+    public abstract Builder createBuilder(String templateFilename);
     public final static int REPORT_PERIOD_PREV_MONTH=0,
             REPORT_PERIOD_PREV_DAY=1, REPORT_PERIOD_TODAY=2,
             REPORT_PERIOD_PREV_PREV_DAY=3, REPORT_PERIOD_PREV_PREV_PREV_DAY=4,

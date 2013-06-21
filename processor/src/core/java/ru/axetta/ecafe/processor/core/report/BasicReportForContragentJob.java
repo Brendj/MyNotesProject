@@ -31,7 +31,7 @@ public abstract class BasicReportForContragentJob extends BasicReportJob {
 
     protected Class getMyClass() { return getClass(); }
     public abstract BasicReportForContragentJob createInstance();
-    protected abstract Builder createBuilder(String templateFilename);
+    //protected abstract Builder createBuilder(String templateFilename);
     protected abstract Logger getLogger();
     protected Integer getContragentSelectClass() {
         return null;

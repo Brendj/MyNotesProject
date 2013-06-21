@@ -312,6 +312,6 @@ public class OrgOrderCategoryReport extends BasicReportForOrgJob {
                 calendar);    //To change body of overridden methods use File | Settings | File Templates.
     }
 
-    protected OrgOrderCategoryReport() {
+    public OrgOrderCategoryReport() {
     }
 }

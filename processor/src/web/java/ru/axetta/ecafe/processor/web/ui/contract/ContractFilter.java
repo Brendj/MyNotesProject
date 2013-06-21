@@ -45,6 +45,11 @@ public class ContractFilter {
             this.contractName = contract.getContractNumber();
         }
 
+        public ContractItem(Long idOfContract, String contractName) {
+            this.idOfContract = idOfContract;
+            this.contractName = contractName;
+        }
+
         public Long getIdOfContract() {
             return idOfContract;
         }
@@ -124,9 +129,28 @@ public class ContractFilter {
         return "установлен";
     }
 
+    public void completeContractSelection (Contract contract) throws Exception {
+        completeContractSelection(contract, 0, "");
+    }
+
+    public void completeContractSelection (Long idofContract, String contractName) throws Exception {
+        if (null != idofContract && null != contractName && contractName.length() > 0) {
+            this.contract = new ContractItem(idofContract, contractName);
+        }
+    }
+
     public void completeContractSelection(Session session, Long idOfContract, int multiContrFlag, String classTypes) throws Exception {
         if (null != idOfContract) {
             Contract contract = (Contract) session.load(Contract.class, idOfContract);
+            //this.contract = new ContractItem(contract);
+            completeContractSelection(contract, multiContrFlag, classTypes);
+        } else {
+            clear ();
+        }
+    }
+
+    public void completeContractSelection(Contract contract, int multiContrFlag, String classTypes) throws Exception {
+        if (null != contract) {
             this.contract = new ContractItem(contract);
         }
     }

@@ -323,9 +323,15 @@ public class HalfYearSummaryReport extends BasicReportJob
     }
 
 
-    public Builder createBuilder (String templateFilename)
+    public Builder createCustomBuilder (String templateFilename)
     {
         return new Builder (templateFilename);
+    }
+
+
+    @Override
+    public BasicReportForAllOrgJob.Builder createBuilder(String templateFilename) {
+        return null;
     }
 
 
@@ -354,7 +360,7 @@ public class HalfYearSummaryReport extends BasicReportJob
             templateFilename = AutoReportGenerator
                     .restoreFilename(RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath(),
                             templateFilename);
-            Builder builder = createBuilder (templateFilename);
+            Builder builder = createCustomBuilder (templateFilename);
             Session session = null;
             org.hibernate.Transaction transaction = null;
             try

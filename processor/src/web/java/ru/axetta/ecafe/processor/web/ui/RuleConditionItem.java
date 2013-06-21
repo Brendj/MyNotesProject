@@ -34,6 +34,7 @@ public class RuleConditionItem {
     }
 
     public RuleConditionItem(String text) throws Exception {
+        /* Производится процедура сверки текста с тем, что указано в шаблонах. Выполняется с целью понять, какой класс для сравнения использовать */
         if (StringUtils.equals(text, RuleCondition.OPERATION_TEXT[RuleCondition.TAUTOLOGY_OPERTAION])) {
             this.conditionOperation = RuleCondition.TAUTOLOGY_OPERTAION;
             this.conditionOperationText = RuleCondition.OPERATION_TEXT[RuleCondition.TAUTOLOGY_OPERTAION];

@@ -125,6 +125,15 @@ public class CCAccountFilter {
     public void completeContragentSelection(Session session, Long idOfContragent) throws Exception {
         if (null != idOfContragent) {
             Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
+            //this.contragent = new ContragentItem(contragent);
+            completeContragentSelection(contragent);
+        } else {
+            clear();
+        }
+    }
+
+    public void completeContragentSelection(Contragent contragent) throws Exception {
+        if (null != contragent) {
             this.contragent = new ContragentItem(contragent);
         }
     }

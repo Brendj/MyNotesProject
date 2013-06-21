@@ -66,6 +66,10 @@ public class DAOUtils {
         return (Contragent) persistenceSession.get(Contragent.class, idOfContragent);
     }
 
+    public static Contract findContract(Session persistenceSession, long idOfContract) throws Exception {
+        return (Contract) persistenceSession.load(Contract.class, idOfContract);
+    }
+
     public static Client findClient(Session persistenceSession, long idOfClient) throws Exception {
         return (Client) persistenceSession.get(Client.class, idOfClient);
     }

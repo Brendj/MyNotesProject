@@ -33,6 +33,10 @@
         <h:outputText escape="true" value="Формат отчета" styleClass="output-text" />
         <h:inputText readonly="true" value="#{mainPage.reportRuleViewPage.documentFormat}"
                      converter="reportFormatConverter" style="width: 600px;" styleClass="input-text" />
+
+        <h:outputText escape="true" value="Запуск в ручном режиме" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.reportRuleViewPage.manualReportRun}" styleClass="output-text" disabled="true" />
+
         <h:outputText escape="true" value="Тема письма" styleClass="output-text" />
         <h:inputText readonly="true" value="#{mainPage.reportRuleViewPage.subject}" style="width: 600px;"
                      styleClass="input-text" />
@@ -40,13 +44,13 @@
     <rich:dataTable value="#{mainPage.reportRuleViewPage.routeAddresses}" var="item"
                     columnClasses="left-aligned-column">
         <f:facet name="header">
-            <h:outputText escape="true" value="Адреса рассылки" styleClass="output-text" />
+            <h:outputText escape="true" value="Адреса рассылки" styleClass="output-text" style="color: #FFFFFF" />
         </f:facet>
         <rich:column>
             <h:outputText escape="true" value="#{item}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
-    <rich:dataTable value="#{mainPage.reportRuleViewPage.ruleConditionItems}" var="item"
+    <%--<rich:dataTable value="#{mainPage.reportRuleViewPage.ruleConditionItems}" var="item"
                     columnClasses="left-aligned-column, center-aligned-column, left-aligned-column">
         <f:facet name="header">
             <h:outputText escape="true" value="Условия применения правила" styleClass="output-text" />
@@ -60,7 +64,7 @@
         <rich:column>
             <h:outputText escape="true" value="#{item.conditionConstant}" styleClass="output-text" />
         </rich:column>
-    </rich:dataTable>
+    </rich:dataTable>--%>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showReportRuleEditPage}"
@@ -69,12 +73,15 @@
 <rich:dataTable value="#{mainPage.reportRuleViewPage.paramHints}" var="item"
                 columnClasses="left-aligned-column, left-aligned-column">
     <f:facet name="header">
-        <h:outputText escape="true" value="Описание параметров для темы, адресов и условий" styleClass="output-text" />
+        <h:outputText escape="true" value="Параметры отчеты" styleClass="output-text" style="color: #FFFFFF" />
     </f:facet>
     <rich:column>
         <h:outputText escape="true" value="#{item.name}" styleClass="output-text" />
     </rich:column>
     <rich:column>
         <h:outputText escape="true" value="#{item.description}" styleClass="output-text" />
+    </rich:column>
+    <rich:column>
+        <h:outputText escape="true" value="#{item.value}" styleClass="output-text" />
     </rich:column>
 </rich:dataTable>

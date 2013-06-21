@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,6 +40,106 @@ import java.util.regex.Pattern;
  * To change this template use File | Settings | File Templates.
  */
 public class RuleProcessor implements AutoReportProcessor, EventProcessor {
+    public static final String COMBOBOX_EXPRESSION = "комбобокс:";
+    public static final String INPUT_EXPRESSION = "значение:";
+    public static final String CHECKBOX_EXPRESSION = "чекбокс:";
+    public static final String RADIO_EXPRESSION = "опции:";
+    public static final String METHOD_EXPRESSION = "метод:";
+
+
+    public static final Map<String, String> getParametersFromString (String parameters) {
+        if (parameters.indexOf(COMBOBOX_EXPRESSION) < 0 &&
+            parameters.indexOf(CHECKBOX_EXPRESSION) < 0 &&
+            parameters.indexOf(RADIO_EXPRESSION) < 0 &&
+            parameters.indexOf(METHOD_EXPRESSION) < 0) {
+            return Collections.EMPTY_MAP;
+        }
+        if (parameters.indexOf(METHOD_EXPRESSION) > -1) {
+            try {
+                String method = parameters.substring(parameters.indexOf(METHOD_EXPRESSION) + METHOD_EXPRESSION.length());
+                parameters = getMethodExecutionResult(method);
+            } catch (Exception e) {
+                return Collections.EMPTY_MAP;
+            }
+        }
+
+        Map<String, String> result = new HashMap<String, String> ();
+        parameters = parameters.replaceAll(COMBOBOX_EXPRESSION, "");
+        parameters = parameters.replaceAll(CHECKBOX_EXPRESSION, "");
+        parameters = parameters.replaceAll(RADIO_EXPRESSION, "");
+        parameters = parameters.replaceAll(METHOD_EXPRESSION, "");
+
+        String parts [] = parameters.split(DELIMETER);
+        Pattern pattern = Pattern.compile("(\\{([а-яА-Яa-zA-Z0-9]*)\\})?([а-яА-Яa-zA-Z0-9]*)");
+        for (String p : parts) {
+            Matcher matcher = pattern.matcher(p);
+            while (matcher.find()) {
+                String group1 = matcher.group(2);
+                String group2 = matcher.group(3);
+                if (group1 == null || group1.length() < 1) {
+                    group1 = new String(group2);
+                }
+                if (group1 != null && group1.length() > 0) {
+                    result.put(group1, group2);
+                }
+            }
+        }
+        return result;
+    }
+
+    public static final String getMethodExecutionResult (String method) throws Exception {
+        //  Данный метод возвращает унифицированную строку для результата от выполнения метода в виде {ключ}значение, {ключ}значение
+        if (method == null || method.length() < 1) {
+            return "";
+        }
+
+
+        List <String []> values = new ArrayList <String []> ();
+        try {
+            Class cl = Class.forName(method.substring(0, method.lastIndexOf(".")));
+            java.lang.reflect.Method meth = cl.getDeclaredMethod(method.substring(method.lastIndexOf(".") + 1), Session.class, Map.class, List.class);
+            meth.invoke(RuntimeContext.getInstance().getAutoReportProcessor(), null, Collections.EMPTY_MAP, values);
+        } catch (Exception e) {
+            throw e;
+        }
+
+        String result = "";
+        for (String [] v : values) {
+            if (v[1] == null || v[1].length() < 1) {
+                continue;
+            }
+            if (result.length() > 0) {
+                result = result + ",";
+            }
+            result = result + "{" + v[0] + "}" + v[1];
+        }
+    return result;
+    }
+
+    public void testMethodCalling (Session session, Map<String, Object> parameters, List <String []> result) {
+        result.add(new String [] { "1", "один" });
+        result.add(new String [] { "2", "два" });
+        result.add(new String [] { "3", "три" });
+    }
+
+    public void inputValueMethodCalling (Session session, Map<String, Object> parameters, List <String []> result) {
+        result.add(new String [] { "", "значение будет здесь" });   //  ключ можно не заполнять, браться будет всегда только первое значение
+    }
+
+    public static final String parseMethodExecutionResultForEquals (String methodResult) {
+        //  Данный метод обрабатывает результат от метода в формате {ключ}значение, {ключ}значение в ключ, ключ
+        Pattern pattern = Pattern.compile("\\{{1}([a-zA-Z0-9]*)\\}{1}");
+        Matcher matcher = pattern.matcher(methodResult);
+        String result   = "";
+        while (matcher.find()) {
+            if (result.length() > 0) {
+                result += DELIMETER;
+            }
+            result += matcher.group();
+        }
+        return result;
+    }
+
 
     private static final Logger logger = LoggerFactory.getLogger(RuleProcessor.class);
 
@@ -56,6 +157,35 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
 
         boolean evaluate(Properties properties);
 
+    }
+
+
+    private static class MethodExpression implements BasicBoolExpression {
+        private final String comparatorArgument;
+        private final String methodName;
+
+        public MethodExpression(String comparatorArgument, String methodName) {
+            this.comparatorArgument = comparatorArgument;
+            this.methodName = methodName;
+        }
+
+        @Override
+        public String getComparatorArgument() {
+            return comparatorArgument;
+        }
+
+        @Override
+        public String getComparatorValue() {
+            return methodName;
+        }
+
+        public boolean applicatable(Properties properties) {
+            return true;
+        }
+
+        public boolean evaluate(Properties properties) {
+            return true;                                //  НЕОБХОДИМО ВЫЗЫВАТЬ МЕТОД И ПРОВЕРЯТЬ ОТВЕТ ОТ НЕГО!
+        }
     }
 
     private static class TautologyExpression implements BasicBoolExpression {
@@ -82,8 +212,8 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
 
     private static class EqualExpression implements BasicBoolExpression {
 
-        private final String comparatorArgument;
-        private final String comparatorValue;
+        private String comparatorArgument;
+        private String comparatorValue;
 
         public EqualExpression(String comparatorArgument, String comparatorValue) {
             this.comparatorArgument = comparatorArgument;
@@ -108,6 +238,31 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         }
 
         public boolean evaluate(Properties properties) {
+            //  Анализ строки-сигнатуры, получение дополнительных параметров для сравнения (напр., необходимость запуска процедуры, выбора из комбобокса и т.д.)
+            if (comparatorValue.indexOf(METHOD_EXPRESSION) == 0) {
+                String result = "";
+                try {
+                    result = getMethodExecutionResult(comparatorValue);
+                } catch (Exception e) {
+                    return false;
+                }
+                comparatorValue = parseMethodExecutionResultForEquals(result);
+            } else if (comparatorValue.indexOf(CHECKBOX_EXPRESSION) == 0) {
+                //  Если есть слово чекбокс, значит был произведен выбор из нескольких чекбоксов
+                comparatorValue = comparatorValue.substring(0, CHECKBOX_EXPRESSION.length()).trim();
+                //
+            } else if (comparatorValue.indexOf(COMBOBOX_EXPRESSION) == 0) {
+                //  Если есть слово комбобокс, значит был произведен выбор из меню
+                comparatorValue = comparatorValue.substring(0, COMBOBOX_EXPRESSION.length()).trim();
+            } else if (comparatorValue.indexOf(RADIO_EXPRESSION) == 0) {
+                //  Если есть слово комбобокс, значит был произведен выбор из меню
+                comparatorValue = comparatorValue.substring(0, RADIO_EXPRESSION.length()).trim();
+            }
+
+            return evaluateValue (properties);
+        }
+
+        public boolean evaluateValue (Properties properties) {
             boolean result = false;
             String values[];
             if (this.comparatorValue.startsWith("/")) values = new String[]{this.comparatorValue};
@@ -180,6 +335,9 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
             switch (ruleCondition.getConditionOperation()) {
                 case RuleCondition.TAUTOLOGY_OPERTAION:
                     return new TautologyExpression();
+                case RuleCondition.LESS_OPERATION:
+                case RuleCondition.MORE_OPERATION:
+                case RuleCondition.NOT_EQUAL_OPERATION:
                 case RuleCondition.EQUAL_OPERTAION:
                     return new EqualExpression(ruleCondition.getConditionArgument(),
                             ruleCondition.getConditionConstant());
@@ -498,7 +656,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         return mailListMap;
     }
 
-    static String fillTemplate(String pattern, Properties properties) {
+    public static String fillTemplate(String pattern, Properties properties) {
         if (StringUtils.isEmpty(pattern)) {
             return StringUtils.defaultString(pattern);
         }

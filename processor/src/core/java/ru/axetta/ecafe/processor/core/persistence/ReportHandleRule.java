@@ -32,9 +32,10 @@ public class ReportHandleRule {
             "{Список рассылки отчетов по питанию}", "{Список рассылки отчетов по посещению}", "{Список рассылки №1}",
             "{Список рассылки №2}"};
     public static final int HTML_FORMAT = 0;
-    public static final int XLS_FORMAT = 1;
-    public static final int CSV_FORMAT = 2;
-    public static final int PDF_FORMAT = 3;
+    public static final int XLS_FORMAT  = 1;
+    public static final int CSV_FORMAT  = 2;
+    public static final int PDF_FORMAT  = 3;
+    public static final int REPOSITORY_FORMAT = 4;  //  Должен быть последним среди всех форматов! если формат добавится, то следует обновить и это значение
     private Long IdOfReportHandleRule;
     private String ruleName;
     private String templateFileName; // имя файла шаблона отчета
@@ -54,6 +55,7 @@ public class ReportHandleRule {
     private boolean enabled;
     private Set<RuleCondition> ruleConditions = new HashSet<RuleCondition>();
     private String tag;
+    private boolean allowManualReportRun = false;
 
     protected ReportHandleRule() {
         // For Hibernate only
@@ -64,6 +66,14 @@ public class ReportHandleRule {
         this.subject = subject;
         this.route0 = route0;
         this.enabled = enabled;
+    }
+
+    public boolean isAllowManualReportRun() {
+        return allowManualReportRun;
+    }
+
+    public void setAllowManualReportRun(boolean allowManualReportRun) {
+        this.allowManualReportRun = allowManualReportRun;
     }
 
     public boolean isEnabled() {
@@ -245,8 +255,15 @@ public class ReportHandleRule {
     }
 
     public static Criteria createAllReportRulesCriteria(Session session) throws Exception {
-        return session.createCriteria(ReportHandleRule.class).addOrder(org.hibernate.criterion.Order.asc("ruleName")).
-                createCriteria("ruleConditionsInternal")
+        return createAllReportRulesCriteria(null, session);
+    }
+
+    public static Criteria createAllReportRulesCriteria(Boolean manualAllowed, Session session) throws Exception {
+        Criteria cr = session.createCriteria(ReportHandleRule.class).addOrder(org.hibernate.criterion.Order.asc("ruleName"));
+        if (manualAllowed != null) {
+            cr.add(Restrictions.eq("allowManualReportRun", manualAllowed));
+        }
+        return cr.createCriteria("ruleConditionsInternal")
                 .add(Restrictions.eq("conditionOperation", RuleCondition.EQUAL_OPERTAION))
                 .add(Restrictions.eq("conditionArgument", RuleCondition.TYPE_CONDITION_ARG)).add(Restrictions
                         .like("conditionConstant", RuleCondition.REPORT_TYPE_BASE_PART + ".%", MatchMode.START));

@@ -71,7 +71,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
     }
 
 
-    public static class Builder implements BasicReportForAllOrgJob.Builder {
+    public static class Builder extends BasicReportForAllOrgJob.Builder {
 
         private final String templateFilename;
         private boolean exportToHTML = false;
@@ -88,7 +88,21 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
         @Override
         public DeliveredServicesReport build(Session session, Date startTime, Date endTime, Calendar calendar)
                 throws Exception {
-            return build(session, startTime, endTime, calendar, null, null);
+            Long idOfContragent = null;
+            Long idOfContract = null;
+            if (reportProperties.getProperty("idOfContract") != null &&
+                reportProperties.getProperty("idOfContract").length() > 0) {
+                try {
+                    idOfContract = Long.parseLong(reportProperties.getProperty("idOfContract"));
+                } catch (Exception e) {
+                    idOfContract = null;
+                }
+            }
+            if (contragent != null) {
+                idOfContragent = contragent.getIdOfContragent();
+            }
+
+            return build(session, startTime, endTime, calendar, idOfContragent, idOfContract);
         }
 
         public DeliveredServicesReport build(Session session, Date startTime, Date endTime, Calendar calendar,

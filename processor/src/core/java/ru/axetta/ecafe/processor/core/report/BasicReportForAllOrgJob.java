@@ -102,10 +102,10 @@ public abstract class BasicReportForAllOrgJob extends BasicReportJob {
         return String.valueOf(new Date().hashCode());
     }
 
-    public interface Builder {
+    /*public interface Builder {
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar)
                 throws Exception;
-    }
+    } */
 
     protected void prepare() {
         if (!hasPrint() && templateFilename != null && sessionFactory != null) {

@@ -44,7 +44,8 @@ import java.util.concurrent.ExecutorService;
  */
 public class AutoReportGenerator {
 
-    static class ReportDef {
+
+    public static class ReportDef {
         Class<? extends ExecutorServiceWrappedJob> buildJobClass;
         Class<? extends BasicReport> reportClass;
         JobDetailCreator jobDetailCreator;
@@ -58,8 +59,13 @@ public class AutoReportGenerator {
         String getReportType() {
             return reportClass.getCanonicalName();
         }
+
+        public JobDetailCreator getJobDetailCreator (){
+            return jobDetailCreator;
+        }
     }
-    static LinkedList<ReportDef> REPORT_DEFS=new LinkedList<ReportDef>();
+
+    public static LinkedList<ReportDef> REPORT_DEFS=new LinkedList<ReportDef>();
 
     private static final String REPORT_JOBS_BASE_CLASS_NAME;
 
@@ -79,7 +85,7 @@ public class AutoReportGenerator {
                         Order.asc("jobName"));
     }
 
-    private static interface JobDetailCreator {
+    public static interface JobDetailCreator {
 
         public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception;
     }
@@ -994,7 +1000,7 @@ public class AutoReportGenerator {
         return jobDetailCreator.createJobDetail(this, jobId, jobName);
     }
 
-    private JobDetailCreator getReportJobDetailCreator(Class jobClass) {
+    public JobDetailCreator getReportJobDetailCreator(Class jobClass) {
         String jobClassName = jobClass.getCanonicalName();
         for (ReportDef r : REPORT_DEFS) {
             if (r.buildJobClass.getCanonicalName().equals(jobClassName)) return r.jobDetailCreator;

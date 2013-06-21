@@ -25,8 +25,11 @@ public class RuleCondition {
     public static final String REPORT_TYPE_BASE_PART;
 
     public static final int EQUAL_OPERTAION = 1;
-    public static final int[] BINARY_OPERTAIONS = {EQUAL_OPERTAION};
-    public static final String[] OPERATION_TEXT = {"всегда", "="};
+    public static final int LESS_OPERATION = 2;
+    public static final int MORE_OPERATION = 3;
+    public static final int NOT_EQUAL_OPERATION = 4;
+    public static final int[] BINARY_OPERTAIONS = {EQUAL_OPERTAION};            //  Добавлять только бинарные операции для обработки их в ReportConditionItem.ReportConditionItem. Используется для анализа той операции, которую необходимо производить
+    public static final String[] OPERATION_TEXT = {"всегда", "=", "<", ">", "!="};
     public static final String[] ENTEREVENT_TYPE_TEXT = {"все", "учащиеся", "все_без_учащихся"};
     public static final int ENTEREVENT_TYPE_ALL = 0, ENTEREVENT_TYPE_STUDS = 1, ENTEREVENT_TYPE_WITHOUTSTUDS = 2;
 

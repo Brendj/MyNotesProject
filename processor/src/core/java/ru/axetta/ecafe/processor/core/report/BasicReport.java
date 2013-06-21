@@ -4,7 +4,15 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.export.JRHtmlExporter;
+import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
+
 import ru.axetta.ecafe.processor.core.DailyFileCreator;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.hibernate.Transaction;
@@ -12,7 +20,10 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -26,8 +37,6 @@ import java.util.Properties;
  * To change this template use File | Settings | File Templates.
  */
 public class BasicReport {
-
-
 
 
     public static interface DocumentBuilderCallback {
@@ -75,6 +84,98 @@ public class BasicReport {
 
         protected abstract void writeReportDocumentTo(BasicReport report, File file) throws Exception;
 
+    }
+
+
+    public static abstract class ManualDocumentBuilder extends DailyFileCreator implements ReportDocumentBuilder {
+
+
+        private static final Logger logger = LoggerFactory.getLogger(BasicDocumentBuilder.class);
+        private final DateFormat timeFormat;
+
+        public ManualDocumentBuilder(String basePath, DateFormat dateFormat, DateFormat timeFormat) {
+            super(basePath, dateFormat);
+            this.timeFormat = timeFormat;
+        }
+
+        public DateFormat getTimeFormat() {
+            synchronized (this.timeFormat) {
+                return (DateFormat) timeFormat.clone();
+            }
+        }
+
+
+        public ReportDocument buildDocument(String ruleId, BasicReport report) throws Exception {
+            throw new UnsupportedOperationException(
+                    "Use ReportDocument buildDocument(int format, String ruleId, BasicReport report)");
+        }
+
+        public ReportDocument buildDocument(int format, String ruleId, BasicReport report) throws Exception {
+            DateFormat timeFormat = getTimeFormat();
+            String fileNameSuffix = "";
+            if (format == ReportHandleRule.HTML_FORMAT) {
+                fileNameSuffix = "html";
+            } else if (format == ReportHandleRule.XLS_FORMAT) {
+                fileNameSuffix = "xls";
+            } else if (format == ReportHandleRule.CSV_FORMAT) {
+                fileNameSuffix = "csv";
+            } else if (format == ReportHandleRule.PDF_FORMAT) {
+                fileNameSuffix = "pdf";
+            } else {
+                throw new Exception("Unknown file format " + format);
+            }
+
+
+            DocumentBuilderCallback documentBuilderCallback = new BasicReportJob.DocumentBuilderCallback();
+            BasicReportJob job = (BasicReportJob) report;
+            String filename = String.format("%s-%s-%s-%s", job.getBaseDocumentFilename(), ruleId,
+                    documentBuilderCallback.getReportDistinctText(report), timeFormat.format(report.getGenerateTime()));
+            try {
+                File reportDocumentFile = createFile(filename, fileNameSuffix);
+                FileOutputStream fos = new FileOutputStream(reportDocumentFile);
+                generateDocument(format, job.getPrint(), fos);
+                fos.close();
+                return new ReportDocument(reportDocumentFile);
+            } catch (Exception e) {
+                logger.error("Failed to create jasperReport document file", e);
+                throw e;
+            }
+        }
+
+        public String generateDocument(int format, BasicReport report) throws Exception {
+            return generateDocument(format, report, null);
+        }
+
+        public String generateDocument(int format, BasicReport report, OutputStream os) throws Exception {
+            return generateDocument(format, ((BasicJasperReport) report).getPrint(), null);
+        }
+
+        public String generateDocument(int format, JasperPrint print, OutputStream os) throws Exception {
+            try {
+                if (format == ReportHandleRule.HTML_FORMAT) {
+                    return generateHTML(print);
+                } else if (format == ReportHandleRule.XLS_FORMAT) {
+                    return generateXLS(print, os);
+                } else if (format == ReportHandleRule.CSV_FORMAT) {
+                    return generateCSV(print, os);
+                } else if (format == ReportHandleRule.PDF_FORMAT) {
+                    return generatePDF(print, os);
+                } else {
+                    return "FAILED";
+                }
+            } catch (Exception e) {
+                logger.error("Failed to create jasperReport document file", e);
+                throw e;
+            }
+        }
+
+        protected abstract String generateHTML(JasperPrint print) throws Exception;
+
+        protected abstract String generateXLS(JasperPrint print, OutputStream os) throws Exception;
+
+        protected abstract String generatePDF(JasperPrint print, OutputStream os) throws Exception;
+
+        protected abstract String generateCSV(JasperPrint print, OutputStream os) throws Exception;
     }
 
     private Properties reportProperties;
@@ -125,7 +226,7 @@ public class BasicReport {
     }
 
     public static String longToMoney(Long money) {
-        return String.format("%d.%02d", money/100, Math.abs(money%100));
+        return String.format("%d.%02d", money / 100, Math.abs(money % 100));
     }
 
     public Properties getReportProperties() {

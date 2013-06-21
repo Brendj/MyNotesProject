@@ -34,7 +34,7 @@ public class ClientOrderDetailsByAllOrgReport extends BasicReportForAllOrgJob {
     public class AutoReportBuildJob extends BasicReportForAllOrgJob.AutoReportBuildJob {
     }
 
-    public static class Builder implements BasicReportForAllOrgJob.Builder{
+    public static class Builder extends BasicReportForAllOrgJob.Builder{
 
         private final String templateFilename;
 

@@ -229,7 +229,7 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
     }
 
     @Override
-    protected Builder createBuilder(String templateFilename) {
+    public Builder createBuilder(String templateFilename) {
         return new Builder(templateFilename);
     }
 

@@ -187,6 +187,7 @@ public class MainPage {
     // Report online manipulation (baybikov 05.10.2011)
     private final BasicWorkspacePage reportOnlineGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage monitoringGroupPage = new BasicWorkspacePage();
+    private final ManualReportRunnerPage manualReportRunnerPage = new ManualReportRunnerPage ();
 
     // baybikov 23.11.2011
     private final FreeComplexReportPage freeComplexReportPage = new FreeComplexReportPage();
@@ -452,6 +453,24 @@ public class MainPage {
 
     public BasicWorkspacePage getReportGroupPage() {
         return reportGroupPage;
+    }
+
+    public ManualReportRunnerPage getManualReportRunnerPage() {
+        return manualReportRunnerPage;
+    }
+
+    public Object showManualReportRunnerPage () {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = manualReportRunnerPage;
+        } catch (Exception e) {
+            logger.error("Failed to set manul report runner page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы для ручного запуска отчетов",
+                            null));
+        }
+        updateSelectedMainMenu();
+        return null;
     }
 
     // Levadny (11.02.2012)
@@ -4113,7 +4132,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to update report discountrule", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении правила обработки отчетов",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении правила обработки отчетов: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -4173,7 +4192,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to create report discountrule", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании правила", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании правила: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);

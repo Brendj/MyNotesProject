@@ -6,17 +6,29 @@ package ru.axetta.ecafe.processor.web.ui.report.rule;
 
 import sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl;
 
+import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ReportFormatMenu;
 import ru.axetta.ecafe.processor.web.ui.RuleConditionItem;
+import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
+import ru.axetta.ecafe.processor.web.ui.contract.ContractFilter;
+import ru.axetta.ecafe.processor.web.ui.contract.ContractSelectPage;
+import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
+import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.faces.model.SelectItem;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -26,7 +38,9 @@ import java.util.List;
  * Time: 11:33:54
  * To change this template use File | Settings | File Templates.
  */
-public class ReportRuleCreatePage extends BasicWorkspacePage {
+public class ReportRuleCreatePage  extends OnlineReportPage
+        implements ContragentSelectPage.CompleteHandler, ContractSelectPage.CompleteHandler {
+    Logger logger = LoggerFactory.getLogger(ReportRuleCreatePage.class);
 
     private String ruleName;
     private boolean enabled;
@@ -41,6 +55,11 @@ public class ReportRuleCreatePage extends BasicWorkspacePage {
     private String reportTemplateFileName;
     private final ReportTemplateFileNameMenu reportTemplateFileNameMenu = new ReportTemplateFileNameMenu();
     private String tag;
+    private boolean manualReportRun = false;
+
+    private List<ReportRuleEditPage.Hint> hints = new ArrayList<ReportRuleEditPage.Hint>();
+    private final CCAccountFilter contragentFilter = new CCAccountFilter();
+    private final ContractFilter contractFilter= new ContractFilter();
 
     public SelectItem[] getReportTemplatesFiles() {
         if (StringUtils.isEmpty(reportType)) return reportTemplateFileNameMenu.getItems();
@@ -57,6 +76,14 @@ public class ReportRuleCreatePage extends BasicWorkspacePage {
 
     public String getPageFilename() {
         return "report/rule/create";
+    }
+
+    public boolean isManualReportRun() {
+        return manualReportRun;
+    }
+
+    public void setManualReportRun(boolean manualReportRun) {
+        this.manualReportRun = manualReportRun;
     }
 
     public boolean isEnabled() {
@@ -136,9 +163,72 @@ public class ReportRuleCreatePage extends BasicWorkspacePage {
         this.shortName = shortName;
     }
 
+
+    public CCAccountFilter getContragentFilter() {
+        return contragentFilter;
+    }
+
+    public ContractFilter getContractFilter() {
+        return contractFilter;
+    }
+
+    public void showContractSelectPage () {
+        MainPage.getSessionInstance().showContractSelectPage(this.contragentFilter.getContragent().getContragentName());
+    }
+
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
+        contragentFilter.completeContragentSelection(session, idOfContragent);
+    }
+
+    public void completeContractSelection(Session session, Long idOfContract, int multiContrFlag, String classTypes) throws Exception {
+        this.contractFilter.completeContractSelection(session, idOfContract, multiContrFlag, classTypes);
+    }
+
+
+
     public void fill(Session session) throws Exception {
         this.documentFormat = 0;
+        parseExecParams();
     }
+
+    private void clear () {
+        hints.clear();
+        contragentFilter.clear();
+        contractFilter.clear();
+        filter = "";
+        idOfOrgList = Collections.EMPTY_LIST;
+    }
+
+    public void parseExecParams () {
+        clear();
+        List <ReportRuleConstants.ParamHintWrapper> hints = ReportRuleConstants.getParamHintsForReportType(reportType);
+        for (ReportRuleConstants.ParamHintWrapper h : hints) {
+            this.hints.add(new ReportRuleEditPage.Hint (h));
+        }
+
+
+        for (ReportRuleEditPage.Hint hint : this.hints) {
+            RuleConditionItem defRule = null;
+            try {
+                defRule = new RuleConditionItem (hint.getHint().getParamHint().getName() + hint.getHint().getParamHint().getDefaultRule());
+            } catch (Exception e) {
+                if (ReportRuleEditPage.Hint.isSuperType(ReportRuleEditPage.Hint.getType(hint.getHint().getParamHint().getName()))) {
+                    continue;
+                }
+                try {
+                    defRule = new RuleConditionItem (hint.getHint().getParamHint().getName() + "= " + RuleProcessor.INPUT_EXPRESSION);
+                } catch (Exception e2) {
+                    continue;
+                }
+            }
+            hint.getHint().getParamHint().setValue(defRule.getConditionOperationText() + " " + defRule.getConditionConstant());
+
+            RuleCondition actRule = null;
+            hint.fill (defRule, null);
+        }
+    }
+
+
 
     public void createReportRule(Session session) throws Exception {
         String[] addressList = this.routeAddresses.split(ReportRuleEditPage.DELIMETER);
@@ -158,6 +248,79 @@ public class ReportRuleCreatePage extends BasicWorkspacePage {
         reportHandleRule.setRoute9(StringUtils.trim(getString(addressList, 9)));
         reportHandleRule.setTag(tag);
 
+        // Собираем строку с условием
+        StringBuilder newCondition = new StringBuilder("");
+        for (ReportRuleEditPage.Hint hint : hints) {
+            //  Проверяем выбранные значения, если пустые, то пропускаем этот параметр
+            if (!hint.getHint().isRequired() &&
+                (hint.getValueItems() == null || hint.getValueItems().size() < 1) &&
+                (hint.getValue() == null || hint.getValue().length() < 1) &&
+                !hint.isSuperType ()) {
+                continue;
+            }
+            //  Проверка контрагента
+            if (!hint.getHint().isRequired() &&
+                hint.getType().equals(ReportRuleEditPage.Hint.CONTRAGENT) &&
+                (contragentFilter.getContragent() == null ||
+                contragentFilter.getContragent().getIdOfContragent() == null)) {
+                continue;
+            }
+            //  Проверка контракта
+            if (!hint.getHint().isRequired() &&
+                hint.getType().equals(ReportRuleEditPage.Hint.CONTRACT) &&
+                (contractFilter.getContract() == null ||
+                contractFilter.getContract().getIdOfContract() == null)) {
+                continue;
+            }
+            //  Проверка орга
+            if (!hint.getHint().isRequired() &&
+                hint.getType().equals(ReportRuleEditPage.Hint.ORG) &&
+                (idOfOrgList == null || idOfOrgList.size() < 1)) {
+                continue;
+            }
+            //  Проверка клиента
+
+
+            StringBuilder newValue = new StringBuilder();
+            if (hint.getValueItems() != null && hint.getValueItems().size() > 0) {
+                List <String> items = hint.getValueItems();
+                for (int i=0; i<items.size(); i++) {
+                    if (i != 0) {
+                        newValue.append(",");
+                    }
+                    newValue.append(items.get(i));
+                }
+            } else if (hint.getValue() != null && hint.getValue().length() > 0) {
+                newValue.append(hint.getValue());
+            } else if (hint.getType().equals(ReportRuleEditPage.Hint.CONTRAGENT) &&
+                       contragentFilter.getContragent().getIdOfContragent() != null) {
+                newValue.append(contragentFilter.getContragent().getIdOfContragent());
+            } else if (hint.getType().equals(ReportRuleEditPage.Hint.CONTRACT) &&
+                       contractFilter.getContract().getIdOfContract() != null) {
+                newValue.append(contractFilter.getContract().getIdOfContract());
+            } else if (hint.getType().equals(ReportRuleEditPage.Hint.ORG)) {
+                for (int i=0; i<idOfOrgList.size(); i++) {
+                    if (i != 0) {
+                        newValue.append(",");
+                    }
+                    newValue.append(idOfOrgList.get(i));
+                }
+            } else if (hint.getType().equals(ReportRuleEditPage.Hint.CLIENT)) {
+                //  Добавить!
+            }
+
+            if (hint.getHint().isRequired() && newValue.length() < 1) {
+                throw new Exception(String.format("Отсутствует значение для поля '%s'.",
+                        hint.getHint().getParamHint().getDescription()));
+            }
+
+            if (newCondition.length() > 0) {
+                newCondition.append(";");
+            }
+            newCondition.append(hint.getHint().getParamHint().getName()).append("=").append(newValue.toString());
+        }
+
+        this.ruleConditionItems = newCondition.toString();
         reportHandleRule.addRuleCondition(ReportRuleConstants.buildTypeCondition(reportHandleRule, this.reportType));
         String[] textRuleConditions = this.ruleConditionItems.split(ReportRuleEditPage.DELIMETER);
         for (String textRuleCondition : textRuleConditions) {
@@ -170,6 +333,7 @@ public class ReportRuleCreatePage extends BasicWorkspacePage {
             }
         }
         reportHandleRule.setTemplateFileName(this.reportTemplateFileName);
+        reportHandleRule.setAllowManualReportRun(manualReportRun);
 
         session.save(reportHandleRule);
     }
@@ -189,8 +353,9 @@ public class ReportRuleCreatePage extends BasicWorkspacePage {
         return tag;
     }
 
-    public List<ReportRuleConstants.ParamHint> getParamHints() {
-        return ReportRuleConstants.getParamHintsForReportType(reportType);
+    public List<ReportRuleEditPage.Hint> getParamHints() {
+        parseExecParams ();
+        return hints;
     }
 
 }

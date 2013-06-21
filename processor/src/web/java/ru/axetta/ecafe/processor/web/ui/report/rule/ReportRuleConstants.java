@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.rule;
 
+import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.report.*;
@@ -18,6 +19,7 @@ import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
 
+import javax.faces.component.html.HtmlPanelGrid;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,10 +55,14 @@ public class ReportRuleConstants {
 
         private final String name;
         private final String description;
+        private String value;
+        private String defaultRule;
+        private boolean hideOnSetup;
 
         public ParamHint(String name, String description) {
             this.name = name;
             this.description = description;
+            hideOnSetup = false;
         }
 
         public String getName() {
@@ -65,6 +71,32 @@ public class ReportRuleConstants {
 
         public String getDescription() {
             return description;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public ParamHint setDefaultRule (String defaultRule) {
+            this.defaultRule = defaultRule;
+            return this;
+        }
+
+        public String getDefaultRule () {
+            return defaultRule;
+        }
+
+        public boolean isHideOnSetup() {
+            return hideOnSetup;
+        }
+
+        public ParamHint setHideOnSetup(boolean hideOnSetup) {
+            this.hideOnSetup = hideOnSetup;
+            return this;
         }
     }
 
@@ -97,7 +129,7 @@ public class ReportRuleConstants {
             new ParamHint("groupName", "Название класса"),
             new ParamHint("idOfClient", "Идентификатор клиента"),
             new ParamHint("email", "Адрес электронной почты клиента"),
-            new ParamHint("contractPerson.surname", "Фамилия физического лица, заключившего контракт"),
+            new ParamHint("contractPerson.surname", "Фамилия физического лица, заключившего контракт"),      //10
             new ParamHint("contractPerson.firstName", "Имя физического лица, заключившего контракт"),
             new ParamHint("contractPerson.secondName", "Отчество физического лица, заключившего контракт"),
             new ParamHint("contractPerson.abbreviation", "Фамилия И.О. физического лица, заключившего контракт"),
@@ -107,17 +139,26 @@ public class ReportRuleConstants {
             new ParamHint("person.abbreviation", "Фамилия И.О. обслуживаемого физического лица"),
             new ParamHint("phone", "Телефонный номер клиента"),
             new ParamHint("mobile", "Номер мобильного телефона клиента"), new ParamHint("address", "Адрес клиента"),
-            new ParamHint("idOfContragent", "Идентификатор контрагента"), //20
+            new ParamHint("idOfContragent", "Идентификатор контрагента"),    //20
             new ParamHint("contragentName", "Название контрагента"),
             new ParamHint("category", "Категория организации"),
             new ParamHint("idOfMenuSourceOrg", "Идентификатор организации - источника меню"),
             new ParamHint("enterEventType", "Тип отчета по посещаемости: все/учащиеся/все_без_учащихся"),
-            new ParamHint("groupByMenuGroup", "Группировка отчета по товарным группам"), //25
-            new ParamHint(DailySalesByGroupsReport.PARAM_MENU_GROUPS, "Группы меню"),
+            new ParamHint("groupByMenuGroup", "Группировка отчета по товарным группам"),
+            new ParamHint(DailySalesByGroupsReport.PARAM_MENU_GROUPS, "Группы меню"), //25
             new ParamHint(DailySalesByGroupsReport.PARAM_INCLUDE_COMPLEX, "Включать комплексы"),
-            new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD, "Количество дней в выборке"),
+            new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD, "Количество дней в выборке").setHideOnSetup(true),     //  Период отображать не надо, он устанавливается автоматически
             new ParamHint(ReportPropertiesUtils.P_JOB_NAME, "Название задачи"),
-            new ParamHint(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID, "Идентификатор контрагента-получателя"), //30
+            new ParamHint(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID, "Идентификатор контрагента-получателя"), //30,
+
+            // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
+            /*new ParamHint("idOfContract", "Контракт"),
+            new ParamHint("listValue", "Какое-то значение из списка").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION + "{111}один,{222}два,{333}три"),
+            new ParamHint("checkValue", "Какое-то значение по чекбоксу").setDefaultRule("= " + RuleProcessor.CHECKBOX_EXPRESSION + "{555}пять,{666}шесть,{777}семь"),
+            new ParamHint("methodValue", "Какое-то значение из метода").setDefaultRule("= " + RuleProcessor.METHOD_EXPRESSION  + "ru.axetta.ecafe.processor.core.RuleProcessor.inputValueMethodCalling"),
+            new ParamHint("methodValues", "Какие-то значения из метода").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION + RuleProcessor.METHOD_EXPRESSION + "ru.axetta.ecafe.processor.core.RuleProcessor.testMethodCalling"),
+            new ParamHint("radioValues", "Какие-то значения из радио").setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{100}сто,{200}двести,{300}триста"),
+            new ParamHint("input", "Какие-то произольное значение").setDefaultRule("= " + RuleProcessor.INPUT_EXPRESSION + RuleProcessor.METHOD_EXPRESSION + "ru.axetta.ecafe.processor.core.RuleProcessor.inputValueMethodCalling"),*/
 
     };
 
@@ -136,7 +177,7 @@ public class ReportRuleConstants {
             new ReportHint(OrgOrderByDaysReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23}),
             new ReportHint(AutoEnterEventReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23, 24}),
             new ReportHint(AutoEnterEventByDaysReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23, 24}),
-            new ReportHint(DailySalesByGroupsReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23, 25, 26, 27}),
+            new ReportHint(DailySalesByGroupsReport.class.getCanonicalName(), new int[]{28, -29, -3, 22, -23, 25, 26, 27}),
             new ReportHint(ClientOrderDetailsByOneOrgReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(RegisterStampReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(ComplaintCountByGoodReport.class.getCanonicalName(), new int[]{3, 4, 5}),
@@ -153,7 +194,7 @@ public class ReportRuleConstants {
             new ReportHint(ContragentCompletionReport.class.getCanonicalName(), new int[]{20, 21}),
             new ReportHint(HalfYearSummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(BeneficiarySummaryReport.class.getCanonicalName(), new int[]{}),
-            new ReportHint(DeliveredServicesReport.class.getCanonicalName(), new int[]{}),
+            new ReportHint(DeliveredServicesReport.class.getCanonicalName(), new int[]{3, -20/*, 31, 32, 33, 34, 35, 36, 37*/}),
     };
 
     private ReportRuleConstants() {
@@ -173,17 +214,43 @@ public class ReportRuleConstants {
         }
         return null;
     }
+
+    public static class ParamHintWrapper {
+        private ParamHint hint;
+        private boolean required;
+
+        public ParamHintWrapper (ParamHint hint) {
+            this.hint = hint;
+        }
+
+        public ParamHint getParamHint () {
+            return hint;
+        }
+
+        public boolean isRequired () {
+            return required;
+        }
+
+        public ParamHintWrapper setRequired (boolean required) {
+            this.required = required;
+            return this;
+        }
+    }
     
     public static class ReportParamHint {
 
         private final String typeName;
-        private final List<ReportRuleConstants.ParamHint> paramHints;
+        private final List<ParamHintWrapper> paramHints;
 
         public ReportParamHint(ReportRuleConstants.ReportHint reportHint) {
             this.typeName = reportHint.getTypeName();
-            this.paramHints = new LinkedList<ReportRuleConstants.ParamHint>();
+            this.paramHints = new LinkedList<ParamHintWrapper>();
             for (int i : reportHint.getParamHints()) {
-                this.paramHints.add(ReportRuleConstants.PARAM_HINTS[i]);
+                //  Изменяем i, делаем его положительным всегда, но если изначально было отрицательным, то указываем, что
+                //  поле является обязательным
+                int i2 = i;
+                ParamHintWrapper newParam = new ParamHintWrapper (ReportRuleConstants.PARAM_HINTS[Math.abs(i)]);
+                this.paramHints.add(newParam.setRequired(i2 < 0));
             }
         }
 
@@ -191,12 +258,12 @@ public class ReportRuleConstants {
             return typeName;
         }
 
-        public List<ReportRuleConstants.ParamHint> getParamHints() {
+        public List<ParamHintWrapper> getParamHints() {
             return paramHints;
         }
     }
     
-    public static List<ParamHint> getParamHintsForReportType(String reportType) {
+    public static List<ParamHintWrapper> getParamHintsForReportType(String reportType) {
         ReportHint hint = findReportHint(reportType);
         if (hint==null) return Collections.emptyList();
         else return new ReportParamHint(hint).getParamHints();

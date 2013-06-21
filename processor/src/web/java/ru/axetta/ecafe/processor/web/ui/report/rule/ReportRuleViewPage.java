@@ -4,18 +4,19 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.rule;
 
+import ru.axetta.ecafe.processor.core.RuleProcessor;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.RuleConditionItem;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,6 +39,7 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
     private String shortName;
     private List<ReportRuleConstants.ParamHint> paramHints = Collections.emptyList();
     private String reportTemplateFileName;
+    private boolean manualReportRun = false;
 
     public String getPageFilename() {
         return "report/rule/view";
@@ -49,6 +51,14 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
 
     public String getRuleName() {
         return ruleName;
+    }
+
+    public boolean isManualReportRun() {
+        return manualReportRun;
+    }
+
+    public void setManualReportRun(boolean manualReportRun) {
+        this.manualReportRun = manualReportRun;
     }
 
     public boolean isEnabled() {
@@ -89,7 +99,7 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
         this.idOfReportHandleRule = reportHandleRule.getIdOfReportHandleRule();
         this.ruleName = reportHandleRule.getRuleName();
         this.tag = reportHandleRule.getTag();
-        Set<RuleCondition> ruleConditions = reportHandleRule.getRuleConditions();
+        Set<RuleCondition> actualRules = reportHandleRule.getRuleConditions();
         this.reportType = reportHandleRule.findType(session);
         if (null == this.reportType) {
             this.reportType = ReportRuleConstants.UNKNOWN_REPORT_TYPE;
@@ -98,6 +108,7 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
         if (null == this.reportTemplateFileName)
             this.reportTemplateFileName = ReportRuleConstants.DEFAULT_REPORT_TEMPLATE;
         this.enabled = reportHandleRule.isEnabled();
+        this.manualReportRun = reportHandleRule.isAllowManualReportRun();
         this.documentFormat = reportHandleRule.getDocumentFormat();
         this.subject = reportHandleRule.getSubject();
         this.routeAddresses = new LinkedList<String>();
@@ -111,19 +122,114 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
         addAddress(this.routeAddresses, reportHandleRule.getRoute7());
         addAddress(this.routeAddresses, reportHandleRule.getRoute8());
         addAddress(this.routeAddresses, reportHandleRule.getRoute9());
-        this.ruleConditionItems = new LinkedList<RuleConditionItem>();
-        for (RuleCondition currRuleCondition : ruleConditions) {
-            if (!currRuleCondition.isTypeCondition()) {
-                this.ruleConditionItems.add(new RuleConditionItem(currRuleCondition));
-            }
-        }
+        //this.ruleConditionItems = new LinkedList<RuleConditionItem>();
         this.shortName = ReportRuleConstants.createShortName(reportHandleRule, 64);
 
         this.paramHints = new LinkedList<ReportRuleConstants.ParamHint>();
-        ReportRuleConstants.ReportHint reportHint = ReportRuleConstants.findReportHint(this.reportType);
-        for (int i : reportHint.getParamHints()) {
-            this.paramHints.add(ReportRuleConstants.PARAM_HINTS[i]);
+        ReportRuleConstants.ReportHint defaultRules = ReportRuleConstants.findReportHint(this.reportType);
+        for (int i : defaultRules.getParamHints()) {
+            ReportRuleConstants.ParamHint hint = ReportRuleConstants.PARAM_HINTS[Math.abs(i)];
+            String argument  = "";  // к чему применяется
+            String operation = ""; // тип операции
+            String constant  = "";  // значение
+            for (RuleCondition currRuleCondition : actualRules) {
+                if (currRuleCondition.getConditionArgument().equals(hint.getName())) {
+                    //  Для всех остальных просто вставляем значение
+                    RuleConditionItem conditionItem = new RuleConditionItem(currRuleCondition);
+                    argument  = conditionItem.getConditionArgument();  // к чему применяется
+                    operation = conditionItem.getConditionOperationText(); // тип операции
+                    constant  = conditionItem.getConditionConstant();  // значение
+
+                    //  Дополнительные действия для тех значений, которые необходимо грузить из БД
+                    if (hint.getName().equals("idOfContragent")) {
+                        constant = getContragentHintValue (getActualHintByName ("idOfContragent", actualRules));
+                    } else if (hint.getName().equals("idOfContract")) {
+                        constant = getContractHintValue (getActualHintByName ("idOfContract", actualRules));
+                    } else if (hint.getName().equals("idOfOrg")) {
+                        constant = getOrgsHintValue(getActualHintByName("idOfOrg", actualRules));
+                    } else if (hint.getName().equals("idOfClient")) {
+                        constant = getClientHintValue (getActualHintByName ("idOfClient", actualRules));
+                    }
+                }
+            }
+            String space = " ";
+            if (constant.length() < 1) {
+                constant = "{Не выбрано}";
+                operation = "";
+                space = "";
+            }
+            hint.setValue(operation + space + constant);
+            this.paramHints.add(hint);
         }
+    }
+
+    public RuleCondition getActualHintByName (String name, Set<RuleCondition> actualRules) {
+        Iterator<RuleCondition> hints = actualRules.iterator();
+        while (hints.hasNext()) {
+            RuleCondition hint = hints.next();
+            if (hint.getConditionArgument().equals(name)) {
+                return hint;
+            }
+        }
+        return null;
+    }
+
+    public String getContragentHintValue (RuleCondition hint) {
+        if (hint == null || hint.getConditionConstant() == null || hint.getConditionConstant().length() < 1) {
+            return "";
+        }
+        try {
+            long idOfContragent = Long.parseLong(hint.getConditionConstant());
+            Contragent contragent = DAOService.getInstance().getContragentById(idOfContragent);
+            return contragent.getContragentName();
+        } catch (Exception e) {
+            //logger.error("Failed to parse contragent hint " + hint.getConditionConstant(), e);
+        }
+        return "";
+    }
+
+    public String getContractHintValue (RuleCondition hint) {
+        if (hint == null || hint.getConditionConstant() == null || hint.getConditionConstant().length() < 1) {
+            return "";
+        }
+        try {
+            long idOfContract = Long.parseLong(hint.getConditionConstant());
+            String contractName = DAOService.getInstance().getContractNameById (idOfContract);
+            return contractName;
+        } catch (Exception e) {
+            //logger.error("Failed to parse contract hint " + hint.getConditionConstant(), e);
+        }
+        return "";
+    }
+
+    public String getOrgsHintValue (RuleCondition hint) {
+        if (hint == null || hint.getConditionConstant() == null || hint.getConditionConstant().length() < 1) {
+            return "";
+        }
+        try {
+            String ids [] = hint.getConditionConstant().split(",");
+            String res = "";
+            for (String id : ids) {
+                long idOfOrg = Long.parseLong(id);
+                Org org = DAOService.getInstance().getOrg(idOfOrg);
+                if (res.length() > 0) {
+                    res = res + ", ";
+                }
+                res = res + org.getOfficialName();
+            }
+            return res;
+        } catch (Exception e) {
+            //logger.error("Failed to parse orgs hint " + hint.getConditionConstant(), e);
+        }
+    return "";
+    }
+
+    public String getClientHintValue (RuleCondition hint) {
+        if (hint == null) {
+            return "";
+        }
+
+        return "";
     }
 
     private static void addAddress(List<String> addresses, String newAddress) {

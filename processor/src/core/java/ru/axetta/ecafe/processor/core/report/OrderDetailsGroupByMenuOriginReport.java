@@ -31,7 +31,7 @@ public class OrderDetailsGroupByMenuOriginReport extends BasicReportForAllOrgJob
     public class AutoReportBuildJob extends BasicReportForAllOrgJob.AutoReportBuildJob {
     }
 
-    public static class Builder implements BasicReportForAllOrgJob.Builder{
+    public static class Builder extends BasicReportForAllOrgJob.Builder{
 
         public static HashMap<Integer, String> values = new HashMap<Integer, String>();
         static {

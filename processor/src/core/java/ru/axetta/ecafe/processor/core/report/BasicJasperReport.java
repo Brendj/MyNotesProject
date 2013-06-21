@@ -4,11 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.export.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.util.Date;
 
@@ -70,6 +73,59 @@ public class BasicJasperReport extends BasicReport {
             xlsExporter.exportReport();
         }
 
+    }
+
+
+    public static class ManualBuilder extends ManualDocumentBuilder {
+
+        public ManualBuilder(String basePath, DateFormat dateFormat, DateFormat timeFormat) {
+            super(basePath, dateFormat, timeFormat);
+        }
+
+        protected String generateHTML(JasperPrint print) throws Exception {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            JRHtmlExporter exporter = new JRHtmlExporter();
+            exporter.setParameter(JRHtmlExporterParameter.JASPER_PRINT, print);
+            exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
+            exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
+            exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
+            exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
+            exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
+            exporter.setParameter(JRHtmlExporterParameter.CHARACTER_ENCODING, "UTF-8");
+            exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
+            exporter.exportReport();
+            return os.toString("UTF-8");
+        }
+
+        protected String generateXLS (JasperPrint print, OutputStream os) throws Exception {
+            JRXlsExporter xlsExporter = new JRXlsExporter();
+            xlsExporter.setParameter(JRXlsExporterParameter.JASPER_PRINT, print);
+            xlsExporter.setParameter(JRXlsExporterParameter.OUTPUT_STREAM, os);
+            //xlsExporter.setParameter(JRXlsExporterParameter.IS_ONE_PAGE_PER_SHEET, Boolean.FALSE);
+            xlsExporter.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+            xlsExporter.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+            xlsExporter.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+            xlsExporter.exportReport();
+            return "";
+        }
+
+        protected String generateCSV (JasperPrint print, OutputStream os) throws Exception {
+            JRCsvExporter csvExporter = new JRCsvExporter();
+            csvExporter.setParameter(JRCsvExporterParameter.JASPER_PRINT, print);
+            csvExporter.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, os);
+            csvExporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ";");
+            csvExporter.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+            csvExporter.exportReport();
+            return "";
+        }
+
+        protected String generatePDF (JasperPrint print, OutputStream os) throws Exception {
+            JRPdfExporter pdfExporter = new JRPdfExporter ();
+            pdfExporter.setParameter(JRPdfExporterParameter.OUTPUT_STREAM, os);
+            pdfExporter.setParameter(JRPdfExporterParameter.JASPER_PRINT, print);
+            pdfExporter.exportReport();
+            return "";
+        }
     }
 
     /**

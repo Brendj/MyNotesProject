@@ -13,6 +13,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import java.text.SimpleDateFormat;
@@ -135,7 +136,7 @@ public class ContractSelectPage extends BasicPage {
 
     private List retrieveContracts(Session session, String classTypesString, String contragentName) throws HibernateException {
         this.classTypesString = classTypesString;
-        Criteria criteria = session.createCriteria(Contract.class);
+        Criteria criteria = session.createCriteria(Contract.class).addOrder(Order.asc("contractNumber"));
         if (StringUtils.isNotEmpty(filter)) {
             criteria.add(Restrictions.like("contractNumber", filter, MatchMode.ANYWHERE));
         }
