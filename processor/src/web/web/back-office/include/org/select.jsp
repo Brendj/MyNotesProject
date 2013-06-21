@@ -21,10 +21,15 @@
                         <h:inputText value="#{mainPage.orgSelectPage.selectedItem.shortName}" readonly="true" size="64"
                                      styleClass="input-text" />
                     </h:panelGrid>
-                    <h:panelGrid columns="4" styleClass="borderless-grid">
-                        <h:outputText escape="true" value="Фильтр: " styleClass="output-text" />
-                        <h:inputText value="#{mainPage.orgSelectPage.filter}" size="48" maxlength="128"
-                                     styleClass="input-text" />
+                    <h:panelGrid columns="3" styleClass="borderless-grid">
+                        <h:panelGrid columns="2" styleClass="borderless-grid">
+                            <h:outputText escape="true" value="Фильтр: " styleClass="output-text" />
+                            <h:inputText value="#{mainPage.orgSelectPage.filter}" size="48" maxlength="128"
+                                         styleClass="input-text" />
+                            <h:outputText escape="true" value="Фильтр по тэгу: " styleClass="output-text" />
+                            <h:inputText value="#{mainPage.orgSelectPage.tagFilter}" size="48" maxlength="128"
+                                         styleClass="input-text" />
+                        </h:panelGrid>
                         <a4j:commandLink action="#{mainPage.updateOrgSelectPage}" reRender="modalOrgSelectorForm"
                                          styleClass="command-link">
                             <h:graphicImage value="/images/16x16/search.png" style="border: 0;" />

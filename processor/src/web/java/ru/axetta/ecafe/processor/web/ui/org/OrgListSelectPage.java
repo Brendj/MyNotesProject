@@ -33,6 +33,7 @@ public class OrgListSelectPage extends BasicPage {
     private final Stack<CompleteHandlerList> completeHandlerLists = new Stack<CompleteHandlerList>();
     private List<OrgShortItem> items = Collections.emptyList();
     private String filter;
+    private String tagFilter;
     /*
        0               - нет фильтра
        1               - фильтр "только ОУ"
@@ -76,6 +77,14 @@ public class OrgListSelectPage extends BasicPage {
 
     public List<OrgShortItem> getItems() {
         return items;
+    }
+
+    public String getTagFilter() {
+        return tagFilter;
+    }
+
+    public void setTagFilter(String tagFilter) {
+        this.tagFilter = tagFilter;
     }
 
     public String getFilter() {
@@ -192,6 +201,9 @@ public class OrgListSelectPage extends BasicPage {
         if (StringUtils.isNotEmpty(filter)) {
             criteria.add(Restrictions.or(Restrictions.like("shortName", filter, MatchMode.ANYWHERE),
                     Restrictions.like("officialName", filter, MatchMode.ANYWHERE)));
+        }
+        if (StringUtils.isNotEmpty(tagFilter)) {
+            criteria.add(Restrictions.like("tag", tagFilter, MatchMode.ANYWHERE));
         }
         if (supplierFilter != 0) {
             Criteria destMenuExchangeCriteria = session.createCriteria(MenuExchangeRule.class);

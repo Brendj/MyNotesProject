@@ -18,10 +18,15 @@
         <table class="borderless-grid" width="100%">
             <tr>
                 <td style="text-align: left;">
-                    <h:panelGrid columns="4" styleClass="borderless-grid">
-                        <h:outputText escape="true" value="Фильтр: " styleClass="output-text" />
-                        <h:inputText value="#{mainPage.orgListSelectPage.filter}" size="48" maxlength="128"
-                                     styleClass="input-text" />
+                    <h:panelGrid columns="3" styleClass="borderless-grid">
+                        <h:panelGrid columns="2" styleClass="borderless-grid">
+                            <h:outputText escape="true" value="Фильтр: " styleClass="output-text" />
+                            <h:inputText value="#{mainPage.orgListSelectPage.filter}" size="48" maxlength="128"
+                                         styleClass="input-text" />
+                            <h:outputText escape="true" value="Фильтр по тэгу: " styleClass="output-text" />
+                            <h:inputText value="#{mainPage.orgListSelectPage.tagFilter}" size="48" maxlength="128"
+                                         styleClass="input-text" />
+                        </h:panelGrid>
                         <a4j:commandLink action="#{mainPage.updateOrgListSelectPage}" reRender="modalOrgListSelectorForm"
                                          styleClass="command-link">
                             <h:graphicImage value="/images/16x16/search.png" style="border: 0;" />

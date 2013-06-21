@@ -39,6 +39,7 @@ public class OrgSelectPage extends BasicPage {
     private List<OrgShortItem> items = Collections.emptyList();
     private OrgShortItem selectedItem = new OrgShortItem();
     private String filter;
+    private String tagFilter;
 
     public void pushCompleteHandler(CompleteHandler handler) {
         completeHandlers.push(handler);
@@ -65,6 +66,14 @@ public class OrgSelectPage extends BasicPage {
         } else {
             this.selectedItem = selected;
         }
+    }
+
+    public String getTagFilter() {
+        return tagFilter;
+    }
+
+    public void setTagFilter(String tagFilter) {
+        this.tagFilter = tagFilter;
     }
 
     public String getFilter() {
@@ -106,6 +115,9 @@ public class OrgSelectPage extends BasicPage {
         if (StringUtils.isNotEmpty(filter)) {
             criteria.add(Restrictions.or(Restrictions.like("shortName", filter, MatchMode.ANYWHERE),
                     Restrictions.like("officialName", filter, MatchMode.ANYWHERE)));
+        }
+        if (StringUtils.isNotEmpty(tagFilter)) {
+            criteria.add(Restrictions.like("shortName", tagFilter, MatchMode.ANYWHERE));
         }
         criteria.setProjection(Projections.projectionList()
                 .add(Projections.distinct(Projections.property("idOfOrg")),"idOfOrg")
