@@ -54,3 +54,7 @@ begin
   RETURN value::uuid;
 end;' language 'plpgsql';
 
+
+
+--! Необходимо добавить возможность активации ручного запуска для правила
+alter table CF_ReportHandleRules add AllowManualReportRun INTEGER NOT NULL default 0;
