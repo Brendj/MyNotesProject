@@ -26,16 +26,18 @@
             </style>
         </f:verbatim>
         <h:panelGrid styleClass="borderless-grid" columns="2" columnClasses="topAligned">
-            <h:panelGrid styleClass="borderless-grid" columnClasses="topAligned">
-                <h:outputText value="Выберите отчет:" styleClass="output-text"/>
-                <h:selectOneListbox id="subscriptions" valueChangeListener="#{manualReportRunnerPage.valueChangeListener}"
-                                     value="#{manualReportRunnerPage.ruleItem}" style="width:300px; height: 300px" >
-                    <f:selectItems value="#{manualReportRunnerPage.ruleItems}"/>
-
-                    <a4j:support event="onselect" reRender="#{manualReportRunnerPage.pageComponent.id},manualMainParams" />
-                    <a4j:support event="onchange" reRender="#{manualReportRunnerPage.pageComponent.id},manualMainParams" />
-                </h:selectOneListbox>
-            </h:panelGrid>
+            <a4j:region>
+                <h:panelGrid styleClass="borderless-grid" columnClasses="topAligned">
+                    <h:outputText value="Выберите отчет:" styleClass="output-text"/>
+                    <h:selectOneListbox id="subscriptions" valueChangeListener="#{manualReportRunnerPage.valueChangeListener}"
+                                         value="#{manualReportRunnerPage.ruleItem}" style="width:300px; height: 300px" >
+                        <f:selectItems value="#{manualReportRunnerPage.ruleItems}"/>
+                        <%-- workspaceSubView:workspaceForm:workspacePageSubView:manualMainParams --%>
+                        <a4j:support event="onselect" reRender="workspaceSubView:workspaceForm:workspacePageSubView:manualParamHints,workspaceSubView:workspaceForm:workspacePageSubView:manualMainParams" />
+                        <a4j:support event="onchange" reRender="workspaceSubView:workspaceForm:workspacePageSubView:manualParamHints,workspaceSubView:workspaceForm:workspacePageSubView:manualMainParams" />
+                    </h:selectOneListbox>
+                </h:panelGrid>
+            </a4j:region>
             <%--<rich:comboBox width="320" inputClass="input-text" itemClass="output-text"
                            itemSelectedClass="output-text-font"
                            suggestionValues="#{manualReportRunnerPage.ruleItems}" defaultLabel="#{manualReportRunnerPage.ruleItem}"
@@ -60,72 +62,74 @@
                 </h:panelGrid>
 
 
-                <rich:dataTable id="manualParamHints" value="#{manualReportRunnerPage.paramHints}" var="item"
-                                columnClasses="left-aligned-column, left-aligned-column">
-                    <f:facet name="header">
-                        <h:outputText escape="true" value="Параметры отчета" styleClass="output-text" style="color: #FFFFFF" />
-                    </f:facet>
-                    <rich:column>
-                        <h:outputText escape="true" value="#{item.hint.paramHint.name}" styleClass="output-text" style="#{manualReportRunnerPage.displayElement(item)};" />
-                        <h:outputText escape="true" value="*" style="color: #FF0000; font-weight: bold; #{manualReportRunnerPage.displayElement(item)};" rendered="#{item.hint.required}" styleClass="output-text" />
-                    </rich:column>
-                    <rich:column>
-                        <h:outputText escape="true" value="#{item.hint.paramHint.description}" styleClass="output-text" style="#{manualReportRunnerPage.displayElement(item)};" />
-                    </rich:column>
-                    <rich:column>
-                        <h:selectOneMenu rendered="#{item.type=='combobox'}" style="#{manualReportRunnerPage.displayElement(item)};"
-                                         styleClass="output-text" value="#{item.value}">
-                            <f:selectItems value="#{item.listItems}"/>
-                        </h:selectOneMenu>
+                <h:panelGrid id="manualParamHints" styleClass="borderless-grid">
+                    <rich:dataTable value="#{manualReportRunnerPage.paramHints}" var="item"
+                                    columnClasses="left-aligned-column, left-aligned-column">
+                        <f:facet name="header">
+                            <h:outputText escape="true" value="Параметры отчета" styleClass="output-text" style="color: #FFFFFF" />
+                        </f:facet>
+                        <rich:column>
+                            <h:outputText escape="true" value="#{item.hint.paramHint.name}" styleClass="output-text" style="#{manualReportRunnerPage.displayElement(item)};" />
+                            <h:outputText escape="true" value="*" style="color: #FF0000; font-weight: bold; #{manualReportRunnerPage.displayElement(item)};" rendered="#{item.hint.required}" styleClass="output-text" />
+                        </rich:column>
+                        <rich:column>
+                            <h:outputText escape="true" value="#{item.hint.paramHint.description}" styleClass="output-text" style="#{manualReportRunnerPage.displayElement(item)};" />
+                        </rich:column>
+                        <rich:column>
+                            <h:selectOneMenu rendered="#{item.type=='combobox'}" style="#{manualReportRunnerPage.displayElement(item)};"
+                                             styleClass="output-text" value="#{item.value}">
+                                <f:selectItems value="#{item.listItems}"/>
+                            </h:selectOneMenu>
 
-                        <h:selectOneRadio rendered="#{item.type=='radio'}" style="#{manualReportRunnerPage.displayElement(item)};" styleClass="output-text" value="#{item.value}">
-                            <f:selectItems value="#{item.listItems}"/>
-                        </h:selectOneRadio>
+                            <h:selectOneRadio rendered="#{item.type=='radio'}" style="#{manualReportRunnerPage.displayElement(item)};" styleClass="output-text" value="#{item.value}">
+                                <f:selectItems value="#{item.listItems}"/>
+                            </h:selectOneRadio>
 
-                        <h:selectManyCheckbox rendered="#{item.type=='checkbox'}" style="#{manualReportRunnerPage.displayElement(item)};" styleClass="output-text" value="#{item.valueItems}">
-                            <f:selectItems value="#{item.listItems}"/>
-                        </h:selectManyCheckbox>
+                            <h:selectManyCheckbox rendered="#{item.type=='checkbox'}" style="#{manualReportRunnerPage.displayElement(item)};" styleClass="output-text" value="#{item.valueItems}">
+                                <f:selectItems value="#{item.listItems}"/>
+                            </h:selectManyCheckbox>
 
-                        <h:inputText value="#{item.value}" rendered="#{item.type=='input'}" style="#{manualReportRunnerPage.displayElement(item)};" styleClass="output-text" />
+                            <h:inputText value="#{item.value}" rendered="#{item.type=='input'}" style="#{manualReportRunnerPage.displayElement(item)};" styleClass="output-text" />
 
-                        <h:outputText escape="true" value="#{item.value}" style="#{manualReportRunnerPage.displayElement(item)};" rendered="#{item.type=='output'}" styleClass="output-text" />
+                            <h:outputText escape="true" value="#{item.value}" style="#{manualReportRunnerPage.displayElement(item)};" rendered="#{item.type=='output'}" styleClass="output-text" />
 
-                        <h:panelGroup styleClass="borderless-div" rendered="#{item.type=='contragent'}" style="#{manualReportRunnerPage.displayElement(item)};">
-                            <h:inputText value="#{manualReportRunnerPage.contragentFilter.contragent.contragentName}" readonly="true"
-                                         styleClass="input-text" style="margin-right: 2px;" />
-                            <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
-                                               reRender="modalContragentSelectorPanel"
-                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
-                                               styleClass="command-link" style="width: 25px;">
-                                <f:setPropertyActionListener value="0"
-                                                             target="#{mainPage.multiContrFlag}" />
-                                <f:setPropertyActionListener value="2"
-                                                             target="#{mainPage.classTypes}" />
-                            </a4j:commandButton>
-                        </h:panelGroup>
+                            <h:panelGroup styleClass="borderless-div" rendered="#{item.type=='contragent'}" style="#{manualReportRunnerPage.displayElement(item)};">
+                                <h:inputText value="#{manualReportRunnerPage.contragentFilter.contragent.contragentName}" readonly="true"
+                                             styleClass="input-text" style="margin-right: 2px;" />
+                                <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
+                                                   reRender="modalContragentSelectorPanel"
+                                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                                                   styleClass="command-link" style="width: 25px;">
+                                    <f:setPropertyActionListener value="0"
+                                                                 target="#{mainPage.multiContrFlag}" />
+                                    <f:setPropertyActionListener value="2"
+                                                                 target="#{mainPage.classTypes}" />
+                                </a4j:commandButton>
+                            </h:panelGroup>
 
-                        <h:panelGroup styleClass="borderless-div" rendered="#{item.type=='contract'}" style="#{manualReportRunnerPage.displayElement(item)};">
-                            <h:inputText value="#{manualReportRunnerPage.contractFilter.contract.contractName}" readonly="true"
-                                         styleClass="input-text" style="margin-right: 2px;" />
-                            <a4j:commandButton value="..." action="#{mainPage.showContractSelectPage}"
-                                               reRender="modalContractSelectorPanel"
-                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContractSelectorPanel')}.show();"
-                                               styleClass="command-link" style="width: 25px;">
-                                <f:setPropertyActionListener value="0"
-                                                             target="#{mainPage.multiContrFlag}" />
-                                <f:setPropertyActionListener value=""
-                                                             target="#{mainPage.classTypes}" />
-                            </a4j:commandButton>
-                        </h:panelGroup>
+                            <h:panelGroup styleClass="borderless-div" rendered="#{item.type=='contract'}" style="#{manualReportRunnerPage.displayElement(item)};">
+                                <h:inputText value="#{manualReportRunnerPage.contractFilter.contract.contractName}" readonly="true"
+                                             styleClass="input-text" style="margin-right: 2px;" />
+                                <a4j:commandButton value="..." action="#{mainPage.showContractSelectPage}"
+                                                   reRender="modalContractSelectorPanel"
+                                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContractSelectorPanel')}.show();"
+                                                   styleClass="command-link" style="width: 25px;">
+                                    <f:setPropertyActionListener value="0"
+                                                                 target="#{mainPage.multiContrFlag}" />
+                                    <f:setPropertyActionListener value=""
+                                                                 target="#{mainPage.classTypes}" />
+                                </a4j:commandButton>
+                            </h:panelGroup>
 
-                        <h:panelGroup rendered="#{item.type=='org'}" style="#{manualReportRunnerPage.displayElement(item)};">
-                            <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
-                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                                               styleClass="command-link" style="width: 25px;" />
-                            <h:outputText styleClass="output-text" escape="true" value=" {#{manualReportRunnerPage.filter}}" />
-                        </h:panelGroup>
-                    </rich:column>
-                </rich:dataTable>
+                            <h:panelGroup rendered="#{item.type=='org'}" style="#{manualReportRunnerPage.displayElement(item)};">
+                                <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+                                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                                   styleClass="command-link" style="width: 25px;" />
+                                <h:outputText styleClass="output-text" escape="true" value=" {#{manualReportRunnerPage.filter}}" />
+                            </h:panelGroup>
+                        </rich:column>
+                    </rich:dataTable>
+                </h:panelGrid>
             </h:panelGrid>
 
 

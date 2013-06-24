@@ -67,6 +67,8 @@ import java.util.*;
 public class ManualReportRunnerPage extends OnlineReportPage
         implements ContragentSelectPage.CompleteHandler, ContractSelectPage.CompleteHandler {
 
+    private UIComponent paramsComponent;
+
     Logger logger = LoggerFactory.getLogger(ReportRuleEditPage.class);
     private String reportType;
 
@@ -172,6 +174,14 @@ public class ManualReportRunnerPage extends OnlineReportPage
         } else {
             this.generateEndDate = generateEndDate;
         }
+    }
+
+    public UIComponent getParamsComponent() {
+        return paramsComponent;
+    }
+
+    public void setParamsComponent(UIComponent paramsComponent) {
+        this.paramsComponent = paramsComponent;
     }
 
     public void showContractSelectPage() {
