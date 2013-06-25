@@ -38,7 +38,10 @@
                 <param name="type">4</param>
             </type>
         </property>
+        <!-- списано в действительности -->
         <property name="totalCount" column="TotalCount" type="long" not-null="true"/>
+        <!-- должно было списаться -->
+        <!--<property name="totalCountMust" column="TotalCountMust" type="long" not-null="true"/>-->
         <property name="netWeight" column="NetWeight" type="long" not-null="true"/>
         <property name="disposePrice" column="DisposePrice" type="long" not-null="true"/>
         <property name="nds" column="NDS" type="long" not-null="true"/>

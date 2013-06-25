@@ -26,6 +26,15 @@ public class Person {
     private Set<Org> orgs = new HashSet<Org>();
     private Set<Client> clients = new HashSet<Client>();
     private Set<Client> contractClients = new HashSet<Client>();
+    private Set<Visitor> visitorsInternal;
+
+    Set<Visitor> getVisitorsInternal() {
+        return visitorsInternal;
+    }
+
+    void setVisitorsInternal(Set<Visitor> visitorsInternal) {
+        this.visitorsInternal = visitorsInternal;
+    }
 
     protected Person() {
         // For Hibernate only

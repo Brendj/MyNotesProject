@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <beans
         xmlns='http://www.springframework.org/schema/beans'
         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -18,7 +19,8 @@
   http://cxf.apache.org/jaxws
   http://cxf.apache.org/schemas/jaxws.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd http://www.w3.org/ns/ws-policy http://www.w3.org/2007/02/ws-policy.xsd
 
-  ">
+
+http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702 ">
 
     <bean id="contextCapture" class="ru.axetta.ecafe.processor.core.utils.CxfContextCapture"/>
 
@@ -39,42 +41,41 @@
         </property>
     </bean>
 
-  <bean id="signRequest" class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
-    <constructor-arg>
-      <map>
-        <entry key="action" value="Signature"/>
-        <entry key="wss4j.processor.map">
-        <map key-type="javax.xml.namespace.QName">
-            <entry value="null">
-              <key>
-                <bean class="javax.xml.namespace.QName">
-                  <constructor-arg value="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"/>
-                  <constructor-arg value="Timestamp"/>
-                </bean>
-              </key>
-            </entry>
-          </map>
-        </entry>
-          <!--<entry key="signaturePropFile" value="bob.properties"/>
+    <bean id="signRequest" class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
+        <constructor-arg>
+            <map>
+                <entry key="action" value="Signature"/>
+                <entry key="wss4j.processor.map">
+                    <map key-type="javax.xml.namespace.QName">
+                        <entry value="null">
+                            <key>
+                                <bean class="javax.xml.namespace.QName">
+                                    <constructor-arg
+                                            value="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"/>
+                                    <constructor-arg value="Timestamp"/>
+                                </bean>
+                            </key>
+                        </entry>
+                    </map>
+                </entry>
+                <!--<entry key="signaturePropFile" value="bob.properties"/>
         <entry key="decryptionPropFile" value="bob.properties"/>-->
-              <entry key="signaturePropRefId" value="signatureProperties"/>
-          <entry key="signatureProperties" value-ref="wsCryptoProperties"/>
+                <entry key="signaturePropRefId" value="signatureProperties"/>
+                <entry key="signatureProperties" value-ref="wsCryptoProperties"/>
 
-        <entry key="passwordCallbackClass" value="ru.axetta.ecafe.processor.web.internal.KsPasswordCallback"/>
-      </map>
-    </constructor-arg>
-  </bean>
-
+                <entry key="passwordCallbackClass" value="ru.axetta.ecafe.processor.web.internal.KsPasswordCallback"/>
+            </map>
+        </constructor-arg>
+    </bean>
 
 
     <bean id="noRequestSecurity" class="org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor">
-      <constructor-arg>
-        <map>
-          <entry key="action" value="NoSecurity"/>
-        </map>
-      </constructor-arg>
+        <constructor-arg>
+            <map>
+                <entry key="action" value="NoSecurity"/>
+            </map>
+        </constructor-arg>
     </bean>
-
 
 
     <bean id="signResponse" class="org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor">
@@ -102,7 +103,7 @@ the signature crypto configuration.  See SignaturePropRefId. -->
             id="FrontController"
             address='http://localhost:8080/processor/soap/front'
             implementor='ru.axetta.ecafe.processor.web.internal.FrontController'>
-<!--        <jaxws:inInterceptors>
+        <!--        <jaxws:inInterceptors>
             <bean class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
             <ref bean="signRequest"/>
             <bean class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor"/>

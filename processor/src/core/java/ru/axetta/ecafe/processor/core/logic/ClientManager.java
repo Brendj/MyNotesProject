@@ -402,8 +402,7 @@ public class ClientManager {
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
             client.setClientRegistryVersion(clientRegistryVersion);
 
-            long idOfClient = client.getIdOfClient();
-            return idOfClient;
+            return client.getIdOfClient();
         } catch (Exception e) {
             logger.info("Ошибка при обновлении данных клиента", e);
             throw new Exception(e.getMessage());

@@ -583,6 +583,15 @@ public class RuntimeContext implements ApplicationContextAware {
                 em.persist(possibleCauses);
             }
 
+            /* Дополняем всем клиентам guid у тех у кого они пусты */
+            List<Client> clients = DAOUtils.findClientsByGUIDIsNull(em);
+            for (Client client: clients){
+                client.setClientGUID(UUID.randomUUID().toString());
+                long clientRegistryVersion = DAOUtils.updateClientRegistryVersion((Session) em.getDelegate());
+                client.setClientRegistryVersion(clientRegistryVersion);
+                em.persist(client);
+            }
+
         } catch (Exception e) {
             logger.error("Failed to init application.", e);
             throw e;

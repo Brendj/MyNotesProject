@@ -297,7 +297,7 @@ CREATE TABLE Cf_Good_Basic_Basket_Price
 (
   IdOfGoodBasicBasketPrice bigserial NOT NULL,
   IdOfBasicGood bigint NOT NULL,
-  IdOfGood bigint NOT NULL,
+  IdOfGood bigint,
   GlobalVersion bigint,
   GlobalVersionOnCreate bigint,
   GUID character varying(36) NOT NULL,

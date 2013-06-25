@@ -30,6 +30,10 @@
             <key column="IdOfPerson"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Client"/>
         </set>
+        <set name="visitorsInternal" inverse="true" cascade="all" lazy="true">
+            <key column="IdOfPerson"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Visitor"/>
+        </set>
         <set name="contractClientsInternal" inverse="true" cascade="all">
             <key column="IdOfContractPerson"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Client"/>

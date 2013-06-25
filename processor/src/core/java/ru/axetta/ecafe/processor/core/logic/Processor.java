@@ -2592,8 +2592,8 @@ public class Processor implements SyncProcessor,
     }
 
     private void createTempCard(Session persistenceSession, Transaction persistenceTransaction, Long idOfOrg, long cardNo, String cardPrintedNo) throws Exception {
-        Long id = DAOUtils.getIdOfOrg(persistenceSession, idOfOrg);
-        if (id == null) {
+        Org org = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
+        if (org == null) {
             throw new Exception(String.format("Организация не найдена: %d", idOfOrg));
         }
         Card c = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
@@ -2605,7 +2605,7 @@ public class Processor implements SyncProcessor,
         if (ct != null) {
             throw new Exception("Временная карта уже зарегистрирована на клиента: " );
         }
-        CardTemp cardTemp = new CardTemp(id,cardNo, cardPrintedNo);
+        CardTemp cardTemp = new CardTemp(org,cardNo, cardPrintedNo);
         persistenceSession.save(cardTemp);
     }
 

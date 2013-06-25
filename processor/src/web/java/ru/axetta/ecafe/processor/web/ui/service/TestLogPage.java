@@ -4,11 +4,14 @@
 
 package ru.axetta.ecafe.processor.web.ui.service;
 
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,7 +39,9 @@ public class TestLogPage extends BasicWorkspacePage {
     }
 
     public void fill(Session session) throws Exception {
-
+        Org org = (Org) session.load(Org.class, 0L);
+        Person person = (Person) session.get(Person.class, 95L);
+        Visitor visitor = new Visitor(person);
     }
 
     public void writeTextToLog(Session session) throws Exception {

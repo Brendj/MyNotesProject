@@ -373,7 +373,7 @@ public class ClientGroupBalanceReport extends BasicReport {
 
         private final DateFormat dateFormat;
 
-        public HtmlReportBuilder(String basePath, String baseFileName, DocumentBuilderCallback documentBuilderCallback,
+        public HtmlReportBuilder(String basePath, String baseFileName, BasicReport.DocumentBuilderCallback documentBuilderCallback,
                 DateFormat dateFormat, DateFormat timeFormat) {
             super(basePath, baseFileName, "html", documentBuilderCallback, dateFormat, timeFormat);
             this.dateFormat = dateFormat;
@@ -569,7 +569,7 @@ public class ClientGroupBalanceReport extends BasicReport {
 
         public void run() {
             if (logger.isDebugEnabled()) {
-                logger.debug(String.format("Building auto reports \"%s\"", OrgBalanceReport.class.getCanonicalName()));
+                logger.debug(String.format("Building auto reports \"%s\"", ClientGroupBalanceReport.class.getCanonicalName()));
             }
             String classPropertyValue = ClientGroupBalanceReport.class.getCanonicalName();
             List<AutoReport> autoReports = new LinkedList<AutoReport>();

@@ -44,6 +44,7 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element, "UnitsScale", unitsScale.ordinal());
         setAttribute(element, "TotalCount", totalCount);
+        setAttribute(element, "TotalCountMust", totalCountMust);
         setAttribute(element, "NetWeight", netWeight);
         setAttribute(element, "DisposePrice", disposePrice);
         setAttribute(element, "NDS", nds);
@@ -60,6 +61,8 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
         if(integerUnitsScale!=null) setUnitsScale(UnitScale.fromInteger(integerUnitsScale));
         Long longTotalCount = getLongAttributeValue(node,"TotalCount");
         if(longTotalCount!=null) setTotalCount(longTotalCount);
+        Long longTotalCountMust = getLongAttributeValue(node,"TotalCountMust");
+        if(longTotalCountMust!=null) setTotalCountMust(longTotalCountMust);
         Long longNetWeight = getLongAttributeValue(node,"NetWeight");
         if(longNetWeight!=null) setNetWeight(longNetWeight);
         Long longDisposePrice = getLongAttributeValue(node,"DisposePrice");
@@ -78,12 +81,14 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
         setOrgOwner(((InternalDisposingDocumentPosition) distributedObject).getOrgOwner());
         setUnitsScale(((InternalDisposingDocumentPosition) distributedObject).getUnitsScale());
         setTotalCount(((InternalDisposingDocumentPosition) distributedObject).getTotalCount());
+        setTotalCountMust(((InternalDisposingDocumentPosition) distributedObject).getTotalCountMust());
         setNetWeight(((InternalDisposingDocumentPosition) distributedObject).getNetWeight());
         setDisposePrice(((InternalDisposingDocumentPosition) distributedObject).getDisposePrice());
         setNds(((InternalDisposingDocumentPosition) distributedObject).getNds());
     }
 
     private UnitScale unitsScale;
+    /* писано в действительности: фактический */
     private Long totalCount;
     private Long netWeight;
     private Long disposePrice;
@@ -94,6 +99,16 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
     private String guidOfTMG;
     private String guidOfGood;
     private Good good;
+    /* должно было списаться: планировалось */
+    private Long totalCountMust;
+
+    public Long getTotalCountMust() {
+        return totalCountMust;
+    }
+
+    public void setTotalCountMust(Long totalCountMust) {
+        this.totalCountMust = totalCountMust;
+    }
 
     public Good getGood() {
         return good;

@@ -4,7 +4,7 @@
 
 package ru.axetta.soap;
 
-import generated.nsiws.NSIResponseType;
+//import generated.nsiws.NSIResponseType;
 import generated.opc.ru.msk.schemas.uec.identification.v1.HolderIdDescriptionType;
 import junit.framework.TestCase;
 
