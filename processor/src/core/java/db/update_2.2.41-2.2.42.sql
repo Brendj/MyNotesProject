@@ -3,19 +3,53 @@
 --! Информация для разработчика -- информация для пользователя
 
 -- Пакет обновлений 2.2.42
+-- При базовой корзины заполнении может быть пустым товаров может и не быть
+ALTER TABLE cf_good_basic_basket_price ALTER COLUMN idofgood DROP NOT NULL;
+-- Добавлена колонка указывающее количество которое должно было списаться
+ALTER TABLE cf_internal_disposing_document_positions ADD COLUMN totalcountmust bigint;
+
 -- Таблица регистрации временных карт
--- CREATE TABLE cf_cards_temp (
---   IdOfCartTemp bigserial,
---   CardNo bigint NOT NULL,              --! номер карты
---   IdOfOrg bigint NOT NULL,             --! идентификатор организациии
---   CardPrintedNo character varying(24),   --! номер нанесенный на карту
---   Station int not null default 0,
---   CreateDate bigint notnull
---   CloseDate bigint
+CREATE TABLE cf_cards_temp (
+  IdOfCartTemp bigserial,
+  IdOfOrg bigint NOT NULL,               --! идентификатор организациии
+  IdOfClient bigInt,                     --! Идентификатор клиента
+  IdOfVisitor bigint,                    --!  Идентификатор посетителя
+  CustomerType int not null default 0,     --! Признак карты посетителя , bit, 1- карта посетителя, 0 — карта клиента, not null
+  CardNo bigint NOT NULL,                --! номер карты
+  CardPrintedNo character varying(24),   --! номер нанесенный на карту
+  CardStation int not null default 0,    --! int16 или int8, not null, значения:  0 — свободна, 1 — выдана , 3 — заблокирована (? не уверен, что блокировка нужна)
+  CreateDate bigint not null,             --! Дата и время регистрации карты
+  CloseDate bigint,                      --! Дата завершения действия карты
+  CONSTRAINT cf_cards_temp_pk PRIMARY KEY (IdOfCartTemp),
+  CONSTRAINT cf_cards_temp_organization FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg),
+  CONSTRAINT CardNo_Unique UNIQUE (CardNo)
+);
 --
---   CONSTRAINT CardNo_Unique UNIQUE (CardNo)
--- );
+CREATE TABLE cf_card_temp_operations(
+  IdOfCardTempOperation bigserial not null,   --! первичный ключ
+  IdOfOrg bigint not null,                    --! внешний ключ на IdOfOrg из соотв. таблицы — равен идентификатору организации, на которую зарегистрирована врем. карта или, в случае врем. карты посетителя — идентификатору организации, в которой была произведена эта операция.
+  IdOfCartTemp bigint not null,               --! внешний ключ или на физ. идентификатор временной карты или на первичный ключ соотв. записи из TempCards
+  IdOfClient bigint,                          --! Идентификатор клиента
+  IdOfVisitor bigint,                         --! Идентификатор посетителя
+  OperationType int not null,                 --! Тип операции: int16 или int8, not null, значения:  0 — регистрация, 1 — выдача ,2 – возврат, 3 — блокировка
+  OperationDate bigint not null,              --! Дата и время операции
+  CONSTRAINT cf_card_temp_operations_pk PRIMARY KEY (IdOfCardTempOperation),
+  CONSTRAINT cf_card_temp_operations_organization FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg)
+);
 --
+CREATE TABLE cf_visitors(
+  IdOfVisitor bigserial not null,                --! первичный ключ
+  IdOfPerson BIGINT NOT NULL,                    --! внешний ключ на ФИО посетителя
+  PassportNumber varchar(50),                    --! Серийный номер паспорта
+  PassportDate BIGINT,                           --! Дата выдачи паспорта
+  WarTicketNumber varchar(50),                   --! Серийный номер водительского удостоверения (ВУ)
+  WarTicketDate BIGINT,                          --! Дата выдачи ВУ
+  DriverLicenceNumber varchar(50),               --! Серийный номер военного билета (ВБ)
+  DriverLicenceDate BIGINT,                      --! Дата выдачи ВБ
+  CONSTRAINT cf_visitors_pk PRIMARY KEY (IdOfVisitor),
+  CONSTRAINT cf_visitors_IdOfPerson_fk FOREIGN KEY (IdOfPerson) REFERENCES CF_Persons (IdOfPerson)
+);
+
 -- CREATE TABLE cf_synchistory_exceptions
 -- (
 --   idofsynchistoryexception bigserial NOT NULL,
@@ -27,34 +61,6 @@
 --   CONSTRAINT cf_synchistory_exceptions_sync FOREIGN KEY (idofsync) REFERENCES cf_synchistory (idofsync)
 -- );
 
-
-create or replace function generate_uuid_v4() returns VARCHAR(36) as '
-declare value VARCHAR(36);
-begin
-  value = lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
-  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
-  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
-  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
-  value = value || `-`
-  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
-  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
-  value = value || `-`
-  value = value || lpad((to_hex((ceil(random() * 255)::int & 15) | 64)), 2, `0`);
-  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
-  value = value || `-`
-  value = value || lpad((to_hex((ceil(random() * 255)::int & 63) | 128)), 2, `0`);
-  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
-  value = value || `-`
-  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
-  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
-  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
-  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
-  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
-  value = value || lpad(to_hex(ceil(random() * 255)::int), 2, `0`);
-  RETURN value::uuid;
-end;' language 'plpgsql';
-
-
-
 --! Необходимо добавить возможность активации ручного запуска для правила
 alter table CF_ReportHandleRules add AllowManualReportRun INTEGER NOT NULL default 0;
+
