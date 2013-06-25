@@ -26,9 +26,11 @@
 
         <property name="updateTime" column="LastChange" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>
-        <many-to-one name="contragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent"
-                     column="IdOfContragent"
-                     not-null="false"/>
+
+        <set name="contragents" table="CF_UserContragents">
+            <key column="IdOfUser"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Contragent" column="IdOfContragent"/>
+        </set>
         <set name="functionsInternal" table="CF_Permissions">
             <key column="IdOfUser"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Function" column="IdOfFunction"/>

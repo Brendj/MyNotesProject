@@ -64,3 +64,14 @@ CREATE TABLE cf_visitors(
 --! Необходимо добавить возможность активации ручного запуска для правила
 alter table CF_ReportHandleRules add AllowManualReportRun INTEGER NOT NULL default 0;
 
+
+-- Добавление возможности закреплять несколько контрагентов за пользователем
+--! Необходимо для отображения содержимого процессанга в контексте пользователя
+alter table cf_users drop column idofcontragent;
+create table CF_UserContragents (
+  IdOfUser        BIGINT        NOT NULL,
+  IdOfContragent  BIGINT        NOT NULL,
+  CONSTRAINT CF_UserContragents_pk PRIMARY KEY (IdOfUser, IdOfContragent),
+  CONSTRAINT CF_UserContragents_IdOfUser_fk FOREIGN KEY (IdOfUser) REFERENCES CF_Users (IdOfUser),
+  CONSTRAINT CF_UserContragents_IdOfContragent_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent)
+);

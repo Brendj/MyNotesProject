@@ -72,7 +72,7 @@ public class User {
     private String cypheredPassword;
     private String phone;
     private Date updateTime;
-    private Contragent contragent;
+    private Set<Contragent> contragents = new HashSet<Contragent>();
     private Set<Function> functions = new HashSet<Function>();
     private String email;
     private Integer idOfRole;
@@ -170,12 +170,12 @@ public class User {
         this.updateTime = updateTime;
     }
 
-    public Contragent getContragent() {
-        return contragent;
+    public Set<Contragent> getContragents() {
+        return contragents;
     }
 
-    public void setContragent(Contragent contragent) {
-        this.contragent = contragent;
+    public void setContragents(Set<Contragent> contragents) {
+        this.contragents = contragents;
     }
 
     private Set<Function> getFunctionsInternal() {
@@ -240,8 +240,8 @@ public class User {
     @Override
     public String toString() {
         return "User{" + "idOfUser=" + idOfUser + ", userName='" + userName + '\'' + ", cypheredPassword='"
-                + cypheredPassword + '\'' + ", phone='" + phone + '\'' + ", updateTime=" + updateTime + ", contragent="
-                + contragent + '}';
+                + cypheredPassword + '\'' + ", phone='" + phone + '\'' + ", updateTime=" + updateTime + ", contragents="
+                + contragents.toString() + '}';
     }
 
     private static String encryptPassword(String plainPassword) throws NoSuchAlgorithmException, IOException {

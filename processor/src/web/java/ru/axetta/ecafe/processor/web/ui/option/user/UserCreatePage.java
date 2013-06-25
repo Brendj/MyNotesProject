@@ -8,11 +8,12 @@ import ru.axetta.ecafe.processor.core.persistence.Contract;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
 import org.hibernate.Session;
 
-import java.util.Date;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,7 +22,7 @@ import java.util.Date;
  * Time: 11:33:54
  * To change this template use File | Settings | File Templates.
  */
-public class UserCreatePage extends BasicWorkspacePage implements ContragentSelectPage.CompleteHandler{
+public class UserCreatePage extends BasicWorkspacePage implements ContragentListSelectPage.CompleteHandler{
 
     private Long idOfUser;
     private String userName;
@@ -29,12 +30,12 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentSele
     private String plainPasswordConfirmation;
     private String phone;
     private String email;
-    private ContragentItem contragentItem;
+    private List<ContragentItem> contragentItems = new ArrayList<ContragentItem> ();
     private final FunctionSelector functionSelector = new FunctionSelector();
     private Integer idOfRole;
     private String roleName;
     private final UserRoleEnumTypeMenu userRoleEnumTypeMenu = new UserRoleEnumTypeMenu();
-    private Contragent currentContragent;
+    //private Contragent currentContragent;
 
     public void setIdOfRole(Integer idOfRole) {
         this.idOfRole = idOfRole;
@@ -108,12 +109,26 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentSele
         this.email = email;
     }
 
-    public ContragentItem getContragentItem() {
+    /*public ContragentItem getContragentItem() {
         return contragentItem;
     }
 
     public void setContragentItem(ContragentItem contragentItem) {
         this.contragentItem = contragentItem;
+    }*/
+
+    public String getContragentsFilter () {
+        if (contragentItems == null) {
+            return "";
+        }
+        StringBuilder str = new StringBuilder();
+        for (ContragentItem it : contragentItems) {
+            if (str.length() > 0) {
+                str.append("; ");
+            }
+            str.append(it.getContragentName());
+        }
+        return str.toString();
     }
 
     public FunctionSelector getFunctionSelector() {
@@ -140,10 +155,15 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentSele
         if(role.equals(User.DefaultRole.SUPPLIER)){
             user.setFunctions(functionSelector.getSupplierFunctions(session));
             user.setRoleName(role.toString());
-            if(currentContragent==null){
-                throw new Exception("Contragent fields is null");
+            if(contragentItems==null || contragentItems.size() < 1){
+                throw new Exception("Contragents list is empty");
             }
-            user.setContragent(currentContragent);
+            Set<Contragent> contragents = new HashSet<Contragent>();
+            for (ContragentItem it : this.contragentItems) {
+                Contragent contragent = (Contragent) session.load(Contragent.class, it.getIdOfContragent());
+                contragents.add(contragent);
+            }
+            user.setContragents(contragents);
         }
         if(role.equals(User.DefaultRole.MONITORING)){
             user.setFunctions(functionSelector.getMonitoringFunctions(session));
@@ -166,10 +186,16 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentSele
         return role.equals(User.DefaultRole.DEFAULT);
     }
 
-    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
-        if (null != idOfContragent) {
-            currentContragent = (Contragent) session.load(Contragent.class, idOfContragent);
-            this.contragentItem = new ContragentItem(currentContragent);
+    public void completeContragentListSelection(Session session, List<Long> idOfContragentList, int multiContrFlag, String classTypes) throws Exception {
+        if (null != idOfContragentList) {
+            contragentItems.clear();
+            StringBuilder str = new StringBuilder();
+            for (Long idOfContragent : idOfContragentList) {
+                Contragent currentContragent = (Contragent) session.load(Contragent.class, idOfContragent);
+                ContragentItem contragentItem = new ContragentItem(currentContragent);
+                contragentItems.add(contragentItem);
+            }
+
         }
     }
 
