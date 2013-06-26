@@ -19,25 +19,32 @@
                             headerClass="filter-panel-header">
 
         <h:panelGrid columns="2" styleClass="borderless-grid">
-            <h:outputText escape="true" value="Название правила" styleClass="output-text" />
-            <rich:comboBox value="#{reportRepositoryListPage.filter.ruleName}" width="400px" styleClass="input-text">
-                <f:selectItems value="#{reportRepositoryListPage.ruleNameItems}" />
-            </rich:comboBox>
-            <h:outputText escape="true" value="Тэг" styleClass="output-text" />
-            <h:inputText value="#{reportRepositoryListPage.filter.tag}" styleClass="input-text" />
-            <h:outputText escape="true" value="Название отчета" styleClass="output-text" />
-            <h:inputText value="#{reportRepositoryListPage.filter.reportName}" styleClass="input-text" />
-            <h:outputText escape="true" value="Номер организации" styleClass="output-text" />
-            <h:inputText value="#{reportRepositoryListPage.filter.orgNum}" styleClass="input-text" />
-            <h:outputText escape="true" value="Дата создания" styleClass="output-text" />
-            <rich:calendar value="#{reportRepositoryListPage.filter.createdDate}" datePattern="dd.MM.yyyy"
-                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
-            <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
-            <rich:calendar value="#{reportRepositoryListPage.filter.startDate}" datePattern="dd.MM.yyyy"
-                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
-            <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
-            <rich:calendar value="#{reportRepositoryListPage.filter.endDate}" datePattern="dd.MM.yyyy"
-                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+            <h:panelGrid columns="1">
+                <h:outputText escape="true" value="Название правила" styleClass="output-text" />
+                <h:selectOneListbox value="#{reportRepositoryListPage.filter.ruleName}" style="width:200px; height: 200px" >
+                    <f:selectItems value="#{reportRepositoryListPage.ruleNameItems}"/>
+                </h:selectOneListbox>
+                <%--<rich:comboBox value="#{reportRepositoryListPage.filter.ruleName}" width="400px" styleClass="input-text">
+                    <f:selectItems value="#{reportRepositoryListPage.ruleNameItems}" />
+                </rich:comboBox>--%>
+            </h:panelGrid>
+            <h:panelGrid columns="2">
+                <h:outputText escape="true" value="Тэг" styleClass="output-text" />
+                <h:inputText value="#{reportRepositoryListPage.filter.tag}" styleClass="input-text" />
+                <h:outputText escape="true" value="Название отчета" styleClass="output-text" />
+                <h:inputText value="#{reportRepositoryListPage.filter.reportName}" styleClass="input-text" />
+                <h:outputText escape="true" value="Номер организации" styleClass="output-text" />
+                <h:inputText value="#{reportRepositoryListPage.filter.orgNum}" styleClass="input-text" />
+                <h:outputText escape="true" value="Дата создания" styleClass="output-text" />
+                <rich:calendar value="#{reportRepositoryListPage.filter.createdDate}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+                <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
+                <rich:calendar value="#{reportRepositoryListPage.filter.startDate}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+                <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
+                <rich:calendar value="#{reportRepositoryListPage.filter.endDate}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+            </h:panelGrid>
         </h:panelGrid>
 
         <h:panelGrid columns="2" styleClass="borderless-grid">
