@@ -7,11 +7,10 @@ package ru.axetta.ecafe.processor.web.ui;
 import net.sf.jasperreports.engine.JRException;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfContragentClientAccount;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Function;
 import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -23,18 +22,21 @@ import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountDeletePage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFileLoadPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountListPage;
 import ru.axetta.ecafe.processor.web.ui.client.*;
-import ru.axetta.ecafe.processor.web.ui.contract.ContractSelectPage;
-import ru.axetta.ecafe.processor.web.ui.monitoring.StatusSyncReportPage;
-import ru.axetta.ecafe.processor.web.ui.monitoring.SyncReportPage;
-import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.*;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.*;
-import ru.axetta.ecafe.processor.web.ui.option.discountrule.*;
+import ru.axetta.ecafe.processor.web.ui.contract.ContractSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.*;
 import ru.axetta.ecafe.processor.web.ui.event.*;
 import ru.axetta.ecafe.processor.web.ui.journal.JournalViewPage;
+import ru.axetta.ecafe.processor.web.ui.monitoring.StatusSyncReportPage;
+import ru.axetta.ecafe.processor.web.ui.monitoring.SyncReportPage;
 import ru.axetta.ecafe.processor.web.ui.option.ConfigurationPage;
-import ru.axetta.ecafe.processor.web.ui.org.*;
+import ru.axetta.ecafe.processor.web.ui.option.ReportTemplateManagerPage;
+import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategorySelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.option.discountrule.RuleListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.option.user.*;
+import ru.axetta.ecafe.processor.web.ui.org.*;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuDetailsPage;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuExchangePage;
 import ru.axetta.ecafe.processor.web.ui.org.menu.MenuViewPage;
@@ -42,10 +44,11 @@ import ru.axetta.ecafe.processor.web.ui.pos.*;
 import ru.axetta.ecafe.processor.web.ui.report.job.*;
 import ru.axetta.ecafe.processor.web.ui.report.online.*;
 import ru.axetta.ecafe.processor.web.ui.report.rule.*;
-import ru.axetta.ecafe.processor.web.ui.service.*;
+import ru.axetta.ecafe.processor.web.ui.service.BuildSignKeysPage;
+import ru.axetta.ecafe.processor.web.ui.service.OrderRemovePage;
+import ru.axetta.ecafe.processor.web.ui.service.SupportEmailPage;
+import ru.axetta.ecafe.processor.web.ui.service.TestLogPage;
 import ru.axetta.ecafe.processor.web.ui.settlement.*;
-import ru.axetta.ecafe.processor.web.ui.option.user.*;
-import ru.axetta.ecafe.processor.web.ui.option.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -61,8 +64,14 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpSession;
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * Created by IntelliJ IDEA.
@@ -276,6 +285,7 @@ public class MainPage {
     private final OrgListSelectPage contragentOrgListSelectPage = new OrgListSelectPage();
     private final ContragentSelectPage contragentSelectPage = new ContragentSelectPage();
     private final ContractSelectPage contractSelectPage = new ContractSelectPage();
+    private final ContragentListSelectPage contragentListSelectPage = new ContragentListSelectPage();
     private final ClientSelectPage clientSelectPage = new ClientSelectPage();
     private final ClientGroupSelectPage clientGroupSelectPage = new ClientGroupSelectPage();
 
@@ -2088,6 +2098,10 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         return contractSelectPage;
     }
 
+    public ContragentListSelectPage getContragentListSelectPage () {
+        return contragentListSelectPage;
+    }
+
     private int multiContrFlag = 0;
 
     public void setMultiContrFlag(int multiContrFlag) {
@@ -2098,6 +2112,40 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
 
     public void setClassTypes(String classTypes) {
         this.classTypes = classTypes;
+    }
+
+
+    public Object showContragentListSelectPage () {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler
+                || currentTopMostPage instanceof ContragentListSelectPage) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                contragentListSelectPage.fill(persistenceSession, multiContrFlag, classTypes);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler) {
+                    contragentListSelectPage.pushCompleteHandler((ContragentListSelectPage.CompleteHandler) currentTopMostPage);
+                    modalPages.push(contragentListSelectPage);
+                }
+            } catch (Exception e) {
+                logger.error("Failed to fill contragents list selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора списка контрагентов", null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+
+
+            }
+        }
+        return null;
     }
 
     public Object showContractSelectPage () {
@@ -2194,6 +2242,38 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             
         }
     }*/
+
+
+    public Object completeContragentListSelection () {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            contragentListSelectPage.completeContragentSelection(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == contragentListSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete contragent list selection", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора списка контрагентов", null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
+
+    }
 
 
     public Object completeContractSelection () {
