@@ -47,11 +47,16 @@
             </h:panelGrid>
         </h:panelGrid>
 
-        <h:panelGrid columns="2" styleClass="borderless-grid">
+        <h:panelGrid columns="3" styleClass="borderless-grid">
             <a4j:commandButton value="Применить" action="#{reportRepositoryListPage.reload}"
-                               reRender="workspaceTogglePanel" styleClass="command-button" />
+                               reRender="workspaceTogglePanel" styleClass="command-button" status="repositoryStatus" />
             <a4j:commandButton value="Очистить" action="#{reportRepositoryListPage.resetFilter}"
                                reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
+            <a4j:status id="repositoryStatus">
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+                </f:facet>
+            </a4j:status>
         </h:panelGrid>
     </rich:simpleTogglePanel>
 

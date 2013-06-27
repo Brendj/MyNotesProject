@@ -4,10 +4,12 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.repository;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.Contract;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.ReportInfo;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractEntityItem;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractFilter;
 
@@ -37,6 +39,12 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
 
         @Override
         protected void apply(EntityManager entityManager, Criteria crit) {
+            //  Ограничение на просмотр оргов для пользователя
+            try {
+                Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
+                ContextDAOServices.getInstance().buildOrgRestriction(idOfUser, "idOfOrg", crit);
+            } catch (Exception e) {
+            }
             if (!StringUtils.isEmpty(ruleName)) crit.add(Restrictions.like("ruleName", ruleName, MatchMode.ANYWHERE).ignoreCase());
             if (!StringUtils.isEmpty(tag)) crit.add(Restrictions.like("tag", tag, MatchMode.ANYWHERE).ignoreCase());
             if (!StringUtils.isEmpty(reportName)) crit.add(Restrictions.like("reportName", reportName, MatchMode.ANYWHERE).ignoreCase());

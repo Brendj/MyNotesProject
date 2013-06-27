@@ -4,8 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.contragent;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -161,6 +163,12 @@ public class ContragentListSelectPage extends BasicPage {
     private List retrieveContragents(Session session, String classTypesString) throws HibernateException {
         this.classTypesString = classTypesString;
         Criteria criteria = session.createCriteria(Contragent.class).addOrder(Order.asc("contragentName"));
+        //  Ограничение на просмотр только тех контрагентов, которые доступны пользователю
+        try {
+            Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
+            ContextDAOServices.getInstance().buildContragentRestriction(idOfUser, criteria);
+        } catch (Exception e) {
+        }
         if (StringUtils.isNotEmpty(filter)) {
             criteria.add(Restrictions.like("contragentName", filter, MatchMode.ANYWHERE));
         }

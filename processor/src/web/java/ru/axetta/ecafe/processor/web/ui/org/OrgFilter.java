@@ -4,13 +4,15 @@
 
 package ru.axetta.ecafe.processor.web.ui.org;
 
-import ru.axetta.ecafe.processor.core.daoservices.client.items.ClientMigrationHistoryReportItem;
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.*;
 import org.hibernate.transform.Transformers;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -59,6 +61,11 @@ public class OrgFilter {
                 Restrictions.eq("idOfOrg",idOfOrg),
                 Restrictions.like("officialName",officialName, MatchMode.ANYWHERE).ignoreCase()
         ));*/
+        try {
+            Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
+            ContextDAOServices.getInstance().buildOrgRestriction(idOfUser, criteria);
+        } catch (Exception e) {
+        }
         if (idOfOrg != null && idOfOrg.compareTo(Long.parseLong("0")) > 0) {
             criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
         } else if (officialName != null) {

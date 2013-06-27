@@ -4,8 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.org;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -112,6 +114,12 @@ public class OrgSelectPage extends BasicPage {
     @SuppressWarnings("unchecked")
     private List<OrgShortItem> retrieveOrgs(Session session) throws HibernateException {
         Criteria criteria = session.createCriteria(Org.class);
+        //  Ограничение оргов, которые позволено видеть пользователю
+        try {
+            Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
+            ContextDAOServices.getInstance().buildOrgRestriction(idOfUser, criteria);
+        } catch (Exception e) {
+        }
         if (StringUtils.isNotEmpty(filter)) {
             criteria.add(Restrictions.or(Restrictions.like("shortName", filter, MatchMode.ANYWHERE),
                     Restrictions.like("officialName", filter, MatchMode.ANYWHERE)));

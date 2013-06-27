@@ -4,10 +4,12 @@
 
 package ru.axetta.ecafe.processor.web.ui.org;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.MenuExchangeRule;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -42,7 +44,15 @@ public class DistributionRulesPage extends BasicWorkspacePage {
 
     @Transactional
     private void reload() throws Exception{
-        TypedQuery<Org> orgList = entityManager.createQuery("select org from Org org LEFT JOIN FETCH org.sourceMenuOrgs LEFT JOIN FETCH org.defaultSupplier",Org.class);
+        String restiction = "";
+        try {
+            Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
+            restiction = ContextDAOServices.getInstance().buildOrgRestriction(idOfUser, "org.idOfOrg");
+            restiction = restiction != null && restiction.length() > 0 ? " where " + restiction : restiction;
+        } catch (Exception e) {
+        }
+
+        TypedQuery<Org> orgList = entityManager.createQuery("select org from Org org LEFT JOIN FETCH org.sourceMenuOrgs LEFT JOIN FETCH org.defaultSupplier " + restiction,Org.class);
         for (Org org : orgList.getResultList()) {
             Org distributionOrg = null;
             if (!org.getSourceMenuOrgs().isEmpty()) {

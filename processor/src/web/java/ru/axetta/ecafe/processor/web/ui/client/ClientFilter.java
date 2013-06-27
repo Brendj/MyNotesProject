@@ -4,10 +4,12 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -233,6 +235,12 @@ public class ClientFilter {
     }
 
     public void addRestrictions(Session session, Criteria criteria) throws Exception {
+        //  Ограничение на отображение только тех клиентов, которые доступны пользователю
+        try {
+            Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
+            ContextDAOServices.getInstance().buildOrgRestriction(idOfUser, "org.idOfOrg", criteria);
+        } catch (Exception e) {
+        }
         if (!this.org.isEmpty()) {
             Org org = (Org) session.load(Org.class, this.org.getIdOfOrg());
             criteria.add(Restrictions.eq("org", org));

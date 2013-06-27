@@ -4,9 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.ui.contragent;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -203,6 +205,13 @@ public class ContragentListPage extends BasicWorkspacePage {
         if(items==null || items.isEmpty()){
             List<Item> items = new LinkedList<Item>();
             Criteria criteria = session.createCriteria(Contragent.class);
+            Long idOfUser = null;
+            try {
+                idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
+                ContextDAOServices.getInstance().buildContragentRestriction(idOfUser, criteria);
+            } catch (Exception e) {
+                idOfUser = null;
+            }
             List contragents = criteria.list();
             for (Object object : contragents) {
                 Contragent contragent = (Contragent) object;
