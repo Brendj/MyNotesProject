@@ -4,28 +4,20 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
-import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.export.JRHtmlExporter;
-import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.DailyFileCreator;
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
-import org.hibernate.Transaction;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Properties;
 
@@ -147,7 +139,7 @@ public class BasicReport {
         }
 
         public String generateDocument(int format, BasicReport report, OutputStream os) throws Exception {
-            return generateDocument(format, ((BasicJasperReport) report).getPrint(), null);
+            return generateDocument(format, ((BasicJasperReport) report).getPrint(), os);
         }
 
         public String generateDocument(int format, JasperPrint print, OutputStream os) throws Exception {
