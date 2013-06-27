@@ -84,7 +84,7 @@ public class ProcessLogger implements SyncLogger, PaymentLogger, IntegroLogger {
             if(!syncResponseLogPathDay.exists()){
                 boolean result = syncResponseLogPathDay.mkdir();
             }
-            File file = createFile(datePath, idOfOrg, idOfSync, "in");
+            File file = createFile(datePath, idOfOrg, idOfSync, "out");
             FileOutputStream outputStream = new FileOutputStream(file);
             try {
                 writeDocument(responseDocument, outputStream);
