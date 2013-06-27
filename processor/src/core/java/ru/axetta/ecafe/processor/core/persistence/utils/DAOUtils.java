@@ -1170,4 +1170,11 @@ public class DAOUtils {
         return idOfFriendlyOrgSet;
     }
 
+    /* получаем список всех клиентов у которых guid пустой */
+    public static List<Client> findClientsByGUIDIsNull(EntityManager entityManager) {
+        TypedQuery<Client> query = entityManager.createQuery("from Client client where client.clientGUID is null or client.clientGUID=''", Client.class);
+        query.setMaxResults(300);
+        return query.getResultList();
+    }
+
 }
