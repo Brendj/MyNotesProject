@@ -516,6 +516,9 @@ public class ManualReportRunnerPage extends OnlineReportPage
     public void buildReport(Map<String, List<String>> values, Org org) throws Exception {
         //  Строим отчет
         ReportHandleRule rule = DAOService.getInstance().getReportHandleRule(ruleId);
+        if (rule == null) {
+            return;
+        }
         //AutoReportGenerator.JobDetailCreator cr = RuntimeContext.getInstance().getAutoReportGenerator().getReportJobDetailCreator (ManualReportRunnerPage.class);
         BasicReportJob clearReport = ReportsFactory.craeteReportInstance(reportType);
         BasicReportJob.Builder builder = clearReport.createBuilder(rule.getTemplateFileName());
@@ -573,8 +576,8 @@ public class ManualReportRunnerPage extends OnlineReportPage
             DAOService.getInstance()
                     .registerReport(rule.getRuleName(), rule.getDocumentFormat(), subject, report.getGenerateTime(),
                             report.getGenerateDuration(), report.getStartTime(), report.getEndTime(),
-                            relativeReportFilePath, props.getProperty(ReportPropertiesUtils.P_ORG_NUMBER_IN_NAME),
-                            idOfOrg, rule.getTag());
+                            relativeReportFilePath, org.getOrgNumberInName(),
+                            org.getIdOfOrg(), rule.getTag());
             infoMessage = "Отчеты успешно созданы и помещены в репозиторий";
         } else if (documentFormat == ReportHandleRule.HTML_FORMAT) {
             //  Если выбран html, то необходимо выполнить отчет в строку и отобразить его на странице, а так же, добавить
