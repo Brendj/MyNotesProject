@@ -8,7 +8,6 @@ import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.report.*;
-import ru.axetta.ecafe.processor.core.report.ContragentPaymentReport;
 import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
@@ -19,7 +18,6 @@ import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
 
-import javax.faces.component.html.HtmlPanelGrid;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -143,7 +141,7 @@ public class ReportRuleConstants {
             new ParamHint("contragentName", "Название контрагента"),
             new ParamHint("category", "Категория организации"),
             new ParamHint("idOfMenuSourceOrg", "Идентификатор организации - источника меню"),
-            new ParamHint("enterEventType", "Тип отчета по посещаемости: все/учащиеся/все_без_учащихся"),
+            new ParamHint("enterEventType", "Тип отчета по посещаемости: ").setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{все}Все,{учащиеся}Учащиеся,{все_без_учащихся}Все без учащихся"),
             new ParamHint("groupByMenuGroup", "Группировка отчета по товарным группам"),
             new ParamHint(DailySalesByGroupsReport.PARAM_MENU_GROUPS, "Группы меню"), //25
             new ParamHint(DailySalesByGroupsReport.PARAM_INCLUDE_COMPLEX, "Включать комплексы"),
