@@ -434,6 +434,7 @@
     <option name="DEFAULT_COMPILER" value="Javac" />
     <excludeFromCompile>
       <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/batch_expire_edit.jsp" />
+      <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/registerstamp_report.jsp" />
     </excludeFromCompile>
     <resourceExtensions>
       <entry name=".+\.(properties|xml|html|dtd|tld)" />
@@ -469,7 +470,7 @@
     </copyright>
     <module2copyright />
   </component>
-  <component name="DataSourceManagerImpl" format="xml" hash="3015651737">
+  <component name="DataSourceManagerImpl" format="xml" hash="1930774333">
     <data-source source="LOCAL" name="Moscow Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
       <identifier-quote-string>&quot;</identifier-quote-string>
       <synchronize>true</synchronize>
@@ -623,6 +624,44 @@
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/complex_report.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/total_srvc_report.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/all_complex_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/enter_event_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/pay_complex_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/free_complex_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/good_requests_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/org_discounts_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/registerstamp_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/orgs_discounts_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/client_payments_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/clients_benefits_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/current_positions_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/delivered_services_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/contragent_completion_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/aggregate_good_request_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/repository/report_repository_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/journal/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/msk/stop_list_update.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/msk/send_block_request.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/manual_report_runner.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/msk/org_catalog_find_page.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/jbossws-cxf_1.xml" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/jbossws-cxf.xml" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/msk/pupil_catalog_find_page.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/test.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/test_log.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/sign_keys.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/support_sms.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/remove_order.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/other_actions.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/support_email.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contract/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/pos/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/pos/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/pos/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/pos/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/contract/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/contract/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/list.jsp" />
   </component>
   <component name="FacetAutodetectingManager">
     <autodetection-disabled>
@@ -644,6 +683,7 @@
       <profile version="1.0" is_locked="false">
         <option name="myName" value="Project Default" />
         <option name="myLocal" value="false" />
+        <inspection_tool class="HibernateMappingDomInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JpaAttributeMemberSignatureInspection" enabled="false" level="ERROR" enabled_by_default="false" />
         <inspection_tool class="JpaAttributeTypeInspection" enabled="false" level="ERROR" enabled_by_default="false" />
       </profile>
@@ -1377,6 +1417,7 @@
       <JAVADOC />
       <SOURCES>
         <root url="jar://$USER_HOME$/.ideaLibSources/commons-lang-2.4-sources.jar!/" />
+        <root url="jar://$USER_HOME$/.ideaLibSources/commons-io-1.4-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="cryptopro">
@@ -1406,6 +1447,7 @@
         <root url="jar://$PROJECT_DIR$/../lib/apache/cxf/cxf-rt-frontend-simple-2.4.4.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/apache/cxf/cxf-rt-ws-policy-2.4.4.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/apache/cxf/cxf-rt-ws-security-2.4.4.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/cxf/cxf-rt-transports-http-2.4.4.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

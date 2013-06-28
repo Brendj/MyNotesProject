@@ -6367,6 +6367,29 @@
       <primary-key name="cf_calls_pk" columns="idofcall"/>
       <foreign-key name="cf_calls_idofclient_fk" columns="idofclient" ref-table="cf_clients" ref-schema="public" ref-catalog="" ref-columns="idofclient" update-rule="3" delete-rule="3" deferrability="2"/>
     </table>
+    <table name="cf_card_temp_operations" schema="public" catalog="moscow" type="TABLE">
+      <column name="idofcardtempoperation" sqlType="bigserial" length="19" precision="0" nullable="false" jdbcType="-5" def="bmV4dHZhbCgnY2ZfY2FyZF90ZW1wX29wZXJhdGlvbnNfaWRvZmNhcmR0ZW1wb3BlcmF0aW9uX3NlcSc6OnJlZ2NsYXNzKQ==" autoIncrement="true"/>
+      <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="idofcarttemp" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="idofclient" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
+      <column name="idofvisitor" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
+      <column name="operationtype" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4"/>
+      <column name="operationdate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <primary-key name="cf_card_temp_operations_pk" columns="idofcardtempoperation"/>
+      <foreign-key name="cf_card_temp_operations_organization" columns="idoforg" ref-table="cf_orgs" ref-schema="public" ref-catalog="" ref-columns="idoforg" update-rule="3" delete-rule="3" deferrability="2"/>
+    </table>
+    <table name="cf_card_temp_operations_idofcardtempoperation_seq" schema="public" catalog="moscow" type="SEQUENCE">
+      <column name="sequence_name" sqlType="name" length="2147483647" precision="0" nullable="false" jdbcType="12"/>
+      <column name="last_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="start_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="increment_by" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="max_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="min_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="cache_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="log_cnt" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="is_cycled" sqlType="bool" length="1" precision="0" nullable="false" jdbcType="-7"/>
+      <column name="is_called" sqlType="bool" length="1" precision="0" nullable="false" jdbcType="-7"/>
+    </table>
     <table name="cf_cards" schema="public" catalog="moscow" type="TABLE">
       <column name="idofcard" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
       <column name="version" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
@@ -6391,9 +6414,17 @@
     </table>
     <table name="cf_cards_temp" schema="public" catalog="moscow" type="TABLE">
       <column name="idofcarttemp" sqlType="bigserial" length="19" precision="0" nullable="false" jdbcType="-5" def="bmV4dHZhbCgnY2ZfY2FyZHNfdGVtcF9pZG9mY2FydHRlbXBfc2VxJzo6cmVnY2xhc3Mp" autoIncrement="true"/>
-      <column name="cardno" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
       <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="idofclient" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
+      <column name="idofvisitor" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
+      <column name="customertype" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" def="MA=="/>
+      <column name="cardno" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
       <column name="cardprintedno" sqlType="varchar" length="24" precision="0" nullable="true" jdbcType="12"/>
+      <column name="cardstation" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" def="MA=="/>
+      <column name="createdate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="closedate" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
+      <primary-key name="cf_cards_temp_pk" columns="idofcarttemp"/>
+      <foreign-key name="cf_cards_temp_organization" columns="idoforg" ref-table="cf_orgs" ref-schema="public" ref-catalog="" ref-columns="idoforg" update-rule="3" delete-rule="3" deferrability="2"/>
       <index name="cardno_unique" unique="true" columns="cardno"/>
     </table>
     <table name="cf_cards_temp_idofcarttemp_seq" schema="public" catalog="moscow" type="SEQUENCE">
@@ -6560,6 +6591,7 @@
       <index name="cf_clientpayments_crdate_idx" unique="false" columns="createddate"/>
       <index name="cf_clientpayments_idca_idpay_idx" unique="false" columns="idofcontragent,idofpayment"/>
       <index name="cf_clientpayments_idofca_idx" unique="false" columns="idofcontragent"/>
+      <index name="cf_clientpayments_paysum_idx" unique="false" columns="paysum"/>
     </table>
     <table name="cf_clients" schema="public" catalog="moscow" type="TABLE">
       <column name="idofclient" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
@@ -6690,6 +6722,7 @@
       <foreign-key name="cf_clientsms_idofclient_fk" columns="idofclient" ref-table="cf_clients" ref-schema="public" ref-catalog="" ref-columns="idofclient" update-rule="3" delete-rule="3" deferrability="2"/>
       <foreign-key name="cf_clientsms_idoftransaction_fk" columns="idoftransaction" ref-table="cf_transactions" ref-schema="public" ref-catalog="" ref-columns="idoftransaction" update-rule="3" delete-rule="3" deferrability="2"/>
       <index name="cf_clientsms_idofclient_idx" unique="false" columns="idofclient"/>
+      <index name="cf_clientsms_price_idx" unique="false" columns="price"/>
     </table>
     <table name="cf_clientsnotificationsettings" schema="public" catalog="moscow" type="TABLE">
       <column name="idofsetting" sqlType="bigserial" length="19" precision="0" nullable="false" jdbcType="-5" def="bmV4dHZhbCgnY2ZfY2xpZW50c25vdGlmaWNhdGlvbnNldHRpbmdzX2lkb2ZzZXR0aW5nX3NlcSc6OnJlZ2NsYXNzKQ==" autoIncrement="true"/>
@@ -6852,7 +6885,7 @@
       <exported-key name="cf_pos_idofcontragentreceiver_fk" table="cf_pos" schema="public" catalog="moscow" columns="idofcontragent"/>
       <exported-key name="cf_settlements_idofcontragentpayer_fk" table="cf_settlements" schema="public" catalog="moscow" columns="idofcontragentpayer"/>
       <exported-key name="cf_settlements_idofcontragentreceiver_fk" table="cf_settlements" schema="public" catalog="moscow" columns="idofcontragentreceiver"/>
-      <exported-key name="cf_users_idofcontragent_fk" table="cf_users" schema="public" catalog="moscow" columns="idofcontragent"/>
+      <exported-key name="cf_usercontragents_idofcontragent_fk" table="cf_usercontragents" schema="public" catalog="moscow" columns="idofcontragent"/>
       <index name="cf_contragents_contragentname" unique="true" columns="contragentname"/>
     </table>
     <table name="cf_currentpositions" schema="public" catalog="moscow" type="TABLE">
@@ -7303,7 +7336,7 @@
     <table name="cf_good_basic_basket_price" schema="public" catalog="moscow" type="TABLE">
       <column name="idofgoodbasicbasketprice" sqlType="bigserial" length="19" precision="0" nullable="false" jdbcType="-5" def="bmV4dHZhbCgnY2ZfZ29vZF9iYXNpY19iYXNrZXRfcHJpY2VfaWRvZmdvb2RiYXNpY2Jhc2tldHByaWNlX3NlcSc6OnJlZ2NsYXNzKQ==" autoIncrement="true"/>
       <column name="idofbasicgood" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
-      <column name="idofgood" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="idofgood" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
       <column name="globalversion" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
       <column name="globalversiononcreate" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
       <column name="guid" sqlType="varchar" length="36" precision="0" nullable="false" jdbcType="12"/>
@@ -8192,6 +8225,8 @@
       <exported-key name="cf_orderdetails_idoforg_idoforder_fk" table="cf_orderdetails" schema="public" catalog="moscow" columns="idoforg,idoforder"/>
       <index name="cf_orders_client_idx" unique="false" columns="idofclient"/>
       <index name="cf_orders_createddate_idx" unique="false" columns="createddate"/>
+      <index name="cf_orders_sumbycard_idx" unique="false" columns="sumbycard"/>
+      <index name="cf_orders_sumbycash_idx" unique="false" columns="sumbycash"/>
     </table>
     <table name="cf_orgs" schema="public" catalog="moscow" type="TABLE">
       <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
@@ -8234,11 +8269,14 @@
       <column name="refectorytype" sqlType="int4" length="10" precision="0" nullable="true" jdbcType="4"/>
       <column name="clientversion" sqlType="varchar" length="16" precision="0" nullable="true" jdbcType="12"/>
       <column name="remoteaddress" sqlType="varchar" length="20" precision="0" nullable="true" jdbcType="12"/>
+      <column name="fullsyncparam" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" def="MA=="/>
       <primary-key name="cf_orgs_pk" columns="idoforg"/>
       <foreign-key name="cf_orgs_contract" columns="idofcontract" ref-table="cf_contracts" ref-schema="public" ref-catalog="" ref-columns="idofcontract" update-rule="3" delete-rule="3" deferrability="2"/>
       <foreign-key name="cf_orgs_defaultsupplier_fk" columns="defaultsupplier" ref-table="cf_contragents" ref-schema="public" ref-catalog="" ref-columns="idofcontragent" update-rule="3" delete-rule="3" deferrability="2"/>
       <foreign-key name="cf_orgs_idofofficialperson_fk" columns="idofofficialperson" ref-table="cf_persons" ref-schema="public" ref-catalog="" ref-columns="idofperson" update-rule="3" delete-rule="3" deferrability="2"/>
       <exported-key name="cf_assortment_idoforg_fk" table="cf_assortment" schema="public" catalog="moscow" columns="idoforg"/>
+      <exported-key name="cf_card_temp_operations_organization" table="cf_card_temp_operations" schema="public" catalog="moscow" columns="idoforg"/>
+      <exported-key name="cf_cards_temp_organization" table="cf_cards_temp" schema="public" catalog="moscow" columns="idoforg"/>
       <exported-key name="cf_orgscategories_idoforg" table="cf_categoryorg_orgs" schema="public" catalog="moscow" columns="idoforg"/>
       <exported-key name="cf_clientgroups_idoforg_fk" table="cf_clientgroups" schema="public" catalog="moscow" columns="idoforg"/>
       <exported-key name="cf_clients_idoforg_fk" table="cf_clients" schema="public" catalog="moscow" columns="idoforg"/>
@@ -8252,8 +8290,8 @@
       <exported-key name="cf_goods_complaint_orders_idoforderorg_fk" table="cf_goods_complaint_orders" schema="public" catalog="moscow" columns="idoforderorg"/>
       <exported-key name="cf_menu_idoforg_fk" table="cf_menu" schema="public" catalog="moscow" columns="idoforg"/>
       <exported-key name="cf_menuexchange_idoforg_fk" table="cf_menuexchange" schema="public" catalog="moscow" columns="idoforg"/>
-      <exported-key name="cf_menuexchangerules_idofdestorg_fk" table="cf_menuexchangerules" schema="public" catalog="moscow" columns="idofdestorg"/>
       <exported-key name="cf_menuexchangerules_idofsourceorg_fk" table="cf_menuexchangerules" schema="public" catalog="moscow" columns="idofsourceorg"/>
+      <exported-key name="cf_menuexchangerules_idofdestorg_fk" table="cf_menuexchangerules" schema="public" catalog="moscow" columns="idofdestorg"/>
       <exported-key name="cf_orderdetails_idoforg_fk" table="cf_orderdetails" schema="public" catalog="moscow" columns="idoforg"/>
       <exported-key name="cf_orders_idoforg_fk" table="cf_orders" schema="public" catalog="moscow" columns="idoforg"/>
       <exported-key name="cf_qa_organization_questionary_org_fk" table="cf_qa_organization_questionary" schema="public" catalog="moscow" columns="idoforg"/>
@@ -8279,6 +8317,7 @@
       <exported-key name="cf_clients_idofperson_fk" table="cf_clients" schema="public" catalog="moscow" columns="idofperson"/>
       <exported-key name="cf_contragents_idofcontactperson_fk" table="cf_contragents" schema="public" catalog="moscow" columns="idofcontactperson"/>
       <exported-key name="cf_orgs_idofofficialperson_fk" table="cf_orgs" schema="public" catalog="moscow" columns="idofofficialperson"/>
+      <exported-key name="cf_visitors_idofperson_fk" table="cf_visitors" schema="public" catalog="moscow" columns="idofperson"/>
     </table>
     <table name="cf_pos" schema="public" catalog="moscow" type="TABLE">
       <column name="idofpos" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
@@ -8620,6 +8659,7 @@
       <column name="enabled" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4"/>
       <column name="templatefilename" sqlType="varchar" length="256" precision="0" nullable="true" jdbcType="12"/>
       <column name="tag" sqlType="varchar" length="12" precision="0" nullable="true" jdbcType="12"/>
+      <column name="allowmanualreportrun" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" def="MA=="/>
       <primary-key name="cf_reporthandlerules_pk" columns="idofreporthandlerule"/>
       <exported-key name="cf_ruleconditions_idofreporthandlerule_fk" table="cf_ruleconditions" schema="public" catalog="moscow" columns="idofreporthandlerule"/>
     </table>
@@ -8870,6 +8910,7 @@
       <column name="createtime" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
       <primary-key name="cf_subscriptionfee_pk" columns="subscriptionyear,periodno"/>
       <foreign-key name="cf_subscriptionfee_idoftransaction_fk" columns="idoftransaction" ref-table="cf_transactions" ref-schema="public" ref-catalog="" ref-columns="idoftransaction" update-rule="3" delete-rule="3" deferrability="2"/>
+      <index name="cf_subscriptionfee_subscriptionsum_idx" unique="false" columns="subscriptionsum"/>
     </table>
     <table name="cf_synchistory" schema="public" catalog="moscow" type="TABLE">
       <column name="idofsync" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
@@ -9143,6 +9184,13 @@
       <exported-key name="cf_accompanyingdocuments_idoftypeofaccompanyingdocument_fkey" table="cf_accompanyingdocuments" schema="public" catalog="moscow" columns="idoftypeofaccompanyingdocument"/>
       <index name="cf_typesofaccompanyingdocuments_guid_key" unique="true" columns="guid"/>
     </table>
+    <table name="cf_usercontragents" schema="public" catalog="moscow" type="TABLE">
+      <column name="idofuser" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="idofcontragent" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <primary-key name="cf_usercontragents_pk" columns="idofuser,idofcontragent"/>
+      <foreign-key name="cf_usercontragents_idofcontragent_fk" columns="idofcontragent" ref-table="cf_contragents" ref-schema="public" ref-catalog="" ref-columns="idofcontragent" update-rule="3" delete-rule="3" deferrability="2"/>
+      <foreign-key name="cf_usercontragents_idofuser_fk" columns="idofuser" ref-table="cf_users" ref-schema="public" ref-catalog="" ref-columns="idofuser" update-rule="3" delete-rule="3" deferrability="2"/>
+    </table>
     <table name="cf_users" schema="public" catalog="moscow" type="TABLE">
       <column name="idofuser" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
       <column name="version" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
@@ -9150,14 +9198,37 @@
       <column name="password" sqlType="varchar" length="128" precision="0" nullable="false" jdbcType="12"/>
       <column name="lastchange" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
       <column name="phone" sqlType="varchar" length="32" precision="0" nullable="false" jdbcType="12"/>
-      <column name="idofcontragent" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
       <column name="email" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12"/>
       <column name="idofrole" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" def="MA=="/>
       <column name="rolename" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12"/>
       <primary-key name="cf_users_pk" columns="idofuser"/>
-      <foreign-key name="cf_users_idofcontragent_fk" columns="idofcontragent" ref-table="cf_contragents" ref-schema="public" ref-catalog="" ref-columns="idofcontragent" update-rule="3" delete-rule="3" deferrability="2"/>
       <exported-key name="cf_permissions_idofuser_fk" table="cf_permissions" schema="public" catalog="moscow" columns="idofuser"/>
+      <exported-key name="cf_usercontragents_idofuser_fk" table="cf_usercontragents" schema="public" catalog="moscow" columns="idofuser"/>
       <index name="cf_users_shortname" unique="true" columns="username"/>
+    </table>
+    <table name="cf_visitors" schema="public" catalog="moscow" type="TABLE">
+      <column name="idofvisitor" sqlType="bigserial" length="19" precision="0" nullable="false" jdbcType="-5" def="bmV4dHZhbCgnY2ZfdmlzaXRvcnNfaWRvZnZpc2l0b3Jfc2VxJzo6cmVnY2xhc3Mp" autoIncrement="true"/>
+      <column name="idofperson" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="passportnumber" sqlType="varchar" length="50" precision="0" nullable="true" jdbcType="12"/>
+      <column name="passportdate" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
+      <column name="warticketnumber" sqlType="varchar" length="50" precision="0" nullable="true" jdbcType="12"/>
+      <column name="warticketdate" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
+      <column name="driverlicencenumber" sqlType="varchar" length="50" precision="0" nullable="true" jdbcType="12"/>
+      <column name="driverlicencedate" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
+      <primary-key name="cf_visitors_pk" columns="idofvisitor"/>
+      <foreign-key name="cf_visitors_idofperson_fk" columns="idofperson" ref-table="cf_persons" ref-schema="public" ref-catalog="" ref-columns="idofperson" update-rule="3" delete-rule="3" deferrability="2"/>
+    </table>
+    <table name="cf_visitors_idofvisitor_seq" schema="public" catalog="moscow" type="SEQUENCE">
+      <column name="sequence_name" sqlType="name" length="2147483647" precision="0" nullable="false" jdbcType="12"/>
+      <column name="last_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="start_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="increment_by" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="max_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="min_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="cache_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="log_cnt" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="is_cycled" sqlType="bool" length="1" precision="0" nullable="false" jdbcType="-7"/>
+      <column name="is_called" sqlType="bool" length="1" precision="0" nullable="false" jdbcType="-7"/>
     </table>
     <table name="cf_waybills" schema="public" catalog="moscow" type="TABLE">
       <column name="idofwaybill" sqlType="bigserial" length="19" precision="0" nullable="false" jdbcType="-5" def="bmV4dHZhbCgnY2Zfd2F5YmlsbHNfaWRvZndheWJpbGxfc2VxJzo6cmVnY2xhc3Mp" autoIncrement="true"/>
