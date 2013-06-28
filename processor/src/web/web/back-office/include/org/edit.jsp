@@ -95,6 +95,10 @@
     <h:selectOneMenu value="#{mainPage.orgEditPage.state}" styleClass="input-text">
         <f:selectItems value="#{mainPage.orgEditPage.orgStateMenu.items}" />
     </h:selectOneMenu>
+
+    <h:outputText id="fullsyncparamlabel" escape="true" value="Произвести полную синхронизацию" styleClass="output-text" />
+    <h:selectBooleanCheckbox id="fullsyncparamcheckbox" value="#{mainPage.orgEditPage.fullSyncParam}" disabled="#{mainPage.orgEditPage.fullSyncParam}"/>
+
     <h:outputText escape="true" value="Лимит овердрафта по умолчанию" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.cardLimit}" converter="copeckSumConverter" styleClass="input-text" />
     <h:outputText escape="true" value="Открытый ключ" styleClass="output-text" />

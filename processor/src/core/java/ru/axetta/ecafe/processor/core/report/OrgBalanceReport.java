@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.report;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.ExecutorServiceWrappedJob;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -423,7 +424,7 @@ public class OrgBalanceReport extends BasicReport {
 
         private static long getTotalClientPaymentSum(Session session, Date baseTime, Client client) throws Exception {
             Query query = session.createQuery(
-                    "select sum(clientPayment.paySum) from ClientPayment clientPayment where clientPayment.transaction.client = ? and clientPayment.payType = ? and clientPayment.createTime < ?");
+                    "select sum(clientPayment.paySum) from ClientPayment clientPayment left join clientPayment.transaction tr where tr.client = ? and clientPayment.payType = ? and clientPayment.createTime < ?");
             query.setParameter(0, client);
             query.setParameter(1, ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT);
             query.setParameter(2, baseTime);
@@ -461,7 +462,7 @@ public class OrgBalanceReport extends BasicReport {
         private static TotalSums getTotalSubscriptionSums(Session session, Date baseTime, Client client)
                 throws Exception {
             Query query = session.createQuery(
-                    "select sum(fee.subscriptionSum) from SubscriptionFee fee where fee.transaction.client = ? and fee.createTime < ?");
+                    "select sum(fee.subscriptionSum) from SubscriptionFee fee left join fee.transaction tr where tr.client = ? and fee.createTime < ?");
             query.setParameter(0, client);
             query.setParameter(1, baseTime);
             Long result = (Long) query.uniqueResult();

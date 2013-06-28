@@ -508,6 +508,22 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                                 idOfOrg, currRule.getTag());
                             }
 
+                            if (basicReport instanceof OrgBalanceReport) {
+                                OrgBalanceReport basicReportJob = (OrgBalanceReport) basicReport;
+                                File f = new File(
+                                        RuntimeContext.getInstance().getAutoReportGenerator().getReportPath());
+                                String relativeReportFilePath = reportDocument.getReportFile().getAbsolutePath()
+                                        .substring(f.getAbsolutePath().length());
+                                DAOService.getInstance()
+                                        .registerReport(currRule.getRuleName(), currRule.getDocumentFormat(),
+                                                subject, basicReport.getGenerateTime(),
+                                                basicReport.getGenerateDuration(), basicReportJob.getBaseTime(),
+                                                basicReportJob.getBaseTime(), relativeReportFilePath,
+                                                report.getProperties()
+                                                        .getProperty(ReportPropertiesUtils.P_ORG_NUMBER_IN_NAME),
+                                                idOfOrg, currRule.getTag());
+                            }
+
                         }
                         if (null != reportDocument) {
                             // загружаем списки рассылок по id

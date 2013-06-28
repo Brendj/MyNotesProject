@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.G
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +51,7 @@ public class GoodRequestService {
         if ((stateList != null) && !stateList.isEmpty()) {
             criteria.add(Restrictions.in("state",stateList));
         }
+        criteria.addOrder(Order.desc("doneDate"));
         return criteria.list();
     }
 

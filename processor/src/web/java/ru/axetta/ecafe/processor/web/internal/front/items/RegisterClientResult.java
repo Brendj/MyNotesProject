@@ -13,10 +13,10 @@ package ru.axetta.ecafe.processor.web.internal.front.items;
  */
 public class RegisterClientResult {
 
-    private Long idOfClient;
-    private int recId;
-    private boolean success;
-    private String error;
+    protected Long idOfClient;
+    protected int recId;
+    protected boolean success;
+    protected String error;
 
     protected RegisterClientResult() {}
 

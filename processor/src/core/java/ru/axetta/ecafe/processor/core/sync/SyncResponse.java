@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.sync;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
+import ru.axetta.ecafe.processor.core.sync.response.DirectiveElement;
 import ru.axetta.ecafe.processor.core.sync.response.GoodsBasicBasketData;
 import ru.axetta.ecafe.processor.core.sync.response.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.response.QuestionaryData;
@@ -1732,17 +1733,20 @@ public class SyncResponse {
     private final QuestionaryData questionaryData;
     private final GoodsBasicBasketData goodsBasicBasketData;
     private final Manager manager;
+    private final DirectiveElement directiveElement;
 
     public CorrectingNumbersOrdersRegistry getCorrectingNumbersOrdersRegistry() {
         return correctingNumbersOrdersRegistry;
     }
 
-    public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, Long idOfPacket, Long protoVersion, Date time, String options,
-            AccRegistry accRegistry, ResPaymentRegistry resPaymentRegistry, AccIncRegistry accIncRegistry,
+    public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, Long idOfPacket, Long protoVersion, Date time,
+            String options, AccRegistry accRegistry, ResPaymentRegistry resPaymentRegistry, AccIncRegistry accIncRegistry,
             ClientRegistry clientRegistry, ResOrgStructure resOrgStructure, ResMenuExchangeData resMenuExchangeData,
             ResDiary resDiary, String message, ResEnterEvents resEnterEvents, ResLibraryData resLibraryData, ResLibraryData2 resLibraryData2,
             ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules,
-            CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData, QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData) {
+            CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData,
+            QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData,
+            DirectiveElement directiveElement) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1767,6 +1771,7 @@ public class SyncResponse {
         this.orgOwnerData = orgOwnerData;
         this.questionaryData = questionaryData;
         this.goodsBasicBasketData = goodsBasicBasketData;
+        this.directiveElement = directiveElement;
     }
 
     public Document toDocument() throws Exception {
@@ -1876,6 +1881,10 @@ public class SyncResponse {
 
         if(goodsBasicBasketData != null) {
             ecafeEnvelopeElement.appendChild(goodsBasicBasketData.toElement(document));
+        }
+
+        if(directiveElement != null) {
+            ecafeEnvelopeElement.appendChild(directiveElement.toElement(document));
         }
 
         bodyElement.appendChild(ecafeEnvelopeElement);

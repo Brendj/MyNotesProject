@@ -27,6 +27,7 @@ import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.sync.SyncResponse;
 import ru.axetta.ecafe.processor.core.sync.SyncType;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
+import ru.axetta.ecafe.processor.core.sync.response.DirectiveElement;
 import ru.axetta.ecafe.processor.core.sync.response.GoodsBasicBasketData;
 import ru.axetta.ecafe.processor.core.sync.response.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.response.QuestionaryData;
@@ -581,6 +582,7 @@ public class Processor implements SyncProcessor,
         OrgOwnerData orgOwnerData = null;
         QuestionaryData questionaryData = null;
         GoodsBasicBasketData goodsBasicBasketData = null;
+        DirectiveElement directiveElement = null;
 
         idOfPacket = generateIdOfPacket(request.getIdOfOrg());
         // Register sync history
@@ -777,12 +779,14 @@ public class Processor implements SyncProcessor,
         if (request.getSyncType() == SyncType.TYPE_FULL) {
             // Update sync history - store sync end time and sync result
             updateSyncHistory(idOfSync, syncResult, syncEndTime);
+            updateFullSyncParam(request.getIdOfOrg());
         }
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(),
                 request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resLibraryData, resLibraryData2, resCategoriesDiscountsAndRules,
-                correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData);
+                correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
+                directiveElement);
     }
 
     /* Do process short synchronization for update Client parameters */
@@ -806,6 +810,7 @@ public class Processor implements SyncProcessor,
         OrgOwnerData orgOwnerData = null;
         QuestionaryData questionaryData = null;
         GoodsBasicBasketData goodsBasicBasketData = null;
+        DirectiveElement directiveElement = null;
 
         try {
             processSyncClientParamRegistry(idOfSync, request.getIdOfOrg(), request.getClientParamRegistry());
@@ -823,13 +828,21 @@ public class Processor implements SyncProcessor,
                     e);
         }
 
+        try {
+            directiveElement = processSyncDirective(request.getIdOfOrg());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()),
+                    e);
+        }
+
         Date syncEndTime = new Date();
 
         return new SyncResponse(request.getSyncType()/*request.getType()*/, request.getIdOfOrg(),
                 request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resLibraryData, resLibraryData2, resCategoriesDiscountsAndRules,
-                correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData);
+                correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
+                directiveElement);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -853,6 +866,7 @@ public class Processor implements SyncProcessor,
         OrgOwnerData orgOwnerData = null;
         QuestionaryData questionaryData = null;
         GoodsBasicBasketData goodsBasicBasketData = null;
+        DirectiveElement directiveElement = null;
 
         boolean bError = false;
         try {
@@ -887,6 +901,13 @@ public class Processor implements SyncProcessor,
             bError = true;
         }
 
+        try {
+            directiveElement = processSyncDirective(request.getIdOfOrg());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()),
+                    e);
+        }
+
         // Process enterEvents
         try {
             if (request.getEnterEvents() != null) {
@@ -909,7 +930,40 @@ public class Processor implements SyncProcessor,
                 request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resLibraryData, resLibraryData2, resCategoriesDiscountsAndRules,
-                correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData);
+                correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
+                directiveElement);
+    }
+
+    private void updateFullSyncParam(long idOfOrg) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            DAOUtils.falseFullSyncByOrg(persistenceSession, idOfOrg);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    private DirectiveElement processSyncDirective(long idOfOrg) throws Exception{
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        DirectiveElement directiveElement = new DirectiveElement();
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            directiveElement.process(persistenceSession, idOfOrg);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return directiveElement;
     }
 
     private void checkUserPaymentProcessRights(Long idOfUser) throws Exception {

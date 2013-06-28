@@ -758,7 +758,7 @@
                             binding="#{mainPage.goodRequestReportPage.mainMenuComponent}" label="Сводный отчет по заявкам"
                             action="#{mainPage.showGoodRequestReportPage}" reRender="workspaceForm" />
 
-        <%--@elvariable id="aggregateGoodRequestReportPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.AggregateGoodRequestReportPage"--%>
+        <%--@elvariable id="aggregateGoodRequestReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.AggregateGoodRequestReportPage"--%>
         <rich:panelMenuItem id="aggregateGoodRequestReportMenuItem"
                             binding="#{aggregateGoodRequestReportPage.mainMenuComponent}" label="Детальный отчет по заякам"
                             action="#{aggregateGoodRequestReportPage.show}" reRender="workspaceForm" />

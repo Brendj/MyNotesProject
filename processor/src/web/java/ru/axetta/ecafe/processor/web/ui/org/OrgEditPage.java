@@ -73,6 +73,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private String location;
     private String latitude;
     private String longitude;
+    private Boolean fullSyncParam;
 
     private Integer refectoryType;
     private List<SelectItem> refectoryTypeComboMenuItems;
@@ -208,6 +209,9 @@ public class OrgEditPage extends BasicWorkspacePage
             }
         }
 
+        if(this.fullSyncParam){
+            org.setFullSyncParam(fullSyncParam);
+        }
 
         session.update(org);
         fill(org);
@@ -253,6 +257,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.mailingListReports1 = org.getMailingListReports1();
         this.mailingListReports2 = org.getMailingListReports2();
         this.guid = org.getGuid();
+        this.fullSyncParam = org.getFullSyncParam();
 
         this.refectoryType = org.getRefectoryType();
         if (this.refectoryType == null) {
@@ -723,4 +728,11 @@ public class OrgEditPage extends BasicWorkspacePage
         return refectoryTypeComboMenuItems;
     }
 
+    public Boolean getFullSyncParam() {
+        return fullSyncParam;
+    }
+
+    public void setFullSyncParam(Boolean fullSyncParam) {
+        this.fullSyncParam = fullSyncParam;
+    }
 }

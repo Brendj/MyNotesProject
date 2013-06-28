@@ -75,3 +75,11 @@ create table CF_UserContragents (
   CONSTRAINT CF_UserContragents_IdOfUser_fk FOREIGN KEY (IdOfUser) REFERENCES CF_Users (IdOfUser),
   CONSTRAINT CF_UserContragents_IdOfContragent_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent)
 );
+
+create index CF_Orders_SumByCard_idx on CF_Orders(SumByCard);
+create index CF_Orders_SumByCash_idx on CF_Orders(SumByCash);
+create index CF_ClientSms_Price_idx on CF_ClientSms(Price);
+create index CF_SubscriptionFee_SubscriptionSum_idx on CF_SubscriptionFee(SubscriptionSum);
+create index CF_ClientPayments_PaySum_idx on CF_ClientPayments(PaySum);
+
+alter table CF_Orgs add FullSyncParam INTEGER NOT NULL default 0;

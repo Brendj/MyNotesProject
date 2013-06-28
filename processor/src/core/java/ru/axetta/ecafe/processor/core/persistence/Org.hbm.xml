@@ -60,6 +60,10 @@
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>
 
+        <property name="fullSyncParam" column="FullSyncParam"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
+
         <many-to-one name="defaultSupplier" class="ru.axetta.ecafe.processor.core.persistence.Contragent"
                      column="DefaultSupplier"
                      not-null="true"/>

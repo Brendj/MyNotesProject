@@ -23,7 +23,7 @@ public class GoodRequestListPage extends BasicWorkspacePage {
     private Date endDate = new Date();
     private Integer deletedState = 2;
     private List<DocumentState> stateList = new ArrayList<DocumentState>();
-    private Integer[] requestState;
+    private Integer[] documentState;
     private SelectItem[] stateSelectItemList;
     private static DocumentState[] documentStates = DocumentState.values();
 
@@ -54,7 +54,7 @@ public class GoodRequestListPage extends BasicWorkspacePage {
 
     public void reload() throws Exception{
         stateList.clear();
-        for (Integer i: requestState){
+        for (Integer i: documentState){
             stateList.add(DocumentState.values()[i]);
         }
         Calendar localCalendar = Calendar.getInstance();
@@ -107,12 +107,12 @@ public class GoodRequestListPage extends BasicWorkspacePage {
         return filter.toString();
     }
 
-    public Integer[] getRequestState() {
-        return requestState;
+    public Integer[] getDocumentState() {
+        return documentState;
     }
 
-    public void setRequestState(Integer[] requestState) {
-        this.requestState = requestState;
+    public void setDocumentState(Integer[] documentState) {
+        this.documentState = documentState;
     }
 
     public Long getIdOfOrg() {

@@ -10,6 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,6 +20,12 @@ import java.util.GregorianCalendar;
  * To change this template use File | Settings | File Templates.
  */
 public class CalendarUtils {
+
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+    private static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    private static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+    private static SimpleDateFormat dateShortFormat = new SimpleDateFormat("dd.MM.yy");
+    private static SimpleDateFormat dayInWeekFormat = new SimpleDateFormat("EE", new Locale("ru"));
 
     private CalendarUtils() {
 
@@ -52,14 +59,41 @@ public class CalendarUtils {
         return c.getTime();
     }
 
-    static DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-    static DateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     public static Date parseDate(String validTime) throws ParseException {
         return dateFormat.parse(validTime);
     }
 
     public static String dateToString(Date date) {
         return dateFormat.format(date);
+    }
+
+    public static Date parseShortDate(String validTime) throws ParseException {
+        return dateShortFormat.parse(validTime);
+    }
+
+    public static Date parseTime(String validTime) throws ParseException {
+        return timeFormat.parse(validTime);
+    }
+
+    public static String timeToString(Date date) {
+        return timeFormat.format(date);
+    }
+
+    public static Date parseDayInWeek(String validTime) throws ParseException {
+        return timeFormat.parse(validTime);
+    }
+
+    public static String dayInWeekToString(Long timeMillis) {
+        return timeFormat.format(timeMillis);
+    }
+
+    public static String dayInWeekToString(Date date) {
+        return timeFormat.format(date);
+    }
+
+
+    public static String dateShortToString(Date date) {
+        return dateShortFormat.format(date);
     }
 
     public static String dateTimeToString(Date date) {

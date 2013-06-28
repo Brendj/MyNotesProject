@@ -21,7 +21,6 @@
         <property name="classesToBeBound">
             <list>
                 <value>ru.axetta.ecafe.processor.web.internal.report.dataflow.ReportTradeMaterialGoodDataInfo</value>
-                <value>ru.axetta.ecafe.processor.web.internal.report.dataflow.ReportTradeMaterialGoodDataInfo</value>
                 <value>ru.axetta.ecafe.processor.web.partner.integra.dataflow.Data</value>
                 <value>ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummary</value>
             </list>

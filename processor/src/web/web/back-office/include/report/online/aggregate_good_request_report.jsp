@@ -8,7 +8,7 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<%--@elvariable id="aggregateGoodRequestReportPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.AggregateGoodRequestReportPage"--%>
+<%--@elvariable id="aggregateGoodRequestReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.AggregateGoodRequestReportPage"--%>
 <h:panelGrid id="aggregateGoodRequestReportPanelGrid" binding="#{aggregateGoodRequestReportPage.pageComponent}" styleClass="borderless-grid">
     <h:panelGrid id="goodRequestReportParamPanelGrid" styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Начальная дата" styleClass="output-text" />
@@ -18,7 +18,7 @@
         <rich:calendar value="#{aggregateGoodRequestReportPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
-        <h:outputText styleClass="output-text" escape="true" value="Поставщик" />
+        <h:outputText styleClass="output-text required-field" escape="true" value="Поставщик" />
         <h:panelGroup>
             <a4j:commandButton value="..." action="#{aggregateGoodRequestReportPage.showSourceListSelectPage}" reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"

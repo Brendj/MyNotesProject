@@ -1177,4 +1177,23 @@ public class DAOUtils {
         return query.getResultList();
     }
 
+    public static boolean isFullSyncByOrg(Session session, Long idOfOrg) {
+        Query query = session.createQuery("select org.fullSyncParam from Org org where org.idOfOrg=:idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        Boolean f = (Boolean) query.uniqueResult();
+        if(f== null) return false;
+        else return f;
+    }
+
+    public static void falseFullSyncByOrg(Session session, Long idOfOrg) {
+        Query query = session.createQuery("update Org set fullSyncParam=0 where id=:idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.executeUpdate();
+    }
+
+    public static void trueFullSyncByOrg(Session session, long idOfOrg) {
+        Query query = session.createQuery("update Org set fullSyncParam=1 where id=:idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.executeUpdate();
+    }
 }

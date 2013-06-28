@@ -17,11 +17,11 @@
                                 eventsQueue="mainFormEventsQueue" opened="true" headerClass="filter-panel-header">
             <h:panelGrid columns="2" styleClass="borderless-grid">
 
-                <h:outputText escape="true" value="Начальная дата" styleClass="output-text" />
+                <h:outputText escape="true" value="Начальная дата исполнения" styleClass="output-text" />
                 <rich:calendar value="#{goodRequestListPage.baseDate}" datePattern="dd.MM.yyyy"
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
-                <h:outputText escape="true" value="Конечная дата" styleClass="output-text" />
+                <h:outputText escape="true" value="Конечная дата исполнения" styleClass="output-text" />
                 <rich:calendar value="#{goodRequestListPage.endDate}" datePattern="dd.MM.yyyy"
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
@@ -60,11 +60,11 @@
 
     <h:panelGrid id="goodRequestListPanel">
         <h:outputText styleClass="output-text" value="Нет данных для отображения" rendered="#{goodRequestListPage.emptyGoodRequestList}"/>
-        <rich:dataTable id="goodRequestListTable" width="700" var="goodRequest" value="#{goodRequestListPage.goodRequestList}" rendered="#{!goodRequestListPage.emptyGoodRequestList}"
+        <rich:dataTable id="goodRequestListTable" var="goodRequest" value="#{goodRequestListPage.goodRequestList}" rendered="#{!goodRequestListPage.emptyGoodRequestList}"
                         rows="20" rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer">
             <rich:column  headerClass="column-header">
                 <f:facet name="header">
-                    <h:outputText value="№" styleClass="output-text" escape="true"/>
+                    <h:outputText value="ID" styleClass="output-text" escape="true"/>
                 </f:facet>
                 <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{goodRequest.globalId}"
                                  action="#{goodRequestPositionListPage.onSearch}" styleClass="command-link">
@@ -79,6 +79,26 @@
                                  action="#{goodRequestPositionListPage.onSearch}" styleClass="command-link">
                     <f:setPropertyActionListener value="#{goodRequest.globalId}" target="#{goodRequestPositionListPage.idOfGoodRequest}" />
                 </a4j:commandLink>
+            </rich:column>
+            <rich:column headerClass="column-header" sortBy="#{goodRequest.doneDate}">
+                <f:facet name="header">
+                    <h:outputText value="Дата исполнения заявки" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{goodRequest.doneDate}">
+                    <f:convertDateTime pattern="dd.MM.yyyy"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="Заявка отозвана" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <h:selectBooleanCheckbox value="#{goodRequest.deletedState}" readonly="true" disabled="true"/>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText value="Состояние заявки" styleClass="output-text" escape="true"/>
+                </f:facet>
+                <h:outputText styleClass="output-text" value="#{goodRequest.state}" />
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
@@ -98,29 +118,9 @@
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
-                    <h:outputText value="Заявка отозвана" styleClass="output-text" escape="true"/>
-                </f:facet>
-                <h:selectBooleanCheckbox value="#{goodRequest.deletedState}" readonly="true" disabled="true"/>
-            </rich:column>
-            <rich:column headerClass="column-header">
-                <f:facet name="header">
                     <h:outputText value="Дата удаления" styleClass="output-text" escape="true"/>
                 </f:facet>
                 <h:outputText styleClass="output-text" value="#{goodRequest.deleteDate}">
-                    <f:convertDateTime pattern="dd.MM.yyyy"/>
-                </h:outputText>
-            </rich:column>
-            <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:outputText value="Состояние заявки" styleClass="output-text" escape="true"/>
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{goodRequest.state}" />
-            </rich:column>
-            <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:outputText value="Дата исполнения заявки" styleClass="output-text" escape="true"/>
-                </f:facet>
-                <h:outputText styleClass="output-text" value="#{goodRequest.doneDate}">
                     <f:convertDateTime pattern="dd.MM.yyyy"/>
                 </h:outputText>
             </rich:column>

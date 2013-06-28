@@ -35,6 +35,7 @@ public class CardTemp {
         this.org = org;
         this.cardPrintedNo = cardPrintedNo;
         this.cardStation = CardOperationStation.REGISTRATION;
+        this.createDate = new Date();
         this.customerType = 0;
     }
 

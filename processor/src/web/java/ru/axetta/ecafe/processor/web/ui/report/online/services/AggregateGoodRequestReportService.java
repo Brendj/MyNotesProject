@@ -32,7 +32,6 @@ public class AggregateGoodRequestReportService {
 
     public List<AggregateGoodRequestReportItem> fetchAggregateGoodRequestReportItems(List<Long> idOfSourceOrgList,List<Long> idOfEduList, Date startDate, Date endDate){
         List<AggregateGoodRequestReportItem> aggregateGoodRequestReportItems = new ArrayList<AggregateGoodRequestReportItem>();
-        Random random = new Random(System.currentTimeMillis());
         Session session = ((Session) entityManager.getDelegate());
         String sql = "select org.idOfOrg, org.shortName, org.officialName, "
                 + "sourceMenu.idOfOrg, sourceMenu.shortName, sourceMenu.officialName "

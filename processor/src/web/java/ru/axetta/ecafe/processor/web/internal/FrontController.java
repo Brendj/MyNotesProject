@@ -10,8 +10,6 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.internal.front.items.ClientDesc;
-import ru.axetta.ecafe.processor.web.internal.front.items.RegisterClientResult;
 import ru.axetta.ecafe.processor.web.internal.front.items.VisitorItem;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
@@ -318,11 +316,40 @@ public class FrontController extends HttpServlet {
         LinkedList<RegisterClientResult> results = new LinkedList<RegisterClientResult>();
         for (ClientDesc cd : clientDescList) {
             try {
-                ClientManager.ClientFieldConfig fc = ClientDesc.buildClientFieldConfig(cd);
+                //ClientManager.ClientFieldConfig fc = ClientDesc.buildClientFieldConfig(cd);
+                ClientManager.ClientFieldConfig fc = new ClientManager.ClientFieldConfig();
+                if (cd.contractSurname!=null) {
+                    fc.setValue(ClientManager.FieldId.CONTRACT_SURNAME, cd.contractSurname);
+                }  else {
+                    fc.setValue(ClientManager.FieldId.CONTRACT_SURNAME, " ");
+                }
+                if (cd.contractName!=null) fc.setValue(ClientManager.FieldId.CONTRACT_NAME, cd.contractName);
+                if (cd.contractSecondName!=null) fc.setValue(ClientManager.FieldId.CONTRACT_SECONDNAME, cd.contractSecondName);
+                if (cd.contractDoc!=null) fc.setValue(ClientManager.FieldId.CONTRACT_DOC, cd.contractDoc);
+                if (cd.surname!=null) fc.setValue(ClientManager.FieldId.SURNAME, cd.surname);
+                if (cd.name!=null) fc.setValue(ClientManager.FieldId.NAME, cd.name);
+                if (cd.secondName!=null) fc.setValue(ClientManager.FieldId.SECONDNAME, cd.secondName);
+                if (cd.doc!=null) fc.setValue(ClientManager.FieldId.DOC, cd.doc);
+                if (cd.address!=null) fc.setValue(ClientManager.FieldId.ADDRESS, cd.address);
+                if (cd.phone!=null) fc.setValue(ClientManager.FieldId.PHONE, cd.phone);
+                if (cd.mobilePhone!=null) fc.setValue(ClientManager.FieldId.MOBILE_PHONE, cd.mobilePhone);
+                if (cd.email!=null) fc.setValue(ClientManager.FieldId.EMAIL, cd.email);
+                if (cd.group!=null) fc.setValue(ClientManager.FieldId.GROUP, cd.group);
+                fc.setValue(ClientManager.FieldId.NOTIFY_BY_SMS, cd.notifyBySms?"1":"0");
+                fc.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, cd.notifyByEmail?"1":"0");
+                if (cd.comments!=null) fc.setValue(ClientManager.FieldId.COMMENTS, cd.comments);
+                if (cd.cardNo!=null) fc.setValue(ClientManager.FieldId.CARD_ID, cd.cardNo);
+                if (cd.cardPrintedNo!=null) fc.setValue(ClientManager.FieldId.CARD_PRINTED_NUM, cd.cardPrintedNo);
+                fc.setValue(ClientManager.FieldId.CARD_TYPE, cd.cardType);
+                if (cd.cardExpiry!=null) fc.setValue(ClientManager.FieldId.CARD_EXPIRY, cd.cardExpiry);
+                if (cd.cardIssued!=null) fc.setValue(ClientManager.FieldId.CARD_ISSUED, cd.cardIssued);
+                if (cd.snils!=null) fc.setValue(ClientManager.FieldId.SAN, cd.snils);
+                /* Генерируем GUID клиента при регистрации  */
+                fc.setValue(ClientManager.FieldId.CLIENT_GUID, UUID.randomUUID().toString());
                 long idOfClient = ClientManager.registerClient(orgId, fc, checkFullNameUniqueness);
-                results.add(new RegisterClientResult(idOfClient, cd.getRecId(), true));
+                results.add(new RegisterClientResult(idOfClient, cd.recId, true, null));
             } catch (Exception e) {
-                results.add(new RegisterClientResult(null, cd.getRecId(), false, e.getMessage()));
+                results.add(new RegisterClientResult(null, cd.recId, false, e.getMessage()));
             }
         }
         return results;
@@ -364,68 +391,43 @@ public class FrontController extends HttpServlet {
         return linkingToken.getToken();
     }
 
-    //public static class ClientDesc {
-    //    public int recId;
-    //    public String contractSurname;
-    //    public String contractName;
-    //    public String contractSecondName;
-    //    public String contractDoc;
-    //    public String surname;
-    //    public String name;
-    //    public String secondName;
-    //    public String doc;
-    //    public String address;
-    //    public String phone;
-    //    public String mobilePhone;
-    //    public String email;
-    //    public String group;
-    //    public String snils;
-    //    public boolean notifyBySms;
-    //    public boolean notifyByEmail;
-    //    public String comments;
-    //    public Long cardNo;
-    //    public Long cardPrintedNo;
-    //    public int cardType;
-    //    public Date cardExpiry;
-    //    public Date cardIssued;
-    //}
+    public static class ClientDesc {
+        public int recId;
+        public String contractSurname;
+        public String contractName;
+        public String contractSecondName;
+        public String contractDoc;
+        public String surname;
+        public String name;
+        public String secondName;
+        public String doc;
+        public String address;
+        public String phone;
+        public String mobilePhone;
+        public String email;
+        public String group;
+        public String snils;
+        public boolean notifyBySms;
+        public boolean notifyByEmail;
+        public String comments;
+        public Long cardNo;
+        public Long cardPrintedNo;
+        public int cardType;
+        public Date cardExpiry;
+        public Date cardIssued;
+    }
 
-    //public static class RegisterClientResult {
-    //    private Long idOfClient;
-    //    private int recId;
-    //    private boolean success;
-    //    private String error;
-    //
-    //    protected RegisterClientResult() {}
-    //
-    //    public RegisterClientResult(Long idOfClient, int recId, boolean success) {
-    //        this.idOfClient = idOfClient;
-    //        this.recId = recId;
-    //        this.success = success;
-    //        this.error = null;
-    //    }
-    //
-    //    public RegisterClientResult(Long idOfClient, int recId, boolean success, String error) {
-    //        this.idOfClient = idOfClient;
-    //        this.recId = recId;
-    //        this.success = success;
-    //        this.error = error;
-    //    }
-    //
-    //    public Long getIdOfClient() {
-    //        return idOfClient;
-    //    }
-    //
-    //    public int getRecId() {
-    //        return recId;
-    //    }
-    //
-    //    public boolean isSuccess() {
-    //        return success;
-    //    }
-    //
-    //    public String getError() {
-    //        return error;
-    //    }
-    //}
+    public static class RegisterClientResult {
+        public Long idOfClient;
+        public int recId;
+        public boolean success;
+        public String error;
+        public RegisterClientResult() {}
+        public RegisterClientResult(Long idOfClient, int recId, boolean success, String error) {
+            this.idOfClient = idOfClient;
+            this.recId = recId;
+            this.success = success;
+            this.error = error;
+        }
+    }
 }

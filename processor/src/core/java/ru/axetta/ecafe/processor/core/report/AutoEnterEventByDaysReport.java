@@ -35,16 +35,12 @@ import java.util.*;
  */
 public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
 
-    public static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-    public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yy");
-    public static SimpleDateFormat dayInWeekFormat = new SimpleDateFormat("EE", new Locale("ru"));
-
-
-
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
     }
 
     public static class Builder extends BasicReportJob.Builder {
+
+        private final String templateFilename;
 
         public class Event implements Comparable<Event>{
             private Long time;
@@ -77,10 +73,8 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             }
         }
 
-
         public static class ReportItem {
 
-            private Integer id = null;
             private String fio = null;
             private List<String> timeList;
             // все события храним в списках по дням (1 список на 1 день)
@@ -88,8 +82,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             private String groupName;
 
 
-            public ReportItem(Integer id, String fio, String groupName) {
-                this.id = id;
+            public ReportItem(String fio, String groupName) {
                 this.fio = fio;
                 this.groupName = groupName;
             }
@@ -103,10 +96,6 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             }
 
             public ReportItem() {
-            }
-
-            public Integer getId() {
-                return id;
             }
 
             public String getFio() {
@@ -128,7 +117,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
                         return timeFormat.format(new Date(eventList.get(i).getTime()));
                 }*/
                 //return null;
-                return timeFormat.format(new Date(eventList.get(0).getTime()));
+                return CalendarUtils.timeToString(new Date(eventList.get(0).getTime()));
             }
 
             public String getTimeExit(ArrayList<Event> eventList) {
@@ -142,7 +131,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
                                     eventList.get(i-1).getPassdirection() == EnterEvent.PASSAGE_RUFUSAL))
                         return timeFormat.format(new Date(eventList.get(i).getTime()));
                 return null;*/
-                return timeFormat.format(new Date(eventList.get(eventList.size() - 1).getTime()));
+                return CalendarUtils.timeToString(new Date(eventList.get(eventList.size() - 1).getTime()));
             }
 
             private void sort() {
@@ -168,8 +157,6 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             }
         }
 
-        private final String templateFilename;
-
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
         }
@@ -184,22 +171,21 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             parameterMap.put("days", daysOfMonth);
             parameterMap.put("monthName", calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("ru")));
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap, daysOfMonth));
+                    createDataSource(session, org, startTime, daysOfMonth));
             Date generateEndTime = new Date();
             return new AutoEnterEventByDaysReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
-        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
-                Calendar calendar, Map<String, Object> parameterMap, List<String> daysOfMonth) throws Exception {
+        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, List<String> daysOfMonth) throws Exception {
             // хешмап для хранения записей отчета по айди клиенту
             HashMap<Long, ReportItem> mapItems = new HashMap<Long, ReportItem>();
             // лист для хранения результата
-            List<ReportItem> resultRows = new LinkedList<ReportItem>();
+            List<ReportItem> resultRows = new ArrayList<ReportItem>();
             Calendar c = Calendar.getInstance();
             Long startDate = CalendarUtils.getTimeFirstDayOfMonth(startTime.getTime());
             for (int day = 1; day <= 31; day++)
-                daysOfMonth.add(day-1, String.format("%d %s", day, dayInWeekFormat.format(startDate+(day-1)*1000*60*60*24)));
+                daysOfMonth.add(day-1, String.format("%d %s", day, CalendarUtils.dayInWeekToString(startDate+(day-1)*1000*60*60*24)));
 
             // При создании правила для данного типа отчета можно задать параметр enterEventType, который может принимать значения
             // "все", "учащиеся", "все_без_учащихся". typeCondition содержит соответствующее улосвие для sql-запроса
@@ -216,53 +202,81 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
                 else if ((typeConditionsValues[0].trim().equals(RuleCondition.ENTEREVENT_TYPE_TEXT[RuleCondition.ENTEREVENT_TYPE_WITHOUTSTUDS])))
                     typeCondition = String.format("AND c.idOfClientGroup>=%d ", ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES);
             }
-            Query query = session.createSQLQuery(
-                    "SELECT p.firstname, p.surname, p.secondname, e.evtdatetime, e.passdirection, c.idOfClient, g.groupname "
-                    + "FROM cf_enterevents e, cf_clients c, cf_persons p, cf_clientgroups g "
-                    + "WHERE e.idofclient=c.idofclient and p.idofperson=c.idofperson AND e.idoforg=:idOfOrg AND g.idofclientgroup=c.idofclientgroup AND g.idoforg=c.idoforg "
-                    + "AND e.evtdatetime>=:startTime AND e.evtdatetime<=:endTime "
-                    + typeCondition+ " AND c.idOfClientGroup!=1100000060 "
-                    + "order by g.groupname, p.surname, p.firstname, p.secondname;");
 
-            query.setParameter("startTime", CalendarUtils.getTimeFirstDayOfMonth(startTime.getTime()));
-            query.setParameter("endTime", CalendarUtils.getTimeLastDayOfMonth(startTime.getTime()));
-            query.setParameter("idOfOrg", org.getIdOfOrg());
+            String clientSQL = "select c.idOfClient, p.firstname, p.surname, p.secondname, g.groupname "
+                    + " from cf_clients c"
+                    + " join cf_persons p on c.idofperson=p.idofperson "
+                    + " left join cf_clientgroups g on "
+                    + " g.idofclientgroup=c.idofclientgroup and g.idoforg=c.idoforg "+ typeCondition+ "  AND c.idOfClientGroup!=1100000060"
+                    + " where c.idoforg=:idOfOrg"
+                    + " order by g.groupname, p.surname, p.firstname, p.secondname";
 
-            List resultList = query.list();
-            int i = 1; // порядковый номер записи в отчете не используется, данное значение jasper сам генерирует
-            for (Object o : resultList) {
-                Object vals[]=(Object[])o;
-                String firstname = (String)vals[0];
-                String surname = (String)vals[1];
-                String secondname = (String)vals[2];
-                Long time = Long.parseLong(vals[3].toString());
-                Integer passdirection = Integer.parseInt(vals[4].toString());
-                Long idOfClient = Long.parseLong(vals[5].toString());
-                String groupName = (String)vals[6];
-                c.setTimeInMillis(time);
-                int day = c.get(Calendar.DAY_OF_MONTH);
+            Query clientQuery = session.createSQLQuery(clientSQL);
+            clientQuery.setParameter("idOfOrg",org.getIdOfOrg());
+            List<Object> clients = clientQuery.list();
+            for (Object client: clients){
+                //Query query = session.createSQLQuery(
+                //        "SELECT p.firstname, p.surname, p.secondname, e.evtdatetime, e.passdirection, c.idOfClient, g.groupname "
+                //                + "FROM cf_enterevents e, cf_clients c, cf_persons p, cf_clientgroups g "
+                //                + "WHERE e.idofclient=c.idofclient and p.idofperson=c.idofperson AND e.idoforg=:idOfOrg AND g.idofclientgroup=c.idofclientgroup "
+                //                + " AND g.idoforg=c.idoforg AND e.evtdatetime>=:startTime AND e.evtdatetime<=:endTime "
+                //                + typeCondition+ " AND c.idOfClientGroup!=1100000060 "
+                //                + "order by g.groupname, p.surname, p.firstname, p.secondname;");
 
+                Object[] clientParams = (Object[]) client;
+
+                Long idOfClient = Long.valueOf(clientParams[0].toString());
                 ReportItem reportItem = mapItems.get(idOfClient);
                 if (reportItem == null) {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    if (surname != null && !surname.trim().isEmpty())
-                    stringBuilder.append(surname).append(' ');
-                    if (firstname != null && !firstname.trim().isEmpty())
-                        stringBuilder.append(firstname.trim().charAt(0)).append(". ");
-                    if (secondname != null && !secondname.trim().isEmpty())
-                        stringBuilder.append(secondname.trim().charAt(0)).append('.');
-                    reportItem = new ReportItem(i++, stringBuilder.toString().trim(), groupName);
+                    String firstName = String.valueOf(clientParams[1]) ;
+                    String surName = String.valueOf(clientParams[2]);
+                    String secondName = String.valueOf(clientParams[3]);
+                    String groupName = String.valueOf(clientParams[4]);
+                    if(groupName==null || groupName.isEmpty() || groupName.equalsIgnoreCase("null")){
+                        groupName ="";
+                    }
+                    StringBuilder shortFullName = new StringBuilder();
+                    if (surName != null && !surName.trim().isEmpty())
+                        shortFullName.append(surName.trim()).append(' ');
+                    if (firstName != null && !firstName.trim().isEmpty())
+                        shortFullName.append(firstName.trim().charAt(0)).append(". ");
+                    if (secondName != null && !secondName.trim().isEmpty())
+                        shortFullName.append(secondName.trim().charAt(0)).append('.');
+                    reportItem = new ReportItem(shortFullName.toString().trim(), groupName);
                     mapItems.put(idOfClient, reportItem);
                     resultRows.add(reportItem);
                 }
-                // ищем список событий по дню
-                ArrayList<Event> events = reportItem.getEventMap().get(day-1);
-                if (events == null) {
-                    events = new ArrayList<Event>(31);
-                    reportItem.getEventMap().put(day-1, events);
+
+
+                Query query = session.createSQLQuery(
+                        "SELECT e.evtdatetime, e.passdirection "
+                                + " FROM cf_enterevents e "
+                                + " WHERE e.idofclient=:idOfClient AND e.idoforg=:idOfOrg "
+                                + " AND e.evtdatetime>=:startTime AND e.evtdatetime<=:endTime ");
+
+
+                query.setParameter("startTime", CalendarUtils.getTimeFirstDayOfMonth(startTime.getTime()));
+                query.setParameter("endTime", CalendarUtils.getTimeLastDayOfMonth(startTime.getTime()));
+                query.setParameter("idOfOrg", org.getIdOfOrg());
+                query.setParameter("idOfClient", idOfClient);
+
+                List resultList = query.list();
+                for (Object o : resultList) {
+                    Object vals[]=(Object[])o;
+                    Long time = Long.valueOf(vals[0].toString());
+                    Integer passDirection = Integer.valueOf(vals[1].toString());
+                    c.setTimeInMillis(time);
+                    int day = c.get(Calendar.DAY_OF_MONTH);
+
+                    // ищем список событий по дню
+                    ArrayList<Event> events = reportItem.getEventMap().get(day-1);
+                    if (events == null) {
+                        events = new ArrayList<Event>(31);
+                        reportItem.getEventMap().put(day-1, events);
+                    }
+                    // добавляем событие входа или выхода
+                    events.add(new Event(time, passDirection));
                 }
-                // добавляем событие входа или выхода
-                events.add(new Event(time, passdirection));
             }
             return new JRBeanCollectionDataSource(resultRows);
         }

@@ -547,7 +547,7 @@ public class Manager {
         if (distributedObject.getTagName().equals("M")) {
             Long currentVersion = getDistributedObjectVersion(session, distributedObject);
             Long objectVersion = distributedObject.getGlobalVersion();
-            if (!objectVersion.equals(currentVersion)) {
+            if (objectVersion!=null && currentVersion!=null && !objectVersion.equals(currentVersion)) {
                 createConflict(session, distributedObject, currentMaxVersion);
             }
             distributedObject = mergeDistributedObject(session, distributedObject, currentMaxVersion);

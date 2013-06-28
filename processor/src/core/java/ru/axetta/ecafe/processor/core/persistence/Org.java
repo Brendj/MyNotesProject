@@ -91,6 +91,15 @@ public class Org {
     private String clientVersion;
     private String remoteAddress;
     private Set<ClientMigration> clientMigration = new HashSet<ClientMigration>();
+    private Boolean fullSyncParam;
+
+    public Boolean getFullSyncParam() {
+        return fullSyncParam;
+    }
+
+    public void setFullSyncParam(Boolean fullSyncParam) {
+        this.fullSyncParam = fullSyncParam;
+    }
 
     public Set<ClientMigration> getClientMigration() {
         return clientMigration;

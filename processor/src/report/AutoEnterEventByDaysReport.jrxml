@@ -21,7 +21,6 @@
 	<parameter name="days" class="java.util.List"/>
 	<parameter name="monthName" class="java.lang.String"/>
 	<field name="timeList" class="java.util.List"/>
-	<field name="id" class="java.lang.Integer"/>
 	<field name="groupName" class="java.lang.String"/>
 	<field name="fio" class="java.lang.String"/>
 	<group name="origin">
@@ -56,7 +55,7 @@
 					</textElement>
 					<text><![CDATA[]]></text>
 				</staticText>
-				<textField>
+				<textField isBlankWhenNull="true">
 					<reportElement uuid="8e7adb87-7969-4539-933e-5fce84424071" style="table" x="0" y="36" width="2374" height="20"/>
 					<textElement verticalAlignment="Middle" markup="none">
 						<font isBold="true"/>
