@@ -284,6 +284,13 @@ public class ManualReportRunnerPage extends OnlineReportPage
         }
         this.items = newRuleItems;
 
+        //  Если заходят на страницу в первый раз, то делаем выбранным первое правило
+        if (ruleItem == null || ruleItem.length() < 1) {
+            ruleItem = items.get(0).getRuleName();
+            ruleId = items.get(0).getIdOfReportHandleRule();
+            reportType = proxy.getReportHandlerType(ruleId);
+        }
+
         //  Если правило было когда-то установлено, то необходимо переформировать поля под значения по умолчанию
         if (ruleId != null && reportType != null && reportType.length() > 0) {
             this.hints.clear();
