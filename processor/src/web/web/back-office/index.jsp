@@ -197,7 +197,14 @@
                             <a4j:commandLink value="Мои настройки" binding="#{userSettings.mainMenuComponent}"
                                            action="#{userSettings.show}" styleClass="command-link" reRender="mainMenu, workspaceForm"/>
                             &nbsp;&nbsp;&nbsp;
-                            <h:outputText escape="true" value="#{request.remoteUser} - " styleClass="output-text" />
+                            <h:outputText id="sysuser" escape="true" value="#{request.remoteUser}" styleClass="output-text" />
+                            <rich:toolTip for="sysuser" followMouse="true" direction="top-right" showDelay="500" styleClass="tooltip" rendered="#{not empty mainPage.userContragentsList}">
+                                <span  style="white-space:nowrap">
+                                    <h:outputText styleClass="output-text" style="font-weight: bold" value="Доступные контрагенты:" /><br />
+                                    <h:outputText escape="false" value="#{mainPage.userContragentsList}" />
+                                </span>
+                            </rich:toolTip>
+                            <h:outputText value=" - " styleClass="output-text"/>
                             <a4j:commandLink value="Выход" action="#{mainPage.logout}" styleClass="command-link" />
                         </h:panelGroup>
                         <h:panelGroup style="text-align: left;">

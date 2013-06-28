@@ -421,6 +421,11 @@ public class ReportRuleEditPage  extends OnlineReportPage
     }
 
     private void fillHints (Set<RuleCondition> actualRules) {
+        //  Если заходят на страницу в первый раз, то делаем выбранным первое правило
+        if (reportType == null || reportType.length() < 1) {
+            reportType = reportTypeMenu.getItems() [0].getValue().toString();
+        }
+
         clear();
         List <ReportRuleConstants.ParamHintWrapper> hints = ReportRuleConstants.getParamHintsForReportType(reportType);
         for (ReportRuleConstants.ParamHintWrapper h : hints) {

@@ -7,8 +7,10 @@ package ru.axetta.ecafe.processor.web.ui;
 import net.sf.jasperreports.engine.JRException;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.logic.CurrentPositionsManager;
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfContragentClientAccount;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Function;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -68,10 +70,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -7668,5 +7667,13 @@ public User getCurrentUser() throws Exception {
 
     public BasicWorkspacePage getInfoGroupMenu() {
         return infoGroupMenu;
+    }
+
+    public String getUserContragentsList () {
+        try {
+            return ContextDAOServices.getInstance().getContragentsListForTooltip (getCurrentUser().getIdOfUser());
+        } catch (Exception e) {
+            return "";
+        }
     }
 }

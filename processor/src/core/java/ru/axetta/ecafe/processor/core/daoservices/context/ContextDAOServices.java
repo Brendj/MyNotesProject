@@ -41,6 +41,23 @@ public class ContextDAOServices {
     private EntityManager em;
 
 
+    public String getContragentsListForTooltip (long idOfUser) {
+        try {
+            Set<Contragent> contragents = getRestictedContragents(idOfUser);
+            StringBuilder str = new StringBuilder("");
+            for (Contragent c : contragents) {
+                if (str.length() > 0) {
+                    str.append("<br />");
+                }
+                str.append(c.getContragentName());
+            }
+            return str.toString();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+
     public static ContextDAOServices getInstance() {
         return RuntimeContext.getAppContext().getBean(ContextDAOServices.class);
     }
