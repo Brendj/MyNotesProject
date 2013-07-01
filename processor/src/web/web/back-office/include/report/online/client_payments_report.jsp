@@ -33,7 +33,7 @@
         </a4j:status>
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid">
-        <h:outputText escape="true" value="Отчет по продажам" styleClass="output-text" />
+        <h:outputText escape="true" value="Отчет по начислениям" styleClass="output-text" />
         <rich:dataTable id="clientPaymentsReportTable" value="#{mainPage.clientPaymentsReportPage.clientPaymentsReport.clientPaymentItems}"
                         var="payment" rowKeyVar="row" rows="10" footerClass="data-table-footer"
                         columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
