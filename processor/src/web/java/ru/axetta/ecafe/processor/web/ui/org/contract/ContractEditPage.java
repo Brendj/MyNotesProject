@@ -4,10 +4,15 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.contract;
 
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractEditPage;
+import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
+import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
+import org.hibernate.Session;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +21,8 @@ import java.util.Map;
 
 @Component
 @Scope("session")
-public class ContractEditPage extends AbstractEditPage<ContractItem> implements OrgListSelectPage.CompleteHandlerList{
+public class ContractEditPage extends AbstractEditPage<ContractItem> implements ContragentSelectPage.CompleteHandler, OrgListSelectPage.CompleteHandlerList{
+    protected final CCAccountFilter contragentFilter = new CCAccountFilter();
 
     @Component(value = "contractCreatePage")
     @Scope("session")
@@ -72,6 +78,32 @@ public class ContractEditPage extends AbstractEditPage<ContractItem> implements 
                 currentItem.setOrgNames(filter);
             }
         }
+    }
+
+    @Override
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes)
+            throws Exception {
+        contragentFilter.completeContragentSelection(session, idOfContragent);
+        Contragent contragent = DAOService.getInstance().getContragentById(idOfContragent);
+        currentItem.setContragent(contragent);
+        currentItem.setPerformer(contragent.getContragentName());
+    }
+
+    public CCAccountFilter getContragentFilter() {
+        if ((contragentFilter.getContragent() == null ||
+             contragentFilter.getContragent().getContragentName() == null ||
+             contragentFilter.getContragent().getContragentName().length() < 1) &&
+            currentItem.getContragent() != null) {
+            try {
+                contragentFilter.completeContragentSelection(currentItem.getContragent());
+            } catch (Exception e) {
+
+            }
+        }
+        if (currentItem.getContragent() == null) {
+            contragentFilter.clear();
+        }
+        return contragentFilter;
     }
 
     public String getStringIdOfOrgList() {

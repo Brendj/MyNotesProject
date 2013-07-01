@@ -83,3 +83,7 @@ create index CF_SubscriptionFee_SubscriptionSum_idx on CF_SubscriptionFee(Subscr
 create index CF_ClientPayments_PaySum_idx on CF_ClientPayments(PaySum);
 
 alter table CF_Orgs add FullSyncParam INTEGER NOT NULL default 0;
+
+
+-- Добавление ссылки на контрагента для Контракта
+alter table cf_contracts add column IdOfContragent BIGINT DEFAULT NULL;

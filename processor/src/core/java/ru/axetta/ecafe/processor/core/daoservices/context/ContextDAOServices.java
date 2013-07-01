@@ -63,6 +63,8 @@ public class ContextDAOServices {
     }
 
 
+
+
     /*
                             ОГРАНИЧЕНИЯ    ДЛЯ   ОРГАНИЗАЦИЙ
      */
@@ -100,7 +102,6 @@ public class ContextDAOServices {
         }
         return "(" + str.toString() + ")";
     }
-
 
 
 

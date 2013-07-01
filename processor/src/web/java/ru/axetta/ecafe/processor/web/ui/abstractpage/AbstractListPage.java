@@ -61,7 +61,7 @@ public abstract class AbstractListPage<E, I extends AbstractEntityItem> extends 
         Session hiberSession = (Session) entityManager.getDelegate();
 
         Criteria crit = hiberSession.createCriteria(getEntityClass());
-
+        processRestrictions (entityManager, crit);
         processSearchCriteria(entityManager, crit);
         crit = crit.setFirstResult(0);
         crit = crit.setMaxResults(MAX_ITEMS_IN_LIST);
@@ -85,6 +85,10 @@ public abstract class AbstractListPage<E, I extends AbstractEntityItem> extends 
         if (getFilter()!=null) getFilter().clear();
         RuntimeContext.getAppContext().getBean(this.getClass()).reload();
         return null;
+    }
+
+    protected void processRestrictions (EntityManager entityManager, Criteria crit) {
+
     }
 
     protected void processSearchCriteria(EntityManager entityManager, Criteria crit) {

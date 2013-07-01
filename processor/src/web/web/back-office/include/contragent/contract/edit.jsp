@@ -15,6 +15,22 @@
 <%--@elvariable id="contractEditPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractEditPage"--%>
 <h:panelGrid id="contractEditGrid" binding="#{contractEditPage.ap.pageComponent}" styleClass="borderless-grid" columns="2">
 
+    <h:outputText escape="true" value="Контрагент" styleClass="output-text" />
+    <h:outputText escape="true" value="#{contractEditPage.ap.contragentFilter.contragent.contragentName}" styleClass="output-text" rendered="#{contractEditPage.ap.readonly}" />
+    <h:panelGroup styleClass="borderless-div" rendered="#{!contractEditPage.ap.readonly}">
+        <h:inputText value="#{contractEditPage.ap.contragentFilter.contragent.contragentName}" readonly="true"
+                     styleClass="input-text" style="margin-right: 2px;" />
+        <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
+                           reRender="modalContragentSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px;">
+            <f:setPropertyActionListener value="0"
+                                         target="#{mainPage.multiContrFlag}" />
+            <f:setPropertyActionListener value="2"
+                                         target="#{mainPage.classTypes}" />
+        </a4j:commandButton>
+    </h:panelGroup>
+
     <h:outputText escape="true" value="Исполнитель" styleClass="output-text required-field" />
     <h:inputText value="#{contractEditPage.ap.currentEntity.performer}" maxlength="128" styleClass="input-text long-field" required="true" requiredMessage="Введите данные исполнителя." readonly="#{contractEditPage.ap.readonly}"/>
     <h:outputText escape="true" value="Заказчик" styleClass="output-text required-field" />

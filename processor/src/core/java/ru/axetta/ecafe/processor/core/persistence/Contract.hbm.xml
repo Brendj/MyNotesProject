@@ -20,6 +20,8 @@
         <property name="dateOfConclusion" column="DateOfConclusion" type="timestamp"/>
         <property name="dateOfClosing" column="DateOfClosing" type="timestamp"/>
 
+        <many-to-one name="contragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent" column="IdOfContragent"
+                     not-null="true"/>
     </class>
 </hibernate-mapping>
 

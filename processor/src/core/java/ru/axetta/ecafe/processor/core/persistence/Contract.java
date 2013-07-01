@@ -22,6 +22,8 @@ public class Contract {
     private Date dateOfConclusion;
     private Date dateOfClosing;
     private boolean contractState;
+    private Contragent contragent;
+
 
     public boolean getContractState() {
         return contractState;
@@ -79,4 +81,11 @@ public class Contract {
         this.idOfContract = idOfContract;
     }
 
+    public Contragent getContragent() {
+        return contragent;
+    }
+
+    public void setContragent(Contragent contragent) {
+        this.contragent = contragent;
+    }
 }

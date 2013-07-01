@@ -4,8 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.contract;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.Contract;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -137,8 +139,18 @@ public class ContractSelectPage extends BasicPage {
     private List retrieveContracts(Session session, String classTypesString, String contragentName) throws HibernateException {
         this.classTypesString = classTypesString;
         Criteria criteria = session.createCriteria(Contract.class).addOrder(Order.asc("contractNumber"));
+        try {
+            Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
+            ContextDAOServices.getInstance().buildContragentRestriction(idOfUser, "contragent.idOfContragent", criteria);
+        } catch (Exception e) {
+        }
         if (StringUtils.isNotEmpty(filter)) {
-            criteria.add(Restrictions.like("contractNumber", filter, MatchMode.ANYWHERE));
+            criteria.add(Restrictions.or(Restrictions.like("contractNumber", filter, MatchMode.ANYWHERE), Restrictions
+                    .or(Restrictions.like("performer", filter, MatchMode.ANYWHERE), Restrictions
+                            .sqlRestriction("to_char(dateOfConclusion, 'DD.MM.YYYY') like '%" + filter + "%'"))));
+            /*criteria.add(Restrictions.like("contractNumber", filter, MatchMode.ANYWHERE));
+            criteria.add(Restrictions.like("performer", filter, MatchMode.ANYWHERE));
+            criteria.add(Restrictions.sqlRestriction("to_char(dateOfConclusion, 'DD.MM.YYYY') like '%" + filter + "%'"));*/
         }
         if (StringUtils.isNotEmpty(contragentName)) {
             criteria.add(Restrictions.like("performer", contragentName, MatchMode.ANYWHERE));

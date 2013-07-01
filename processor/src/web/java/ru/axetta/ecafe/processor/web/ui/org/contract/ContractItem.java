@@ -5,7 +5,9 @@
 package ru.axetta.ecafe.processor.web.ui.org.contract;
 
 import ru.axetta.ecafe.processor.core.persistence.Contract;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractEntityItem;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractFilter;
@@ -72,6 +74,7 @@ public class ContractItem extends AbstractEntityItem<Contract> {
     
 
     private long idOfContract;
+    private Contragent contragent;
     private String contractNumber;
     private String performer;
     private String customer;
@@ -80,7 +83,7 @@ public class ContractItem extends AbstractEntityItem<Contract> {
     private Date dateOfClosing;
     private String orgNames;
     private List<Long> idOfOrgList = new ArrayList<Long>(0);
-    
+
 
 
     @Override
@@ -92,6 +95,11 @@ public class ContractItem extends AbstractEntityItem<Contract> {
         dateOfClosing = contract.getDateOfClosing();
         dateOfConclusion = contract.getDateOfConclusion();
         contractState = contract.getContractState();
+        try {
+            contragent = DAOService.getInstance().getContragentById(contract.getContragent().getIdOfContragent());
+        } catch (Exception e) {
+            contragent = contract.getContragent();
+        }
     }
     
     @Override
@@ -119,6 +127,7 @@ public class ContractItem extends AbstractEntityItem<Contract> {
         contract.setContractState(isContractState());
         contract.setDateOfClosing(getDateOfClosing());
         contract.setDateOfConclusion(getDateOfConclusion());
+        contract.setContragent(getContragent());
         if(!getIdOfOrgList().isEmpty()){
             for (Org org : DAOUtils.findOrgs(entityManager, getIdOfOrgList())){
                 org.setContract(contract);
@@ -213,6 +222,14 @@ public class ContractItem extends AbstractEntityItem<Contract> {
 
     public void setIdOfOrgList(List<Long> idOfOrgList) {
         this.idOfOrgList = idOfOrgList;
+    }
+
+    public Contragent getContragent() {
+        return contragent;
+    }
+
+    public void setContragent(Contragent contragent) {
+        this.contragent = contragent;
     }
 
     @Override

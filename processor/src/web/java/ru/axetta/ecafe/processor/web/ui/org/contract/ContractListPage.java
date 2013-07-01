@@ -4,12 +4,17 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.contract;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.Contract;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractListPage;
 
+import org.hibernate.Criteria;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import javax.persistence.EntityManager;
 
 @Component
 @Scope("session")
@@ -44,5 +49,15 @@ public class ContractListPage extends AbstractListPage<Contract, ContractItem> {
     @Override
     public ContractItem.Filter getFilter() {
         return filter;
+    }
+
+    @Override
+    protected void processRestrictions (EntityManager em, Criteria criteria) {
+        try {
+            Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
+            ContextDAOServices.getInstance().buildContragentRestriction(idOfUser, "contragent.idOfContragent", criteria);
+        } catch (Exception e) {
+
+        }
     }
 }
