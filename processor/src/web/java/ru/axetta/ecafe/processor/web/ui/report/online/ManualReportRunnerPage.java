@@ -8,12 +8,15 @@ import net.sf.jasperreports.engine.JasperPrint;
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
+import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.report.*;
-import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
-import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.core.report.BasicJasperReport;
+import ru.axetta.ecafe.processor.core.report.BasicReportJob;
+import ru.axetta.ecafe.processor.core.report.ReportDocument;
+import ru.axetta.ecafe.processor.core.report.ReportsFactory;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ReportFormatMenu;
 import ru.axetta.ecafe.processor.web.ui.RuleConditionItem;
@@ -23,12 +26,9 @@ import ru.axetta.ecafe.processor.web.ui.contract.ContractSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.report.rule.ReportRuleConstants;
 import ru.axetta.ecafe.processor.web.ui.report.rule.ReportRuleEditPage;
-import ru.axetta.ecafe.processor.web.ui.report.rule.ReportTypeMenu;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,16 +36,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.faces.component.UIColumn;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIOutput;
-import javax.faces.component.UISelectItems;
-import javax.faces.component.html.*;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
-import javax.faces.webapp.UIComponentELTag;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
@@ -575,7 +570,8 @@ public class ManualReportRunnerPage extends OnlineReportPage
         if (documentFormat == ReportHandleRule.REPOSITORY_FORMAT) {
             //  Если был выбран экспорт в репозитории, то сохраняем все данные туда
             ReportDocument reportDocument = resultBuilder.buildDocument(rule.getDocumentFormat(), "" + ruleId, report);
-            String subject = RuleProcessor.fillTemplate(rule.getSubject(), props);
+            //String subject = RuleProcessor.fillTemplate(rule.getSubject(), props);
+            String subject = rule.getRuleName();
             File f = new File(RuntimeContext.getInstance().getAutoReportGenerator().getReportPath());
             String relativeReportFilePath = reportDocument.getReportFile().getAbsolutePath()
                     .substring(f.getAbsolutePath().length());
