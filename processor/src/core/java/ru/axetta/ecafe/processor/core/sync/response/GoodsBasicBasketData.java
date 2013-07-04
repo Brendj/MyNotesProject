@@ -36,19 +36,19 @@ public class GoodsBasicBasketData {
     }
 
     public void process(Session session, Long idOfOrg) throws Exception{
-        Criteria criteria = session.createCriteria(MenuExchangeRule.class);
-        criteria.add(Restrictions.eq("idOfSourceOrg",idOfOrg));
-        List list = criteria.list();
-        if(list.isEmpty()){
-            basicBasketDataElementList = new ArrayList<GoodsBasicBasketDataElement>(0);
-        }else {
-            Criteria goodsBasicBasketCriteria = session.createCriteria(GoodsBasicBasket.class);
-            List resultList = goodsBasicBasketCriteria.list();
-            basicBasketDataElementList = new ArrayList<GoodsBasicBasketDataElement>(list.size());
-            for (Object object: resultList){
-                GoodsBasicBasket goodsBasicBasket = (GoodsBasicBasket) object;
-                basicBasketDataElementList.add(new GoodsBasicBasketDataElement(goodsBasicBasket));
-            }
+        //Criteria criteria = session.createCriteria(MenuExchangeRule.class);
+        //criteria.add(Restrictions.eq("idOfSourceOrg",idOfOrg));
+        //List list = criteria.list();
+        //if(list.isEmpty()){
+        //    basicBasketDataElementList = new ArrayList<GoodsBasicBasketDataElement>(0);
+        //}else {
+        //}
+        Criteria goodsBasicBasketCriteria = session.createCriteria(GoodsBasicBasket.class);
+        List resultList = goodsBasicBasketCriteria.list();
+        basicBasketDataElementList = new ArrayList<GoodsBasicBasketDataElement>();
+        for (Object object: resultList){
+            GoodsBasicBasket goodsBasicBasket = (GoodsBasicBasket) object;
+            basicBasketDataElementList.add(new GoodsBasicBasketDataElement(goodsBasicBasket));
         }
     }
 

@@ -7,10 +7,7 @@ package ru.axetta.ecafe.processor.core.utils;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,14 +18,16 @@ import java.util.Locale;
  */
 public class CalendarUtils {
 
+    private static TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
     private static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     private static SimpleDateFormat dateShortFormat = new SimpleDateFormat("dd.MM.yy");
     private static SimpleDateFormat dayInWeekFormat = new SimpleDateFormat("EE", new Locale("ru"));
 
-    private CalendarUtils() {
-
+    public static Date parseFullDateTimeWithLocalTimeZone(String stringDateTime) throws ParseException {
+        dateTimeFormat.setTimeZone(localTimeZone);
+        return dateShortFormat.parse(stringDateTime);
     }
 
     public static void truncateToMonth(Calendar calendar) {
@@ -45,6 +44,7 @@ public class CalendarUtils {
         calendar.set(Calendar.MINUTE, 0);
         calendar.set(Calendar.HOUR_OF_DAY, 0);
     }
+
     public static Date truncateToDayOfMonth(Date date) {
         GregorianCalendar c = new GregorianCalendar();
         c.setTime(date);
@@ -58,7 +58,6 @@ public class CalendarUtils {
         truncateToDayOfMonth(c);
         return c.getTime();
     }
-
     public static Date parseDate(String validTime) throws ParseException {
         return dateFormat.parse(validTime);
     }
@@ -91,10 +90,10 @@ public class CalendarUtils {
         return timeFormat.format(date);
     }
 
-
     public static String dateShortToString(Date date) {
         return dateShortFormat.format(date);
     }
+
 
     public static String dateTimeToString(Date date) {
         return dateTimeFormat.format(date);
@@ -149,6 +148,7 @@ public class CalendarUtils {
         calendar.set(Calendar.DAY_OF_MONTH, day);
         return calendar.getTime();
     }
+
     public static Date getFirstDayOfNextMonth(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
@@ -156,4 +156,5 @@ public class CalendarUtils {
         truncateToMonth(calendar);
         return calendar.getTime();
     }
+    private CalendarUtils() {}
 }

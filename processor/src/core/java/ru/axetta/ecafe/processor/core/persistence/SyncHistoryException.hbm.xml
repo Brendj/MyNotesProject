@@ -10,10 +10,10 @@
         <id name="idOfSyncHistoryException" column="IdOfSyncHistoryException" type="long">
            <generator class="identity"/>
         </id>
-        <!--<many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
-                     update="false"/>-->
-        <!--<many-to-one name="syncHistory" class="ru.axetta.ecafe.processor.core.persistence.SyncHistory" column="IdOfOrg" not-null="true"
-                     update="false"/>-->
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
+                     update="false"/>
+        <many-to-one name="syncHistory" class="ru.axetta.ecafe.processor.core.persistence.SyncHistory" column="idofsync" not-null="true"
+                     update="false"/>
         <property name="message" column="Message" type="string" length="20" not-null="false"/>
     </class>
 </hibernate-mapping>

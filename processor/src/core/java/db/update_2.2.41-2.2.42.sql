@@ -19,14 +19,15 @@ CREATE TABLE cf_cards_temp (
   CardPrintedNo character varying(24),   --! номер нанесенный на карту
   CardStation int not null default 0,    --! int16 или int8, not null, значения:  0 — свободна, 1 — выдана , 3 — заблокирована (? не уверен, что блокировка нужна)
   CreateDate bigint not null,             --! Дата и время регистрации карты
-  CloseDate bigint,                      --! Дата завершения действия карты
+  ValidDate bigint,                      --! Дата завершения действия карты
   CONSTRAINT cf_cards_temp_pk PRIMARY KEY (IdOfCartTemp),
   CONSTRAINT cf_cards_temp_organization FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg),
   CONSTRAINT CardNo_Unique UNIQUE (CardNo)
 );
 --
 CREATE TABLE cf_card_temp_operations(
-  IdOfCardTempOperation bigserial not null,   --! первичный ключ
+  IdOfCardTempOperation bigserial not null,      --! первичный ключ процесинга
+  LocalIdOperation bigint NOT NULL,           --! первичный ключ школы
   IdOfOrg bigint not null,                    --! внешний ключ на IdOfOrg из соотв. таблицы — равен идентификатору организации, на которую зарегистрирована врем. карта или, в случае врем. карты посетителя — идентификатору организации, в которой была произведена эта операция.
   IdOfCartTemp bigint not null,               --! внешний ключ или на физ. идентификатор временной карты или на первичный ключ соотв. записи из TempCards
   IdOfClient bigint,                          --! Идентификатор клиента
@@ -34,8 +35,10 @@ CREATE TABLE cf_card_temp_operations(
   OperationType int not null,                 --! Тип операции: int16 или int8, not null, значения:  0 — регистрация, 1 — выдача ,2 – возврат, 3 — блокировка
   OperationDate bigint not null,              --! Дата и время операции
   CONSTRAINT cf_card_temp_operations_pk PRIMARY KEY (IdOfCardTempOperation),
-  CONSTRAINT cf_card_temp_operations_organization FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg)
+  CONSTRAINT cf_card_temp_operations_organization FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg),
+  CONSTRAINT cf_card_temp_operation_org_local_id UNIQUE (IdOfOrg , LocalIdOperation )
 );
+
 --
 CREATE TABLE cf_visitors(
   IdOfVisitor bigserial not null,                --! первичный ключ
@@ -50,16 +53,16 @@ CREATE TABLE cf_visitors(
   CONSTRAINT cf_visitors_IdOfPerson_fk FOREIGN KEY (IdOfPerson) REFERENCES CF_Persons (IdOfPerson)
 );
 
--- CREATE TABLE cf_synchistory_exceptions
--- (
---   idofsynchistoryexception bigserial NOT NULL,
---   idoforg bigint NOT NULL,
---   idofsync bigint NOT NULL,
---   message character varying(512) NOT NULL,
---   CONSTRAINT cf_synchistory_exceptions_pk PRIMARY KEY (idofsynchistoryexception),
---   CONSTRAINT cf_synchistory_exceptions_organization FOREIGN KEY (idoforg) REFERENCES cf_orgs (idoforg),
---   CONSTRAINT cf_synchistory_exceptions_sync FOREIGN KEY (idofsync) REFERENCES cf_synchistory (idofsync)
--- );
+CREATE TABLE cf_synchistory_exceptions
+(
+  idofsynchistoryexception bigserial NOT NULL,
+  idoforg bigint NOT NULL,
+  idofsync bigint NOT NULL,
+  message character varying(512) NOT NULL,
+  CONSTRAINT cf_synchistory_exceptions_pk PRIMARY KEY (idofsynchistoryexception),
+  CONSTRAINT cf_synchistory_exceptions_organization FOREIGN KEY (idoforg) REFERENCES cf_orgs (idoforg),
+  CONSTRAINT cf_synchistory_exceptions_sync FOREIGN KEY (idofsync) REFERENCES cf_synchistory (idofsync)
+);
 
 --! Необходимо добавить возможность активации ручного запуска для правила
 alter table CF_ReportHandleRules add AllowManualReportRun INTEGER NOT NULL default 0;
@@ -87,3 +90,6 @@ alter table CF_Orgs add FullSyncParam INTEGER NOT NULL default 0;
 
 -- Добавление ссылки на контрагента для Контракта
 alter table cf_contracts add column IdOfContragent BIGINT DEFAULT NULL;
+
+-- Добавлен номер правила социальной скидки в деталь заказа
+alter table CF_OrderDetails add column IdOfRule  BIGINT DEFAULT NULL;

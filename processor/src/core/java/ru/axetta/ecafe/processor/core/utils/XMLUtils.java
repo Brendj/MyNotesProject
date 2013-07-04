@@ -44,4 +44,16 @@ public class XMLUtils {
         Document d = factory.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
         return doc.importNode(d.getDocumentElement(), true);
     }
+
+    public static String getStringAttributeValue(Node node, String attributeName,Integer length) throws Exception{
+        if(getAttributeValue(node, attributeName)==null) return null;
+        String result = getAttributeValue(node, attributeName);
+        if(result.length()>length) return result.substring(0, length);
+        return result;
+    }
+
+    public static String getAttributeValue(Node node, String attributeName){
+        if(node.getAttributes().getNamedItem(attributeName)==null) return null;
+        return node.getAttributes().getNamedItem(attributeName).getTextContent().trim();
+    }
 }

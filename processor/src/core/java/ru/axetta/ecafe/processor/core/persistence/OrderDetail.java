@@ -63,6 +63,7 @@ public class OrderDetail {
     private String menuGroup;
     private int state;
     private String itemCode;
+    private Long idOfRule;
     private Good good;
     private Set<GoodComplaintOrders> goodComplaintOrdersInternal;
 
@@ -229,6 +230,14 @@ public class OrderDetail {
 
     public void setState(int state) {
         this.state = state;
+    }
+
+    public Long getIdOfRule() {
+        return idOfRule;
+    }
+
+    public void setIdOfRule(Long idOfRule) {
+        this.idOfRule = idOfRule;
     }
 
     public Good getGood() {

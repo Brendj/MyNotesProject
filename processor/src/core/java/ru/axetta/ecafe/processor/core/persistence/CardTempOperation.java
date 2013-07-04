@@ -16,6 +16,7 @@ import java.util.Date;
 public class CardTempOperation {
 
     private Long idOfCardTempOperation;
+    private Long localId;
     private Org org;
     private CardTemp cardTemp;
     private CardOperationStation operationType;
@@ -23,8 +24,9 @@ public class CardTempOperation {
     private Client client;
     private Visitor visitor;
 
-    public CardTempOperation(Org org, CardTemp cardTemp, CardOperationStation operationType,
+    public CardTempOperation(Long idOfCardTempOperation, Org org, CardTemp cardTemp, CardOperationStation operationType,
             Date operationDate, Client client) {
+        this.localId = idOfCardTempOperation;
         this.org = org;
         this.cardTemp = cardTemp;
         this.operationType = operationType;
@@ -32,8 +34,9 @@ public class CardTempOperation {
         this.client = client;
     }
 
-    public CardTempOperation(Org org, CardTemp cardTemp, CardOperationStation operationType, Date operationDate,
+    public CardTempOperation(Long idOfCardTempOperation, Org org, CardTemp cardTemp, CardOperationStation operationType, Date operationDate,
             Visitor visitor) {
+        this.localId = idOfCardTempOperation;
         this.org = org;
         this.cardTemp = cardTemp;
         this.operationType = operationType;
@@ -43,6 +46,10 @@ public class CardTempOperation {
 
     public Long getIdOfCardTempOperation() {
         return idOfCardTempOperation;
+    }
+
+    public Long getLocalId() {
+        return localId;
     }
 
     public Org getOrg() {
@@ -95,6 +102,10 @@ public class CardTempOperation {
 
     void setVisitor(Visitor visitor) {
         this.visitor = visitor;
+    }
+
+    void setLocalId(Long localId) {
+        this.localId = localId;
     }
 
     protected CardTempOperation() {

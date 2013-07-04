@@ -7,6 +7,8 @@ package ru.axetta.ecafe.processor.core.sync;
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperationBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 
 import org.apache.commons.lang.StringUtils;
@@ -72,7 +74,6 @@ public class SyncRequest {
 
             public static class Purchase {
 
-
                 public static class Builder {
 
                     public Purchase build(Node purchaseNode, MenuGroups menuGroups) throws Exception {
@@ -119,8 +120,14 @@ public class SyncRequest {
                         }
                         String guidOfGoods = getStringValueNullSafe(namedNodeMap, "GoodsGuid");
 
+                        Long idOfRule = null; // собственное
+                        String idOfRuleStr = getStringValueNullSafe(namedNodeMap, "IdOfRule");
+                        if (idOfRuleStr != null) {
+                            idOfRule = Long.parseLong(idOfRuleStr);
+                        }
+
                         return new Purchase(discount, socDiscount, idOfOrderDetail, name, qty, rPrice, rootMenu,
-                                menuOutput, type, menuGroup, menuOrigin, itemCode, guidOfGoods);
+                                menuOutput, type, menuGroup, menuOrigin, itemCode, guidOfGoods, idOfRule);
                     }
 
                 }
@@ -138,10 +145,11 @@ public class SyncRequest {
                 private final int menuOrigin;
                 private final String itemCode;
                 private final String guidOfGoods;
+                private final Long idOfRule;
 
                 public Purchase(long discount, long socDiscount, long idOfOrderDetail, String name, long qty,
                         long rPrice, String rootMenu, String menuOutput, int type, String menuGroup, int menuOrigin,
-                        String itemCode, String guidOfGoods) {
+                        String itemCode, String guidOfGoods, Long idOfRule) {
                     this.discount = discount;
                     this.socDiscount = socDiscount;
                     this.idOfOrderDetail = idOfOrderDetail;
@@ -155,6 +163,7 @@ public class SyncRequest {
                     this.menuOrigin = menuOrigin;
                     this.itemCode = itemCode;
                     this.guidOfGoods = guidOfGoods;
+                    this.idOfRule = idOfRule;
                 }
 
                 public String getItemCode() {
@@ -207,6 +216,10 @@ public class SyncRequest {
 
                 public String getGuidOfGoods() {
                     return guidOfGoods;
+                }
+
+                public Long getIdOfRule() {
+                    return idOfRule;
                 }
 
                 @Override
@@ -2208,7 +2221,387 @@ public class SyncRequest {
         }
     }
 
-    public static class LibraryData {
+    public static class LoadContext {
+
+        public MenuGroups menuGroups;
+        public long protoVersion;
+        public DateFormat timeFormat, dateOnlyFormat;
+    }
+
+    public static class Builder {
+
+        private final DateFormat dateOnlyFormat;
+        private final DateFormat timeFormat;
+        private final PaymentRegistry.Builder paymentRegistryBuilder;
+        private final AccIncRegistryRequest.Builder accIncRegistryRequestBuilder;
+        private final ClientParamRegistry.Builder clientParamRegistryBuilder;
+        private final ClientRegistryRequest.Builder clientRegistryRequestBuilder;
+        private final OrgStructure.Builder orgStructureBuilder;
+        private final ReqMenu.Builder reqMenuBuilder;
+        private final ReqDiary.Builder reqDiaryBuilder;
+        private final MenuGroups.Builder menuGroupsBuilder;
+        private final EnterEvents.Builder enterEventsBuilder;
+        private final TempCardsOperationBuilder tempCardsOperationBuilder;
+        private Manager manager;
+
+        public Builder() {
+            TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
+            this.dateOnlyFormat = new SimpleDateFormat("dd.MM.yyyy");
+            this.dateOnlyFormat.setTimeZone(utcTimeZone);
+
+            TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
+            this.timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+            this.timeFormat.setTimeZone(localTimeZone);
+
+            this.paymentRegistryBuilder = new PaymentRegistry.Builder();
+            this.accIncRegistryRequestBuilder = new AccIncRegistryRequest.Builder();
+            this.clientParamRegistryBuilder = new ClientParamRegistry.Builder();
+            this.clientRegistryRequestBuilder = new ClientRegistryRequest.Builder();
+            this.orgStructureBuilder = new OrgStructure.Builder();
+            this.reqMenuBuilder = new ReqMenu.Builder();
+            this.reqDiaryBuilder = new ReqDiary.Builder();
+            this.menuGroupsBuilder = new MenuGroups.Builder();
+            this.enterEventsBuilder = new EnterEvents.Builder();
+            this.tempCardsOperationBuilder = new TempCardsOperationBuilder();
+        }
+
+        public static Node findEnvelopeNode(Document document) throws Exception {
+            Node dataNode = findFirstChildElement(document, "Data");
+            Node bodyNode = findFirstChildElement(dataNode, "Body");
+            return findFirstChildElement(bodyNode, "CafeteriaExchange");
+        }
+
+        public static long getIdOfOrg(NamedNodeMap namedNodeMap) throws Exception {
+            return getLongValue(namedNodeMap, "IdOfOrg");
+        }
+
+        public static String getIdOfSync(NamedNodeMap namedNodeMap) throws Exception {
+            return namedNodeMap.getNamedItem("Date").getTextContent();
+        }
+
+        public static String getClientVersion(NamedNodeMap namedNodeMap) throws Exception {
+            if(namedNodeMap.getNamedItem("ClientVersion")==null) return null;
+            return namedNodeMap.getNamedItem("ClientVersion").getTextContent();
+        }
+
+        //public static int getSyncType(NamedNodeMap namedNodeMap) throws Exception {
+        //    return parseSyncType(getStringValueNullSafe(namedNodeMap, "Type"));
+        //}
+
+        public static SyncType getSyncType(NamedNodeMap namedNodeMap) throws Exception {
+            return SyncType.parse(getStringValueNullSafe(namedNodeMap, "Type"));
+        }
+
+        public SyncRequest build(Node envelopeNode, NamedNodeMap namedNodeMap, Org org, String idOfSync, String remoteAddr)
+                throws Exception {
+            long version = getLongValue(namedNodeMap, "Version");
+            if (3L != version && 4L != version && 5L != version) {
+                throw new Exception(String.format("Unsupported protoVersion: %d", version));
+            }
+            String sSyncType = getStringValueNullSafe(namedNodeMap, "Type");
+
+            //int type = parseSyncType(sSyncType);
+            SyncType syncType = SyncType.parse(sSyncType);
+
+            String clientVersion = getClientVersion(namedNodeMap);
+
+            Date syncTime = timeFormat.parse(idOfSync);
+            Long idOfPacket = getLongValueNullSafe(namedNodeMap, "IdOfPacket");
+
+            Node menuNode = findFirstChildElement(envelopeNode, "Menu");
+
+            MenuGroups menuGroups = null;
+            Node menuGroupsNode = findFirstChildElement(envelopeNode, "MenuGroups");
+            if (menuGroupsNode == null) {
+                // может быть как на верхнем уровне (старый протокол), так и в Menu / Settings
+                if (menuNode != null) {
+                    Node settingsNode = findFirstChildElement(menuNode, "Settings");
+                    if (settingsNode != null) {
+                        menuGroupsNode = findFirstChildElement(settingsNode, "MenuGroups");
+                    }
+                }
+            }
+            if (menuGroupsNode != null) {
+                menuGroups = menuGroupsBuilder.build(menuGroupsNode);
+            } else {
+                menuGroups = MenuGroups.Builder.buildEmpty();
+            }
+
+            LoadContext loadContext = new LoadContext();
+            loadContext.menuGroups = menuGroups;
+            loadContext.protoVersion = version;
+            loadContext.dateOnlyFormat = dateOnlyFormat;
+            loadContext.timeFormat = timeFormat;
+
+            Node paymentRegistryNode = findFirstChildElement(envelopeNode, "PaymentRegistry");
+            PaymentRegistry paymentRegistry = null;
+            if (paymentRegistryNode != null) {
+                paymentRegistry = paymentRegistryBuilder.build(paymentRegistryNode, loadContext);
+            }
+
+            Node accIncRegistryRequestNode = findFirstChildElement(envelopeNode, "AccIncRegistryRequest");
+            AccIncRegistryRequest accIncRegistryRequest = null;
+            if (accIncRegistryRequestNode != null) {
+                accIncRegistryRequest = accIncRegistryRequestBuilder.build(accIncRegistryRequestNode, loadContext);
+            }
+
+            Node clientParamRegistryNode = findFirstChildElement(envelopeNode, "ClientParams");
+            ClientParamRegistry clientParamRegistry;
+            if (null == clientParamRegistryNode) {
+                clientParamRegistry = clientParamRegistryBuilder.build();
+            } else {
+                clientParamRegistry = clientParamRegistryBuilder.build(clientParamRegistryNode, loadContext);
+            }
+
+            Node clientRegistryRequestNode = findFirstChildElement(envelopeNode, "ClientRegistryRequest");
+            ClientRegistryRequest clientRegistryRequest = null;
+            if (clientRegistryRequestNode != null) {
+                clientRegistryRequest = clientRegistryRequestBuilder.build(clientRegistryRequestNode);
+            }
+
+            Node orgStructureNode = findFirstChildElement(envelopeNode, "OrgStructure");
+            OrgStructure orgStructure = null;
+            if (orgStructureNode != null) {
+                orgStructure = orgStructureBuilder.build(orgStructureNode);
+            }
+
+
+            ReqMenu reqMenu = null;
+            if (menuNode != null) {
+                reqMenu = reqMenuBuilder.build(menuNode, loadContext);
+            }
+
+            Node messageNode = findFirstChildElement(envelopeNode, "Message");
+            Node reqDiaryNode = findFirstChildElement(envelopeNode, "Diary");
+
+            ReqDiary reqDiary = null;
+            if (reqDiaryNode != null) {
+                reqDiary = reqDiaryBuilder.build(reqDiaryNode, loadContext);
+            }
+
+            String message = null;
+            if (null != messageNode) {
+                message = findFirstChildTextNode(messageNode).getTextContent();
+            }
+
+            // 07.09.2011 EnterEvents
+            Node enterEventsNode = findFirstChildElement(envelopeNode, "EnterEvents");
+            EnterEvents enterEvents = null;
+            if (enterEventsNode != null) {
+                enterEvents = enterEventsBuilder.build(enterEventsNode, loadContext, org.getIdOfOrg());
+            }
+
+            TempCardsOperations tempCardsOperations = null;
+            Node tempCardsOperationsNode = findFirstChildElement(envelopeNode, "TempCardsOperations");
+            if (tempCardsOperationsNode != null) {
+                tempCardsOperations = tempCardsOperationBuilder.build(tempCardsOperationsNode, org.getIdOfOrg());
+            }
+
+            // 15.09.2011 LibraryData
+            //Node libraryDataNode = findFirstChildElement(envelopeNode, "LibraryData");
+            //LibraryData libraryData = null;
+            //if (libraryDataNode != null) {
+            //    libraryData = libraryDataBuilder.build(libraryDataNode, org.getIdOfOrg());
+            //}
+            //
+            //Node libraryData2Node = findFirstChildElement(envelopeNode, "LibraryData2");
+            //LibraryData2 libraryData2 = null;
+            //if (libraryData2Node != null) {
+            //    libraryData2 = libraryData2Builder.build(libraryData2Node);
+            //}
+
+            /*  Модуль распределенной синхронизации объектов */
+            Node roNode = findFirstChildElement(envelopeNode, "RO");
+            if(roNode != null){
+                manager = new Manager(dateOnlyFormat, timeFormat);
+                manager.setIdOfOrg(org.getIdOfOrg());
+                Node itemNode = roNode.getFirstChild();
+                while (null != itemNode) {
+                    if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
+                        manager.build(itemNode);
+                    }
+                    itemNode = itemNode.getNextSibling();
+                }
+            }
+
+
+            return new SyncRequest(remoteAddr, version, syncType /*type,*/, clientVersion, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
+                    clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
+                    enterEvents, tempCardsOperations, manager);
+        }
+
+        private static Node findFirstChildElement(Node node, String name) throws Exception {
+            Node currNode = node.getFirstChild();
+            while (null != currNode) {
+                if (Node.ELEMENT_NODE == currNode.getNodeType() && currNode.getNodeName().equals(name)) {
+                    return currNode;
+                }
+                currNode = currNode.getNextSibling();
+            }
+            return null;
+        }
+
+        private static Node findFirstChildTextNode(Node node) throws Exception {
+            Node currNode = node.getFirstChild();
+            while (null != currNode) {
+                if (Node.TEXT_NODE == currNode.getNodeType()) {
+                    return currNode;
+                }
+                currNode = currNode.getNextSibling();
+            }
+            return null;
+        }
+    }
+
+    private final SyncType syncType;
+
+    public SyncType getSyncType() {
+        return syncType;
+    }
+
+    private final String remoteAddr;
+    private final long protoVersion;
+    private final long idOfOrg;
+    private final Org org;
+    private final Date syncTime;
+    private final Long idOfPacket;
+    private final MenuGroups menuGroups;
+    private final PaymentRegistry paymentRegistry;
+    private final ClientParamRegistry clientParamRegistry;
+    private final ClientRegistryRequest clientRegistryRequest;
+    private final AccIncRegistryRequest accIncRegistryRequest;
+    private final OrgStructure orgStructure;
+    private final ReqMenu reqMenu;
+    private final ReqDiary reqDiary;
+    private final String message;
+    private final String clientVersion;
+    private final EnterEvents enterEvents;
+    private final TempCardsOperations tempCardsOperations;
+    private final Manager manager;
+
+    public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket,
+            PaymentRegistry paymentRegistry, AccIncRegistryRequest accIncRegistryRequest, ClientParamRegistry clientParamRegistry,
+            ClientRegistryRequest clientRegistryRequest, OrgStructure orgStructure, MenuGroups menuGroups, ReqMenu reqMenu, ReqDiary reqDiary, String message,
+            EnterEvents enterEvents, TempCardsOperations tempCardsOperations, Manager manager) {
+        this.remoteAddr = remoteAddr;
+        this.protoVersion = protoVersion;
+        this.syncType = syncType;
+        this.clientVersion = clientVersion;
+        this.tempCardsOperations = tempCardsOperations;
+        this.manager = manager;
+        this.idOfOrg = org.getIdOfOrg();
+        this.org = org;
+        this.syncTime = syncTime;
+        this.idOfPacket = idOfPacket;
+        this.paymentRegistry = paymentRegistry;
+        this.accIncRegistryRequest = accIncRegistryRequest;
+        this.clientParamRegistry = clientParamRegistry;
+        this.clientRegistryRequest = clientRegistryRequest;
+        this.orgStructure = orgStructure;
+        this.menuGroups = menuGroups;
+        this.reqMenu = reqMenu;
+        this.reqDiary = reqDiary;
+        this.message = message;
+        this.enterEvents = enterEvents;
+    }
+
+    public String getClientVersion() {
+        return clientVersion;
+    }
+
+    public String getRemoteAddr() {
+        return remoteAddr;
+    }
+
+    public long getProtoVersion() {
+        return protoVersion;
+    }
+
+    public long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public Org getOrg() {
+        return org;
+    }
+
+    public Date getSyncTime() {
+        return syncTime;
+    }
+
+    public long getIdOfPacket() {
+        return idOfPacket;
+    }
+
+    public PaymentRegistry getPaymentRegistry() {
+        return paymentRegistry;
+    }
+
+    public AccIncRegistryRequest getAccIncRegistryRequest() {
+        return accIncRegistryRequest;
+    }
+
+    public ClientParamRegistry getClientParamRegistry() {
+        return clientParamRegistry;
+    }
+
+    public ClientRegistryRequest getClientRegistryRequest() {
+        return clientRegistryRequest;
+    }
+
+    public OrgStructure getOrgStructure() {
+        return orgStructure;
+    }
+
+    public ReqMenu getReqMenu() {
+        return reqMenu;
+    }
+
+    public ReqDiary getReqDiary() {
+        return reqDiary;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public EnterEvents getEnterEvents() {
+        return enterEvents;
+    }
+
+    public Manager getManager() {
+        return manager;
+    }
+
+    public TempCardsOperations getTempCardsOperations() {
+        return tempCardsOperations;
+    }
+
+    @Override
+    public String toString() {
+        return "SyncRequest{" + "protoVersion=" + protoVersion + ", idOfOrg=" + idOfOrg + ", syncTime=" + syncTime
+                + ", idOfPacket=" + idOfPacket + ", paymentRegistry=" + paymentRegistry + ", clientParamRegistry="
+                + clientParamRegistry + ", clientRegistryRequest=" + clientRegistryRequest + ", orgStructure="
+                + orgStructure + ", reqMenu=" + reqMenu + ", reqDiary=" + reqDiary + ", message='" + message + '\''
+                + ", enterEvents=" + enterEvents + '}';
+    }
+
+    private static Double getCalories(NamedNodeMap namedNodeMap, String name) {
+        Node node = namedNodeMap.getNamedItem(name);
+        if (null == node) {
+            return null;
+        }
+        String calString = node.getTextContent();
+        if (calString.equals("")) {
+            return null;
+        }
+        String replacedString = calString.replaceAll(",", ".");
+        return Double.parseDouble(replacedString);
+    }
+}
+
+
+/*public static class LibraryData {
 
         public static class Circulations {
 
@@ -2994,402 +3387,4 @@ public class SyncRequest {
         public long getVersion() {
             return version;
         }
-    }
-
-    public static class LoadContext {
-
-        public MenuGroups menuGroups;
-        public long protoVersion;
-        public DateFormat timeFormat, dateOnlyFormat;
-    }
-
-    public static class Builder {
-
-        private final DateFormat dateOnlyFormat;
-        private final DateFormat timeFormat;
-        private final PaymentRegistry.Builder paymentRegistryBuilder;
-        private final AccIncRegistryRequest.Builder accIncRegistryRequestBuilder;
-        private final ClientParamRegistry.Builder clientParamRegistryBuilder;
-        private final ClientRegistryRequest.Builder clientRegistryRequestBuilder;
-        private final OrgStructure.Builder orgStructureBuilder;
-        private final ReqMenu.Builder reqMenuBuilder;
-        private final ReqDiary.Builder reqDiaryBuilder;
-        private final MenuGroups.Builder menuGroupsBuilder;
-        private final EnterEvents.Builder enterEventsBuilder;
-        private final LibraryData.Builder libraryDataBuilder;
-        private final LibraryData2.Builder libraryData2Builder;
-        private Manager manager;
-
-        public Builder() {
-            TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
-            this.dateOnlyFormat = new SimpleDateFormat("dd.MM.yyyy");
-            this.dateOnlyFormat.setTimeZone(utcTimeZone);
-
-            TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
-            this.timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-            this.timeFormat.setTimeZone(localTimeZone);
-
-            this.paymentRegistryBuilder = new PaymentRegistry.Builder();
-            this.accIncRegistryRequestBuilder = new AccIncRegistryRequest.Builder();
-            this.clientParamRegistryBuilder = new ClientParamRegistry.Builder();
-            this.clientRegistryRequestBuilder = new ClientRegistryRequest.Builder();
-            this.orgStructureBuilder = new OrgStructure.Builder();
-            this.reqMenuBuilder = new ReqMenu.Builder();
-            this.reqDiaryBuilder = new ReqDiary.Builder();
-            this.menuGroupsBuilder = new MenuGroups.Builder();
-            this.enterEventsBuilder = new EnterEvents.Builder();
-            this.libraryDataBuilder = new LibraryData.Builder();
-            this.libraryData2Builder = new LibraryData2.Builder();
-        }
-
-        public static Node findEnvelopeNode(Document document) throws Exception {
-            Node dataNode = findFirstChildElement(document, "Data");
-            Node bodyNode = findFirstChildElement(dataNode, "Body");
-            return findFirstChildElement(bodyNode, "CafeteriaExchange");
-        }
-
-        public static long getIdOfOrg(NamedNodeMap namedNodeMap) throws Exception {
-            return getLongValue(namedNodeMap, "IdOfOrg");
-        }
-
-        public static String getIdOfSync(NamedNodeMap namedNodeMap) throws Exception {
-            return namedNodeMap.getNamedItem("Date").getTextContent();
-        }
-
-        public static String getClientVersion(NamedNodeMap namedNodeMap) throws Exception {
-            if(namedNodeMap.getNamedItem("ClientVersion")==null) return null;
-            return namedNodeMap.getNamedItem("ClientVersion").getTextContent();
-        }
-
-        //public static int getSyncType(NamedNodeMap namedNodeMap) throws Exception {
-        //    return parseSyncType(getStringValueNullSafe(namedNodeMap, "Type"));
-        //}
-
-        public static SyncType getSyncType(NamedNodeMap namedNodeMap) throws Exception {
-            return SyncType.parse(getStringValueNullSafe(namedNodeMap, "Type"));
-        }
-
-        public SyncRequest build(Node envelopeNode, NamedNodeMap namedNodeMap, Org org, String idOfSync, String remoteAddr)
-                throws Exception {
-            long version = getLongValue(namedNodeMap, "Version");
-            if (3L != version && 4L != version && 5L != version) {
-                throw new Exception(String.format("Unsupported protoVersion: %d", version));
-            }
-            String sSyncType = getStringValueNullSafe(namedNodeMap, "Type");
-
-            //int type = parseSyncType(sSyncType);
-            SyncType syncType = SyncType.parse(sSyncType);
-
-            String clientVersion = getClientVersion(namedNodeMap);
-
-            Date syncTime = timeFormat.parse(idOfSync);
-            Long idOfPacket = getLongValueNullSafe(namedNodeMap, "IdOfPacket");
-
-            Node menuNode = findFirstChildElement(envelopeNode, "Menu");
-
-            MenuGroups menuGroups = null;
-            Node menuGroupsNode = findFirstChildElement(envelopeNode, "MenuGroups");
-            if (menuGroupsNode == null) {
-                // может быть как на верхнем уровне (старый протокол), так и в Menu / Settings
-                if (menuNode != null) {
-                    Node settingsNode = findFirstChildElement(menuNode, "Settings");
-                    if (settingsNode != null) {
-                        menuGroupsNode = findFirstChildElement(settingsNode, "MenuGroups");
-                    }
-                }
-            }
-            if (menuGroupsNode != null) {
-                menuGroups = menuGroupsBuilder.build(menuGroupsNode);
-            } else {
-                menuGroups = MenuGroups.Builder.buildEmpty();
-            }
-
-            LoadContext loadContext = new LoadContext();
-            loadContext.menuGroups = menuGroups;
-            loadContext.protoVersion = version;
-            loadContext.dateOnlyFormat = dateOnlyFormat;
-            loadContext.timeFormat = timeFormat;
-
-            Node paymentRegistryNode = findFirstChildElement(envelopeNode, "PaymentRegistry");
-            PaymentRegistry paymentRegistry = null;
-            if (paymentRegistryNode != null) {
-                paymentRegistry = paymentRegistryBuilder.build(paymentRegistryNode, loadContext);
-            }
-
-            Node accIncRegistryRequestNode = findFirstChildElement(envelopeNode, "AccIncRegistryRequest");
-            AccIncRegistryRequest accIncRegistryRequest = null;
-            if (accIncRegistryRequestNode != null) {
-                accIncRegistryRequest = accIncRegistryRequestBuilder.build(accIncRegistryRequestNode, loadContext);
-            }
-
-            Node clientParamRegistryNode = findFirstChildElement(envelopeNode, "ClientParams");
-            ClientParamRegistry clientParamRegistry;
-            if (null == clientParamRegistryNode) {
-                clientParamRegistry = clientParamRegistryBuilder.build();
-            } else {
-                clientParamRegistry = clientParamRegistryBuilder.build(clientParamRegistryNode, loadContext);
-            }
-
-            Node clientRegistryRequestNode = findFirstChildElement(envelopeNode, "ClientRegistryRequest");
-            ClientRegistryRequest clientRegistryRequest = null;
-            if (clientRegistryRequestNode != null) {
-                clientRegistryRequest = clientRegistryRequestBuilder.build(clientRegistryRequestNode);
-            }
-
-            Node orgStructureNode = findFirstChildElement(envelopeNode, "OrgStructure");
-            OrgStructure orgStructure = null;
-            if (orgStructureNode != null) {
-                orgStructure = orgStructureBuilder.build(orgStructureNode);
-            }
-
-
-            ReqMenu reqMenu = null;
-            if (menuNode != null) {
-                reqMenu = reqMenuBuilder.build(menuNode, loadContext);
-            }
-
-            Node messageNode = findFirstChildElement(envelopeNode, "Message");
-            Node reqDiaryNode = findFirstChildElement(envelopeNode, "Diary");
-
-            ReqDiary reqDiary = null;
-            if (reqDiaryNode != null) {
-                reqDiary = reqDiaryBuilder.build(reqDiaryNode, loadContext);
-            }
-
-            String message = null;
-            if (null != messageNode) {
-                message = findFirstChildTextNode(messageNode).getTextContent();
-            }
-
-            // 07.09.2011 EnterEvents
-            Node enterEventsNode = findFirstChildElement(envelopeNode, "EnterEvents");
-            EnterEvents enterEvents = null;
-            if (enterEventsNode != null) {
-                enterEvents = enterEventsBuilder.build(enterEventsNode, loadContext, org.getIdOfOrg());
-            }
-
-            // 15.09.2011 LibraryData
-            Node libraryDataNode = findFirstChildElement(envelopeNode, "LibraryData");
-            LibraryData libraryData = null;
-            if (libraryDataNode != null) {
-                libraryData = libraryDataBuilder.build(libraryDataNode, org.getIdOfOrg());
-            }
-
-            Node libraryData2Node = findFirstChildElement(envelopeNode, "LibraryData2");
-            LibraryData2 libraryData2 = null;
-            if (libraryData2Node != null) {
-                libraryData2 = libraryData2Builder.build(libraryData2Node);
-            }
-
-            /*  Универсальный модуль распределенной синхронизации объектов */
-            Node roNode = findFirstChildElement(envelopeNode, "RO");
-            if(roNode != null){
-                manager = new Manager(dateOnlyFormat, timeFormat);
-                manager.setIdOfOrg(org.getIdOfOrg());
-                Node itemNode = roNode.getFirstChild();
-                while (null != itemNode) {
-                    if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
-                        manager.build(itemNode);
-                    }
-                    itemNode = itemNode.getNextSibling();
-                }
-            }
-
-
-            return new SyncRequest(remoteAddr, version, syncType /*type,*/, clientVersion, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
-                    clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
-                    enterEvents, libraryData, libraryData2, manager);
-        }
-
-        //private static int parseSyncType(String sSyncType) throws Exception {
-        //    int type;
-        //    if (sSyncType != null && sSyncType.equals("GetAccInc")) {
-        //        type = SyncRequest.TYPE_GET_ACC_INC;
-        //    } else if (sSyncType != null && sSyncType.equals("GetClientParams")) {
-        //        type = SyncRequest.TYPE_GET_CLIENTS_PARAMS;
-        //    } else if (sSyncType == null || sSyncType.equals("Full")) {
-        //        type = SyncRequest.TYPE_FULL;
-        //    } else  {
-        //        throw new Exception("Invalid request type: " + sSyncType);
-        //    }
-        //    return type;
-        //}
-
-        private static Node findFirstChildElement(Node node, String name) throws Exception {
-            Node currNode = node.getFirstChild();
-            while (null != currNode) {
-                if (Node.ELEMENT_NODE == currNode.getNodeType() && currNode.getNodeName().equals(name)) {
-                    return currNode;
-                }
-                currNode = currNode.getNextSibling();
-            }
-            return null;
-        }
-
-        private static Node findFirstChildTextNode(Node node) throws Exception {
-            Node currNode = node.getFirstChild();
-            while (null != currNode) {
-                if (Node.TEXT_NODE == currNode.getNodeType()) {
-                    return currNode;
-                }
-                currNode = currNode.getNextSibling();
-            }
-            return null;
-        }
-    }
-
-    private final SyncType syncType;
-
-    public SyncType getSyncType() {
-        return syncType;
-    }
-
-    private final String remoteAddr;
-    private final long protoVersion;
-    private final long idOfOrg;
-    private final Org org;
-    private final Date syncTime;
-    private final Long idOfPacket;
-    private final MenuGroups menuGroups;
-    private final PaymentRegistry paymentRegistry;
-    private final ClientParamRegistry clientParamRegistry;
-    private final ClientRegistryRequest clientRegistryRequest;
-    private final AccIncRegistryRequest accIncRegistryRequest;
-    private final OrgStructure orgStructure;
-    private final ReqMenu reqMenu;
-    private final ReqDiary reqDiary;
-    private final String message;
-    private final String clientVersion;
-    private final EnterEvents enterEvents;
-    private final LibraryData libraryData;
-    private final LibraryData2 libraryData2;
-    private final Manager manager;
-
-    public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket,
-            PaymentRegistry paymentRegistry, AccIncRegistryRequest accIncRegistryRequest,
-            ClientParamRegistry clientParamRegistry, ClientRegistryRequest clientRegistryRequest,
-            OrgStructure orgStructure, MenuGroups menuGroups, ReqMenu reqMenu, ReqDiary reqDiary, String message,
-            EnterEvents enterEvents, LibraryData libraryData, LibraryData2 libraryData2,
-            Manager manager) {
-        this.remoteAddr = remoteAddr;
-        this.protoVersion = protoVersion;
-        this.syncType = syncType;
-        this.clientVersion = clientVersion;
-        this.manager = manager;
-        this.idOfOrg = org.getIdOfOrg();
-        this.org = org;
-        this.syncTime = syncTime;
-        this.idOfPacket = idOfPacket;
-        this.paymentRegistry = paymentRegistry;
-        this.accIncRegistryRequest = accIncRegistryRequest;
-        this.clientParamRegistry = clientParamRegistry;
-        this.clientRegistryRequest = clientRegistryRequest;
-        this.orgStructure = orgStructure;
-        this.menuGroups = menuGroups;
-        this.reqMenu = reqMenu;
-        this.reqDiary = reqDiary;
-        this.message = message;
-        this.enterEvents = enterEvents;
-        this.libraryData = libraryData;
-        this.libraryData2 = libraryData2;
-    }
-
-    public String getClientVersion() {
-        return clientVersion;
-    }
-
-    public String getRemoteAddr() {
-        return remoteAddr;
-    }
-
-    public long getProtoVersion() {
-        return protoVersion;
-    }
-
-    public long getIdOfOrg() {
-        return idOfOrg;
-    }
-
-    public Org getOrg() {
-        return org;
-    }
-
-    public Date getSyncTime() {
-        return syncTime;
-    }
-
-    public long getIdOfPacket() {
-        return idOfPacket;
-    }
-
-    public PaymentRegistry getPaymentRegistry() {
-        return paymentRegistry;
-    }
-
-    public AccIncRegistryRequest getAccIncRegistryRequest() {
-        return accIncRegistryRequest;
-    }
-
-    public ClientParamRegistry getClientParamRegistry() {
-        return clientParamRegistry;
-    }
-
-    public ClientRegistryRequest getClientRegistryRequest() {
-        return clientRegistryRequest;
-    }
-
-    public OrgStructure getOrgStructure() {
-        return orgStructure;
-    }
-
-    public ReqMenu getReqMenu() {
-        return reqMenu;
-    }
-
-    public ReqDiary getReqDiary() {
-        return reqDiary;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public EnterEvents getEnterEvents() {
-        return enterEvents;
-    }
-
-    public LibraryData getLibraryData() {
-        return libraryData;
-    }
-
-    public LibraryData2 getLibraryData2() {
-        return libraryData2;
-    }
-
-
-    public Manager getManager() {
-        return manager;
-    }
-
-    @Override
-    public String toString() {
-        return "SyncRequest{" + "protoVersion=" + protoVersion + ", idOfOrg=" + idOfOrg + ", syncTime=" + syncTime
-                + ", idOfPacket=" + idOfPacket + ", paymentRegistry=" + paymentRegistry + ", clientParamRegistry="
-                + clientParamRegistry + ", clientRegistryRequest=" + clientRegistryRequest + ", orgStructure="
-                + orgStructure + ", reqMenu=" + reqMenu + ", reqDiary=" + reqDiary + ", message='" + message + '\''
-                + ", enterEvents=" + enterEvents + ", libraryData=" + libraryData + '}';
-    }
-
-    private static Double getCalories(NamedNodeMap namedNodeMap, String name) {
-        Node node = namedNodeMap.getNamedItem(name);
-        if (null == node) {
-            return null;
-        }
-        String calString = node.getTextContent();
-        if (calString.equals("")) {
-            return null;
-        }
-        String replacedString = calString.replaceAll(",", ".");
-        return Double.parseDouble(replacedString);
-    }
-}
+    }*/

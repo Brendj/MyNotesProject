@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,7 +21,7 @@ public class CardTemp {
     private String cardPrintedNo;
     private CardOperationStation cardStation;
     private Date createDate;
-    private Date closeDate;
+    private Date validDate;
     private Integer customerType;
     private Client client;
     private Visitor visitor;
@@ -87,19 +84,19 @@ public class CardTemp {
         this.createDate = createDate;
     }
 
-    public Date getCloseDate() {
-        return closeDate;
+    public Date getValidDate() {
+        return validDate;
     }
 
-    public void setCloseDate(Date closeDate) {
-        this.closeDate = closeDate;
+    public void setValidDate(Date closeDate) {
+        this.validDate = closeDate;
     }
 
-    public Integer getCustomerType() {
+    Integer getCustomerType() {
         return customerType;
     }
 
-    public void setCustomerType(Integer customerType) {
+    void setCustomerType(Integer customerType) {
         this.customerType = customerType;
     }
 
@@ -108,6 +105,8 @@ public class CardTemp {
     }
 
     public void setClient(Client client) {
+        this.customerType=0;
+        this.visitor = null;
         this.client = client;
     }
 
@@ -116,6 +115,8 @@ public class CardTemp {
     }
 
     public void setVisitor(Visitor visitor) {
+        this.client=null;
+        this.customerType=1;
         this.visitor = visitor;
     }
 

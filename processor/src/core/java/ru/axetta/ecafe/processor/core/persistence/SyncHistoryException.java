@@ -18,6 +18,14 @@ public class SyncHistoryException {
     private String message;
     private SyncHistory syncHistory;
 
+    protected SyncHistoryException() {}
+
+    public SyncHistoryException(Org org, SyncHistory syncHistory, String message) {
+        this.org = org;
+        this.message = message;
+        this.syncHistory = syncHistory;
+    }
+
     public SyncHistory getSyncHistory() {
         return syncHistory;
     }

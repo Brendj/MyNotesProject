@@ -12,16 +12,14 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,14 +29,13 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 
-@Service
-@Transactional
 @Component
 @Scope("singleton")
+@Transactional
 public class ContextDAOServices {
 
     @PersistenceContext
-    private EntityManager em;
+    private EntityManager entityManager;
 
 
     public String getContragentsListForTooltip (long idOfUser) {
@@ -141,7 +138,7 @@ public class ContextDAOServices {
     */
     @Transactional
     private Set<Contragent> getRestictedContragents (long idOfUser) {
-        Session persistenceSession = (Session) em.getDelegate();
+        Session persistenceSession = (Session) entityManager.getDelegate();
         Set<Contragent> contragents = null;
         try {
             User user = (User) persistenceSession.load(User.class, idOfUser);
@@ -160,7 +157,7 @@ public class ContextDAOServices {
         if (contragents == null || contragents.size() < 1) {
             return Collections.EMPTY_LIST;
         }
-        Session persistenceSession = (Session) em.getDelegate();
+        Session persistenceSession = (Session) entityManager.getDelegate();
         String suppliers = "";
         for (Contragent c : contragents) {
             if (suppliers.length() > 0) {
@@ -179,4 +176,26 @@ public class ContextDAOServices {
         }
         return orgs;
     }
+
+    @Transactional(readOnly = true)
+    public List<Long> findOrgOwnersByContragentSet(Long idOfUser){
+        Query contragentTypedQuery = entityManager.createQuery("select u.contragents from User u where u.idOfUser=:idOfUser");
+        contragentTypedQuery.setParameter("idOfUser", idOfUser);
+        List list = contragentTypedQuery.getResultList();
+        Set<Contragent> contragentSet= new HashSet<Contragent>();
+        for (Object o: list){
+            Contragent contragent = (Contragent) o;
+            if(!contragentSet.contains(contragent)){
+                contragentSet.add(contragent);
+            }
+        }
+        if(contragentSet.isEmpty()){
+            return null;
+        } else {
+            TypedQuery<Long> query = entityManager.createQuery("select idOfOrg from Org where defaultSupplier in :contragentSet",Long.class);
+            query.setParameter("contragentSet", contragentSet);
+            return query.getResultList();
+        }
+    }
+
 }

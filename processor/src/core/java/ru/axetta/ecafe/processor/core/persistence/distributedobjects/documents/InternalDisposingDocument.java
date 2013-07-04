@@ -11,6 +11,8 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -26,12 +28,21 @@ import java.util.Set;
  */
 public class InternalDisposingDocument extends DistributedObject {
 
+    //private static final Logger logger = LoggerFactory.getLogger(InternalDisposingDocument.class);
+
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         Staff st = (Staff) DAOUtils.findDistributedObjectByRefGUID(session, guidOfSt);
         if(st==null) throw new DistributedObjectException("NOT_FOUND_VALUE Staff");
         setStaff(st);
         ActOfInventarization ai = (ActOfInventarization) DAOUtils.findDistributedObjectByRefGUID(session, guidOfAI);
+        //if (logger.isDebugEnabled()) {
+        //    if(ai==null) {
+        //        logger.debug("ActOfInventarization is null");
+        //    } else {
+        //        logger.debug("ActOfInventarization not null");
+        //    }
+        //}
         if(ai!=null) setActOfInventarization(ai);
     }
 

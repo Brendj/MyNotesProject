@@ -109,18 +109,45 @@ public class DAOUtils {
     /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
     public static List findNewerClients(Session persistenceSession, Collection<Org> organizations, long clientRegistryVersion)
             throws Exception {
+        Set<CompositeIdOfClientGroup> clientGroups = new HashSet<CompositeIdOfClientGroup>();
+        for (Org organization: organizations){
+            CompositeIdOfClientGroup deletedClientGroup = new CompositeIdOfClientGroup(organization.getIdOfOrg(),ClientGroup.Predefined.CLIENT_DELETED.getValue());
+            CompositeIdOfClientGroup leavingClientGroup = new CompositeIdOfClientGroup(organization.getIdOfOrg(),ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+            clientGroups.add(deletedClientGroup);
+            clientGroups.add(leavingClientGroup);
+        }
+        Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
+        clientGroupCriteria.add(Restrictions.in("compositeIdOfClientGroup",clientGroups));
+        List<ClientGroup> deletingAndLeavingClientGroup = clientGroupCriteria.list();
+
         Criteria criteria = persistenceSession.createCriteria(Client.class);
         criteria.add(Restrictions.in("org", organizations));
         criteria.add(Restrictions.gt("clientRegistryVersion", clientRegistryVersion));
+
+        if (!deletingAndLeavingClientGroup.isEmpty()){
+            criteria.add(Restrictions.not(Restrictions.in("clientGroup", deletingAndLeavingClientGroup)));
+        }
+
         return criteria.list();
     }
 
     /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
     public static List findNewerClients(Session persistenceSession, Org organization, long clientRegistryVersion)
             throws Exception {
+
+        Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
+        CompositeIdOfClientGroup deletedClientGroup = new CompositeIdOfClientGroup(organization.getIdOfOrg(),ClientGroup.Predefined.CLIENT_DELETED.getValue());
+        CompositeIdOfClientGroup leavingClientGroup = new CompositeIdOfClientGroup(organization.getIdOfOrg(),ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+        clientGroupCriteria.add(Restrictions.in("compositeIdOfClientGroup",Arrays.asList(deletedClientGroup, leavingClientGroup)));
+        List<ClientGroup> deletingAndLeavingClientGroup = clientGroupCriteria.list();
+
         Criteria criteria = persistenceSession.createCriteria(Client.class);
         criteria.add(Restrictions.eq("org", organization));
         criteria.add(Restrictions.gt("clientRegistryVersion", clientRegistryVersion));
+        if (!deletingAndLeavingClientGroup.isEmpty()){
+            criteria.add(Restrictions.not(Restrictions.in("clientGroup", deletingAndLeavingClientGroup)));
+        }
+
         return criteria.list();
     }
 
@@ -230,7 +257,6 @@ public class DAOUtils {
     /**
      * производит выборку Группы клиента по номеру организации и имени группы
      * игнорируя регистр имени группы
-     * @author Kadyrov Damir
      * @since  2012-03-06
      * @param persistenceSession ссылка на сессию
      * @param idOfOrg идентификатор организации
@@ -252,7 +278,6 @@ public class DAOUtils {
     /**
      * производит выборку Группы клиента по номеру организации и имени группы
      * игнорируя регистр имени группы
-     * @author Kadyrov Damir
      * @since  2012-03-06
      * @param persistenceSession ссылка на сессию
      * @param idOfOrg идентификатор организации
@@ -339,7 +364,7 @@ public class DAOUtils {
 
 
     public static List <Client> findClientsForOrgAndFriendly (EntityManager em, Org organization) throws Exception {
-        /*javax.persistence.Query query = em.createQuery(
+        /*javax.persistence.Query query = entityManager.createQuery(
                 //"from Client client where (client.org = :org or client.org.idOfOrg in (select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=client.org.idOfOrg))");
                 "from Client client where client.org = :org");
         query.setParameter("org", organization);
@@ -351,7 +376,7 @@ public class DAOUtils {
     }
 
     public static List<Org> findFriendlyOrgs (EntityManager em, Org organization) throws Exception {
-        /*Session persistenceSession = (Session) em.getDelegate();
+        /*Session persistenceSession = (Session) entityManager.getDelegate();
         Query query = persistenceSession.createQuery(
                 "select idoffriendlyorg from cf_friendly_organization where currentorg=? order by currentorg");
         query.setParameter(0, organization.getIdOfOrg());
@@ -431,7 +456,7 @@ public class DAOUtils {
         return ((Number)res.get(0)).longValue();
 
 
-        /*javax.persistence.Query query = em.createQuery(
+        /*javax.persistence.Query query = entityManager.createQuery(
                "select idOfClient from Client client where (client.org = :org) and "
                + "(trim(upper(client.person.surname)) = :surname) and "
                + "(trim(upper(client.person.firstName)) = :firstName) and (trim(upper(client.person.secondName)) = :secondName)");
@@ -440,7 +465,7 @@ public class DAOUtils {
        query.setParameter("firstName", StringUtils.upperCase(firstName).trim());
        query.setParameter("secondName", StringUtils.upperCase(secondName).trim());
        query.setMaxResults(2);
-       if (query.getResultList().isEmpty()) return findClientByFullNameInFriendlyOrgs (em, organization, surname, firstName, secondName);
+       if (query.getResultList().isEmpty()) return findClientByFullNameInFriendlyOrgs (entityManager, organization, surname, firstName, secondName);
        if (query.getResultList().size()==2) return -1L;
        return (Long)query.getResultList().get(0);*/
     }
@@ -645,11 +670,36 @@ public class DAOUtils {
         return (List<Object[]>)query.list();
     }
 
-    /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
+
     @SuppressWarnings("unchecked")
     public static List<Object[]> getClientsAndCardsForOrgs(Session persistenceSession, Set<Long> idOfOrgs) {
-        Query query = persistenceSession.createQuery("select cl, card from Card card, Client cl where card.client=cl and cl.org.idOfOrg in (:idOfOrg)");
+
+        List<ClientGroup> deletingAndLeavingClientGroup = new ArrayList<ClientGroup>();
+
+        /* раскомментировать TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
+        //Set<CompositeIdOfClientGroup> clientGroups = new HashSet<CompositeIdOfClientGroup>();
+        //for (Long idOfOrg: idOfOrgs){
+        //    CompositeIdOfClientGroup deletedClientGroup = new CompositeIdOfClientGroup(idOfOrg,ClientGroup.Predefined.CLIENT_DELETED.getValue());
+        //    CompositeIdOfClientGroup leavingClientGroup = new CompositeIdOfClientGroup(idOfOrg,ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+        //    clientGroups.add(deletedClientGroup);
+        //    clientGroups.add(leavingClientGroup);
+        //}
+        //Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
+        //clientGroupCriteria.add(Restrictions.in("compositeIdOfClientGroup",clientGroups));
+        //deletingAndLeavingClientGroup = clientGroupCriteria.list();
+
+        String sql;
+        if (deletingAndLeavingClientGroup.isEmpty()){
+            sql = "select cl, card from Card card, Client cl where card.client=cl and cl.org.idOfOrg in (:idOfOrg)";
+        } else {
+            sql = "select cl, card from Card card, Client cl where card.client=cl and cl.org.idOfOrg in (:idOfOrg) and not (cl.clientGroup in (:deletingAndLeavingClientGroup))";
+        }
+
+        Query query = persistenceSession.createQuery(sql);
         query.setParameterList("idOfOrg", idOfOrgs);
+        if (!deletingAndLeavingClientGroup.isEmpty()){
+            query.setParameterList("deletingAndLeavingClientGroup", deletingAndLeavingClientGroup);
+        }
         return (List<Object[]>)query.list();
     }
 
@@ -1191,9 +1241,34 @@ public class DAOUtils {
         query.executeUpdate();
     }
 
-    public static void trueFullSyncByOrg(Session session, long idOfOrg) {
-        Query query = session.createQuery("update Org set fullSyncParam=1 where id=:idOfOrg");
-        query.setParameter("idOfOrg",idOfOrg);
-        query.executeUpdate();
+    public static List<Client> fetchErrorClientsWithOutFriendlyOrg(final Session persistenceSession,final Set<Org> friendlyOrg,
+            final List<Long> errorClientIds) {
+        final Query query = persistenceSession.createQuery("from Client cl where not(cl.org in :friendlyOrg) and cl.idOfClient in :errorClientIds");
+        query.setParameterList("friendlyOrg", friendlyOrg);
+        query.setParameterList("errorClientIds", errorClientIds);
+        return query.list();
+    }
+
+    public static Client checkClientBindOrg(final Session session,final Long idOfClient,final Long idOfOrg) {
+        final Query query = session.createQuery("select friendly.idOfOrg from Org o left join o.friendlyOrg friendly where o.idOfOrg=:idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        final List<Long> idOfOrgList = query.list();
+        Query clientQuery = session.createQuery("select cl from Client cl right join cl.org o where cl.idOfClient=:idOfClient and o.idOfOrg in (:idOfOrgList)");
+        clientQuery.setParameter("idOfClient", idOfClient);
+        clientQuery.setParameterList("idOfOrgList", idOfOrgList);
+        return (Client) clientQuery.uniqueResult();
+    }
+
+    public static CardTempOperation findTempCartOperation(Session session, Long idOfOperation, Org org) {
+        final Query query = session.createQuery("select cto from CardTempOperation cto right join cto.org organization where organization.idOfOrg=:idOfOrg and cto.localId=:localId");
+        query.setParameter("idOfOrg", org.getIdOfOrg());
+        query.setParameter("localId", idOfOperation);
+        return (CardTempOperation) query.uniqueResult();
+    }
+
+    public static Visitor existVisitor(Session session, Long idOfVisitor) {
+        Query clientQuery = session.createQuery("select vi from Visitor vi where vi.idOfVisitor=:idOfVisitor");
+        clientQuery.setParameter("idOfVisitor", idOfVisitor);
+        return (Visitor) clientQuery.uniqueResult();
     }
 }

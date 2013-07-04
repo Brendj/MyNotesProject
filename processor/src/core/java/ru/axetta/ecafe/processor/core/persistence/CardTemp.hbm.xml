@@ -21,7 +21,7 @@
             </type>
         </property>
         <property name="createDate" column="CreateDate" not-null="true" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
-        <property name="closeDate" column="CloseDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="validDate" column="ValidDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
 
         <property name="customerType" column="CustomerType" type="integer"/>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idOfClient" not-null="true"/>
