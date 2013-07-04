@@ -4,9 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.group;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderSelect;
 
@@ -37,14 +41,14 @@ public class ProductGroupListPage extends BasicWorkspacePage implements Configur
     private List<ProductGroup> productGroupList;
     private Boolean deletedStatusSelected = Boolean.FALSE;
     private ConfigurationProvider selectedConfigurationProvider;
-
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    private DAOService daoService;
     @Autowired
     private ProductGroupItemsPanel productGroupItemsPanel;
     @Autowired
     private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
-
+    @Autowired
+    private ContextDAOServices contextDAOServices;
 
     @Override
     public void onShow() {}
@@ -59,15 +63,22 @@ public class ProductGroupListPage extends BasicWorkspacePage implements Configur
         return null;
     }
 
-    @Transactional
     private void reload() throws Exception{
-        //productGroupList = entityManager.createQuery("FROM ProductGroup ORDER BY globalId",ProductGroup.class).getResultList();
-        String where = "";
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
         if(selectedConfigurationProvider!=null){
-            where = " where idOfConfigurationProvider=" + selectedConfigurationProvider.getIdOfConfigurationProvider();
+            if(orgOwners==null || orgOwners.isEmpty()){
+                productGroupList = daoService.findProductGroupByConfigurationProvider(selectedConfigurationProvider.getIdOfConfigurationProvider());
+            } else {
+                productGroupList = daoService.findProductGroupByConfigurationProvider(selectedConfigurationProvider.getIdOfConfigurationProvider(),orgOwners);
+            }
+        } else {
+            if(orgOwners==null || orgOwners.isEmpty()){
+                productGroupList = daoService.findProductGroupByConfigurationProvider();
+            } else {
+                productGroupList = daoService.findProductGroupByConfigurationProvider(orgOwners);
+            }
         }
-        TypedQuery<ProductGroup> query = entityManager.createQuery("from ProductGroup " + where + " ORDER BY globalId", ProductGroup.class);
-        productGroupList = query.getResultList();
     }
 
     public Object selectConfigurationProvider() throws Exception{

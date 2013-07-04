@@ -7125,140 +7125,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-
-    //private int workspaceState = WorkspaceConstants.DEFAULT_PAGE_INDEX;
-    ///* For ru.axetta.ecafe.processor.core.test only */
-    //private String smsMessageId;
-    //private String smsMessageText;
-    //private String smsPhoneNumber;
-    //private String currentSmsMessageId;            
-    //
-    //public String testSmsSend() {
-    //    FacesContext facesContext = FacesContext.getCurrentInstance();
-    //    try {
-    //        SendResponse response = RuntimeContext.getInstance().getSmsService()
-    //                .sendTextMessage(smsMessageId, null, smsPhoneNumber, smsMessageText);
-    //        if (response.isSuccess()) {
-    //            facesContext.addMessage(null,
-    //                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Запрос на отправку отправлен успешно.", null));
-    //        } else {
-    //            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-    //                    String.format("Запрос на отправку отправлен успешно, но служба ответила отказом. Результат: %s",
-    //                            response.getStatusMessage()), null));
-    //        }
-    //    } catch (Exception e) {
-    //        if (logger.isDebugEnabled()) {
-    //            logger.debug("Failed working with SMS service", e);
-    //        }
-    //        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-    //                String.format("Ошибка при работе с SMS службой: %s", StringUtils.defaultString(e.getMessage())),
-    //                null));
-    //        updateView();
-    //        return null;
-    //    }
-    //    updateView();
-    //    return null;
-    //}
-    //
-    //public String testSmsDeliveryCheck() {
-    //    FacesContext facesContext = FacesContext.getCurrentInstance();
-    //    try {
-    //        DeliveryResponse response = RuntimeContext.getInstance().getSmsService().getDeliveryStatus(smsMessageId);
-    //        if (response.isDelivered()) {
-    //            facesContext.addMessage(null,
-    //                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Сообщение доставлено успешно.", null));
-    //        } else {
-    //            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-    //                    String.format("Сообщение недоставлено. Результат: %s",
-    //                            StringUtils.defaultString(response.getStatusMessage())), null));
-    //        }
-    //    } catch (Exception e) {
-    //        if (logger.isDebugEnabled()) {
-    //            logger.debug("Failed working with SMS service", e);
-    //        }
-    //        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-    //                String.format("Ошибка при работе с SMS службой: %s", StringUtils.defaultString(e.getMessage())),
-    //                null));
-    //        updateView();
-    //        return null;
-    //    }
-    //    updateView();
-    //    return null;
-    //}
-    //
-    //public String testSmsMessageIdGeneration2() {
-    //    RuntimeContext runtimeContext = RuntimeContext.getInstance();
-    //    FacesContext facesContext = FacesContext.getCurrentInstance();
-    //    try {
-    //        currentSmsMessageId = runtimeContext.getMessageIdGenerator().generate();
-    //        if (logger.isDebugEnabled()) {
-    //            logger.debug("Ok");
-    //        }
-    //        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Ok", null));
-    //        if (logger.isDebugEnabled()) {
-    //            logger.debug("Ok");
-    //        }
-    //        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Ok", null));
-    //    } catch (Exception e) {
-    //        logger.error("Failed", e);
-    //        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed", null));
-    //        updateView();
-    //        return null;
-    //    }
-    //    updateView();
-    //    return null;
-    //}    
-    //
-    //public String showOrderDeleter() {
-    //    workspaceState = WorkspaceConstants.SERVICE_ORDER_DELETE_STATE;
-    //    updateView();
-    //    return null;
-    //}
-    //
-    //public String deleteOrder() {
-    //    FacesContext facesContext = FacesContext.getCurrentInstance();
-    //    try {
-    //        orderDeleter.delete();
-    //        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Ok", null));
-    //    } catch (Exception e) {
-    //        logger.error("Failed", e);
-    //        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка", null));
-    //    }
-    //    updateView();
-    //    return null;
-    //}
-    //
-    //public String changePasswords() {
-    //    Session session = null;
-    //    AccountTransaction transaction = null;
-    //    try {
-    //        session = RuntimeContext.getInstance().getSessionFactory().openSession();
-    //        transaction = session.beginTransaction();
-    //        Org org = (Org) session.load(Org.class, 6L);
-    //        Criteria clientCriteria = session.createCriteria(Client.class);
-    //        clientCriteria.add(Restrictions.eq("org", org));
-    //        List clients = clientCriteria.list();
-    //        for (Object object : clients) {
-    //            Client client = (Client) object;
-    //            long contractId = client.getContractId();
-    //            NumberFormat formatter = new DecimalFormat("0000");
-    //            String newPassword = formatter.format(contractId % 10000);
-    //            client.setPassword(newPassword);
-    //            session.update(client);
-    //        }
-    //        transaction.commit();
-    //        transaction = null;
-    //    } catch (Exception e) {
-    //        logger.error("Failed", e);
-    //    } finally {
-    //        HibernateUtils.rollback(transaction, logger);
-    //        HibernateUtils.close(session, logger);
-    //    }
-    //    updateView();
-    //    return null;
-    //}
-    //
-
     User currentUser;
 
 public User getCurrentUser() throws Exception {
@@ -7279,7 +7145,6 @@ public User getCurrentUser() throws Exception {
                 ///
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
-                //currentWorkspacePage = reportJobCreatePage;
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -7297,7 +7162,6 @@ public User getCurrentUser() throws Exception {
     }
 
     public String getUserRole() throws Exception {
-       //return (isEligibleToEditOrgs() && isEligibleToEditClients())?"администратор":"поставщик питания";
        return getCurrentUser().getRoleName();
     }
 
@@ -7677,3 +7541,138 @@ public User getCurrentUser() throws Exception {
         }
     }
 }
+
+
+
+//private int workspaceState = WorkspaceConstants.DEFAULT_PAGE_INDEX;
+///* For ru.axetta.ecafe.processor.core.test only */
+//private String smsMessageId;
+//private String smsMessageText;
+//private String smsPhoneNumber;
+//private String currentSmsMessageId;
+//
+//public String testSmsSend() {
+//    FacesContext facesContext = FacesContext.getCurrentInstance();
+//    try {
+//        SendResponse response = RuntimeContext.getInstance().getSmsService()
+//                .sendTextMessage(smsMessageId, null, smsPhoneNumber, smsMessageText);
+//        if (response.isSuccess()) {
+//            facesContext.addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Запрос на отправку отправлен успешно.", null));
+//        } else {
+//            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+//                    String.format("Запрос на отправку отправлен успешно, но служба ответила отказом. Результат: %s",
+//                            response.getStatusMessage()), null));
+//        }
+//    } catch (Exception e) {
+//        if (logger.isDebugEnabled()) {
+//            logger.debug("Failed working with SMS service", e);
+//        }
+//        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                String.format("Ошибка при работе с SMS службой: %s", StringUtils.defaultString(e.getMessage())),
+//                null));
+//        updateView();
+//        return null;
+//    }
+//    updateView();
+//    return null;
+//}
+//
+//public String testSmsDeliveryCheck() {
+//    FacesContext facesContext = FacesContext.getCurrentInstance();
+//    try {
+//        DeliveryResponse response = RuntimeContext.getInstance().getSmsService().getDeliveryStatus(smsMessageId);
+//        if (response.isDelivered()) {
+//            facesContext.addMessage(null,
+//                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Сообщение доставлено успешно.", null));
+//        } else {
+//            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+//                    String.format("Сообщение недоставлено. Результат: %s",
+//                            StringUtils.defaultString(response.getStatusMessage())), null));
+//        }
+//    } catch (Exception e) {
+//        if (logger.isDebugEnabled()) {
+//            logger.debug("Failed working with SMS service", e);
+//        }
+//        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+//                String.format("Ошибка при работе с SMS службой: %s", StringUtils.defaultString(e.getMessage())),
+//                null));
+//        updateView();
+//        return null;
+//    }
+//    updateView();
+//    return null;
+//}
+//
+//public String testSmsMessageIdGeneration2() {
+//    RuntimeContext runtimeContext = RuntimeContext.getInstance();
+//    FacesContext facesContext = FacesContext.getCurrentInstance();
+//    try {
+//        currentSmsMessageId = runtimeContext.getMessageIdGenerator().generate();
+//        if (logger.isDebugEnabled()) {
+//            logger.debug("Ok");
+//        }
+//        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Ok", null));
+//        if (logger.isDebugEnabled()) {
+//            logger.debug("Ok");
+//        }
+//        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Ok", null));
+//    } catch (Exception e) {
+//        logger.error("Failed", e);
+//        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed", null));
+//        updateView();
+//        return null;
+//    }
+//    updateView();
+//    return null;
+//}
+//
+//public String showOrderDeleter() {
+//    workspaceState = WorkspaceConstants.SERVICE_ORDER_DELETE_STATE;
+//    updateView();
+//    return null;
+//}
+//
+//public String deleteOrder() {
+//    FacesContext facesContext = FacesContext.getCurrentInstance();
+//    try {
+//        orderDeleter.delete();
+//        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Ok", null));
+//    } catch (Exception e) {
+//        logger.error("Failed", e);
+//        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка", null));
+//    }
+//    updateView();
+//    return null;
+//}
+//
+//public String changePasswords() {
+//    Session session = null;
+//    AccountTransaction transaction = null;
+//    try {
+//        session = RuntimeContext.getInstance().getSessionFactory().openSession();
+//        transaction = session.beginTransaction();
+//        Org org = (Org) session.load(Org.class, 6L);
+//        Criteria clientCriteria = session.createCriteria(Client.class);
+//        clientCriteria.add(Restrictions.eq("org", org));
+//        List clients = clientCriteria.list();
+//        for (Object object : clients) {
+//            Client client = (Client) object;
+//            long contractId = client.getContractId();
+//            NumberFormat formatter = new DecimalFormat("0000");
+//            String newPassword = formatter.format(contractId % 10000);
+//            client.setPassword(newPassword);
+//            session.update(client);
+//        }
+//        transaction.commit();
+//        transaction = null;
+//    } catch (Exception e) {
+//        logger.error("Failed", e);
+//    } finally {
+//        HibernateUtils.rollback(transaction, logger);
+//        HibernateUtils.close(session, logger);
+//    }
+//    updateView();
+//    return null;
+//}
+//

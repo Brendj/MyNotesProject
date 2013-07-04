@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider;
 
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -36,13 +37,10 @@ import java.util.Map;
 @Scope("session")
 public class ConfigurationProviderCreatePage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList{
 
-    @PersistenceContext
-    private EntityManager entityManager;
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationProviderCreatePage.class);
     private ConfigurationProvider currentConfigurationProvider;
     private String filter;
     private List<Long> idOfOrgList = new ArrayList<Long>();
-
     @Autowired
     private DAOService daoService;
 
@@ -81,26 +79,13 @@ public class ConfigurationProviderCreatePage extends BasicWorkspacePage implemen
     @Transactional
     protected void onSave() throws Exception{
         currentConfigurationProvider.setCreatedDate(new Date());
-
-        //Есть ли необходимость?
-        //currentConfigurationProvider.setDeletedState(false);
-        //currentConfigurationProvider.setGuid(UUID.randomUUID().toString());
-        //product.setGlobalVersion(0L);
-        //product.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
-
         MainPage mainPage = MainPage.getSessionInstance();
         currentConfigurationProvider.setUserCreate(mainPage.getCurrentUser());
+        DAOService.getInstance().persistConfigurationProvider(currentConfigurationProvider, this.idOfOrgList);
 
-        DAOService.getInstance().persistEntity(currentConfigurationProvider);
 
-        if(!this.idOfOrgList.isEmpty()){
-            for (Long idOfOrg: idOfOrgList){
-                daoService.setConfigurationProviderInOrg(idOfOrg,currentConfigurationProvider);
-            }
-        }
         idOfOrgList.clear();
         filter = "";
-        currentConfigurationProvider = new ConfigurationProvider();
         printMessage("Производственная конфигурация сохранена успешно.");
     }
 
@@ -124,4 +109,14 @@ public class ConfigurationProviderCreatePage extends BasicWorkspacePage implemen
         this.filter = filter;
     }
 
+    public boolean getEligibleToWorkConfigurationProviderList() {
+        Boolean result = false;
+        try {
+            User user = MainPage.getSessionInstance().getCurrentUser();
+            result = !user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification());
+        } catch (Exception e) {
+            getLogger().error("getEligibleToWorkConfigurationProviderList exception", e);
+        }
+        return result;
+    }
 }

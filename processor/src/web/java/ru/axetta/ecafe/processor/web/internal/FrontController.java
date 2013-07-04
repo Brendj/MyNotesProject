@@ -246,7 +246,7 @@ public class FrontController extends HttpServlet {
                              throw new Exception("Военный билет не соотвествует владельцу карты");
                          }
                      }
-                     ct.setCloseDate(validDate);
+                     ct.setValidDate(validDate);
                      ct.setCardStation(CardOperationStation.ISSUE);
 
                  } else {
@@ -260,7 +260,7 @@ public class FrontController extends HttpServlet {
                      newVisitor.setWarTicketNumber(visitor.getWarTicketNumber());
                      ct.setVisitor(newVisitor);
                      ct.setCardStation(CardOperationStation.ISSUE);
-                     ct.setCloseDate(validDate);
+                     ct.setValidDate(validDate);
                  }
                 persistenceSession.save(ct);
                 idOfVisitor = ct.getVisitor().getIdOfVisitor();

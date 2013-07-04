@@ -4,9 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupSelect;
 
@@ -37,11 +41,12 @@ public class GoodListPage extends BasicWorkspacePage implements GoodGroupSelect{
     private List<Good> goodList;
     private Boolean deletedStatusSelected = Boolean.FALSE;
     private GoodGroup selectedGoodGroup;
-
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    private DAOService daoService;
     @Autowired
     private GoodGroupItemsPanel goodGroupItemsPanel;
+    @Autowired
+    private ContextDAOServices contextDAOServices;
 
     @Override
     public void onShow() { }
@@ -57,18 +62,22 @@ public class GoodListPage extends BasicWorkspacePage implements GoodGroupSelect{
         return null;
     }
 
-    @Transactional
     public void reload() throws Exception{
-        String where = "";
-        if(selectedGoodGroup!=null){
-            where = " goodGroup=:goodGroup ";
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
+        if(selectedGoodGroup==null){
+            if(orgOwners==null || orgOwners.isEmpty()){
+                goodList = daoService.findGoods();
+            } else {
+                goodList = daoService.findGoods(orgOwners);
+            }
+        } else {
+            if(orgOwners==null || orgOwners.isEmpty()){
+                goodList = daoService.findGoodsByGoodGroup(selectedGoodGroup);
+            } else {
+                goodList = daoService.findGoodsByGoodGroup(selectedGoodGroup,orgOwners);
+            }
         }
-        where = (where.equals("")?"":" where ") + where;
-        TypedQuery<Good> query = entityManager.createQuery("from Good " + where, Good.class);
-        if(selectedGoodGroup!=null){
-            query.setParameter("goodGroup", selectedGoodGroup);
-        }
-        goodList = query.getResultList();
     }
 
     public Object selectGoodGroup() throws Exception{

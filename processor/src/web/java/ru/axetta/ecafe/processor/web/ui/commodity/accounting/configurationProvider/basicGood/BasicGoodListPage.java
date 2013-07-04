@@ -40,9 +40,6 @@ public class BasicGoodListPage extends BasicWorkspacePage {
     private Long idOfBasicGood;
     private Integer intUnitsScale;
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     @Autowired
     private DAOService daoService;
 
@@ -51,13 +48,10 @@ public class BasicGoodListPage extends BasicWorkspacePage {
         reload();
     }
 
-    @Transactional
     public void reload() throws Exception{
         newBasicGood = new GoodsBasicBasket();
         editBasicGood = null;
-
-        TypedQuery<GoodsBasicBasket> query = entityManager.createQuery("from GoodsBasicBasket", GoodsBasicBasket.class);
-        basicGoodList = query.getResultList();
+        basicGoodList = daoService.findGoodsBasicBasket();
     }
 
     public Object onCreate() {

@@ -7,8 +7,12 @@ package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvi
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 /*import ru.axetta.ecafe.processor.core.persistence.ProductGuide;
 import ru.axetta.ecafe.processor.core.persistence.User;*/
+import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -27,8 +31,8 @@ import java.util.List;
 @Scope("session")
 public class ConfigurationProviderListPage extends BasicWorkspacePage {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    private DAOService daoService;
 
     private List<ConfigurationProvider> configurationProviderList;
 
@@ -42,7 +46,7 @@ public class ConfigurationProviderListPage extends BasicWorkspacePage {
 
     @Override
     public void onShow() throws Exception {
-        configurationProviderList = entityManager.createQuery("from ConfigurationProvider order by id",ConfigurationProvider.class).getResultList();
+        configurationProviderList = daoService.findConfigurationProvidersList();
     }
 
     public List<ConfigurationProvider> getConfigurationProviderList() {
@@ -51,5 +55,16 @@ public class ConfigurationProviderListPage extends BasicWorkspacePage {
 
     public void setConfigurationProviderList(List<ConfigurationProvider> configurationProviderList) {
         this.configurationProviderList = configurationProviderList;
+    }
+
+    public boolean getEligibleToWorkConfigurationProviderList() {
+        Boolean result = false;
+        try {
+            User user = MainPage.getSessionInstance().getCurrentUser();
+            result = !user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification());
+        } catch (Exception e) {
+             getLogger().error("getEligibleToWorkConfigurationProviderList exception", e);
+        }
+        return result;
     }
 }

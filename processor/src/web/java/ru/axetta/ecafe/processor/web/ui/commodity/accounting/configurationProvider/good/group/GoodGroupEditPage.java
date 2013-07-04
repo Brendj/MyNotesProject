@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -38,8 +37,6 @@ public class GoodGroupEditPage extends BasicWorkspacePage implements OrgSelectPa
     private static final Logger logger = LoggerFactory.getLogger(GoodGroupEditPage.class);
     private GoodGroup currentGoodGroup;
     private Org org;
-    @PersistenceContext
-    private EntityManager entityManager;
     @Autowired
     private DAOService daoService;
     @Autowired
@@ -51,7 +48,7 @@ public class GoodGroupEditPage extends BasicWorkspacePage implements OrgSelectPa
     public void onShow() throws Exception {
         selectedGoodGroupGroupPage.onShow();
         currentGoodGroup = selectedGoodGroupGroupPage.getCurrentGoodGroup();
-        currentGoodGroup = entityManager.merge(currentGoodGroup);
+        currentGoodGroup = daoService.saveEntity(currentGoodGroup);
         org = daoService.findOrById(currentGoodGroup.getOrgOwner());
     }
 
@@ -83,8 +80,6 @@ public class GoodGroupEditPage extends BasicWorkspacePage implements OrgSelectPa
         return null;
     }
 
-
-    @Transactional
     protected void removeGroup(){
         if(!currentGoodGroup.getDeletedState()) {
             printError("Группа не может быть удалена.");

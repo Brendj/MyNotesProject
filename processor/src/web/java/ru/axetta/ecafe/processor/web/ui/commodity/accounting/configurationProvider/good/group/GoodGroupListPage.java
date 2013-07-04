@@ -4,8 +4,12 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
 
 import org.slf4j.Logger;
@@ -34,10 +38,10 @@ public class GoodGroupListPage extends BasicWorkspacePage {
     private static final Logger logger = LoggerFactory.getLogger(GoodGroupListPage.class);
     private List<GoodGroup> goodGroupList;
     private Boolean deletedStatusSelected = false;
-
-    @PersistenceContext
-    private EntityManager entityManager;
-
+    @Autowired
+    private DAOService daoService;
+    @Autowired
+    private ContextDAOServices contextDAOServices;
 
     @Override
     public void onShow() {}
@@ -51,10 +55,14 @@ public class GoodGroupListPage extends BasicWorkspacePage {
         return null;
     }
 
-    @Transactional
     public void reload() throws Exception{
-        TypedQuery<GoodGroup> query = entityManager.createQuery("from GoodGroup ORDER BY globalId", GoodGroup.class);
-        goodGroupList = query.getResultList();
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
+        if(orgOwners==null || orgOwners.isEmpty()){
+            goodGroupList = daoService.findGoodGroupBySuplifier();
+        } else {
+            goodGroupList = daoService.findGoodGroupBySuplifier(orgOwners);
+        }
     }
 
     public String getPageFilename() {
