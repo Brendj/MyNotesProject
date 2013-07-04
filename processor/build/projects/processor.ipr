@@ -470,7 +470,7 @@
     </copyright>
     <module2copyright />
   </component>
-  <component name="DataSourceManagerImpl" format="xml" hash="1930774333">
+  <component name="DataSourceManagerImpl" format="xml" hash="1109538403">
     <data-source source="LOCAL" name="Moscow Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
       <identifier-quote-string>&quot;</identifier-quote-string>
       <synchronize>true</synchronize>
@@ -533,7 +533,6 @@
   <component name="ExcludeFromValidation">
     <file url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodComplaintPossibleCauses.java" />
     <file url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodComplaintIterationStatus.java" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Client.hbm.xml" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/menu/view.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/menu/details.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/menu/exchange.jsp" />
@@ -662,6 +661,36 @@
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/contract/list.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/edit.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/ccaccount/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/ccaccount/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/ccaccount/load_file.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/ccaccount/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/addpayment/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/addpayment/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/addpayment/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/addpayment/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/settlement/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/settlement/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/settlement/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/settlement/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/select_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/reconciliation.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/client_payment_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/monitoring/dashboard.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/monitoring/sync_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/monitoring/sync_monitor.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/monitoring/status_sync_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/monitoring/aggregate_costs_and_sales_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/default.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/abstractpage/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/workspace.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/user_setting.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/event_notification/edit.jsp" />
   </component>
   <component name="FacetAutodetectingManager">
     <autodetection-disabled>
@@ -1553,6 +1582,14 @@
         <root url="jar://$PROJECT_DIR$/../lib/richfaces-331/richfaces-impl-3.3.1.GA.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/richfaces-331/richfaces-ui-3.3.1.GA.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/richfaces-331/darkX-3.3.1.GA.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="slf4j-api-1.5.6">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/slf4j-api-1.5.6.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/slf4j-log4j12-1.5.5.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
