@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
@@ -607,6 +608,30 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         Client client = (Client) persistenceSession.load(Client.class, idOfClient);
         long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
 
+        Set<GuardSan> guardSans = new HashSet<GuardSan>();
+        String items [] = null;
+        if (this.guardsan.indexOf(ClientGuardSanRebuildService.DELIMETER_1) > -1) {
+            items = this.guardsan.split(ClientGuardSanRebuildService.DELIMETER_1);
+        } else if (this.guardsan.indexOf(ClientGuardSanRebuildService.DELIMETER_2) > -1) {
+            items = this.guardsan.split(ClientGuardSanRebuildService.DELIMETER_2);
+        } else {
+            items = new String[] { this.guardsan };
+        }
+
+        if (items.length > 0) {
+            for (String i : items) {
+                i = ClientGuardSanRebuildService.clearGuardSan (i);
+                if (i.length() < 1) {
+                    continue;
+                }
+                GuardSan guardSan = new GuardSan(client, i);
+                guardSan.setGuardSan(i);
+                persistenceSession.save(guardSan);
+                guardSans.add(guardSan);
+            }
+        }
+        client.setGuardSan(guardSans);
+
         Person person = client.getPerson();
         this.person.copyTo(person);
         persistenceSession.update(person);
@@ -644,7 +669,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setExpenditureLimit(this.expenditureLimit);
         client.setFreePayMaxCount(this.freePayMaxCount);
         client.setSan(this.san);
-        client.setGuardSan(this.guardsan);
+        client.setGuardSan(guardSans);
         if (this.externalId == null || this.externalId == 0) {
             client.setExternalId(null);
         } else {
@@ -802,7 +827,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.expenditureLimit = client.getExpenditureLimit();
         this.freePayMaxCount = client.getFreePayMaxCount();
         this.san = client.getSan();
-        this.guardsan = client.getGuardSan();
+        Set <GuardSan> guardSans = client.getGuardSan();
+        this.guardsan="";
+        for (GuardSan guard : guardSans) {
+            if (this.guardsan.length() > 0) {
+                this.guardsan = this.guardsan + ",";
+            }
+            this.guardsan = this.guardsan + guard.getGuardSan();
+        }
         this.externalId = client.getExternalId();
         this.clientGUID = client.getClientGUID();
         this.discountMode = client.getDiscountMode();

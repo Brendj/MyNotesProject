@@ -22,6 +22,7 @@ import ru.axetta.ecafe.processor.core.persistence.questionary.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService;
+import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
@@ -38,6 +39,8 @@ import org.hibernate.criterion.*;
 import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -46,6 +49,7 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -91,6 +95,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_CLIENT_AUTHORIZATION_FAILED_DESC = "Ошибка авторизации клиента";
     private static final String RC_INTERNAL_ERROR_DESC = "Внутренняя ошибка";
     private static final String RC_NO_CONTACT_DATA_DESC = "У лицевого счета нет контактных данных";
+
+
 
     @Resource
     private WebServiceContext context;
@@ -2075,6 +2081,43 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public ClientsData getClientsByGuardSan(String guardSan) {
         authenticateRequest(null);
+        ClientsData data = new ClientsData();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            String sql = "select IdOfClient from CF_GuardSan where GuardSan=:guardSan";
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            org.hibernate.Query q = persistenceSession.createSQLQuery(sql);
+            q.setParameter("guardSan", guardSan);
+
+            List<BigInteger> idOfClients = q.list();
+            for (BigInteger id : idOfClients) {
+                long idOfClient = id.longValue();
+                Client cl = DAOService.getInstance().findClientById(idOfClient);
+                ClientItem clientItem = new ClientItem();
+                clientItem.setContractId(cl.getContractId());
+                clientItem.setSan(cl.getSan());
+                data.clientList.getClients().add(clientItem);
+            }
+            data.resultCode = RC_OK;
+            data.description = "OK";
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            data.resultCode = RC_INTERNAL_ERROR;
+            data.description = e.toString();
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return data;
+    }
+    /*public ClientsData getClientsByGuardSan(String guardSan) {
+        authenticateRequest(null);
 
         ClientsData data = new ClientsData();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -2115,35 +2158,33 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.close(persistenceSession, logger);
         }
         return data;
-    }
+    }*/
 
     @Override
     public AttachGuardSanResult attachGuardSan(String san, String guardSan) {
+        guardSan = ClientGuardSanRebuildService.clearGuardSan(guardSan);
         authenticateRequest(null);
 
         AttachGuardSanResult data = new AttachGuardSanResult();
-        EntityManager entityManager = null;
-        EntityTransaction entityTransaction = null;
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
         try {
-            entityManager = EntityManagerUtils.createEntityManager();
-            entityTransaction = entityManager.getTransaction();
-            entityTransaction.begin();
-            Query query = entityManager
-                    .createNativeQuery("select c.IdOfClient, c.GuardSan from CF_Clients c where c.san like :san");
-            query.setParameter("san", san);
-            List clientList = query.getResultList();
-            workClientSan(entityManager, guardSan, data, clientList);
-            entityTransaction.commit();
-            entityTransaction = null;
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            List clientList = DAOUtils.findClientsBySan(persistenceSession, san);
+            workClientSan(persistenceSession, guardSan, data, clientList);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
         } catch (Exception e) {
             data.resultCode = RC_INTERNAL_ERROR;
             data.description = e.getMessage();
         } finally {
-            if (entityTransaction != null) {
-                entityTransaction.rollback();
+            if (persistenceTransaction != null) {
+                persistenceTransaction.rollback();
             }
-            if (entityManager != null) {
-                entityManager.close();
+            if (persistenceSession != null) {
+                persistenceSession.close();
             }
         }
         return data;
@@ -2151,31 +2192,29 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public AttachGuardSanResult attachGuardSan(Long contractId, String guardSan) {
+        guardSan = ClientGuardSanRebuildService.clearGuardSan(guardSan);
         authenticateRequest(null);
 
         AttachGuardSanResult data = new AttachGuardSanResult();
-        EntityManager entityManager = null;
-        EntityTransaction entityTransaction = null;
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
         try {
-            entityManager = EntityManagerUtils.createEntityManager();
-            entityTransaction = entityManager.getTransaction();
-            entityTransaction.begin();
-            Query query = entityManager.createNativeQuery(
-                    "select c.IdOfClient, c.GuardSan from CF_Clients c where c.contractId = :contractId");
-            query.setParameter("contractId", contractId);
-            List clientList = query.getResultList();
-            workClientSan(entityManager, guardSan, data, clientList);
-            entityTransaction.commit();
-            entityTransaction = null;
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            List clientList = DAOUtils.findClientsByContract(persistenceSession, contractId);
+            workClientSan(persistenceSession, guardSan, data, clientList);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
         } catch (Exception e) {
             data.resultCode = RC_INTERNAL_ERROR;
             data.description = e.getMessage();
         } finally {
-            if (entityTransaction != null) {
-                entityTransaction.rollback();
+            if (persistenceTransaction != null) {
+                persistenceTransaction.rollback();
             }
-            if (entityManager != null) {
-                entityManager.close();
+            if (persistenceSession != null) {
+                persistenceSession.close();
             }
         }
         return data;
@@ -2183,32 +2222,29 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public DetachGuardSanResult detachGuardSan(String san, String guardSan) {
+        guardSan = ClientGuardSanRebuildService.clearGuardSan(guardSan);
         authenticateRequest(null);
 
         DetachGuardSanResult data = new DetachGuardSanResult();
-
-        EntityManager entityManager = null;
-        EntityTransaction entityTransaction = null;
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
         try {
-            entityManager = EntityManagerUtils.createEntityManager();
-            entityTransaction = entityManager.getTransaction();
-            entityTransaction.begin();
-            Query query = entityManager
-                    .createNativeQuery("select c.IdOfClient, c.GuardSan from CF_Clients c where c.san like :san");
-            query.setParameter("san", san);
-            List clientList = query.getResultList();
-            workClientSan(entityManager, guardSan, data, clientList);
-            entityTransaction.commit();
-            entityTransaction = null;
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            List clientList = DAOUtils.findClientsBySan(persistenceSession, san);
+            workClientSan(persistenceSession, guardSan, data, clientList);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
         } catch (Exception e) {
             data.resultCode = RC_INTERNAL_ERROR;
             data.description = e.getMessage();
         } finally {
-            if (entityTransaction != null) {
-                entityTransaction.rollback();
+            if (persistenceTransaction != null) {
+                persistenceTransaction.rollback();
             }
-            if (entityManager != null) {
-                entityManager.close();
+            if (persistenceSession != null) {
+                persistenceSession.close();
             }
         }
 
@@ -2217,39 +2253,148 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public DetachGuardSanResult detachGuardSan(Long contractId, String guardSan) {
+        guardSan = ClientGuardSanRebuildService.clearGuardSan(guardSan);
         authenticateRequest(null);
 
         DetachGuardSanResult data = new DetachGuardSanResult();
-
-        EntityManager entityManager = null;
-        EntityTransaction entityTransaction = null;
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
         try {
-            entityManager = EntityManagerUtils.createEntityManager();
-            entityTransaction = entityManager.getTransaction();
-            entityTransaction.begin();
-            Query query = entityManager.createNativeQuery(
-                    "select c.IdOfClient, c.GuardSan from CF_Clients c where c.contractId = :contractId");
-            query.setParameter("contractId", contractId);
-            List clientList = query.getResultList();
-            workClientSan(entityManager, guardSan, data, clientList);
-            entityTransaction.commit();
-            entityTransaction = null;
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            List clientList = DAOUtils.findClientsByContract(persistenceSession, contractId);
+            workClientSan(persistenceSession, guardSan, data, clientList);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
         } catch (Exception e) {
             data.resultCode = RC_INTERNAL_ERROR;
             data.description = e.getMessage();
         } finally {
-            if (entityTransaction != null) {
-                entityTransaction.rollback();
+            if (persistenceTransaction != null) {
+                persistenceTransaction.rollback();
             }
-            if (entityManager != null) {
-                entityManager.close();
+            if (persistenceSession != null) {
+                persistenceSession.close();
             }
         }
 
         return data;
     }
 
-    private void workClientSan(EntityManager entityManager, String guardSan, Result data, List clientList) {
+
+    private void workClientSan(Session persistenceSession, String guardSan, Result data, List clientList) {
+        guardSan = ClientGuardSanRebuildService.clearGuardSan(guardSan);
+        if (guardSan.length() < 1) {
+            data.resultCode = RC_INVALID_DATA;
+            data.description = "Неверно указан СНИЛС: " + guardSan;
+            return;
+        }
+
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        try {
+            parseWorkClientSan (persistenceSession, guardSan, data, clientList);
+        } catch (Exception e) {
+            data.resultCode = RC_INVALID_DATA;
+            data.description = RC_INTERNAL_ERROR_DESC;
+            return;
+        }
+    }
+
+
+    public void parseWorkClientSan (Session persistenceSession, String guardSan, Result data, List clientList) {
+        if (clientList.size() == 0) {
+            data.resultCode = RC_CLIENT_NOT_FOUND;
+            data.description = RC_CLIENT_NOT_FOUND_DESC;
+        } /*else if (clientList.size() > 1) {
+            data.resultCode = RC_SEVERAL_CLIENTS_WERE_FOUND;
+            data.description = RC_SEVERAL_CLIENTS_WERE_FOUND_DESC;
+        }*/ else {
+            Long idOfClient = ((BigInteger) clientList.get(0)).longValue();
+            Client cl = null;
+            Set <GuardSan> guardSans = Collections.EMPTY_SET;
+            //String clientGuardSan = (String) clientObject[1];
+            try {
+                Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+                clientCriteria.add(Restrictions.eq("idOfClient", idOfClient));
+                cl = (Client) clientCriteria.uniqueResult();
+                guardSans = cl.getGuardSan();
+            } catch (Exception e) {
+                data.resultCode = RC_INTERNAL_ERROR;
+                data.description = RC_INTERNAL_ERROR_DESC;
+                logger.error("Failed to insert SNILS using WS", e);
+                return;
+            }
+
+
+            //  Проверка наличия опекуна среди текущих
+            boolean exists = false;
+            for (GuardSan gSan : guardSans) {
+                if (gSan.getGuardSan().equals(guardSan)) {
+                    exists = true;
+                    break;
+                }
+            }
+
+            if (data instanceof AttachGuardSanResult) {
+                //  Если надо прикрепить опекуна
+                try {
+                    if (exists) {
+                        //  Если уже опекун уже существует, то ничего не делаем
+                        data.resultCode = RC_CLIENT_HAS_THIS_SNILS_ALREADY;
+                        data.description = RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC;
+                    } else {
+                        //  Иначе, добавляем его и обновляем все сущности в БД
+                        GuardSan newGuardSan = new GuardSan(cl, guardSan);
+                        newGuardSan.setGuardSan(guardSan);
+                        persistenceSession.save(newGuardSan);
+                        /*guardSans.add(newGuardSan);
+                        cl.setGuardSan(guardSans);
+                        session.update(cl);*/
+                        data.resultCode = RC_OK;
+                        data.description = "Ok";
+                    }
+                } catch (Exception e) {
+                    data.resultCode = RC_INTERNAL_ERROR;
+                    data.description = RC_INTERNAL_ERROR_DESC;
+                    logger.error("Failed to insert guard SNILS using WS", e);
+                    return;
+                }
+            } else if (data instanceof DetachGuardSanResult) {
+                //  Если надо его открепить
+                try {
+                    if (!exists) {
+                        //  Если опекун уже не существует, ничего не делаем
+                        data.resultCode = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS;
+                        data.description = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC;
+                    } else {
+                        for (GuardSan gSan : guardSans) {
+                            if (gSan.getGuardSan().equals(guardSan)) {
+                                guardSans.remove(gSan);
+                                break;
+                            }
+                        }
+                        cl.setGuardSan(guardSans);
+                        persistenceSession.update(cl);
+                        data.resultCode = RC_OK;
+                        data.description = "Ok";
+                    }
+                } catch (Exception e) {
+                    data.resultCode = RC_INTERNAL_ERROR;
+                    data.description = RC_INTERNAL_ERROR_DESC;
+                    logger.error("Failed to remove guard SNILS using WS", e);
+                    return;
+                }
+            } else {
+                data.resultCode = RC_INTERNAL_ERROR;
+                data.description = RC_INTERNAL_ERROR_DESC;
+                logger.error("Try to execute unknown operation " + data.getClass());
+            }
+        }
+    }
+
+    /*private void workClientSan(EntityManager entityManager, String guardSan, Result data, List clientList) {
         if (clientList.size() == 0) {
             data.resultCode = RC_CLIENT_NOT_FOUND;
             data.description = RC_CLIENT_NOT_FOUND_DESC;
@@ -2319,7 +2464,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
             }
         }
-    }
+    }*/
 
 
     private boolean isGuardSanExists(String guardSan, String clientGuardSans) {

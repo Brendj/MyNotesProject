@@ -79,7 +79,7 @@ public class Client {
     private Long expenditureLimit;
     private String categoriesDiscounts;
     private String san;
-    private String guardSan;
+    private Set<GuardSan> guardSan;
     private Long externalId;
     private String clientGUID;
     private Set<Card> cards = new HashSet<Card>();
@@ -215,11 +215,11 @@ public class Client {
         this.canConfirmGroupPayment = false;
     }
 
-    public String getGuardSan() {
+    public Set<GuardSan> getGuardSan() {
         return guardSan;
     }
 
-    public void setGuardSan(String guardSan) {
+    public void setGuardSan(Set<GuardSan> guardSan) {
         this.guardSan = guardSan;
     }
 

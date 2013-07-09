@@ -6,9 +6,10 @@ package ru.axetta.ecafe.processor.web.ui.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
-import ru.axetta.ecafe.processor.core.service.BIDataExportService;
 import ru.axetta.ecafe.processor.core.service.BenefitsRecalculationService;
+import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWS;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.springframework.context.annotation.Scope;
@@ -26,6 +27,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
         printMessage("Генерация данных ключевых показателей выполнена");
     }
 
+
     public void runImportRegisterClients() throws Exception {
         RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).run(); //DEF
         printMessage("Импорт клиентов из Реестров выполнен");
@@ -35,6 +37,18 @@ public class OtherActionsPage extends BasicWorkspacePage {
         RuntimeContext.getAppContext().getBean(BenefitsRecalculationService.class).runForcibly(); //DEF
         printMessage("Пересчет льготных правил выполнен");
     }
+
+    public void runClientGuardSANRebuild () throws Exception {
+        RuntimeContext.getAppContext().getBean(ClientGuardSanRebuildService.class).rebuild(); //DEF
+        printMessage("Переформирование Guard SAN для клиентов выполнено успешно");
+        /*RuntimeContext.getAppContext().getBean(ClientRoomControllerWS.class).attachGuardSan("14414414452", "14414414453"); //DEF
+        printMessage("Переформирование Guard SAN для клиентов выполнено успешно");*/
+    }
+
+    /*public void runClientGuardSANRemove () throws Exception {
+        RuntimeContext.getAppContext().getBean(ClientGuardSanRebuildService.class).delete(); //DEF
+        printMessage("Переформирование Guard SAN для клиентов выполнено успешно");
+    }*/
 
     @Override
     public String getPageFilename() {

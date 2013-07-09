@@ -293,7 +293,14 @@ public class ClientViewPage extends BasicWorkspacePage {
         // опекуны
         // (Kadyrov D) 23.12.2011
         this.san= client.getSan();
-        this.guardsan=client.getGuardSan();
+        Set <GuardSan> guardSans = client.getGuardSan();
+        this.guardsan="";
+        for (GuardSan guard : guardSans) {
+            if (this.guardsan.length() > 0) {
+                this.guardsan = this.guardsan + ",";
+            }
+            this.guardsan = this.guardsan + guard.getGuardSan();
+        }
 
 
         ClientGroup group = client.getClientGroup();

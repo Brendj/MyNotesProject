@@ -74,6 +74,24 @@ public class DAOUtils {
         return (Client) persistenceSession.get(Client.class, idOfClient);
     }
 
+    public static List findClientsBySan (Session persistenceSession, String san) {
+        org.hibernate.Query query = persistenceSession.createSQLQuery("select CF_Clients.IdOfClient "
+                                                                    + "from CF_Clients "
+                                                                    + "where CF_Clients.san like :san");
+        query.setParameter("san", san);
+        List clientList = query.list();
+        return clientList;
+    }
+
+    public static List findClientsByContract (Session persistenceSession, Long idOfContract) {
+        org.hibernate.Query query = persistenceSession.createSQLQuery("select distinct CF_Clients.IdOfClient "
+                                                                    + "from CF_Clients  "
+                                                                    + "where CF_Clients.IdOfContract=:contractId");
+        query.setParameter("contractId", idOfContract);
+        List clientList = query.list();
+        return clientList;
+    }
+
     public static GoodsBasicBasket findBasicGood(Session persistenceSession, String guidOfBasicGood) {
         Criteria criteria = persistenceSession.createCriteria(GoodsBasicBasket.class);
         criteria.add(Restrictions.eq("guid",guidOfBasicGood));
