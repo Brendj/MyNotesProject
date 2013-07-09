@@ -93,3 +93,15 @@ alter table cf_contracts add column IdOfContragent BIGINT DEFAULT NULL;
 
 -- Добавлен номер правила социальной скидки в деталь заказа
 alter table CF_OrderDetails add column IdOfRule  BIGINT DEFAULT NULL;
+
+
+-- Таблица привязки GuardSAN и клиентов.
+--! Ранее поле GuardSAN располагалось в CF_Clients, чем сильно загружало процессинг
+create table CF_GuardSan  (
+  IdOfGuardSan      bigserial     NOT NULL,
+  IdOfClient        BIGINT        NOT NULL,
+  GuardSan          VARCHAR(11)   NOT NULL,
+  CONSTRAINT CF_GuardSan_pk PRIMARY KEY (IdOfGuardSan),
+  CONSTRAINT CF_Client_GuardSan_IdOfClient_fk FOREIGN KEY (IdOfClient) REFERENCES CF_Clients (IdOfClient)
+);
+create index CF_GuardSan_GuardSan_idx on CF_GuardSan(GuardSAN);
