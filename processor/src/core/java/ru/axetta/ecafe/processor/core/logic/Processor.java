@@ -438,7 +438,7 @@ public class Processor implements SyncProcessor,
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            createTempCard(persistenceSession, persistenceTransaction, idOfOrg, cardNo, cardPrintedNo);
+            createTempCard(persistenceSession, idOfOrg, cardNo, cardPrintedNo);
 
             persistenceSession.flush();
             persistenceTransaction.commit();
@@ -2733,7 +2733,7 @@ public class Processor implements SyncProcessor,
         }
     }
 
-    private void createTempCard(Session persistenceSession, Transaction persistenceTransaction, Long idOfOrg, long cardNo, String cardPrintedNo) throws Exception {
+    private void createTempCard(Session persistenceSession, Long idOfOrg, long cardNo, String cardPrintedNo) throws Exception {
         Org org = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
         if (org == null) {
             throw new Exception(String.format("Организация не найдена: %d", idOfOrg));
@@ -2743,11 +2743,16 @@ public class Processor implements SyncProcessor,
             throw new Exception(
                     String.format("Карта уже зарегистрирована на клиента: %d", c.getClient().getIdOfClient()));
         }
-        CardTemp ct = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
-        if (ct != null) {
-            throw new Exception("Временная карта уже зарегистрирована на клиента: " );
+        CardTemp cardTemp = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
+        if (cardTemp != null) {
+            if(cardTemp.getCardPrintedNo()!=null && !cardTemp.getCardPrintedNo().equals(cardPrintedNo)){
+                cardTemp.setCardPrintedNo(cardPrintedNo);
+            } else {
+                throw new Exception("Временная карта уже зарегистрирована на временная: " );
+            }
+        } else {
+            cardTemp = new CardTemp(org,cardNo, cardPrintedNo);
         }
-        CardTemp cardTemp = new CardTemp(org,cardNo, cardPrintedNo);
         persistenceSession.save(cardTemp);
     }
 

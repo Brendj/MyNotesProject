@@ -88,10 +88,12 @@ public class SyncServlet extends HttpServlet {
             } catch (Exception e) {
                 logger.error(String.format("Failed to extract required packet attribute [remote address: %s]",
                         request.getRemoteAddr()), e);
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST,"Failed to extract required packet attribute [remote address: "+request.getRemoteAddr()+"]");
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                        String.format("Failed to extract required packet attribute [remote address: %s]",
+                                request.getRemoteAddr()));
                 return;
             }
-            logger.info(String.format("Starting synchronization with %s: id: %s", request.getRemoteAddr(), idOfOrg+""));
+            logger.info(String.format("Starting synchronization with %s: id: %s", request.getRemoteAddr(), idOfOrg));
 
             boolean bLogPackets = (syncType==SyncType.TYPE_FULL);
 
@@ -113,7 +115,7 @@ public class SyncServlet extends HttpServlet {
                 return;
             }
             /* Must be FALSE for testing!!!  */
-            boolean verifySignature = false;
+            boolean verifySignature = true;
             try {
                 if (verifySignature && !DigitalSignatureUtils.verify(publicKey, requestData.document)) {
                     logger.error(String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg));
