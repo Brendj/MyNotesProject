@@ -608,30 +608,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         Client client = (Client) persistenceSession.load(Client.class, idOfClient);
         long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
 
-        Set<GuardSan> guardSans = new HashSet<GuardSan>();
-        String items [] = null;
-        if (this.guardsan.indexOf(ClientGuardSanRebuildService.DELIMETER_1) > -1) {
-            items = this.guardsan.split(ClientGuardSanRebuildService.DELIMETER_1);
-        } else if (this.guardsan.indexOf(ClientGuardSanRebuildService.DELIMETER_2) > -1) {
-            items = this.guardsan.split(ClientGuardSanRebuildService.DELIMETER_2);
-        } else {
-            items = new String[] { this.guardsan };
-        }
-
-        if (items.length > 0) {
-            for (String i : items) {
-                i = ClientGuardSanRebuildService.clearGuardSan (i);
-                if (i.length() < 1) {
-                    continue;
-                }
-                GuardSan guardSan = new GuardSan(client, i);
-                guardSan.setGuardSan(i);
-                persistenceSession.save(guardSan);
-                guardSans.add(guardSan);
-            }
-        }
-        client.setGuardSan(guardSans);
-
         Person person = client.getPerson();
         this.person.copyTo(person);
         persistenceSession.update(person);
@@ -669,7 +645,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setExpenditureLimit(this.expenditureLimit);
         client.setFreePayMaxCount(this.freePayMaxCount);
         client.setSan(this.san);
-        client.setGuardSan(guardSans);
+        client.setGuardSan(Collections.EMPTY_SET);
         if (this.externalId == null || this.externalId == 0) {
             client.setExternalId(null);
         } else {
@@ -757,6 +733,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
 
         persistenceSession.update(client);
+
+        //  Добавляем опекунов
+        ClientGuardSanRebuildService.addGuardSan (client, this.guardsan, persistenceSession);
 
         fill(client);
     }

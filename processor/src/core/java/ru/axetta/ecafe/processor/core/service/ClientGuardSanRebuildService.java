@@ -3,7 +3,6 @@
  */
 package ru.axetta.ecafe.processor.core.service;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.GuardSan;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -17,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -57,7 +58,7 @@ public class ClientGuardSanRebuildService {
             //  Очищаем cf_client_guardsan
             org.hibernate.Query clear = session.createSQLQuery(CLEAR_TABLE_SQL);
             clear.executeUpdate();
-            log ("Таблица CF_Client_GuardSan очищена");
+            log("Таблица CF_Client_GuardSan очищена");
 
             //  Загружаем данные из cf_clients
             Map<Long, String> data = new HashMap<Long, String>();
@@ -72,40 +73,7 @@ public class ClientGuardSanRebuildService {
 
             //  Заполняем cf_client_guardsan
             for (Long idOfClient : data.keySet()) {
-                Client cl = DAOUtils.findClient(session, idOfClient);
-                Set<GuardSan> guardSans = new HashSet<GuardSan>();
-                String guardSan = data.get(idOfClient);
-                String list [] = null;
-                if (guardSan.indexOf(DELIMETER_1) > -1) {
-                    list = guardSan.split(DELIMETER_1);
-                } else if (guardSan.indexOf(DELIMETER_2) > -1) {
-                    list = guardSan.split(DELIMETER_2);
-                }
-
-                if (list != null && list.length > 0) {
-                    for (String i : list) {
-                        i = clearGuardSan(i);
-                        if (i.length() < 1) {
-                            continue;
-                        }
-                        GuardSan newGuardSan = new GuardSan(cl, i);
-                        newGuardSan.setGuardSan(i);
-                        session.save(newGuardSan);
-                        guardSans.add(newGuardSan);
-                    }
-                } else {
-                    guardSan = clearGuardSan(guardSan);
-                    if (guardSan.length() < 1) {
-                        continue;
-                    }
-                    GuardSan newGuardSan = new GuardSan(cl, guardSan);
-                    newGuardSan.setGuardSan(guardSan);
-                    session.save(newGuardSan);
-                    guardSans.add(newGuardSan);
-                }
-
-                /*cl.setGuardSan(guardSans);
-                session.update(cl);*/
+                addGuardSan (idOfClient, data.get(idOfClient), session);
             }
         } catch (Exception e) {
             logger.error("Failed to update CF_Client_GuardSan table", e);
@@ -113,23 +81,38 @@ public class ClientGuardSanRebuildService {
     }
 
 
-    @Transactional
-    public void delete() {
+    public static void addGuardSan (long idOfClient, String guardSan, Session session) throws Exception {
+        Client cl = DAOUtils.findClient(session, idOfClient);
+        addGuardSan (cl, guardSan, session);
+    }
 
-        Session session = (Session) em.getDelegate();
-        try {
-            Client cl = DAOUtils.findClient(session, 127251L);
-            Set<GuardSan> guardSans = cl.getGuardSan();
-            for (GuardSan gSan : guardSans) {
-                if (gSan.getGuardSan().equals("14414414451")) {
-                    guardSans.remove(gSan);
-                    break;
+
+    public static void addGuardSan (Client cl, String guardSan, Session session) throws Exception {
+        String list [] = null;
+        if (guardSan.indexOf(DELIMETER_1) > -1) {
+            list = guardSan.split(DELIMETER_1);
+        } else if (guardSan.indexOf(DELIMETER_2) > -1) {
+            list = guardSan.split(DELIMETER_2);
+        }
+
+        if (list != null && list.length > 0) {
+            for (String i : list) {
+                i = clearGuardSan(i);
+                if (i.length() < 1) {
+                    continue;
                 }
+                GuardSan newGuardSan = new GuardSan(cl, i);
+                newGuardSan.setGuardSan(i);
+                session.save(newGuardSan);
             }
-            cl.setGuardSan(guardSans);
-            session.update(cl);
-        } catch (Exception e) {
-            int ff = 1;
+        } else {
+            guardSan = clearGuardSan(guardSan);
+            if (guardSan.length() < 1) {
+                return;
+            }
+            GuardSan newGuardSan = new GuardSan(cl, guardSan);
+            newGuardSan.setGuardSan(guardSan);
+            session.save(newGuardSan);
         }
     }
 
