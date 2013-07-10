@@ -13,6 +13,17 @@
       { out.println("Недостаточно прав для просмотра страницы"); return; } %>
 
 <%--@elvariable id="reportRepositoryListPage" type="ru.axetta.ecafe.processor.web.ui.report.repository.ReportRepositoryListPage"--%>
+<f:verbatim>
+<script language="javascript">
+function checkReporitoryDate () {
+    var startDate = RichFaces.$('startDate').currentDate.getTime();
+    var endDate = RichFaces.$('endDate').currentDate.getTime();
+    alert (startDate + " :: " + endDate);
+    RichFaces.$('startDate').currentDate.setTime(endDate);
+    RichFaces.$('startDate').currentDate.setTime(startDate);
+}
+</script>
+</f:verbatim>
 <h:panelGrid id="reportRepListPanelGrid" binding="#{reportRepositoryListPage.pageComponent}"
              styleClass="borderless-grid">
     <rich:simpleTogglePanel label="Фильтр (#{reportRepositoryListPage.filter.status})" switchType="client" opened="true"
@@ -39,14 +50,15 @@
                 <rich:calendar value="#{reportRepositoryListPage.filter.createdDate}" datePattern="dd.MM.yyyy"
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
                 <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
-                <rich:calendar value="#{reportRepositoryListPage.filter.startDate}" datePattern="dd.MM.yyyy"
-                               converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+                <rich:calendar id="startDate" onchanged="if(#{rich:component('startDate')}.getSelectedDate().getTime() > #{rich:component('endDate')}.getSelectedDate().getTime()) { #{rich:component('startDate')}.selectDate(#{rich:component('endDate')}.getSelectedDate()) }"
+                               datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
                 <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
-                <rich:calendar value="#{reportRepositoryListPage.filter.endDate}" datePattern="dd.MM.yyyy"
+                <rich:calendar id="endDate" onchanged="if(#{rich:component('startDate')}.getSelectedDate().getTime() > #{rich:component('endDate')}.getSelectedDate().getTime()) { #{rich:component('startDate')}.selectDate(#{rich:component('endDate')}.getSelectedDate()) }"
+                               value="#{reportRepositoryListPage.filter.endDate}" datePattern="dd.MM.yyyy"
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
             </h:panelGrid>
         </h:panelGrid>
-
+<%----%>
         <h:panelGrid columns="3" styleClass="borderless-grid">
             <a4j:commandButton value="Применить" action="#{reportRepositoryListPage.reload}"
                                reRender="workspaceTogglePanel" styleClass="command-button" status="repositoryStatus" />
