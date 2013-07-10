@@ -470,7 +470,7 @@
     </copyright>
     <module2copyright />
   </component>
-  <component name="DataSourceManagerImpl" format="xml" hash="1109538403">
+  <component name="DataSourceManagerImpl" format="xml" hash="3005801551">
     <data-source source="LOCAL" name="Moscow Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
       <identifier-quote-string>&quot;</identifier-quote-string>
       <synchronize>true</synchronize>
@@ -691,6 +691,7 @@
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/user_setting.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/confirm_delete.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/event_notification/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/event_notification/list.jsp" />
   </component>
   <component name="FacetAutodetectingManager">
     <autodetection-disabled>
