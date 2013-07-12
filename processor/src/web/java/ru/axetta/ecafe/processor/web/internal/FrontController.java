@@ -38,12 +38,16 @@ import java.util.UUID;
 public class FrontController extends HttpServlet {
     public static class FrontControllerException extends Exception {
 
+        public String msg;
+
         public FrontControllerException(String message) {
             super(message);    //To change body of overridden methods use File | Settings | File Templates.
+            msg = message;
         }
 
         public FrontControllerException(String message, Throwable cause) {
             super(message, cause);    //To change body of overridden methods use File | Settings | File Templates.
+            msg = message;
         }
     }
 
@@ -61,7 +65,8 @@ public class FrontController extends HttpServlet {
 
     /* Выполняет проверку наличия карты с физическим идентификатором  idOfTempCard и признаком карты посетителя в таблице временных карт */
     @WebMethod(operationName = "checkVisitorByCard")
-    public VisitorItem checkVisitorByCard(Long idOfOrg, Long cardNo) throws Exception{
+    public VisitorItem checkVisitorByCard(@WebParam(name = "orgId") Long idOfOrg,@WebParam(name = "cardNo") Long cardNo) throws FrontControllerException{
+        checkRequestValidity(idOfOrg);
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         VisitorItem visitorItem = null;
@@ -75,7 +80,7 @@ public class FrontController extends HttpServlet {
              * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
             Card c = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
             if (c != null) {
-                throw new Exception("Карта уже зарегистрирована как постоянная на клиента: "+c.getClient().getIdOfClient());
+                throw new FrontControllerException("Карта уже зарегистрирована как постоянная на клиента: "+c.getClient().getIdOfClient());
             }
 
             CardTemp ct = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
@@ -85,7 +90,7 @@ public class FrontController extends HttpServlet {
              * карт выбрасывать исключение «Карта не зарегистрирована как временная» *
              * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
             if (ct == null) {
-                throw new Exception("Карта не зарегистрирована как временная");
+                throw new FrontControllerException("Карта не зарегистрирована как временная");
             }
 
             /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -93,7 +98,7 @@ public class FrontController extends HttpServlet {
              * выбрасывать исключение с сообщением «Карта уже зарегистрирована как временная карта клиента»      *
              * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
             if(ct.getClient() != null){
-                throw new Exception("Карта уже зарегистрирована как временная карта клиента");
+                throw new FrontControllerException("Карта уже зарегистрирована как временная карта клиента");
             }
 
             /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -110,7 +115,7 @@ public class FrontController extends HttpServlet {
             return visitorItem;
         } catch (Exception e) {
             logger.error("Ошибка при регистрацию посетителя и временной карты посетителя", e);
-            throw new Exception("Ошибка: " + e.getMessage());
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -119,7 +124,8 @@ public class FrontController extends HttpServlet {
 
     /* Выполняет регистрацию посетителя и временной карты посетителя */
     @WebMethod(operationName = "registerVisitor")
-    public Long registerVisitor(Long idOfOrg,  Long cardNo, Date validDate, VisitorItem visitor) throws Exception {
+    public Long registerVisitor(@WebParam(name = "orgId")Long idOfOrg, @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "validDate") Date validDate,@WebParam(name = "visitor") VisitorItem visitor) throws FrontControllerException {
+        checkRequestValidity(idOfOrg);
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         Long idOfVisitor = null;
@@ -133,7 +139,7 @@ public class FrontController extends HttpServlet {
              * */
             Card c = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
             if (c != null) {
-                throw new Exception("Карта уже зарегистрирована как постоянная на клиента: "+c.getClient().getIdOfClient());
+                throw new FrontControllerException("Карта уже зарегистрирована как постоянная на клиента: "+c.getClient().getIdOfClient());
             }
 
             /**
@@ -143,7 +149,7 @@ public class FrontController extends HttpServlet {
             CardTemp ct = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
             if (ct != null && ct.getClient()!=null) {
                 String fio= ct.getClient().getPerson().getFullName();
-                throw new Exception("Карта уже зарегистрирована как временная карта клиента: "+fio);
+                throw new FrontControllerException("Карта уже зарегистрирована как временная карта клиента: "+fio);
             }
 
             /**
@@ -151,7 +157,7 @@ public class FrontController extends HttpServlet {
              * сообщением «Неверное значение даты окончания действия карты»
              * */
             if(System.currentTimeMillis()>validDate.getTime()){
-                throw new Exception("Неверное значение даты окончания действия карты");
+                throw new FrontControllerException("Неверное значение даты окончания действия карты");
             }
 
             /**
@@ -159,7 +165,7 @@ public class FrontController extends HttpServlet {
              * сообщением «все поля ФИО должны быть заполнены»
              * */
             if(StringUtils.isEmpty(visitor.getFirstName()) || StringUtils.isEmpty(visitor.getSurname()) || StringUtils.isEmpty(visitor.getSecondName())) {
-                throw new  Exception("Все поля ФИО должны быть заполнены");
+                throw new  FrontControllerException("Все поля ФИО должны быть заполнены");
             }
             /**
              * Если поле-массив PersonDocuments не содержит ни одного описания удостоверния личности,
@@ -169,7 +175,7 @@ public class FrontController extends HttpServlet {
                (visitor.getPassportDate()==null || StringUtils.isEmpty(visitor.getPassportNumber())) &&
                (visitor.getWarTicketDate()==null || StringUtils.isEmpty(visitor.getWarTicketNumber()))
               ) {
-                throw new  Exception("Отсутствует информация об удостоверении личности");
+                throw new  FrontControllerException("Отсутствует информация об удостоверении личности");
             }
 
             /**
@@ -185,7 +191,7 @@ public class FrontController extends HttpServlet {
                 (visitor.getPassportDate()!=null && System.currentTimeMillis()<visitor.getPassportDate().getTime()) ||
                 (visitor.getWarTicketDate()!=null && System.currentTimeMillis()<visitor.getWarTicketDate().getTime())
                ){
-                throw new Exception("Неверное значение даты окончания действия карты");
+                throw new FrontControllerException("Неверное значение даты окончания действия карты");
             }
 
             /**
@@ -215,7 +221,7 @@ public class FrontController extends HttpServlet {
                              ct.getVisitor().setDriverLicenceDate(visitor.getDriverLicenceDate());
                              ct.getVisitor().setDriverLicenceNumber(visitor.getDriverLicenceNumber());
                          }  else {
-                             throw new Exception("Водительского удостоверения  личности не соотвествует владельцу карты");
+                             throw new FrontControllerException("Водительского удостоверения  личности не соотвествует владельцу карты");
                          }
                      }
 
@@ -229,7 +235,7 @@ public class FrontController extends HttpServlet {
                              ct.getVisitor().setPassportDate(visitor.getPassportDate());
                              ct.getVisitor().setPassportNumber(visitor.getPassportNumber());
                          }  else {
-                             throw new Exception("Паспорт личности не соотвествует владельцу карты");
+                             throw new FrontControllerException("Паспорт личности не соотвествует владельцу карты");
                          }
                      }
 
@@ -243,7 +249,7 @@ public class FrontController extends HttpServlet {
                              ct.getVisitor().setWarTicketDate(visitor.getWarTicketDate());
                              ct.getVisitor().setWarTicketNumber(visitor.getWarTicketNumber());
                          }  else {
-                             throw new Exception("Военный билет не соотвествует владельцу карты");
+                             throw new FrontControllerException("Военный билет не соотвествует владельцу карты");
                          }
                      }
                      ct.setValidDate(validDate);
@@ -261,7 +267,33 @@ public class FrontController extends HttpServlet {
                      ct.setVisitor(newVisitor);
                      ct.setCardStation(CardOperationStation.ISSUE);
                      ct.setValidDate(validDate);
+                     persistenceSession.save(person);
+                     persistenceSession.save(newVisitor);
+                     if(logger.isDebugEnabled()){
+                         logger.debug("register: visitor "+visitor.toString());
+                     }
                  }
+                persistenceSession.save(ct);
+                if(logger.isDebugEnabled()){
+                    logger.debug("register: CardTemp "+ct.toString());
+                }
+                idOfVisitor = ct.getVisitor().getIdOfVisitor();
+            } else {
+                /* Регистрация клиента со своей картой которая не зарегестрирована в нашей системе */
+                ct = new CardTemp(DAOUtils.getOrgReference(persistenceSession, idOfOrg),cardNo, String.valueOf(cardNo));
+                Person person = new Person(visitor.getFirstName(), visitor.getSurname(), visitor.getSecondName());
+                Visitor newVisitor = new Visitor(person);
+                newVisitor.setDriverLicenceDate(visitor.getDriverLicenceDate());
+                newVisitor.setDriverLicenceNumber(visitor.getDriverLicenceNumber());
+                newVisitor.setPassportDate(visitor.getPassportDate());
+                newVisitor.setPassportNumber(visitor.getPassportNumber());
+                newVisitor.setWarTicketDate(visitor.getWarTicketDate());
+                newVisitor.setWarTicketNumber(visitor.getWarTicketNumber());
+                ct.setVisitor(newVisitor);
+                ct.setCardStation(CardOperationStation.ISSUE);
+                ct.setValidDate(validDate);
+                persistenceSession.save(person);
+                persistenceSession.save(newVisitor);
                 persistenceSession.save(ct);
                 idOfVisitor = ct.getVisitor().getIdOfVisitor();
             }
@@ -270,7 +302,7 @@ public class FrontController extends HttpServlet {
             return idOfVisitor;
         } catch (Exception e) {
             logger.error("Ошибка при регистрацию посетителя и временной карты посетителя", e);
-            throw new Exception("Ошибка: " + e.getMessage());
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -280,7 +312,7 @@ public class FrontController extends HttpServlet {
     @WebMethod(operationName = "registerTempCard")
     public void registerTempCard(@WebParam(name = "orgId") Long idOfOrg,@WebParam(name = "cardNo") Long cardNo, @WebParam(name = "cardPrintedNo") String cardPrintedNo)
             throws FrontControllerException {
-        //checkRequestValidity(idOfOrg);
+        checkRequestValidity(idOfOrg);
         ///
         try {
             RuntimeContext.getInstance().getCardManager().createTempCard(idOfOrg, cardNo, cardPrintedNo);
@@ -361,17 +393,18 @@ public class FrontController extends HttpServlet {
         X509Certificate[] cert = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
 
         //X509Certificate cert = (X509Certificate)((WSSecurityEngineResult)wsContext.getMessageContext().get(WSS4JInInterceptor.SIGNATURE_RESULT)).get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        if (cert==null || cert.length==0) throw new FrontControllerException("В запросе нет валидных сертификатов");
-        Org org = DAOService.getInstance().getOrg(orgId);
-        if (org==null) throw new FrontControllerException(String.format("Неизвестная организация: %d", orgId));
-        PublicKey publicKey = null;
-        try {
-            publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
-        } catch (Exception e) {
-            throw new FrontControllerException("Внутренняя ошибка", e);
-        }
-        if (!publicKey.equals(cert[0].getPublicKey())) throw new FrontControllerException(
-                String.format("Ключ сертификата невалиден: %d", orgId));
+
+        //if (cert==null || cert.length==0) throw new FrontControllerException("В запросе нет валидных сертификатов");
+        //Org org = DAOService.getInstance().getOrg(orgId);
+        //if (org==null) throw new FrontControllerException(String.format("Неизвестная организация: %d", orgId));
+        //PublicKey publicKey = null;
+        //try {
+        //    publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
+        //} catch (Exception e) {
+        //    throw new FrontControllerException("Внутренняя ошибка", e);
+        //}
+        //if (!publicKey.equals(cert[0].getPublicKey())) throw new FrontControllerException(
+        //        String.format("Ключ сертификата невалиден: %d", orgId));
     }
     
     @WebMethod(operationName = "generateLinkingToken")
@@ -430,4 +463,5 @@ public class FrontController extends HttpServlet {
             this.error = error;
         }
     }
+
 }

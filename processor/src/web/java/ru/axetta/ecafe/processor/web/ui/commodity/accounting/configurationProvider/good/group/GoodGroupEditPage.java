@@ -85,7 +85,7 @@ public class GoodGroupEditPage extends BasicWorkspacePage implements OrgSelectPa
             printError("Группа не может быть удалена.");
             return;
         }
-        List<Good> goodList = daoService.findGoodsByGoodGroup(currentGoodGroup);
+        List<Good> goodList = daoService.findGoodsByGoodGroup(currentGoodGroup, true);
         if(!(goodList==null || goodList.isEmpty())){
             printError("В группе имеются зарегистрированные товары.");
             return;

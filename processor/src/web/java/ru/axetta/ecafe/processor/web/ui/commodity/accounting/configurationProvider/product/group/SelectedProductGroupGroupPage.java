@@ -27,9 +27,6 @@ public class SelectedProductGroupGroupPage extends BasicWorkspacePage {
     private String title;
     private ProductGroup currentProductGroup;
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     @Override
     public void onShow() throws Exception {
         if (null == currentProductGroup) {

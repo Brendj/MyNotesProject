@@ -4,15 +4,24 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.technologicalMap;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
@@ -31,14 +40,17 @@ import java.util.Queue;
 @Scope("session")
 public class TechnologicalMapPanel extends BasicPage {
 
+    private static final Logger logger = LoggerFactory.getLogger(TechnologicalMapPanel.class);
     private final Queue<TechnologicalMapSelect> completeHandlerLists = new LinkedList<TechnologicalMapSelect>();
 
     private List<TechnologicalMap> technologicalMapList;
     private TechnologicalMap selectTechnologicalMap;
     private String filter;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    private DAOService daoService;
+    @Autowired
+    private ContextDAOServices contextDAOServices;
 
     public void pushCompleteHandler(TechnologicalMapSelect handler) {
         completeHandlerLists.add(handler);
@@ -68,18 +80,31 @@ public class TechnologicalMapPanel extends BasicPage {
     }
 
     public Object updateTechnologicalMapSelectPage(){
-        technologicalMapList = retrieveTechnologicalMap();
+        try {
+            retrieveTechnologicalMap();
+        } catch (Exception e) {
+            printError("Ошибка при загрузке страницы: "+e.getMessage());
+            logger.error("Error load page", e);
+        }
         return null;
     }
 
-    @Transactional
-    private List<TechnologicalMap> retrieveTechnologicalMap(){
-        String where="";
-        if (StringUtils.isNotEmpty(filter)){
-            where = "where UPPER(nameOfTechnologicalMap) like '%"+filter.toUpperCase()+"%'";
+    private void retrieveTechnologicalMap() throws Exception {
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
+        if(orgOwners==null || orgOwners.isEmpty()){
+            if (StringUtils.isEmpty(filter)){
+                technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(filter);
+            }else {
+                technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(false);
+            }
+        } else {
+            if (StringUtils.isEmpty(filter)){
+                technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(orgOwners, filter);
+            }else{
+                technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(orgOwners, false);
+            }
         }
-        String query = "from TechnologicalMap "+ where + " order by id";
-        return entityManager.createQuery(query, TechnologicalMap.class).getResultList();
     }
 
     public String getFilter() {
@@ -104,5 +129,11 @@ public class TechnologicalMapPanel extends BasicPage {
 
     public void setSelectTechnologicalMap(TechnologicalMap selectTechnologicalMap) {
         this.selectTechnologicalMap = selectTechnologicalMap;
+    }
+
+    public void printError(String msg) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        facesContext.addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
     }
 }

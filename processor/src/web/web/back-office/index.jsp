@@ -181,10 +181,6 @@
         <c:import url="include/commodity_accounting/configuration_provider/technologicalMap/confirm_delete.jsp" />
     </f:subview>
 
-    <f:subview id="basicGoodDeletePageSubView">
-        <c:import url="include/commodity_accounting/configuration_provider/basicGood/confirm_delete.jsp" />
-    </f:subview>
-
     <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">
         <tr>
             <td colspan="2">

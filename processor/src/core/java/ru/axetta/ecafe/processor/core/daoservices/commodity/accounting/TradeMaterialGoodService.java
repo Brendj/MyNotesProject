@@ -28,8 +28,6 @@ import java.util.List;
  */
 public class TradeMaterialGoodService extends AbstractDAOService {
 
-    private static final Logger logger = LoggerFactory.getLogger(TradeMaterialGoodService.class);
-
     @SuppressWarnings("unchecked")
     public List<TradeMaterialGoodItem> findReportDataInfo(Long idOfOrg, Date startDate, Date endDate){
         Criteria criteria = getSession().createCriteria(TradeMaterialGood.class);

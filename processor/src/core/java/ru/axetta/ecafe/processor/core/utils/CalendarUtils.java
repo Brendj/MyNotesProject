@@ -136,6 +136,13 @@ public class CalendarUtils {
         return calendar.getTime();
     }
 
+    public static Date addMonth(Date date, int nMonth) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.MONTH, nMonth);
+        return calendar.getTime();
+    }
+
     public static int getDayOfMonth(Date date) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);

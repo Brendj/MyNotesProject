@@ -452,10 +452,34 @@
 
 </rich:panelMenuGroup>
 
-<%--@elvariable id="basicGoodListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basicGood.BasicGoodListPage"--%>
-<rich:panelMenuItem id="viewBasicGoodMenuItem" label="Справочник базовых товаров"
-                    binding="#{basicGoodListPage.mainMenuComponent}" action="#{basicGoodListPage.show}"
-                    reRender="workspaceForm" />
+<%--@elvariable id="basicGoodListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good.BasicGoodListPage"--%>
+<%--@elvariable id="basicGoodEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good.BasicGoodEditPage"--%>
+<%--@elvariable id="basicGoodCreatePage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good.BasicGoodCreatePage"--%>
+<%--@elvariable id="basicGoodViewPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good.BasicGoodViewPage"--%>
+<rich:panelMenuGroup id="basicGoodGroupMenu" label="Справочник базовых товаров"
+                     binding="#{basicGoodListPage.groupPage.mainMenuComponent}">
+    <rich:panelMenuItem id="listBasicGoodMenuItem" label="Список"
+                        binding="#{basicGoodListPage.mainMenuComponent}" action="#{basicGoodListPage.show}"
+                        reRender="workspaceForm" />
+
+    <rich:panelMenuGroup id="selectedBasicGoodGroupMenu" label="#{basicGoodEditPage.selectedEntityGroupPage.title}"
+                         binding="#{basicGoodEditPage.selectedEntityGroupPage.mainMenuComponent}" rendered="false">
+        <a4j:support event="onclick" action="#{basicGoodEditPage.selectedEntityGroupPage.show}"
+                     reRender="workspaceForm" />
+
+
+        <rich:panelMenuItem id="viewBasicGoodMenuItem" binding="#{basicGoodViewPage.mainMenuComponent}"
+                            label="Просмотр" action="#{basicGoodViewPage.show}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="editBasicGoodMenuItem" binding="#{basicGoodEditPage.mainMenuComponent}"
+                            label="Редактирование" action="#{basicGoodEditPage.show}" reRender="workspaceForm" />
+
+    </rich:panelMenuGroup>
+
+    <rich:panelMenuItem id="createBasicGoodMenuItem" binding="#{basicGoodCreatePage.mainMenuComponent}"
+                        label="Регистрация" action="#{basicGoodCreatePage.show}" reRender="workspaceForm" />
+
+</rich:panelMenuGroup>
+
 
 <rich:panelMenuGroup id="productGroupMenu" binding="#{mainPage.productGuideGroupPage.mainMenuComponent}"
                      label="Справочник продуктов"

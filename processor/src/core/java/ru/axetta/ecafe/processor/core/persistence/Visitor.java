@@ -89,4 +89,11 @@ public class Visitor {
     void setIdOfVisitor(Long idOfVisitor) {
         this.idOfVisitor = idOfVisitor;
     }
+
+    @Override
+    public String toString() {
+        return "Visitor{" +
+                "idOfVisitor=" + idOfVisitor +
+                '}';
+    }
 }

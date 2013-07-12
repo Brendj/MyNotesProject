@@ -4,12 +4,14 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
-import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderSelect;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.group.ProductGroupItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.group.ProductGroupSelect;
 
@@ -18,11 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.List;
 
 /**
@@ -34,64 +31,71 @@ import java.util.List;
  */
 @Component
 @Scope("session")
-public class ProductListPage extends BasicWorkspacePage implements ProductGroupSelect, ConfigurationProviderSelect {
+public class ProductListPage extends BasicWorkspacePage implements ProductGroupSelect {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductListPage.class);
     private List<Product> productList;
     private Boolean deletedStatusSelected = Boolean.FALSE;
-    private ConfigurationProvider selectedConfigurationProvider;
     private ProductGroup selectedProductGroup;
-
-    @PersistenceContext
-    private EntityManager entityManager;
+    private ConfigurationProvider selectedConfigurationProvider;
+    @Autowired
+    private DAOService daoService;
     @Autowired
     private ProductGroupItemsPanel productGroupItemsPanel;
     @Autowired
-    private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
+    private ContextDAOServices contextDAOServices;
 
     @Override
     public void onShow() { }
 
-    public Object onSearch() throws Exception{
-        reload();
+    public Object onSearch(){
+        try {
+            reload();
+        } catch (Exception e) {
+            printError(String.format("Ошибка при загрузке данных: %s", e.getMessage()));
+            logger.error("Product onSearch error: ", e);
+        }
         return null;
     }
 
     public Object onClear() throws Exception{
-        selectedConfigurationProvider = null;
         selectedProductGroup = null;
         return null;
     }
 
-    @Transactional
     public void reload() throws Exception{
-        String where = "";
-        if(selectedConfigurationProvider!=null){
-            where = " idOfConfigurationProvider=" + selectedConfigurationProvider.getIdOfConfigurationProvider();
-        }
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
         if(selectedProductGroup!=null){
-            where = (where.equals("")?"":where + " and ") + " productGroup=:productGroup";
+            if(selectedConfigurationProvider!=null){
+                if(orgOwners==null || orgOwners.isEmpty()){
+                    productList = daoService.findProductByConfigurationProvider(selectedProductGroup, selectedConfigurationProvider.getIdOfConfigurationProvider(), deletedStatusSelected);
+                } else {
+                    productList = daoService.findProductByConfigurationProvider(selectedProductGroup, selectedConfigurationProvider.getIdOfConfigurationProvider(),orgOwners, deletedStatusSelected);
+                }
+            } else {
+                if(orgOwners==null || orgOwners.isEmpty()){
+                    productList = daoService.findProductByConfigurationProvider(selectedProductGroup, deletedStatusSelected);
+                } else {
+                    productList = daoService.findProductByConfigurationProvider(selectedProductGroup, orgOwners, deletedStatusSelected);
+                }
+            }
+        } else {
+            if(selectedConfigurationProvider!=null){
+                if(orgOwners==null || orgOwners.isEmpty()){
+                    productList = daoService.findProductByConfigurationProvider(selectedConfigurationProvider.getIdOfConfigurationProvider(), deletedStatusSelected);
+                } else {
+                    productList = daoService.findProductByConfigurationProvider(selectedConfigurationProvider.getIdOfConfigurationProvider(),orgOwners, deletedStatusSelected);
+                }
+            } else {
+                if(orgOwners==null || orgOwners.isEmpty()){
+                    productList = daoService.findProductByConfigurationProvider(deletedStatusSelected);
+                } else {
+                    productList = daoService.findProductByConfigurationProvider(orgOwners, deletedStatusSelected);
+                }
+            }
         }
-        where = (where.equals("")?"":" where ") + where;
-        TypedQuery<Product> query = entityManager.createQuery("from Product " + where, Product.class);
-        if(selectedProductGroup!=null){
-            query.setParameter("productGroup", selectedProductGroup);
-        }
-        productList = query.getResultList();
-    }
 
-    public Object selectConfigurationProvider() throws Exception{
-        configurationProviderItemsPanel.reload();
-        if(selectedConfigurationProvider !=null){
-            configurationProviderItemsPanel.setSelectConfigurationProvider(selectedConfigurationProvider);
-        }
-        configurationProviderItemsPanel.pushCompleteHandler(this);
-        return null;
-    }
-
-    @Override
-    public void select(ConfigurationProvider configurationProvider) {
-        selectedConfigurationProvider = configurationProvider;
     }
 
     public Object selectProductGroup() throws Exception{
@@ -134,14 +138,6 @@ public class ProductListPage extends BasicWorkspacePage implements ProductGroupS
         return  this.productList == null || this.productList.isEmpty();
     }
 
-    public ConfigurationProvider getSelectedConfigurationProvider() {
-        return selectedConfigurationProvider;
-    }
-
-    public void setSelectedConfigurationProvider(ConfigurationProvider selectedConfigurationProvider) {
-        this.selectedConfigurationProvider = selectedConfigurationProvider;
-    }
-
     public ProductGroup getSelectedProductGroup() {
         return selectedProductGroup;
     }
@@ -150,4 +146,11 @@ public class ProductListPage extends BasicWorkspacePage implements ProductGroupS
         this.selectedProductGroup = selectedProductGroup;
     }
 
+    public ConfigurationProvider getSelectedConfigurationProvider() {
+        return selectedConfigurationProvider;
+    }
+
+    public void setSelectedConfigurationProvider(ConfigurationProvider selectedConfigurationProvider) {
+        this.selectedConfigurationProvider = selectedConfigurationProvider;
+    }
 }

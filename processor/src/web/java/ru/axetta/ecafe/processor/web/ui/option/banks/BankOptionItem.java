@@ -27,11 +27,15 @@ import javax.persistence.EntityManager;
  */
 public class BankOptionItem {
 
-    private EntityManager entityManager;
+    private    Long idOfBank;
+    private    String name;
+    private    String logoUrl;
+    private    String terminalsUrl;
+    private    Double rate;
+    private    Double minRate;
+    private    String enrollmentType;
 
-    public BankOptionItem(EntityManager entityManager) {
-         this.entityManager = entityManager;
-    }
+    public BankOptionItem() {}
 
     public void fill(Bank bank) {
         idOfBank=bank.getIdOfBank();
@@ -42,19 +46,6 @@ public class BankOptionItem {
         minRate = bank.getMinRate();
         enrollmentType = bank.getEnrollmentType();
     }
-
-    Logger logger = LoggerFactory
-            .getLogger(BankOptionItem.class);
-
-    //OptionPage optionPage = RuntimeContext.getAppContext().getBean(OptionPage.class);
-
-    private    Long idOfBank;
-    private    String name;
-    private    String logoUrl;
-    private    String terminalsUrl;
-    private    Double rate;
-    private    Double minRate;
-    private    String enrollmentType;
 
 
 
@@ -114,36 +105,4 @@ public class BankOptionItem {
         this.enrollmentType = enrollmentType;
     }
 
-    //public Object delete(){
-    //
-    //    logger.info("deleting from BankItem");
-    //    RuntimeContext runtimeContext = RuntimeContext.getInstance();
-    //    Session persistenceSession = null;
-    //    Transaction persistenceTransaction = null;
-    //    try {
-    //        persistenceSession = runtimeContext.createPersistenceSession();
-    //        persistenceTransaction = persistenceSession.beginTransaction();
-    //
-    //        Query q = persistenceSession.createQuery("DELETE FROM Bank WHERE idOfBank=:idOfBank");
-    //        q.setParameter("idOfBank", idOfBank);
-    //
-    //        q.executeUpdate();
-    //
-    //        //persistenceSession.save(bank);
-    //
-    //        persistenceSession.flush();
-    //        persistenceTransaction.commit();
-    //        persistenceTransaction = null;
-    //    }catch(Exception e){
-    //
-    //        logger.error("error in creating a new bank : ",e);
-    //    }  finally {
-    //        HibernateUtils.rollback(persistenceTransaction, logger);
-    //        HibernateUtils.close(persistenceSession, logger);
-    //    }
-    //    try{
-    //        optionPage.onShow();
-    //    }catch(Exception e){logger.error("error in save(): ",e);}
-    //    return  null;
-    //}
 }

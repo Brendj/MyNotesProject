@@ -37,8 +37,6 @@ public class ConfigurationProviderViewPage extends BasicWorkspacePage {
     private TechnologicalMapListPage technologicalMapListPage;
     @Autowired
     private ProductListPage productListPage;
-    @PersistenceContext
-    private EntityManager entityManager;
 
     @Override
     public void onShow() throws Exception {

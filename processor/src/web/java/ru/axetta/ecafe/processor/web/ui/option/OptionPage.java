@@ -76,10 +76,8 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean syncRegisterIsTestingService;
     private Boolean syncRegisterLogging;
     private Integer syncRegisterMaxAttempts;
-
-
-    @PersistenceContext
-    private EntityManager entityManager;
+    private Integer syncLimits;
+    private Integer retryAfter;
 
     private List<BankOptionItem> banks;
 
@@ -404,6 +402,22 @@ public class OptionPage extends BasicWorkspacePage {
         this.syncRegisterMaxAttempts = syncRegisterMaxAttempts;
     }
 
+    public Integer getSyncLimits() {
+        return syncLimits;
+    }
+
+    public void setSyncLimits(Integer syncLimits) {
+        this.syncLimits = syncLimits;
+    }
+
+    public Integer getRetryAfter() {
+        return retryAfter;
+    }
+
+    public void setRetryAfter(Integer retryAfter) {
+        this.retryAfter = retryAfter;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -455,6 +469,9 @@ public class OptionPage extends BasicWorkspacePage {
         syncRegisterLogging = runtimeContext.getOptionValueBool(Option.OPTION_MSK_NSI_LOG);
         syncRegisterMaxAttempts = runtimeContext.getOptionValueInt(Option.OPTION_MSK_NSI_MAX_ATTEMPTS);
 
+        syncLimits = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS);
+        retryAfter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_RETRY_AFTER);
+
         bankListPage.onShow();
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -467,7 +484,7 @@ public class OptionPage extends BasicWorkspacePage {
             List<Bank> banksList = (List<Bank>) banksCriteria.list();
             banks = new ArrayList<BankOptionItem>();
             for (Bank bank : banksList) {
-                BankOptionItem bankOptionItem = new BankOptionItem(entityManager);
+                BankOptionItem bankOptionItem = new BankOptionItem();
                 bankOptionItem.setEnrollmentType(bank.getEnrollmentType());
                 bankOptionItem.setLogoUrl(bank.getLogoUrl());
                 bankOptionItem.setMinRate(bank.getMinRate());
@@ -545,6 +562,9 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS, RNIPPaymentsAlias);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD, RNIPPaymentsPassword);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_STORE_NAME, RNIPPaymentsStore);
+
+            runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_LIMITS, syncLimits);
+            runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_RETRY_AFTER, retryAfter);
 
 
             runtimeContext.saveOptionValues();

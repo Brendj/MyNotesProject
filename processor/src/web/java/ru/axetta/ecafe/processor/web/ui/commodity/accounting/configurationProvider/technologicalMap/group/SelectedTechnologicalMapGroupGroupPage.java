@@ -27,9 +27,6 @@ public class SelectedTechnologicalMapGroupGroupPage extends BasicWorkspacePage {
     private String title;
     private TechnologicalMapGroup currentTechnologicalMapGroup;
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     @Override
     public void onShow() throws Exception {
         if (null == currentTechnologicalMapGroup) {

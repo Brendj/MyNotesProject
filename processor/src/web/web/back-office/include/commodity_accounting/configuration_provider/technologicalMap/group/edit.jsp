@@ -19,7 +19,9 @@
                          style="margin-right: 2px; width: 374px; float: left;" />
             <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show()"
-                               styleClass="command-link" style="width: 25px; float: right;" />
+                               styleClass="command-link" style="width: 25px; float: right;">
+                <f:setPropertyActionListener value="2" target="#{mainPage.orgSelectPage.filterMode}" />
+            </a4j:commandButton>
         </h:panelGroup>
         <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text required-field" />
         <h:panelGroup styleClass="borderless-div">

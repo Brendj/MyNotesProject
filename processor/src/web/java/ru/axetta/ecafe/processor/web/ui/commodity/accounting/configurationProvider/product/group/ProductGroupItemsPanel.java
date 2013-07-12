@@ -4,15 +4,24 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.group;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.*;
@@ -28,14 +37,18 @@ import java.util.*;
 @Scope("session")
 public class ProductGroupItemsPanel extends BasicPage {
 
+    private final static Logger logger = LoggerFactory.getLogger(ProductGroupItemsPanel.class);
+
     private final Queue<ProductGroupSelect> completeHandlerLists = new LinkedList<ProductGroupSelect>();
 
     private List<ProductGroup> productGroupList;
     private ProductGroup selectProductGroup;
     private String filter;
+    @Autowired
+    private DAOService daoService;
+    @Autowired
+    private ContextDAOServices contextDAOServices;
 
-    @PersistenceContext
-    private EntityManager entityManager;
 
     public void pushCompleteHandler(ProductGroupSelect handler) {
         completeHandlerLists.add(handler);
@@ -66,18 +79,31 @@ public class ProductGroupItemsPanel extends BasicPage {
     }
 
     public Object updateConfigurationProviderSelectPage(){
-        productGroupList = retrieveProduct();
+        try {
+            retrieveProduct();
+        } catch (Exception e) {
+            printError("Ошибка при загрузке страницы: "+e.getMessage());
+            logger.error("Error load page",e);
+        }
         return null;
     }
 
-    @Transactional
-    private List<ProductGroup> retrieveProduct(){
-        String where="";
-        if (StringUtils.isNotEmpty(filter)){
-            where = "where UPPER(nameOfGroup) like '%"+filter.toUpperCase()+"%'";
+    private void retrieveProduct() throws Exception {
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
+        if(orgOwners==null || orgOwners.isEmpty()){
+            if (StringUtils.isEmpty(filter)){
+                productGroupList = daoService.findProductGroupByConfigurationProvider(false);
+            } else{
+                productGroupList = daoService.findProductGroupByConfigurationProvider(filter);
+            }
+        } else {
+            if (StringUtils.isEmpty(filter)){
+                productGroupList = daoService.findProductGroupByConfigurationProvider(orgOwners, false);
+            } else{
+                productGroupList = daoService.findProductGroupByConfigurationProvider(orgOwners, filter);
+            }
         }
-        String query = "from ProductGroup "+ where + " order by id";
-        return entityManager.createQuery(query, ProductGroup.class).getResultList();
     }
 
     public String getFilter() {
@@ -102,5 +128,12 @@ public class ProductGroupItemsPanel extends BasicPage {
 
     public void setSelectProductGroup(ProductGroup selectProductGroup) {
         this.selectProductGroup = selectProductGroup;
+    }
+
+
+    public void printError(String msg) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        facesContext.addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
     }
 }

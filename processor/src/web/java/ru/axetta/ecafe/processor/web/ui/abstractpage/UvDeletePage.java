@@ -4,12 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.abstractpage;
 
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
-import ru.axetta.ecafe.processor.web.ui.org.contract.ContractListPage;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,12 +14,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 @Component
+@Scope("session")
 public class UvDeletePage extends AbstractModalPage {
     @PersistenceContext
-    EntityManager em;
+    private EntityManager entityManager;
     
     protected Object currentEntityItem;
-    AbstractListPage listPage;
+    private AbstractListPage listPage;
 
     @Override
     public void show() {
@@ -33,7 +31,7 @@ public class UvDeletePage extends AbstractModalPage {
     @Transactional
     public Object delete(){
         try{
-            ((AbstractEntityItem)currentEntityItem).removeEntity(em);
+            ((AbstractEntityItem)currentEntityItem).removeEntity(entityManager);
             listPage.getItemList().remove(currentEntityItem);
             listPage.printMessage("Объект удален: "+currentEntityItem);
         } catch (Exception e){

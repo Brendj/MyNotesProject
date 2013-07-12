@@ -4,9 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.technologicalMap.group;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderSelect;
 
@@ -15,11 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.List;
 
 /**
@@ -38,18 +38,23 @@ public class TechnologicalMapGroupListPage extends BasicWorkspacePage implements
     private Boolean deletedStatusSelected = Boolean.FALSE;
     private ConfigurationProvider selectedConfigurationProvider;
 
-    @PersistenceContext
-    private EntityManager entityManager;
     @Autowired
-    private TechnologicalMapGroupItemsPanel technologicalMapGroupItemsPanel;
+    private DAOService daoService;
     @Autowired
     private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
+    @Autowired
+    private ContextDAOServices contextDAOServices;
 
     @Override
     public void onShow() { }
 
-    public Object onSearch() throws Exception{
-        reload();
+    public Object onSearch(){
+        try {
+            reload();
+        } catch (Exception e) {
+            printError(String.format("Ошибка при загрузке данных: %s", e.getMessage()));
+            logger.error("TechnologicalMapGroup onSearch error: ", e);
+        }
         return null;
     }
 
@@ -58,14 +63,24 @@ public class TechnologicalMapGroupListPage extends BasicWorkspacePage implements
         return null;
     }
 
-    @Transactional
     private void reload() throws Exception{
-        String where = "";
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
         if(selectedConfigurationProvider!=null){
-            where = " where idOfConfigurationProvider=" + selectedConfigurationProvider.getIdOfConfigurationProvider();
+            if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+                technologicalMapGroupList = daoService.findTechnologicalMapGroupByConfigurationProvider(
+                        selectedConfigurationProvider.getIdOfConfigurationProvider(), deletedStatusSelected);
+            } else {
+                technologicalMapGroupList = daoService.findTechnologicalMapGroupByConfigurationProvider(
+                        selectedConfigurationProvider.getIdOfConfigurationProvider(), orgOwners, deletedStatusSelected);
+            }
+        } else {
+            if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+                technologicalMapGroupList = daoService.findTechnologicalMapGroupByConfigurationProvider(deletedStatusSelected);
+            } else {
+                technologicalMapGroupList = daoService.findTechnologicalMapGroupByConfigurationProvider(orgOwners, false);
+            }
         }
-        TypedQuery<TechnologicalMapGroup> query = entityManager.createQuery("from TechnologicalMapGroup "+where+" ORDER BY globalId", TechnologicalMapGroup.class);
-        technologicalMapGroupList = query.getResultList();
     }
 
     public Object selectConfigurationProvider() throws Exception{

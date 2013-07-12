@@ -228,6 +228,18 @@
                 </h:panelGrid>
             </rich:panel>
 
+            <rich:panel>
+                <f:facet name="header"><h:outputText styleClass="column-header" value="Параметры синхронизации" /></f:facet>
+                <h:panelGrid styleClass="borderless-grid" columns="2">
+                    <h:outputText escape="true" value="Максимальное количество параллельных сессий синхронизации"
+                                  styleClass="output-text" />
+                    <h:inputText value="#{optionPage.syncLimits}" styleClass="input-text" size="3" />
+                    <h:outputText escape="true" value="Тайм-аут"
+                                  styleClass="output-text" />
+                    <h:inputText value="#{optionPage.retryAfter}" styleClass="input-text" size="5" />
+                </h:panelGrid>
+            </rich:panel>
+
         </h:panelGrid>
     </rich:tab>
 

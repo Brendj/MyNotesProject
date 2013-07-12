@@ -27,9 +27,6 @@ public class SelectedGoodGroupGroupPage extends BasicWorkspacePage {
     private String title;
     private GoodGroup currentGoodGroup;
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     @Override
     public void onShow() throws Exception {
         if (null == currentGoodGroup) {

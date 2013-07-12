@@ -1705,6 +1705,11 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         return null;
     }
 
+    public Object updateOrgSelectPageWithItemDeselection() {
+        updateOrgSelectPage();
+        return null;
+    }
+
     public Object clearOrgListSelectedItemsList() {
         orgListSelectPage.deselectAllItems();
         return null;

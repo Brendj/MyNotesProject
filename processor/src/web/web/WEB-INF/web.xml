@@ -33,6 +33,19 @@
         </init-param>
     </filter>
 
+    <filter>
+        <filter-name>LimitFilter</filter-name>
+        <filter-class>ru.axetta.ecafe.processor.web.LimitFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>LimitFilter</filter-name>
+        <servlet-name>SyncServlet</servlet-name>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+    </filter-mapping>
+
     <listener>
         <display-name>JavaServer Faces configure listener</display-name>
         <listener-class>com.sun.faces.config.ConfigureListener</listener-class>

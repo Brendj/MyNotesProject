@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Go
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
+import java.util.UUID;
 
 public class GoodsBasicBasket {
 
@@ -49,8 +50,13 @@ public class GoodsBasicBasket {
         this.goodBasicBasketPrice = goodBasicBasketPrice;
     }
 
-    public GoodsBasicBasket() {
+    protected GoodsBasicBasket() {
+    }
 
+    public GoodsBasicBasket(String guid) {
+        this.guid = guid;
+        this.createdDate = new Date();
+        this.lastUpdate = new Date();
     }
 
     public GoodsBasicBasket(Long idOfBasicGood, String guid, Date createdDate, Date lastUpdate, String nameOfGood,

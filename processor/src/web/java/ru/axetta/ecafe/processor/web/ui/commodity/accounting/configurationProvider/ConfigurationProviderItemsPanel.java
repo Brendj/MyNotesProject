@@ -4,17 +4,23 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.util.*;
 
 /**
@@ -28,14 +34,16 @@ import java.util.*;
 @Scope("session")
 public class ConfigurationProviderItemsPanel extends BasicPage {
 
+    private final static Logger logger = LoggerFactory.getLogger(ConfigurationProviderItemsPanel.class);
     private final Queue<ConfigurationProviderSelect> completeHandlerLists = new LinkedList<ConfigurationProviderSelect>();
-
     private List<ConfigurationProvider> configurationProviderList;
     private ConfigurationProvider selectConfigurationProvider;
     private String filter;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    private DAOService daoService;
+    @Autowired
+    private ContextDAOServices contextDAOServices;
 
     public void pushCompleteHandler(ConfigurationProviderSelect handler) {
         completeHandlerLists.add(handler);
@@ -60,25 +68,41 @@ public class ConfigurationProviderItemsPanel extends BasicPage {
 
     @PostConstruct
     public void reload() throws Exception {
-        //configurationProviderList = new ArrayList<ConfigurationProvider>();
-        configurationProviderList = retrieveProduct();
-        selectConfigurationProvider = new ConfigurationProvider();
-        filter="";
+        try {
+            retrieveProduct();
+            selectConfigurationProvider = new ConfigurationProvider();
+            filter="";
+        } catch (Exception e) {
+            printError("Ошибка при загрузке страницы: "+e.getMessage());
+            logger.error("Error load page", e);
+        }
     }
 
     public Object updateConfigurationProviderSelectPage(){
-        configurationProviderList = retrieveProduct();
+        try {
+            retrieveProduct();
+        } catch (Exception e) {
+            printError("Ошибка при загрузке страницы: "+e.getMessage());
+            logger.error("Error load page", e);
+        }
         return null;
     }
 
-    @Transactional
-    private List<ConfigurationProvider> retrieveProduct(){
-        String where="";
-        if (StringUtils.isNotEmpty(filter)){
-            where = "where UPPER(name) like '%"+filter.toUpperCase()+"%'";
+    private void retrieveProduct() throws Exception {
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification())){
+            if(StringUtils.isEmpty(filter)){
+                configurationProviderList = contextDAOServices.findConfigurationProviderByContragentSet(user.getIdOfUser());
+            } else {
+                configurationProviderList = contextDAOServices.findConfigurationProviderByContragentSet(user.getIdOfUser(), filter);
+            }
+        } else {
+            if(StringUtils.isEmpty(filter)){
+                configurationProviderList = daoService.findConfigurationProvidersList();
+            } else {
+                configurationProviderList = daoService.findConfigurationProvidersList(filter);
+            }
         }
-        String query = "from ConfigurationProvider "+ where + " order by id";
-        return entityManager.createQuery(query, ConfigurationProvider.class).getResultList();
     }
 
     public String getFilter() {
@@ -105,4 +129,9 @@ public class ConfigurationProviderItemsPanel extends BasicPage {
         this.selectConfigurationProvider = selectConfigurationProvider;
     }
 
+    public void printError(String msg) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        facesContext.addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
+    }
 }

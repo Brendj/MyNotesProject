@@ -157,6 +157,12 @@
         <converter-class>ru.axetta.ecafe.processor.web.ui.client.SmsDeliveryStatusConverter</converter-class>
     </converter>
 
+    <converter>
+        <description>Unit Scale Converter</description>
+        <converter-id>unitScaleConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.UnitScaleConverter</converter-class>
+    </converter>
+
     <navigation-rule>
         <from-view-id>/back-office/index.jsp</from-view-id>
         <navigation-case>

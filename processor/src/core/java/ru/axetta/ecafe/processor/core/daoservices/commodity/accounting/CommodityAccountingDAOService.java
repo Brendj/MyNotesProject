@@ -11,7 +11,11 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
+import org.springframework.orm.jpa.support.JpaDaoSupport;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,15 +26,10 @@ import java.util.List;
  * Time: 15:37
  * To change this template use File | Settings | File Templates.
  */
-@Component
-@Scope("session")
-public class GoodGroupDAOService extends AbstractDAOService{
+//@Repository
+//@Transactional
+public class CommodityAccountingDAOService{
 
-    public List<GoodGroup> findByDeleteState(Boolean state){
-        Criteria criteria = getSession().createCriteria(GoodGroup.class);
-        criteria.add(Restrictions.eq("deletedState",state));
-        criteria.addOrder(Order.asc("globalId"));
-        return criteria.list();
-    }
+
 
 }

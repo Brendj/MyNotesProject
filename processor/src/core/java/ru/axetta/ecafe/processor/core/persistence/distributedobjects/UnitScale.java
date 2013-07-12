@@ -21,11 +21,17 @@ public enum UnitScale {
     UNITS("единицы");
 
     private String description;
-    static HashMap<Integer, UnitScale> map = new HashMap<Integer, UnitScale>();
+    static HashMap<Integer, UnitScale> unitScaleHashMap = new HashMap<Integer, UnitScale>();
+    static HashMap<String, UnitScale> descriptionMap = new HashMap<String, UnitScale>();
     static {
          for (UnitScale unitScale: UnitScale.values()){
-             map.put(unitScale.ordinal(), unitScale);
+             unitScaleHashMap.put(unitScale.ordinal(), unitScale);
          }
+    }
+    static {
+        for (UnitScale unitScale: UnitScale.values()){
+            descriptionMap.put(unitScale.toString(), unitScale);
+        }
     }
 
     private UnitScale(String description) {
@@ -33,7 +39,11 @@ public enum UnitScale {
     }
 
     public static UnitScale fromInteger(int value){
-         return map.get(value);
+         return unitScaleHashMap.get(value);
+    }
+
+    public static UnitScale fromString(String description){
+        return descriptionMap.get(description);
     }
 
     @Override

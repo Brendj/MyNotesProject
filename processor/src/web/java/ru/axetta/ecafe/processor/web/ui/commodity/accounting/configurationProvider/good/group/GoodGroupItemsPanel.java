@@ -4,15 +4,24 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
@@ -31,14 +40,17 @@ import java.util.Queue;
 @Scope("session")
 public class GoodGroupItemsPanel extends BasicPage {
 
+    private final static Logger logger = LoggerFactory.getLogger(GoodGroupItemsPanel.class);
     private final Queue<GoodGroupSelect> completeHandlerLists = new LinkedList<GoodGroupSelect>();
 
     private List<GoodGroup> goodGroupList;
     private GoodGroup selectGoodGroup;
     private String filter;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    private DAOService daoService;
+    @Autowired
+    private ContextDAOServices contextDAOServices;
 
     public void pushCompleteHandler(GoodGroupSelect handler) {
         completeHandlerLists.add(handler);
@@ -57,7 +69,6 @@ public class GoodGroupItemsPanel extends BasicPage {
     }
 
     public Object cancel(){
-        //completeSelection(false);
         return null;
     }
 
@@ -68,18 +79,31 @@ public class GoodGroupItemsPanel extends BasicPage {
     }
 
     public Object updateConfigurationProviderSelectPage(){
-        goodGroupList = retrieveGoods();
+        try {
+            retrieveGoods();
+        } catch (Exception e) {
+            printError("Ошибка при загрузке страницы: "+e.getMessage());
+            logger.error("Error load page", e);
+        }
         return null;
     }
 
-    @Transactional
-    private List<GoodGroup> retrieveGoods(){
-        String where="";
-        if (StringUtils.isNotEmpty(filter)){
-            where = "where UPPER(NameOfGoodsGroup) like '%"+filter.toUpperCase()+"%'";
+    private void retrieveGoods() throws Exception {
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
+        if(orgOwners==null || orgOwners.isEmpty()){
+            if (StringUtils.isEmpty(filter)){
+                goodGroupList = daoService.findGoodGroupBySuplifier(false);
+            } else{
+                goodGroupList = daoService.findGoodGroupBySuplifier(filter);
+            }
+        } else {
+            if (StringUtils.isEmpty(filter)){
+                goodGroupList = daoService.findGoodGroupBySuplifier(orgOwners,false);
+            } else{
+                goodGroupList = daoService.findGoodGroupBySuplifier(orgOwners, filter);
+            }
         }
-        String query = "from GoodGroup "+ where + " order by id";
-        return entityManager.createQuery(query, GoodGroup.class).getResultList();
     }
 
     public String getFilter() {
@@ -104,5 +128,11 @@ public class GoodGroupItemsPanel extends BasicPage {
 
     public void setSelectGoodGroup(GoodGroup selectGoodGroup) {
         this.selectGoodGroup = selectGoodGroup;
+    }
+
+    public void printError(String msg) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        facesContext.addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
     }
 }

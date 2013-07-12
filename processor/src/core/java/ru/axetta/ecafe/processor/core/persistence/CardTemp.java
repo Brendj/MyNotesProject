@@ -121,4 +121,14 @@ public class CardTemp {
     }
 
     protected CardTemp() {}
+
+    @Override
+    public String toString() {
+        return "CardTemp{" +
+                "cardNo=" + cardNo +
+                ", idOfCartTemp=" + idOfCartTemp +
+                ", org=" + org +
+                ", cardPrintedNo='" + cardPrintedNo + '\'' +
+                '}';
+    }
 }

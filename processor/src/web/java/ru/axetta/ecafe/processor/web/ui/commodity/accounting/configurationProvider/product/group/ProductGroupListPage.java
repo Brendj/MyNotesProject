@@ -19,11 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.List;
 
 /**
@@ -44,8 +39,6 @@ public class ProductGroupListPage extends BasicWorkspacePage implements Configur
     @Autowired
     private DAOService daoService;
     @Autowired
-    private ProductGroupItemsPanel productGroupItemsPanel;
-    @Autowired
     private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
     @Autowired
     private ContextDAOServices contextDAOServices;
@@ -53,8 +46,13 @@ public class ProductGroupListPage extends BasicWorkspacePage implements Configur
     @Override
     public void onShow() {}
 
-    public Object onSearch() throws Exception{
-        reload();
+    public Object onSearch(){
+        try {
+            reload();
+        } catch (Exception e) {
+            printError(String.format("Ошибка при загрузке данных: %s", e.getMessage()));
+            logger.error("ProductGroup onSearch error: ", e);
+        }
         return null;
     }
 
@@ -67,16 +65,16 @@ public class ProductGroupListPage extends BasicWorkspacePage implements Configur
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
         if(selectedConfigurationProvider!=null){
-            if(orgOwners==null || orgOwners.isEmpty()){
-                productGroupList = daoService.findProductGroupByConfigurationProvider(selectedConfigurationProvider.getIdOfConfigurationProvider());
+            if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+                productGroupList = daoService.findProductGroupByConfigurationProvider(selectedConfigurationProvider.getIdOfConfigurationProvider(), deletedStatusSelected);
             } else {
-                productGroupList = daoService.findProductGroupByConfigurationProvider(selectedConfigurationProvider.getIdOfConfigurationProvider(),orgOwners);
+                productGroupList = daoService.findProductGroupByConfigurationProvider(selectedConfigurationProvider.getIdOfConfigurationProvider(),orgOwners, deletedStatusSelected);
             }
         } else {
-            if(orgOwners==null || orgOwners.isEmpty()){
-                productGroupList = daoService.findProductGroupByConfigurationProvider();
+            if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+                productGroupList = daoService.findProductGroupByConfigurationProvider(deletedStatusSelected);
             } else {
-                productGroupList = daoService.findProductGroupByConfigurationProvider(orgOwners);
+                productGroupList = daoService.findProductGroupByConfigurationProvider(orgOwners,deletedStatusSelected);
             }
         }
     }

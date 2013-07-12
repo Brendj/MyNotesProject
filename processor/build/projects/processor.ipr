@@ -164,7 +164,6 @@
         <element id="library" level="project" name="commons" />
         <element id="library" level="project" name="org.aopalliance:com.springsource.org.aopalliance:1.0.0" />
         <element id="library" level="project" name="postgresql-9.1-901.jdbc4" />
-        <element id="library" level="project" name="Java EE 6-3.1" />
       </root>
     </artifact>
   </component>
@@ -692,6 +691,72 @@
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/confirm_delete.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/event_notification/edit.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/event_notification/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/event_notification/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/event_notification/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/event_notification/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/acts/tradematrialgoods.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/acts/inventarization_acts.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/acts/waybilldifferenceposition_acts.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/waybill/waybill.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/waybill/waybillposition.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/group/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/group/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/group/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/group/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/group/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/group/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/load_file.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/group/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/group/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/group/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/group/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/group/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/group/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/load_file.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/basicGood/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/basicGood/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/basicGood/basicgood.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/basicGood/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/group/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/group/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/group/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/group/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/group/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/group/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/product/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/index.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/login.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/pos_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/card_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/menu_data_xml.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/sale_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/client_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/ccaccount_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/addpayment_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/client_org_csv_list.jsp" />
   </component>
   <component name="FacetAutodetectingManager">
     <autodetection-disabled>
@@ -1523,21 +1588,6 @@
         <root url="jar://D:/lib/ireport/src/jasperreports-4.7.1-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Java EE 6-3.1">
-      <CLASSES>
-        <root url="jar://$PROJECT_DIR$/../lib/ejb3/javax.annotation.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/ejb3/javax.ejb.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/ejb3/javax.jms.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/ejb3/javax.persistence.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/ejb3/javax.resource.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/ejb3/javax.servlet.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/ejb3/javax.servlet.jsp.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/ejb3/javax.servlet.jsp.jstl.jar!/" />
-        <root url="jar://$PROJECT_DIR$/../lib/ejb3/javax.transaction.jar!/" />
-      </CLASSES>
-      <JAVADOC />
-      <SOURCES />
-    </library>
     <library name="javamelody-monitoring">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/jrobin-1.5.9.jar!/" />
@@ -1545,6 +1595,23 @@
       </CLASSES>
       <JAVADOC />
       <SOURCES />
+    </library>
+    <library name="jboss_J2EE">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-annotations-api_1.1_spec-1.0.0.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-connector-api_1.6_spec-1.0.0.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-ejb-api_3.1_spec-1.0.1.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-el-api_2.2_spec-1.0.0.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-jms-api_1.1_spec-1.0.0.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-jsp-api_2.2_spec-1.0.0.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-jstl-api_1.2_spec-1.0.1.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-servlet-api_3.0_spec-1.0.0.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-transaction-api_1.1_spec-1.0.0.Final.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$USER_HOME$/.ideaLibSources/jboss-servlet-api_3.0_spec-1.0.0.Final-sources.jar!/" />
+      </SOURCES>
     </library>
     <library name="jsf-impl-1.2_15-jbossorg-2">
       <CLASSES>

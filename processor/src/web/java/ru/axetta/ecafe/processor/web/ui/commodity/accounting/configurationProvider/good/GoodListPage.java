@@ -19,11 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.List;
 
 /**
@@ -51,8 +46,13 @@ public class GoodListPage extends BasicWorkspacePage implements GoodGroupSelect{
     @Override
     public void onShow() { }
 
-    public Object onSearch() throws Exception{
-        reload();
+    public Object onSearch(){
+        try {
+            reload();
+        } catch (Exception e) {
+            printError(String.format("Ошибка при загрузке данных: %s", e.getMessage()));
+            logger.error("Good onSearch error: ", e);
+        }
         return null;
     }
 
@@ -66,16 +66,16 @@ public class GoodListPage extends BasicWorkspacePage implements GoodGroupSelect{
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
         if(selectedGoodGroup==null){
-            if(orgOwners==null || orgOwners.isEmpty()){
-                goodList = daoService.findGoods();
+            if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+                goodList = daoService.findGoods(deletedStatusSelected);
             } else {
-                goodList = daoService.findGoods(orgOwners);
+                goodList = daoService.findGoods(orgOwners, deletedStatusSelected);
             }
         } else {
-            if(orgOwners==null || orgOwners.isEmpty()){
-                goodList = daoService.findGoodsByGoodGroup(selectedGoodGroup);
+            if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+                goodList = daoService.findGoodsByGoodGroup(selectedGoodGroup,deletedStatusSelected);
             } else {
-                goodList = daoService.findGoodsByGoodGroup(selectedGoodGroup,orgOwners);
+                goodList = daoService.findGoodsByGoodGroup(selectedGoodGroup,orgOwners, deletedStatusSelected);
             }
         }
     }

@@ -1,17 +1,23 @@
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.technologicalMap.technologicalMapProduct;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapProduct;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.util.*;
 
 /**
@@ -25,6 +31,7 @@ import java.util.*;
 @Scope("session")
 public class ProductListItemsPanel extends BasicPage {
 
+    private final static Logger logger = LoggerFactory.getLogger(ProductListItemsPanel.class);
     private final Queue<ProductListSelect> completeHandlerLists = new LinkedList<ProductListSelect>();
 
     private TechnologicalMap technologicalMap;
@@ -33,8 +40,10 @@ public class ProductListItemsPanel extends BasicPage {
     private List<Product> pr = new ArrayList<Product>();
     private String filter="";
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    private DAOService daoService;
+    @Autowired
+    private ContextDAOServices contextDAOServices;
 
     public void pushCompleteHandlerList(ProductListSelect handlerList) {
         completeHandlerLists.add(handlerList);
@@ -78,24 +87,45 @@ public class ProductListItemsPanel extends BasicPage {
     }
 
     public Object updateTechnologicalMapProductListSelectPage(){
-        List<Product> productList = retrieveProduct();
-        productItems.clear();
-        for (Product product: productList){
-            if (!pr.contains(product)) {
-                productItems.add(new ProductListItem(pr.contains(product), product));
+        List<Product> productList = null;
+        try {
+            productList = retrieveProduct();
+            productItems.clear();
+            for (Product product: productList){
+                if (!pr.contains(product)) {
+                    productItems.add(new ProductListItem(pr.contains(product), product));
+                }
             }
+        } catch (Exception e) {
+            printError("Ошибка при загрузке страницы: "+e.getMessage());
+            logger.error("Error load page", e);
         }
+
         return null;
     }
 
-    @Transactional
-    private List<Product> retrieveProduct(){
-        String where="";
-        if (StringUtils.isNotEmpty(filter)){
-            where = "where UPPER(productName) like '%"+filter.toUpperCase()+"%'";
+    private List<Product> retrieveProduct() throws Exception {
+        //String where="";
+        //if (StringUtils.isNotEmpty(filter)){
+        //    where = "where UPPER(productName) like '%"+filter.toUpperCase()+"%'";
+        //}
+        //String query = "from Product "+ where + " order by id";
+        //return entityManager.createQuery(query, Product.class).getResultList();
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
+        if(orgOwners==null || orgOwners.isEmpty()){
+            if (StringUtils.isEmpty(filter)){
+                return daoService.findProductByConfigurationProvider(filter);
+            }else {
+                return daoService.findProductByConfigurationProvider(false);
+            }
+        } else {
+            if (StringUtils.isEmpty(filter)){
+                return daoService.findProductByConfigurationProvider(orgOwners, filter);
+            }else {
+                return daoService.findProductByConfigurationProvider(orgOwners, false);
+            }
         }
-        String query = "from Product "+ where + " order by id";
-        return entityManager.createQuery(query, Product.class).getResultList();
     }
 
     public TechnologicalMap getTechnologicalMap() {
@@ -120,5 +150,11 @@ public class ProductListItemsPanel extends BasicPage {
 
     public void setProductItems(List<ProductListItem> productItems) {
         this.productItems = productItems;
+    }
+
+    public void printError(String msg) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        facesContext.addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, msg, null));
     }
 }

@@ -4,12 +4,15 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.technologicalMap;
 
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.ConfirmDeletePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderSelect;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.technologicalMap.group.TechnologicalMapGroupItemsPanel;
@@ -21,9 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.List;
 
 /**
@@ -40,27 +40,30 @@ public class TechnologicalMapListPage extends BasicWorkspacePage implements Conf
 
     private static final Logger logger = LoggerFactory.getLogger(TechnologicalMapListPage.class);
 
-
-    private TechnologicalMap technologicalMap = new TechnologicalMap();
     private List<TechnologicalMap> technologicalMapList;
     private ConfigurationProvider selectedConfigurationProvider;
 
     private TechnologicalMapGroup selectedTechnologicalMapGroup;
     private Boolean deletedStatusSelected = Boolean.FALSE;
 
-    @PersistenceContext
-    private EntityManager entityManager;
     @Autowired
     private TechnologicalMapGroupItemsPanel technologicalMapGroupItemsPanel;
     @Autowired
     private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
     @Autowired
     private DAOService daoService;
+    @Autowired
+    private ContextDAOServices contextDAOServices;
 
     @Override
     public void onConfirmDelete(ConfirmDeletePage confirmDeletePage) {
         daoService.deleteEntity(confirmDeletePage.getEntity());
-        reload();
+        try {
+            reload();
+        } catch (Exception e) {
+            printError(String.format("Ошибка при загрузке данных: %s", e.getMessage()));
+            logger.error("TechnologicalMap onSearch error: ", e);
+        }
     }
 
     public String getPageTitle() {
@@ -74,8 +77,13 @@ public class TechnologicalMapListPage extends BasicWorkspacePage implements Conf
     @Override
     public void onShow() throws Exception {}
 
-    public Object onSearch() throws Exception{
-        reload();
+    public Object onSearch(){
+        try {
+            reload();
+        } catch (Exception e) {
+            printError(String.format("Ошибка при загрузке данных: %s", e.getMessage()));
+            logger.error("TechnologicalMap onSearch error: ", e);
+        }
         return null;
     }
 
@@ -89,20 +97,44 @@ public class TechnologicalMapListPage extends BasicWorkspacePage implements Conf
         return technologicalMapList;
     }
 
-    public void reload() {
-        String where = "";
-        if(selectedConfigurationProvider!=null){
-            where = " idOfConfigurationProvider=" + selectedConfigurationProvider.getIdOfConfigurationProvider();
+    public void reload() throws Exception {
+        User user = MainPage.getSessionInstance().getCurrentUser();
+        List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
+        /* проверка на отсутсвие выбора грпуппы */
+        if(selectedTechnologicalMapGroup==null){
+            /* проверка на отсутвие конфигурации провайдера */
+            if(selectedConfigurationProvider!=null){
+                if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+                    technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(
+                            selectedConfigurationProvider.getIdOfConfigurationProvider(), deletedStatusSelected);
+                } else {
+                    technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(
+                            selectedConfigurationProvider.getIdOfConfigurationProvider(), orgOwners, deletedStatusSelected);
+                }
+            } else {
+                if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+                    technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(deletedStatusSelected);
+                } else {
+                    technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(orgOwners, deletedStatusSelected);
+                }
+            }
+        } else {
+            if(selectedConfigurationProvider!=null){
+                if(orgOwners==null || orgOwners.isEmpty()){
+                    technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(selectedTechnologicalMapGroup,
+                            selectedConfigurationProvider.getIdOfConfigurationProvider(), deletedStatusSelected);
+                } else {
+                    technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(selectedTechnologicalMapGroup,
+                            selectedConfigurationProvider.getIdOfConfigurationProvider(), orgOwners, deletedStatusSelected);
+                }
+            } else {
+                if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+                    technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(selectedTechnologicalMapGroup,deletedStatusSelected);
+                } else {
+                    technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(selectedTechnologicalMapGroup, orgOwners, deletedStatusSelected);
+                }
+            }
         }
-        if(selectedTechnologicalMapGroup!=null){
-            where = (where.equals("")?"":where + " and ") + " technologicalMapGroup=:technologicalMapGroup";
-        }
-        where = (where.equals("")?"":" where ") + where;
-        TypedQuery<TechnologicalMap> query = entityManager.createQuery("from TechnologicalMap " + where, TechnologicalMap.class);
-        if(selectedTechnologicalMapGroup!=null){
-            query.setParameter("technologicalMapGroup", selectedTechnologicalMapGroup);
-        }
-        technologicalMapList = query.getResultList();
     }
 
     public Object selectConfigurationProvider() throws Exception{

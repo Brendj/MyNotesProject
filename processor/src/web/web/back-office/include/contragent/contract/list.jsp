@@ -98,10 +98,10 @@
                 <h:outputText escape="true" value="Редактировать" />
             </f:facet>
             <a4j:commandLink ajaxSingle="true" action="#{contractEditPage.show}" styleClass="command-link"
-                    reRender="mainMenu, workspaceForm">
-                <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{item}" target="#{contractEditPage.selectedEntityGroupPage.currentEntityItem}" />
-            </a4j:commandLink>
+                                               reRender="mainMenu, workspaceForm">
+            <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
+            <f:setPropertyActionListener value="#{item}" target="#{contractEditPage.selectedEntityGroupPage.currentEntityItem}" />
+        </a4j:commandLink>
         </rich:column>
 
         <rich:column style="text-align:center">

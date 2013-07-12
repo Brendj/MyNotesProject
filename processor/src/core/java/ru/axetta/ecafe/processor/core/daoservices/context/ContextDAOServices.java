@@ -198,4 +198,44 @@ public class ContextDAOServices {
         }
     }
 
+
+    public List<ConfigurationProvider> findConfigurationProviderByContragentSet(Long idOfUser) {
+        Query contragentTypedQuery = entityManager.createQuery("select u.contragents from User u where u.idOfUser=:idOfUser");
+        contragentTypedQuery.setParameter("idOfUser", idOfUser);
+        List list = contragentTypedQuery.getResultList();
+        Set<Contragent> contragentSet= new HashSet<Contragent>();
+        for (Object o: list){
+            Contragent contragent = (Contragent) o;
+            if(!contragentSet.contains(contragent)){
+                contragentSet.add(contragent);
+            }
+        }
+        if(contragentSet.isEmpty()){
+            return null;
+        } else {
+            TypedQuery<ConfigurationProvider> query = entityManager.createQuery("select configurationProvider from Org where defaultSupplier in :contragentSet",ConfigurationProvider.class);
+            query.setParameter("contragentSet", contragentSet);
+            return query.getResultList();
+        }
+    }
+
+    public List<ConfigurationProvider> findConfigurationProviderByContragentSet(Long idOfUser, String filter) {
+        Query contragentTypedQuery = entityManager.createQuery("select u.contragents from User u where u.idOfUser=:idOfUser");
+        contragentTypedQuery.setParameter("idOfUser", idOfUser);
+        List list = contragentTypedQuery.getResultList();
+        Set<Contragent> contragentSet= new HashSet<Contragent>();
+        for (Object o: list){
+            Contragent contragent = (Contragent) o;
+            if(!contragentSet.contains(contragent)){
+                contragentSet.add(contragent);
+            }
+        }
+        if(contragentSet.isEmpty()){
+            return null;
+        } else {
+            TypedQuery<ConfigurationProvider> query = entityManager.createQuery("select configurationProvider from Org where UPPER(configurationProvider.name) like '%"+filter.toUpperCase()+"%' defaultSupplier in :contragentSet",ConfigurationProvider.class);
+            query.setParameter("contragentSet", contragentSet);
+            return query.getResultList();
+        }
+    }
 }

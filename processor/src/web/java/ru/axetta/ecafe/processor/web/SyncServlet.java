@@ -101,7 +101,7 @@ public class SyncServlet extends HttpServlet {
             SyncLogger syncLogger = runtimeContext.getSyncLogger();
             if (bLogPackets) syncLogger.registerSyncRequest(requestData.document, idOfOrg, idOfSync);
             else {
-                logger.info(String.format("Synchronization with %s - type: %d - packets not logged", request.getRemoteAddr(), syncType.getValue()));
+                logger.info(String.format("Synchronization with %s - type: %s - packets not logged", request.getRemoteAddr(), syncType.toString()));
             }
 
             // Verify XML signature

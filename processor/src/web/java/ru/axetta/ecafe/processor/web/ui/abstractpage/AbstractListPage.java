@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -20,6 +21,7 @@ import java.util.List;
 public abstract class AbstractListPage<E, I extends AbstractEntityItem> extends BasicWorkspacePage {
     @PersistenceContext
     protected EntityManager entityManager;
+
     private static final int MAX_ITEMS_IN_LIST = 200;
 
     protected abstract String getPageFileName();
@@ -57,7 +59,7 @@ public abstract class AbstractListPage<E, I extends AbstractEntityItem> extends 
                 return null;
             }
         }
-        
+
         Session hiberSession = (Session) entityManager.getDelegate();
 
         Criteria crit = hiberSession.createCriteria(getEntityClass());
