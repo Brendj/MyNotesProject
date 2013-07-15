@@ -645,7 +645,30 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setExpenditureLimit(this.expenditureLimit);
         client.setFreePayMaxCount(this.freePayMaxCount);
         client.setSan(this.san);
-        client.setGuardSan(Collections.EMPTY_SET);
+        /* Добавление СНИЛС опекунов */
+        /*Set<GuardSan> guardSans = new HashSet<GuardSan>();
+        String gSanList [] = null;
+        if (guardsan.indexOf(ClientGuardSanRebuildService.DELIMETER_1) > -1) {
+            gSanList = guardsan.split(ClientGuardSanRebuildService.DELIMETER_1);
+        } else if (guardsan.indexOf(ClientGuardSanRebuildService.DELIMETER_2) > -1) {
+            gSanList = guardsan.split(ClientGuardSanRebuildService.DELIMETER_2);
+        } else {
+            gSanList = new String [] { guardsan };
+        }
+        for (String gSan : gSanList) {
+            gSan = ClientGuardSanRebuildService.clearGuardSan(gSan);
+            if (gSan.length() < 1) {
+                continue;
+            }
+            GuardSan obj = new GuardSan(client, gSan);
+            guardSans.add(obj);
+        }*/
+        /*Set <GuardSan> guardSans = client.getGuardSan();
+        guardSans.removeAll(guardSans);*/
+        ClientGuardSanRebuildService.getInstance().removeGuardSan(idOfClient);
+        Set <GuardSan> newGuardSans = ClientGuardSanRebuildService.getInstance().addGuardSan(idOfClient, guardsan);
+        /*guardSans.addAll(newGuardSans);
+        client.setGuardSan(guardSans);*/
         if (this.externalId == null || this.externalId == 0) {
             client.setExternalId(null);
         } else {
@@ -733,9 +756,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
 
         persistenceSession.update(client);
-
-        //  Добавляем опекунов
-        ClientGuardSanRebuildService.addGuardSan (client, this.guardsan, persistenceSession);
 
         fill(client);
     }

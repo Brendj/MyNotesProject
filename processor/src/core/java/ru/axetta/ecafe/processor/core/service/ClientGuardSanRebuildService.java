@@ -3,6 +3,7 @@
  */
 package ru.axetta.ecafe.processor.core.service;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.GuardSan;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -16,9 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -27,19 +26,23 @@ import java.util.Map;
  * Time: 14:07
  * To change this template use File | Settings | File Templates.
  */
+@Transactional
 @Component
 @Scope("singleton")
 public class ClientGuardSanRebuildService {
     public static final boolean DEBUG_MODE = false;
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BIDataExportService.class);
-    public static final String CLEAR_TABLE_SQL = "delete from CF_GuardSan";
-    public static final String LOAD_DATA_SQL = "select idofclient, guardsan from CF_Clients where guardsan<>'' order by idofclient";
-    public static final String INSERT_DATA_SQL = "insert CF_GuardSan (IdOfClient, GuardSan) VALUES (:idOfClient, :guardSan)";
     public static final String DELIMETER_1 = ",";
     public static final String DELIMETER_2 = ";";
 
     @PersistenceContext
     EntityManager em;
+
+
+
+    public static ClientGuardSanRebuildService getInstance() {
+        return RuntimeContext.getAppContext().getBean(ClientGuardSanRebuildService.class);
+    }
 
 
     public static final String clearGuardSan (String guardSan) {
@@ -56,20 +59,11 @@ public class ClientGuardSanRebuildService {
         Session session = (Session) em.getDelegate();
         try {
             //  Очищаем cf_client_guardsan
-            org.hibernate.Query clear = session.createSQLQuery(CLEAR_TABLE_SQL);
-            clear.executeUpdate();
+            DAOUtils.clearGuardSanTable(session);
             log("Таблица CF_Client_GuardSan очищена");
 
             //  Загружаем данные из cf_clients
-            Map<Long, String> data = new HashMap<Long, String>();
-            org.hibernate.Query select = session.createSQLQuery(LOAD_DATA_SQL);
-            List resultList = select.list();
-            for (Object entry : resultList) {
-                Object e[] = (Object[]) entry;
-                long idOfClient= ((BigInteger) e[0]).longValue();
-                String guardSan = e[1].toString ();
-                data.put(idOfClient, guardSan);
-            }
+            Map<Long, String> data = DAOUtils.getClientGuardSan_Old(session);
 
             //  Заполняем cf_client_guardsan
             for (Long idOfClient : data.keySet()) {
@@ -81,13 +75,27 @@ public class ClientGuardSanRebuildService {
     }
 
 
-    public static void addGuardSan (long idOfClient, String guardSan, Session session) throws Exception {
+    public Set<GuardSan> addGuardSan (long idOfClient, String guardSan) throws Exception {
+        Session session = (Session) em.getDelegate();
         Client cl = DAOUtils.findClient(session, idOfClient);
-        addGuardSan (cl, guardSan, session);
+        return addGuardSan (cl, guardSan, session);
     }
 
 
-    public static void addGuardSan (Client cl, String guardSan, Session session) throws Exception {
+    public Set<GuardSan> addGuardSan (Client cl, String guardSan) throws Exception {
+        return addGuardSan (cl, guardSan, (Session) em.getDelegate());
+    }
+
+
+    public Set<GuardSan> addGuardSan (long idOfClient, String guardSan, Session session) throws Exception {
+        Client cl = DAOUtils.findClient(session, idOfClient);
+        return addGuardSan (cl, guardSan, session);
+    }
+
+
+    @Transactional
+    public Set<GuardSan> addGuardSan (Client cl, String guardSan, Session session) throws Exception {
+        Set<GuardSan> result = new HashSet<GuardSan>();
         String list [] = null;
         if (guardSan.indexOf(DELIMETER_1) > -1) {
             list = guardSan.split(DELIMETER_1);
@@ -101,19 +109,36 @@ public class ClientGuardSanRebuildService {
                 if (i.length() < 1) {
                     continue;
                 }
-                GuardSan newGuardSan = new GuardSan(cl, i);
-                newGuardSan.setGuardSan(i);
-                session.save(newGuardSan);
+                try {
+                    GuardSan newGuardSan = new GuardSan(cl, i);
+                    session.save(newGuardSan);
+                    result.add(newGuardSan);
+                } catch (Exception e) {
+                    logger.error("Failed to add guard san", e);
+                }
             }
         } else {
             guardSan = clearGuardSan(guardSan);
             if (guardSan.length() < 1) {
-                return;
+                return Collections.EMPTY_SET;
             }
-            GuardSan newGuardSan = new GuardSan(cl, guardSan);
-            newGuardSan.setGuardSan(guardSan);
-            session.save(newGuardSan);
+            try {
+                GuardSan newGuardSan = new GuardSan(cl, guardSan);
+                session.save(newGuardSan);
+                result.add(newGuardSan);
+            } catch (Exception e) {
+                logger.error("Failed to add guard san", e);
+            }
         }
+    return result;
+    }
+
+
+    @Transactional
+    public void removeGuardSan (long idOfClient) throws Exception {
+        Session session = (Session) em.getDelegate();
+        Client cl = DAOUtils.findClient(session, idOfClient);
+        DAOUtils.removeGuardSan (session, cl);
     }
 
 

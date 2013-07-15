@@ -19,7 +19,7 @@
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
                      not-null="true"/>
 
-        <property name="guardSan" column="GuardSan" type="string" length="11"/>
+        <property name="guardSan" column="GuardSan" type="string" not-null="true" length="11"/>
     </class>
 </hibernate-mapping>
 

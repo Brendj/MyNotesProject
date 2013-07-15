@@ -21,6 +21,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.math.BigInteger;
@@ -1288,5 +1289,30 @@ public class DAOUtils {
         Query clientQuery = session.createQuery("select vi from Visitor vi where vi.idOfVisitor=:idOfVisitor");
         clientQuery.setParameter("idOfVisitor", idOfVisitor);
         return (Visitor) clientQuery.uniqueResult();
+    }
+
+    public static void removeGuardSan (Session session, Client client) {
+        //  Очищаем cf_client_guardsan
+        org.hibernate.Query remove = session.createSQLQuery("delete from CF_GuardSan where idofclient=:idofclient");
+        remove.setLong("idofclient", client.getIdOfClient());
+        remove.executeUpdate();
+    }
+
+    public static void clearGuardSanTable(Session session) {
+        org.hibernate.Query clear = session.createSQLQuery("delete from CF_GuardSan");
+        clear.executeUpdate();
+    }
+
+    public static Map<Long, String> getClientGuardSan_Old (Session session) {
+        Map<Long, String> data = new HashMap<Long, String>();
+        org.hibernate.Query select = session.createSQLQuery("select idofclient, guardsan from CF_Clients where guardsan<>'' order by idofclient");
+        List resultList = select.list();
+        for (Object entry : resultList) {
+            Object e[] = (Object[]) entry;
+            long idOfClient= ((BigInteger) e[0]).longValue();
+            String guardSan = e[1].toString ();
+            data.put(idOfClient, guardSan);
+        }
+        return data;
     }
 }
