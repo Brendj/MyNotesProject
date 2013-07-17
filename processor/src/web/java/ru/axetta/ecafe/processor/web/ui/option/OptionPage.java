@@ -78,6 +78,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Integer syncRegisterMaxAttempts;
     private Integer syncLimits;
     private Integer retryAfter;
+    private String syncRegisterSupportEmail;
 
     private List<BankOptionItem> banks;
 
@@ -468,6 +469,8 @@ public class OptionPage extends BasicWorkspacePage {
         syncRegisterIsTestingService = runtimeContext.getOptionValueBool(Option.OPTION_MSK_NSI_USE_TESTING_SERVICE);
         syncRegisterLogging = runtimeContext.getOptionValueBool(Option.OPTION_MSK_NSI_LOG);
         syncRegisterMaxAttempts = runtimeContext.getOptionValueInt(Option.OPTION_MSK_NSI_MAX_ATTEMPTS);
+        syncRegisterSupportEmail = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_SUPPORT_EMAIL);
+
 
         syncLimits = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS);
         retryAfter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_RETRY_AFTER);
@@ -565,6 +568,7 @@ public class OptionPage extends BasicWorkspacePage {
 
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_LIMITS, syncLimits);
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_RETRY_AFTER, retryAfter);
+            runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_SUPPORT_EMAIL, syncRegisterSupportEmail);
 
 
             runtimeContext.saveOptionValues();

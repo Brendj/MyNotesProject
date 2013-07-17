@@ -225,6 +225,8 @@
                     <h:selectBooleanCheckbox value="#{optionPage.syncRegisterLogging}" styleClass="output-text" />
                     <h:outputText escape="true" value="Количество попыток" styleClass="output-text" />
                     <h:inputText value="#{optionPage.syncRegisterMaxAttempts}" styleClass="input-text" size="5" />
+                    <h:outputText escape="true" value="Емайл для оповещений" styleClass="output-text" />
+                    <h:inputText value="#{optionPage.syncRegisterSupportEmail}" styleClass="input-text" size="100" />
                 </h:panelGrid>
             </rich:panel>
 

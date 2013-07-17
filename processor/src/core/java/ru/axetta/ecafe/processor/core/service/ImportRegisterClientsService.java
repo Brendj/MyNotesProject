@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.mail.File;
+import ru.axetta.ecafe.processor.core.mail.Postman;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
@@ -29,6 +31,7 @@ import java.net.SocketTimeoutException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -160,9 +163,16 @@ public class ImportRegisterClientsService {
         //  Проверяем количество поступивших изменений, если больще чем ограничение, то прекращаем обновление школы и
         //  отправляем уведомление на email
         if (pupils.size() > MAX_CLIENTS_PER_TRANSACTION) {
-            String msg = "Внимание! Из Реестров поступило обновление " + pupils.size() + " клиентов для " + org.getOfficialName() +
-                         ". В целях безопасности автоматическое обновление прекращено.";
-            logError(msg);
+            String text = "Внимание! Из Реестров поступило обновление " + pupils.size() + " клиентов для " + org.getOfficialName() +
+                    ". В целях безопасности автоматическое обновление прекращено.";
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            if (runtimeContext != null) {
+                String address = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_SUPPORT_EMAIL);
+                String subject = "Синхронизация с Реестрами";
+                List<File> files = new ArrayList<File>();
+                runtimeContext.getPostman().postSupportEmail(address, subject, text, files);
+            }
+            logError(text);
             return;
         }
 
