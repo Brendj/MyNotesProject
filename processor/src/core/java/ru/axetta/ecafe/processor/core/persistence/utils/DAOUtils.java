@@ -363,22 +363,24 @@ public class DAOUtils {
     }
 
 
-    public static List <Client> findClientsForOrgAndFriendly (EntityManager em, List <Org> orgs) throws Exception {
-        String orgsClause = "";
-        for (int i=0; i<orgs.size(); i++) {
+    public static List <Client> findClientsForOrgAndFriendly (EntityManager em, Org parentOrg, List <Org> friendlyOrgs) throws Exception {
+        String orgsClause = " where client.org = :org0";
+        for (int i=0; i<friendlyOrgs.size(); i++) {
             if (orgsClause.length() > 0) {
                 orgsClause += " or ";
             }
-            orgsClause += " client.org = :org" + i;
+            orgsClause += "client.org = :org" + (i + 1);
         }
 
         javax.persistence.Query query = em.createQuery(
-                "from Client client where " + orgsClause);
-        for (int i=0; i<orgs.size(); i++) {
-            query.setParameter("org" + i, orgs.get(i));
+                "from Client client " + orgsClause);
+        query.setParameter("org0", parentOrg);
+        for (int i=0; i<friendlyOrgs.size(); i++) {
+            query.setParameter("org" + (i + 1), friendlyOrgs.get(i));
         }
         if (query.getResultList().isEmpty()) return Collections.emptyList();
-        return (List <Client>)query.getResultList();
+        List <Client> cls = (List <Client>)query.getResultList();
+        return cls;
     }
 
 
@@ -391,7 +393,7 @@ public class DAOUtils {
         return (List <Client>)query.getResultList();*/
 
         List <Org> orgs = findFriendlyOrgs (em, organization);
-        return findClientsForOrgAndFriendly (em, orgs);
+        return findClientsForOrgAndFriendly (em, organization, orgs);
     }
 
     public static List<Org> findFriendlyOrgs (EntityManager em, Org organization) throws Exception {
@@ -409,10 +411,13 @@ public class DAOUtils {
 
         javax.persistence.Query query = em.createQuery("select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg");
         query.setParameter("idOfOrg", organization.getIdOfOrg());
-        if (query.getResultList().isEmpty()) return Collections.emptyList();
+        if (query.getResultList().isEmpty()) return new ArrayList<Org> ();
         List <Long> orgs = (List <Long>)query.getResultList();
         List <Org> res = new ArrayList <Org> ();
         for (Long idoforg : orgs) {
+            if (idoforg.longValue() == organization.getIdOfOrg().longValue()) {
+                continue;
+            }
             res.add(DAOService.getInstance().getOrg((Long) idoforg));
         }
         return res;

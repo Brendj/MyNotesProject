@@ -14,10 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -33,7 +31,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -45,6 +42,7 @@ import java.util.Set;
 @Component
 @Scope("singleton")
 public class ImportRegisterClientsService {
+    private static final int MAX_CLIENTS_PER_TRANSACTION = 500;
     @PersistenceContext
     EntityManager em;
 
@@ -79,7 +77,7 @@ public class ImportRegisterClientsService {
             }
             return dateFormat.parse(d);
         } catch (Exception e) {
-            logger.error("Failed to parse date from options", e);
+            logError("Failed to parse date from options", e);
         }
         return new Date(0);
     }
@@ -106,7 +104,7 @@ public class ImportRegisterClientsService {
                     break;
                 } catch (SocketTimeoutException ste) {
                 } catch (Exception e) {
-                    logger.error("Ошибка при синхронизации с Реестрами для организации: " + org.getIdOfOrg(), e);
+                    logError("Ошибка при синхронизации с Реестрами для организации: " + org.getIdOfOrg(), e);
                     break;
                 } finally {
                     attempt++;
@@ -114,7 +112,7 @@ public class ImportRegisterClientsService {
             }
             if (attempt >= maxAttempts) {
                 allOperationsAreFinished = false;
-                logger.error("Неудалось подключиться к сервису, превышено максимальное количество попыток (" + maxAttempts +")");
+                logError("Неудалось подключиться к сервису, превышено максимальное количество попыток (" + maxAttempts +")");
             }
         }
         //  Если была хотя бы одна неудачная загрузка данных с сервиса, время последный синхронизации не обновляем!
@@ -133,15 +131,15 @@ public class ImportRegisterClientsService {
         Session session = (Session) em.getDelegate();
         org = em.find(Org.class, org.getIdOfOrg());
         //  Итеративно загружаем клиентов, используя ограничения
-        List<MskNSIService.ExpandedPupilInfo> pupils = new ArrayList <MskNSIService.ExpandedPupilInfo> ();
-        List<MskNSIService.ExpandedPupilInfo> tempPupils = new ArrayList<MskNSIService.ExpandedPupilInfo>();
+        List<ExpandedPupilInfo> pupils = new ArrayList <ExpandedPupilInfo> ();
+        List<ExpandedPupilInfo> tempPupils = new ArrayList<ExpandedPupilInfo>();
         int importIteration = 1;
         while (true) {
             tempPupils.clear();
             try {
                 tempPupils = nsiService.getChangedClients(lastUpd, org, importIteration);
             } catch (Exception e) {
-                logger.error("Ошибка получения данных от Реестров для "+org.getOfficialName(), e);
+                logError("Ошибка получения данных от Реестров для "+org.getOfficialName(), e);
                 return;
             }
             //  Если клиенты найдены, значит добавляем их в общий список и выполняем следующую итерацию, иначе - завершаем импорт
@@ -153,16 +151,31 @@ public class ImportRegisterClientsService {
             importIteration++;
         }
         log(synchDate + "Всего импортировано " + pupils.size() + " за " + (importIteration) + " итераций импорта");
+        parseClients (synchDate, date, lastUpd, org, pupils);
+    }
 
+    @Transactional
+    public void parseClients (String synchDate, String date,
+            java.util.Date lastUpd, Org org, List<ExpandedPupilInfo> pupils) throws Exception {
+        //  Проверяем количество поступивших изменений, если больще чем ограничение, то прекращаем обновление школы и
+        //  отправляем уведомление на email
+        if (pupils.size() > MAX_CLIENTS_PER_TRANSACTION) {
+            String msg = "Внимание! Из Реестров поступило обновление " + pupils.size() + " клиентов для " + org.getOfficialName() +
+                         ". В целях безопасности автоматическое обновление прекращено.";
+            logError(msg);
+            return;
+        }
+
+        Session session = (Session) em.getDelegate();
         try {
 
             //  Проходим по всем существующим клиентам ОУ
             List<Client> currentClients = DAOUtils.findClientsForOrgAndFriendly (em, org);
             List<Org> orgsList = DAOUtils.findFriendlyOrgs (em, org);   //  Текущая организация и дружественные ей
-            orgsList.add(org);
+            //orgsList.add(org);
             for (Client dbClient : currentClients) {
                 boolean found = false;
-                for (MskNSIService.ExpandedPupilInfo pupil : pupils) {
+                for (ExpandedPupilInfo pupil : pupils) {
                     if (pupil.getGuid().equals(dbClient.getClientGUID())) {
                         found = true;
                         break;
@@ -187,7 +200,7 @@ public class ImportRegisterClientsService {
             }
 
             //  Проходим по ответу от Реестров и анализируем надо ли обновлять его или нет
-            for (MskNSIService.ExpandedPupilInfo pupil : pupils) {
+            for (ExpandedPupilInfo pupil : pupils) {
                 FieldProcessor.Config fieldConfig;
                 boolean updateClient = false;
                 Client cl = DAOUtils.findClientByGuid(em, emptyIfNull(pupil.getGuid()));
@@ -216,11 +229,11 @@ public class ImportRegisterClientsService {
                         break;
                     }
                 }
-                if (cl != null && !guidFound) {
+                if (cl != null && !cl.getOrg().getGuid().equals(pupil.getGuidOfOrg()) && !guidFound) {
                     Org newOrg = DAOService.getInstance().getOrgByGuid (pupil.getGuidOfOrg());
                     log(synchDate + "Клиент " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
-                            emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName()) + ", " +
-                            emptyIfNull(cl.getClientGroup().getGroupName()) + " был переведен из школы " + cl.getOrg().getIdOfOrg() + " в школу " + newOrg.getIdOfOrg());
+                        emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName()) + ", " +
+                        emptyIfNull(cl.getClientGroup().getGroupName()) + " был переведен из школы " + cl.getOrg().getIdOfOrg() + " в школу " + newOrg.getIdOfOrg());
                     cl.setOrg(newOrg);
                     updateClient = true;
                 }
@@ -244,20 +257,21 @@ public class ImportRegisterClientsService {
                                             true, session);
                         } catch (Exception e) {
                             // Не раскомментировать, очень много исключений будет из-за дублирования клиентов
+                            e.printStackTrace();
                         }
                     //  Иначе - обновляем клиента в БД
                     } else {
                         log(synchDate + "Требуется внести изменения в учетную запись существующего пользователя " +
-                                emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
-                                emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName()) + ", " +
-                                emptyIfNull(cl.getClientGroup().getGroupName()) + " на " +
-                                emptyIfNull(pupil.getGuid()) + ", " + emptyIfNull(pupil.getFamilyName()) + " " + emptyIfNull(pupil.getFirstName()) + " " +
-                                emptyIfNull(pupil.getSecondName()) + ", " + emptyIfNull(pupil.getGroup()));
+                            emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
+                            emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName()) + ", " +
+                            emptyIfNull(cl.getClientGroup().getGroupName()) + " на " +
+                            emptyIfNull(pupil.getGuid()) + ", " + emptyIfNull(pupil.getFamilyName()) + " " + emptyIfNull(pupil.getFirstName()) + " " +
+                            emptyIfNull(pupil.getSecondName()) + ", " + emptyIfNull(pupil.getGroup()));
                         ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) fieldConfig, org,
                                 String.format(MskNSIService.COMMENT_AUTO_MODIFY, date), cl, session);
                     }
                 } catch (Exception e) {
-                    logger.error("Failed to add client for " + org.getIdOfOrg() + " org", e);
+                    logError("Failed to add client for " + org.getIdOfOrg() + " org", e);
                 }
             }
         } finally {
@@ -265,7 +279,7 @@ public class ImportRegisterClientsService {
         log(synchDate + "Синхронизация завершена для " + org.getOfficialName());
     }
 
-    public boolean doClientUpdate (FieldProcessor.Config fieldConfig, Object fieldID,
+    public static boolean doClientUpdate (FieldProcessor.Config fieldConfig, Object fieldID,
                                   String reesterValue, String currentValue, boolean doClientUpdate) throws Exception {
         reesterValue = emptyIfNull(reesterValue);
         currentValue = emptyIfNull(currentValue);
@@ -273,7 +287,7 @@ public class ImportRegisterClientsService {
         return doClientUpdate || !currentValue.trim().equals(reesterValue.trim());
     }
 
-    private String emptyIfNull(String str) {
+    private static String emptyIfNull(String str) {
         return str == null ? "" : str;
     }
 
@@ -313,9 +327,87 @@ public class ImportRegisterClientsService {
     } */
 
 
-    private void log (String str) {
+    private static void log (String str) {
         if (RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_MSK_NSI_LOG)) {
             logger.info(str);
+        }
+    }
+
+    private static void logError (String str) {
+        logError(str);
+    }
+
+    private static void logError (String str, Exception e) {
+        if (e != null) {
+            logger.error(str, e);
+        } else {
+            logger.error(str);
+        }
+    }
+
+    public static class PupilInfo {
+
+        public String familyName, firstName, secondName, guid, group;
+        public String birthDate;
+
+        public String getFamilyName() {
+            return familyName;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public String getSecondName() {
+            return secondName;
+        }
+
+        public String getGuid() {
+            return guid;
+        }
+
+        public String getGroup() {
+            return group;
+        }
+
+        public String getBirthDate() {
+            return birthDate;
+        }
+
+        public void setBirthDate(String birthDate) {
+            this.birthDate = birthDate;
+        }
+
+        public void copyFrom(PupilInfo pi) {
+            this.birthDate = pi.birthDate;
+            this.firstName = pi.firstName;
+            this.secondName = pi.secondName;
+            this.familyName = pi.familyName;
+            this.guid = pi.guid;
+            this.group = pi.group;
+        }
+    }
+
+    public static class ExpandedPupilInfo extends PupilInfo {
+
+        public boolean deleted;
+        public boolean created;
+        public String guidOfOrg;
+
+        public boolean isDeleted() {
+            return deleted;
+        }
+
+        public boolean isCreated() {
+            return created;
+        }
+
+        public String getGuidOfOrg() {
+            return guidOfOrg;
+        }
+
+        public void setGuidOfOrg(String guidOfOrg) {
+            this.guidOfOrg = guidOfOrg;
         }
     }
 }

@@ -17,11 +17,12 @@ import generated.nsiws.rev110801.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+/*import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;*/
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -89,73 +90,6 @@ public class MskNSIService {
         }
     }
 
-    public static class PupilInfo {
-
-        public String familyName, firstName, secondName, guid, group;
-        public String birthDate;
-
-        public String getFamilyName() {
-            return familyName;
-        }
-
-        public String getFirstName() {
-            return firstName;
-        }
-
-        public String getSecondName() {
-            return secondName;
-        }
-
-        public String getGuid() {
-            return guid;
-        }
-
-        public String getGroup() {
-            return group;
-        }
-
-        public String getBirthDate() {
-            return birthDate;
-        }
-
-        public void setBirthDate(String birthDate) {
-            this.birthDate = birthDate;
-        }
-
-        public void copyFrom(PupilInfo pi) {
-            this.birthDate = pi.birthDate;
-            this.firstName = pi.firstName;
-            this.secondName = pi.secondName;
-            this.familyName = pi.familyName;
-            this.guid = pi.guid;
-            this.group = pi.group;
-        }
-    }
-
-
-    public static class ExpandedPupilInfo extends PupilInfo {
-
-        public boolean deleted;
-        public boolean created;
-        public String guidOfOrg;
-
-        public boolean isDeleted() {
-            return deleted;
-        }
-
-        public boolean isCreated() {
-            return created;
-        }
-
-        public String getGuidOfOrg() {
-            return guidOfOrg;
-        }
-
-        public void setGuidOfOrg(String guidOfOrg) {
-            this.guidOfOrg = guidOfOrg;
-        }
-    }
-
 
     NSIServiceService nsiServicePort;
     NSIService nsiService;
@@ -188,9 +122,9 @@ public class MskNSIService {
         setTimeouts (provider, new Long (60000), new Long (180000));
         //provider.getRequestContext().put("jaxb-validation-event-handle", null);
         Client client = ClientProxy.getClient(nsiService);
-        HTTPConduit conduit = (HTTPConduit)client.getConduit();
+        /*HTTPConduit conduit = (HTTPConduit)client.getConduit();
         HTTPClientPolicy policy = conduit.getClient();
-        policy.setReceiveTimeout(60*10*1000);
+        policy.setReceiveTimeout(60*10*1000);*/
 
         OrgExternalType recipient = new OrgExternalType();
         recipient.setName("NSI");
@@ -279,11 +213,11 @@ public class MskNSIService {
         return group;
     }
 
-    public List<PupilInfo> getPupilsByOrgGUID(String orgGuid, String familyName, Long updateTime) throws Exception {
-        List<PupilInfo> pupils = new ArrayList<PupilInfo>();
+    public List<ImportRegisterClientsService.PupilInfo> getPupilsByOrgGUID(String orgGuid, String familyName, Long updateTime) throws Exception {
+        List<ImportRegisterClientsService.PupilInfo> pupils = new ArrayList<ImportRegisterClientsService.PupilInfo>();
         int importIteration = 1;
         while (true) {
-            List<PupilInfo> iterationPupils = null;
+            List<ImportRegisterClientsService.PupilInfo> iterationPupils = null;
             try {
                 iterationPupils = getPupilsByOrgGUID(orgGuid, familyName, updateTime, importIteration);
             } catch (Exception e) {
@@ -299,7 +233,7 @@ public class MskNSIService {
         return pupils;
     }
 
-    public List<PupilInfo> getPupilsByOrgGUID(String orgGuid, String familyName, Long updateTime, int iteration) throws Exception {
+    public List<ImportRegisterClientsService.PupilInfo> getPupilsByOrgGUID(String orgGuid, String familyName, Long updateTime, int iteration) throws Exception {
         String tbl = getNSIWorkTable ();
         String select = "select item['" + tbl + "/Фамилия'], "
         + "item['" + tbl + "/Имя'], item['" + tbl + "/Отчество'], "
@@ -316,9 +250,9 @@ public class MskNSIService {
             select += " and  item['" + tbl + "/Дата изменения (число)']  &gt; " + (updateTime / 1000);
         }
         List<QueryResult> queryResults = executeQuery(select, iteration);
-        LinkedList<PupilInfo> list = new LinkedList<PupilInfo>();
+        LinkedList<ImportRegisterClientsService.PupilInfo> list = new LinkedList<ImportRegisterClientsService.PupilInfo>();
         for (QueryResult qr : queryResults) {
-            PupilInfo pupilInfo = new PupilInfo();
+            ImportRegisterClientsService.PupilInfo pupilInfo = new ImportRegisterClientsService.PupilInfo();
             pupilInfo.familyName = qr.getQrValue().get(0);
             pupilInfo.firstName = qr.getQrValue().get(1);
             pupilInfo.secondName = qr.getQrValue().get(2);
@@ -338,7 +272,7 @@ public class MskNSIService {
     }
 
 
-    public List<ExpandedPupilInfo> getChangedClients(java.util.Date date, Org org, int importIteration) throws Exception {
+    public List<ImportRegisterClientsService.ExpandedPupilInfo> getChangedClients(java.util.Date date, Org org, int importIteration) throws Exception {
         /*
         От Козлова
         */
@@ -360,9 +294,9 @@ public class MskNSIService {
         "item['" + tbl + "/GUID образовательного учреждения'] like '" + org.getGuid() + "'";
 
         List<QueryResult> queryResults = executeQuery(query, importIteration);
-        LinkedList<ExpandedPupilInfo> list = new LinkedList<ExpandedPupilInfo>();
+        LinkedList<ImportRegisterClientsService.ExpandedPupilInfo> list = new LinkedList<ImportRegisterClientsService.ExpandedPupilInfo>();
         for (QueryResult qr : queryResults) {
-            ExpandedPupilInfo pupilInfo = new ExpandedPupilInfo();
+            ImportRegisterClientsService.ExpandedPupilInfo pupilInfo = new ImportRegisterClientsService.ExpandedPupilInfo();
             pupilInfo.familyName = qr.getQrValue().get(0);
             pupilInfo.firstName = qr.getQrValue().get(1);
             pupilInfo.secondName = qr.getQrValue().get(2);

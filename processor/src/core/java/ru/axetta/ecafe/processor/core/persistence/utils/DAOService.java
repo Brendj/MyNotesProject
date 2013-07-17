@@ -1418,4 +1418,22 @@ public class DAOService {
         query.setParameter("lastUpdate",new Date());
         return query.executeUpdate()!=0;
     }
+
+
+    @Transactional
+    public List<Client> getClientsByOrgId (long idOfOrg) {
+        TypedQuery<Client> query = entityManager.createQuery("from Client where IdOfOrg=:idoforg", Client.class);
+        query.setParameter("idoforg",idOfOrg);
+        List <Client> clients = query.getResultList();
+        for (Client cl : clients) {
+            try {
+                cl.getPerson().getFirstName();
+                cl.getOrg().getOfficialName();
+                cl.getClientGroup().getGroupName();
+            } catch (Exception e) {
+
+            }
+        }
+        return clients;
+    }
 }

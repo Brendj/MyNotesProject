@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
@@ -85,12 +86,12 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
         }
     }
 
-    public static class Item extends MskNSIService.PupilInfo {
+    public static class Item extends ImportRegisterClientsService.PupilInfo {
         boolean toAdd, toBind;
         Long idOfClient, idOfClientForBind;
         String findByFIOResult;
 
-        public Item(MskNSIService.PupilInfo pi) {
+        public Item(ImportRegisterClientsService.PupilInfo pi) {
             this.copyFrom(pi);
         }
 
@@ -150,8 +151,8 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
             }
             pupilInfos = new LinkedList<Item>();
             int nItemsNotFound=0;
-            List<MskNSIService.PupilInfo> pis = nsiService.getPupilsByOrgGUID(org.getGuid(), familyName, null);
-            for (MskNSIService.PupilInfo pi : pis) {
+            List<ImportRegisterClientsService.PupilInfo> pis = nsiService.getPupilsByOrgGUID(org.getGuid(), familyName, null);
+            for (ImportRegisterClientsService.PupilInfo pi : pis) {
                 Item i = new Item(pi);
                 i.idOfClient = DAOUtils.getClientIdByGuid(em, i.guid);
                 if (i.idOfClient==null) nItemsNotFound++;

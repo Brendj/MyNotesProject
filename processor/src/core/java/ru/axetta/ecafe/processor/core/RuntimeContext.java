@@ -86,8 +86,13 @@ import java.util.concurrent.TimeUnit;
 @Scope("singleton")
 public class RuntimeContext implements ApplicationContextAware {
 
+
     public static FinancialOpsManager getFinancialOpsManager() {
         return getAppContext().getBean(FinancialOpsManager.class);
+    }
+
+    public static boolean isTestRunning() {
+        return getAppContext().containsBean("TEST");
     }
 
     public static class NotInitializedException extends RuntimeException {
@@ -393,19 +398,27 @@ public class RuntimeContext implements ApplicationContextAware {
                     else if (role.equalsIgnoreCase("processor")) roleNode = NODE_ROLE_PROCESSOR;
                     else throw new Exception("Unknown node role: "+role+" (valid: main, processor)");
                     logger.info("CLUSTER NODE ROLE: "+role+"; NAME: "+nodeName);
-                } catch (Exception e) {
+                } catch (FileNotFoundException x) {
+                    nodeName = "UNKNOWN";
+                    roleNode = NODE_ROLE_PROCESSOR;
+                }
+                catch (Exception e) {
                     logger.error("Failed to load node info", e);
                     throw e;
                 }
             }
 
-            executorService = createExecutorService(properties);
-            this.executorService = executorService;
+            if (!isTestRunning()) {
 
-            scheduler = createScheduler(properties);
-            this.scheduler = scheduler;
+                executorService = createExecutorService(properties);
+                this.executorService = executorService;
 
-            postman = createPostman(properties, sessionFactory);
+                scheduler = createScheduler(properties);
+                this.scheduler = scheduler;
+
+                postman = createPostman(properties, sessionFactory);
+            }
+
 
             ruleProcessor = createRuleHandler(properties, sessionFactory, postman, postman);
             this.autoReportProcessor = ruleProcessor;
@@ -479,7 +492,9 @@ public class RuntimeContext implements ApplicationContextAware {
             }
 
             //
-            initWSCrypto();
+            if (!isTestRunning()) {
+                initWSCrypto();
+            }
         } catch (Exception e) {
             destroy(executorService, scheduler);
             throw e;
@@ -514,7 +529,8 @@ public class RuntimeContext implements ApplicationContextAware {
     public void initDB() throws Exception {
         // Configure runtime context
         try {
-            //persistenceSession = sessionFactory.openSession();
+
+                //persistenceSession = sessionFactory.openSession();
             //persistenceTransaction = persistenceSession.beginTransaction();
             // check DB version
             currentSchemaVersionInfo = getAppContext().getBean(DBUpdater.class).checkDbVersion();
@@ -618,6 +634,7 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     private Properties loadConfig() throws Exception {
+
         Transaction persistenceTransaction = null;
         try {
             Session persistenceSession = sessionFactory.openSession();

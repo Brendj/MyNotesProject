@@ -17,7 +17,7 @@ CREATE TABLE cf_cards_temp (
   CustomerType int not null default 0,     --! Признак карты посетителя , bit, 1- карта посетителя, 0 — карта клиента, not null
   CardNo bigint NOT NULL,                --! номер карты
   CardPrintedNo character varying(24),   --! номер нанесенный на карту
-  CardStation int not null default 0,    --! int16 или int8, not null, значения:  0 — свободна, 1 — выдана , 3 — заблокирована (? не уверен, что блокировка нужна)
+  CardStation int not null default 0,    --! int16 или int8, not null, значения-  0 — свободна, 1 — выдана , 3 — заблокирована (? не уверен, что блокировка нужна)
   CreateDate bigint not null,             --! Дата и время регистрации карты
   ValidDate bigint,                      --! Дата завершения действия карты
   CONSTRAINT cf_cards_temp_pk PRIMARY KEY (IdOfCartTemp),
@@ -32,7 +32,7 @@ CREATE TABLE cf_card_temp_operations(
   IdOfCartTemp bigint not null,               --! внешний ключ или на физ. идентификатор временной карты или на первичный ключ соотв. записи из TempCards
   IdOfClient bigint,                          --! Идентификатор клиента
   IdOfVisitor bigint,                         --! Идентификатор посетителя
-  OperationType int not null,                 --! Тип операции: int16 или int8, not null, значения:  0 — регистрация, 1 — выдача ,2 – возврат, 3 — блокировка
+  OperationType int not null,                 --! Тип операции- int16 или int8, not null, значения-  0 — регистрация, 1 — выдача ,2 – возврат, 3 — блокировка
   OperationDate bigint not null,              --! Дата и время операции
   CONSTRAINT cf_card_temp_operations_pk PRIMARY KEY (IdOfCardTempOperation),
   CONSTRAINT cf_card_temp_operations_organization FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg),
