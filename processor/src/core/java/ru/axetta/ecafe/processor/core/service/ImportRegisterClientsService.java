@@ -163,7 +163,7 @@ public class ImportRegisterClientsService {
         //  Проверяем количество поступивших изменений, если больще чем ограничение, то прекращаем обновление школы и
         //  отправляем уведомление на email
         if (pupils.size() > MAX_CLIENTS_PER_TRANSACTION) {
-            String text = "Внимание! Из Реестров поступило обновление " + pupils.size() + " клиентов для " + org.getOfficialName() + " {" org.getIdOfOrg() + "}". В целях безопасности автоматическое обновление прекращено.";
+            String text = "Внимание! Из Реестров поступило обновление " + pupils.size() + " клиентов для " + org.getOfficialName() + " {" org.getIdOfOrg() + "}. В целях безопасности автоматическое обновление прекращено.";
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             if (runtimeContext != null) {
                 String address = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_SUPPORT_EMAIL);
