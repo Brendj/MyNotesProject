@@ -1436,4 +1436,10 @@ public class DAOService {
         }
         return clients;
     }
+
+    public void applyFullSyncOperationByOrgList(List<Long> idOfOrgList) throws Exception{
+        Query query = entityManager.createQuery("update Org set fullSyncParam=1 where idOfOrg in :idOfOrgList");
+        query.setParameter("idOfOrgList", idOfOrgList);
+        query.executeUpdate();
+    }
 }
