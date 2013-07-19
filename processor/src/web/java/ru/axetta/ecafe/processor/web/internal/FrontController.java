@@ -214,17 +214,38 @@ public class FrontController extends HttpServlet {
                 throw new FrontControllerException("Неверное значение даты окончания действия карты");
             }
 
-            Person person = new Person(visitorItem.getFirstName(), visitorItem.getSurname(), visitorItem.getSecondName());
-            persistenceSession.save(person);
-            Visitor visitor = new Visitor(person);
-            visitor.setPassportNumber(visitorItem.getPassportNumber());
-            visitor.setPassportDate(visitorItem.getPassportDate());
-            visitor.setDriverLicenceNumber(visitorItem.getDriverLicenceNumber());
-            visitor.setDriverLicenceDate(visitorItem.getDriverLicenceDate());
-            visitor.setWarTicketNumber(visitorItem.getWarTicketNumber());
-            visitor.setWarTicketDate(visitorItem.getWarTicketDate());
-            persistenceSession.save(visitor);
-            idOfVisitor = visitor.getIdOfVisitor();
+            if(visitorItem.getIdOfVisitor()==null){
+                Person person = new Person(visitorItem.getFirstName(), visitorItem.getSurname(), visitorItem.getSecondName());
+                persistenceSession.save(person);
+                Visitor visitor = new Visitor(person);
+                visitor.setPassportNumber(visitorItem.getPassportNumber());
+                visitor.setPassportDate(visitorItem.getPassportDate());
+                visitor.setDriverLicenceNumber(visitorItem.getDriverLicenceNumber());
+                visitor.setDriverLicenceDate(visitorItem.getDriverLicenceDate());
+                visitor.setWarTicketNumber(visitorItem.getWarTicketNumber());
+                visitor.setWarTicketDate(visitorItem.getWarTicketDate());
+                persistenceSession.save(visitor);
+                idOfVisitor = visitor.getIdOfVisitor();
+            } else {
+                Visitor visitor = DAOUtils.findVisitorById(persistenceSession,visitorItem.getIdOfVisitor());
+                if(visitor==null){
+                    throw new FrontControllerException("Посетитель не найден");
+                } else {
+                    Person person = visitor.getPerson();
+                    person.setFirstName(visitorItem.getFirstName());
+                    person.setSecondName(visitorItem.getSecondName());
+                    person.setSurname(visitorItem.getSurname());
+                    persistenceSession.save(person);
+                    visitor.setPassportNumber(visitorItem.getPassportNumber());
+                    visitor.setPassportDate(visitorItem.getPassportDate());
+                    visitor.setDriverLicenceNumber(visitorItem.getDriverLicenceNumber());
+                    visitor.setDriverLicenceDate(visitorItem.getDriverLicenceDate());
+                    visitor.setWarTicketNumber(visitorItem.getWarTicketNumber());
+                    visitor.setWarTicketDate(visitorItem.getWarTicketDate());
+                    persistenceSession.save(visitor);
+                    idOfVisitor = visitor.getIdOfVisitor();
+                }
+            }
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
