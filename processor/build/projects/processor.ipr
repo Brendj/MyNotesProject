@@ -757,6 +757,17 @@
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/ccaccount_csv_list.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/addpayment_csv_list.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/client_org_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/settlement_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/all_complex_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/enter_event_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/pay_complex_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/free_complex_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/currentposition_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/card_load_result_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/menu_load_result_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/client_load_result_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/client_update_load_result_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/client-room/mos/uec.jsp" />
   </component>
   <component name="FacetAutodetectingManager">
     <autodetection-disabled>
