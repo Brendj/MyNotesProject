@@ -1320,4 +1320,31 @@ public class DAOUtils {
         }
         return data;
     }
+
+
+    // TODO: воспользоваться диклоративными пособами генерации запроса и на выходи получать только TempCardOperationItem
+    public static CardTempOperation getLastTempCardOperationByOrgAndCartNo(Session session, Long idOfOrg,Long cardNo) {
+        Query query = session.createQuery("select operation from CardTempOperation operation left join operation.cardTemp card  where operation.org.idOfOrg=:idOfOrg and card.cardNo=:cardNo order by operation.operationDate desc");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("cardNo",cardNo);
+        List list = query.list();
+        if(list==null || list.isEmpty()){
+            return null;
+        }else {
+            return (CardTempOperation) list.get(0);
+        }
+    }
+
+    public static Visitor findVisitorById(Session session, Long idOfVisitor) {
+        Criteria criteria = session.createCriteria(Visitor.class);
+        criteria.add(Restrictions.eq("idOfVisitor",idOfVisitor));
+        return (Visitor) criteria.uniqueResult();
+    }
+
+    public static CardTemp findCardTempByVisitorAndCardNo(Session session, Visitor visitor, Long cardNo) {
+        Criteria criteria = session.createCriteria(CardTemp.class);
+        criteria.add(Restrictions.eq("visitor",visitor));
+        criteria.add(Restrictions.eq("cardNo",cardNo));
+        return (CardTemp) criteria.uniqueResult();
+    }
 }
