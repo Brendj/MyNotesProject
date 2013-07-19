@@ -1691,11 +1691,10 @@
         <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.transaction-3.0.5.RELEASE.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.web-3.0.5.RELEASE.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.web.servlet-3.0.5.RELEASE.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.test-3.1.1.RELEASE.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES>
-        <root url="jar://D:/lib/spring-framework-3.1.1.RELEASE-with-docs/src/org.springframework.orm-3.0.5.RELEASE-sources.jar!/" />
-      </SOURCES>
+      <SOURCES />
     </library>
   </component>
 </project>

@@ -32,7 +32,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="hibernate-4.0.1" level="project" />
     <orderEntry type="library" name="spring305" level="project" />
-    <orderEntry type="module" module-name="core" />
     <orderEntry type="library" name="commons" level="project" />
     <orderEntry type="library" name="org.aopalliance:com.springsource.org.aopalliance:1.0.0" level="project" />
     <orderEntry type="library" name="postgresql-9.1-901.jdbc4" level="project" />
@@ -47,6 +46,7 @@
     <orderEntry type="library" name="guava" level="project" />
     <orderEntry type="library" name="jasperlib" level="project" />
     <orderEntry type="library" name="javamelody-monitoring" level="project" />
+    <orderEntry type="module" module-name="core" />
   </component>
 </module>
 

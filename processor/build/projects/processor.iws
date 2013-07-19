@@ -20,17 +20,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/OrgClientSettingsPage.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/internal/front/items/TempCardOperationItem.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/org/settings.jsp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/CardTemp.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/CardTemp.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/internal/FrontController.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/internal/FrontController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/OrgListSelectPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/OrgListSelectPage.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Visitor.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Visitor.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Option.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Option.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/testmodule/datatest/datatest.iml" afterPath="$PROJECT_DIR$/../../src/testmodule/datatest/datatest.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.ipr" afterPath="$PROJECT_DIR$/processor.ipr" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.iws" afterPath="$PROJECT_DIR$/processor.iws" />
     </list>
@@ -1622,6 +1613,11 @@
     <file path="/OrgClientSettingsPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374226769345" ignored="false" />
     <file path="/DistributionRulesPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374222683431" ignored="false" />
     <file path="/EnterEventReportPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374223097763" ignored="false" />
+    <file path="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/partner/nsi/MskNSIService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374227889191" ignored="false" />
+    <file path="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/updater/DBUpdater.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374227889191" ignored="false" />
+    <file path="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/client/ClientEditPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374227889191" ignored="false" />
+    <file path="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/service/msk/PupilCatalogFindPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374227889191" ignored="false" />
+    <file path="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/service/ClientGuardSanRebuildService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374227889191" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -1770,10 +1766,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DAOUtils.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="DAOUtils.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="1348" column="5" selection-start="69181" selection-end="69181" vertical-scroll-proportion="1.544">
+            <state line="1323" column="49" selection-start="67817" selection-end="67817" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#27344#27374#0" expanded="true" />
@@ -1796,10 +1792,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="QuestionaryLoadPage.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/questionaries/questionary/QuestionaryLoadPage.java">
+      <file leaf-file-name="OptionPage.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/OptionPage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="90" column="6" selection-start="3276" selection-end="3380" vertical-scroll-proportion="0.0">
+            <state line="475" column="92" selection-start="16055" selection-end="16086" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Option.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Option.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="105" column="50" selection-start="4030" selection-end="4030" vertical-scroll-proportion="0.5116279">
               <folding />
             </state>
           </provider>
@@ -1831,22 +1836,6 @@
             <state line="187" column="10" selection-start="5841" selection-end="5841" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="e#6162#6192#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="option.jsp" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/option.jsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="240" column="28" selection-start="15089" selection-end="15861" vertical-scroll-proportion="-21.0">
-              <folding>
-                <element signature="tag#rich:tab#0;tag#rich:tabPanel#0;tag#h:panelGrid#0;tag#jsp:root#0" expanded="false" />
-                <marker date="1373528598133" expanded="true" signature="5345:5358" placeholder="{...}" />
-                <marker date="1373528598133" expanded="true" signature="6953:6966" placeholder="{...}" />
-                <marker date="1373528598133" expanded="true" signature="7215:7232" placeholder="{...}" />
-                <marker date="1373528598133" expanded="true" signature="7624:7634" placeholder="{...}" />
-                <marker date="1373528598133" expanded="true" signature="18254:18270" placeholder="{...}" />
               </folding>
             </state>
           </provider>
@@ -1917,7 +1906,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/CardTemp.java" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" />
         <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/internal/front/items/TempCardOperationItem.java" />
@@ -1933,6 +1921,7 @@
         <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Option.java" />
       </list>
     </option>
   </component>
@@ -2820,14 +2809,14 @@
     <property name="JdbcConsole.Extract.ClosingQuote" value="'" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.includeInheritedMembers" value="false" />
-    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.last.edited" value="Libraries" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit4" />
     <property name="OverrideImplement.combined" value="true" />
     <property name="project.structure.proportion" value="0.09832842" />
     <property name="Repository.Attach.JavaDocs" value="false" />
     <property name="Persistence.ERD.MergeEmbedded" value="false" />
     <property name="GenerateAntBuildDialog.generateSingleFile" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../lib/jbossJ2EE/jboss-transaction-api_1.1_spec-1.0.0.Final.jar!/" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../lib/spring305/org.springframework.test-3.1.1.RELEASE.jar!/" />
     <property name="GenerateAntBuildDialog.inclineRuntiemClasspath" value="false" />
     <property name="JdbcConsole.OpenEditorOnStart" value="false" />
     <property name="JdbcConsole.ResultInNewTab" value="true" />
@@ -4199,7 +4188,7 @@
     <frame x="-8" y="-8" width="1696" height="1066" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.38257992" sideWeight="0.32986537" order="30" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38257992" sideWeight="0.32986537" order="30" side_tool="false" content_ui="tabs" />
       <window_info id="JavaEE:App" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2613219" sideWeight="0.1565601" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.18467109" sideWeight="0.24696803" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24934725" sideWeight="0.76529163" order="0" side_tool="false" content_ui="tabs" />
@@ -4212,14 +4201,14 @@
       <window_info id="CDI" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32986537" sideWeight="0.98039216" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32083791" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32855567" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23133415" sideWeight="0.6174201" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23133415" sideWeight="0.74310917" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32855567" sideWeight="0.4853121" order="32" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32986537" sideWeight="0.70893055" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38919514" sideWeight="0.49786097" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32194045" sideWeight="0.57711136" order="31" side_tool="false" content_ui="tabs" x="100" y="294" width="710" height="371" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21052632" sideWeight="0.30334488" order="5" side_tool="true" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25799337" sideWeight="0.57037944" order="27" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25689086" sideWeight="0.57037944" order="27" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21604279" sideWeight="0.27534685" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22276622" sideWeight="0.7574421" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32864138" sideWeight="0.7794457" order="12" side_tool="false" content_ui="tabs" />
@@ -4458,55 +4447,6 @@
     </option>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/OnlineReportPage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="114" selection-start="710" selection-end="747" vertical-scroll-proportion="0.11751152">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/EnterEventReportPage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="59" selection-start="425" selection-end="425" vertical-scroll-proportion="0.2508513">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="104" column="10" selection-start="4895" selection-end="4895" vertical-scroll-proportion="0.5092166">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/AggregateGoodRequestReportPage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="16" column="13" selection-start="597" selection-end="597" vertical-scroll-proportion="0.11577752">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/option.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="240" column="28" selection-start="15089" selection-end="15861" vertical-scroll-proportion="-21.0">
-          <folding>
-            <element signature="tag#rich:tab#0;tag#rich:tabPanel#0;tag#h:panelGrid#0;tag#jsp:root#0" expanded="false" />
-            <marker date="1373528598133" expanded="true" signature="5345:5358" placeholder="{...}" />
-            <marker date="1373528598133" expanded="true" signature="6953:6966" placeholder="{...}" />
-            <marker date="1373528598133" expanded="true" signature="7215:7232" placeholder="{...}" />
-            <marker date="1373528598133" expanded="true" signature="7624:7634" placeholder="{...}" />
-            <marker date="1373528598133" expanded="true" signature="18254:18270" placeholder="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/questionaries/questionary/QuestionaryLoadPage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="90" column="6" selection-start="3276" selection-end="3380" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/questions_load.jsp">
       <provider selected="true" editor-type-id="text-editor">
         <state line="27" column="71" selection-start="1259" selection-end="1259" vertical-scroll-proportion="-10.0">
@@ -4604,9 +4544,39 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/test/ru/axetta/ecafe/processor/core/test/synch/JUnit4ClassRunner.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="26" selection-start="626" selection-end="626" vertical-scroll-proportion="0.4338118">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/test/META-INF/context.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/service/ImportRegisterClientsService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="397" column="24" selection-start="18573" selection-end="18573" vertical-scroll-proportion="4.2361565">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/test/ru/axetta/ecafe/processor/core/test/synch/RegisterSynchTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="37" column="34" selection-start="1371" selection-end="1371" vertical-scroll-proportion="-1.1850079">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1348" column="5" selection-start="69181" selection-end="69181" vertical-scroll-proportion="1.544">
+        <state line="1323" column="49" selection-start="67817" selection-end="67817" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#27344#27374#0" expanded="true" />
@@ -4625,6 +4595,20 @@
             <element signature="e#59656#59686#0" expanded="true" />
             <element signature="e#67334#67348#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/OptionPage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="475" column="92" selection-start="16055" selection-end="16086" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Option.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="105" column="50" selection-start="4030" selection-end="4030" vertical-scroll-proportion="0.5116279">
+          <folding />
         </state>
       </provider>
     </entry>
@@ -4688,7 +4672,7 @@
       </state>
       <state key="ModuleStructureConfigurable.UI">
         <settings>
-          <last-edited>core</last-edited>
+          <last-edited>datatest</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -4700,7 +4684,7 @@
       </state>
       <state key="ProjectLibrariesConfigurable.UI">
         <settings>
-          <last-edited>javamelody-monitoring</last-edited>
+          <last-edited>spring305</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
