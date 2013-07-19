@@ -139,6 +139,10 @@
                 <rich:spacer width="20px" />
                 <a4j:commandButton value="Зарегистрировать" action="#{pupilCatalogFindPage.registerClients}"
                                    reRender="workspaceTogglePanel" styleClass="command-button" />
+                <rich:spacer width="20px" />
+
+                <h:commandLink value="Сравнение в файл CSV" style="color: #0000ff;" action="#{pupilCatalogFindPage.buildComparisonCSVFile}"
+                               styleClass="command-button"/>
             </h:panelGroup>
         </f:facet>
 
