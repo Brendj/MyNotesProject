@@ -768,6 +768,7 @@
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/client_load_result_csv_list.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/client_update_load_result_csv_list.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/client-room/mos/uec.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/settings.jsp" />
   </component>
   <component name="FacetAutodetectingManager">
     <autodetection-disabled>

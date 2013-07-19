@@ -26,9 +26,11 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/CardTemp.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/CardTemp.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/internal/FrontController.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/internal/FrontController.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/OrgListSelectPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/OrgListSelectPage.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Visitor.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Visitor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.ipr" afterPath="$PROJECT_DIR$/processor.ipr" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.iws" afterPath="$PROJECT_DIR$/processor.iws" />
     </list>
@@ -43,7 +45,7 @@
     <ignored path="$USER_HOME$/.grails/" />
     <file path="/InternalIncomingDocument.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1364208076131" ignored="false" />
     <file path="/TransactionTest.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355830368186" ignored="false" />
-    <file path="/main_menu.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1373614616248" ignored="false" />
+    <file path="/main_menu.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374227220590" ignored="false" />
     <file path="/CommodityAccountingGroupPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1356006147159" ignored="false" />
     <file path="/fragment.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1373977159121" ignored="false" />
     <file path="/ActOfInventarizationListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355842278615" ignored="false" />
@@ -97,7 +99,7 @@
     <file path="/contragent_completion_report.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361458581379" ignored="false" />
     <file path="/ContragentDAOService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1360674228069" ignored="false" />
     <file path="/ContragentPayItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1358944713712" ignored="false" />
-    <file path="/DAOService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1373629862497" ignored="false" />
+    <file path="/DAOService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374227668472" ignored="false" />
     <file path="/OrgItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1358954809735" ignored="false" />
     <file path="/view.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369645088428" ignored="false" />
     <file path="/LoadPaymentsService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1359015695136" ignored="false" />
@@ -1075,7 +1077,7 @@
     <file path="/OrgFilter.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366627373741" ignored="false" />
     <file path="/OrgListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366627902882" ignored="false" />
     <file path="/OrgSelectPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366628272902" ignored="false" />
-    <file path="/OrgListSelectPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366629085373" ignored="false" />
+    <file path="/OrgListSelectPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374226271229" ignored="false" />
     <file path="/OrgShortItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366628859875" ignored="false" />
     <file path="/QuestionaryDAOService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366791968228" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../../../updater/2013/04/update-server-08/src/core/java/ru/axetta/updater/core/loader/AppVerInfo.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1370353601569" ignored="false" />
@@ -1616,8 +1618,8 @@
     <file path="$PROJECT_DIR$/../../../../../../updater/2013/06/update-server-10/src/newweb/java/ru/axetta/updater/web/pages/events/SortField.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1373977255435" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../../../updater/2013/06/update-server-10/src/core/java/ru/axetta/updater/core/services/items/InstallationSummary.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374050523638" ignored="false" />
     <file path="/InstallationSummary.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374050507683" ignored="false" />
-    <file path="/settings.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374222539517" ignored="false" />
-    <file path="/OrgClientSettingsPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374223052525" ignored="false" />
+    <file path="/settings.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374227099685" ignored="false" />
+    <file path="/OrgClientSettingsPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374226769345" ignored="false" />
     <file path="/DistributionRulesPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374222683431" ignored="false" />
     <file path="/EnterEventReportPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374223097763" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -1715,8 +1717,23 @@
       <file leaf-file-name="settings.jsp" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/settings.jsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="19" column="107" selection-start="737" selection-end="758" vertical-scroll-proportion="-12.423077">
-              <folding />
+            <state line="24" column="108" selection-start="1041" selection-end="1041" vertical-scroll-proportion="-11.769231">
+              <folding>
+                <marker date="1374227241663" expanded="true" signature="436:448" placeholder="{...}" />
+                <marker date="1374227241663" expanded="true" signature="1751:1763" placeholder="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="main_menu.jsp" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="137" column="88" selection-start="10582" selection-end="10582" vertical-scroll-proportion="-18.153847">
+              <folding>
+                <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
+                <element signature="tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -1724,7 +1741,7 @@
       <file leaf-file-name="OrgClientSettingsPage.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/OrgClientSettingsPage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="33" column="8" selection-start="905" selection-end="905" vertical-scroll-proportion="0.0">
+            <state line="36" column="30" selection-start="1128" selection-end="1128" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -1732,11 +1749,105 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RuntimeContext.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java">
+      <file leaf-file-name="DAOService.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="104" column="10" selection-start="4895" selection-end="4895" vertical-scroll-proportion="0.5092166">
+            <state line="1426" column="87" selection-start="68610" selection-end="68610" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="e#2187#2217#0" expanded="true" />
+                <element signature="e#22980#23010#0" expanded="true" />
+                <element signature="e#23636#23666#0" expanded="true" />
+                <element signature="e#24084#24114#0" expanded="true" />
+                <element signature="e#25092#25122#0" expanded="true" />
+                <element signature="e#27439#27469#0" expanded="true" />
+                <element signature="e#29747#29777#0" expanded="true" />
+                <element signature="e#32382#32412#0" expanded="true" />
+                <element signature="e#34650#34680#0" expanded="true" />
+                <element signature="e#35642#35672#0" expanded="true" />
+                <element signature="e#37362#37392#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="DAOUtils.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="1348" column="5" selection-start="69181" selection-end="69181" vertical-scroll-proportion="1.544">
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#27344#27374#0" expanded="true" />
+                <element signature="e#28585#28615#0" expanded="true" />
+                <element signature="e#33628#33658#0" expanded="true" />
+                <element signature="e#34474#34504#0" expanded="true" />
+                <element signature="e#35539#35569#0" expanded="true" />
+                <element signature="e#35942#35972#0" expanded="true" />
+                <element signature="e#37836#37866#0" expanded="true" />
+                <element signature="e#39785#39815#0" expanded="true" />
+                <element signature="e#42892#42922#0" expanded="true" />
+                <element signature="e#45442#45472#0" expanded="true" />
+                <element signature="e#48098#48128#0" expanded="true" />
+                <element signature="e#56813#56843#0" expanded="true" />
+                <element signature="e#59065#59095#0" expanded="true" />
+                <element signature="e#59656#59686#0" expanded="true" />
+                <element signature="e#67334#67348#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="QuestionaryLoadPage.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/questionaries/questionary/QuestionaryLoadPage.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="90" column="6" selection-start="3276" selection-end="3380" vertical-scroll-proportion="0.0">
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="questions_load.jsp" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/questions_load.jsp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="27" column="71" selection-start="1259" selection-end="1259" vertical-scroll-proportion="-10.0">
+              <folding>
+                <marker date="1366007206503" expanded="true" signature="1519:1531" placeholder="{...}" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MainPage.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/MainPage.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="282" column="28" selection-start="15872" selection-end="15872" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="OrgListSelectPage.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/OrgListSelectPage.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="187" column="10" selection-start="5841" selection-end="5841" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="e#6162#6192#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="option.jsp" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/option.jsp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="240" column="28" selection-start="15089" selection-end="15861" vertical-scroll-proportion="-21.0">
+              <folding>
+                <element signature="tag#rich:tab#0;tag#rich:tabPanel#0;tag#h:panelGrid#0;tag#jsp:root#0" expanded="false" />
+                <marker date="1373528598133" expanded="true" signature="5345:5358" placeholder="{...}" />
+                <marker date="1373528598133" expanded="true" signature="6953:6966" placeholder="{...}" />
+                <marker date="1373528598133" expanded="true" signature="7215:7232" placeholder="{...}" />
+                <marker date="1373528598133" expanded="true" signature="7624:7634" placeholder="{...}" />
+                <marker date="1373528598133" expanded="true" signature="18254:18270" placeholder="{...}" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -1806,22 +1917,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/commodity/accounting/configurationProvider/basic/good/BasicGoodListPage.java" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/commodity/accounting/configurationProvider/basic/good/BasicGoodFilter.java" />
-        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/basicGood/list.jsp" />
         <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/CardTemp.java" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" />
         <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/internal/front/items/TempCardOperationItem.java" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Visitor.hbm.xml" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Visitor.java" />
         <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/internal/FrontController.java" />
         <option value="$PROJECT_DIR$/../../src/web/web/WEB-INF/classes/META-INF/persistence.xml" />
-        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/org/settings.jsp" />
         <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/DistributionRulesPage.java" />
         <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/EnterEventReportPage.java" />
+        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/OrgListSelectPage.java" />
         <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/OrgClientSettingsPage.java" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/org/settings.jsp" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" />
       </list>
     </option>
   </component>
@@ -2228,7 +2339,33 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="good_request" />
+              <option name="myItemId" value="questionaries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="back-office" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="include" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="option" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -2371,6 +2508,108 @@
               <option name="myItemId" value="processor" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="org" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="org" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="questionaries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="org" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="questionaries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="questionary" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
           </PATH>
           <PATH>
             <PATH_ELEMENT>
@@ -2445,6 +2684,54 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="manager" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="persistence" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="persistence" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="utils" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -3912,7 +4199,7 @@
     <frame x="-8" y="-8" width="1696" height="1066" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38257992" sideWeight="0.32986537" order="30" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.38257992" sideWeight="0.32986537" order="30" side_tool="false" content_ui="tabs" />
       <window_info id="JavaEE:App" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2613219" sideWeight="0.1565601" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.18467109" sideWeight="0.24696803" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24934725" sideWeight="0.76529163" order="0" side_tool="false" content_ui="tabs" />
@@ -3925,14 +4212,14 @@
       <window_info id="CDI" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32986537" sideWeight="0.98039216" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32083791" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32855567" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18482251" sideWeight="0.59536934" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23133415" sideWeight="0.6174201" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32855567" sideWeight="0.4853121" order="32" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32986537" sideWeight="0.70893055" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38943896" sideWeight="0.49786097" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38919514" sideWeight="0.49786097" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32194045" sideWeight="0.57711136" order="31" side_tool="false" content_ui="tabs" x="100" y="294" width="710" height="371" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21052632" sideWeight="0.30334488" order="5" side_tool="true" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40463066" sideWeight="0.57037944" order="27" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25799337" sideWeight="0.57037944" order="27" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21604279" sideWeight="0.27534685" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22276622" sideWeight="0.7574421" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32864138" sideWeight="0.7794457" order="12" side_tool="false" content_ui="tabs" />
@@ -4171,109 +4458,6 @@
     </option>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/CardTemp.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="13" selection-start="313" selection-end="313" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1315" column="49" selection-start="67698" selection-end="67698" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#26990#27020#0" expanded="true" />
-            <element signature="e#28231#28261#0" expanded="true" />
-            <element signature="e#33274#33304#0" expanded="true" />
-            <element signature="e#34120#34150#0" expanded="true" />
-            <element signature="e#35185#35215#0" expanded="true" />
-            <element signature="e#35588#35618#0" expanded="true" />
-            <element signature="e#37482#37512#0" expanded="true" />
-            <element signature="e#39431#39461#0" expanded="true" />
-            <element signature="e#42538#42568#0" expanded="true" />
-            <element signature="e#45088#45118#0" expanded="true" />
-            <element signature="e#47744#47774#0" expanded="true" />
-            <element signature="e#56459#56489#0" expanded="true" />
-            <element signature="e#58711#58741#0" expanded="true" />
-            <element signature="e#59302#59332#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Visitor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="100" column="37" selection-start="2288" selection-end="2288" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/internal/FrontController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="118" column="17" selection-start="5815" selection-end="5815" vertical-scroll-proportion="-17.68">
-          <folding>
-            <element signature="e#17297#17319#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/classes/META-INF/persistence.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="13" column="11" selection-start="753" selection-end="753" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/view.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="623" vertical-scroll-proportion="-0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/good_request/list.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="156" selection-start="518" selection-end="674" vertical-scroll-proportion="0.22209026">
-          <folding>
-            <marker date="1372322906685" expanded="true" signature="-1:-1" placeholder="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/settings.jsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="107" selection-start="737" selection-end="758" vertical-scroll-proportion="-12.423077">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/daoservices/context/ContextDAOServices.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="155" column="22" selection-start="4373" selection-end="4373" vertical-scroll-proportion="0.3329493">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuleProcessor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="41" column="13" selection-start="1435" selection-end="1435" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/DistributionRulesPage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="42" column="8" selection-start="1184" selection-end="1313" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/client/ClientEditPage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="34" column="49" selection-start="1304" selection-end="1304" vertical-scroll-proportion="0.27014756">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/OnlineReportPage.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="20" column="114" selection-start="710" selection-end="747" vertical-scroll-proportion="0.11751152">
@@ -4288,19 +4472,159 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="104" column="10" selection-start="4895" selection-end="4895" vertical-scroll-proportion="0.5092166">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/AggregateGoodRequestReportPage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="13" selection-start="597" selection-end="597" vertical-scroll-proportion="0.11577752">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/option.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="240" column="28" selection-start="15089" selection-end="15861" vertical-scroll-proportion="-21.0">
+          <folding>
+            <element signature="tag#rich:tab#0;tag#rich:tabPanel#0;tag#h:panelGrid#0;tag#jsp:root#0" expanded="false" />
+            <marker date="1373528598133" expanded="true" signature="5345:5358" placeholder="{...}" />
+            <marker date="1373528598133" expanded="true" signature="6953:6966" placeholder="{...}" />
+            <marker date="1373528598133" expanded="true" signature="7215:7232" placeholder="{...}" />
+            <marker date="1373528598133" expanded="true" signature="7624:7634" placeholder="{...}" />
+            <marker date="1373528598133" expanded="true" signature="18254:18270" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/questionaries/questionary/QuestionaryLoadPage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="90" column="6" selection-start="3276" selection-end="3380" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/questions_load.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="27" column="71" selection-start="1259" selection-end="1259" vertical-scroll-proportion="-10.0">
+          <folding>
+            <marker date="1366007206503" expanded="true" signature="1519:1531" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/MainPage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="282" column="28" selection-start="15872" selection-end="15872" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/OrgListSelectPage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="187" column="10" selection-start="5841" selection-end="5841" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#6162#6192#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/edit.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="0" selection-start="466" selection-end="639" vertical-scroll-proportion="0.20706455">
+          <folding>
+            <marker date="1372428830396" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1372428830396" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1372428830396" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1372428830396" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1372428830396" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1372428830396" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1372428830396" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1372428830396" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1372428830396" expanded="true" signature="-1:-1" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/org/OrgClientSettingsPage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="8" selection-start="905" selection-end="905" vertical-scroll-proportion="0.0">
+        <state line="36" column="30" selection-start="1128" selection-end="1128" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="104" column="10" selection-start="4895" selection-end="4895" vertical-scroll-proportion="0.5092166">
+        <state line="137" column="88" selection-start="10582" selection-end="10582" vertical-scroll-proportion="-18.153847">
+          <folding>
+            <element signature="tag#rich:panelMenuGroup#0;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
+            <element signature="tag#rich:panelMenuGroup#2;tag#rich:panelMenuGroup#0;tag#rich:panelMenu#0;tag#a4j:form#0;tag#jsp:root#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/styles.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="98" column="0" selection-start="1661" selection-end="1661" vertical-scroll-proportion="0.33255813">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/settings.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="108" selection-start="1041" selection-end="1041" vertical-scroll-proportion="-11.769231">
+          <folding>
+            <marker date="1374227241663" expanded="true" signature="436:448" placeholder="{...}" />
+            <marker date="1374227241663" expanded="true" signature="1751:1763" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1426" column="87" selection-start="68610" selection-end="68610" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#2187#2217#0" expanded="true" />
+            <element signature="e#22980#23010#0" expanded="true" />
+            <element signature="e#23636#23666#0" expanded="true" />
+            <element signature="e#24084#24114#0" expanded="true" />
+            <element signature="e#25092#25122#0" expanded="true" />
+            <element signature="e#27439#27469#0" expanded="true" />
+            <element signature="e#29747#29777#0" expanded="true" />
+            <element signature="e#32382#32412#0" expanded="true" />
+            <element signature="e#34650#34680#0" expanded="true" />
+            <element signature="e#35642#35672#0" expanded="true" />
+            <element signature="e#37362#37392#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1348" column="5" selection-start="69181" selection-end="69181" vertical-scroll-proportion="1.544">
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#27344#27374#0" expanded="true" />
+            <element signature="e#28585#28615#0" expanded="true" />
+            <element signature="e#33628#33658#0" expanded="true" />
+            <element signature="e#34474#34504#0" expanded="true" />
+            <element signature="e#35539#35569#0" expanded="true" />
+            <element signature="e#35942#35972#0" expanded="true" />
+            <element signature="e#37836#37866#0" expanded="true" />
+            <element signature="e#39785#39815#0" expanded="true" />
+            <element signature="e#42892#42922#0" expanded="true" />
+            <element signature="e#45442#45472#0" expanded="true" />
+            <element signature="e#48098#48128#0" expanded="true" />
+            <element signature="e#56813#56843#0" expanded="true" />
+            <element signature="e#59065#59095#0" expanded="true" />
+            <element signature="e#59656#59686#0" expanded="true" />
+            <element signature="e#67334#67348#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

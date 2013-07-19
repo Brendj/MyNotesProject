@@ -10,10 +10,13 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.internal.front.items.TempCardOperationItem;
 import ru.axetta.ecafe.processor.web.internal.front.items.VisitorItem;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -63,7 +66,7 @@ public class FrontController extends HttpServlet {
         return "OK";
     }
 
-    /* Выполняет проверку наличия карты с физическим идентификатором  idOfTempCard и признаком карты посетителя в таблице временных карт */
+    /* Выполняет проверку наличия «не нашей customerType=1» карты с физическим идентификатором  cardNo в таблице временных карт. */
     @WebMethod(operationName = "checkVisitorByCard")
     public VisitorItem checkVisitorByCard(@WebParam(name = "orgId") Long idOfOrg,@WebParam(name = "cardNo") Long cardNo) throws FrontControllerException{
         checkRequestValidity(idOfOrg);
@@ -101,13 +104,21 @@ public class FrontController extends HttpServlet {
                 throw new FrontControllerException("Карта уже зарегистрирована как временная карта клиента");
             }
 
-            /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-             * В случае совпадения cardNo временной карты с cardNo карты посетителя в таблице  *
-             * временных карт - возвращать с процессинга информацию об этом посетителе         *
-             * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-            if(ct.getVisitor() != null){
-                String name = ct.getVisitor().getPerson().getFirstName();
-                VisitorItem item = new VisitorItem(ct.getVisitor());
+            if(ct.getCustomerType()==0){
+                /**
+                 * В случае совпадения id временной карты с id врем. карты клиента системы («нашей карты»)
+                 * в таблице временных карт, выбрасывать исключение с сообщением «Карта уже зарегистрирована
+                 * как временная карта клиента системы»
+                 * */
+                throw new FrontControllerException("Карта уже зарегистрирована как временная карта клиента системы");
+            } else {
+                 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+                 * В случае совпадения cardNo временной карты с cardNo карты посетителя в таблице  *
+                 * временных карт - возвращать с процессинга информацию об этом посетителе         *
+                 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+                if(ct.getVisitor() != null){
+                    visitorItem = new VisitorItem(ct.getVisitor());
+                }
             }
 
             persistenceTransaction.commit();
@@ -122,184 +133,22 @@ public class FrontController extends HttpServlet {
         }
     }
 
-    /* Выполняет регистрацию посетителя и временной карты посетителя */
-    @WebMethod(operationName = "registerVisitor")
-    public Long registerVisitor(@WebParam(name = "orgId")Long idOfOrg, @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "validDate") Date validDate,@WebParam(name = "visitor") VisitorItem visitor) throws FrontControllerException {
+    /* возвращающий последнюю операцию по врем. карте */
+    @WebMethod(operationName = "getLastTempCardOperation")
+    public TempCardOperationItem getLastTempCardOperation(@WebParam(name = "orgId") Long idOfOrg,@WebParam(name = "cardNo") Long cardNo) throws FrontControllerException{
         checkRequestValidity(idOfOrg);
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        Long idOfVisitor = null;
+        TempCardOperationItem tempCardOperationItem = null;
         try {
             persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-
-            /**
-             * Если есть совпадение idOfCardNo регистрируемой временной карты с idOfCardNo в таблице постоянных карт,
-             * выбрасывать исключение с сообщением «Карта уже зарегистрирована как постоянная»
-             * */
-            Card c = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
-            if (c != null) {
-                throw new FrontControllerException("Карта уже зарегистрирована как постоянная на клиента: "+c.getClient().getIdOfClient());
-            }
-
-            /**
-             * Если есть совпадение id временной карты с id врем. карты клиента в таблице временных карт,
-             * то выбрасывать исключение с сообщением «Карта уже зарегистрирована как временная карта клиента».
-             * */
-            CardTemp ct = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
-            if (ct != null && ct.getClient()!=null) {
-                String fio= ct.getClient().getPerson().getFullName();
-                throw new FrontControllerException("Карта уже зарегистрирована как временная карта клиента: "+fio);
-            }
-
-            /**
-             * Если параметр  validDate меньше текущей даты — выбрасывать исключение с
-             * сообщением «Неверное значение даты окончания действия карты»
-             * */
-            if(System.currentTimeMillis()>validDate.getTime()){
-                throw new FrontControllerException("Неверное значение даты окончания действия карты");
-            }
-
-            /**
-             * Если хотя бы одно из полей имени == null выбрасывать исключение с
-             * сообщением «все поля ФИО должны быть заполнены»
-             * */
-            if(StringUtils.isEmpty(visitor.getFirstName()) || StringUtils.isEmpty(visitor.getSurname()) || StringUtils.isEmpty(visitor.getSecondName())) {
-                throw new  FrontControllerException("Все поля ФИО должны быть заполнены");
-            }
-            /**
-             * Если поле-массив PersonDocuments не содержит ни одного описания удостоверния личности,
-             * выбрасывать исключение с сообщением «Отсутствует информация об удостоверении личности»
-             * */
-            if((visitor.getDriverLicenceDate()==null || StringUtils.isEmpty(visitor.getDriverLicenceNumber())) &&
-               (visitor.getPassportDate()==null || StringUtils.isEmpty(visitor.getPassportNumber())) &&
-               (visitor.getWarTicketDate()==null || StringUtils.isEmpty(visitor.getWarTicketNumber()))
-              ) {
-                throw new  FrontControllerException("Отсутствует информация об удостоверении личности");
-            }
-
-            /**
-             * Если поле-массив PersonDocuments содержит более одного описания документа одного и
-             * того же типа (2 паспорта или 3 ВУ и т.п.) выбрасывать исключение с сообщением «Дублирование типов документов».
-             * */
-
-            /**
-             * Если в  поле-массиве PersonDocuments у какого-либо документа для даты выдачи
-             * будет указана еще не наступившая дата, выбрасывать исключение с сообщением «Неверная дата выдачи документа»
-             * */
-            if( (visitor.getDriverLicenceDate()!=null && System.currentTimeMillis()<visitor.getDriverLicenceDate().getTime()) ||
-                (visitor.getPassportDate()!=null && System.currentTimeMillis()<visitor.getPassportDate().getTime()) ||
-                (visitor.getWarTicketDate()!=null && System.currentTimeMillis()<visitor.getWarTicketDate().getTime())
-               ){
-                throw new FrontControllerException("Неверное значение даты окончания действия карты");
-            }
-
-            /**
-             * Если есть совпадение id временной карты с id врем. карты посетителя в таблице врем. карт, то:
-             * */
-            if(ct!=null && ct.getCardNo().equals(cardNo)){
-
-                /**
-                 * если параметр  idOfOrg не совпадает с соотв. параметром в таблице врем. карт — обновляем значение этого параметра.
-                 * */
-                if (ct.getOrg().getIdOfOrg()==null || !ct.getOrg().getIdOfOrg().equals(idOfOrg)){
-                    ct.setOrg(DAOUtils.getOrgReference(persistenceSession, idOfOrg));
-                }
-
-                /**
-                 * если для какого-то из документов не совпадает серийный номер, но дата его выдачи более поздняя,
-                 * чем указанная в таблице на сервере — обновляем дату выдачи и серийный номер для этого документа.
-                 * */
-                 if(ct.getVisitor()!=null){
-                     /* водительского удостоверения */
-                     if(ct.getVisitor().getDriverLicenceNumber()==null){
-                         ct.getVisitor().setDriverLicenceDate(visitor.getDriverLicenceDate());
-                         ct.getVisitor().setDriverLicenceNumber(visitor.getDriverLicenceNumber());
-                     } else {
-                         if(!ct.getVisitor().getDriverLicenceNumber().equals(visitor.getDriverLicenceNumber()) &&
-                                 ct.getVisitor().getDriverLicenceDate().getTime()<visitor.getDriverLicenceDate().getTime()) {
-                             ct.getVisitor().setDriverLicenceDate(visitor.getDriverLicenceDate());
-                             ct.getVisitor().setDriverLicenceNumber(visitor.getDriverLicenceNumber());
-                         }  else {
-                             throw new FrontControllerException("Водительского удостоверения  личности не соотвествует владельцу карты");
-                         }
-                     }
-
-                     /* паспорта */
-                     if(ct.getVisitor().getPassportNumber()==null){
-                         ct.getVisitor().setPassportDate(visitor.getPassportDate());
-                         ct.getVisitor().setPassportNumber(visitor.getPassportNumber());
-                     } else {
-                         if(!ct.getVisitor().getPassportNumber().equals(visitor.getPassportNumber()) &&
-                                 ct.getVisitor().getPassportDate().getTime()<visitor.getPassportDate().getTime()) {
-                             ct.getVisitor().setPassportDate(visitor.getPassportDate());
-                             ct.getVisitor().setPassportNumber(visitor.getPassportNumber());
-                         }  else {
-                             throw new FrontControllerException("Паспорт личности не соотвествует владельцу карты");
-                         }
-                     }
-
-                     /* паспорта */
-                     if(ct.getVisitor().getWarTicketNumber()==null){
-                         ct.getVisitor().setWarTicketDate(visitor.getWarTicketDate());
-                         ct.getVisitor().setWarTicketNumber(visitor.getWarTicketNumber());
-                     } else {
-                         if(!ct.getVisitor().getWarTicketNumber().equals(visitor.getWarTicketNumber()) &&
-                                 ct.getVisitor().getWarTicketDate().getTime()<visitor.getWarTicketDate().getTime()) {
-                             ct.getVisitor().setWarTicketDate(visitor.getWarTicketDate());
-                             ct.getVisitor().setWarTicketNumber(visitor.getWarTicketNumber());
-                         }  else {
-                             throw new FrontControllerException("Военный билет не соотвествует владельцу карты");
-                         }
-                     }
-                     ct.setValidDate(validDate);
-                     ct.setCardStation(CardOperationStation.ISSUE);
-
-                 } else {
-                     Person person = new Person(visitor.getFirstName(), visitor.getSurname(), visitor.getSecondName());
-                     Visitor newVisitor = new Visitor(person);
-                     newVisitor.setDriverLicenceDate(visitor.getDriverLicenceDate());
-                     newVisitor.setDriverLicenceNumber(visitor.getDriverLicenceNumber());
-                     newVisitor.setPassportDate(visitor.getPassportDate());
-                     newVisitor.setPassportNumber(visitor.getPassportNumber());
-                     newVisitor.setWarTicketDate(visitor.getWarTicketDate());
-                     newVisitor.setWarTicketNumber(visitor.getWarTicketNumber());
-                     ct.setVisitor(newVisitor);
-                     ct.setCardStation(CardOperationStation.ISSUE);
-                     ct.setValidDate(validDate);
-                     persistenceSession.save(person);
-                     persistenceSession.save(newVisitor);
-                     if(logger.isDebugEnabled()){
-                         logger.debug("register: visitor "+visitor.toString());
-                     }
-                 }
-                persistenceSession.save(ct);
-                if(logger.isDebugEnabled()){
-                    logger.debug("register: CardTemp "+ct.toString());
-                }
-                idOfVisitor = ct.getVisitor().getIdOfVisitor();
-            } else {
-                /* Регистрация клиента со своей картой которая не зарегестрирована в нашей системе */
-                ct = new CardTemp(DAOUtils.getOrgReference(persistenceSession, idOfOrg),cardNo, String.valueOf(cardNo));
-                Person person = new Person(visitor.getFirstName(), visitor.getSurname(), visitor.getSecondName());
-                Visitor newVisitor = new Visitor(person);
-                newVisitor.setDriverLicenceDate(visitor.getDriverLicenceDate());
-                newVisitor.setDriverLicenceNumber(visitor.getDriverLicenceNumber());
-                newVisitor.setPassportDate(visitor.getPassportDate());
-                newVisitor.setPassportNumber(visitor.getPassportNumber());
-                newVisitor.setWarTicketDate(visitor.getWarTicketDate());
-                newVisitor.setWarTicketNumber(visitor.getWarTicketNumber());
-                ct.setVisitor(newVisitor);
-                ct.setCardStation(CardOperationStation.ISSUE);
-                ct.setValidDate(validDate);
-                persistenceSession.save(person);
-                persistenceSession.save(newVisitor);
-                persistenceSession.save(ct);
-                idOfVisitor = ct.getVisitor().getIdOfVisitor();
+            CardTempOperation cardTempOperation = DAOUtils.getLastTempCardOperationByOrgAndCartNo(persistenceSession, idOfOrg, cardNo);
+            if(cardTempOperation!=null){
+                tempCardOperationItem = new TempCardOperationItem(cardTempOperation);
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return idOfVisitor;
         } catch (Exception e) {
             logger.error("Ошибка при регистрацию посетителя и временной карты посетителя", e);
             throw new FrontControllerException("Ошибка: " + e.getMessage());
@@ -307,8 +156,10 @@ public class FrontController extends HttpServlet {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+        return tempCardOperationItem;
     }
 
+    /* Выполняет регистрацию временной карты системы customerType=0 */
     @WebMethod(operationName = "registerTempCard")
     public void registerTempCard(@WebParam(name = "orgId") Long idOfOrg,@WebParam(name = "cardNo") Long cardNo, @WebParam(name = "cardPrintedNo") String cardPrintedNo)
             throws FrontControllerException {
@@ -321,6 +172,141 @@ public class FrontController extends HttpServlet {
             throw new FrontControllerException(
                     String.format("Ошибка при регистрации времменой карты: %s", e.getMessage()), e);
         }
+    }
+
+
+    @WebMethod(operationName = "registerVisitor")
+    public Long registerVisitor(@WebParam(name = "orgId")Long idOfOrg, @WebParam(name = "visitor") VisitorItem visitorItem) throws FrontControllerException {
+        checkRequestValidity(idOfOrg);
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        Long idOfVisitor = -1L;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            /**
+             * Если хотя бы одно из полей имени == null выбрасывать исключение с
+             * сообщением «все поля ФИО должны быть заполнены»
+             * */
+            if(StringUtils.isEmpty(visitorItem.getFirstName()) || StringUtils.isEmpty(visitorItem.getSurname()) || StringUtils.isEmpty(visitorItem.getSecondName())) {
+                throw new  FrontControllerException("Все поля ФИО должны быть заполнены");
+            }
+
+            /**
+            * Если поле-массив PersonDocuments не содержит ни одного описания удостоверния личности,
+            * выбрасывать исключение с сообщением «Отсутствует информация об удостоверении личности»
+            * */
+            if((visitorItem.getDriverLicenceDate()==null || StringUtils.isEmpty(visitorItem.getDriverLicenceNumber())) &&
+                    (visitorItem.getPassportDate()==null || StringUtils.isEmpty(visitorItem.getPassportNumber())) &&
+                    (visitorItem.getWarTicketDate()==null || StringUtils.isEmpty(visitorItem.getWarTicketNumber()))
+                    ) {
+                throw new  FrontControllerException("Отсутствует информация об удостоверении личности");
+            }
+
+            /**
+            * Если в  поле-массиве PersonDocuments у какого-либо документа для даты выдачи
+            * будет указана еще не наступившая дата, выбрасывать исключение с сообщением «Неверная дата выдачи документа»
+            * */
+            if( (visitorItem.getDriverLicenceDate()!=null && System.currentTimeMillis()<=visitorItem.getDriverLicenceDate().getTime()) ||
+                    (visitorItem.getPassportDate()!=null && System.currentTimeMillis()<=visitorItem.getPassportDate().getTime()) ||
+                    (visitorItem.getWarTicketDate()!=null && System.currentTimeMillis()<=visitorItem.getWarTicketDate().getTime())
+                    ){
+                throw new FrontControllerException("Неверное значение даты окончания действия карты");
+            }
+
+            Person person = new Person(visitorItem.getFirstName(), visitorItem.getSurname(), visitorItem.getSecondName());
+            persistenceSession.save(person);
+            Visitor visitor = new Visitor(person);
+            visitor.setPassportNumber(visitorItem.getPassportNumber());
+            visitor.setPassportDate(visitorItem.getPassportDate());
+            visitor.setDriverLicenceNumber(visitorItem.getDriverLicenceNumber());
+            visitor.setDriverLicenceDate(visitorItem.getDriverLicenceDate());
+            visitor.setWarTicketNumber(visitorItem.getWarTicketNumber());
+            visitor.setWarTicketDate(visitorItem.getWarTicketDate());
+            persistenceSession.save(visitor);
+            idOfVisitor = visitor.getIdOfVisitor();
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return idOfVisitor;
+        } catch (Exception e) {
+            logger.error("Ошибка при регистрацию посетителя и временной карты посетителя", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    /* Выполняет регистрацию врем. карты посетителя. */
+    @WebMethod(operationName = "registerVisitorTempCard")
+    public void registerVisitorTempCard(@WebParam(name = "orgId") Long idOfOrg, @WebParam(name = "idOfVisitor") Long idOfVisitor, @WebParam(name = "cardNo") Long cardNo)
+            throws FrontControllerException{
+        checkRequestValidity(idOfOrg);
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            /**
+             * Если отсутствует посетитель с таким id, выбрасывать исключение «Посетитель не зарегистрирован»
+             * */
+            Visitor visitor = DAOUtils.findVisitorById(persistenceSession, idOfVisitor);
+            if(visitor==null){
+                throw new FrontControllerException(String.format("Посетитель не зарегистрирован"));
+            }
+
+            Card card = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+
+            /**
+             * Если id карты совпадает с идентификатором постоянной карты из таблицы постоянных карт —
+             * возвращать ошибку с сообщением «карта уже зарегистрирована как постоянная»
+             * */
+            if(card!=null){
+                throw new FrontControllerException(String.format("Карта уже зарегистрирована как постоянная"));
+            }
+
+            CardTemp cardTemp = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
+
+            /**
+             * Если id карты совпадает с идентификатором временной карты и карта является временной картой системы
+             * («наша карта»), то выбрасывать исключение «карта уже зарегистрирована как временная»
+             * */
+
+            if(cardTemp.getCustomerType()==0){
+                throw new FrontControllerException(String.format("карта уже зарегистрирована как временная"));
+            } else {
+                if(cardTemp.getVisitor()==null){
+                    /**
+                     * Если посетитель уже зарегистрирован, но временной карты у него нет —
+                     * регистрируем временную карту с идентификатором  idOfTempCard
+                     * */
+                     cardTemp.setVisitor(visitor);
+                     persistenceSession.save(visitor);
+                 } else {
+                    /**
+                     * Если id карты совпадает с идентификатором временной карты и карта является временной картой посетителя
+                     * («не наша карта»), но id посетителя не совпадает с параметром  idOfVisitor, выбрасывать исключение
+                     * «Карта зарегистрирована на другого посетителя».
+                     * */
+                    if(!cardTemp.getVisitor().equals(visitor)){
+                        throw new FrontControllerException(String.format("Карта зарегистрирована на другого посетителя"));
+                    }
+                }
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Ошибка при регистрацию посетителя и временной карты посетителя", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+
     }
 
     @WebMethod(operationName = "registerCard")
@@ -465,3 +451,222 @@ public class FrontController extends HttpServlet {
     }
 
 }
+
+/* Выполняет регистрацию посетителя и временной карты посетителя *//*
+    @WebMethod(operationName = "registerVisitor")
+    public Long registerVisitor(@WebParam(name = "orgId")Long idOfOrg, @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "validDate") Date validDate,@WebParam(name = "visitor") VisitorItem visitor) throws FrontControllerException {
+        logger.info("registerVisitor start");
+        checkRequestValidity(idOfOrg);
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        Long idOfVisitor = null;
+        try {
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            *//**
+ * Если есть совпадение idOfCardNo регистрируемой временной карты с idOfCardNo в таблице постоянных карт,
+ * выбрасывать исключение с сообщением «Карта уже зарегистрирована как постоянная»
+ * *//*
+            Card c = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+            if (c != null) {
+                throw new FrontControllerException("Карта уже зарегистрирована как постоянная на клиента: "+c.getClient().getIdOfClient());
+            }
+
+            *//**
+ * Если есть совпадение id временной карты с id врем. карты клиента в таблице временных карт,
+ * то выбрасывать исключение с сообщением «Карта уже зарегистрирована как временная карта клиента».
+ * *//*
+            CardTemp ct = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
+            if (ct != null && ct.getClient()!=null) {
+                String fio= ct.getClient().getPerson().getFullName();
+                throw new FrontControllerException("Карта уже зарегистрирована как временная карта клиента: "+fio);
+            }
+
+            *//**
+ * Если параметр  validDate меньше текущей даты — выбрасывать исключение с
+ * сообщением «Неверное значение даты окончания действия карты»
+ * *//*
+            if(System.currentTimeMillis()>validDate.getTime()){
+                throw new FrontControllerException("Неверное значение даты окончания действия карты");
+            }
+
+            *//**
+ * Если хотя бы одно из полей имени == null выбрасывать исключение с
+ * сообщением «все поля ФИО должны быть заполнены»
+ * *//*
+            if(StringUtils.isEmpty(visitor.getFirstName()) || StringUtils.isEmpty(visitor.getSurname()) || StringUtils.isEmpty(visitor.getSecondName())) {
+                throw new  FrontControllerException("Все поля ФИО должны быть заполнены");
+            }
+            *//**
+ * Если поле-массив PersonDocuments не содержит ни одного описания удостоверния личности,
+ * выбрасывать исключение с сообщением «Отсутствует информация об удостоверении личности»
+ * *//*
+            if((visitor.getDriverLicenceDate()==null || StringUtils.isEmpty(visitor.getDriverLicenceNumber())) &&
+               (visitor.getPassportDate()==null || StringUtils.isEmpty(visitor.getPassportNumber())) &&
+               (visitor.getWarTicketDate()==null || StringUtils.isEmpty(visitor.getWarTicketNumber()))
+              ) {
+                throw new  FrontControllerException("Отсутствует информация об удостоверении личности");
+            }
+
+            *//**
+ * Если поле-массив PersonDocuments содержит более одного описания документа одного и
+ * того же типа (2 паспорта или 3 ВУ и т.п.) выбрасывать исключение с сообщением «Дублирование типов документов».
+ * *//*
+
+            *//**
+ * Если в  поле-массиве PersonDocuments у какого-либо документа для даты выдачи
+ * будет указана еще не наступившая дата, выбрасывать исключение с сообщением «Неверная дата выдачи документа»
+ * *//*
+            if( (visitor.getDriverLicenceDate()!=null && System.currentTimeMillis()<=visitor.getDriverLicenceDate().getTime()) ||
+                (visitor.getPassportDate()!=null && System.currentTimeMillis()<=visitor.getPassportDate().getTime()) ||
+                (visitor.getWarTicketDate()!=null && System.currentTimeMillis()<=visitor.getWarTicketDate().getTime())
+               ){
+                throw new FrontControllerException("Неверное значение даты окончания действия карты");
+            }
+
+            *//**
+ * Если есть совпадение id временной карты с id врем. карты посетителя в таблице врем. карт, то:
+ * *//*
+            if(ct!=null && ct.getCardNo().equals(cardNo)){
+
+                *//**
+ * если параметр  idOfOrg не совпадает с соотв. параметром в таблице врем. карт — обновляем значение этого параметра.
+ * *//*
+                if (ct.getOrg().getIdOfOrg()==null || !ct.getOrg().getIdOfOrg().equals(idOfOrg)){
+                    ct.setOrg(DAOUtils.getOrgReference(persistenceSession, idOfOrg));
+                }
+
+                *//**
+ * если для какого-то из документов не совпадает серийный номер, но дата его выдачи более поздняя,
+ * чем указанная в таблице на сервере — обновляем дату выдачи и серийный номер для этого документа.
+ * *//*
+                 if(ct.getVisitor()!=null){
+                     *//* водительского удостоверения *//*
+                     if(ct.getVisitor().getDriverLicenceNumber()==null){
+                         ct.getVisitor().setDriverLicenceDate(visitor.getDriverLicenceDate());
+                         ct.getVisitor().setDriverLicenceNumber(visitor.getDriverLicenceNumber());
+                     } else {
+                         if(ct.getVisitor().getDriverLicenceNumber().equals(visitor.getDriverLicenceNumber()) &&
+                                 ct.getVisitor().getDriverLicenceDate().equals(visitor.getDriverLicenceDate())) {
+                             ct.getVisitor().setDriverLicenceDate(visitor.getDriverLicenceDate());
+                             ct.getVisitor().setDriverLicenceNumber(visitor.getDriverLicenceNumber());
+                         }  else {
+                             if(!ct.getVisitor().getDriverLicenceNumber().equals(visitor.getDriverLicenceNumber()) &&
+                                     ct.getVisitor().getDriverLicenceDate().getTime()<=visitor.getDriverLicenceDate().getTime()){
+                                 ct.getVisitor().setDriverLicenceDate(visitor.getDriverLicenceDate());
+                                 ct.getVisitor().setDriverLicenceNumber(visitor.getDriverLicenceNumber());
+                             }  else {
+                                 Visitor ctVisitor = ct.getVisitor();
+                                 String info = " DB: "+ctVisitor.getDriverLicenceNumber()+" "+ctVisitor.getDriverLicenceDate();
+                                 info += " IN: "+visitor.getDriverLicenceNumber()+" "+visitor.getDriverLicenceDate();
+                                 throw new FrontControllerException("Водительского удостоверения  личности не соотвествует владельцу карты"+info);
+                             }
+                         }
+                     }
+
+                     *//* паспорта *//*
+                     if(ct.getVisitor().getPassportNumber()==null){
+                         ct.getVisitor().setPassportDate(visitor.getPassportDate());
+                         ct.getVisitor().setPassportNumber(visitor.getPassportNumber());
+                     } else {
+                         if(ct.getVisitor().getPassportNumber().equals(visitor.getPassportNumber()) &&
+                                 ct.getVisitor().getPassportDate().equals(visitor.getPassportDate())) {
+                             ct.getVisitor().setPassportDate(visitor.getPassportDate());
+                             ct.getVisitor().setPassportNumber(visitor.getPassportNumber());
+                         }  else {
+                             if(!ct.getVisitor().getPassportNumber().equals(visitor.getPassportNumber()) &&
+                                     ct.getVisitor().getPassportDate().getTime()<=visitor.getPassportDate().getTime()) {
+                                 ct.getVisitor().setPassportDate(visitor.getPassportDate());
+                                 ct.getVisitor().setPassportNumber(visitor.getPassportNumber());
+                             } else {
+                                 Visitor ctVisitor = ct.getVisitor();
+                                 String info = " DB: "+ctVisitor.getPassportNumber()+" "+ctVisitor.getPassportDate();
+                                 info += " IN: "+visitor.getPassportNumber()+" "+visitor.getPassportDate();
+                                 throw new FrontControllerException("Паспорт личности не соотвествует владельцу карты "+info);
+                             }
+                         }
+                     }
+
+                     *//* паспорта *//*
+                     if(ct.getVisitor().getWarTicketNumber()==null){
+                         ct.getVisitor().setWarTicketDate(visitor.getWarTicketDate());
+                         ct.getVisitor().setWarTicketNumber(visitor.getWarTicketNumber());
+                     } else {
+                         if(ct.getVisitor().getWarTicketNumber().equals(visitor.getWarTicketNumber()) &&
+                                 ct.getVisitor().getWarTicketDate().equals(visitor.getWarTicketDate())) {
+                             ct.getVisitor().setWarTicketDate(visitor.getWarTicketDate());
+                             ct.getVisitor().setWarTicketNumber(visitor.getWarTicketNumber());
+                         }  else {
+                             if(!ct.getVisitor().getWarTicketNumber().equals(visitor.getWarTicketNumber()) &&
+                                     ct.getVisitor().getWarTicketDate().getTime()<=visitor.getWarTicketDate().getTime()) {
+                                 ct.getVisitor().setWarTicketDate(visitor.getWarTicketDate());
+                                 ct.getVisitor().setWarTicketNumber(visitor.getWarTicketNumber());
+                             } else {
+                                 Visitor ctVisitor = ct.getVisitor();
+                                 String info = " DB: "+ctVisitor.getWarTicketNumber()+" "+ctVisitor.getWarTicketDate();
+                                 info += " IN: "+visitor.getWarTicketNumber()+" "+visitor.getWarTicketDate();
+                                 throw new FrontControllerException("Военный билет не соотвествует владельцу карты"+info);
+                             }
+                         }
+                     }
+                     ct.setValidDate(validDate);
+                     ct.setCardStation(CardOperationStation.ISSUE);
+                     logger.info("registerVisitor "+visitor.toString());
+                 } else {
+                     Person person = new Person(visitor.getFirstName(), visitor.getSurname(), visitor.getSecondName());
+                     Visitor newVisitor = new Visitor(person);
+                     newVisitor.setDriverLicenceDate(visitor.getDriverLicenceDate());
+                     newVisitor.setDriverLicenceNumber(visitor.getDriverLicenceNumber());
+                     newVisitor.setPassportDate(visitor.getPassportDate());
+                     newVisitor.setPassportNumber(visitor.getPassportNumber());
+                     newVisitor.setWarTicketDate(visitor.getWarTicketDate());
+                     newVisitor.setWarTicketNumber(visitor.getWarTicketNumber());
+                     ct.setVisitor(newVisitor);
+                     ct.setCardStation(CardOperationStation.ISSUE);
+                     ct.setValidDate(validDate);
+                     persistenceSession.save(person);
+                     persistenceSession.save(newVisitor);
+                     if(logger.isDebugEnabled()){
+                         logger.debug("register: visitor "+visitor.toString());
+                     }
+                     logger.info("registerVisitor "+visitor.toString());
+                 }
+                persistenceSession.save(ct);
+                if(logger.isDebugEnabled()){
+                    logger.debug("register: CardTemp "+ct.toString());
+                }
+                logger.info("registerVisitor "+visitor.toString());
+                idOfVisitor = ct.getVisitor().getIdOfVisitor();
+            } else {
+                *//* Регистрация клиента со своей картой которая не зарегестрирована в нашей системе *//*
+                ct = new CardTemp(DAOUtils.getOrgReference(persistenceSession, idOfOrg),cardNo, String.valueOf(cardNo), 1);
+                Person person = new Person(visitor.getFirstName(), visitor.getSurname(), visitor.getSecondName());
+                Visitor newVisitor = new Visitor(person);
+                newVisitor.setDriverLicenceDate(visitor.getDriverLicenceDate());
+                newVisitor.setDriverLicenceNumber(visitor.getDriverLicenceNumber());
+                newVisitor.setPassportDate(visitor.getPassportDate());
+                newVisitor.setPassportNumber(visitor.getPassportNumber());
+                newVisitor.setWarTicketDate(visitor.getWarTicketDate());
+                newVisitor.setWarTicketNumber(visitor.getWarTicketNumber());
+                ct.setVisitor(newVisitor);
+                ct.setCardStation(CardOperationStation.ISSUE);
+                ct.setValidDate(validDate);
+                persistenceSession.save(person);
+                persistenceSession.save(newVisitor);
+                persistenceSession.save(ct);
+                idOfVisitor = ct.getVisitor().getIdOfVisitor();
+                logger.info("registerVisitor "+visitor.toString());
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return idOfVisitor;
+        } catch (Exception e) {
+            logger.error("Ошибка при регистрацию посетителя и временной карты посетителя", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+*/

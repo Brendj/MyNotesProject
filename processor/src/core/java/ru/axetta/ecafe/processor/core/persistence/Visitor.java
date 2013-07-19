@@ -96,4 +96,27 @@ public class Visitor {
                 "idOfVisitor=" + idOfVisitor +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Visitor visitor = (Visitor) o;
+
+        if (!idOfVisitor.equals(visitor.idOfVisitor)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return idOfVisitor.hashCode();
+    }
 }

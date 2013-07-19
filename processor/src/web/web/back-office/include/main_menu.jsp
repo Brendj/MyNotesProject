@@ -127,9 +127,15 @@
                             label="Загрузить с файла" action="#{questionaryLoadPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
+    <%--@elvariable id="orgClientSettingsPage" type="ru.axetta.ecafe.processor.web.ui.org.OrgClientSettingsPage"--%>
+    <rich:panelMenuItem id="orgClientSettingsMenuItem" binding="#{orgClientSettingsPage.mainMenuComponent}"
+                        label="Параметры" action="#{orgClientSettingsPage.show}"
+                        reRender="workspaceForm" />
+
+    <%--@elvariable id="distributionRulesPage" type="ru.axetta.ecafe.processor.web.ui.org.DistributionRulesPage"--%>
     <rich:panelMenuItem id="distributionRulesMenuItem" binding="#{distributionRulesPage.mainMenuComponent}"
                         label="Правила распространения" action="#{distributionRulesPage.show}"
-                        reRender="workspaceForm" />
+                        reRender="workspaceForm" rendered="#{mainPage.eligibleToEditOrgs}"/>
 
 </rich:panelMenuGroup>
 

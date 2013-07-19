@@ -156,10 +156,12 @@ public class OrgListSelectPage extends BasicPage {
         Set<String> longSet = new HashSet<String>(Arrays.asList(idOfOrgs));
         ///
         for (String sId : longSet) {
-            Long id = Long.parseLong(sId.trim());
-            if (selectedOrgs.containsKey(id)) continue;
-            Org org = (Org)session.get(Org.class, id);
-            selectedOrgs.put(id, org.getShortName());
+            try{
+                Long id = Long.parseLong(sId.trim());
+                if (selectedOrgs.containsKey(id)) continue;
+                Org org = (Org)session.get(Org.class, id);
+                selectedOrgs.put(id, org.getShortName());
+            } catch (Exception e){}
         }
         ///
         List<OrgShortItem> items = retrieveOrgs(session);

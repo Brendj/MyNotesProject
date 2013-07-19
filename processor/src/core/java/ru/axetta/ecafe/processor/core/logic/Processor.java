@@ -2753,7 +2753,7 @@ public class Processor implements SyncProcessor,
                 throw new Exception("Временная карта уже зарегистрирована на временная: " );
             }
         } else {
-            cardTemp = new CardTemp(org,cardNo, cardPrintedNo);
+            cardTemp = new CardTemp(org,cardNo, cardPrintedNo, 0);
         }
         persistenceSession.save(cardTemp);
     }
