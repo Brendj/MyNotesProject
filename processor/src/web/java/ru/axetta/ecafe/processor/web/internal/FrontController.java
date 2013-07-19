@@ -290,37 +290,44 @@ public class FrontController extends HttpServlet {
 
             CardTemp cardTemp = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
 
-            /**
-             * Если id карты совпадает с идентификатором временной карты и карта является временной картой системы
-             * («наша карта»), то выбрасывать исключение «карта уже зарегистрирована как временная»
-             * */
-
-            if(cardTemp.getCustomerType()==0){
-                throw new FrontControllerException(String.format("карта уже зарегистрирована как временная"));
+            if(cardTemp==null){
+                Org org = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
+                cardTemp = new CardTemp(org, cardNo, String.valueOf(cardNo), 1);
+                persistenceSession.save(cardTemp);
             } else {
-                if(cardTemp.getVisitor()==null){
-                    /**
-                     * Если посетитель уже зарегистрирован, но временной карты у него нет —
-                     * регистрируем временную карту с идентификатором  idOfTempCard
-                     * */
-                     cardTemp.setVisitor(visitor);
-                     persistenceSession.save(visitor);
-                 } else {
-                    /**
-                     * Если id карты совпадает с идентификатором временной карты и карта является временной картой посетителя
-                     * («не наша карта»), но id посетителя не совпадает с параметром  idOfVisitor, выбрасывать исключение
-                     * «Карта зарегистрирована на другого посетителя».
-                     * */
-                    if(!cardTemp.getVisitor().equals(visitor)){
-                        throw new FrontControllerException(String.format("Карта зарегистрирована на другого посетителя"));
+                /**
+                 * Если id карты совпадает с идентификатором временной карты и карта является временной картой системы
+                 * («наша карта»), то выбрасывать исключение «карта уже зарегистрирована как временная»
+                 * */
+                if(cardTemp.getCustomerType()==0){
+                    throw new FrontControllerException(String.format("карта уже зарегистрирована как временная"));
+                } else {
+                    if(cardTemp.getVisitor()==null){
+                        /**
+                         * Если посетитель уже зарегистрирован, но временной карты у него нет —
+                         * регистрируем временную карту с идентификатором  idOfTempCard
+                         * */
+                        cardTemp.setVisitor(visitor);
+                        persistenceSession.save(visitor);
+                    } else {
+                        /**
+                         * Если id карты совпадает с идентификатором временной карты и карта является временной картой посетителя
+                         * («не наша карта»), но id посетителя не совпадает с параметром  idOfVisitor, выбрасывать исключение
+                         * «Карта зарегистрирована на другого посетителя».
+                         * */
+                        if(!cardTemp.getVisitor().equals(visitor)){
+                            throw new FrontControllerException(String.format("Карта зарегистрирована на другого посетителя"));
+                        }
                     }
                 }
+
             }
+
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
-            logger.error("Ошибка при регистрацию посетителя и временной карты посетителя", e);
+            logger.error("Ошибка при регистрацию временной карты посетителя", e);
             throw new FrontControllerException("Ошибка: " + e.getMessage());
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
