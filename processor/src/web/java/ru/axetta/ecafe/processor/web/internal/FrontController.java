@@ -293,6 +293,7 @@ public class FrontController extends HttpServlet {
 
             if(cardTemp==null){
                 cardTemp = new CardTemp(cardNo, String.valueOf(cardNo));
+                cardTemp.setVisitor(visitor);
                 persistenceSession.save(cardTemp);
             } else {
                 /**
@@ -308,7 +309,7 @@ public class FrontController extends HttpServlet {
                          * регистрируем временную карту с идентификатором  idOfTempCard
                          * */
                         cardTemp.setVisitor(visitor);
-                        persistenceSession.save(visitor);
+                        persistenceSession.save(cardTemp);
                     } else {
                         /**
                          * Если id карты совпадает с идентификатором временной карты и карта является временной картой посетителя
