@@ -27,13 +27,21 @@ public class CardTemp {
     private Visitor visitor;
 
     /* Конструктор регистрации врекменой карты, но не выдавая его ни кому */
-    public CardTemp(Org org, Long cardNo,  String cardPrintedNo, Integer customerType) {
+    public CardTemp(Org org, Long cardNo,  String cardPrintedNo) {
         this.cardNo = cardNo;
         this.org = org;
         this.cardPrintedNo = cardPrintedNo;
         this.cardStation = CardOperationStation.REGISTRATION;
         this.createDate = new Date();
-        this.customerType = customerType;
+        this.customerType = 0;
+    }
+
+    public CardTemp(Long cardNo,  String cardPrintedNo) {
+        this.cardNo = cardNo;
+        this.cardPrintedNo = cardPrintedNo;
+        this.cardStation = CardOperationStation.REGISTRATION;
+        this.createDate = new Date();
+        this.customerType = 1;
     }
 
     public Long getIdOfCartTemp() {
@@ -125,8 +133,8 @@ public class CardTemp {
     public String toString() {
         return "CardTemp{" +
                 "cardNo=" + cardNo +
-                ", idOfCartTemp=" + idOfCartTemp +
-                ", org=" + org +
+                ", cardNo=" + idOfCartTemp +
+                (org==null?"":", org=" + org) +
                 ", cardPrintedNo='" + cardPrintedNo + '\'' +
                 '}';
     }

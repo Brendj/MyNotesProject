@@ -11,7 +11,7 @@ ALTER TABLE cf_internal_disposing_document_positions ADD COLUMN totalcountmust b
 -- Таблица регистрации временных карт
 CREATE TABLE cf_cards_temp (
   IdOfCartTemp bigserial,
-  IdOfOrg bigint NOT NULL,               --! идентификатор организациии
+  IdOfOrg bigint,                        --! идентификатор организациии
   IdOfClient bigInt,                     --! Идентификатор клиента
   IdOfVisitor bigint,                    --!  Идентификатор посетителя
   CustomerType int not null default 0,     --! Признак карты посетителя , bit, 1- карта посетителя, 0 — карта клиента, not null

@@ -110,7 +110,8 @@ public class FrontController extends HttpServlet {
                  * в таблице временных карт, выбрасывать исключение с сообщением «Карта уже зарегистрирована
                  * как временная карта клиента системы»
                  * */
-                throw new FrontControllerException("Карта уже зарегистрирована как временная карта клиента системы");
+                 logger.error(ct.toString());
+                 throw new FrontControllerException("Карта уже зарегистрирована как временная карта клиента системы");
             } else {
                  /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
                  * В случае совпадения cardNo временной карты с cardNo карты посетителя в таблице  *
@@ -291,8 +292,7 @@ public class FrontController extends HttpServlet {
             CardTemp cardTemp = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
 
             if(cardTemp==null){
-                Org org = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
-                cardTemp = new CardTemp(org, cardNo, String.valueOf(cardNo), 1);
+                cardTemp = new CardTemp(cardNo, String.valueOf(cardNo));
                 persistenceSession.save(cardTemp);
             } else {
                 /**
