@@ -132,9 +132,12 @@ public class CardTemp {
     @Override
     public String toString() {
         return "CardTemp{" +
-                "cardNo=" + cardNo +
-                ", cardNo=" + idOfCartTemp +
+                "id=" + idOfCartTemp +
+                ", cardNo=" + cardNo +
                 (org==null?"":", org=" + org) +
+                ", customerType=" + customerType +
+                (client==null?"":", client=" + client) +
+                (visitor==null?"":", visitor=" + visitor) +
                 ", cardPrintedNo='" + cardPrintedNo + '\'' +
                 '}';
     }

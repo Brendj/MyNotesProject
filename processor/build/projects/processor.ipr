@@ -469,12 +469,12 @@
     </copyright>
     <module2copyright />
   </component>
-  <component name="DataSourceManagerImpl" format="xml" hash="3005801551">
+  <component name="DataSourceManagerImpl" format="xml" hash="2223805316">
     <data-source source="LOCAL" name="Moscow Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
       <identifier-quote-string>&quot;</identifier-quote-string>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://192.168.15.158:5432/amoscow</jdbc-url>
+      <jdbc-url>jdbc:postgresql://172.18.16.14:5432/amoscow</jdbc-url>
       <user-name>postgres</user-name>
       <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
       <schema-pattern>amoscow.public</schema-pattern>

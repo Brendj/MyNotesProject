@@ -104,7 +104,7 @@ public class FrontController extends HttpServlet {
                 throw new FrontControllerException("Карта уже зарегистрирована как временная карта клиента");
             }
 
-            if(ct.getCustomerType()==0){
+            if(ct.getCustomerType().equals(0)){
                 /**
                  * В случае совпадения id временной карты с id врем. карты клиента системы («нашей карты»)
                  * в таблице временных карт, выбрасывать исключение с сообщением «Карта уже зарегистрирована
@@ -260,7 +260,7 @@ public class FrontController extends HttpServlet {
         }
     }
 
-    /* Выполняет регистрацию врем. карты посетителя. */
+    /* Выполняет регистрацию врем. карты посетителя customerType=1. */
     @WebMethod(operationName = "registerVisitorTempCard")
     public void registerVisitorTempCard(@WebParam(name = "orgId") Long idOfOrg, @WebParam(name = "idOfVisitor") Long idOfVisitor, @WebParam(name = "cardNo") Long cardNo)
             throws FrontControllerException{
