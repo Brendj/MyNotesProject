@@ -12,6 +12,9 @@
 
 <%--Тест лога --%>
 <h:panelGrid id="otherActionsGrid" binding="#{otherActionsPage.pageComponent}" styleClass="borderless-grid">
+    <a4j:commandButton value="Экспортировать данные для BI" action="#{otherActionsPage.rubBIExport}"
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+
     <a4j:commandButton value="Запустить генерацию ключевых показателей" action="#{otherActionsPage.runProjectStateGenerator}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
