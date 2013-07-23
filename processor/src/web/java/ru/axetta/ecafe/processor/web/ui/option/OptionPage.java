@@ -419,6 +419,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.retryAfter = retryAfter;
     }
 
+    public String getSyncRegisterSupportEmail() {
+        return syncRegisterSupportEmail;
+    }
+
+    public void setSyncRegisterSupportEmail(String syncRegisterSupportEmail) {
+        this.syncRegisterSupportEmail = syncRegisterSupportEmail;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }

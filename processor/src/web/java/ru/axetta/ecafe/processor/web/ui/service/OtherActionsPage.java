@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
+import ru.axetta.ecafe.processor.core.service.BIDataExportService;
 import ru.axetta.ecafe.processor.core.service.BenefitsRecalculationService;
 import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
@@ -18,6 +19,11 @@ import org.springframework.stereotype.Component;
 @Component
 @Scope("session")
 public class OtherActionsPage extends BasicWorkspacePage {
+
+    public void rubBIExport () throws Exception {
+        RuntimeContext.getAppContext().getBean(BIDataExportService.class).run(); // DEF
+        printMessage("Генерация данных ключевых показателей выполнена");
+    }
 
     public void runProjectStateGenerator() throws Exception {
         RuntimeContext.getAppContext().getBean(ProjectStateReportService.class).run(); //DEF
