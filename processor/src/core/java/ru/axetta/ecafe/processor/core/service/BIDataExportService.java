@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 
 import org.hibernate.Session;
 import org.slf4j.LoggerFactory;
@@ -75,7 +76,7 @@ public class BIDataExportService {
         //  ------------------------------------------
         //  Поставщики питания (Contragents)
         //  ------------------------------------------
-        TYPES.add(new BIDataExportType("contagents",
+        TYPES.add(new BIDataExportType("contragents",
                 "select cf_contragents.idofcontragent, cf_contragents.contragentname "
                 + "from cf_orders "
                 + "left join cf_contragents on cf_orders.idofcontragent=cf_contragents.idofcontragent "
@@ -124,7 +125,7 @@ public class BIDataExportService {
         //  Типы карт (CardTypes)
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("cardtypes", new String[]{"card_type_id", "categoryname"})
-                .setSpecificExporter("cartTypesExporter"));
+                .setSpecificExporter("cardTypesExporter"));
 
 
 
@@ -162,15 +163,19 @@ public class BIDataExportService {
         //  Детализация заказа (OrderDetails)
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("orderdetails",
-                "select cf_orders.idofclient, cf_orders.createddate, cf_orders.idoforg, cf_orders.idoforder, cf_orders.idofcontragent, "
-                        + "     cf_cards.cardtype, cf_orders.rsum, cf_orders.socdiscount "
-                        + "from cf_orders "
-                        + "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient and cf_orders.idoforg=cf_clients.idoforg "
-                        + "left join cf_cards on cf_orders.idofcard=cf_cards.idofcard "
-                        + "where cf_orders.idofclient<>0 and cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 and "
-                        + "                                                                EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
-                        + "order by createddate",
-                new String[]{"idofclient", "createddate", "idoforg", "idoforder", "idofcontragent","cardtype", "rsum", "socdiscount"}));
+                "select cf_orders.idoforg, cf_orders.idoforder, cf_orderdetails.idoforderdetail, "
+                + "       case when cf_orderdetails.menuType=" + OrderDetail.TYPE_DISH_ITEM + " then 1 "
+                + "            when cf_orderdetails.menuType>=" + OrderDetail.TYPE_COMPLEX_MIN + " and cf_orderdetails.menuType<=" + OrderDetail.TYPE_COMPLEX_LAST + " then 2 "
+                + "            when lower(cf_orderdetails.menugroup)='вендинг' then 3 "
+                + "            else -1 end as foodtype, "
+                + "       cf_orderdetails.menugroup as groupname, CF_ComplexRoles.ExtendRoleName as rationtype, cf_orderdetails.idofrule as idofcategorydiscount, cf_orderdetails.rprice as rsum, cf_orderdetails.socdiscount "
+                + "from cf_orders "
+                + "join cf_orderdetails on cf_orders.idoforg=cf_orderdetails.idoforg and cf_orders.idoforder=cf_orderdetails.idoforder "
+                + "left join CF_ComplexRoles on CF_ComplexRoles.IdOfRole=cf_orderdetails.idofrule "
+                + "where cf_orders.idofclient<>0 and cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 and "
+                + "                                                                EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
+                + "order by cf_orders.createddate",
+                new String[]{"idoforg", "idoforder", "idoforderdetail", "foodtype", "groupname", "rationtype", "idofcategorydiscount", "rsum", "socdiscount"}));
 
 
         newTypes = new ExportType(TYPES, "new");
@@ -287,12 +292,20 @@ public class BIDataExportService {
             StringBuilder builder = new StringBuilder();
             boolean fileCreated = false;
             boolean dataExists = false;
+            File rootDir = null;
+            try {
+                rootDir = new File (exportType.getRootDirectory (LOCAL_DIRECTORY));
+                rootDir.mkdirs();
+            } catch (Exception e) {
+                logger.error("Failed to create directory " + exportType.getRootDirectory (LOCAL_DIRECTORY), e);
+                return false;
+            }
             //  Составляем таблицу с данными в CSV
             for (Object entry : resultList) {
 
                 dataExists = true;
                 if (!fileCreated) {
-                    tempFile = new File(exportType.getRootDirectory (LOCAL_DIRECTORY), parseFileName(last, t));
+                    tempFile = new File(rootDir, parseFileName(last, t));
                     if (!USE_FTP_AS_STORAGE) {
                         if (tempFile.exists()) {
                             tempFile.delete();
@@ -478,7 +491,7 @@ public class BIDataExportService {
     public static String parseFileName(Calendar cal, String type) {
         String date = FILES_FORMAT.format(cal.getTime());
         //return date + "_" + type + ".csv";
-        return date + " " + type + ".csv";
+        return type + "_" + date + ".csv";
     }
 
 
@@ -492,8 +505,7 @@ public class BIDataExportService {
     }
 
 
-    public static void cartTypesExporter(List<BIDataExportType> types, String LOCAL_DIRECTORY, String t, Calendar last) throws IOException {
-        BIDataExportType type = getTypeByName(types, t);
+    public static void cardTypesExporter(BIDataExportType type, String LOCAL_DIRECTORY, String t, Calendar last) throws IOException {
         File tempFile = new File(LOCAL_DIRECTORY, parseFileName(last, t));
         if (!USE_FTP_AS_STORAGE) {
             if (tempFile.exists()) {
@@ -530,8 +542,8 @@ public class BIDataExportService {
         java.lang.reflect.Method meth;
         try {
             meth = BIDataExportService.class
-                    .getDeclaredMethod(type.getSpecificExporter(), String.class, String.class, Calendar.class);
-            meth.invoke(null, dir, t, now);
+                    .getDeclaredMethod(type.getSpecificExporter(), BIDataExportType.class, String.class, String.class, Calendar.class);
+            meth.invoke(null, type, dir, t, now);
         } catch (Exception e) {
             logger.error("Failed to execute exporter method " + type.getSpecificExporter(), e);
         }
@@ -673,7 +685,7 @@ public class BIDataExportService {
         //  Типы карт (CardTypes)
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("cardtypes", new String[]{"card_type_id", "categoryname"})
-                .setSpecificExporter("cartTypesExporter"));
+                .setSpecificExporter("cardTypesExporter"));
 
         //  ------------------------------------------
         //  ???
