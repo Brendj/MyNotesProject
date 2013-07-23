@@ -63,6 +63,8 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -2495,12 +2497,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(null);
 
         long lCardId = Long.parseLong(cardId);
+        Long contractId = null;
         try {
-            return DAOService.getInstance().getContractIdByCardNo(lCardId);
+            contractId = DAOService.getInstance().getContractIdByCardNo(lCardId);
+            if(contractId==null){
+                contractId = DAOService.getInstance().getContractIdByTempCardNoAndCheckValidDate(lCardId);
+            }
         } catch (Exception e) {
             logger.error("ClientRoomController failed", e);
-            return null;
         }
+        return contractId;
     }
 
     @Override
@@ -3526,7 +3532,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             if (list.size() < 1) {
                 for (ClientNotificationSetting.Predefined pd : ClientNotificationSetting.Predefined.values()) {
-                    if (pd.getValue() == ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue() ||
+                    if (pd.getValue().equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue()) ||
                             !pd.isEnabledAtDefault()) {
                         continue;
                     }
@@ -3583,7 +3589,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (notificationTypes != null) {
                 for (Long type : notificationTypes) {
                     ClientNotificationSetting.Predefined pd = ClientNotificationSetting.Predefined.parse(type);
-                    if (pd == null || pd.getValue() == ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue()) {
+                    if (pd == null || pd.getValue()
+                            .equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
                         continue;
                     }
                     newSettings.add(new ClientNotificationSetting(client, pd.getValue()));
@@ -3607,7 +3614,52 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return res;
     }
 
-    @Transactional
+    @Override
+    public void getStudentsByCanNotConfirmPayment(@WebParam(name = "contractId") Long contractId) {
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
+            DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+            timeFormat.setTimeZone(localTimeZone);
+            Client teacher = DAOUtils.findTeacherPaymentForStudents(persistenceSession, contractId);
+            if (teacher !=null) {
+                List students = DAOUtils.fetchStudentsByCanNotConfirmPayment(persistenceSession, teacher.getIdOfClient());
+                Long idOfClient = null;
+                Long sum = 0L;
+                for (Object object : students) {
+                    Object[] student = (Object[]) object;
+                    //String fio = String.valueOf(student[1]) + " "+String.valueOf(student[0]) + " "+String.valueOf(student[2]) ;
+                    Long balance = Long.valueOf(String.valueOf(student[3]));
+                    //String stringDate = timeFormat.format((Date)student[5]);
+                    Long paySum = Long.valueOf(String.valueOf(student[4]));
+                    Long currentIdOfClient = Long.valueOf(String.valueOf(student[6]));
+                    if (idOfClient == null || (!idOfClient.equals(currentIdOfClient))) {
+                        idOfClient = currentIdOfClient;
+                        sum = 0L;
+                    }
+                    if (balance + sum < 0 && idOfClient.equals(currentIdOfClient)) {
+                        sum += paySum;
+
+                    }
+                }
+            }
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to Students By Can Not Confirm Payment settings", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+        }
+    }
+
     public void removeSMSSettings(Set<ClientNotificationSetting> notificationSettings) throws Exception {
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;

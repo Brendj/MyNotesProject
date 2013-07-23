@@ -14,7 +14,7 @@ CREATE TABLE cf_cards_temp (
   IdOfOrg bigint,                        --! идентификатор организациии
   IdOfClient bigInt,                     --! Идентификатор клиента
   IdOfVisitor bigint,                    --!  Идентификатор посетителя
-  CustomerType int not null default 0,     --! Признак карты посетителя , bit, 1- карта посетителя, 0 — карта клиента, not null
+  myclienttype bigint ,                  --! Признак карты посетителя , bit, 1- карта посетителя, 0 — карта клиента, not null
   CardNo bigint NOT NULL,                --! номер карты
   CardPrintedNo character varying(24),   --! номер нанесенный на карту
   CardStation int not null default 0,    --! int16 или int8, not null, значения-  0 — свободна, 1 — выдана , 3 — заблокирована (? не уверен, что блокировка нужна)
@@ -85,8 +85,8 @@ create index CF_ClientSms_Price_idx on CF_ClientSms(Price);
 create index CF_SubscriptionFee_SubscriptionSum_idx on CF_SubscriptionFee(SubscriptionSum);
 create index CF_ClientPayments_PaySum_idx on CF_ClientPayments(PaySum);
 
+-- Параметр запроса полной синхронизации
 alter table CF_Orgs add FullSyncParam INTEGER NOT NULL default 0;
-
 
 -- Добавление ссылки на контрагента для Контракта
 alter table cf_contracts add column IdOfContragent BIGINT DEFAULT NULL;
@@ -105,3 +105,11 @@ create table CF_GuardSan  (
   CONSTRAINT CF_Client_GuardSan_IdOfClient_fk FOREIGN KEY (IdOfClient) REFERENCES CF_Clients (IdOfClient)
 );
 create index CF_GuardSan_GuardSan_idx on CF_GuardSan(GuardSAN);
+
+-- Наименование комплексов
+create table CF_ComplexRoles(
+  IdOfRole bigint not null,
+  RoleName varchar(128),
+  ExtendRoleName varchar(128),
+  CONSTRAINT CF_ComplexRole_pk PRIMARY KEY (IdOfRole)
+);

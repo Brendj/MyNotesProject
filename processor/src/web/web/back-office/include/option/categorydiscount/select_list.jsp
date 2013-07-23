@@ -36,7 +36,7 @@
             <tr>
                 <td style="text-align: center;">
                     <rich:dataTable width="100%" align="center" id="modalCategoryListSelectorCategoryTable"
-                                    value="#{mainPage.categoryListSelectPage.items}" var="item" rows="25"
+                                    value="#{mainPage.categoryListSelectPage.items}" var="item" rows="8"
                                     footerClass="data-table-footer" columnClasses="left-aligned-column"
                                     rowClasses="select-panel-row" onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
                                     onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">

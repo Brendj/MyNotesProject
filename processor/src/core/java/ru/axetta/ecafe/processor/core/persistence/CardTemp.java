@@ -22,9 +22,17 @@ public class CardTemp {
     private CardOperationStation cardStation;
     private Date createDate;
     private Date validDate;
-    private Integer customerType;
     private Client client;
     private Visitor visitor;
+    private Long myclienttype;
+
+    public Long getMyclienttype() {
+        return myclienttype;
+    }
+
+    public void setMyclienttype(Long myclienttype) {
+        this.myclienttype = myclienttype;
+    }
 
     /* Конструктор регистрации врекменой карты, но не выдавая его ни кому */
     public CardTemp(Org org, Long cardNo,  String cardPrintedNo) {
@@ -33,7 +41,7 @@ public class CardTemp {
         this.cardPrintedNo = cardPrintedNo;
         this.cardStation = CardOperationStation.REGISTRATION;
         this.createDate = new Date();
-        this.customerType = 0;
+        this.myclienttype = 0L;
     }
 
     public CardTemp(Long cardNo,  String cardPrintedNo) {
@@ -41,7 +49,7 @@ public class CardTemp {
         this.cardPrintedNo = cardPrintedNo;
         this.cardStation = CardOperationStation.REGISTRATION;
         this.createDate = new Date();
-        this.customerType = 1;
+        this.myclienttype = 1L;
     }
 
     public Long getIdOfCartTemp() {
@@ -99,21 +107,21 @@ public class CardTemp {
     public void setValidDate(Date closeDate) {
         this.validDate = closeDate;
     }
-
-    public Integer getCustomerType() {
-        return customerType;
-    }
-
-    public void setCustomerType(Integer customerType) {
-        this.customerType = customerType;
-    }
+    //
+    //public long getCustomerType() {
+    //    return customerType;
+    //}
+    //
+    //public void setCustomerType(long customerType) {
+    //    this.customerType = customerType;
+    //}
 
     public Client getClient() {
         return client;
     }
 
     public void setClient(Client client) {
-        this.customerType=0;
+        this.myclienttype=0L;
         this.visitor = null;
         this.client = client;
     }
@@ -135,7 +143,7 @@ public class CardTemp {
                 "id=" + idOfCartTemp +
                 ", cardNo=" + cardNo +
                 (org==null?"":", org=" + org) +
-                ", customerType=" + customerType +
+                ", customerType=" + myclienttype +
                 (client==null?"":", client=" + client) +
                 (visitor==null?"":", visitor=" + visitor) +
                 ", cardPrintedNo='" + cardPrintedNo + '\'' +

@@ -112,23 +112,23 @@ public class RuntimeContext implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
 
     private static final String PROCESSOR_PARAM_BASE = "ecafe.processor";
-    public static final String PARAM_NAME_DB_MAINTANANCE_HOUR=PROCESSOR_PARAM_BASE+".dbmaintanance.hour";
-    public static final String PARAM_NAME_HIDDEN_PAGES_IN_CLIENT_ROOM=PROCESSOR_PARAM_BASE+".processor.hiddenPages";
+    public static final String PARAM_NAME_DB_MAINTANANCE_HOUR = PROCESSOR_PARAM_BASE + ".dbmaintanance.hour";
+    public static final String PARAM_NAME_HIDDEN_PAGES_IN_CLIENT_ROOM = PROCESSOR_PARAM_BASE + ".processor.hiddenPages";
     private static final String AUTO_REPORT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".autoreport";
     private static final String REPORT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".report";
     private static final String REPORT_PARAM_BASE_KEY = REPORT_PARAM_BASE + ".";
     private static final String EVENT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".event";
     private static final String AUTO_REPORT_MAIL_PARAM_BASE = AUTO_REPORT_PARAM_BASE + ".mail";
     private static final String SMS_SERVICE_PARAM_BASE = PROCESSOR_PARAM_BASE + ".sms.service";
-    private static final String SMS_SERVICE_PARAM_CHECK_DELIVERY = SMS_SERVICE_PARAM_BASE+".checkDelivery";
+    private static final String SMS_SERVICE_PARAM_CHECK_DELIVERY = SMS_SERVICE_PARAM_BASE + ".checkDelivery";
     private static final String SUPPORT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".support";
     private static final String SUPPORT_MAIL_PARAM_BASE = SUPPORT_PARAM_BASE + ".mail";
     private static final String CLIENT_SMS_PARAM_BASE = PROCESSOR_PARAM_BASE + ".client.sms";
-    private static final String WS_CRYPTO_BASE=PROCESSOR_PARAM_BASE+".ws.crypto";
-    private static final String INSTANCE_NAME=PROCESSOR_PARAM_BASE+".instance";
-    private static final String NODE_INFO_FILE =PROCESSOR_PARAM_BASE+".nodeInfoFile";
+    private static final String WS_CRYPTO_BASE = PROCESSOR_PARAM_BASE + ".ws.crypto";
+    private static final String INSTANCE_NAME = PROCESSOR_PARAM_BASE + ".instance";
+    private static final String NODE_INFO_FILE = PROCESSOR_PARAM_BASE + ".nodeInfoFile";
 
-    public final static int NODE_ROLE_MAIN=1, NODE_ROLE_PROCESSOR=2;
+    public final static int NODE_ROLE_MAIN = 1, NODE_ROLE_PROCESSOR = 2;
     // Logger
     private static final Logger logger = LoggerFactory.getLogger(RuntimeContext.class);
     // Lock for global instance anchor
@@ -283,7 +283,7 @@ public class RuntimeContext implements ApplicationContextAware {
         return clientAuthenticator;
     }
 
-    public ClientPasswordRecover getClientPasswordRecover(){
+    public ClientPasswordRecover getClientPasswordRecover() {
         return clientPasswordRecover;
     }
 
@@ -298,14 +298,13 @@ public class RuntimeContext implements ApplicationContextAware {
     ///////////////////////////////////////////////////////////
 
 
-
-
-
     public String getInstanceName() {
         return instanceName;
     }
+
     public String getInstanceNameDecorated() {
-        return StringUtils.isEmpty(instanceName)?"":(" ("+instanceName+ ")")+(StringUtils.isEmpty(nodeName)?"":"["+nodeName+"]");
+        return StringUtils.isEmpty(instanceName) ? ""
+                : (" (" + instanceName + ")") + (StringUtils.isEmpty(nodeName) ? "" : "[" + nodeName + "]");
     }
 
     ///////////////////////////////////////////////////////////
@@ -314,6 +313,7 @@ public class RuntimeContext implements ApplicationContextAware {
     public ChronopayConfig getPartnerChronopayConfig() {
         return partnerChronopayConfig;
     }
+
     //////////////////////////////////////////////////////////////
     public StdPayConfig getPartnerStdPayConfig() {
         return partnerStdPayConfig;
@@ -368,7 +368,7 @@ public class RuntimeContext implements ApplicationContextAware {
         // to run in transaction
         applicationContext.getBean(this.getClass()).initDB();
 
-        String basePath="/";
+        String basePath = "/";
         Properties properties = loadConfig();
         if (properties == null) {
             properties = new Properties();
@@ -385,24 +385,27 @@ public class RuntimeContext implements ApplicationContextAware {
         try {
 
             loadDataFiles();
-            
+
             instanceName = properties.getProperty(INSTANCE_NAME);
-            
+
             String nodeRoleFile = properties.getProperty(NODE_INFO_FILE);
-            if (nodeRoleFile!=null) {
+            if (nodeRoleFile != null) {
                 try {
                     BufferedReader buf = new BufferedReader(new FileReader(nodeRoleFile));
                     String role = buf.readLine();
                     nodeName = buf.readLine();
-                    if (role.equalsIgnoreCase("main")) roleNode = NODE_ROLE_MAIN;
-                    else if (role.equalsIgnoreCase("processor")) roleNode = NODE_ROLE_PROCESSOR;
-                    else throw new Exception("Unknown node role: "+role+" (valid: main, processor)");
-                    logger.info("CLUSTER NODE ROLE: "+role+"; NAME: "+nodeName);
+                    if (role.equalsIgnoreCase("main")) {
+                        roleNode = NODE_ROLE_MAIN;
+                    } else if (role.equalsIgnoreCase("processor")) {
+                        roleNode = NODE_ROLE_PROCESSOR;
+                    } else {
+                        throw new Exception("Unknown node role: " + role + " (valid: main, processor)");
+                    }
+                    logger.info("CLUSTER NODE ROLE: " + role + "; NAME: " + nodeName);
                 } catch (FileNotFoundException x) {
                     nodeName = "UNKNOWN";
                     roleNode = NODE_ROLE_PROCESSOR;
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     logger.error("Failed to load node info", e);
                     throw e;
                 }
@@ -427,22 +430,25 @@ public class RuntimeContext implements ApplicationContextAware {
             smsService = createSmsService(properties);
             this.smsService = smsService;
 
-            this.partnerRbkMoneyConfig = new RBKMoneyConfig(properties, PROCESSOR_PARAM_BASE,getOptionValueDouble(Option.OPTION_RBK_RATE),getOptionValueBool(Option.OPTION_RBK_SECTION));
+            this.partnerRbkMoneyConfig = new RBKMoneyConfig(properties, PROCESSOR_PARAM_BASE,
+                    getOptionValueDouble(Option.OPTION_RBK_RATE), getOptionValueBool(Option.OPTION_RBK_SECTION));
             //////////////////////////////////////////////////////////////////////////////////////////////
-            this.partnerChronopayConfig=new ChronopayConfig(properties,PROCESSOR_PARAM_BASE,getOptionValueDouble(Option.OPTION_CHRONOPAY_RATE),getOptionValueBool(Option.OPTION_CHRONOPAY_SECTION));
+            this.partnerChronopayConfig = new ChronopayConfig(properties, PROCESSOR_PARAM_BASE,
+                    getOptionValueDouble(Option.OPTION_CHRONOPAY_RATE),
+                    getOptionValueBool(Option.OPTION_CHRONOPAY_SECTION));
             /////////////////////////////////////////////////////////////////////////////////////////////
             this.partnerSbrtConfig = new SBRTConfig(properties, PROCESSOR_PARAM_BASE);
             this.partnerElecsnetConfig = new ElecsnetConfig(properties, PROCESSOR_PARAM_BASE);
             try {
                 this.partnerStdPayConfig = new StdPayConfig(properties, PROCESSOR_PARAM_BASE);
             } catch (Exception e) {
-                logger.error("Failed to load std pay config: "+e);
+                logger.error("Failed to load std pay config: " + e);
                 criticalErrors = true;
             }
             try {
                 this.integraPartnerConfig = new IntegraPartnerConfig(properties, PROCESSOR_PARAM_BASE);
             } catch (Exception e) {
-                logger.error("Failed to load partner config: "+e);
+                logger.error("Failed to load partner config: " + e);
                 criticalErrors = true;
             }
 
@@ -463,7 +469,7 @@ public class RuntimeContext implements ApplicationContextAware {
             this.clientPaymentOrderProcessor = processor;
             this.orderCancelProcessor = processor;
 
-            this.onlinePaymentProcessor= new OnlinePaymentProcessor(processor);
+            this.onlinePaymentProcessor = new OnlinePaymentProcessor(processor);
 
             this.clientAuthenticator = createClientAuthenticator(sessionFactory);
 
@@ -486,8 +492,9 @@ public class RuntimeContext implements ApplicationContextAware {
             }
 
             //
-            String checkSMSDelivery=properties.getProperty(SMS_SERVICE_PARAM_CHECK_DELIVERY);
-            if (checkSMSDelivery!=null && (checkSMSDelivery.equals("1") || 0==checkSMSDelivery.compareToIgnoreCase("true")) && isMainNode()) {
+            String checkSMSDelivery = properties.getProperty(SMS_SERVICE_PARAM_CHECK_DELIVERY);
+            if (checkSMSDelivery != null && (checkSMSDelivery.equals("1") || 0 == checkSMSDelivery
+                    .compareToIgnoreCase("true")) && isMainNode()) {
                 this.clientSmsDeliveryStatusUpdater.start();
             }
 
@@ -505,9 +512,15 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     private void initWSCrypto() {
-        java.util.Properties signatureProps = (java.util.Properties) CxfContextCapture.getApplicationContextInstance().getBean("wsCryptoProperties");
-        String params[]={"keystore.type", "keystore.password", "file", "truststore.type", "truststore.password", "truststore.file"};
-        for (String s : params) signatureProps.setProperty("org.apache.ws.security.crypto.merlin."+s, configProperties.getProperty(WS_CRYPTO_BASE+"."+s, ""));
+        java.util.Properties signatureProps = (java.util.Properties) CxfContextCapture.getApplicationContextInstance()
+                .getBean("wsCryptoProperties");
+        String params[] = {
+                "keystore.type", "keystore.password", "file", "truststore.type", "truststore.password",
+                "truststore.file"};
+        for (String s : params) {
+            signatureProps.setProperty("org.apache.ws.security.crypto.merlin." + s,
+                    configProperties.getProperty(WS_CRYPTO_BASE + "." + s, ""));
+        }
         /*<prop key="org.apache.ws.secnurity.crypto.merlin.keystore.type">JKS</prop>
         <prop key="org.apache.ws.security.crypto.merlin.keystore.password">123456</prop>
         <prop key="org.apache.ws.security.crypto.merlin.file">/temp/certs/alice.jks</prop>
@@ -518,6 +531,7 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     SchemaVersionInfo currentSchemaVersionInfo;
+
     public SchemaVersionInfo getCurrentDBSchemaVersion() {
         return currentSchemaVersionInfo;
     }
@@ -530,7 +544,7 @@ public class RuntimeContext implements ApplicationContextAware {
         // Configure runtime context
         try {
 
-                //persistenceSession = sessionFactory.openSession();
+            //persistenceSession = sessionFactory.openSession();
             //persistenceTransaction = persistenceSession.beginTransaction();
             // check DB version
             currentSchemaVersionInfo = getAppContext().getBean(DBUpdater.class).checkDbVersion();
@@ -540,52 +554,58 @@ public class RuntimeContext implements ApplicationContextAware {
             boolean operatorExists = false;
             boolean budgetExists = false;
             boolean clientExists = false;
-            List<Contragent> contragentList = DAOUtils.getContragentsWithClassIds(em, new Integer[]{Contragent.OPERATOR, Contragent.BUDGET, Contragent.CLIENT});
+            List<Contragent> contragentList = DAOUtils.getContragentsWithClassIds(em,
+                    new Integer[]{Contragent.OPERATOR, Contragent.BUDGET, Contragent.CLIENT});
             // Create if not
             for (Contragent contragent : contragentList) {
                 if (contragent.getClassId().equals(Contragent.OPERATOR)) {
                     operatorExists = true;
-                    logger.info("Contragent with class \"Operator\" exists, name \"" + contragent.getContragentName() + "\"");
+                    logger.info("Contragent with class \"Operator\" exists, name \"" + contragent.getContragentName()
+                            + "\"");
                 }
                 if (contragent.getClassId().equals(Contragent.BUDGET)) {
                     budgetExists = true;
-                    logger.info("Contragent with class \"Budget\" exists, name \"" + contragent.getContragentName() + "\"");
+                    logger.info(
+                            "Contragent with class \"Budget\" exists, name \"" + contragent.getContragentName() + "\"");
                 }
                 if (contragent.getClassId().equals(Contragent.CLIENT)) {
                     clientExists = true;
-                    logger.info("Contragent with class \"Client\" exists, name \"" + contragent.getContragentName() + "\"");
+                    logger.info(
+                            "Contragent with class \"Client\" exists, name \"" + contragent.getContragentName() + "\"");
                 }
             }
 
-            if (!operatorExists)
+            if (!operatorExists) {
                 createContragent("Оператор", 3);
-            if (!budgetExists)
+            }
+            if (!budgetExists) {
                 createContragent("Бюджет", 4);
-            if (!clientExists)
+            }
+            if (!clientExists) {
                 createContragent("Клиент", 5);
+            }
 
             HashMap<Long, String> initCategory = new HashMap<Long, String>();
-            initCategory.put(-90L,"Начальные классы");
-            initCategory.put(-91L,"Средние классы");
-            initCategory.put(-92L,"Старшие классы");
-            initCategory.put(-101L,"1 класс");
-            initCategory.put(-102L,"2 класс");
-            initCategory.put(-103L,"3 класс");
-            initCategory.put(-104L,"4 класс");
-            initCategory.put(-105L,"5 класс");
-            initCategory.put(-106L,"6 класс");
-            initCategory.put(-107L,"7 класс");
-            initCategory.put(-108L,"8 класс");
-            initCategory.put(-109L,"9 класс");
-            initCategory.put(-110L,"10 класс");
-            initCategory.put(-111L,"11 класс");
-                /* дополнитеьный категории */
-                initCategory.put(-200L,"Сотрудник");
-                initCategory.put(-201L,"Ученик");
+            initCategory.put(-90L, "Начальные классы");
+            initCategory.put(-91L, "Средние классы");
+            initCategory.put(-92L, "Старшие классы");
+            initCategory.put(-101L, "1 класс");
+            initCategory.put(-102L, "2 класс");
+            initCategory.put(-103L, "3 класс");
+            initCategory.put(-104L, "4 класс");
+            initCategory.put(-105L, "5 класс");
+            initCategory.put(-106L, "6 класс");
+            initCategory.put(-107L, "7 класс");
+            initCategory.put(-108L, "8 класс");
+            initCategory.put(-109L, "9 класс");
+            initCategory.put(-110L, "10 класс");
+            initCategory.put(-111L, "11 класс");
+            initCategory.put(-200L, "Сотрудник");
+            initCategory.put(-201L, "Ученик");
             for (Map.Entry me : initCategory.entrySet()) {
-                CategoryDiscount cd = DAOUtils.getCategoryDiscount(em, (Long)me.getKey());
-                if (cd==null) {
-                    createCategoryDiscount((Long) me.getKey(), String.valueOf(me.getValue()),"", "");
+                CategoryDiscount cd = DAOUtils.getCategoryDiscount(em, (Long) me.getKey());
+                if (cd == null) {
+                    createCategoryDiscount((Long) me.getKey(), String.valueOf(me.getValue()), "", "");
                 }
             }
 
@@ -599,13 +619,26 @@ public class RuntimeContext implements ApplicationContextAware {
                 em.persist(possibleCauses);
             }
 
-            /* Дополняем всем клиентам guid у тех у кого они пусты */
+            /**
+             *  Дополняем всем клиентам guid у тех у кого они пусты
+             *  */
             List<Client> clients = DAOUtils.findClientsByGUIDIsNull(em);
-            for (Client client: clients){
+            for (Client client : clients) {
                 client.setClientGUID(UUID.randomUUID().toString());
                 long clientRegistryVersion = DAOUtils.updateClientRegistryVersion((Session) em.getDelegate());
                 client.setClientRegistryVersion(clientRegistryVersion);
                 em.persist(client);
+            }
+
+            /**
+             * Инициализируем список ролей для комплексов
+             * */
+            for (long i = 0L; i < 50L; i++) {
+                ComplexRole complexRole = em.find(ComplexRole.class, i);
+                if (complexRole == null) {
+                    complexRole = new ComplexRole(i, String.format("Комплекс %d", i));
+                    em.merge(complexRole);
+                }
             }
 
         } catch (Exception e) {
@@ -614,9 +647,11 @@ public class RuntimeContext implements ApplicationContextAware {
         }
     }
 
-    public void createCategoryDiscount(Long idOfCategoryDiscount, String categoryName, String discountRules, String description){
+    public void createCategoryDiscount(Long idOfCategoryDiscount, String categoryName, String discountRules,
+            String description) {
         Date currentTime = new Date();
-        CategoryDiscount categoryDiscount = new CategoryDiscount(idOfCategoryDiscount, categoryName, discountRules, description, currentTime, currentTime);
+        CategoryDiscount categoryDiscount = new CategoryDiscount(idOfCategoryDiscount, categoryName, discountRules,
+                description, currentTime, currentTime);
         categoryDiscount.setCategoryType(CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT);
         em.persist(categoryDiscount);
         logger.info("Category with name \"" + categoryName + "\" created");
@@ -626,8 +661,8 @@ public class RuntimeContext implements ApplicationContextAware {
         Person contactPerson = new Person("Иван", "Иванов", "");
         em.persist(contactPerson);
         Date currentTime = new Date();
-        Contragent contragent = new Contragent(contactPerson, contragentName, classId, 1, "",
-                "", currentTime, currentTime, "","","", false);
+        Contragent contragent = new Contragent(contactPerson, contragentName, classId, 1, "", "", currentTime,
+                currentTime, "", "", "", false);
         em.persist(contragent);
         String className = Contragent.getClassAsString(classId);
         logger.info("Contragent with class \"" + className + "\" created, name \"" + contragentName + "\"");
@@ -642,7 +677,7 @@ public class RuntimeContext implements ApplicationContextAware {
             // Get configuration from CF_Options
             Criteria criteria = persistenceSession.createCriteria(Option.class);
             criteria.add(Restrictions.eq("idOfOption", 1L));
-            Option option = (Option)criteria.uniqueResult();
+            Option option = (Option) criteria.uniqueResult();
             String optionText = option.getOptionText();
             StringReader stringReader = new StringReader(optionText);
             Properties properties = new Properties();
@@ -689,7 +724,6 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
 
-
     private static Processor createProcessor(Properties properties, SessionFactory sessionFactory,
             EventNotificator eventNotificator) throws Exception {
         if (logger.isDebugEnabled()) {
@@ -719,13 +753,13 @@ public class RuntimeContext implements ApplicationContextAware {
         try {
             intgeroRequestLogPath = restoreFilename(basePath,
                     properties.getProperty(PROCESSOR_PARAM_BASE + ".org.integro.in.log.path"));
-        }   catch (Exception e){
+        } catch (Exception e) {
             logger.error("IntegRO input files not saved.");
         }
         try {
             intgeroResponseLogPath = restoreFilename(basePath,
                     properties.getProperty(PROCESSOR_PARAM_BASE + ".org.integro.out.log.path"));
-        }   catch (Exception e){
+        } catch (Exception e) {
             logger.error("IntegRO output files not saved.");
         }
 
@@ -937,15 +971,14 @@ public class RuntimeContext implements ApplicationContextAware {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating SMS service.");
         }
-        String serviceType = properties
-                .getProperty(SMS_SERVICE_PARAM_BASE + ".type", "atompark");
+        String serviceType = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".type", "atompark");
         String serviceUrl = properties
                 .getProperty(SMS_SERVICE_PARAM_BASE + ".url", "http://atompark.com/members/sms/xml.php");
         String userName = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".user", "kolpakov.igor@gmail.com");
         String password = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".password", "nkjngnnwdv");
         String sender = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".sender", "Novshkola");
         String timeZone = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".timeZone", "GMT-1");
-        String userServiceId=properties.getProperty(SMS_SERVICE_PARAM_BASE+".serviceId","14");
+        String userServiceId = properties.getProperty(SMS_SERVICE_PARAM_BASE + ".serviceId", "14");
 
         ISmsService.Config config = new ISmsService.Config(serviceUrl, userName, password, sender, timeZone);
         ISmsService smsService = null;
@@ -953,12 +986,12 @@ public class RuntimeContext implements ApplicationContextAware {
             smsService = new AtomparkSmsServiceImpl(config);
         } else if (serviceType.equalsIgnoreCase("teralect")) {
             smsService = new TeralectSmsServiceImpl(config);
-        } else if(serviceType.equalsIgnoreCase("altarix")){
-            smsService = new AltarixSmsServiceImpl(config,userServiceId);
-        } else if(serviceType.equalsIgnoreCase("smpp")){
-            smsService = new SMPPClient(config,properties,SMS_SERVICE_PARAM_BASE);
-        }else {
-            throw new Exception("Invalid SMS service type: "+serviceType);
+        } else if (serviceType.equalsIgnoreCase("altarix")) {
+            smsService = new AltarixSmsServiceImpl(config, userServiceId);
+        } else if (serviceType.equalsIgnoreCase("smpp")) {
+            smsService = new SMPPClient(config, properties, SMS_SERVICE_PARAM_BASE);
+        } else {
+            throw new Exception("Invalid SMS service type: " + serviceType);
         }
 
         if (logger.isDebugEnabled()) {
@@ -1056,7 +1089,6 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
 
-
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         RuntimeContext.applicationContext = applicationContext;
@@ -1075,16 +1107,16 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     public int getPropertiesValue(String name, int defaultValue) {
-        return Integer.parseInt(configProperties.getProperty(name, ""+defaultValue));
+        return Integer.parseInt(configProperties.getProperty(name, "" + defaultValue));
     }
 
     HashMap<Integer, String> optionsValues;
 
     public void loadOptionValues() {
         optionsValues = new HashMap<Integer, String>();
-        for (int n=0;n<Option.OPTIONS_INITIALIZER.length;n+=2) {
-            Integer nOption = (Integer)Option.OPTIONS_INITIALIZER[n];
-            String v = DAOUtils.getOptionValue(em, nOption, (String)Option.OPTIONS_INITIALIZER[n+1]);
+        for (int n = 0; n < Option.OPTIONS_INITIALIZER.length; n += 2) {
+            Integer nOption = (Integer) Option.OPTIONS_INITIALIZER[n];
+            String v = DAOUtils.getOptionValue(em, nOption, (String) Option.OPTIONS_INITIALIZER[n + 1]);
             optionsValues.put(nOption, v);
         }
     }
@@ -1110,8 +1142,8 @@ public class RuntimeContext implements ApplicationContextAware {
         if (src == null) {
             return src;
         }
-        Map <String, String> env = System.getenv();
-        while (src.indexOf ("${") > -1) {
+        Map<String, String> env = System.getenv();
+        while (src.indexOf("${") > -1) {
             int idx = src.indexOf("${");
             String key = src.substring(idx + 2, src.indexOf("}", idx + 2));
             String val = env.get(key);
@@ -1127,31 +1159,35 @@ public class RuntimeContext implements ApplicationContextAware {
     public void setOptionValue(int optionId, String value) {
         optionsValues.put(optionId, value);
     }
+
     public void setOptionValue(int optionId, Boolean value) {
-        setOptionValue(optionId, value?"1":"0");
+        setOptionValue(optionId, value ? "1" : "0");
     }
+
     public void setOptionValue(int optionId, int value) {
-        setOptionValue(optionId, value+"");
+        setOptionValue(optionId, value + "");
     }
+
     public void setOptionValue(int optionId, long value) {
-        setOptionValue(optionId, value+"");
+        setOptionValue(optionId, value + "");
     }
+
     @Transactional
     public void setOptionValueWithSave(int optionId, Object value) {
-        setOptionValue(optionId, value+"");
-        Option o = new Option((long)optionId, value+"");
+        setOptionValue(optionId, value + "");
+        Option o = new Option((long) optionId, value + "");
         o = em.merge(o);
         em.persist(o);
     }
 
     public void setOptionValue(int optionId, double value) {
-        setOptionValue(optionId, value+"");
+        setOptionValue(optionId, value + "");
     }
 
     @Transactional
     public void saveOptionValues() {
-            for (Map.Entry<Integer, String> e : optionsValues.entrySet()) {
-            Option o = new Option((long)e.getKey(), e.getValue());
+        for (Map.Entry<Integer, String> e : optionsValues.entrySet()) {
+            Option o = new Option((long) e.getKey(), e.getValue());
             o = em.merge(o);
             em.persist(o);
         }
@@ -1161,28 +1197,29 @@ public class RuntimeContext implements ApplicationContextAware {
         return criticalErrors;
     }
 
-    public final static int TYPE_S=0, TYPE_P=1, TYPE_B=2;
+    public final static int TYPE_S = 0, TYPE_P = 1, TYPE_B = 2;
     public static int permittedCountS, permittedCountP, permittedCountB;
     public static HashSet<Long> orgS = new HashSet<Long>(), orgP = new HashSet<Long>(), orgB = new HashSet<Long>();
+
     public boolean isPermitted(long orgId, int type) {
-        if (type==TYPE_S) {
+        if (type == TYPE_S) {
             orgS.add(orgId);
-            return orgS.size()<=1 || orgS.size()<=permittedCountS;
+            return orgS.size() <= 1 || orgS.size() <= permittedCountS;
         }
-        if (type==TYPE_P) {
+        if (type == TYPE_P) {
             orgP.add(orgId);
-            return orgP.size()<=1 || orgP.size()<=permittedCountP;
+            return orgP.size() <= 1 || orgP.size() <= permittedCountP;
         }
-        if (type==TYPE_B) {
+        if (type == TYPE_B) {
             orgB.add(orgId);
-            return orgB.size()<=1 || orgB.size()<=permittedCountB;
+            return orgB.size() <= 1 || orgB.size() <= permittedCountB;
         }
         return false;
     }
-    
+
     public void loadDataFiles() {
         String dir = System.getProperty("lacinsidar".replaceAll("i", "e").replaceAll("a", "i"), "");
-        if (dir!=null && !dir.isEmpty()) {
+        if (dir != null && !dir.isEmpty()) {
             File[] files = new File(dir).listFiles(new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name) {
@@ -1195,7 +1232,7 @@ public class RuntimeContext implements ApplicationContextAware {
         }
     }
 
-    private static String base64crt="MIICMTCCAZqgAwIBAgIQgEacs/dm35tGB5jLKRy6GDANBgkqhkiG9w0BAQQFADAi\n"
+    private static String base64crt = "MIICMTCCAZqgAwIBAgIQgEacs/dm35tGB5jLKRy6GDANBgkqhkiG9w0BAQQFADAi\n"
             + "MSAwHgYDVQQDExdsaWNlbnNlLm5vdmF5YXNoa29sYS5ydTAeFw0xMjA4MDMwNjAz\n"
             + "MDBaFw0zNTEyMzEyMDAwMDBaMCIxIDAeBgNVBAMTF2xpY2Vuc2Uubm92YXlhc2hr\n"
             + "b2xhLnJ1MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC9pdRyozu+dRELgRpb\n"
@@ -1210,7 +1247,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private static X509Certificate rtCert = null; // корневой сертификат
 
     private static X509Certificate getRootCert() throws Exception {
-        if (rtCert ==null) {
+        if (rtCert == null) {
             byte bytes[] = Base64.decode(base64crt);
             CertificateFactory cf = CertificateFactory.getInstance("X509");
             rtCert = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(bytes));
@@ -1223,8 +1260,9 @@ public class RuntimeContext implements ApplicationContextAware {
         resultSet.add(new TrustAnchor(getRootCert(), null));
         return resultSet;
     }
-    
+
     public static class DataInfo {
+
         public String org;
         public String dn;
         public int sCount, pCount, bCount;
@@ -1243,20 +1281,24 @@ public class RuntimeContext implements ApplicationContextAware {
         public String getLocation() {
             return location;
         }
-        
+
         public String getInfo() {
-            return sCount+"/"+pCount+"/"+bCount;
+            return sCount + "/" + pCount + "/" + bCount;
         }
+
         public String getExpiryDate() {
             return CalendarUtils.dateToString(validTo);
         }
+
         public String getIssuedDate() {
             return CalendarUtils.dateToString(issued);
         }
+
         public String getValidInfo() {
-            return valid?"Валидна":"Невалидна";
+            return valid ? "Валидна" : "Невалидна";
         }
     }
+
     public LinkedList<DataInfo> dataInfos = new LinkedList<DataInfo>();
 
     public void processDataFile(File file) {
@@ -1267,15 +1309,20 @@ public class RuntimeContext implements ApplicationContextAware {
             fis.close();
             Date currentDate = new Date();
             boolean isValid = true;
-            if (currentDate.after(cert.getNotAfter())) isValid = false;
-            if (currentDate.before(cert.getNotBefore())) isValid = false;
+            if (currentDate.after(cert.getNotAfter())) {
+                isValid = false;
+            }
+            if (currentDate.before(cert.getNotBefore())) {
+                isValid = false;
+            }
             List<X509Certificate> mylist = new ArrayList<X509Certificate>();
             mylist.add(cert);
             CertPath cp = cf.generateCertPath(mylist);
             PKIXParameters pkiXParameters = new PKIXParameters(getTrustStore());
             pkiXParameters.setRevocationEnabled(false);
             CertPathValidator cpv = CertPathValidator.getInstance(CertPathValidator.getDefaultType());
-            PKIXCertPathValidatorResult pkixCertPathValidatorResult = (PKIXCertPathValidatorResult) cpv.validate(cp, pkiXParameters);
+            PKIXCertPathValidatorResult pkixCertPathValidatorResult = (PKIXCertPathValidatorResult) cpv
+                    .validate(cp, pkiXParameters);
             isValid = getRootCert().equals(pkixCertPathValidatorResult.getTrustAnchor().getTrustedCert());
             DataInfo dataInfo = new DataInfo();
             // проверили сертификат
@@ -1284,10 +1331,16 @@ public class RuntimeContext implements ApplicationContextAware {
             dataInfo.org = getDNField(dn, "O");
             for (DataInfo di : dataInfos) {
                 // проверяем не был ли сертификат уже загружен
-                if (di.dn.equals(dn)) return;
+                if (di.dn.equals(dn)) {
+                    return;
+                }
                 // проверяем чтобы была одинаковая организация и локация
-                if (!di.org.equals(dataInfo.org)) return;
-                if (!di.location.equals(dataInfo.location)) return;
+                if (!di.org.equals(dataInfo.org)) {
+                    return;
+                }
+                if (!di.location.equals(dataInfo.location)) {
+                    return;
+                }
             }
             dataInfo.id = getDNField(dn, "OU");
             dataInfo.location = getDNField(dn, "L");
@@ -1295,34 +1348,44 @@ public class RuntimeContext implements ApplicationContextAware {
             dataInfo.validTo = cert.getNotAfter();
             dataInfo.valid = isValid;
             if (isValid) {
-                String cn=getDNField(dn, "CN");
-                String words[]=cn.split("-");
+                String cn = getDNField(dn, "CN");
+                String words[] = cn.split("-");
                 for (String w : words) {
-                    if (w.isEmpty()) continue;
+                    if (w.isEmpty()) {
+                        continue;
+                    }
                     int pos = w.indexOf('_');
-                    if (pos==-1) continue;
-                    String count = w.substring(0, pos), type=w.substring(pos+1);
+                    if (pos == -1) {
+                        continue;
+                    }
+                    String count = w.substring(0, pos), type = w.substring(pos + 1);
                     int lcount = Integer.parseInt(count);
-                    if (type.equals("STD".replaceAll("T", "K"))) permittedCountS+=(dataInfo.sCount=lcount);
-                    else if (type.equals("PXT".replaceAll("X", "I"))) permittedCountP+=(dataInfo.pCount=lcount);
-                    else if (type.equals("BOB".replaceAll("O", "I"))) permittedCountB+=(dataInfo.bCount=lcount);
+                    if (type.equals("STD".replaceAll("T", "K"))) {
+                        permittedCountS += (dataInfo.sCount = lcount);
+                    } else if (type.equals("PXT".replaceAll("X", "I"))) {
+                        permittedCountP += (dataInfo.pCount = lcount);
+                    } else if (type.equals("BOB".replaceAll("O", "I"))) {
+                        permittedCountB += (dataInfo.bCount = lcount);
+                    }
                 }
             }
             dataInfos.add(dataInfo);
         } catch (Exception e) {
             if (!System.getProperty("lacinsierror".replaceAll("i", "e").replaceAll("a", "i"), "").equals("")) {
-                logger.error("Error loading file: "+file.getAbsolutePath(), e);
+                logger.error("Error loading file: " + file.getAbsolutePath(), e);
             }
         }
     }
 
     private String getDNField(String dn, String field) {
-        int cnPos= dn.indexOf(field);
-        if (cnPos!=-1) {
+        int cnPos = dn.indexOf(field);
+        if (cnPos != -1) {
             int cnEqPos = dn.indexOf("=", cnPos);
             int cnEndPos = dn.indexOf(",", cnPos);
-            if (cnEndPos==-1) cnEndPos=dn.length();
-            return dn.substring(cnEqPos+1, cnEndPos);
+            if (cnEndPos == -1) {
+                cnEndPos = dn.length();
+            }
+            return dn.substring(cnEqPos + 1, cnEndPos);
         }
         return "";
     }
@@ -1330,13 +1393,13 @@ public class RuntimeContext implements ApplicationContextAware {
     public LinkedList<DataInfo> getDataInfos() {
         return dataInfos;
     }
-    
+
     public Processor getProcessor() {
         return processor;
     }
 
     public boolean isMainNode() {
-        return roleNode==NODE_ROLE_MAIN;
+        return roleNode == NODE_ROLE_MAIN;
     }
 }
 

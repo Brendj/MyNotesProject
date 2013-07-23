@@ -6,7 +6,9 @@ package ru.axetta.ecafe.processor.web.ui.option.discountrule;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
+import ru.axetta.ecafe.processor.core.persistence.ComplexRole;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
@@ -16,6 +18,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,23 +47,22 @@ public class RuleCreatePage extends BasicWorkspacePage
     private String categoryDiscounts;
     private String filter = "Не выбрано";
     private String filterOrg = "Не выбрано";
-    private Set<CategoryDiscount> categoryDiscountSet;
-    private Set<CategoryOrg> categoryOrgs;
-
+    private int priority;
     private Integer[] selectedComplexIds;
-
-    public Integer[] getSelectedComplexIds() {
-        return selectedComplexIds;
-    }
-
-    public void setSelectedComplexIds(Integer[] selectedComplexIds) {
-        this.selectedComplexIds = selectedComplexIds;
-    }
+    @Autowired
+    private DAOService daoService;
 
     public List<SelectItem> getAvailableComplexs() {
-        List<SelectItem> list = new ArrayList<SelectItem>(50);
-        for (int i=0;i<50;i++) {
-            SelectItem selectItem = new SelectItem(i,"Комплекс "+i);
+        final List<ComplexRole> complexRoles = daoService.findComplexRoles();
+        final int size = complexRoles.size();
+        List<SelectItem> list = new ArrayList<SelectItem>(size);
+        for (int i=0;i<size;i++) {
+            ComplexRole complexRole = complexRoles.get(i);
+            String complexName = String.format("Комплекс %d", i);
+            if(!complexName.equals(complexRole.getRoleName())){
+                complexName = String.format("Комплекс %d - %s", i, complexRole.getRoleName());
+            }
+            SelectItem selectItem = new SelectItem(i,complexName);
             list.add(selectItem);
         }
         return list;
@@ -74,40 +76,8 @@ public class RuleCreatePage extends BasicWorkspacePage
         this.filterOrg = filterOrg;
     }
 
-    public Set<CategoryOrg> getCategoryOrgs() {
-        return categoryOrgs;
-    }
-
-    public void setCategoryOrgs(Set<CategoryOrg> categoryOrgs) {
-        this.categoryOrgs = categoryOrgs;
-    }
-
-    public Set<CategoryDiscount> getCategoryDiscountSet() {
-        return categoryDiscountSet;
-    }
-
-    public void setCategoryDiscountSet(Set<CategoryDiscount> categoryDiscountSet) {
-        this.categoryDiscountSet = categoryDiscountSet;
-    }
-
-    public List<Long> getIdOfCategoryList() {
-        return idOfCategoryList;
-    }
-
-    public List<Long> getIdOfCategoryOrgList(){
-        return idOfCategoryOrgList;
-    }
-
     public String getFilter() {
         return filter;
-    }
-
-    public String getCategoryDiscounts() {
-        return categoryDiscounts;
-    }
-
-    public void setCategoryDiscounts(String categoryDiscounts) {
-        this.categoryDiscounts = categoryDiscounts;
     }
 
     public Boolean getOperationOr() {
@@ -118,7 +88,7 @@ public class RuleCreatePage extends BasicWorkspacePage
         this.operationOr = operationOr;
     }
 
-    private int priority;
+
     public int getPriority() {
         return priority;
     }
@@ -136,7 +106,6 @@ public class RuleCreatePage extends BasicWorkspacePage
     }
 
     public void completeCategoryListSelection(Map<Long, String> categoryMap) throws HibernateException {
-        //To change body of implemented methods use File | Settings | File Templates.
          if(null != categoryMap) {
              idOfCategoryList = new ArrayList<Long>();
              if(categoryMap.isEmpty()){
@@ -157,7 +126,6 @@ public class RuleCreatePage extends BasicWorkspacePage
     }
 
     public void completeCategoryOrgListSelection(Map<Long, String> categoryOrgMap) throws Exception {
-        //To change body of implemented methods use File | Settings | File Templates.
         if(null != categoryOrgMap) {
             idOfCategoryOrgList = new ArrayList<Long>();
             if(categoryOrgMap.isEmpty()){
@@ -188,12 +156,8 @@ public class RuleCreatePage extends BasicWorkspacePage
         this.filterOrg="Не выбрано";
     }
 
-    @PersistenceContext
-    EntityManager em;
-
     @Transactional
     public void createRule() throws Exception {
-//        CategoryDiscount categorydiscount = (CategoryDiscount) session.load(CategoryDiscount.class, this.categorydiscount.getIdOfCategory());
         DiscountRule discountRule = new DiscountRule();
         discountRule.setDescription(description);
         List<Integer> selectedComplex = Arrays.asList(selectedComplexIds);
@@ -252,22 +216,26 @@ public class RuleCreatePage extends BasicWorkspacePage
         discountRule.setPriority(priority);
         discountRule.setOperationOr(operationOr);
         discountRule.setCategoryDiscounts(categoryDiscounts);
-        this.categoryDiscountSet = new HashSet<CategoryDiscount>();
+        Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
         if (!this.idOfCategoryList.isEmpty()) {
-            List categoryList = DAOUtils.getCategoryDiscountListWithIds(em, this.idOfCategoryList);
-            for (Object object: categoryList){
-                 this.categoryDiscountSet.add((CategoryDiscount) object);
-            }
-            discountRule.setCategoriesDiscounts(this.categoryDiscountSet);
+            List<CategoryDiscount> categoryList = daoService.getCategoryDiscountListWithIds(this.idOfCategoryList);
+            categoryDiscountSet.addAll(categoryList);
+            discountRule.setCategoriesDiscounts(categoryDiscountSet);
         }
         if (!this.idOfCategoryOrgList.isEmpty()) {
-            List categoryOrgList = DAOUtils.getCategoryOrgWithIds(em, this.idOfCategoryOrgList);
-            for (Object object: categoryOrgList){
-                discountRule.getCategoryOrgs().add((CategoryOrg) object);
-            }
+            List<CategoryOrg> categoryOrgList = daoService.getCategoryOrgWithIds(this.idOfCategoryOrgList);
+            discountRule.getCategoryOrgs().addAll(categoryOrgList);
         }
-
-        em.persist(discountRule);
+        daoService.persistEntity(discountRule);
+        //em.persist(discountRule);
         printMessage("Правило зарегистрировано успешно");
+    }
+
+    public Integer[] getSelectedComplexIds() {
+        return selectedComplexIds;
+    }
+
+    public void setSelectedComplexIds(Integer[] selectedComplexIds) {
+        this.selectedComplexIds = selectedComplexIds;
     }
 }

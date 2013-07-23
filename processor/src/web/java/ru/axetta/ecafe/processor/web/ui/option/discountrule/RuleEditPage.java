@@ -7,7 +7,9 @@ package ru.axetta.ecafe.processor.web.ui.option.discountrule;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
+import ru.axetta.ecafe.processor.core.persistence.ComplexRole;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
@@ -17,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,8 +47,11 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
     private List<Long> idOfCategoryList = new ArrayList<Long>();
     private String filter = "Не выбрано";
     private Set<CategoryDiscount> categoryDiscountSet;
-
     private Integer[] selectedComplexIds;
+    @PersistenceContext
+    private EntityManager em;
+    @Autowired
+    private DAOService daoService;
 
     public Integer[] getSelectedComplexIds() {
         return selectedComplexIds;
@@ -55,15 +61,17 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         this.selectedComplexIds = selectedComplexIds;
     }
 
-    public Object testCheckValues(){
-        printMessage(Arrays.toString(selectedComplexIds));
-        return null;
-    }
-
     public List<SelectItem> getAvailableComplexs() {
-        List<SelectItem> list = new ArrayList<SelectItem>(50);
-        for (int i=0;i<50;i++) {
-            SelectItem selectItem = new SelectItem(i,"Комплекс "+i);
+        final List<ComplexRole> complexRoles = daoService.findComplexRoles();
+        final int size = complexRoles.size();
+        List<SelectItem> list = new ArrayList<SelectItem>(size);
+        for (int i=0;i<size;i++) {
+            ComplexRole complexRole = complexRoles.get(i);
+            String complexName = String.format("Комплекс %d", i);
+            if(!complexName.equals(complexRole.getRoleName())){
+                complexName = String.format("Комплекс %d - %s", i, complexRole.getRoleName());
+            }
+            SelectItem selectItem = new SelectItem(i,complexName);
             list.add(selectItem);
         }
         return list;
@@ -401,9 +409,6 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
     public String getEntityName() {
         return entity.getDescription();
     }
-
-    @PersistenceContext
-    EntityManager em;
 
     @Override
     public void onShow() throws Exception {

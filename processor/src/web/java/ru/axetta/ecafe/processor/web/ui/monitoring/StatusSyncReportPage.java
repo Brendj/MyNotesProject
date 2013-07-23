@@ -32,4 +32,5 @@ public class StatusSyncReportPage extends OnlineReportPage {
         StatusSyncReport.Builder reportBuilder = new StatusSyncReport.Builder();
         this.statusSyncReport = reportBuilder.build(session);
     }
+
 }

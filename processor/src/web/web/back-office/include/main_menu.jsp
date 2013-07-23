@@ -901,7 +901,6 @@
 
     </rich:panelMenuGroup>
 
-
     <rich:panelMenuGroup id="userGroupMenu" label="Пользователи" binding="#{mainPage.userGroupPage.mainMenuComponent}"
                          rendered="#{mainPage.eligibleToViewUsers}">
         <a4j:support event="onclick" action="#{mainPage.showUserGroupPage}" reRender="workspaceForm" />
@@ -988,6 +987,11 @@
 
         <rich:panelMenuItem id="ruleCreateMenuItem" binding="#{ruleCreatePage.mainMenuComponent}" label="Регистрация"
                             action="#{ruleCreatePage.show}" reRender="workspaceForm" />
+
+        <%--@elvariable id="complexRuleEditPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.ComplexRuleEditPage"--%>
+        <rich:panelMenuItem id="complexRoleEditMenuItem" binding="#{complexRuleEditPage.mainMenuComponent}" label="Роли комплексов"
+                            action="#{complexRuleEditPage.show}" reRender="workspaceForm" />
+
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="reportGroupMenu" binding="#{mainPage.reportGroupPage.mainMenuComponent}" label="Отчеты">

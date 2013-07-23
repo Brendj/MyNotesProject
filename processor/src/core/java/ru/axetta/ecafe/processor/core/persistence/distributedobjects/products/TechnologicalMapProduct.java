@@ -40,7 +40,7 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element, "GWeight", grossWeight);
         setAttribute(element, "NWeight", netWeight);
-        setAttribute(element, "NumberGroupReplace", netWeight);
+        setAttribute(element, "NumberGroupReplace", numberGroupReplace);
         setAttribute(element, "GuidOfP", product.getGuid());
         setAttribute(element, "GuidOfTM", technologicalMap.getGuid());
     }

@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
@@ -245,16 +246,6 @@ public class DAOService {
         entityManager.persist(entity);
     }
 
-
-    public Long getClientContractIdByCardId(String idOfCard) throws Exception {
-        Client cl = DAOUtils.findClientByCardNo(entityManager, Long.decode(idOfCard));
-        if (cl == null) {
-            return null;
-        }
-        return cl.getContractId();
-    }
-
-
     public void deleteEntity(Object entity) {
         entity = entityManager.merge(entity);
         if (entity != null) {
@@ -264,11 +255,28 @@ public class DAOService {
 
 
     public Long getContractIdByCardNo(long lCardId) throws Exception {
-        Client client = DAOUtils.findClientByCardNo(entityManager, lCardId);
-        if (client != null) {
-            return client.getContractId();
+        TypedQuery<Long> query = entityManager.createQuery("select card.client.contractId from Card card where card.cardNo=:cardNo", Long.class);
+        query.setParameter("cardNo", lCardId);
+        List<Long> list = query.getResultList();
+        if(list==null || list.isEmpty()){
+            return null;
+        } else {
+            return list.get(0);
         }
-        return null;
+    }
+
+    public Long getContractIdByTempCardNoAndCheckValidDate(long lCardId) throws Exception {
+        /* так как в поле хранится дата на 00:00 ночи текущего дня вычтем из текущего дня 24 часа в милисекудах */
+        Long currentDay = System.currentTimeMillis() - 86400000L;
+        TypedQuery<Long> query = entityManager.createQuery("select cl.contractId from CardTemp card left join card.client cl where card.cardNo=:cardNo and card.validDate>:currentDay", Long.class);
+        query.setParameter("cardNo", lCardId);
+        query.setParameter("currentDay", currentDay);
+        List<Long> list = query.getResultList();
+        if(list==null || list.isEmpty()){
+            return null;
+        } else {
+            return list.get(0);
+        }
     }
 
 
@@ -454,12 +462,12 @@ public class DAOService {
         if (cl == null) {
             throw new Exception("Клиент не найден: " + idOfClient);
         }
-        if (cl.getOrg().getIdOfOrg() == orgId) {
+        if (cl.getOrg().getIdOfOrg().equals(orgId)) {
             return true;
         }
         Set<Org> friendlyOrgs = org.getFriendlyOrg();
         for (Org o : friendlyOrgs) {
-            if (cl.getOrg().getIdOfOrg() == o.getIdOfOrg()) {
+            if (cl.getOrg().getIdOfOrg().equals(o.getIdOfOrg())) {
                 return true;
             }
         }
@@ -1442,4 +1450,38 @@ public class DAOService {
         query.setParameter("idOfOrgList", idOfOrgList);
         query.executeUpdate();
     }
+
+    public List<ComplexRole> findComplexRoles() {
+        return entityManager.createQuery("from ComplexRole order by idOfRole",ComplexRole.class).getResultList();
+    }
+
+    public List<ComplexRole> updateComplexRoles(List<ComplexRole> complexRoles) throws Exception{
+        List<ComplexRole> roles = new ArrayList<ComplexRole>(complexRoles.size());
+        for (ComplexRole complexRole: complexRoles){
+            ComplexRole role = entityManager.find(ComplexRole.class, complexRole.getIdOfRole());
+            String roleName = complexRole.getRoleName();
+            if(StringUtils.isEmpty(roleName) || StringUtils.isEmpty(roleName.trim())){
+                role.setRoleName(String.format("Комплекс %d", complexRole.getIdOfRole()));
+            } else {
+                role.setRoleName(roleName);
+            }
+            role.setExtendRoleName(complexRole.getExtendRoleName());
+            entityManager.persist(role);
+            roles.add(role);
+        }
+        return roles;
+    }
+
+    public List<CategoryDiscount> getCategoryDiscountListWithIds(List<Long> idOfCategoryList) {
+        TypedQuery<CategoryDiscount> q = entityManager.createQuery("from CategoryDiscount where idOfCategoryDiscount in (:idOfCategoryList)", CategoryDiscount.class);
+        q.setParameter("idOfCategoryList", idOfCategoryList);
+        return q.getResultList();
+    }
+
+    public List<CategoryOrg> getCategoryOrgWithIds(List<Long> idOfCategoryOrgList) {
+        TypedQuery<CategoryOrg> q = entityManager.createQuery("from CategoryOrg where idOfCategoryOrg in (:idOfCategoryOrgList)", CategoryOrg.class);
+        q.setParameter("idOfCategoryOrgList", idOfCategoryOrgList);
+        return q.getResultList();
+    }
+
 }

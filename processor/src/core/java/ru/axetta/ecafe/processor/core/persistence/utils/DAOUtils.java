@@ -18,7 +18,9 @@ import org.hibernate.*;
 import org.hibernate.Query;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -214,13 +216,14 @@ public class DAOUtils {
         return (CardTemp) criteria.uniqueResult();
     }
 
-    public static Client findClientByCardNo(EntityManager em, long cardNo) throws Exception {
-        javax.persistence.Query q = em.createQuery("from Card where cardNo=:cardNo");
-        q.setParameter("cardNo", cardNo);
-        List l = q.getResultList();
-        if (l.size()==0) return null;
-        return ((Card)l.get(0)).getClient();
-    }
+    //public static Client findClientByCardNo(EntityManager em, long cardNo) throws Exception {
+    //    javax.persistence.Query q = em.createQuery("from Card where cardNo=:cardNo");
+    //    q.setParameter("cardNo", cardNo);
+    //    List l = q.getResultList();
+    //    if (l.size()==0) return null;
+    //    return ((Card)l.get(0)).getClient();
+    //}
+
     public static Client findClientByContractId(EntityManager em, long cardNo) throws Exception {
         return findClientByContractId((Session)em.getDelegate(), cardNo);
     }
@@ -1346,5 +1349,36 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("visitor",visitor));
         criteria.add(Restrictions.eq("cardNo",cardNo));
         return (CardTemp) criteria.uniqueResult();
+    }
+
+    public static List fetchStudentsByCanNotConfirmPayment(Session persistenceSession, Long idOfClient) {
+        Criteria criteria = persistenceSession.createCriteria(Order.class);
+        criteria.add(Restrictions.eq("confirmerId",idOfClient));
+        criteria.createCriteria("client","student", JoinType.LEFT_OUTER_JOIN)
+                .add(Restrictions.sqlRestriction("{alias}.balance + {alias}.\"Limit\" < 0"));
+        criteria.createAlias("student.person","person", JoinType.LEFT_OUTER_JOIN);
+        criteria.setProjection(Projections.projectionList()
+                .add(Projections.property("person.firstName"), "firstName")
+                .add(Projections.property("person.surname"), "surname")
+                .add(Projections.property("person.secondName"), "secondName")
+                .add(Projections.property("student.balance"), "balance")
+                .add(Projections.property("RSum"), "rSum")
+                .add(Projections.property("createTime"), "createTime")
+                .add(Projections.property("student.idOfClient"), "idOfClient")
+        );
+        return criteria.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Client findTeacherPaymentForStudents(Session persistenceSession, Long contractId) {
+        Criteria criteriaCanConfirmGroupPayment = persistenceSession.createCriteria(Client.class);
+        criteriaCanConfirmGroupPayment.add(Restrictions.eq("canConfirmGroupPayment", true));
+        criteriaCanConfirmGroupPayment.add(Restrictions.eq("contractId", contractId));
+        List<Client> clients = criteriaCanConfirmGroupPayment.list();
+        if(clients==null || clients.isEmpty()){
+            return null;
+        } else {
+            return clients.get(0);
+        }
     }
 }

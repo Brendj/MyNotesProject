@@ -41,7 +41,8 @@ public class TempCardOperationProcessor extends AbstractProcessor<ResTempCardsOp
                     if(cardTemp==null) {
                         addResTempCardOperation(tempCardOperation, 3, "Карта не зарегистрирована как временная");
                     } else {
-                        if(cardTemp.getOrg().getIdOfOrg().equals(tempCardOperation.getIdOfOrg())){
+                        /**TODO: подумать над работтой с временными картами визитеров*/
+                        if(cardTemp.getOrg()!=null && cardTemp.getOrg().getIdOfOrg().equals(tempCardOperation.getIdOfOrg())){
                             if(tempCardOperation.getIdOfClient()!=null){
                                 resTempCardOperationList.add(registrClientOperation(tempCardOperation, cardTemp));
                             }

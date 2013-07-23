@@ -11,6 +11,7 @@
             <generator class="identity"/>
         </id>
         <property name="cardNo" column="CardNo" type="long" not-null="true" unique="true"/>
+        <property name="myclienttype" column="myclienttype" type="long"/>
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
         <property name="cardPrintedNo" column="CardPrintedNo" type="string"/>
         <property name="cardStation" column="CardStation">
@@ -22,7 +23,6 @@
         <property name="createDate" column="CreateDate" not-null="true" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="validDate" column="ValidDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
 
-        <property name="customerType" column="CustomerType" type="integer"/>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idOfClient" not-null="true"/>
         <many-to-one name="visitor" class="ru.axetta.ecafe.processor.core.persistence.Visitor" column="idOfVisitor" not-null="true"/>
 

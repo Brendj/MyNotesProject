@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardOperation;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
@@ -1181,6 +1182,7 @@ public class SyncResponse {
     private final ResEnterEvents resEnterEvents;
     private final ResTempCardsOperations resTempCardsOperations;
     private final ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules;
+    private final ComplexRoles complexRoles;
     private final CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry;
     private final OrgOwnerData orgOwnerData;
     private final QuestionaryData questionaryData;
@@ -1197,7 +1199,7 @@ public class SyncResponse {
             ClientRegistry clientRegistry, ResOrgStructure resOrgStructure, ResMenuExchangeData resMenuExchangeData,
             ResDiary resDiary, String message, ResEnterEvents resEnterEvents,
             ResTempCardsOperations resTempCardsOperations, ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules,
-            CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData,
+            ComplexRoles complexRoles, CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData,
             QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData,
             DirectiveElement directiveElement) {
         this.syncType = syncType;
@@ -1218,6 +1220,7 @@ public class SyncResponse {
         this.resEnterEvents = resEnterEvents;
         this.resTempCardsOperations = resTempCardsOperations;
         this.resCategoriesDiscountsAndRules = resCategoriesDiscountsAndRules;
+        this.complexRoles = complexRoles;
         this.correctingNumbersOrdersRegistry = correctingNumbersOrdersRegistry;
         this.manager = manager;
         this.orgOwnerData = orgOwnerData;
@@ -1319,6 +1322,12 @@ public class SyncResponse {
         if (resCategoriesDiscountsAndRules != null) {
             ecafeEnvelopeElement.appendChild(resCategoriesDiscountsAndRules.toElement(document));
         }
+
+        // ComplexRoles
+        if (complexRoles != null) {
+            ecafeEnvelopeElement.appendChild(complexRoles.toElement(document));
+        }
+
         // CorrectingNumbersOrdersRegistry
         if (correctingNumbersOrdersRegistry != null){
             ecafeEnvelopeElement.appendChild(correctingNumbersOrdersRegistry.toElement(document));

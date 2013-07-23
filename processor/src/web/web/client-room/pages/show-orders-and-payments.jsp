@@ -28,6 +28,7 @@
 <%@ page import="org.hibernate.sql.JoinType" %>
 <%@ page import="org.hibernate.criterion.Projections" %>
 <%@ page import="org.hibernate.Hibernate" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils" %>
 
 <%-- Код для динамической загрузки Yahoo UI Calendar dependancies --%>
 
@@ -660,29 +661,12 @@
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
 
-                Criteria criteriaCanConfirmGroupPayment = persistenceSession.createCriteria(Client.class);
-                criteriaCanConfirmGroupPayment.add(Restrictions.eq("canConfirmGroupPayment", true));
-                criteriaCanConfirmGroupPayment.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
-                if (!criteriaCanConfirmGroupPayment.list().isEmpty()) {
-                       /* TODO: teacher logic  */
+                Client teacher = DAOUtils.findTeacherPaymentForStudents(persistenceSession, clientAuthToken.getContractId());
+
+                if (teacher !=null) {
                     List students = new ArrayList(0);
                     if(haveDataToProcessView){
-                        Client teacher = (Client) criteriaCanConfirmGroupPayment.list().get(0);
-                        Criteria criteria = persistenceSession.createCriteria(Order.class);
-                        criteria.add(Restrictions.eq("confirmerId",teacher.getIdOfClient()));
-                        criteria.createCriteria("client","student", JoinType.LEFT_OUTER_JOIN)
-                                .add(Restrictions.sqlRestriction("{alias}.balance + {alias}.\"Limit\" < 0"));
-                        criteria.createAlias("student.person","person", JoinType.LEFT_OUTER_JOIN);
-                        criteria.setProjection(Projections.projectionList()
-                                .add(Projections.property("person.firstName"), "firstName")
-                                .add(Projections.property("person.surname"), "surname")
-                                .add(Projections.property("person.secondName"), "secondName")
-                                .add(Projections.property("student.balance"), "balance")
-                                .add(Projections.property("RSum"), "rSum")
-                                .add(Projections.property("createTime"), "createTime")
-                                .add(Projections.property("student.idOfClient"), "idOfClient")
-                        );
-                        students = criteria.list();
+                        students = DAOUtils.fetchStudentsByCanNotConfirmPayment(persistenceSession, teacher.getIdOfClient());
                     }
 
     %>

@@ -6588,15 +6588,16 @@
     </table>
     <table name="cf_cards_temp" schema="public" catalog="moscow" type="TABLE">
       <column name="idofcarttemp" sqlType="bigserial" length="19" precision="0" nullable="false" jdbcType="-5" def="bmV4dHZhbCgnY2ZfY2FyZHNfdGVtcF9pZG9mY2FydHRlbXBfc2VxJzo6cmVnY2xhc3Mp" autoIncrement="true"/>
-      <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
       <column name="idofclient" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
       <column name="idofvisitor" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
-      <column name="customertype" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" def="MA=="/>
+      <column name="customertype" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
       <column name="cardno" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
       <column name="cardprintedno" sqlType="varchar" length="24" precision="0" nullable="true" jdbcType="12"/>
       <column name="cardstation" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" def="MA=="/>
       <column name="createdate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
       <column name="validdate" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
+      <column name="myclienttype" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
       <primary-key name="cf_cards_temp_pk" columns="idofcarttemp"/>
       <foreign-key name="cf_cards_temp_organization" columns="idoforg" ref-table="cf_orgs" ref-schema="public" ref-catalog="" ref-columns="idoforg" update-rule="3" delete-rule="3" deferrability="2"/>
       <index name="cardno_unique" unique="true" columns="cardno"/>
@@ -6972,6 +6973,12 @@
       <column name="count" sqlType="int4" length="10" precision="0" nullable="true" jdbcType="4"/>
       <primary-key name="cf_complexinfodetail_pk" columns="idofcomplexinfodetail"/>
       <foreign-key name="cf_complexinfodetail_idofmenudetail_fk" columns="idofmenudetail" ref-table="cf_menudetails" ref-schema="public" ref-catalog="" ref-columns="idofmenudetail" update-rule="3" delete-rule="0" deferrability="2"/>
+    </table>
+    <table name="cf_complexroles" schema="public" catalog="moscow" type="TABLE">
+      <column name="idofrole" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="rolename" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12"/>
+      <column name="extendrolename" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12"/>
+      <primary-key name="cf_complexrole_pk" columns="idofrole"/>
     </table>
     <table name="cf_contracts" schema="public" catalog="moscow" type="TABLE">
       <column name="idofcontract" sqlType="bigserial" length="19" precision="0" nullable="false" jdbcType="-5" def="bmV4dHZhbCgnY2ZfY29udHJhY3RzX2lkb2Zjb250cmFjdF9zZXEnOjpyZWdjbGFzcyk=" autoIncrement="true"/>

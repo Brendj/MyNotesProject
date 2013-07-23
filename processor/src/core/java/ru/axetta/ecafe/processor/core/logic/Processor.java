@@ -23,6 +23,8 @@ import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
 import ru.axetta.ecafe.processor.core.subscription.SubscriptionFeeManager;
 import ru.axetta.ecafe.processor.core.sync.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoleProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardOperationProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
@@ -575,6 +577,7 @@ public class Processor implements SyncProcessor,
         SyncResponse.ResEnterEvents resEnterEvents = null;
         ResTempCardsOperations resTempCardsOperations = null;
         SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
+        ComplexRoles complexRoles = null;
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
         Manager manager = null;
         OrgOwnerData orgOwnerData = null;
@@ -745,6 +748,14 @@ public class Processor implements SyncProcessor,
             logger.error(message, e);
         }
 
+        // Process ComplexRoles
+        try {
+            complexRoles = processComplexRoles();
+        } catch (Exception e) {
+            String message = String.format("processComplexRoles: %s", e.getMessage());
+            logger.error(message, e);
+        }
+
         // Process CorrectingNumbersOrdersRegistry
         try {
             correctingNumbersOrdersRegistry = processSyncCorrectingNumbersOrdersRegistry(request.getIdOfOrg());
@@ -798,7 +809,7 @@ public class Processor implements SyncProcessor,
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(),
                 request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
-                resEnterEvents, resTempCardsOperations, resCategoriesDiscountsAndRules,
+                resEnterEvents, resTempCardsOperations, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement);
     }
@@ -819,6 +830,7 @@ public class Processor implements SyncProcessor,
         SyncResponse.ResEnterEvents resEnterEvents = null;
         ResTempCardsOperations resTempCardsOperations = null;
         SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
+        ComplexRoles complexRoles = null;
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
         Manager manager = null;
         OrgOwnerData orgOwnerData = null;
@@ -856,7 +868,7 @@ public class Processor implements SyncProcessor,
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(),
                 request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
-                resEnterEvents, resTempCardsOperations, resCategoriesDiscountsAndRules,
+                resEnterEvents, resTempCardsOperations, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement);
     }
@@ -875,6 +887,7 @@ public class Processor implements SyncProcessor,
         SyncResponse.ResDiary resDiary = null;
         SyncResponse.ResEnterEvents resEnterEvents = null;
         ResTempCardsOperations resTempCardsOperations = null;
+        ComplexRoles complexRoles = null;
         SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
         Manager manager = null;
@@ -958,7 +971,7 @@ public class Processor implements SyncProcessor,
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(),
                 request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
-                resEnterEvents, resTempCardsOperations, resCategoriesDiscountsAndRules,
+                resEnterEvents, resTempCardsOperations, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement);
     }
@@ -1125,7 +1138,6 @@ public class Processor implements SyncProcessor,
         return orgOwnerData;
     }
 
-    // TODO: реализовать логику обработку временных карт
     private ResTempCardsOperations processTempCardsOperations(TempCardsOperations tempCardsOperations) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -1142,6 +1154,24 @@ public class Processor implements SyncProcessor,
             HibernateUtils.close(persistenceSession, logger);
         }
         return resTempCardsOperations;
+    }
+
+    private ComplexRoles processComplexRoles() throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ComplexRoles complexRoles = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new ComplexRoleProcessor(persistenceSession);
+            complexRoles = (ComplexRoles) processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return complexRoles;
     }
 
     private QuestionaryData processQuestionaryData(Long idOfOrg) throws Exception {
