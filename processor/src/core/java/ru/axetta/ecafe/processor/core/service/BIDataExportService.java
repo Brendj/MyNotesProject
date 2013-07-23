@@ -19,7 +19,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,6 +35,8 @@ import java.util.*;
 @Scope("singleton")
 public class BIDataExportService {
 
+
+
     private static boolean USE_FTP_AS_STORAGE = false;
     private static final DateFormat FILES_FORMAT = new SimpleDateFormat("yyyyMMdd");
     private static final DateFormat DB_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
@@ -41,63 +46,66 @@ public class BIDataExportService {
     private static final String FTP_PASSWORD = "";
     private static final String FTP_WORKDIR = "";
     private String LOCAL_DIRECTORY = null;
-    private static final List<BIDataExportType> TYPES;
+    private static final ExportType oldTypes;
+    private static final ExportType newTypes;
 
     static {
-        TYPES = new ArrayList<BIDataExportType>();
-        TYPES.add(new BIDataExportType("orders",
-                "select int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, cf_orders.createddate, cf_orders.idoforder, cf_orders.idoforg, cf_orders.idofcontragent, cf_orders.idofclient, "
-                        + "       grp1.idofclientgroup, grp2.groupname as grade_class, "
-                        + "       array_to_string(array( " + "select cf_clients_categorydiscounts.idofcategorydiscount "
-                        + "from cf_clients_categorydiscounts "
-                        + "where cf_clients_categorydiscounts.idofclient = cf_clients.idofclient "
-                        + "       ), ',') as idofcategorydiscount, cf_cards.cardtype, cf_orders.rsum, cf_orders.socdiscount "
-                        + "from cf_orders "
-                        + "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient and cf_orders.idoforg=cf_clients.idoforg "
-                        + "left join cf_cards on cf_orders.idofcard=cf_cards.idofcard "
-                        + "left join cf_clientgroups grp1 on cf_clients.idofclientgroup=grp1.idofclientgroup and cf_clients.idoforg=grp1.idoforg "
-                        + "left join cf_clientgroups grp2 on cf_clients.idofclientgroup=grp2.idofclientgroup and cf_clients.idoforg=grp2.idoforg and "
-                        + "          CAST(substring(grp2.groupname FROM '[0-9]+') AS INTEGER)<>0 "
-                        + "where cf_orders.idofclient<>0 and cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000  and "
-                        + "EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " + "order by createddate",
-                new String[]{
-                        "build_date", "createddate", "idoforder", "idoforg", "idofcontragent", "idofclient",
-                        "idofclientgroup", "grade_class", "idofcategorydiscount", "cardtype", "rsum", "socdiscount"}));
+        /* Новый тип */
+        List<BIDataExportType> TYPES = new ArrayList<BIDataExportType>();
 
-        TYPES.add(new BIDataExportType("events",
-                "select int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, cf_enterevents.evtdatetime, cf_enterevents.idofenterevent, cf_enterevents.idoforg, "
-                        +
-                        "       cf_enterevents.idofclient, case when (cf_enterevents.passdirection=1) then 0 when (cf_enterevents.passdirection=0) then 1 end as action_type, "
-                        +
-                        "       cf_clientgroups.idofclientgroup, cf_clientgroups.groupname as grade_class " +
-                        "from cf_enterevents " +
-                        "left join cf_clients on cf_enterevents.idofclient=cf_clients.idofclient and cf_enterevents.idoforg=cf_clients.idoforg "
-                        + "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
-                        +
+        //  ------------------------------------------
+        //  Категория ОУ (CategoryOrg)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("categoryorg",
+                "select idofcategoryorg, categoryname "
+                + "from cf_categoryorg",
+                new String[]{"idofcategoryorg", "categoryname"}));
 
-                        "where (cf_enterevents.passdirection=0 or cf_enterevents.passdirection=1) and cf_enterevents.idofclient<>0 and "
-                        +
-                        "      cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
-                        +
-                        "                                         EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
-                        +
-                        "order by cf_enterevents.evtdatetime", new String[]{
-                "build_date", "evtdatetime", "idofenterevent", "idoforg", "idofclient", "action_type",
-                "idofclientgroup", "grade_class"}));
+        //  ------------------------------------------
+        //  Общеобразовательные учреждения (Orgs)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("orgs",
+                "select cf_orgs.idoforg, cf_orgs.officialname, cf_orgs.address, cf_orgs.district, array_to_string(array_agg(cf_categoryorg_orgs.idofcategoryorg), ',') as orgCategory, cf_orgs.state as isInProm "
+                + "from cf_orgs "
+                + "left join cf_categoryorg_orgs on cf_categoryorg_orgs.idoforg=cf_orgs.idoforg "
+                + "group by cf_orgs.idoforg, cf_orgs.officialname, cf_orgs.address, cf_orgs.district "
+                + "order by cf_orgs.officialname",
+                new String[]{"idoforg", "officialname", "address", "district", "orgCategory", "isInProm"}));
 
-        TYPES.add(new BIDataExportType("orgs", "select cf_orgs.idoforg, cf_orgs.officialname, cf_orgs.address " +
-                "from cf_orgs " +
-                //"where cf_orgs.officialname<>'' " +
-                "order by cf_orgs.officialname", new String[]{"idoforg", "officialname", "address"}));
-
+        //  ------------------------------------------
+        //  Поставщики питания (Contragents)
+        //  ------------------------------------------
         TYPES.add(new BIDataExportType("contagents",
-                "select cf_contragents.idofcontragent, cf_contragents.contragentname, cf_contragents.inn "
-                        + "from cf_orders "
-                        + "left join cf_contragents on cf_orders.idofcontragent=cf_contragents.idofcontragent "
-                        + "group by cf_contragents.idofcontragent, cf_contragents.contragentname, cf_contragents.inn "
-                        + "order by cf_contragents.idofcontragent",
-                new String[]{"idofcontragent", "contragentname", "inn"}));
+                "select cf_contragents.idofcontragent, cf_contragents.contragentname "
+                + "from cf_orders "
+                + "left join cf_contragents on cf_orders.idofcontragent=cf_contragents.idofcontragent "
+                + "group by cf_contragents.idofcontragent, cf_contragents.contragentname "
+                + "order by cf_contragents.idofcontragent",
+                new String[]{"idofcontragent", "contragentname"}));
 
+        //  ------------------------------------------
+        //  Клиенты (Clients)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("clients",
+                "select cf_clients.idofclient, cf_clients.idoforg, cf_clients.idofclientgroup, array_to_string(array_agg(cf_clients_categorydiscounts.idofcategorydiscount), ',')  as idofcategorydiscount "
+                + "from cf_clients "
+                + "left join cf_clients_categorydiscounts on cf_clients_categorydiscounts.idofclient=cf_clients.idofclient "
+                + "group by cf_clients.idofclient, cf_clients.idoforg, cf_clients.idofclientgroup "
+                + "order by idoforg",
+                new String[]{"idofclient", "idoforg", "idofclientgroup", "socdiscount"}));
+
+        //  ------------------------------------------
+        //  Правила социальных скидок (DiscountRules)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("discouuntrules",
+                "select cf_DiscountRules.idofrule as idofdiscountrule, cf_DiscountRules.priority, cf_DiscountRules.description "
+                + "from cf_DiscountRules "
+                + "order by cf_DiscountRules.idofrule",
+                new String[]{"idofdiscountrule", "priority", "description"}));
+
+        //  ------------------------------------------
+        //  Группы клиентов (ClientGroups)
+        //  ------------------------------------------
         TYPES.add(new BIDataExportType("clientgroups",
                 "select distinct cf_clientgroups.idoforg, cf_clientgroups.idofclientgroup, cf_clientgroups.groupname " +
                         "from cf_clientgroups " +
@@ -105,50 +113,67 @@ public class BIDataExportService {
                         "order by cf_clientgroups.idofclientgroup",
                 new String[]{"idoforg", "idofclientgroup", "groupname"}));
 
-        TYPES.add(new BIDataExportType("discounts", "select idofcategorydiscount, categoryname " +
+        //  ------------------------------------------
+        //  Категории клиентов (CategoryDiscounts)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("categorydiscounts", "select idofcategorydiscount, categoryname " +
                 "from cf_categorydiscounts " +
                 "order by idofcategorydiscount", new String[]{"idofcategorydiscount", "categoryname"}));
 
+        //  ------------------------------------------
+        //  Типы карт (CardTypes)
+        //  ------------------------------------------
         TYPES.add(new BIDataExportType("cardtypes", new String[]{"card_type_id", "categoryname"})
                 .setSpecificExporter("cartTypesExporter"));
 
 
-        TYPES.add(new BIDataExportType("clientscount",
-                "select cf_clients.idoforg, 1 as supergroup, int8(EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_DATE%') * 1000) as condition_date, int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, cf_clients.idOfClientGroup, count(cf_clients.idofclient) "
-                + "from cf_clients "
-                + "left join cf_clientgroups on cf_clientgroups.idoforg=cf_clients.idoforg and cf_clientgroups.idOfClientGroup=cf_clients.idOfClientGroup "
-                + "where cf_clients.idOfClientGroup>=" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " AND cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() + " "//--Сотрудники
-                + "group by cf_clients.idoforg, cf_clients.idOfClientGroup, cf_clientgroups.groupname "
-
-                + "union all "
-
-                + "select cf_clients.idoforg, 2 as supergroup, int8(EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_DATE%') * 1000) as condition_date, int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, cf_clients.idOfClientGroup, count(cf_clients.idofclient) "
-                + "from cf_clients "
-                + "left join cf_clientgroups on cf_clientgroups.idoforg=cf_clients.idoforg and cf_clientgroups.idOfClientGroup=cf_clients.idOfClientGroup "
-                + "where cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " " //--Ученики
-                + "group by cf_clients.idoforg, cf_clients.idOfClientGroup, cf_clientgroups.groupname "
-                + "order by idoforg, 2",
-                new String[]{
-                        "idoforg", "supergroup", "condition_date", "build_date", "idOfClientGroup", "count"}));
 
 
-        TYPES.add(new BIDataExportType("clientsdiscountcategories",
-                "select cf_clients.idofclient, cf_clients.idoforg, int8(EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_DATE%') * 1000) as condition_date, int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, "
-                + "       array_to_string(array_agg(cf_clients_categorydiscounts.idofcategorydiscount), ',')  as idofcategorydiscount, cf_clients.idOfClientGroup as idOfClientGroup "
-                + "from cf_clients "
-                + "left join cf_clients_categorydiscounts on cf_clients_categorydiscounts.idofclient=cf_clients.idofclient "
-                + "left join cf_clientgroups on cf_clientgroups.idoforg=cf_clients.idoforg and cf_clientgroups.idOfClientGroup=cf_clients.idOfClientGroup "
-                + "where cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() + " " // Выбывшие
-                + "group by cf_clients.idofclient, cf_clients.idoforg, condition_date, build_date "
-                + "order by cf_clients.idofclient, cf_clients.idoforg",
-                /*"select cf_clients.idofclient, cf_clients.idoforg, int8(EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_DATE%') * 1000) as condition_date, int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, "
-                + "       array_to_string(array(select cf_clients_categorydiscounts.idofcategorydiscount "
-                + "                             from cf_clients_categorydiscounts "
-                + "                             where cf_clients_categorydiscounts.idofclient = cf_clients.idofclient), ',') as idofcategorydiscount "
-                + "from cf_clients "
-                + "order by cf_clients.idoforg, cf_clients.idofclient", */
-                new String[]{
-                        "idofclient", "idoforg", "condition_date", "build_date", "categories", "idOfClientGroup"}));
+
+        //  ------------------------------------------
+        //  Проходы (Events)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("events",
+                "select cf_enterevents.idofclient, cf_enterevents.evtdatetime, cf_enterevents.idoforg, cf_enterevents.idofenterevent, "
+                + "       case when (cf_enterevents.passdirection=1) then 0 when (cf_enterevents.passdirection=0) then 1 end as action_type "
+                + "from cf_enterevents "
+                + "left join cf_clients on cf_enterevents.idofclient=cf_clients.idofclient and cf_enterevents.idoforg=cf_clients.idoforg "
+                + "where (cf_enterevents.passdirection=0 or cf_enterevents.passdirection=1) and cf_enterevents.idofclient<>0 and "
+                + "      cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                + "                                         EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
+                + "order by cf_enterevents.evtdatetime",
+                new String[]{"idofclient", "evtdatetime", "idoforg", "idofenterevent", "action_type"}));
+
+        //  ------------------------------------------
+        //  Заказы (Orders)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("orders",
+                "select cf_orders.idofclient, cf_orders.createddate, cf_orders.idoforg, cf_orders.idoforder, cf_orders.idofcontragent, "
+                + "     cf_cards.cardtype, cf_orders.rsum, cf_orders.socdiscount "
+                + "from cf_orders "
+                + "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient and cf_orders.idoforg=cf_clients.idoforg "
+                + "left join cf_cards on cf_orders.idofcard=cf_cards.idofcard "
+                + "where cf_orders.idofclient<>0 and cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 and "
+                + "                                                                EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
+                + "order by createddate",
+                new String[]{"idofclient", "createddate", "idoforg", "idoforder", "idofcontragent","cardtype", "rsum", "socdiscount"}));
+
+        //  ------------------------------------------
+        //  Детализация заказа (OrderDetails)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("orderdetails",
+                "select cf_orders.idofclient, cf_orders.createddate, cf_orders.idoforg, cf_orders.idoforder, cf_orders.idofcontragent, "
+                        + "     cf_cards.cardtype, cf_orders.rsum, cf_orders.socdiscount "
+                        + "from cf_orders "
+                        + "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient and cf_orders.idoforg=cf_clients.idoforg "
+                        + "left join cf_cards on cf_orders.idofcard=cf_cards.idofcard "
+                        + "where cf_orders.idofclient<>0 and cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 and "
+                        + "                                                                EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
+                        + "order by createddate",
+                new String[]{"idofclient", "createddate", "idoforg", "idoforder", "idofcontragent","cardtype", "rsum", "socdiscount"}));
+
+
+        newTypes = new ExportType(TYPES, "new");
     }
 
 
@@ -188,7 +213,7 @@ public class BIDataExportService {
         }
 
 
-        buildFiles();
+        buildFiles(newTypes);
     }
 
 
@@ -197,7 +222,20 @@ public class BIDataExportService {
     }
 
 
-    private boolean buildFiles() throws IOException {
+    private void getUnfinishedTypes(ExportType exportType, String dir, List<String> typesToUpdate, Calendar now) {
+        typesToUpdate.clear();
+        File check = null;
+        for (BIDataExportType t : exportType.getTypes()) {
+            String tName = t.getReportName();
+            check = new File(exportType.getRootDirectory(LOCAL_DIRECTORY), parseFileName(now, tName));
+            if (!check.exists() && check.length() < 1) {
+                typesToUpdate.add(tName);
+            }
+        }
+    }
+
+
+    private boolean buildFiles(ExportType exportType) throws IOException {
         List<String> typesToUpdate = new ArrayList<String>();
         Calendar last = getStartDate();
         Calendar now = new GregorianCalendar();
@@ -214,9 +252,9 @@ public class BIDataExportService {
                 start.setTimeInMillis(ts);
                 end.setTimeInMillis(ts + 86400000);
 
-                getUnfinishedTypes(LOCAL_DIRECTORY, typesToUpdate, end);
+                getUnfinishedTypes(exportType, LOCAL_DIRECTORY, typesToUpdate, end);
                 for (String t : typesToUpdate) {
-                    if (!updateFiles(session, t, end, start)) // Если файл не удалось создать, то пропускаем
+                    if (!updateFiles(exportType, session, t, end, start)) // Если файл не удалось создать, то пропускаем
                     // создание всех остальных файлов
                     {
                         //break;
@@ -231,25 +269,13 @@ public class BIDataExportService {
     }
 
 
-    private void getUnfinishedTypes(String dir, List<String> typesToUpdate, Calendar now) {
-        typesToUpdate.clear();
-        File check = null;
-        for (BIDataExportType t : TYPES) {
-            String tName = t.getReportName();
-            check = new File(LOCAL_DIRECTORY, parseFileName(now, tName));
-            if (!check.exists() && check.length() < 1) {
-                typesToUpdate.add(tName);
-            }
-        }
-    }
-
-
-    private boolean updateFiles(Session session, String t, Calendar now, Calendar last) {
+    private boolean updateFiles(ExportType exportType, Session session, String t, Calendar now, Calendar last) {
         try {
             // Запись во временный файл
-            BIDataExportType type = getTypeByName(t);
+            List<BIDataExportType> types = exportType.getTypes();
+            BIDataExportType type = getTypeByName(types, t);
             if (type.useSpecificExporter()) {
-                executeExporterMethod(LOCAL_DIRECTORY, t, last, type);
+                executeExporterMethod(exportType.getRootDirectory (LOCAL_DIRECTORY), t, last, type);
                 return true;
             }
             File tempFile = null;
@@ -266,7 +292,7 @@ public class BIDataExportService {
 
                 dataExists = true;
                 if (!fileCreated) {
-                    tempFile = new File(LOCAL_DIRECTORY, parseFileName(last, t));
+                    tempFile = new File(exportType.getRootDirectory (LOCAL_DIRECTORY), parseFileName(last, t));
                     if (!USE_FTP_AS_STORAGE) {
                         if (tempFile.exists()) {
                             tempFile.delete();
@@ -409,7 +435,7 @@ public class BIDataExportService {
     }
 
 
-    public Calendar[] getUpdatePeriodsViaLocal(List<String> typesToUpdate) throws IOException {
+    public Calendar[] getUpdatePeriodsViaLocal(List<BIDataExportType> types, List<String> typesToUpdate) throws IOException {
         File dir = new File(LOCAL_DIRECTORY);
         Calendar last = getLastBuildedPeriod(dir);
         Calendar now = new GregorianCalendar();
@@ -421,7 +447,7 @@ public class BIDataExportService {
         if (last != null && last.getTimeInMillis() == now.getTimeInMillis()) {
             File files[] = dir.listFiles();
 
-            for (BIDataExportType type : TYPES) {
+            for (BIDataExportType type : types) {
                 String t = type.getReportName();
                 String fileName = parseFileName(now, t);
                 boolean doAdd = true;
@@ -440,7 +466,7 @@ public class BIDataExportService {
             }
         } else {
             dir.mkdirs();
-            for (BIDataExportType type : TYPES) {
+            for (BIDataExportType type : types) {
                 typesToUpdate.add(type.getReportName());
             }
         }
@@ -456,8 +482,8 @@ public class BIDataExportService {
     }
 
 
-    public static BIDataExportType getTypeByName(String reportName) {
-        for (BIDataExportType t : TYPES) {
+    public static BIDataExportType getTypeByName(List<BIDataExportType> types, String reportName) {
+        for (BIDataExportType t : types) {
             if (t.getReportName().equals(reportName)) {
                 return t;
             }
@@ -466,8 +492,8 @@ public class BIDataExportService {
     }
 
 
-    public static void cartTypesExporter(String LOCAL_DIRECTORY, String t, Calendar last) throws IOException {
-        BIDataExportType type = getTypeByName(t);
+    public static void cartTypesExporter(List<BIDataExportType> types, String LOCAL_DIRECTORY, String t, Calendar last) throws IOException {
+        BIDataExportType type = getTypeByName(types, t);
         File tempFile = new File(LOCAL_DIRECTORY, parseFileName(last, t));
         if (!USE_FTP_AS_STORAGE) {
             if (tempFile.exists()) {
@@ -554,6 +580,162 @@ public class BIDataExportService {
 
         public String getReportName() {
             return reportName;
+        }
+    }
+
+
+    static {
+
+        List<BIDataExportType> TYPES = new ArrayList<BIDataExportType>();
+        //  ------------------------------------------
+        //  Заказы (Orders)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("orders",
+                "select int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, cf_orders.createddate, cf_orders.idoforder, cf_orders.idoforg, cf_orders.idofcontragent, cf_orders.idofclient, "
+                        + "       grp1.idofclientgroup, grp2.groupname as grade_class, "
+                        + "       array_to_string(array( " + "select cf_clients_categorydiscounts.idofcategorydiscount "
+                        + "from cf_clients_categorydiscounts "
+                        + "where cf_clients_categorydiscounts.idofclient = cf_clients.idofclient "
+                        + "       ), ',') as idofcategorydiscount, cf_cards.cardtype, cf_orders.rsum, cf_orders.socdiscount "
+                        + "from cf_orders "
+                        + "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient and cf_orders.idoforg=cf_clients.idoforg "
+                        + "left join cf_cards on cf_orders.idofcard=cf_cards.idofcard "
+                        + "left join cf_clientgroups grp1 on cf_clients.idofclientgroup=grp1.idofclientgroup and cf_clients.idoforg=grp1.idoforg "
+                        + "left join cf_clientgroups grp2 on cf_clients.idofclientgroup=grp2.idofclientgroup and cf_clients.idoforg=grp2.idoforg and "
+                        + "          CAST(substring(grp2.groupname FROM '[0-9]+') AS INTEGER)<>0 "
+                        + "where cf_orders.idofclient<>0 and cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000  and "
+                        + "EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " + "order by createddate",
+                new String[]{
+                        "build_date", "createddate", "idoforder", "idoforg", "idofcontragent", "idofclient",
+                        "idofclientgroup", "grade_class", "idofcategorydiscount", "cardtype", "rsum", "socdiscount"}));
+
+        //  ------------------------------------------
+        //  Проходы (Events)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("events",
+                "select int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, cf_enterevents.evtdatetime, cf_enterevents.idofenterevent, cf_enterevents.idoforg, "
+                        +
+                        "       cf_enterevents.idofclient, case when (cf_enterevents.passdirection=1) then 0 when (cf_enterevents.passdirection=0) then 1 end as action_type, "
+                        +
+                        "       cf_clientgroups.idofclientgroup, cf_clientgroups.groupname as grade_class " +
+                        "from cf_enterevents " +
+                        "left join cf_clients on cf_enterevents.idofclient=cf_clients.idofclient and cf_enterevents.idoforg=cf_clients.idoforg "
+                        + "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
+                        +
+
+                        "where (cf_enterevents.passdirection=0 or cf_enterevents.passdirection=1) and cf_enterevents.idofclient<>0 and "
+                        +
+                        "      cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        +
+                        "                                         EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
+                        +
+                        "order by cf_enterevents.evtdatetime", new String[]{
+                "build_date", "evtdatetime", "idofenterevent", "idoforg", "idofclient", "action_type",
+                "idofclientgroup", "grade_class"}));
+
+        //  ------------------------------------------
+        //  Общеобразовательные учреждения (Orgs)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("orgs", "select cf_orgs.idoforg, cf_orgs.officialname, cf_orgs.address " +
+                "from cf_orgs " +
+                //"where cf_orgs.officialname<>'' " +
+                "order by cf_orgs.officialname", new String[]{"idoforg", "officialname", "address"}));
+
+        //  ------------------------------------------
+        //  Поставщики питания (Contragents)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("contagents",
+                "select cf_contragents.idofcontragent, cf_contragents.contragentname, cf_contragents.inn "
+                        + "from cf_orders "
+                        + "left join cf_contragents on cf_orders.idofcontragent=cf_contragents.idofcontragent "
+                        + "group by cf_contragents.idofcontragent, cf_contragents.contragentname, cf_contragents.inn "
+                        + "order by cf_contragents.idofcontragent",
+                new String[]{"idofcontragent", "contragentname", "inn"}));
+
+        //  ------------------------------------------
+        //  Группы клиентов (clientgroups)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("clientgroups",
+                "select distinct cf_clientgroups.idoforg, cf_clientgroups.idofclientgroup, cf_clientgroups.groupname " +
+                        "from cf_clientgroups " +
+                        "where cf_clientgroups.idofclientgroup > 0 " +
+                        "order by cf_clientgroups.idofclientgroup",
+                new String[]{"idoforg", "idofclientgroup", "groupname"}));
+
+        //  ------------------------------------------
+        //  Социальные скидки для клиентов (clientcomplexdiscounts) - УДАЛЕНО
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("discounts", "select idofcategorydiscount, categoryname " +
+                "from cf_categorydiscounts " +
+                "order by idofcategorydiscount", new String[]{"idofcategorydiscount", "categoryname"}));
+
+        //  ------------------------------------------
+        //  Типы карт (CardTypes)
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("cardtypes", new String[]{"card_type_id", "categoryname"})
+                .setSpecificExporter("cartTypesExporter"));
+
+        //  ------------------------------------------
+        //  ???
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("clientscount",
+                "select cf_clients.idoforg, 1 as supergroup, int8(EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_DATE%') * 1000) as condition_date, int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, cf_clients.idOfClientGroup, count(cf_clients.idofclient) "
+                        + "from cf_clients "
+                        + "left join cf_clientgroups on cf_clientgroups.idoforg=cf_clients.idoforg and cf_clientgroups.idOfClientGroup=cf_clients.idOfClientGroup "
+                        + "where cf_clients.idOfClientGroup>=" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " AND cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() + " "//--Сотрудники
+                        + "group by cf_clients.idoforg, cf_clients.idOfClientGroup, cf_clientgroups.groupname "
+
+                        + "union all "
+
+                        + "select cf_clients.idoforg, 2 as supergroup, int8(EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_DATE%') * 1000) as condition_date, int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, cf_clients.idOfClientGroup, count(cf_clients.idofclient) "
+                        + "from cf_clients "
+                        + "left join cf_clientgroups on cf_clientgroups.idoforg=cf_clients.idoforg and cf_clientgroups.idOfClientGroup=cf_clients.idOfClientGroup "
+                        + "where cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " " //--Ученики
+                        + "group by cf_clients.idoforg, cf_clients.idOfClientGroup, cf_clientgroups.groupname "
+                        + "order by idoforg, 2",
+                new String[]{
+                        "idoforg", "supergroup", "condition_date", "build_date", "idOfClientGroup", "count"}));
+
+        //  ------------------------------------------
+        //  ???
+        //  ------------------------------------------
+        TYPES.add(new BIDataExportType("clientsdiscountcategories",
+                "select cf_clients.idofclient, cf_clients.idoforg, int8(EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_DATE%') * 1000) as condition_date, int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, "
+                        + "       array_to_string(array_agg(cf_clients_categorydiscounts.idofcategorydiscount), ',')  as idofcategorydiscount, cf_clients.idOfClientGroup as idOfClientGroup "
+                        + "from cf_clients "
+                        + "left join cf_clients_categorydiscounts on cf_clients_categorydiscounts.idofclient=cf_clients.idofclient "
+                        + "left join cf_clientgroups on cf_clientgroups.idoforg=cf_clients.idoforg and cf_clientgroups.idOfClientGroup=cf_clients.idOfClientGroup "
+                        + "where cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() + " " // Выбывшие
+                        + "group by cf_clients.idofclient, cf_clients.idoforg, condition_date, build_date "
+                        + "order by cf_clients.idofclient, cf_clients.idoforg",
+                /*"select cf_clients.idofclient, cf_clients.idoforg, int8(EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_DATE%') * 1000) as condition_date, int8(EXTRACT(EPOCH FROM now()) * 1000) as build_date, "
+                + "       array_to_string(array(select cf_clients_categorydiscounts.idofcategorydiscount "
+                + "                             from cf_clients_categorydiscounts "
+                + "                             where cf_clients_categorydiscounts.idofclient = cf_clients.idofclient), ',') as idofcategorydiscount "
+                + "from cf_clients "
+                + "order by cf_clients.idoforg, cf_clients.idofclient", */
+                new String[]{
+                        "idofclient", "idoforg", "condition_date", "build_date", "categories", "idOfClientGroup"}));
+
+        oldTypes = new ExportType (TYPES, "old");
+    }
+
+
+    public static class ExportType {
+        private String dir;
+        private final List<BIDataExportType> types;
+
+        public ExportType (List<BIDataExportType> types, String dir) {
+            this.types = types;
+            this.dir = dir;
+        }
+
+        public List<BIDataExportType> getTypes () {
+            return types;
+        }
+
+        public String getRootDirectory (String rootDir) {
+            return rootDir + "/" + dir;
         }
     }
 }
