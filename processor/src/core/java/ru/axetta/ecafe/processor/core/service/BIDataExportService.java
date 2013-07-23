@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
@@ -98,7 +98,7 @@ public class BIDataExportService {
         //  ------------------------------------------
         //  Правила социальных скидок (DiscountRules)
         //  ------------------------------------------
-        TYPES.add(new BIDataExportType("discouuntrules",
+        TYPES.add(new BIDataExportType("discountrules",
                 "select cf_DiscountRules.idofrule as idofdiscountrule, cf_DiscountRules.priority, cf_DiscountRules.description "
                 + "from cf_DiscountRules "
                 + "order by cf_DiscountRules.idofrule",
