@@ -114,7 +114,7 @@ public class BasicWorkspacePage extends BasicPage {
     public void onShow() throws Exception {
     }
 
-    public void show() {
+    public Object show() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             this.onShow();
@@ -127,6 +127,7 @@ public class BasicWorkspacePage extends BasicPage {
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы: "+e,
                             null));
         }
+        return null;
     }
 
     public void printMessage(String msg) {

@@ -42,7 +42,7 @@
         </rich:column>
         <rich:column>
             <f:facet name="header">
-                <h:outputText value="Обощещнная роль" escape="true" styleClass="column-header"/>
+                <h:outputText value="Обощенная роль" escape="true" styleClass="column-header"/>
             </f:facet>
             <rich:inplaceInput layout="block" value="#{complexRole.extendRoleName}"
                                id="inplaceExtendRoleName"
@@ -54,6 +54,17 @@
 
             </rich:inplaceInput>
         </rich:column>
+        <f:facet name="footer">
+            <rich:datascroller for="complexRuleTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                               stepControls="auto" boundaryControls="hide">
+                <f:facet name="previous">
+                    <h:graphicImage value="/images/16x16/left-arrow.png" />
+                </f:facet>
+                <f:facet name="next">
+                    <h:graphicImage value="/images/16x16/right-arrow.png" />
+                </f:facet>
+            </rich:datascroller>
+        </f:facet>
     </rich:dataTable>
     <h:panelGrid columns="2" styleClass="borderless-grid">
         <a4j:commandButton value="Сохранить" action="#{complexRuleEditPage.updateRule}" reRender="complexRuleEditPanel"

@@ -760,7 +760,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         fill(client);
     }
 
-    @Transactional
     public void removeSMSSettings(Set<ClientNotificationSetting> notificationSettings) throws Exception {
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
