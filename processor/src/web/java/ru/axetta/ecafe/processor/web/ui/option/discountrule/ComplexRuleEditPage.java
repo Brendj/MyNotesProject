@@ -34,7 +34,7 @@ public class ComplexRuleEditPage extends BasicWorkspacePage {
     public Object updateRule(){
         try {
             complexRoles = daoService.updateComplexRoles(complexRoles);
-            printMessage("Данные организации обновлены успешно");
+            printMessage("Данные обновлены успешно");
         } catch (Exception e){
             printError("Ошибка при подготовке страницы");
             getLogger().error("Failed to load page", e);
