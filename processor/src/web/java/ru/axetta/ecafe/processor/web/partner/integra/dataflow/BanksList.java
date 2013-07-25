@@ -16,8 +16,9 @@ public class BanksList {
     protected List<BankItem> banks;
 
     public List<BankItem> getBanks() {
-        if (banks == null)
+        if (banks == null){
             banks = new ArrayList<BankItem>();
-        return this.banks;
+        }
+        return banks;
     }
 }

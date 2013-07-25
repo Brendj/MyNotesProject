@@ -31,9 +31,6 @@ import javax.xml.bind.annotation.*;
 
 public class BankItem {
 
-
-   /* OptionPage optionPage = (OptionPage) SpringApplicationContext.getBean("optionPage");*/
-
     @XmlAttribute(name = "Name")
     protected String name;
     @XmlAttribute(name = "LogoUrl")
@@ -105,39 +102,4 @@ public class BankItem {
     public void setEnrollmentType(String enrollmentType) {
         this.enrollmentType = enrollmentType;
     }
-
-     /*public Object delete(){
-         Logger logger = LoggerFactory
-                 .getLogger(BankItem.class);
-
-         logger.info("deleting from BankItem");
-         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-         Session persistenceSession = null;
-         Transaction persistenceTransaction = null;
-         try {
-             persistenceSession = runtimeContext.createPersistenceSession();
-             persistenceTransaction = persistenceSession.beginTransaction();
-
-             Query q = persistenceSession.createQuery("DELETE FROM Bank WHERE idOfBank=:idOfBank");
-             q.setParameter("idOfBank", idOfBank);
-
-             q.executeUpdate();
-
-             //persistenceSession.save(bank);
-
-             persistenceSession.flush();
-             persistenceTransaction.commit();
-             persistenceTransaction = null;
-         }catch(Exception e){
-
-             logger.error("error in creating a new bank : ",e);
-         }  finally {
-             HibernateUtils.rollback(persistenceTransaction, logger);
-             HibernateUtils.close(persistenceSession, logger);
-         }
-        try{
-         optionPage.onShow();
-        }catch(Exception e){logger.error("error in save(): ",e);}
-         return  null;
-     }*/
 }

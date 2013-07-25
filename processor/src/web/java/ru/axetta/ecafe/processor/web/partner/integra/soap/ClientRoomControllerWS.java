@@ -79,15 +79,17 @@ import java.util.*;
 public class ClientRoomControllerWS extends HttpServlet implements ClientRoomController {
 
     final Logger logger = LoggerFactory.getLogger(ClientRoomControllerWS.class);
+    private static final Long RC_CLIENT_AUTHORIZATION_FAILED = -101L;
+    private static final Long RC_PARTNER_AUTHORIZATION_FAILED = -100L;
+    private static final Long RC_OK = 0L;
+    private static final Long RC_INTERNAL_ERROR = 100L;
     private static final Long RC_CLIENT_NOT_FOUND = 110L;
     private static final Long RC_SEVERAL_CLIENTS_WERE_FOUND = 120L;
-    private static final Long RC_INTERNAL_ERROR = 100L, RC_OK = 0L;
     private static final Long RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS = 130L;
     private static final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
     private static final Long RC_INVALID_DATA = 150L;
     private static final Long RC_NO_CONTACT_DATA = 160L;
-    private static final Long RC_PARTNER_AUTHORIZATION_FAILED = -100L;
-    private static final Long RC_CLIENT_AUTHORIZATION_FAILED = -101L;
+    private static final Long RC_CAN_NOT_CONFIRM_PAYMENT = 170L;
 
     private static final String RC_OK_DESC = "OK";
     private static final String RC_CLIENT_NOT_FOUND_DESC = "Клиент не найден";
@@ -97,6 +99,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_CLIENT_AUTHORIZATION_FAILED_DESC = "Ошибка авторизации клиента";
     private static final String RC_INTERNAL_ERROR_DESC = "Внутренняя ошибка";
     private static final String RC_NO_CONTACT_DATA_DESC = "У лицевого счета нет контактных данных";
+    private static final String RC_CAN_NOT_CONFIRM_PAYMENT_DESC = "Лицевой счет не может подтвердить оплату";
 
 
 
@@ -3615,49 +3618,70 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public void getStudentsByCanNotConfirmPayment(@WebParam(name = "contractId") Long contractId) {
+    public StudentsConfirmPaymentData getStudentsByCanNotConfirmPayment(@WebParam(name = "contractId") Long contractId) {
+        // authenticateRequest(contractId);
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
+        StudentsConfirmPaymentData studentsConfirmPaymentData = new StudentsConfirmPaymentData();
         try {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
-            DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-            timeFormat.setTimeZone(localTimeZone);
-            Client teacher = DAOUtils.findTeacherPaymentForStudents(persistenceSession, contractId);
-            if (teacher !=null) {
-                List students = DAOUtils.fetchStudentsByCanNotConfirmPayment(persistenceSession, teacher.getIdOfClient());
-                Long idOfClient = null;
-                Long sum = 0L;
-                for (Object object : students) {
-                    Object[] student = (Object[]) object;
-                    //String fio = String.valueOf(student[1]) + " "+String.valueOf(student[0]) + " "+String.valueOf(student[2]) ;
-                    Long balance = Long.valueOf(String.valueOf(student[3]));
-                    //String stringDate = timeFormat.format((Date)student[5]);
-                    Long paySum = Long.valueOf(String.valueOf(student[4]));
-                    Long currentIdOfClient = Long.valueOf(String.valueOf(student[6]));
-                    if (idOfClient == null || (!idOfClient.equals(currentIdOfClient))) {
-                        idOfClient = currentIdOfClient;
-                        sum = 0L;
+            Client teacher = DAOUtils.findClientByContractId(persistenceSession, contractId);
+            if (teacher==null) {
+                studentsConfirmPaymentData.resultCode=RC_CLIENT_NOT_FOUND;
+                studentsConfirmPaymentData.description=RC_CLIENT_NOT_FOUND_DESC;
+                studentsConfirmPaymentData.studentsConfirmPaymentList = new StudentsConfirmPaymentList();
+            } else {
+                if(teacher.getCanConfirmGroupPayment()){
+                    List students = DAOUtils.fetchStudentsByCanNotConfirmPayment(persistenceSession, teacher.getIdOfClient());
+                    Long idOfClient = null;
+                    Long sum = 0L;
+                    List<StudentMustPayItem> studentMustPayItemList = new ArrayList<StudentMustPayItem>();
+                    for (Object object : students) {
+                        Object[] student = (Object[]) object;
+                        Long balance = Long.valueOf(String.valueOf(student[3]));
+                        Long paySum = Long.valueOf(String.valueOf(student[4]));
+                        Long currentIdOfClient = Long.valueOf(String.valueOf(student[6]));
+                        if (idOfClient == null || (!idOfClient.equals(currentIdOfClient))) {
+                            idOfClient = currentIdOfClient;
+                            sum = 0L;
+                        }
+                        if (balance + sum < 0 && idOfClient.equals(currentIdOfClient)) {
+                            sum += paySum;
+                            StudentMustPayItem mustPayItem = new StudentMustPayItem();
+                            mustPayItem.setFirstName(String.valueOf(student[0]));
+                            mustPayItem.setSurname(String.valueOf(student[1]));
+                            mustPayItem.setSecondName(String.valueOf(student[2]));
+                            mustPayItem.setBalance(balance);
+                            mustPayItem.setCreateTime((Date)student[5]);
+                            mustPayItem.setPaySum(paySum);
+                            studentMustPayItemList.add(mustPayItem);
+                        }
                     }
-                    if (balance + sum < 0 && idOfClient.equals(currentIdOfClient)) {
-                        sum += paySum;
-
-                    }
+                    studentsConfirmPaymentData.resultCode=RC_OK;
+                    studentsConfirmPaymentData.description=RC_OK_DESC;
+                    studentsConfirmPaymentData.studentsConfirmPaymentList = new StudentsConfirmPaymentList(studentMustPayItemList);
+                } else {
+                    studentsConfirmPaymentData.resultCode=RC_CAN_NOT_CONFIRM_PAYMENT;
+                    studentsConfirmPaymentData.description=RC_CAN_NOT_CONFIRM_PAYMENT_DESC;
+                    studentsConfirmPaymentData.studentsConfirmPaymentList = new StudentsConfirmPaymentList();
                 }
             }
-
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to Students By Can Not Confirm Payment settings", e);
+            studentsConfirmPaymentData.resultCode=RC_INTERNAL_ERROR;
+            studentsConfirmPaymentData.description=RC_INTERNAL_ERROR_DESC;
+            studentsConfirmPaymentData.studentsConfirmPaymentList = new StudentsConfirmPaymentList();
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
 
         }
+        return studentsConfirmPaymentData;
     }
 
     public void removeSMSSettings(Set<ClientNotificationSetting> notificationSettings) throws Exception {

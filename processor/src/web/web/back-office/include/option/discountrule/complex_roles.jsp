@@ -42,7 +42,7 @@
         </rich:column>
         <rich:column>
             <f:facet name="header">
-                <h:outputText value="Обощенная роль" escape="true" styleClass="column-header"/>
+                <h:outputText value="Обобщенная роль" escape="true" styleClass="column-header"/>
             </f:facet>
             <rich:inplaceInput layout="block" value="#{complexRole.extendRoleName}"
                                id="inplaceExtendRoleName"

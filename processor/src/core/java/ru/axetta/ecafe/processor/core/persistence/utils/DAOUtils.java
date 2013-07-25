@@ -1355,7 +1355,7 @@ public class DAOUtils {
         Criteria criteria = persistenceSession.createCriteria(Order.class);
         criteria.add(Restrictions.eq("confirmerId",idOfClient));
         criteria.createCriteria("client","student", JoinType.LEFT_OUTER_JOIN)
-                .add(Restrictions.sqlRestriction("{alias}.balance + {alias}.\"Limit\" < 0"));
+                .add(Restrictions.sqlRestriction("{alias}.balance + {alias}.limits < 0"));
         criteria.createAlias("student.person","person", JoinType.LEFT_OUTER_JOIN);
         criteria.setProjection(Projections.projectionList()
                 .add(Projections.property("person.firstName"), "firstName")

@@ -195,7 +195,6 @@ public interface ClientRoomController {
     public ClientNotificationSettingsResult getClientNotificationTypes ();
 
     @WebMethod(operationName="getStudentsByCanNotConfirmPayment")
-    //public StudentsByCanNotConfirmPayment getStudentsByCanNotConfirmPayment(@WebParam(name = "contractId") Long contractId);
-    public void getStudentsByCanNotConfirmPayment(@WebParam(name = "contractId") Long contractId);
+    public StudentsConfirmPaymentData getStudentsByCanNotConfirmPayment(@WebParam(name = "contractId") Long contractId);
 
 }
