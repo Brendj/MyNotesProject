@@ -59,7 +59,7 @@ public class BIDataExportService {
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("categoryorg",
                 "select idofcategoryorg, categoryname "
-                + "from cf_categoryorg",
+                        + "from cf_categoryorg",
                 new String[]{"idofcategoryorg", "categoryname"}));
 
         //  ------------------------------------------
@@ -67,10 +67,10 @@ public class BIDataExportService {
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("orgs",
                 "select cf_orgs.idoforg, cf_orgs.officialname, cf_orgs.address, cf_orgs.district, array_to_string(array_agg(cf_categoryorg_orgs.idofcategoryorg), ',') as orgCategory, cf_orgs.state as isInProm "
-                + "from cf_orgs "
-                + "left join cf_categoryorg_orgs on cf_categoryorg_orgs.idoforg=cf_orgs.idoforg "
-                + "group by cf_orgs.idoforg, cf_orgs.officialname, cf_orgs.address, cf_orgs.district "
-                + "order by cf_orgs.officialname",
+                        + "from cf_orgs "
+                        + "left join cf_categoryorg_orgs on cf_categoryorg_orgs.idoforg=cf_orgs.idoforg "
+                        + "group by cf_orgs.idoforg, cf_orgs.officialname, cf_orgs.address, cf_orgs.district "
+                        + "order by cf_orgs.officialname",
                 new String[]{"idoforg", "officialname", "address", "district", "orgCategory", "isInProm"}));
 
         //  ------------------------------------------
@@ -78,10 +78,10 @@ public class BIDataExportService {
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("contragents",
                 "select cf_contragents.idofcontragent, cf_contragents.contragentname "
-                + "from cf_orders "
-                + "left join cf_contragents on cf_orders.idofcontragent=cf_contragents.idofcontragent "
-                + "group by cf_contragents.idofcontragent, cf_contragents.contragentname "
-                + "order by cf_contragents.idofcontragent",
+                        + "from cf_orders "
+                        + "left join cf_contragents on cf_orders.idofcontragent=cf_contragents.idofcontragent "
+                        + "group by cf_contragents.idofcontragent, cf_contragents.contragentname "
+                        + "order by cf_contragents.idofcontragent",
                 new String[]{"idofcontragent", "contragentname"}));
 
         //  ------------------------------------------
@@ -89,10 +89,10 @@ public class BIDataExportService {
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("clients",
                 "select cf_clients.idofclient, cf_clients.idoforg, cf_clients.idofclientgroup, array_to_string(array_agg(cf_clients_categorydiscounts.idofcategorydiscount), ',')  as idofcategorydiscount "
-                + "from cf_clients "
-                + "left join cf_clients_categorydiscounts on cf_clients_categorydiscounts.idofclient=cf_clients.idofclient "
-                + "group by cf_clients.idofclient, cf_clients.idoforg, cf_clients.idofclientgroup "
-                + "order by idoforg",
+                        + "from cf_clients "
+                        + "left join cf_clients_categorydiscounts on cf_clients_categorydiscounts.idofclient=cf_clients.idofclient "
+                        + "group by cf_clients.idofclient, cf_clients.idoforg, cf_clients.idofclientgroup "
+                        + "order by idoforg",
                 new String[]{"idofclient", "idoforg", "idofclientgroup", "socdiscount"}));
 
         //  ------------------------------------------
@@ -100,8 +100,8 @@ public class BIDataExportService {
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("discountrules",
                 "select cf_DiscountRules.idofrule as idofdiscountrule, cf_DiscountRules.priority, cf_DiscountRules.description "
-                + "from cf_DiscountRules "
-                + "order by cf_DiscountRules.idofrule",
+                        + "from cf_DiscountRules "
+                        + "order by cf_DiscountRules.idofrule",
                 new String[]{"idofdiscountrule", "priority", "description"}));
 
         //  ------------------------------------------
@@ -136,13 +136,13 @@ public class BIDataExportService {
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("events",
                 "select cf_enterevents.idofclient, cf_enterevents.evtdatetime, cf_enterevents.idoforg, cf_enterevents.idofenterevent, "
-                + "       case when (cf_enterevents.passdirection=1) then 0 when (cf_enterevents.passdirection=0) then 1 end as action_type "
-                + "from cf_enterevents "
-                + "left join cf_clients on cf_enterevents.idofclient=cf_clients.idofclient and cf_enterevents.idoforg=cf_clients.idoforg "
-                + "where (cf_enterevents.passdirection=0 or cf_enterevents.passdirection=1) and cf_enterevents.idofclient<>0 and "
-                + "      cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
-                + "                                         EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
-                + "order by cf_enterevents.evtdatetime",
+                        + "       case when (cf_enterevents.passdirection=1) then 0 when (cf_enterevents.passdirection=0) then 1 end as action_type "
+                        + "from cf_enterevents "
+                        + "left join cf_clients on cf_enterevents.idofclient=cf_clients.idofclient and cf_enterevents.idoforg=cf_clients.idoforg "
+                        + "where (cf_enterevents.passdirection=0 or cf_enterevents.passdirection=1) and cf_enterevents.idofclient<>0 and "
+                        + "      cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        + "                                         EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
+                        + "order by cf_enterevents.evtdatetime",
                 new String[]{"idofclient", "evtdatetime", "idoforg", "idofenterevent", "action_type"}));
 
         //  ------------------------------------------
@@ -150,13 +150,13 @@ public class BIDataExportService {
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("orders",
                 "select cf_orders.idofclient, cf_orders.createddate, cf_orders.idoforg, cf_orders.idoforder, cf_orders.idofcontragent, "
-                + "     cf_cards.cardtype, cf_orders.rsum, cf_orders.socdiscount "
-                + "from cf_orders "
-                + "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient and cf_orders.idoforg=cf_clients.idoforg "
-                + "left join cf_cards on cf_orders.idofcard=cf_cards.idofcard "
-                + "where cf_orders.idofclient<>0 and cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 and "
-                + "                                                                EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
-                + "order by createddate",
+                        + "     cf_cards.cardtype, cf_orders.rsum, cf_orders.socdiscount "
+                        + "from cf_orders "
+                        + "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient and cf_orders.idoforg=cf_clients.idoforg "
+                        + "left join cf_cards on cf_orders.idofcard=cf_cards.idofcard "
+                        + "where cf_orders.idofclient<>0 and cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 and "
+                        + "                                                                EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
+                        + "order by createddate",
                 new String[]{"idofclient", "createddate", "idoforg", "idoforder", "idofcontragent","cardtype", "rsum", "socdiscount"}));
 
         //  ------------------------------------------
@@ -164,17 +164,17 @@ public class BIDataExportService {
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("orderdetails",
                 "select cf_orders.idoforg, cf_orders.idoforder, cf_orderdetails.idoforderdetail, "
-                + "       case when cf_orderdetails.menuType=" + OrderDetail.TYPE_DISH_ITEM + " then 1 "
-                + "            when cf_orderdetails.menuType>=" + OrderDetail.TYPE_COMPLEX_MIN + " and cf_orderdetails.menuType<=" + OrderDetail.TYPE_COMPLEX_LAST + " then 2 "
-                + "            when lower(cf_orderdetails.menugroup)='вендинг' then 3 "
-                + "            else -1 end as foodtype, "
-                + "       cf_orderdetails.menugroup as groupname, CF_ComplexRoles.ExtendRoleName as rationtype, cf_orderdetails.idofrule as idofcategorydiscount, cf_orderdetails.rprice as rsum, cf_orderdetails.socdiscount "
-                + "from cf_orders "
-                + "join cf_orderdetails on cf_orders.idoforg=cf_orderdetails.idoforg and cf_orders.idoforder=cf_orderdetails.idoforder "
-                + "left join CF_ComplexRoles on CF_ComplexRoles.IdOfRole=cf_orderdetails.idofrule "
-                + "where cf_orders.idofclient<>0 and cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 and "
-                + "                                                                EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
-                + "order by cf_orders.createddate",
+                        + "       case when cf_orderdetails.menuType=" + OrderDetail.TYPE_DISH_ITEM + " then 2 "
+                        + "            when cf_orderdetails.menuType>=" + OrderDetail.TYPE_COMPLEX_MIN + " and cf_orderdetails.menuType<=" + OrderDetail.TYPE_COMPLEX_LAST + " then 1 "
+                        + "            when lower(cf_orderdetails.menugroup)='вендинг' then 3 "
+                        + "            else -1 end as foodtype, "
+                        + "       cf_orderdetails.menugroup as groupname, CF_ComplexRoles.ExtendRoleName as rationtype, cf_orderdetails.idofrule as idofcategorydiscount, cf_orderdetails.rprice as rsum, cf_orderdetails.socdiscount "
+                        + "from cf_orders "
+                        + "join cf_orderdetails on cf_orders.idoforg=cf_orderdetails.idoforg and cf_orders.idoforder=cf_orderdetails.idoforder "
+                        + "left join CF_ComplexRoles on CF_ComplexRoles.IdOfRole=cf_orderdetails.idofrule "
+                        + "where cf_orders.idofclient<>0 and cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 and "
+                        + "                                                                EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
+                        + "order by cf_orders.createddate",
                 new String[]{"idoforg", "idoforder", "idoforderdetail", "foodtype", "groupname", "rationtype", "idofcategorydiscount", "rsum", "socdiscount"}));
 
 
