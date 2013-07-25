@@ -4,13 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
-import sun.awt.AppContext;
-
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.hibernate.Session;
 import org.hibernate.jdbc.Work;
@@ -67,7 +63,7 @@ public class BenefitsRecalculationService {
                     + "order by idofclient, 3";
     private static final String INSERT_SQL = "INSERT INTO cf_clientscomplexdiscounts (createdate, idofclient, idofrule, idofcategoryorg, priority, operationar, idofcomplex) values (?, ?, ?, ?, ?, ?, ?)";
     private static final String DELETE_SQL = "DELETE FROM cf_clientscomplexdiscounts ";//WHERE createdate=:createdate";
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BIDataExportService.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BenefitsRecalculationService.class);
     
     @PersistenceContext
     EntityManager em;
