@@ -705,7 +705,9 @@ public class Processor implements SyncProcessor,
         }
 
         try {
-            resTempCardsOperations = processTempCardsOperations(request.getTempCardsOperations());
+            if(request.getTempCardsOperations()!=null){
+                resTempCardsOperations = processTempCardsOperations(request.getTempCardsOperations());
+            }
         } catch (Exception e) {
             String message = String.format("processTempCardsOperations: %s", e.getMessage());
             createSyncHistory(request.getIdOfOrg(),syncHistory, message);

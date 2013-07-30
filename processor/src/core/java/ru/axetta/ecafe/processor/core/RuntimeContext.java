@@ -585,6 +585,7 @@ public class RuntimeContext implements ApplicationContextAware {
                 createContragent("Клиент", 5);
             }
 
+            logger.info("Initialize default client category");
             HashMap<Long, String> initCategory = new HashMap<Long, String>();
             initCategory.put(-90L, "Начальные классы");
             initCategory.put(-91L, "Средние классы");
@@ -623,6 +624,7 @@ public class RuntimeContext implements ApplicationContextAware {
              *  Дополняем всем клиентам guid у тех у кого они пусты
              *  */
             List<Client> clients = DAOUtils.findClientsByGUIDIsNull(em);
+            logger.info("Generate update uuid in client");
             for (Client client : clients) {
                 client.setClientGUID(UUID.randomUUID().toString());
                 long clientRegistryVersion = DAOUtils.updateClientRegistryVersion((Session) em.getDelegate());
@@ -633,6 +635,7 @@ public class RuntimeContext implements ApplicationContextAware {
             /**
              * Инициализируем список ролей для комплексов
              * */
+            logger.info("Initialize default complex role");
             for (long i = 0L; i < 50L; i++) {
                 ComplexRole complexRole = em.find(ComplexRole.class, i);
                 if (complexRole == null) {
