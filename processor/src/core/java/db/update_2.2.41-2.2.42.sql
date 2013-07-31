@@ -24,7 +24,8 @@ CREATE TABLE cf_cards_temp (
   CONSTRAINT cf_cards_temp_organization FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg),
   CONSTRAINT CardNo_Unique UNIQUE (CardNo)
 );
---
+
+-- Таблица зарегистрированных операций по временным картам
 CREATE TABLE cf_card_temp_operations(
   IdOfCardTempOperation bigserial not null,      --! первичный ключ процесинга
   LocalIdOperation bigint NOT NULL,           --! первичный ключ школы
@@ -39,7 +40,7 @@ CREATE TABLE cf_card_temp_operations(
   CONSTRAINT cf_card_temp_operation_org_local_id UNIQUE (IdOfOrg , LocalIdOperation )
 );
 
---
+-- Таблица посетителей
 CREATE TABLE cf_visitors(
   IdOfVisitor bigserial not null,                --! первичный ключ
   IdOfPerson BIGINT NOT NULL,                    --! внешний ключ на ФИО посетителя
@@ -53,6 +54,7 @@ CREATE TABLE cf_visitors(
   CONSTRAINT cf_visitors_IdOfPerson_fk FOREIGN KEY (IdOfPerson) REFERENCES CF_Persons (IdOfPerson)
 );
 
+-- Таблица списка ошибок зафиксированных во время синхронизации
 CREATE TABLE cf_synchistory_exceptions
 (
   idofsynchistoryexception bigserial NOT NULL,
