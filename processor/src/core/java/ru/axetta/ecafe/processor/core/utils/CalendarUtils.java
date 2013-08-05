@@ -19,6 +19,7 @@ import java.util.*;
 public class CalendarUtils {
 
     private static TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
+    private static TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
     private static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
@@ -27,7 +28,12 @@ public class CalendarUtils {
 
     public static Date parseFullDateTimeWithLocalTimeZone(String stringDateTime) throws ParseException {
         dateTimeFormat.setTimeZone(localTimeZone);
-        return dateShortFormat.parse(stringDateTime);
+        return dateTimeFormat.parse(stringDateTime);
+    }
+
+    public static String toStringFullDateTimeWithUTCTimeZone(Date dateTime) throws ParseException {
+        dateTimeFormat.setTimeZone(utcTimeZone);
+        return dateTimeFormat.format(dateTime);
     }
 
     public static void truncateToMonth(Calendar calendar) {

@@ -12,7 +12,8 @@ import java.util.List;
 public class TempCardsOperations {
 
     private final List<TempCardOperation> tempCardOperationList;
-    TempCardsOperations(List<TempCardOperation> tempCardOperationList) {
+
+    public TempCardsOperations(List<TempCardOperation> tempCardOperationList) {
         this.tempCardOperationList = tempCardOperationList;
     }
 

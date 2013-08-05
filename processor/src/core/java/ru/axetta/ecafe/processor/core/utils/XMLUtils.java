@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.utils;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -56,4 +57,65 @@ public class XMLUtils {
         if(node.getAttributes().getNamedItem(attributeName)==null) return null;
         return node.getAttributes().getNamedItem(attributeName).getTextContent().trim();
     }
+
+    public static Node findFirstChildElement(Node node, String name) throws Exception {
+        Node currNode = node.getFirstChild();
+        while (null != currNode) {
+            if (Node.ELEMENT_NODE == currNode.getNodeType() && currNode.getNodeName().equals(name)) {
+                return currNode;
+            }
+            currNode = currNode.getNextSibling();
+        }
+        return null;
+    }
+
+    public static Node findFirstChildTextNode(Node node) throws Exception {
+        Node currNode = node.getFirstChild();
+        while (null != currNode) {
+            if (Node.TEXT_NODE == currNode.getNodeType()) {
+                return currNode;
+            }
+            currNode = currNode.getNextSibling();
+        }
+        return null;
+    }
+
+    public static int getIntValue(NamedNodeMap namedNodeMap, String name) throws Exception {
+        return Integer.parseInt(namedNodeMap.getNamedItem(name).getTextContent());
+    }
+
+    public static long getLongValue(NamedNodeMap namedNodeMap, String name) throws Exception {
+        Node n = namedNodeMap.getNamedItem(name);
+        return Long.parseLong(n.getTextContent());
+    }
+
+    public static Long getLongValueNullSafe(NamedNodeMap namedNodeMap, String name) throws Exception {
+        Node node = namedNodeMap.getNamedItem(name);
+        if (null == node) {
+            node = namedNodeMap.getNamedItem(name.toUpperCase());
+            if (node == null) {
+                return null;
+            }
+        }
+        return Long.parseLong(node.getTextContent());
+    }
+
+    public static String getStringValueNullSafe(NamedNodeMap namedNodeMap, String name) throws Exception {
+        Node node = namedNodeMap.getNamedItem(name);
+        if (null == node) {
+            return null;
+        }
+        return node.getTextContent();
+    }
+
+    public static String getStringValueNullSafe(NamedNodeMap namedNodeMap, String name, int length) throws Exception {
+        Node node = namedNodeMap.getNamedItem(name);
+        if (null == node) {
+            return null;
+        }
+        String result = node.getTextContent();
+        if(result.length()>length) return result.substring(0, length);
+        return result;
+    }
+
 }

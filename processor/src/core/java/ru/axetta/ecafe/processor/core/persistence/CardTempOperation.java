@@ -25,6 +25,15 @@ public class CardTempOperation {
     private Visitor visitor;
 
     public CardTempOperation(Long idOfCardTempOperation, Org org, CardTemp cardTemp, CardOperationStation operationType,
+            Date operationDate) {
+        this.localId = idOfCardTempOperation;
+        this.org = org;
+        this.cardTemp = cardTemp;
+        this.operationType = operationType;
+        this.operationDate = operationDate;
+    }
+
+    public CardTempOperation(Long idOfCardTempOperation, Org org, CardTemp cardTemp, CardOperationStation operationType,
             Date operationDate, Client client) {
         this.localId = idOfCardTempOperation;
         this.org = org;

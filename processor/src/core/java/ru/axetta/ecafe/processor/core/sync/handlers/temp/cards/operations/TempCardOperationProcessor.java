@@ -31,6 +31,7 @@ public class TempCardOperationProcessor extends AbstractProcessor<ResTempCardsOp
     @Override
     public ResTempCardsOperations process() throws Exception {
         List<TempCardOperation> tempCardOperations = tempCardsOperations.getTempCardOperationList();
+
         for (TempCardOperation tempCardOperation: tempCardOperations){
             if (StringUtils.isEmpty(tempCardOperation.getErrorMessage())){
                 Card card = DAOUtils.findCardByCardNo(session, tempCardOperation.getIdOfTempCard());
@@ -43,6 +44,9 @@ public class TempCardOperationProcessor extends AbstractProcessor<ResTempCardsOp
                     } else {
                         /**TODO: подумать над работтой с временными картами визитеров*/
                         if(cardTemp.getOrg()!=null && cardTemp.getOrg().getIdOfOrg().equals(tempCardOperation.getIdOfOrg())){
+                            if(tempCardOperation.getIdOfClient()==null && tempCardOperation.getIdOfVisitor()==null){
+                                resTempCardOperationList.add(registrOperation(tempCardOperation, cardTemp));
+                            }
                             if(tempCardOperation.getIdOfClient()!=null){
                                 resTempCardOperationList.add(registrClientOperation(tempCardOperation, cardTemp));
                             }
@@ -60,6 +64,22 @@ public class TempCardOperationProcessor extends AbstractProcessor<ResTempCardsOp
 
         }
         return new ResTempCardsOperations(resTempCardOperationList);
+    }
+
+    private ResTempCardOperation registrOperation(TempCardOperation tempCardOperation, CardTemp cardTemp) {
+        if(tempCardOperation.getIssueExpiryDate()!=null && System.currentTimeMillis()>tempCardOperation.getIssueExpiryDate().getTime()){
+            return new ResTempCardOperation(tempCardOperation.getIdOfOperation(),6,"Неверное значение даты окончания действия карты");
+        } else {
+            CardOperationStation operation = CardOperationStation.value(tempCardOperation.getOperationType());
+            CardTempOperation cardTempOperation = DAOUtils.findTempCartOperation(session, tempCardOperation.getIdOfOperation(), cardTemp.getOrg());
+            if(cardTempOperation==null){
+                cardTempOperation = new CardTempOperation(tempCardOperation.getIdOfOperation(), cardTemp.getOrg(), cardTemp, operation, tempCardOperation.getOperationDate());
+                session.save(cardTempOperation);
+                return new ResTempCardOperation(tempCardOperation.getIdOfOperation(),0,null);
+            }  else {
+                return new ResTempCardOperation(tempCardOperation.getIdOfOperation(),7,"Операция уже зарегистрирована");
+            }
+        }
     }
 
     private void addResTempCardOperation(TempCardOperation tempCardOperation, int code, String message) {

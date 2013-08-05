@@ -78,11 +78,15 @@ public class TempCardOperation {
                 return new TempCardOperation(idOfOperation, "NumberFormatException IdOfVisitor not found");
             }
         }
-        if(idOfClient==null && idOfVisitor==null){
-            return new TempCardOperation(idOfOperation, "IdOfClient and IdOfVisitor IdOfVisitor is null");
-        }
-        if(idOfClient!=null && idOfVisitor!=null){
-            return new TempCardOperation(idOfOperation, "IdOfClient and IdOfVisitor IdOfVisitor is not null");
+        String strOperationType = XMLUtils.getAttributeValue(itemNode,"OperationType");
+        if(StringUtils.isNotEmpty(strOperationType)){
+            try {
+                operationType = Integer.parseInt(strOperationType);
+            } catch (NumberFormatException e){
+                return new TempCardOperation(idOfOperation, "NumberFormatException OperationType");
+            }
+        } else {
+            return new TempCardOperation(idOfOperation, "Attribute OperationType not found");
         }
         String strIssueExpiryDate = XMLUtils.getAttributeValue(itemNode,"IssueExpiryDate");
         if(StringUtils.isNotEmpty(strIssueExpiryDate)){
@@ -102,16 +106,14 @@ public class TempCardOperation {
         } else {
             return new TempCardOperation(idOfOperation, "Attribute OperationDate not found");
         }
-        String strOperationType = XMLUtils.getAttributeValue(itemNode,"OperationType");
-        if(StringUtils.isNotEmpty(strOperationType)){
-            try {
-                operationType = Integer.parseInt(strOperationType);
-            } catch (NumberFormatException e){
-                return new TempCardOperation(idOfOperation, "NumberFormatException OperationType");
-            }
-        } else {
-            return new TempCardOperation(idOfOperation, "Attribute OperationType not found");
+        if(idOfClient==null && idOfVisitor==null && operationType!=0){
+            return new TempCardOperation(idOfOperation, "IdOfClient and IdOfVisitor is null");
         }
+        if(idOfClient!=null && idOfVisitor!=null){
+            return new TempCardOperation(idOfOperation, "IdOfClient and IdOfVisitor is not null");
+        }
+
+
         return new TempCardOperation(idOfOrg, idOfClient, idOfVisitor, idOfOperation, idOfTempCard,issueExpiryDate, operationDate, operationType);
     }
 

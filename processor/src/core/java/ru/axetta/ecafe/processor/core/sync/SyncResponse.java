@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardOperation;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
@@ -1181,6 +1182,7 @@ public class SyncResponse {
     private final String message;
     private final ResEnterEvents resEnterEvents;
     private final ResTempCardsOperations resTempCardsOperations;
+    private final TempCardOperationData tempCardOperationData;
     private final ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules;
     private final ComplexRoles complexRoles;
     private final CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry;
@@ -1198,8 +1200,9 @@ public class SyncResponse {
             String options, AccRegistry accRegistry, ResPaymentRegistry resPaymentRegistry, AccIncRegistry accIncRegistry,
             ClientRegistry clientRegistry, ResOrgStructure resOrgStructure, ResMenuExchangeData resMenuExchangeData,
             ResDiary resDiary, String message, ResEnterEvents resEnterEvents,
-            ResTempCardsOperations resTempCardsOperations, ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules,
-            ComplexRoles complexRoles, CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData,
+            ResTempCardsOperations resTempCardsOperations, TempCardOperationData tempCardOperationData,
+            ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules, ComplexRoles complexRoles,
+            CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData,
             QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData,
             DirectiveElement directiveElement) {
         this.syncType = syncType;
@@ -1219,6 +1222,7 @@ public class SyncResponse {
         this.message = message;
         this.resEnterEvents = resEnterEvents;
         this.resTempCardsOperations = resTempCardsOperations;
+        this.tempCardOperationData = tempCardOperationData;
         this.resCategoriesDiscountsAndRules = resCategoriesDiscountsAndRules;
         this.complexRoles = complexRoles;
         this.correctingNumbersOrdersRegistry = correctingNumbersOrdersRegistry;
@@ -1306,6 +1310,11 @@ public class SyncResponse {
         // ResTempCardsOperations
         if (resTempCardsOperations != null) {
             ecafeEnvelopeElement.appendChild(resTempCardsOperations.toElement(document));
+        }
+
+        // TempCardOperationData
+        if (tempCardOperationData != null) {
+            ecafeEnvelopeElement.appendChild(tempCardOperationData.toElement(document));
         }
 
         // ResLibraryData

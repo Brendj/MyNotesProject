@@ -57,7 +57,7 @@
     })();
 </script>
 
-<%final Logger logger = LoggerFactory
+<%  final Logger logger = LoggerFactory
         .getLogger("ru.axetta.ecafe.processor.web.client-room.pages.show-orders-and-payments_jsp");
     final String PROCESS_PARAM = "submit";
     final String PROCESS_PARAM_VIEW = "submit_view";

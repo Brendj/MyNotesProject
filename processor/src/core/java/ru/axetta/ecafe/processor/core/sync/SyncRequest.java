@@ -7,6 +7,8 @@ package ru.axetta.ecafe.processor.core.sync;
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.sync.handlers.client.request.ClientRequestBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.client.request.ClientRequests;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperationBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
@@ -21,6 +23,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static ru.axetta.ecafe.processor.core.utils.XMLUtils.*;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Developer
@@ -29,44 +33,6 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class SyncRequest {
-
-    private static int getIntValue(NamedNodeMap namedNodeMap, String name) throws Exception {
-        return Integer.parseInt(namedNodeMap.getNamedItem(name).getTextContent());
-    }
-
-    private static long getLongValue(NamedNodeMap namedNodeMap, String name) throws Exception {
-        Node n = namedNodeMap.getNamedItem(name);
-        return Long.parseLong(n.getTextContent());
-    }
-
-    private static Long getLongValueNullSafe(NamedNodeMap namedNodeMap, String name) throws Exception {
-        Node node = namedNodeMap.getNamedItem(name);
-        if (null == node) {
-            node = namedNodeMap.getNamedItem(name.toUpperCase());
-            if (node == null) {
-                return null;
-            }
-        }
-        return Long.parseLong(node.getTextContent());
-    }
-
-    private static String getStringValueNullSafe(NamedNodeMap namedNodeMap, String name) throws Exception {
-        Node node = namedNodeMap.getNamedItem(name);
-        if (null == node) {
-            return null;
-        }
-        return node.getTextContent();
-    }
-
-    private static String getStringValueNullSafe(NamedNodeMap namedNodeMap, String name, int length) throws Exception {
-        Node node = namedNodeMap.getNamedItem(name);
-        if (null == node) {
-            return null;
-        }
-        String result = node.getTextContent();
-        if(result.length()>length) return result.substring(0, length);
-        return result;
-    }
 
     public static class PaymentRegistry {
 
@@ -2243,6 +2209,7 @@ public class SyncRequest {
         private final EnterEvents.Builder enterEventsBuilder;
         private final TempCardsOperationBuilder tempCardsOperationBuilder;
         private Manager manager;
+        private final ClientRequestBuilder clientRequestBuilder;
 
         public Builder() {
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
@@ -2263,6 +2230,7 @@ public class SyncRequest {
             this.menuGroupsBuilder = new MenuGroups.Builder();
             this.enterEventsBuilder = new EnterEvents.Builder();
             this.tempCardsOperationBuilder = new TempCardsOperationBuilder();
+            this.clientRequestBuilder = new ClientRequestBuilder();
         }
 
         public static Node findEnvelopeNode(Document document) throws Exception {
@@ -2397,6 +2365,13 @@ public class SyncRequest {
                 tempCardsOperations = tempCardsOperationBuilder.build(tempCardsOperationsNode, org.getIdOfOrg());
             }
 
+            ClientRequests clientRequests = null;
+            Node clientRequestsNode = findFirstChildElement(envelopeNode, "ClientRequests");
+            if (clientRequestsNode != null) {
+                clientRequests = clientRequestBuilder.build(clientRequestsNode);
+            }
+
+
             // 15.09.2011 LibraryData
             //Node libraryDataNode = findFirstChildElement(envelopeNode, "LibraryData");
             //LibraryData libraryData = null;
@@ -2425,32 +2400,12 @@ public class SyncRequest {
             }
 
 
-            return new SyncRequest(remoteAddr, version, syncType /*type,*/, clientVersion, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
+            return new SyncRequest(remoteAddr, version, syncType , clientVersion, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
-                    enterEvents, tempCardsOperations, manager);
+                    enterEvents, tempCardsOperations, clientRequests, manager);
         }
 
-        private static Node findFirstChildElement(Node node, String name) throws Exception {
-            Node currNode = node.getFirstChild();
-            while (null != currNode) {
-                if (Node.ELEMENT_NODE == currNode.getNodeType() && currNode.getNodeName().equals(name)) {
-                    return currNode;
-                }
-                currNode = currNode.getNextSibling();
-            }
-            return null;
-        }
 
-        private static Node findFirstChildTextNode(Node node) throws Exception {
-            Node currNode = node.getFirstChild();
-            while (null != currNode) {
-                if (Node.TEXT_NODE == currNode.getNodeType()) {
-                    return currNode;
-                }
-                currNode = currNode.getNextSibling();
-            }
-            return null;
-        }
     }
 
     private final SyncType syncType;
@@ -2477,17 +2432,19 @@ public class SyncRequest {
     private final String clientVersion;
     private final EnterEvents enterEvents;
     private final TempCardsOperations tempCardsOperations;
+    private final ClientRequests clientRequests;
     private final Manager manager;
 
     public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket,
             PaymentRegistry paymentRegistry, AccIncRegistryRequest accIncRegistryRequest, ClientParamRegistry clientParamRegistry,
             ClientRegistryRequest clientRegistryRequest, OrgStructure orgStructure, MenuGroups menuGroups, ReqMenu reqMenu, ReqDiary reqDiary, String message,
-            EnterEvents enterEvents, TempCardsOperations tempCardsOperations, Manager manager) {
+            EnterEvents enterEvents, TempCardsOperations tempCardsOperations, ClientRequests clientRequests, Manager manager) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.syncType = syncType;
         this.clientVersion = clientVersion;
         this.tempCardsOperations = tempCardsOperations;
+        this.clientRequests = clientRequests;
         this.manager = manager;
         this.idOfOrg = org.getIdOfOrg();
         this.org = org;
@@ -2575,6 +2532,10 @@ public class SyncRequest {
 
     public TempCardsOperations getTempCardsOperations() {
         return tempCardsOperations;
+    }
+
+    public ClientRequests getClientRequests() {
+        return clientRequests;
     }
 
     @Override

@@ -23,6 +23,9 @@ import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
 import ru.axetta.ecafe.processor.core.subscription.SubscriptionFeeManager;
 import ru.axetta.ecafe.processor.core.sync.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.client.request.ClientRequests;
+import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
+import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardRequestProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoleProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
@@ -576,6 +579,7 @@ public class Processor implements SyncProcessor,
         SyncResponse.ResDiary resDiary = null;
         SyncResponse.ResEnterEvents resEnterEvents = null;
         ResTempCardsOperations resTempCardsOperations = null;
+        TempCardOperationData tempCardOperationData = null;
         SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
         ComplexRoles complexRoles = null;
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
@@ -714,6 +718,19 @@ public class Processor implements SyncProcessor,
             logger.error(message, e);
         }
 
+        try {
+            if(request.getClientRequests()!=null){
+                ClientRequests clientRequests = request.getClientRequests();
+                if(clientRequests.getResponseTempCardOperation()) {
+                    tempCardOperationData = processClientRequestsOperations(request.getIdOfOrg());
+                }
+            }
+        } catch (Exception e) {
+            String message = String.format("processTempCardsOperations: %s", e.getMessage());
+            createSyncHistory(request.getIdOfOrg(),syncHistory, message);
+            logger.error(message, e);
+        }
+
         // Process library data
                 /*try {
                     if (request.getLibraryData() != null) {
@@ -811,7 +828,7 @@ public class Processor implements SyncProcessor,
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(),
                 request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
-                resEnterEvents, resTempCardsOperations, resCategoriesDiscountsAndRules, complexRoles,
+                resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement);
     }
@@ -831,6 +848,7 @@ public class Processor implements SyncProcessor,
         SyncResponse.ResDiary resDiary = null;
         SyncResponse.ResEnterEvents resEnterEvents = null;
         ResTempCardsOperations resTempCardsOperations = null;
+        TempCardOperationData tempCardOperationData = null;
         SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
         ComplexRoles complexRoles = null;
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
@@ -870,7 +888,7 @@ public class Processor implements SyncProcessor,
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(),
                 request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
-                resEnterEvents, resTempCardsOperations, resCategoriesDiscountsAndRules, complexRoles,
+                resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement);
     }
@@ -889,6 +907,7 @@ public class Processor implements SyncProcessor,
         SyncResponse.ResDiary resDiary = null;
         SyncResponse.ResEnterEvents resEnterEvents = null;
         ResTempCardsOperations resTempCardsOperations = null;
+        TempCardOperationData tempCardOperationData = null;
         ComplexRoles complexRoles = null;
         SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
         SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
@@ -973,7 +992,7 @@ public class Processor implements SyncProcessor,
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(),
                 request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
-                resEnterEvents, resTempCardsOperations, resCategoriesDiscountsAndRules, complexRoles,
+                resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
                 directiveElement);
     }
@@ -990,7 +1009,7 @@ public class Processor implements SyncProcessor,
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
-            logger.error("createSyncHistory excaption: ",e);
+            logger.error("createSyncHistory exception: ",e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1156,6 +1175,24 @@ public class Processor implements SyncProcessor,
             HibernateUtils.close(persistenceSession, logger);
         }
         return resTempCardsOperations;
+    }
+
+    private TempCardOperationData processClientRequestsOperations(Long idOfOrg) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        TempCardOperationData tempCardOperationData = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new TempCardRequestProcessor(persistenceSession, idOfOrg);
+            tempCardOperationData = (TempCardOperationData) processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return tempCardOperationData;
     }
 
     private ComplexRoles processComplexRoles() throws Exception {
@@ -2786,6 +2823,7 @@ public class Processor implements SyncProcessor,
             }
         } else {
             cardTemp = new CardTemp(org,cardNo, cardPrintedNo);
+
         }
         persistenceSession.save(cardTemp);
     }

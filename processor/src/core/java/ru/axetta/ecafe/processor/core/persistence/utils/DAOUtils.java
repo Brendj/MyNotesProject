@@ -1381,4 +1381,11 @@ public class DAOUtils {
             return clients.get(0);
         }
     }
+
+    @SuppressWarnings("unchecked")
+    public static List<CardTempOperation> getRegistrTempCardOperationByOrg(Session session, Long idOfOrg) {
+        Query query = session.createQuery("from CardTempOperation oper where oper.org.id = :idOfOrg and oper.operationType=0");
+        query.setParameter("idOfOrg", idOfOrg);
+        return query.list();
+    }
 }

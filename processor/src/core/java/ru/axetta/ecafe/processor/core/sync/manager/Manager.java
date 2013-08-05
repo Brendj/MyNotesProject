@@ -4,9 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.manager;
 
-import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.MenuExchangeRule;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -60,6 +58,7 @@ public class Manager {
     private Long idOfOrg;
     private final DateFormat dateOnlyFormat;
     private final DateFormat timeFormat;
+    private SyncHistory syncHistory;
 
     public Manager(DateFormat dateOnlyFormat, DateFormat timeFormat){
         this.dateOnlyFormat = dateOnlyFormat;
@@ -412,7 +411,11 @@ public class Manager {
             Criterion sendToAllRestriction = Restrictions.conjunction();
             Set<Long>  allOrg = new TreeSet<Long>();
             allOrg.addAll(menuExchangeRuleList);
-            allOrg.addAll(DAOUtils.getListIdOfOrgList(persistenceSession, menuExchangeRuleList.get(0)));
+            if(!menuExchangeRuleList.isEmpty()){
+                allOrg.addAll(DAOUtils.getListIdOfOrgList(persistenceSession, menuExchangeRuleList.get(0)));
+            } else {
+                throw new DistributedObjectException("The organization has no source menu");
+            }
             sendToAllRestriction = ((Conjunction)sendToAllRestriction)
                     .add(Restrictions.in("orgOwner",allOrg))
                     .add(Restrictions.eq("sendAll",SendToAssociatedOrgs.SendToAll));
@@ -471,6 +474,14 @@ public class Manager {
             persistenceTransaction = null;
         }catch (Exception e){
             // TODO: записать в журнал ошибок
+            Org org = null;
+            try {
+                org = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
+                SyncHistoryException syncHistoryException = new SyncHistoryException(org, syncHistory, "Error generateResponseResult: " + e.getMessage());
+                persistenceSession.save(syncHistoryException);
+            } catch (Exception e1) {
+                logger.error("createSyncHistory exception: ",e1);
+            }
             logger.error("Error generateResponseResult: ",e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
