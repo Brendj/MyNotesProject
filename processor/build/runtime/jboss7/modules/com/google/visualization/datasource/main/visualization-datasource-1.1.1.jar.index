@@ -1,0 +1,15 @@
+
+com
+com/google/visualization
+com/google/visualization/datasource/query/scalarfunction
+com/google/visualization/datasource/util
+META-INF
+com/google/visualization/datasource/base
+com/google/visualization/datasource/datatable
+com/google/visualization/datasource
+com/google
+com/google/visualization/datasource/query
+com/google/visualization/datasource/datatable/value
+com/google/visualization/datasource/render
+com/google/visualization/datasource/query/engine
+com/google/visualization/datasource/query/parser
