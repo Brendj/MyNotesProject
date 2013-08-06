@@ -25,7 +25,7 @@ public class GoodBasicBasketPrice extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGood);
+        Good g = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfGood);
         //if(g == null) throw new DistributedObjectException("Good NOT_FOUND_VALUE");
         //setGood(g);
         if(g != null){

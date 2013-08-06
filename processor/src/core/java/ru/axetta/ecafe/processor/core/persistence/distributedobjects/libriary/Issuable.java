@@ -25,23 +25,6 @@ import java.util.Set;
  */
 public class Issuable extends DistributedObject {
 
-    private Long barcode;
-    private char type;
-    private Instance instance;
-    private JournalItem journalItem;
-
-    private String guidInstance;
-    private String guidJournalItem;
-    private Set<Circulation> circulationInternal;
-
-    public Set<Circulation> getCirculationInternal() {
-        return circulationInternal;
-    }
-
-    public void setCirculationInternal(Set<Circulation> circulationInternal) {
-        this.circulationInternal = circulationInternal;
-    }
-
     @Override
     protected void appendAttributes(Element element) {
     }
@@ -68,8 +51,8 @@ public class Issuable extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException{
-        Instance i = (Instance) DAOUtils.findDistributedObjectByRefGUID(session, guidInstance);
-        JournalItem ji = (JournalItem) DAOUtils.findDistributedObjectByRefGUID(session, guidJournalItem);
+        Instance i = DAOUtils.findDistributedObjectByRefGUID(Instance.class, session, guidInstance);
+        JournalItem ji = DAOUtils.findDistributedObjectByRefGUID(JournalItem.class, session, guidJournalItem);
         if((i==null && ji==null) || (i!=null && ji!=null)) throw new DistributedObjectException("NOT_FOUND_VALUE");
         if(i!=null) setInstance(i);
         if(ji!=null) setJournalItem(ji);
@@ -119,5 +102,22 @@ public class Issuable extends DistributedObject {
     public String toString() {
         return String.format("Issuable{barcode=%d, type=%s, instance=%s, journalItem=%s}", barcode, type, instance,
                 journalItem);
+    }
+
+    private Long barcode;
+    private char type;
+    private Instance instance;
+    private JournalItem journalItem;
+
+    private String guidInstance;
+    private String guidJournalItem;
+    private Set<Circulation> circulationInternal;
+
+    public Set<Circulation> getCirculationInternal() {
+        return circulationInternal;
+    }
+
+    public void setCirculationInternal(Set<Circulation> circulationInternal) {
+        this.circulationInternal = circulationInternal;
     }
 }

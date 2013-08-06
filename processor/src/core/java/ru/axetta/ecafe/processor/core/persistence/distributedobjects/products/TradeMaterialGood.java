@@ -52,8 +52,7 @@ public class TradeMaterialGood extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        //Good g = DAOService.getInstance().findDistributedObjectByRefGUID(Good.class, guidOfG);
-        Good g  = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfG);
+        Good g  = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfG);
         if(g==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setGood(g);
     }

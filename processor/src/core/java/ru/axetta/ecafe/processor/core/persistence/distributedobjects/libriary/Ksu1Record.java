@@ -26,38 +26,12 @@ import java.util.Set;
  */
 public class Ksu1Record extends DistributedObject {
 
-    private int recordNumber;
-    private Fund fund;
-    private Date incomeDate;
-    private AccompanyingDocument accompanyingDocument;
-
-    private String guidFund;
-    private String guidAccompanyingDocument;
-    private Set<JournalItem> journalItemInternal;
-    private Set<Instance> instanceInternal;
-
-    public Set<Instance> getInstanceInternal() {
-        return instanceInternal;
-    }
-
-    public void setInstanceInternal(Set<Instance> instanceInternal) {
-        this.instanceInternal = instanceInternal;
-    }
-
-    public Set<JournalItem> getJournalItemInternal() {
-        return journalItemInternal;
-    }
-
-    public void setJournalItemInternal(Set<JournalItem> journalItemInternal) {
-        this.journalItemInternal = journalItemInternal;
-    }
-
     @Override
     public void preProcess(Session session) throws DistributedObjectException{
-        AccompanyingDocument ad = (AccompanyingDocument) DAOUtils.findDistributedObjectByRefGUID(session, guidAccompanyingDocument);
+        AccompanyingDocument ad = DAOUtils.findDistributedObjectByRefGUID(AccompanyingDocument.class, session, guidAccompanyingDocument);
         if(ad==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setAccompanyingDocument(ad);
-        Fund f = (Fund) DAOUtils.findDistributedObjectByRefGUID(session, guidFund);
+        Fund f =  DAOUtils.findDistributedObjectByRefGUID(Fund.class, session, guidFund);
         if(f==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setFund(f);
     }
@@ -85,6 +59,32 @@ public class Ksu1Record extends DistributedObject {
         setFund(((Ksu1Record) distributedObject).getFund());
         setAccompanyingDocument(((Ksu1Record) distributedObject).getAccompanyingDocument());
         setIncomeDate(((Ksu1Record) distributedObject).getIncomeDate());
+    }
+
+    private int recordNumber;
+    private Fund fund;
+    private Date incomeDate;
+    private AccompanyingDocument accompanyingDocument;
+
+    private String guidFund;
+    private String guidAccompanyingDocument;
+    private Set<JournalItem> journalItemInternal;
+    private Set<Instance> instanceInternal;
+
+    public Set<Instance> getInstanceInternal() {
+        return instanceInternal;
+    }
+
+    public void setInstanceInternal(Set<Instance> instanceInternal) {
+        this.instanceInternal = instanceInternal;
+    }
+
+    public Set<JournalItem> getJournalItemInternal() {
+        return journalItemInternal;
+    }
+
+    public void setJournalItemInternal(Set<JournalItem> journalItemInternal) {
+        this.journalItemInternal = journalItemInternal;
     }
 
     public int getRecordNumber() {

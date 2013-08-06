@@ -149,8 +149,7 @@ public class Product extends DistributedObject implements IConfigProvider {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        //ProductGroup pg = DAOService.getInstance().findDistributedObjectByRefGUID(ProductGroup.class,guidOfPG);
-        ProductGroup pg = (ProductGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfPG);
+        ProductGroup pg = DAOUtils.findDistributedObjectByRefGUID(ProductGroup.class, session, guidOfPG);
         if(pg==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setProductGroup(pg);
     }

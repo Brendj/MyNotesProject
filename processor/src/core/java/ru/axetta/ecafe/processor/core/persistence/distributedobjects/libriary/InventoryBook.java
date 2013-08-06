@@ -21,20 +21,9 @@ import java.util.Set;
  */
 public class InventoryBook extends DistributedObject {
 
-    private String bookName;
-    private Set<Instance> instanceInternal;
-
-    public Set<Instance> getInstanceInternal() {
-        return instanceInternal;
-    }
-
-    public void setInstanceInternal(Set<Instance> instanceInternal) {
-        this.instanceInternal = instanceInternal;
-    }
-
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "BookName", bookName);
+        //setAttribute(element, "BookName", bookName);
     }
 
     @Override
@@ -65,5 +54,16 @@ public class InventoryBook extends DistributedObject {
     @Override
     public String toString() {
         return String.format("InventoryBook{bookName='%s'}", bookName);
+    }
+
+    private String bookName;
+    private Set<Instance> instanceInternal;
+
+    public Set<Instance> getInstanceInternal() {
+        return instanceInternal;
+    }
+
+    public void setInstanceInternal(Set<Instance> instanceInternal) {
+        this.instanceInternal = instanceInternal;
     }
 }

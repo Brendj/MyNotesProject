@@ -14,30 +14,20 @@ import java.util.Set;
 
 public class GoodComplaintBook extends DistributedObject {
 
-    private Set<GoodComplaintIterations> GoodComplaintIterationsInternal;
-
-    public Set<GoodComplaintIterations> getGoodComplaintIterationsInternal() {
-        return GoodComplaintIterationsInternal;
-    }
-
-    public void setGoodComplaintIterationsInternal(Set<GoodComplaintIterations> goodComplaintIterationsInternal) {
-        GoodComplaintIterationsInternal = goodComplaintIterationsInternal;
-    }
-
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         DistributedObjectException distributedObjectException = new DistributedObjectException("Client NOT_FOUND_VALUE");
         distributedObjectException.setData(String.valueOf(idOfClient));
         Client c;
         try {
-            c = (Client) DAOUtils.findClient(session, idOfClient);
+            c = DAOUtils.findClient(session, idOfClient);
         } catch (Exception e) {
             throw distributedObjectException;
         }
         if (c == null) throw distributedObjectException;
         setClient(c);
 
-        Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGood);
+        Good g = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfGood);
         if (g == null) throw new DistributedObjectException("Good NOT_FOUND_VALUE");
         setGood(g);
     }
@@ -68,6 +58,7 @@ public class GoodComplaintBook extends DistributedObject {
     private Long idOfClient;
     private Good good;
     private String guidOfGood;
+    private Set<GoodComplaintIterations> GoodComplaintIterationsInternal;
 
     public Client getClient() {
         return client;
@@ -99,6 +90,14 @@ public class GoodComplaintBook extends DistributedObject {
 
     public void setGuidOfGood(String guidOfGood) {
         this.guidOfGood = guidOfGood;
+    }
+
+    public Set<GoodComplaintIterations> getGoodComplaintIterationsInternal() {
+        return GoodComplaintIterationsInternal;
+    }
+
+    public void setGoodComplaintIterationsInternal(Set<GoodComplaintIterations> goodComplaintIterationsInternal) {
+        GoodComplaintIterationsInternal = goodComplaintIterationsInternal;
     }
 
 }

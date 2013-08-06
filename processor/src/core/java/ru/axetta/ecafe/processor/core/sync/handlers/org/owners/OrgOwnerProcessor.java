@@ -1,40 +1,36 @@
 /*
- * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2013. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.sync.response;
+package ru.axetta.ecafe.processor.core.sync.handlers.org.owners;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
 import org.hibernate.Session;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
  * User: damir
- * Date: 16.08.12
- * Time: 10:56
+ * Date: 06.08.13
+ * Time: 12:54
  * To change this template use File | Settings | File Templates.
  */
-public class OrgOwnerData {
+public class OrgOwnerProcessor extends AbstractProcessor<OrgOwnerData> {
 
-    private List<OrgOwner> orgOwnerList;
+    private final Long idOfOrg;
 
-    public OrgOwnerData() {}
-
-    public List<OrgOwner> getOrgOwnerList() {
-        return orgOwnerList;
+    public OrgOwnerProcessor(Session session, Long idOfOrg) {
+        super(session);
+        this.idOfOrg = idOfOrg;
     }
 
-    public void process(Session session, Long idOfOrg) throws Exception{
+    @Override
+    public OrgOwnerData process() throws Exception {
         List<OrgOwner> orgOwners = new ArrayList<OrgOwner>();
         orgOwners.addAll(DAOUtils.getOrgSourceByMenuExchangeRule(session, idOfOrg, false));
         Org org = DAOUtils.findOrg(session, idOfOrg);
@@ -49,14 +45,6 @@ public class OrgOwnerData {
             orgOwners.add(new OrgOwner(org.getIdOfOrg(),org.getShortName(),org.getOfficialName(), false));
         }
         orgOwners.addAll(DAOUtils.getOrgSourceByMenuExchangeRule(session, idOfOrg, true));
-        orgOwnerList = orgOwners;
-    }
-
-    public Element toElement(Document document) throws Exception {
-        Element element = document.createElement("OrgOwnerData");
-        for (OrgOwner orgOwner : this.orgOwnerList) {
-            element.appendChild(orgOwner.toElement(document));
-        }
-        return element;
+        return new OrgOwnerData(orgOwners);
     }
 }

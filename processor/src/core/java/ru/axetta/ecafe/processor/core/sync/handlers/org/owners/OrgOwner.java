@@ -2,7 +2,9 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.sync.response;
+package ru.axetta.ecafe.processor.core.sync.handlers.org.owners;
+
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -14,7 +16,7 @@ import org.w3c.dom.Element;
  * Time: 11:02
  * To change this template use File | Settings | File Templates.
  */
-public class OrgOwner {
+public class OrgOwner extends AbstractToElement {
 
     private final Long idOfOrg;
 

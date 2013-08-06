@@ -51,8 +51,8 @@ public class FreeComplexReport extends BasicReport {
                 long endDateLong = endDate.getTime();
                 query.setLong("fromCreatedDate", startDateLong);
                 query.setLong("toCreatedDate", endDateLong);
-                query.setInteger("fromMenuType", OrderDetail.TYPE_COMPLEX_0);
-                query.setInteger("toMenuType", OrderDetail.TYPE_COMPLEX_9);
+                query.setInteger("fromMenuType", OrderDetail.TYPE_COMPLEX_MIN);
+                query.setInteger("toMenuType", OrderDetail.TYPE_COMPLEX_MAX);
 
                 resultList = query.list();
 

@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.complex.roles;
 
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -16,7 +18,7 @@ import java.util.List;
  * Time: 12:42
  * To change this template use File | Settings | File Templates.
  */
-public class ComplexRoles {
+public class ComplexRoles extends AbstractToElement {
 
     private final List<ComplexRoleItem> complexRoleItemList;
 

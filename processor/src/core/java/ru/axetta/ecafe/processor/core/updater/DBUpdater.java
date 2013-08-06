@@ -24,18 +24,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class DBUpdater {
-    final static Logger logger = LoggerFactory.getLogger(DBUpdater.class);
-    final static String UPDATES_ROOT="/db";
+    private final static Logger logger = LoggerFactory.getLogger(DBUpdater.class);
+    private final static String UPDATES_ROOT="/db";
 
     @PersistenceContext
     private EntityManager entityManager;
 
-    @Autowired
+    @Autowired(required = false)
     private RuntimeContext runtimeContext;
 
 
-    int[] INITIAL_DB_VERSION;
-    Properties updatesMap = new Properties();
+    private int[] INITIAL_DB_VERSION;
+    private Properties updatesMap = new Properties();
 
     void lookupDBVersions() throws IOException {
         updatesMap.load(DBUpdater.class.getResourceAsStream(UPDATES_ROOT+ "/update.properties"));

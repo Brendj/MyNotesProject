@@ -14,6 +14,7 @@ import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -29,7 +30,11 @@ public class Staff extends DistributedObject {
     public void preProcess(Session session) throws DistributedObjectException {
         Criteria criteria = session.createCriteria(Staff.class);
         criteria.add(Restrictions.eq("hashCode", getHashCode()));
-        Staff staff = (Staff) criteria.uniqueResult();
+        Staff staff = null;
+        List list = criteria.list();
+        if(list!=null && !list.isEmpty()){
+            staff = (Staff) list.get(0);
+        }
         if(!(staff==null || staff.getDeletedState() || guid.equals(staff.getGuid()))){
             DistributedObjectException distributedObjectException =  new DistributedObjectException("Staff DATA_EXIST_VALUE");
             distributedObjectException.setData(staff.getGuid());

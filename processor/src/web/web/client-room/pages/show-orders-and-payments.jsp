@@ -565,11 +565,11 @@
             <tr valign="top">
                 <td>
                     <% String odStyle = "";
-                        if (currOrderDetail.getMenuType() >= OrderDetail.TYPE_COMPLEX_0
-                                && currOrderDetail.getMenuType() <= OrderDetail.TYPE_COMPLEX_9) {
+                        if (currOrderDetail.getMenuType() >= OrderDetail.TYPE_COMPLEX_MIN
+                                && currOrderDetail.getMenuType() <= OrderDetail.TYPE_COMPLEX_MAX) {
                             odStyle = "od-complex";
-                        } else if (currOrderDetail.getMenuType() >= OrderDetail.TYPE_COMPLEX_ITEM_0
-                                && currOrderDetail.getMenuType() <= OrderDetail.TYPE_COMPLEX_ITEM_9) {
+                        } else if (currOrderDetail.getMenuType() >= OrderDetail.TYPE_COMPLEX_ITEM_MIN
+                                && currOrderDetail.getMenuType() <= OrderDetail.TYPE_COMPLEX_ITEM_MAX) {
                             odStyle = "od-c-item";
                         }%>
                     <div class="output-text <%=odStyle%>"><%=StringEscapeUtils

@@ -26,6 +26,52 @@ import java.util.Set;
  */
 public class Ksu2Record extends DistributedObject {
 
+
+
+    @Override
+    protected void appendAttributes(Element element) {}
+
+    @Override
+    public Ksu2Record parseAttributes(Node node) throws Exception {
+
+        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
+        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
+
+        guidFund = getStringAttributeValue(node, "GuidFund", 36);
+        guidRetirementReason = getStringAttributeValue(node, "GuidRetirementReason", 36);
+        retirementDate = getDateOnlyAttributeValue(node, "RetirementDate");
+        recordNumber = getIntegerAttributeValue(node, "RecordNumber");
+        setSendAll(SendToAssociatedOrgs.DontSend);
+        return this;
+    }
+
+    @Override
+    public void preProcess(Session session) throws DistributedObjectException{
+        RetirementReason rr = DAOUtils.findDistributedObjectByRefGUID(RetirementReason.class, session, guidRetirementReason);
+        if(rr==null) {
+            DistributedObjectException distributedObjectException = new DistributedObjectException("RetirementReason NOT_FOUND_VALUE");
+            distributedObjectException.setData(guidRetirementReason);
+            throw distributedObjectException;
+        }
+        setRetirementReason(rr);
+
+        Fund f = DAOUtils.findDistributedObjectByRefGUID(Fund.class, session, guidFund);
+        if(f==null){
+            DistributedObjectException distributedObjectException = new DistributedObjectException("Fund NOT_FOUND_VALUE");
+            distributedObjectException.setData(guidFund);
+            throw distributedObjectException;
+        }
+        setFund(f);
+    }
+
+    @Override
+    public void fill(DistributedObject distributedObject) {
+        setRecordNumber(((Ksu2Record) distributedObject).getRecordNumber());
+        setFund(((Ksu2Record) distributedObject).getFund());
+        setRetirementReason(((Ksu2Record) distributedObject).getRetirementReason());
+        setRetirementDate(((Ksu2Record) distributedObject).getRetirementDate());
+    }
+
     private Integer recordNumber;
     private Fund fund;
     private Date retirementDate;
@@ -50,50 +96,6 @@ public class Ksu2Record extends DistributedObject {
 
     public void setJournalItemInternal(Set<JournalItem> journalItemInternal) {
         this.journalItemInternal = journalItemInternal;
-    }
-
-    @Override
-    protected void appendAttributes(Element element) {}
-
-    @Override
-    public Ksu2Record parseAttributes(Node node) throws Exception {
-
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-
-        guidFund = getStringAttributeValue(node, "GuidFund", 36);
-        guidRetirementReason = getStringAttributeValue(node, "GuidRetirementReason", 36);
-        retirementDate = getDateOnlyAttributeValue(node, "RetirementDate");
-        recordNumber = getIntegerAttributeValue(node, "RecordNumber");
-        setSendAll(SendToAssociatedOrgs.DontSend);
-        return this;
-    }
-
-    @Override
-    public void preProcess(Session session) throws DistributedObjectException{
-        RetirementReason rr = (RetirementReason) DAOUtils.findDistributedObjectByRefGUID(session, guidRetirementReason);
-        if(rr==null) {
-            DistributedObjectException distributedObjectException = new DistributedObjectException("RetirementReason NOT_FOUND_VALUE");
-            distributedObjectException.setData(guidRetirementReason);
-            throw distributedObjectException;
-        }
-        setRetirementReason(rr);
-
-        Fund f = (Fund) DAOUtils.findDistributedObjectByRefGUID(session, guidFund);
-        if(f==null){
-            DistributedObjectException distributedObjectException = new DistributedObjectException("Fund NOT_FOUND_VALUE");
-            distributedObjectException.setData(guidFund);
-            throw distributedObjectException;
-        }
-        setFund(f);
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setRecordNumber(((Ksu2Record) distributedObject).getRecordNumber());
-        setFund(((Ksu2Record) distributedObject).getFund());
-        setRetirementReason(((Ksu2Record) distributedObject).getRetirementReason());
-        setRetirementDate(((Ksu2Record) distributedObject).getRetirementDate());
     }
 
     public Integer getRecordNumber() {

@@ -31,6 +31,11 @@ public class CalendarUtils {
         return dateTimeFormat.parse(stringDateTime);
     }
 
+    public static String toStringFullDateTimeWithLocalTimeZone(Date dateTime) throws ParseException {
+        dateTimeFormat.setTimeZone(localTimeZone);
+        return dateTimeFormat.format(dateTime);
+    }
+
     public static String toStringFullDateTimeWithUTCTimeZone(Date dateTime) throws ParseException {
         dateTimeFormat.setTimeZone(utcTimeZone);
         return dateTimeFormat.format(dateTime);

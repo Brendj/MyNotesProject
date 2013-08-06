@@ -116,6 +116,21 @@ public class DAOService {
 
     }
 
+    public void updateClientSetGUID(List<Long> clients) throws Exception {
+        for (Long id : clients) {
+            long clientRegistryVersion = DAOUtils.updateClientRegistryVersion((Session) entityManager.getDelegate());
+            Query query = entityManager.createQuery("update Client set clientGUID=:uuid, clientRegistryVersion=:version where idOfClient=:idOfClient");
+            query.setParameter("idOfClient", id);
+            query.setParameter("version", clientRegistryVersion);
+            query.setParameter("uuid", UUID.randomUUID().toString());
+            int result = query.executeUpdate();
+            if(result==0){
+                logger.error("Error edit uuid by client: idOfClient="+id);
+            }
+        }
+
+    }
+
     public void setDeletedState(DistributedObject distributedObject) {
         distributedObject = entityManager.find(distributedObject.getClass(), distributedObject.getGlobalId());
         distributedObject.setDeletedState(true);

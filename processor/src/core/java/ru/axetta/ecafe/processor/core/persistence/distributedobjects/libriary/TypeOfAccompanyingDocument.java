@@ -25,26 +25,7 @@ import java.util.Set;
  */
 public class TypeOfAccompanyingDocument extends DistributedObject {
 
-    private long idOfTypeOfAccompanyingDocument;
-    private String typeOfAccompanyingDocumentName;
-    private Integer hashCode;
-    private Set<AccompanyingDocument> accompanyingDocumentInternal;
 
-    public Set<AccompanyingDocument> getAccompanyingDocumentInternal() {
-        return accompanyingDocumentInternal;
-    }
-
-    public void setAccompanyingDocumentInternal(Set<AccompanyingDocument> accompanyingDocumentInternal) {
-        this.accompanyingDocumentInternal = accompanyingDocumentInternal;
-    }
-
-    public Integer getHashCode() {
-        return hashCode;
-    }
-
-    public void setHashCode(Integer hashCode) {
-        this.hashCode = hashCode;
-    }
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
@@ -151,5 +132,26 @@ public class TypeOfAccompanyingDocument extends DistributedObject {
     @Override
     public int hashCode() {
         return 31 * ((typeOfAccompanyingDocumentName != null ? getStringForHash(typeOfAccompanyingDocumentName).hashCode() : 0)) + (typeOfAccompanyingDocumentName != null ? getStringForHash(typeOfAccompanyingDocumentName).hashCode() : 0);
+    }
+
+    private long idOfTypeOfAccompanyingDocument;
+    private String typeOfAccompanyingDocumentName;
+    private Integer hashCode;
+    private Set<AccompanyingDocument> accompanyingDocumentInternal;
+
+    public Set<AccompanyingDocument> getAccompanyingDocumentInternal() {
+        return accompanyingDocumentInternal;
+    }
+
+    public void setAccompanyingDocumentInternal(Set<AccompanyingDocument> accompanyingDocumentInternal) {
+        this.accompanyingDocumentInternal = accompanyingDocumentInternal;
+    }
+
+    public Integer getHashCode() {
+        return hashCode;
+    }
+
+    public void setHashCode(Integer hashCode) {
+        this.hashCode = hashCode;
     }
 }

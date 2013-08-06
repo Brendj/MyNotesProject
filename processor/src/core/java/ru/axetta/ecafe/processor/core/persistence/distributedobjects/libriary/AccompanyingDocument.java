@@ -25,22 +25,6 @@ import java.util.Set;
  */
 public class AccompanyingDocument extends DistributedObject {
 
-    private TypeOfAccompanyingDocument typeOfAccompanyingDocument;
-    private String accompanyingDocumentNumber;
-    private Source source;
-
-    private String guidTypeOfAccompanyingDocument;
-    private String guidSource;
-    private Set<Ksu1Record> ksu1RecordInternal;
-
-    public Set<Ksu1Record> getKsu1RecordInternal() {
-        return ksu1RecordInternal;
-    }
-
-    public void setKsu1RecordInternal(Set<Ksu1Record> ksu1RecordInternal) {
-        this.ksu1RecordInternal = ksu1RecordInternal;
-    }
-
     @Override
     protected void appendAttributes(Element element) {
         setAttribute(element, "AccompanyingDocumentNumber", accompanyingDocumentNumber);
@@ -50,7 +34,7 @@ public class AccompanyingDocument extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException{
-        Source s = (Source) DAOUtils.findDistributedObjectByRefGUID(session, guidSource);
+        Source s = DAOUtils.findDistributedObjectByRefGUID(Source.class, session, guidSource);
         if(s==null){
             DistributedObjectException distributedObjectException = new DistributedObjectException("Source NOT_FOUND_VALUE");
             distributedObjectException.setData(guidSource);
@@ -58,7 +42,7 @@ public class AccompanyingDocument extends DistributedObject {
         } else {
             setSource(s);
         }
-        TypeOfAccompanyingDocument tad = (TypeOfAccompanyingDocument) DAOUtils.findDistributedObjectByRefGUID(session, guidTypeOfAccompanyingDocument);
+        TypeOfAccompanyingDocument tad = DAOUtils.findDistributedObjectByRefGUID(TypeOfAccompanyingDocument.class, session, guidTypeOfAccompanyingDocument);
         if(tad==null) {
             DistributedObjectException distributedObjectException = new DistributedObjectException("TypeOfAccompanyingDocument NOT_FOUND_VALUE");
             distributedObjectException.setData(guidTypeOfAccompanyingDocument);
@@ -111,5 +95,21 @@ public class AccompanyingDocument extends DistributedObject {
 
     public void setSource(Source source) {
         this.source = source;
+    }
+
+    private TypeOfAccompanyingDocument typeOfAccompanyingDocument;
+    private String accompanyingDocumentNumber;
+    private Source source;
+
+    private String guidTypeOfAccompanyingDocument;
+    private String guidSource;
+    private Set<Ksu1Record> ksu1RecordInternal;
+
+    public Set<Ksu1Record> getKsu1RecordInternal() {
+        return ksu1RecordInternal;
+    }
+
+    public void setKsu1RecordInternal(Set<Ksu1Record> ksu1RecordInternal) {
+        this.ksu1RecordInternal = ksu1RecordInternal;
     }
 }

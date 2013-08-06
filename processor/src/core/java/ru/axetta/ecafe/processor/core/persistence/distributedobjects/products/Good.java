@@ -29,50 +29,13 @@ import java.util.Set;
  */
 public class Good extends DistributedObject {
 
-    private String pathPart1;
-    private String pathPart2;
-    private String pathPart3;
-    private String pathPart4;
-
-    String getPathPart4() {
-        return pathPart4;
-    }
-
-    void setPathPart4(String pathPart4) {
-        this.pathPart4 = pathPart4;
-    }
-
-    String getPathPart3() {
-        return pathPart3;
-    }
-
-    void setPathPart3(String pathPart3) {
-        this.pathPart3 = pathPart3;
-    }
-
-    String getPathPart2() {
-        return pathPart2;
-    }
-
-    void setPathPart2(String pathPart2) {
-        this.pathPart2 = pathPart2;
-    }
-
-    String getPathPart1() {
-        return pathPart1;
-    }
-
-    void setPathPart1(String pathPart1) {
-        this.pathPart1 = pathPart1;
-    }
-
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGG);
+        GoodGroup gg = DAOUtils.findDistributedObjectByRefGUID(GoodGroup.class, session, guidOfGG);
         if(gg == null) throw new DistributedObjectException("GoodGroup NOT_FOUND_VALUE");
         setGoodGroup(gg);
-        Product p = (Product) DAOUtils.findDistributedObjectByRefGUID(session, guidOfP);
-        TechnologicalMap tm = (TechnologicalMap) DAOUtils.findDistributedObjectByRefGUID(session, guidOfTM);
+        Product p = DAOUtils.findDistributedObjectByRefGUID(Product.class, session, guidOfP);
+        TechnologicalMap tm = DAOUtils.findDistributedObjectByRefGUID(TechnologicalMap.class, session, guidOfTM);
         if(p == null && tm == null) throw new DistributedObjectException("Product or TechnologicalMap NOT_FOUND_VALUE");
         if(p != null) setProduct(p);
         if(tm != null) setTechnologicalMap(tm);
@@ -270,11 +233,14 @@ public class Good extends DistributedObject {
     private String guidOfTM;
     private GoodsBasicBasket basicGood;
     private String guidOfBasicGood;
-
     private User userCreate;
     private User userEdit;
     private User userDelete;
     private UnitScale unitsScale;
+    private String pathPart1;
+    private String pathPart2;
+    private String pathPart3;
+    private String pathPart4;
 
     public UnitScale getUnitsScale() {
         return unitsScale;
@@ -421,7 +387,36 @@ public class Good extends DistributedObject {
         this.userDelete = userDelete;
     }
 
-    //public String getUnitScaleString(){
-    //    return UNIT_SCALES[unitsScale];
-    //}
+    String getPathPart4() {
+        return pathPart4;
+    }
+
+    void setPathPart4(String pathPart4) {
+        this.pathPart4 = pathPart4;
+    }
+
+    String getPathPart3() {
+        return pathPart3;
+    }
+
+    void setPathPart3(String pathPart3) {
+        this.pathPart3 = pathPart3;
+    }
+
+    String getPathPart2() {
+        return pathPart2;
+    }
+
+    void setPathPart2(String pathPart2) {
+        this.pathPart2 = pathPart2;
+    }
+
+    String getPathPart1() {
+        return pathPart1;
+    }
+
+    void setPathPart1(String pathPart1) {
+        this.pathPart1 = pathPart1;
+    }
+
 }

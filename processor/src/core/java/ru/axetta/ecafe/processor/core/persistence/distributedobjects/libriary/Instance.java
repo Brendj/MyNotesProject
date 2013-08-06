@@ -25,30 +25,6 @@ import java.util.Set;
  */
 public class Instance extends DistributedObject {
 
-    private Publication publication;
-    private boolean inGroup;
-    private Fund fund;
-    private String invNumber;
-    private InventoryBook inventoryBook;
-    private Ksu1Record ksu1Record;
-    private Ksu2Record ksu2Record;
-    private int cost;
-
-    private String guidPublication;
-    private String guidFund;
-    private String guidInventaryBook;
-    private String guidKsu1Record;
-    private String guidKsu2Record;
-    private Set<Issuable> issuableInternal;
-
-    public Set<Issuable> getIssuableInternal() {
-        return issuableInternal;
-    }
-
-    public void setIssuableInternal(Set<Issuable> issuableInternal) {
-        this.issuableInternal = issuableInternal;
-    }
-
     @Override
     protected void appendAttributes(Element element) {}
 
@@ -73,8 +49,7 @@ public class Instance extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        //DAOService daoService = DAOService.getInstance();
-        Publication p = (Publication) DAOUtils.findDistributedObjectByRefGUID(session, guidPublication);
+        Publication p = DAOUtils.findDistributedObjectByRefGUID(Publication.class, session, guidPublication);
         if(p==null) {
             DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication NOT_FOUND_VALUE");
             distributedObjectException.setData(guidPublication);
@@ -83,22 +58,22 @@ public class Instance extends DistributedObject {
             setPublication(p);
         }
 
-        Fund f = (Fund) DAOUtils.findDistributedObjectByRefGUID(session, guidFund);
+        Fund f = DAOUtils.findDistributedObjectByRefGUID(Fund.class, session, guidFund);
         if(f!=null) {
             setFund(f);
         }
 
-        InventoryBook ib = (InventoryBook) DAOUtils.findDistributedObjectByRefGUID(session, guidInventaryBook);
+        InventoryBook ib = DAOUtils.findDistributedObjectByRefGUID(InventoryBook.class, session, guidInventaryBook);
         if(ib!=null){
             setInventoryBook(ib);
         }
 
-        Ksu1Record ksu1 = (Ksu1Record) DAOUtils.findDistributedObjectByRefGUID(session, guidKsu1Record);
+        Ksu1Record ksu1 = DAOUtils.findDistributedObjectByRefGUID(Ksu1Record.class, session, guidKsu1Record);
         if(ksu1!=null){
             setKsu1Record(ksu1);
         }
 
-        Ksu2Record ksu2 = (Ksu2Record) DAOUtils.findDistributedObjectByRefGUID(session, guidKsu2Record);
+        Ksu2Record ksu2 = DAOUtils.findDistributedObjectByRefGUID(Ksu2Record.class, session, guidKsu2Record);
         if(ksu2!=null) {
             setKsu2Record(ksu2);
         }
@@ -178,6 +153,30 @@ public class Instance extends DistributedObject {
 
     public void setCost(int cost) {
         this.cost = cost;
+    }
+
+    private Publication publication;
+    private boolean inGroup;
+    private Fund fund;
+    private String invNumber;
+    private InventoryBook inventoryBook;
+    private Ksu1Record ksu1Record;
+    private Ksu2Record ksu2Record;
+    private int cost;
+
+    private String guidPublication;
+    private String guidFund;
+    private String guidInventaryBook;
+    private String guidKsu1Record;
+    private String guidKsu2Record;
+    private Set<Issuable> issuableInternal;
+
+    public Set<Issuable> getIssuableInternal() {
+        return issuableInternal;
+    }
+
+    public void setIssuableInternal(Set<Issuable> issuableInternal) {
+        this.issuableInternal = issuableInternal;
     }
 
 

@@ -35,17 +35,17 @@ public class OrderDetail {
     public static final int TYPE_COMPLEX_9 = 59;
     public static final int TYPE_COMPLEX_ITEM_MIN = 150;
     public static final int TYPE_COMPLEX_ITEM_MAX = 199;
-    public static final int TYPE_COMPLEX_ITEM_0 = 150;
-    public static final int TYPE_COMPLEX_ITEM_1 = 151;
-    public static final int TYPE_COMPLEX_ITEM_2 = 152;
-    public static final int TYPE_COMPLEX_ITEM_3 = 153;
-    public static final int TYPE_COMPLEX_ITEM_4 = 154;
-    public static final int TYPE_COMPLEX_ITEM_5 = 155;
-    public static final int TYPE_COMPLEX_ITEM_6 = 156;
-    public static final int TYPE_COMPLEX_ITEM_7 = 157;
-    public static final int TYPE_COMPLEX_ITEM_8 = 158;
-    public static final int TYPE_COMPLEX_ITEM_9 = 159;
-    public static final int TYPE_COMPLEX_LAST = 160;           // неодбходи мо обновлять, если добавится новый комплекс! Используется в BeneficiarySummaryReport
+    //public static final int TYPE_COMPLEX_ITEM_0 = 150;
+    //public static final int TYPE_COMPLEX_ITEM_1 = 151;
+    //public static final int TYPE_COMPLEX_ITEM_2 = 152;
+    //public static final int TYPE_COMPLEX_ITEM_3 = 153;
+    //public static final int TYPE_COMPLEX_ITEM_4 = 154;
+    //public static final int TYPE_COMPLEX_ITEM_5 = 155;
+    //public static final int TYPE_COMPLEX_ITEM_6 = 156;
+    //public static final int TYPE_COMPLEX_ITEM_7 = 157;
+    //public static final int TYPE_COMPLEX_ITEM_8 = 158;
+    //public static final int TYPE_COMPLEX_ITEM_9 = 159;
+    public static final int TYPE_COMPLEX_LAST = TYPE_COMPLEX_ITEM_MAX+1;           // неодбходи мо обновлять, если добавится новый комплекс! Используется в BeneficiarySummaryReport
 
     private CompositeIdOfOrderDetail compositeIdOfOrderDetail;
     private Long idOfOrder;
@@ -285,10 +285,10 @@ public class OrderDetail {
     }
 
     public boolean isComplex() {
-        return menuType>=TYPE_COMPLEX_0 && menuType<=TYPE_COMPLEX_9;
+        return menuType>=TYPE_COMPLEX_MIN && menuType<=TYPE_COMPLEX_MAX;
     }
     public boolean isComplexItem() {
-        return menuType>=TYPE_COMPLEX_ITEM_0 && menuType<=TYPE_COMPLEX_ITEM_9;
+        return menuType>=TYPE_COMPLEX_ITEM_MIN && menuType<=TYPE_COMPLEX_ITEM_MAX;
     }
 
 }

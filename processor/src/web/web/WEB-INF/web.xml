@@ -214,7 +214,7 @@
 
     <servlet>
         <servlet-name>BarcodeServlet</servlet-name>
-        <servlet-class>ru.axetta.ecafe.processor.web.partner.barcode.BarcodeServlet</servlet-class>
+        <servlet-class>ru.axetta.ecafe.processor.web.BarcodeServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>BarcodeServlet</servlet-name>

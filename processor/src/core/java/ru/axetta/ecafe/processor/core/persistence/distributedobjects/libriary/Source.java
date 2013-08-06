@@ -25,26 +25,6 @@ import java.util.Set;
  */
 public class Source extends DistributedObject {
 
-    private String sourceName;
-    private Integer hashCode;
-    private Set<AccompanyingDocument> accompanyingDocumentInternal;
-
-    public Set<AccompanyingDocument> getAccompanyingDocumentInternal() {
-        return accompanyingDocumentInternal;
-    }
-
-    public void setAccompanyingDocumentInternal(Set<AccompanyingDocument> accompanyingDocumentInternal) {
-        this.accompanyingDocumentInternal = accompanyingDocumentInternal;
-    }
-
-    public Integer getHashCode() {
-        return hashCode;
-    }
-
-    public void setHashCode(Integer hashCode) {
-        this.hashCode = hashCode;
-    }
-
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         Criteria criteria = session.createCriteria(Source.class);
@@ -137,5 +117,25 @@ public class Source extends DistributedObject {
     @Override
     public int hashCode() {
         return 31 * ((sourceName != null ? getStringForHash(sourceName).hashCode() : 0)) + (sourceName != null ? getStringForHash(sourceName).hashCode() : 0);
+    }
+
+    private String sourceName;
+    private Integer hashCode;
+    private Set<AccompanyingDocument> accompanyingDocumentInternal;
+
+    public Set<AccompanyingDocument> getAccompanyingDocumentInternal() {
+        return accompanyingDocumentInternal;
+    }
+
+    public void setAccompanyingDocumentInternal(Set<AccompanyingDocument> accompanyingDocumentInternal) {
+        this.accompanyingDocumentInternal = accompanyingDocumentInternal;
+    }
+
+    public Integer getHashCode() {
+        return hashCode;
+    }
+
+    public void setHashCode(Integer hashCode) {
+        this.hashCode = hashCode;
     }
 }

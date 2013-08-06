@@ -331,7 +331,7 @@ public class EventNotificationService {
         Enumeration<SyncRequest.PaymentRegistry.Payment.Purchase> purchases = payment.getPurchases();
         while (purchases.hasMoreElements()) {
             SyncRequest.PaymentRegistry.Payment.Purchase purchase = purchases.nextElement();
-            if (purchase.getType() >= OrderDetail.TYPE_COMPLEX_0 && purchase.getType() <= OrderDetail.TYPE_COMPLEX_9) {
+            if (purchase.getType() >= OrderDetail.TYPE_COMPLEX_MIN && purchase.getType() <= OrderDetail.TYPE_COMPLEX_MAX) {
                 complexes += purchase.getSocDiscount() + purchase.getRPrice();
             } else {
                 others += purchase.getSocDiscount() + purchase.getRPrice();

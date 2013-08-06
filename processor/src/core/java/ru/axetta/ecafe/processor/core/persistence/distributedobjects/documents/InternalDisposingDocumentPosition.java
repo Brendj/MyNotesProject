@@ -28,13 +28,13 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        InternalDisposingDocument idd  = (InternalDisposingDocument) DAOUtils.findDistributedObjectByRefGUID(session, guidOfIDD);
+        InternalDisposingDocument idd  = DAOUtils.findDistributedObjectByRefGUID(InternalDisposingDocument.class, session, guidOfIDD);
         if(idd==null) throw new DistributedObjectException("NOT_FOUND_InternalDisposingDocument");
         setInternalDisposingDocument(idd);
-        TradeMaterialGood tmg  = (TradeMaterialGood) DAOUtils.findDistributedObjectByRefGUID(session, guidOfTMG);
+        TradeMaterialGood tmg  = DAOUtils.findDistributedObjectByRefGUID(TradeMaterialGood.class, session, guidOfTMG);
         if(tmg!=null) setTradeMaterialGood(tmg);
 
-        Good g  = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGood);
+        Good g  = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfGood);
         if(g==null)  throw new DistributedObjectException("NOT_FOUND_Good");
         setGood(g);
     }

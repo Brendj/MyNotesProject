@@ -7,12 +7,11 @@ package ru.axetta.ecafe.processor.core.sync;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
-import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardOperation;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.response.DirectiveElement;
 import ru.axetta.ecafe.processor.core.sync.response.GoodsBasicBasketData;
-import ru.axetta.ecafe.processor.core.sync.response.OrgOwnerData;
+import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.response.QuestionaryData;
 
 import org.apache.commons.lang.StringUtils;

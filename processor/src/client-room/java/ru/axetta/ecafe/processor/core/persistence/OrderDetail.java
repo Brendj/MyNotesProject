@@ -12,29 +12,7 @@ package ru.axetta.ecafe.processor.core.persistence;
  * To change this template use File | Settings | File Templates.
  */
 public class OrderDetail {
-    public static final int STATE_COMMITED=0, STATE_CANCELED=1;
 
-    public static final int TYPE_DISH_ITEM = 0;
-    public static final int TYPE_COMPLEX_0 = 50;
-    public static final int TYPE_COMPLEX_1 = 51;
-    public static final int TYPE_COMPLEX_2 = 52;
-    public static final int TYPE_COMPLEX_3 = 53;
-    public static final int TYPE_COMPLEX_4 = 54;
-    public static final int TYPE_COMPLEX_5 = 55;
-    public static final int TYPE_COMPLEX_6 = 56;
-    public static final int TYPE_COMPLEX_7 = 57;
-    public static final int TYPE_COMPLEX_8 = 58;
-    public static final int TYPE_COMPLEX_9 = 59;
-    public static final int TYPE_COMPLEX_ITEM_0 = 150;
-    public static final int TYPE_COMPLEX_ITEM_1 = 151;
-    public static final int TYPE_COMPLEX_ITEM_2 = 152;
-    public static final int TYPE_COMPLEX_ITEM_3 = 153;
-    public static final int TYPE_COMPLEX_ITEM_4 = 154;
-    public static final int TYPE_COMPLEX_ITEM_5 = 155;
-    public static final int TYPE_COMPLEX_ITEM_6 = 156;
-    public static final int TYPE_COMPLEX_ITEM_7 = 157;
-    public static final int TYPE_COMPLEX_ITEM_8 = 158;
-    public static final int TYPE_COMPLEX_ITEM_9 = 159;
 
     //private CompositeIdOfOrderDetail compositeIdOfOrderDetail;
     private Long idOfOrderDetail;
@@ -274,13 +252,6 @@ public class OrderDetail {
         else if (menuOrigin==PRODUCT_CENTRALIZE_COOK) return PRODUCTION_NAMES_TYPES[2];
         else if (menuOrigin==PRODUCT_PURCHASE) return PRODUCTION_NAMES_TYPES[3];
         return "Неизвестное";
-    }
-
-    public boolean isComplex() {
-        return menuType>=TYPE_COMPLEX_0 && menuType<=TYPE_COMPLEX_9;
-    }
-    public boolean isComplexItem() {
-        return menuType>=TYPE_COMPLEX_ITEM_0 && menuType<=TYPE_COMPLEX_ITEM_9;
     }
 
 }

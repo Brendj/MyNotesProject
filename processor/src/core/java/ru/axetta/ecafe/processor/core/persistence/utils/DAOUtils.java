@@ -8,7 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
-import ru.axetta.ecafe.processor.core.sync.response.OrgOwner;
+import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
@@ -23,7 +23,6 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.math.BigInteger;
@@ -130,46 +129,76 @@ public class DAOUtils {
     /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
     public static List findNewerClients(Session persistenceSession, Collection<Org> organizations, long clientRegistryVersion)
             throws Exception {
-        Set<CompositeIdOfClientGroup> clientGroups = new HashSet<CompositeIdOfClientGroup>();
-        for (Org organization: organizations){
-            CompositeIdOfClientGroup deletedClientGroup = new CompositeIdOfClientGroup(organization.getIdOfOrg(),ClientGroup.Predefined.CLIENT_DELETED.getValue());
-            CompositeIdOfClientGroup leavingClientGroup = new CompositeIdOfClientGroup(organization.getIdOfOrg(),ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-            clientGroups.add(deletedClientGroup);
-            clientGroups.add(leavingClientGroup);
-        }
-        Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
-        clientGroupCriteria.add(Restrictions.in("compositeIdOfClientGroup",clientGroups));
-        List<ClientGroup> deletingAndLeavingClientGroup = clientGroupCriteria.list();
+        //Set<CompositeIdOfClientGroup> clientGroups = new HashSet<CompositeIdOfClientGroup>();
+        //for (Org organization: organizations){
+        //    CompositeIdOfClientGroup deletedClientGroup = new CompositeIdOfClientGroup(organization.getIdOfOrg(),ClientGroup.Predefined.CLIENT_DELETED.getValue());
+        //    CompositeIdOfClientGroup leavingClientGroup = new CompositeIdOfClientGroup(organization.getIdOfOrg(),ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+        //    clientGroups.add(deletedClientGroup);
+        //    clientGroups.add(leavingClientGroup);
+        //}
+        //Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
+        //clientGroupCriteria.add(Restrictions.in("compositeIdOfClientGroup",clientGroups));
+        //clientGroupCriteria.add(Restrictions.not(Restrictions.in("compositeIdOfClientGroup", clientGroups)));
+        //clientGroupCriteria.add(Restrictions.in("org",organizations));
+        //List<ClientGroup> deletingAndLeavingClientGroup = clientGroupCriteria.list();
 
-        Criteria criteria = persistenceSession.createCriteria(Client.class);
-        criteria.add(Restrictions.in("org", organizations));
-        criteria.add(Restrictions.gt("clientRegistryVersion", clientRegistryVersion));
+        //Criteria criteria = persistenceSession.createCriteria(Client.class);
+        //criteria.add(Restrictions.in("org", organizations));
+        //criteria.add(Restrictions.gt("clientRegistryVersion", clientRegistryVersion));
+        //
+        //List<Long> deletingAndLeavingClientGroup = new ArrayList<Long>(2);
+        //deletingAndLeavingClientGroup.add(ClientGroup.Predefined.CLIENT_DELETED.getValue());
+        //deletingAndLeavingClientGroup.add(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+        //
+        //Criterion clientGroupRestriction = Restrictions.disjunction()
+        //        .add(Restrictions.in("idOfClientGroup", deletingAndLeavingClientGroup))
+        //        .add(Restrictions.isNull("idOfClientGroup"));
+        //
+        //criteria.add(clientGroupRestriction);
 
-        if (!deletingAndLeavingClientGroup.isEmpty()){
-            criteria.add(Restrictions.not(Restrictions.in("clientGroup", deletingAndLeavingClientGroup)));
-        }
+        //criteria.add(Restrictions.not(Restrictions.in("idOfClientGroup", deletingAndLeavingClientGroup)));
+        //criteria.add(Restrictions.isNull("idOfClientGroup"));
+        //if (!deletingAndLeavingClientGroup.isEmpty()){
+        //    //criteria.add(Restrictions.not(Restrictions.in("clientGroup", deletingAndLeavingClientGroup)));
+        //    Criterion clientGroupRestriction = Restrictions.disjunction().
+        //            add(Restrictions.in("clientGroup", deletingAndLeavingClientGroup))
+        //           .add(Restrictions.isNull("clientGroup"));
+        //    criteria.add(clientGroupRestriction);
+        //}
 
-        return criteria.list();
+
+        //return criteria.list();
+
+
+        Query query = persistenceSession.createQuery("from Client cl where (cl.idOfClientGroup is null or cl.idOfClientGroup !=1100000060 or cl.idOfClientGroup !=1100000070)  and cl.org in :orgs and clientRegistryVersion>:version");
+        query.setParameter("version", clientRegistryVersion);
+        query.setParameterList("orgs", organizations);
+        return query.list();
     }
 
     /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
     public static List findNewerClients(Session persistenceSession, Org organization, long clientRegistryVersion)
             throws Exception {
 
-        Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
-        CompositeIdOfClientGroup deletedClientGroup = new CompositeIdOfClientGroup(organization.getIdOfOrg(),ClientGroup.Predefined.CLIENT_DELETED.getValue());
-        CompositeIdOfClientGroup leavingClientGroup = new CompositeIdOfClientGroup(organization.getIdOfOrg(),ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-        clientGroupCriteria.add(Restrictions.in("compositeIdOfClientGroup",Arrays.asList(deletedClientGroup, leavingClientGroup)));
-        List<ClientGroup> deletingAndLeavingClientGroup = clientGroupCriteria.list();
+        //Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
+        //CompositeIdOfClientGroup deletedClientGroup = new CompositeIdOfClientGroup(organization.getIdOfOrg(),ClientGroup.Predefined.CLIENT_DELETED.getValue());
+        //CompositeIdOfClientGroup leavingClientGroup = new CompositeIdOfClientGroup(organization.getIdOfOrg(),ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+        //clientGroupCriteria.add(Restrictions.in("compositeIdOfClientGroup",Arrays.asList(deletedClientGroup, leavingClientGroup)));
+        //List<ClientGroup> deletingAndLeavingClientGroup = clientGroupCriteria.list();
+        //
+        //Criteria criteria = persistenceSession.createCriteria(Client.class);
+        //criteria.add(Restrictions.eq("org", organization));
+        //criteria.add(Restrictions.gt("clientRegistryVersion", clientRegistryVersion));
+        //if (!deletingAndLeavingClientGroup.isEmpty()){
+        //    criteria.add(Restrictions.not(Restrictions.in("clientGroup", deletingAndLeavingClientGroup)));
+        //}
+        //
+        //return criteria.list();
 
-        Criteria criteria = persistenceSession.createCriteria(Client.class);
-        criteria.add(Restrictions.eq("org", organization));
-        criteria.add(Restrictions.gt("clientRegistryVersion", clientRegistryVersion));
-        if (!deletingAndLeavingClientGroup.isEmpty()){
-            criteria.add(Restrictions.not(Restrictions.in("clientGroup", deletingAndLeavingClientGroup)));
-        }
-
-        return criteria.list();
+        Query query = persistenceSession.createQuery("from Client cl where (cl.idOfClientGroup is null or cl.idOfClientGroup !=1100000060 or cl.idOfClientGroup !=1100000070)  and cl.org in :orgs and clientRegistryVersion>:version");
+        query.setParameter("version", clientRegistryVersion);
+        query.setParameter("orgs", organization);
+        return query.list();
     }
 
     public static Org findOrg(Session persistenceSession, long idOfOrg) throws Exception {
@@ -1178,10 +1207,20 @@ public class DAOUtils {
         return (Client) criteria.uniqueResult();
     }
 
-    public static DistributedObject findDistributedObjectByRefGUID(Session session, String guid){
-        Criteria criteria = session.createCriteria(DistributedObject.class);
-        criteria.add(Restrictions.eq("guid",guid));
-        return (DistributedObject) criteria.uniqueResult();
+    @SuppressWarnings("unchecked")
+    public static <T extends DistributedObject> T findDistributedObjectByRefGUID(Class<T> clazz, Session session, String guid){
+        //Criteria criteria = session.createCriteria(DistributedObject.class);
+        //criteria.add(Restrictions.eq("guid",guid));
+        //return (DistributedObject) criteria.uniqueResult();
+        String sql = "from "+clazz.getClass()+" where guid=:guid";
+        Query query = session.createQuery(sql);
+        query.setParameter("guid", guid);
+        List list = query.list();
+        if(list==null || list.isEmpty()){
+            return null;
+        } else {
+            return (T) list.get(0);
+        }
     }
 
     public static List<Long> getListIdOfOrgList(Session session, Long idOfOrg){
@@ -1248,9 +1287,9 @@ public class DAOUtils {
     }
 
     /* получаем список всех клиентов у которых guid пустой */
-    public static List<Client> findClientsByGUIDIsNull(EntityManager entityManager) {
-        TypedQuery<Client> query = entityManager.createQuery("from Client client where client.clientGUID is null or client.clientGUID=''", Client.class);
-        query.setMaxResults(300);
+    public static List<Long> extractIdFromClientsByGUIDIsNull(EntityManager entityManager) {
+        TypedQuery<Long> query = entityManager.createQuery("select idOfClient from Client client where client.clientGUID is null or client.clientGUID=''", Long.class);
+        query.setMaxResults(2000);
         return query.getResultList();
     }
 
@@ -1327,8 +1366,9 @@ public class DAOUtils {
 
     // TODO: воспользоваться диклоративными пособами генерации запроса и на выходи получать только TempCardOperationItem
     public static CardTempOperation getLastTempCardOperationByOrgAndCartNo(Session session, Long idOfOrg,Long cardNo) {
-        Query query = session.createQuery("select operation from CardTempOperation operation left join operation.cardTemp card  where operation.org.idOfOrg=:idOfOrg and card.cardNo=:cardNo order by operation.operationDate desc");
-        query.setParameter("idOfOrg",idOfOrg);
+        Query query = session.createQuery(
+                "select operation from CardTempOperation operation left join operation.cardTemp card  where operation.org.idOfOrg=:idOfOrg and card.cardNo=:cardNo order by operation.operationDate desc");
+        query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("cardNo",cardNo);
         List list = query.list();
         if(list==null || list.isEmpty()){
@@ -1346,8 +1386,8 @@ public class DAOUtils {
 
     public static CardTemp findCardTempByVisitorAndCardNo(Session session, Visitor visitor, Long cardNo) {
         Criteria criteria = session.createCriteria(CardTemp.class);
-        criteria.add(Restrictions.eq("visitor",visitor));
-        criteria.add(Restrictions.eq("cardNo",cardNo));
+        criteria.add(Restrictions.eq("visitor", visitor));
+        criteria.add(Restrictions.eq("cardNo", cardNo));
         return (CardTemp) criteria.uniqueResult();
     }
 

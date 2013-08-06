@@ -28,19 +28,15 @@ public class InternalIncomingDocument extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        //WayBill wb = DAOService.getInstance().findDistributedObjectByRefGUID(WayBill.class,guidOfWB);
-        WayBill wb  = (WayBill) DAOUtils.findDistributedObjectByRefGUID(session, guidOfWB);
-        //InternalDisposingDocument idd = DAOService.getInstance().findDistributedObjectByRefGUID(InternalDisposingDocument.class,guidOfIDD);
-        //ActOfInventarization ai = DAOService.getInstance().findDistributedObjectByRefGUID(ActOfInventarization.class,guidOfAI);
-        InternalDisposingDocument idd  = (InternalDisposingDocument) DAOUtils.findDistributedObjectByRefGUID(session, guidOfIDD);
-        ActOfInventarization ai  = (ActOfInventarization) DAOUtils.findDistributedObjectByRefGUID(session, guidOfAI);
+        WayBill wb  = DAOUtils.findDistributedObjectByRefGUID(WayBill.class, session, guidOfWB);
+        InternalDisposingDocument idd  = DAOUtils.findDistributedObjectByRefGUID(InternalDisposingDocument.class, session, guidOfIDD);
+        ActOfInventarization ai  = DAOUtils.findDistributedObjectByRefGUID(ActOfInventarization.class, session, guidOfAI);
         if(wb==null && idd==null && ai==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         if(wb!=null) setWayBill(wb);
         if(idd!=null) setInternalDisposingDocument(idd);
         if(ai!=null) setActOfInventarization(ai);
 
-        //Staff st = DAOService.getInstance().findDistributedObjectByRefGUID(Staff.class,guidOfS);
-        Staff st  = (Staff) DAOUtils.findDistributedObjectByRefGUID(session, guidOfS);
+        Staff st  = DAOUtils.findDistributedObjectByRefGUID(Staff.class, session, guidOfS);
         if(st==null) throw new DistributedObjectException("NOT_FOUND_VALUE Staff");
         setStaff(st);
     }

@@ -20,8 +20,7 @@ public class GoodComplaintOrders extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        GoodComplaintIterations gci = (GoodComplaintIterations) DAOUtils
-                .findDistributedObjectByRefGUID(session, guidOfComplaintIteration);
+        GoodComplaintIterations gci = DAOUtils.findDistributedObjectByRefGUID(GoodComplaintIterations.class, session, guidOfComplaintIteration);
         if (gci == null) throw new DistributedObjectException("Complaint iteration NOT_FOUND_VALUE");
         setComplaintIteration(gci);
 

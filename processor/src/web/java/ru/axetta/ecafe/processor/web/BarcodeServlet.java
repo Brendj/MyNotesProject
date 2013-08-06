@@ -2,7 +2,7 @@
  * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.partner.barcode;
+package ru.axetta.ecafe.processor.web;
 
 /**
  * Created with IntelliJ IDEA.

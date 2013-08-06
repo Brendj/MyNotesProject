@@ -28,11 +28,11 @@ public class GoodRequestPosition extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        GoodRequest gr =  (GoodRequest) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGR);
+        GoodRequest gr =  DAOUtils.findDistributedObjectByRefGUID(GoodRequest.class, session, guidOfGR);
         if(gr==null) throw new DistributedObjectException("NOT_FOUND_VALUE GOOD_REQUEST");
         setGoodRequest(gr);
-        Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfG);
-        Product p =(Product) DAOUtils.findDistributedObjectByRefGUID(session, guidOfP);
+        Good g = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfG);
+        Product p = DAOUtils.findDistributedObjectByRefGUID(Product.class, session, guidOfP);
         if(g==null && p==null) {
             throw new DistributedObjectException("NOT_FOUND_VALUE PRODUCT OR GOOD");
         }

@@ -29,14 +29,14 @@ public class ActOfWayBillDifferencePosition extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        Good g  = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfG);
+        Good g  = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfG);
         if(g==null) {
             DistributedObjectException distributedObjectException = new DistributedObjectException("NOT_FOUND_GOOD");
             distributedObjectException.setData(guidOfG);
             throw distributedObjectException;
         }
         setGood(g);
-        ActOfWayBillDifference awd  = (ActOfWayBillDifference) DAOUtils.findDistributedObjectByRefGUID(session, guidOfAWD);
+        ActOfWayBillDifference awd  = DAOUtils.findDistributedObjectByRefGUID(ActOfWayBillDifference.class, session, guidOfAWD);
         if(awd==null) {
             DistributedObjectException distributedObjectException = new DistributedObjectException("NOT_FOUND_"+actOfWayBillDifference.getClass().getSimpleName().toUpperCase());
             distributedObjectException.setData(guidOfG);

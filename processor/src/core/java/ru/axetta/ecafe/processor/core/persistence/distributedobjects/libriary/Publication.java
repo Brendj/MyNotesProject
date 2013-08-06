@@ -32,34 +32,6 @@ import java.util.Set;
  */
 public class Publication extends DistributedObject {
 
-    private Boolean validISBN;
-    private Set<Journal> journalInternal;
-    private Set<Instance> instanceInternal;
-
-    public Set<Instance> getInstanceInternal() {
-        return instanceInternal;
-    }
-
-    public void setInstanceInternal(Set<Instance> instanceInternal) {
-        this.instanceInternal = instanceInternal;
-    }
-
-    public Set<Journal> getJournalInternal() {
-        return journalInternal;
-    }
-
-    public void setJournalInternal(Set<Journal> journalInternal) {
-        this.journalInternal = journalInternal;
-    }
-
-    public Boolean getValidISBN() {
-        return validISBN;
-    }
-
-    public void setValidISBN(Boolean validISBN) {
-        this.validISBN = validISBN;
-    }
-
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         if(!(isbn==null || isbn.isEmpty() || publicationdate==null || publicationdate.isEmpty() || !validISBN)){
@@ -100,6 +72,33 @@ public class Publication extends DistributedObject {
     private Integer hash;
     private String title2;
     private String publicationdate;
+    private Boolean validISBN;
+    private Set<Journal> journalInternal;
+    private Set<Instance> instanceInternal;
+
+    public Set<Instance> getInstanceInternal() {
+        return instanceInternal;
+    }
+
+    public void setInstanceInternal(Set<Instance> instanceInternal) {
+        this.instanceInternal = instanceInternal;
+    }
+
+    public Set<Journal> getJournalInternal() {
+        return journalInternal;
+    }
+
+    public void setJournalInternal(Set<Journal> journalInternal) {
+        this.journalInternal = journalInternal;
+    }
+
+    public Boolean getValidISBN() {
+        return validISBN;
+    }
+
+    public void setValidISBN(Boolean validISBN) {
+        this.validISBN = validISBN;
+    }
 
     public String getPublicationdate() {
         return publicationdate;

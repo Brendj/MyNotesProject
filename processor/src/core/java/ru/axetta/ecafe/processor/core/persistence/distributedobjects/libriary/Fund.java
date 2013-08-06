@@ -21,6 +21,48 @@ import java.util.Set;
  */
 public class Fund extends DistributedObject {
 
+    @Override
+    protected void appendAttributes(Element element) {
+        setAttribute(element, "FundName", fundName);
+        setAttribute(element, "Stud", stud);
+    }
+
+    @Override
+    public Fund parseAttributes(Node node) throws Exception{
+
+        String fundName = getStringAttributeValue(node, "FundName", 128);
+        if (fundName != null) {
+            setFundName(fundName);
+        }
+
+        Boolean bollStud =  getBollAttributeValue(node, "Stud");
+        if(bollStud != null){
+            setStud(bollStud);
+        }
+
+        setSendAll(SendToAssociatedOrgs.DontSend);
+
+        return this;
+    }
+
+    @Override
+    public void fill(DistributedObject distributedObject) {
+        setFundName(((Fund) distributedObject).getFundName());
+    }
+
+    public String getFundName() {
+        return fundName;
+    }
+
+    public void setFundName(String fundName) {
+        this.fundName = fundName;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Fund{fundName='%s'}", fundName);
+    }
+
     private String fundName;
     private Boolean stud;
     private Set<Ksu2Record> ksu2RecordInternal;
@@ -75,47 +117,5 @@ public class Fund extends DistributedObject {
 
     public void setStud(Boolean stud) {
         this.stud = stud;
-    }
-
-    @Override
-    protected void appendAttributes(Element element) {
-        setAttribute(element, "FundName", fundName);
-        setAttribute(element, "Stud", stud);
-    }
-
-    @Override
-    public Fund parseAttributes(Node node) throws Exception{
-
-        String fundName = getStringAttributeValue(node, "FundName", 128);
-        if (fundName != null) {
-            setFundName(fundName);
-        }
-
-        Boolean bollStud =  getBollAttributeValue(node, "Stud");
-        if(bollStud != null){
-            setStud(bollStud);
-        }
-
-        setSendAll(SendToAssociatedOrgs.DontSend);
-
-        return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setFundName(((Fund) distributedObject).getFundName());
-    }
-
-    public String getFundName() {
-        return fundName;
-    }
-
-    public void setFundName(String fundName) {
-        this.fundName = fundName;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("Fund{fundName='%s'}", fundName);
     }
 }

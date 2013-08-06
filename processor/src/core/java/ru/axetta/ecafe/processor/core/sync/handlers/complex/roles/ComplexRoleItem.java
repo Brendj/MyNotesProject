@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.complex.roles;
 
 import ru.axetta.ecafe.processor.core.persistence.ComplexRole;
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -16,7 +17,7 @@ import org.w3c.dom.Element;
  * Time: 12:42
  * To change this template use File | Settings | File Templates.
  */
-public class ComplexRoleItem {
+public class ComplexRoleItem extends AbstractToElement {
 
     private final Long id;
     private final String name;

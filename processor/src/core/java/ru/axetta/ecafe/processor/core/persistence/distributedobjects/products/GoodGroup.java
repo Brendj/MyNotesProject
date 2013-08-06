@@ -46,11 +46,6 @@ public class GoodGroup extends DistributedObject {
     }
 
     @Override
-    public void preProcess(Session session) throws DistributedObjectException {
-
-    }
-
-    @Override
     protected void appendAttributes(Element element) {
         setAttribute(element, "OrgOwner", orgOwner);
         setAttribute(element,"Name", NameOfGoodsGroup);

@@ -9,7 +9,7 @@ import org.hibernate.Session;
  * Time: 19:22
  * To change this template use File | Settings | File Templates.
  */
-public abstract class AbstractProcessor<RES> {
+public abstract class AbstractProcessor<RES extends AbstractToElement> {
 
     protected final Session session;
 

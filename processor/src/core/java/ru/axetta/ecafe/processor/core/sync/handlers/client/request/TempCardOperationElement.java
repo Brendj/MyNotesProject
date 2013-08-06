@@ -1,6 +1,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.client.request;
 
 import ru.axetta.ecafe.processor.core.persistence.CardTempOperation;
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.w3c.dom.Document;
@@ -18,7 +19,7 @@ import java.util.TimeZone;
  * Time: 15:02
  * To change this template use File | Settings | File Templates.
  */
-public class TempCardOperationElement {
+public class TempCardOperationElement extends AbstractToElement {
 
     private Long idOfOperation;
     private Long idOfClient;
@@ -28,13 +29,6 @@ public class TempCardOperationElement {
     private Date issueExpiryDate;
     private Date operationDate;
     private Integer operationType;
-
-    private final static DateFormat dateOnlyFormat;
-    static {
-        TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
-        dateOnlyFormat = new SimpleDateFormat("dd.MM.yyyy");
-        dateOnlyFormat.setTimeZone(utcTimeZone);
-    }
 
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("TCO");
@@ -47,16 +41,15 @@ public class TempCardOperationElement {
         }
         if(idOfTempCard !=null){
             element.setAttribute("IdOfTempCard", Long.toString(this.idOfTempCard));
+            element.setAttribute("CardPrintedNo", this.cardPrintedNo);
         }
         if(issueExpiryDate !=null){
             String dateTime = CalendarUtils.toStringFullDateTimeWithUTCTimeZone(this.issueExpiryDate);
             element.setAttribute("IssueExpiryDate", dateTime);
-            //element.setAttribute("IssueExpiryDate", dateOnlyFormat.format(this.issueExpiryDate));
         }
         if(operationDate !=null){
             String dateTime = CalendarUtils.toStringFullDateTimeWithUTCTimeZone(this.operationDate);
             element.setAttribute("OperationDate", dateTime);
-            //element.setAttribute("OperationDate", dateOnlyFormat.format(this.operationDate));
         }
         element.setAttribute("OperationType", Integer.toString(this.operationType));
         return element;

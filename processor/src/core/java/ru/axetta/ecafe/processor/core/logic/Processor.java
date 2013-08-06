@@ -28,13 +28,14 @@ import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOpera
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardRequestProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoleProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
+import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardOperationProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.response.DirectiveElement;
 import ru.axetta.ecafe.processor.core.sync.response.GoodsBasicBasketData;
-import ru.axetta.ecafe.processor.core.sync.response.OrgOwnerData;
+import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.response.QuestionaryData;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
@@ -1145,11 +1146,12 @@ public class Processor implements SyncProcessor,
     private OrgOwnerData processOrgOwnerData(Long idOfOrg) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        OrgOwnerData orgOwnerData = new OrgOwnerData();
+        OrgOwnerData orgOwnerData = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            orgOwnerData.process(persistenceSession, idOfOrg);
+            AbstractProcessor processor = new OrgOwnerProcessor(persistenceSession, idOfOrg);
+            orgOwnerData = (OrgOwnerData) processor.process();
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {

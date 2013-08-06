@@ -29,29 +29,6 @@ public class Circulation extends DistributedObject {
 
     public final static int ISSUED = 0, EXTENDED = 1, LOST = 2, REFUNDED = 3;
 
-    private Circulation parentCirculation;
-    private Issuable issuable;
-    private Date issuanceDate;
-    private Date refundDate;
-    private Date realRefundDate;
-    private int status;
-
-    private String guidClient;
-
-    private String guidParentCirculation;
-    private String guidIssuable;
-    private Client client;
-    private Set<Circulation> circulationInternal;
-
-    public Set<Circulation> getCirculationInternal() {
-        return circulationInternal;
-    }
-
-    public void setCirculationInternal(Set<Circulation> circulationInternal) {
-        this.circulationInternal = circulationInternal;
-    }
-
-
     @Override
     protected void appendAttributes(Element element) {
     }
@@ -74,11 +51,11 @@ public class Circulation extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException{
-        Issuable iss = (Issuable) DAOUtils.findDistributedObjectByRefGUID(session, guidIssuable);
+        Issuable iss = DAOUtils.findDistributedObjectByRefGUID(Issuable.class, session, guidIssuable);
         if(iss==null) throw new DistributedObjectException("Issuable NOT_FOUND_VALUE");
         setIssuable(iss);
 
-        Circulation parentCirculation = (Circulation) DAOUtils.findDistributedObjectByRefGUID(session, guidParentCirculation);
+        Circulation parentCirculation = DAOUtils.findDistributedObjectByRefGUID(Circulation.class, session, guidParentCirculation);
         if(parentCirculation!=null) setParentCirculation(parentCirculation);
 
         Client cl = DAOUtils.findClientByRefGUID(session, guidClient);
@@ -152,5 +129,27 @@ public class Circulation extends DistributedObject {
 
     public void setClient(Client client) {
         this.client = client;
+    }
+
+    private Circulation parentCirculation;
+    private Issuable issuable;
+    private Date issuanceDate;
+    private Date refundDate;
+    private Date realRefundDate;
+    private int status;
+
+    private String guidClient;
+
+    private String guidParentCirculation;
+    private String guidIssuable;
+    private Client client;
+    private Set<Circulation> circulationInternal;
+
+    public Set<Circulation> getCirculationInternal() {
+        return circulationInternal;
+    }
+
+    public void setCirculationInternal(Set<Circulation> circulationInternal) {
+        this.circulationInternal = circulationInternal;
     }
 }

@@ -26,30 +26,6 @@ import java.util.Set;
  */
 public class JournalItem extends DistributedObject {
 
-    private Journal journal;
-    private Fund fund;
-    private Ksu1Record ksu1Record;
-    private Ksu2Record ksu2Record;
-
-    private Date date;
-    private String number;
-    private int cost;
-
-    private String guidJournal;
-    private String guidFund;
-    private String guidKsu1Record;
-    private String guidKsu2Record;
-    private Set<Issuable> issuableInternal;
-
-    public Set<Issuable> getIssuableInternal() {
-        return issuableInternal;
-    }
-
-    public void setIssuableInternal(Set<Issuable> issuableInternal) {
-        this.issuableInternal = issuableInternal;
-    }
-
-
     @Override
     protected void appendAttributes(Element element) {}
 
@@ -73,20 +49,20 @@ public class JournalItem extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        Journal j = (Journal) DAOUtils.findDistributedObjectByRefGUID(session, guidJournal);
+        Journal j = DAOUtils.findDistributedObjectByRefGUID(Journal.class, session, guidJournal);
         if(j==null) {
             DistributedObjectException distributedObjectException =  new DistributedObjectException("Journal NOT_FOUND_VALUE");
             distributedObjectException.setData(guidJournal);
             throw  distributedObjectException;
         }
         setJournal(j);
-        Fund f = (Fund) DAOUtils.findDistributedObjectByRefGUID(session, guidFund);
+        Fund f = DAOUtils.findDistributedObjectByRefGUID(Fund.class, session, guidFund);
         setFund(f);
 
-        Ksu1Record ksu1 = (Ksu1Record) DAOUtils.findDistributedObjectByRefGUID(session, guidKsu1Record);
+        Ksu1Record ksu1 = DAOUtils.findDistributedObjectByRefGUID(Ksu1Record.class, session, guidKsu1Record);
         setKsu1Record(ksu1);
 
-        Ksu2Record ksu2 = (Ksu2Record) DAOUtils.findDistributedObjectByRefGUID(session, guidKsu2Record);
+        Ksu2Record ksu2 = DAOUtils.findDistributedObjectByRefGUID(Ksu2Record.class, session, guidKsu2Record);
         setKsu2Record(ksu2);
     }
 
@@ -101,6 +77,30 @@ public class JournalItem extends DistributedObject {
         setNumber(((JournalItem) distributedObject).getNumber());
         setCost(((JournalItem) distributedObject).getCost());
     }
+
+    private Journal journal;
+    private Fund fund;
+    private Ksu1Record ksu1Record;
+    private Ksu2Record ksu2Record;
+
+    private Date date;
+    private String number;
+    private int cost;
+
+    private String guidJournal;
+    private String guidFund;
+    private String guidKsu1Record;
+    private String guidKsu2Record;
+    private Set<Issuable> issuableInternal;
+
+    public Set<Issuable> getIssuableInternal() {
+        return issuableInternal;
+    }
+
+    public void setIssuableInternal(Set<Issuable> issuableInternal) {
+        this.issuableInternal = issuableInternal;
+    }
+
 
     public Journal getJournal() {
         return journal;

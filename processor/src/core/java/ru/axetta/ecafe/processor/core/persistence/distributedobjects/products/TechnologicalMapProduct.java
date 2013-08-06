@@ -71,10 +71,8 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        //Product p = DAOService.getInstance().findDistributedObjectByRefGUID(Product.class, guidOfP);
-        //TechnologicalMap tm = DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMap.class, guidOfTM);
-        Product p = (Product) DAOUtils.findDistributedObjectByRefGUID(session, guidOfP);
-        TechnologicalMap tm = (TechnologicalMap) DAOUtils.findDistributedObjectByRefGUID(session, guidOfTM);
+        Product p = DAOUtils.findDistributedObjectByRefGUID(Product.class, session, guidOfP);
+        TechnologicalMap tm = DAOUtils.findDistributedObjectByRefGUID(TechnologicalMap.class, session, guidOfTM);
         if(tm==null || p==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setProduct(p);
         setTechnologicalMap(tm);

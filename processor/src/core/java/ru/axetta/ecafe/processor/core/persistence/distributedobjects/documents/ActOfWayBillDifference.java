@@ -29,7 +29,7 @@ public class ActOfWayBillDifference extends DistributedObject {
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         //Staff st = DAOService.getInstance().findDistributedObjectByRefGUID(Staff.class, guidOfStaff);
-        Staff st = (Staff) DAOUtils.findDistributedObjectByRefGUID(session, guidOfStaff);
+        Staff st = DAOUtils.findDistributedObjectByRefGUID(Staff.class, session, guidOfStaff);
         if(st==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setStaff(st);
     }

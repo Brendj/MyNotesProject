@@ -133,8 +133,8 @@ public class SalesReport extends BasicReportForOrgJob {
                     "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime)");
 
             freeComplexQuery.setParameter("idOfOrg", org.getIdOfOrg());
-            freeComplexQuery.setParameter("typeComplex1", OrderDetail.TYPE_COMPLEX_0);
-            freeComplexQuery.setParameter("typeComplex10", OrderDetail.TYPE_COMPLEX_9);
+            freeComplexQuery.setParameter("typeComplex1", OrderDetail.TYPE_COMPLEX_MIN);
+            freeComplexQuery.setParameter("typeComplex10", OrderDetail.TYPE_COMPLEX_MAX);
             freeComplexQuery.setParameter("startTime", startTime.getTime());
             freeComplexQuery.setParameter("endTime", endTime.getTime());
 
@@ -201,8 +201,8 @@ public class SalesReport extends BasicReportForOrgJob {
 
             totalQuery.setParameter("idOfOrg", org.getIdOfOrg());
             totalQuery.setParameter("typeDish", OrderDetail.TYPE_DISH_ITEM);
-            totalQuery.setParameter("complexType0", OrderDetail.TYPE_COMPLEX_0);
-            totalQuery.setParameter("complexType9", OrderDetail.TYPE_COMPLEX_9);
+            totalQuery.setParameter("complexType0", OrderDetail.TYPE_COMPLEX_MIN);
+            totalQuery.setParameter("complexType9", OrderDetail.TYPE_COMPLEX_MAX);
             totalQuery.setParameter("startTime", startTime.getTime());
             totalQuery.setParameter("endTime", endTime.getTime());
             vals=(Object[])totalQuery.uniqueResult();

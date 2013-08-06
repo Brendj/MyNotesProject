@@ -27,6 +27,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterationStatus;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterations;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintPossibleCauses;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.AutoReportPostman;
@@ -61,6 +62,7 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Scope;
@@ -539,6 +541,9 @@ public class RuntimeContext implements ApplicationContextAware {
     @PersistenceContext
     EntityManager em;
 
+    @Autowired
+    private DAOService daoService;
+
     @Transactional
     public void initDB() throws Exception {
         // Configure runtime context
@@ -623,14 +628,9 @@ public class RuntimeContext implements ApplicationContextAware {
             /**
              *  Дополняем всем клиентам guid у тех у кого они пусты
              *  */
-            List<Client> clients = DAOUtils.findClientsByGUIDIsNull(em);
-            logger.info("Generate update uuid in client");
-            for (Client client : clients) {
-                client.setClientGUID(UUID.randomUUID().toString());
-                long clientRegistryVersion = DAOUtils.updateClientRegistryVersion((Session) em.getDelegate());
-                client.setClientRegistryVersion(clientRegistryVersion);
-                em.persist(client);
-            }
+            List<Long> clients = DAOUtils.extractIdFromClientsByGUIDIsNull(em);
+            logger.info("Generate update uuid in client: "+clients.size());
+            daoService.updateClientSetGUID(clients);
 
             /**
              * Инициализируем список ролей для комплексов
@@ -649,6 +649,8 @@ public class RuntimeContext implements ApplicationContextAware {
             throw e;
         }
     }
+
+
 
     public void createCategoryDiscount(Long idOfCategoryDiscount, String categoryName, String discountRules,
             String description) {

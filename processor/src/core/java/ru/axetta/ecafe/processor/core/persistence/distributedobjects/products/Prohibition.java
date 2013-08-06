@@ -41,10 +41,10 @@ public class Prohibition extends DistributedObject {
         if (c == null) throw distributedObjectException;
         setClient(c);
 
-        Product p = (Product) DAOUtils.findDistributedObjectByRefGUID(session, guidOfProduct);
-        ProductGroup pg = (ProductGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfProductGroup);
-        Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoods);
-        GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoodsGroup);
+        Product p = DAOUtils.findDistributedObjectByRefGUID(Product.class, session, guidOfProduct);
+        ProductGroup pg = DAOUtils.findDistributedObjectByRefGUID(ProductGroup.class, session, guidOfProductGroup);
+        Good g = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfGoods);
+        GoodGroup gg = DAOUtils.findDistributedObjectByRefGUID(GoodGroup.class, session, guidOfGoodsGroup);
         if(pg != null) {
             setProductGroup(pg);
             return;

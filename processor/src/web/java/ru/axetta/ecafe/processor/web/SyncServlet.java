@@ -68,8 +68,8 @@ public class SyncServlet extends HttpServlet {
                 //requestData = readRequestFromFile();  /* For tests only!!! */
             } catch (Exception e) {
                 logger.error("Failed to parse request", e);
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                        String.format("Failed to parse request: %s", e.getMessage()));
+                final String format = String.format("Failed to parse request: %s", e.getMessage());
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, format);
                 return;
             }
 
@@ -86,11 +86,10 @@ public class SyncServlet extends HttpServlet {
                 idOfSync = SyncRequest.Builder.getIdOfSync(namedNodeMap);
                 syncType = SyncRequest.Builder.getSyncType(namedNodeMap);
             } catch (Exception e) {
-                logger.error(String.format("Failed to extract required packet attribute [remote address: %s]",
-                        request.getRemoteAddr()), e);
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                        String.format("Failed to extract required packet attribute [remote address: %s]",
-                                request.getRemoteAddr()));
+                final String message = String.format("Failed to extract required packet attribute [remote address: %s]",
+                        request.getRemoteAddr());
+                logger.error(message, e);
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
                 return;
             }
             logger.info(String.format("Starting synchronization with %s: id: %s", request.getRemoteAddr(), idOfOrg));
@@ -101,7 +100,8 @@ public class SyncServlet extends HttpServlet {
             SyncLogger syncLogger = runtimeContext.getSyncLogger();
             if (bLogPackets) syncLogger.registerSyncRequest(requestData.document, idOfOrg, idOfSync);
             else {
-                logger.info(String.format("Synchronization with %s - type: %s - packets not logged", request.getRemoteAddr(), syncType.toString()));
+                final String message = "Synchronization with %s - type: %s - packets not logged";
+                logger.info(String.format(message, request.getRemoteAddr(), syncType.toString()));
             }
 
             // Verify XML signature
@@ -115,16 +115,18 @@ public class SyncServlet extends HttpServlet {
                 return;
             }
             /* Must be FALSE for testing!!!  */
-            boolean verifySignature = false;
+            boolean verifySignature = true;
             try {
                 if (verifySignature && !DigitalSignatureUtils.verify(publicKey, requestData.document)) {
-                    logger.error(String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg));
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg));
+                    final String message = String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg);
+                    logger.error(message);
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST, message);
                     return;
                 }
             } catch (Exception e) {
                 logger.error(String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg), e);
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST,String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg));
+                final String format = String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg);
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, format);
                 return;
             }
 
@@ -135,7 +137,8 @@ public class SyncServlet extends HttpServlet {
                 syncRequest = syncRequestBuilder.build(envelopeNode, namedNodeMap, org, idOfSync, request.getRemoteAddr());
             } catch (Exception e) {
                 logger.error("Failed to parse XML request", e);
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST,"Failed to parse XML request: " + e.getMessage());
+                final String msg = String.format("Failed to parse XML request: %s", e.getMessage());
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
                 return;
             }
 
@@ -147,8 +150,8 @@ public class SyncServlet extends HttpServlet {
                 syncRequest = null;
             } catch (Exception e) {
                 logger.error("Failed to process request", e);
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                        String.format("Failed to serialize response: %s", e.getMessage()));
+                final String format = String.format("Failed to serialize response: %s", e.getMessage());
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, format);
                 return;
             }
 
@@ -160,8 +163,8 @@ public class SyncServlet extends HttpServlet {
                 DigitalSignatureUtils.sign(runtimeContext.getSyncPrivateKey(), responseDocument);
             } catch (Exception e) {
                 logger.error("Failed to serialize response", e);
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                        String.format("Failed to serialize response: %s", e.getMessage()));
+                final String format = String.format("Failed to serialize response: %s", e.getMessage());
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, format);
                 return;
             }
 
@@ -178,7 +181,8 @@ public class SyncServlet extends HttpServlet {
                 throw new ServletException(e);
             }
 
-            logger.info(String.format("End of synchronization with %s", request.getRemoteAddr()));
+            final String message = String.format("End of synchronization with %s", request.getRemoteAddr());
+            logger.info(message);
         } catch (RuntimeContext.NotInitializedException e) {
             throw new UnavailableException(e.getMessage());
         }
@@ -227,8 +231,9 @@ public class SyncServlet extends HttpServlet {
             // Find given org
             Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
             if (null == org) {
-                logger.error(String.format("Unknown org with IdOfOrg == %s", idOfOrg));
-                throw new NullPointerException(String.format("Unknown org with IdOfOrg == %s", idOfOrg));
+                final String message = String.format("Unknown org with IdOfOrg == %s", idOfOrg);
+                logger.error(message);
+                throw new NullPointerException(message);
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;

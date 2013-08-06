@@ -192,8 +192,7 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        //TechnologicalMapGroup tmg = DAOService.getInstance().findDistributedObjectByRefGUID(TechnologicalMapGroup.class, guidOfTMG);
-        TechnologicalMapGroup tmg = (TechnologicalMapGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfTMG);
+        TechnologicalMapGroup tmg = DAOUtils.findDistributedObjectByRefGUID(TechnologicalMapGroup.class, session, guidOfTMG);
         if(tmg==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setTechnologicalMapGroup(tmg);
     }

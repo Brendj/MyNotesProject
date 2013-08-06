@@ -193,8 +193,8 @@ public class RegisterReport extends BasicReportForOrgJob {
             query.setParameter("startTime", CalendarUtils.getTimeFirstDayOfMonth(startTime.getTime()));
             query.setParameter("endTime", CalendarUtils.getTimeLastDayOfMonth(startTime.getTime()));
             query.setParameter("idOfOrg", org.getIdOfOrg());
-            query.setParameter("typeComplex1", OrderDetail.TYPE_COMPLEX_0);
-            query.setParameter("typeComplex10", OrderDetail.TYPE_COMPLEX_9);
+            query.setParameter("typeComplex1", OrderDetail.TYPE_COMPLEX_MIN);
+            query.setParameter("typeComplex10", OrderDetail.TYPE_COMPLEX_MAX);
 
             List resultList = query.list();
 

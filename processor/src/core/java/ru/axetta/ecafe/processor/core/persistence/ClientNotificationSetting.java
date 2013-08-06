@@ -117,14 +117,14 @@ public class ClientNotificationSetting {
     public ClientNotificationSetting(Client client, Long notifyType) {
         this.client = client;
         this.notifyType = notifyType;
-        createdDate = new Date(System.currentTimeMillis());
+        createdDate = new Date();
     }
 
-    public ClientNotificationSetting(Client client, long notifyType) {
-        this.client = client;
-        this.notifyType = notifyType;
-        createdDate = new Date(System.currentTimeMillis());
-    }
+    //public ClientNotificationSetting(Client client, long notifyType) {
+    //    this.client = client;
+    //    this.notifyType = notifyType;
+    //    createdDate = new Date(System.currentTimeMillis());
+    //}
 
     public long getIdOfSetting() {
         return idOfSetting;

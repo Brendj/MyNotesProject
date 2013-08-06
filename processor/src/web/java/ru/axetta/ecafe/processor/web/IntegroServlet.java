@@ -5,13 +5,13 @@
 package ru.axetta.ecafe.processor.web;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerProcessor;
 import ru.axetta.ecafe.processor.core.sync.manager.IntegroLogger;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
-import ru.axetta.ecafe.processor.core.sync.response.OrgOwnerData;
+import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
@@ -170,8 +170,8 @@ public class IntegroServlet extends HttpServlet {
                 Element dataElement = document.createElement("Data");
                 document.appendChild(dataElement);
                 dataElement.appendChild(manager.toElement(document));
-                OrgOwnerData orgOwnerData = new OrgOwnerData();
-                orgOwnerData.process(runtimeContext.createPersistenceSession(), idOfOrg);
+                AbstractProcessor processor = new OrgOwnerProcessor(runtimeContext.createPersistenceSession(), idOfOrg);
+                OrgOwnerData orgOwnerData = (OrgOwnerData) processor.process();
                 dataElement.appendChild(orgOwnerData.toElement(document));
                 responseDocument = document;
             } catch (Exception e) {
@@ -192,16 +192,6 @@ public class IntegroServlet extends HttpServlet {
         } catch (RuntimeContext.NotInitializedException e) {
             throw new UnavailableException(e.getMessage());
         }
-    }
-
-    private static RequestData readRequestFromFile() throws Exception {
-        RequestData requestData = new RequestData();
-        FileInputStream fileInputStream = new FileInputStream("D:/Projects/request.xml");
-        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        documentBuilderFactory.setNamespaceAware(true);
-        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        requestData.document = documentBuilder.parse(fileInputStream);
-        return requestData;
     }
 
     private static RequestData readRequest(HttpServletRequest httpRequest) throws Exception {

@@ -30,13 +30,13 @@ public class InternalIncomingDocumentPosition extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        InternalIncomingDocument iid  = (InternalIncomingDocument) DAOUtils.findDistributedObjectByRefGUID(session, guidOfIID);
+        InternalIncomingDocument iid  = DAOUtils.findDistributedObjectByRefGUID(InternalIncomingDocument.class, session, guidOfIID);
         if(iid==null) throw new DistributedObjectException("NOT_FOUND_VALUE InternalIncomingDocument");
         setInternalIncomingDocument(iid);
-        Good g  = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfG);
+        Good g  = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfG);
         if(g==null) throw new DistributedObjectException("NOT_FOUND_VALUE Good");
         setGood(g);
-        TradeMaterialGood tmg = (TradeMaterialGood) DAOUtils.findDistributedObjectByRefGUID(session, guidOfTMG);
+        TradeMaterialGood tmg = DAOUtils.findDistributedObjectByRefGUID(TradeMaterialGood.class, session, guidOfTMG);
         if(tmg!=null) setTradeMaterialGood(tmg);
     }
 

@@ -17,12 +17,12 @@ public class ProhibitionExclusion extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        Prohibition p = (Prohibition) DAOUtils.findDistributedObjectByRefGUID(session, guidOfProhibition);
+        Prohibition p = DAOUtils.findDistributedObjectByRefGUID(Prohibition.class, session, guidOfProhibition);
         if (p == null) throw new DistributedObjectException("Prohibition NOT_FOUND_VALUE");
         setProhibition(p);
 
-        Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoods);
-        GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoodsGroup);
+        Good g = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfGoods);
+        GoodGroup gg =  DAOUtils.findDistributedObjectByRefGUID(GoodGroup.class, session, guidOfGoodsGroup);
 
         if(gg != null) {
             setGoodsGroup(gg);
@@ -33,13 +33,6 @@ public class ProhibitionExclusion extends DistributedObject {
             return;
         }
         throw new DistributedObjectException("NOT_FOUND_VALUE");
-
-        //Good g = (Good) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoods);
-        //if(g == null) throw new DistributedObjectException("Good NOT_FOUND_VALUE");
-        //setGood(g);
-        //GoodGroup gg = (GoodGroup) DAOUtils.findDistributedObjectByRefGUID(session, guidOfGoodsGroup);
-        //if(gg == null) throw new DistributedObjectException("GoodGroup NOT_FOUND_VALUE");
-        //setGoodsGroup(gg);
     }
 
     @Override

@@ -25,26 +25,6 @@ import java.util.Set;
  */
 public class RetirementReason extends DistributedObject {
 
-    private String retirementReasonName;
-    private int hashCode;
-    private Set<Ksu2Record> ksu2RecordInternal;
-
-    public Set<Ksu2Record> getKsu2RecordInternal() {
-        return ksu2RecordInternal;
-    }
-
-    public void setKsu2RecordInternal(Set<Ksu2Record> ksu2RecordInternal) {
-        this.ksu2RecordInternal = ksu2RecordInternal;
-    }
-
-    public int getHashCode() {
-        return hashCode;
-    }
-
-    public void setHashCode(int hashCode) {
-        this.hashCode = hashCode;
-    }
-
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         Criteria criteria = session.createCriteria(RetirementReason.class);
@@ -137,5 +117,25 @@ public class RetirementReason extends DistributedObject {
     @Override
     public int hashCode() {
         return 31 * ((retirementReasonName != null ? getStringForHash(retirementReasonName).hashCode() : 0)) + (retirementReasonName != null ? getStringForHash(retirementReasonName).hashCode() : 0);
+    }
+
+    private String retirementReasonName;
+    private int hashCode;
+    private Set<Ksu2Record> ksu2RecordInternal;
+
+    public Set<Ksu2Record> getKsu2RecordInternal() {
+        return ksu2RecordInternal;
+    }
+
+    public void setKsu2RecordInternal(Set<Ksu2Record> ksu2RecordInternal) {
+        this.ksu2RecordInternal = ksu2RecordInternal;
+    }
+
+    public int getHashCode() {
+        return hashCode;
+    }
+
+    public void setHashCode(int hashCode) {
+        this.hashCode = hashCode;
     }
 }

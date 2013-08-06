@@ -17,28 +17,9 @@ import java.util.Set;
 
 public class GoodComplaintIterations extends DistributedObject {
 
-    private Set<GoodComplaintOrders> goodComplaintOrdersInternal;
-    private Set<GoodComplaintCauses> goodComplaintCausesInternal;
-
-    public Set<GoodComplaintCauses> getGoodComplaintCausesInternal() {
-        return goodComplaintCausesInternal;
-    }
-
-    public void setGoodComplaintCausesInternal(Set<GoodComplaintCauses> goodComplaintCausesInternal) {
-        this.goodComplaintCausesInternal = goodComplaintCausesInternal;
-    }
-
-    public Set<GoodComplaintOrders> getGoodComplaintOrdersInternal() {
-        return goodComplaintOrdersInternal;
-    }
-
-    public void setGoodComplaintOrdersInternal(Set<GoodComplaintOrders> goodComplaintOrdersInternal) {
-        this.goodComplaintOrdersInternal = goodComplaintOrdersInternal;
-    }
-
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        GoodComplaintBook gcb = (GoodComplaintBook) DAOUtils.findDistributedObjectByRefGUID(session, guidOfComplaint);
+        GoodComplaintBook gcb = DAOUtils.findDistributedObjectByRefGUID(GoodComplaintBook.class, session, guidOfComplaint);
         if (gcb == null) throw new DistributedObjectException("Complaint NOT_FOUND_VALUE");
         setComplaint(gcb);
 
@@ -145,6 +126,25 @@ public class GoodComplaintIterations extends DistributedObject {
 
     public void setConclusion(String conclusion) {
         this.conclusion = conclusion;
+    }
+
+    private Set<GoodComplaintOrders> goodComplaintOrdersInternal;
+    private Set<GoodComplaintCauses> goodComplaintCausesInternal;
+
+    public Set<GoodComplaintCauses> getGoodComplaintCausesInternal() {
+        return goodComplaintCausesInternal;
+    }
+
+    public void setGoodComplaintCausesInternal(Set<GoodComplaintCauses> goodComplaintCausesInternal) {
+        this.goodComplaintCausesInternal = goodComplaintCausesInternal;
+    }
+
+    public Set<GoodComplaintOrders> getGoodComplaintOrdersInternal() {
+        return goodComplaintOrdersInternal;
+    }
+
+    public void setGoodComplaintOrdersInternal(Set<GoodComplaintOrders> goodComplaintOrdersInternal) {
+        this.goodComplaintOrdersInternal = goodComplaintOrdersInternal;
     }
 
 }

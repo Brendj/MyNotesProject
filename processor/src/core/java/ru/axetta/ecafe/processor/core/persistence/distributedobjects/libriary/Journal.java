@@ -25,24 +25,6 @@ import java.util.Set;
  */
 public class Journal extends DistributedObject {
 
-    private Fund fund;
-    private Publication publication;
-    private boolean isNewspaper;
-    private int monthCount;
-    private int count;
-
-    private String guidFund;
-    private String guidPublication;
-    private Set<JournalItem> journalItemInternal;
-
-    public Set<JournalItem> getJournalItemInternal() {
-        return journalItemInternal;
-    }
-
-    public void setJournalItemInternal(Set<JournalItem> journalItemInternal) {
-        this.journalItemInternal = journalItemInternal;
-    }
-
     @Override
     protected void appendAttributes(Element element) {}
 
@@ -65,7 +47,7 @@ public class Journal extends DistributedObject {
     @Override
     public void preProcess(Session session) throws DistributedObjectException{
 
-        Publication p = (Publication) DAOUtils.findDistributedObjectByRefGUID(session, guidPublication);
+        Publication p = DAOUtils.findDistributedObjectByRefGUID(Publication.class, session, guidPublication);
         if(p==null){
             DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication NOT_FOUND_VALUE");
             distributedObjectException.setData(guidPublication);
@@ -73,7 +55,7 @@ public class Journal extends DistributedObject {
         }
         setPublication(p);
 
-        Fund f = (Fund) DAOUtils.findDistributedObjectByRefGUID(session, guidFund);
+        Fund f = DAOUtils.findDistributedObjectByRefGUID(Fund.class, session, guidFund);
         if(f!=null) setFund(f);
     }
 
@@ -132,5 +114,23 @@ public class Journal extends DistributedObject {
         return String
                 .format("Journal{fund=%s, publication=%s, isNewspaper=%s, monthCount=%d, count=%d}", fund, publication,
                         isNewspaper, monthCount, count);
+    }
+
+    private Fund fund;
+    private Publication publication;
+    private boolean isNewspaper;
+    private int monthCount;
+    private int count;
+
+    private String guidFund;
+    private String guidPublication;
+    private Set<JournalItem> journalItemInternal;
+
+    public Set<JournalItem> getJournalItemInternal() {
+        return journalItemInternal;
+    }
+
+    public void setJournalItemInternal(Set<JournalItem> journalItemInternal) {
+        this.journalItemInternal = journalItemInternal;
     }
 }

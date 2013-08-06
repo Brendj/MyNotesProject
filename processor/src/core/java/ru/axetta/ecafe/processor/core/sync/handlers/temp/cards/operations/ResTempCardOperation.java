@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations;
 
+import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -10,7 +12,7 @@ import org.w3c.dom.Element;
  * Time: 18:23
  * To change this template use File | Settings | File Templates.
  */
-public class ResTempCardOperation {
+public class ResTempCardOperation extends AbstractToElement {
 
     private final long idOfTempCardOperation;
     private final int resOperation;

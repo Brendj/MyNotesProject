@@ -134,16 +134,18 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             if (includeComplex) {
                 Query complexQuery_1 = session.createSQLQuery("SELECT od.MenuType, SUM(od.Qty) as qtySum, od.RPrice, SUM(od.Qty*od.RPrice), od.menuDetailName, od.discount, od.socdiscount, o.grantsum" +
                         " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
-                        " (od.MenuType>=:typeComplex1 AND od.MenuType<=:typeComplex10) AND (od.rPrice>0) AND " +
+                        " (od.MenuType>=:typeComplexMin AND od.MenuType<=:typeComplexMax) AND (od.rPrice>0) AND " +
                         " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) "
                         + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.menuDetailName, od.discount, od.socdiscount, o.grantsum");
 
                 complexQuery_1.setParameter("idOfOrg", org.getIdOfOrg());
-                complexQuery_1.setParameter("typeComplex1", OrderDetail.TYPE_COMPLEX_0); // централизованный 11-18
+                complexQuery_1.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
+                complexQuery_1.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
+                //complexQuery_1.setParameter("typeComplex1", OrderDetail.TYPE_COMPLEX_0); // централизованный 11-18
                 //complexQuery_1.setParameter("typeComplex2", OrderDetail.TYPE_COMPLEX_1); // централизованный 7-10
                 //complexQuery_1.setParameter("typeComplex4", OrderDetail.TYPE_COMPLEX_4); // локальный 11-18
                 //complexQuery_1.setParameter("typeComplex5", OrderDetail.TYPE_COMPLEX_5); // локальный 7-10
-                complexQuery_1.setParameter("typeComplex10", OrderDetail.TYPE_COMPLEX_9); // свободный выбоh
+                //complexQuery_1.setParameter("typeComplex10", OrderDetail.TYPE_COMPLEX_9); // свободный выбоh
                 complexQuery_1.setParameter("startTime", startTime.getTime());
                 complexQuery_1.setParameter("endTime", endTime.getTime());
 
@@ -174,13 +176,13 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 //// бесплатное питание
                 Query freeComplexQuery1 = session.createSQLQuery("SELECT od.MenuType, SUM(od.Qty) as qtySum, od.RPrice, SUM(od.Qty*od.RPrice), od.menuDetailName " +
                         " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND " +
-                        " (od.MenuType>=:typeComplex1 OR od.MenuType<=:typeComplex10) AND (od.RPrice=0 AND od.Discount>0) AND " +
+                        " (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.RPrice=0 AND od.Discount>0) AND " +
                         " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) "
                         + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName");
 
                 freeComplexQuery1.setParameter("idOfOrg", org.getIdOfOrg());
-                freeComplexQuery1.setParameter("typeComplex1", OrderDetail.TYPE_COMPLEX_0);
-                freeComplexQuery1.setParameter("typeComplex10", OrderDetail.TYPE_COMPLEX_9);
+                freeComplexQuery1.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
+                freeComplexQuery1.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
                 freeComplexQuery1.setParameter("startTime", startTime.getTime());
                 freeComplexQuery1.setParameter("endTime", endTime.getTime());
 

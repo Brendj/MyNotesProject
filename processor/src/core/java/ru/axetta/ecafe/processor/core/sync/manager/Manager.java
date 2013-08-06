@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.core.sync.manager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.*;
 
 import org.hibernate.*;
 import org.hibernate.criterion.Conjunction;
@@ -687,10 +687,15 @@ public class Manager {
     }
 
     private long getGlobalIDByGUID(Session session, DistributedObject distributedObject) {
+
+        //String where = String.format("select id from %s where guid='%s'",distributedObject.getClass().getSimpleName(), distributedObject.getGuid());
+        //Query query = session.createQuery(where);
+        //List list = query.list();
+
+        Criteria criteria = session.createCriteria(distributedObject.getClass());
+        criteria.add(Restrictions.eq("guid",distributedObject.getGuid()));
         Long result = -1L;
-        String where = String.format("select id from %s where guid='%s'",distributedObject.getClass().getSimpleName(), distributedObject.getGuid());
-        Query query = session.createQuery(where);
-        List list = query.list();
+        List list = criteria.list();
         if(!(list == null || list.isEmpty())){
             result = (Long) list.get(0);
         }
@@ -704,12 +709,13 @@ public class Manager {
         distributedObject.setDateOnlyFormat(dateOnlyFormat);
         distributedObject.setTimeFormat(timeFormat);
         element = distributedObject.toElement(element);
-        TransformerFactory transFactory = TransformerFactory.newInstance();
-        Transformer transformer = transFactory.newTransformer();
-        StringWriter buffer = new StringWriter();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-        transformer.transform(new DOMSource(element), new StreamResult(buffer));
-        return buffer.toString();
+        return XMLUtils.nodeToString(element);
+        //TransformerFactory transFactory = TransformerFactory.newInstance();
+        //Transformer transformer = transFactory.newTransformer();
+        //StringWriter buffer = new StringWriter();
+        //transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        //transformer.transform(new DOMSource(element), new StreamResult(buffer));
+        //return buffer.toString();
     }
 
     private Document getSimpleDocument() throws Exception {
