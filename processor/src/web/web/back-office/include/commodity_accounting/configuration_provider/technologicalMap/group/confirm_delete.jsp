@@ -10,6 +10,7 @@
 
 <%--@elvariable id="technologicalMapGroupEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.technologicalMap.group.TechnologicalMapGroupEditPage"--%>
 <rich:modalPanel id="removedTechnologicalMapGroupItemDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
+    <rich:hotKey key="esc" handler="#{rich:component('removedTechnologicalMapGroupItemDeletePanel')}.hide();return false;"/>
     <f:facet name="header">
         <h:outputText value="Удаление группы техническох карт из справочника" styleClass="output-text" />
     </f:facet>

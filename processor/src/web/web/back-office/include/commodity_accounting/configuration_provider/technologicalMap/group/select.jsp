@@ -10,6 +10,7 @@
 
 <%--@elvariable id="technologicalMapGroupItemsPanel" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.technologicalMap.group.TechnologicalMapGroupItemsPanel"--%>
 <rich:modalPanel id="technologicalMapGroupSelectModalPanel" autosized="true" width="200" headerClass="modal-panel-header">
+    <rich:hotKey key="esc" handler="#{rich:component('technologicalMapGroupSelectModalPanel')}.hide();return false;"/>
     <f:facet name="header">
         <h:outputText escape="true" value="Выберите группу" />
     </f:facet>
@@ -41,7 +42,7 @@
             <tr>
                 <td style="text-align: center;">
                     <rich:dataTable value="#{technologicalMapGroupItemsPanel.technologicalMapGroupList}" var="technologicalMapGroup" rowKeyVar="row"
-                                    width="100%" align="center" id="modalProductGroupSelectorTable" rows="8"
+                                    width="100%" align="center" id="modalProductGroupSelectorTable" rows="15"
                                     footerClass="data-table-footer" columnClasses="left-aligned-column"
                                     rowClasses="select-panel-row" onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
                                     onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">

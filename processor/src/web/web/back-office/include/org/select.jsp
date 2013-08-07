@@ -9,6 +9,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <rich:modalPanel id="modalOrgSelectorPanel" autosized="true" headerClass="modal-panel-header">
+    <rich:hotKey key="esc" handler="#{rich:component('modalOrgSelectorPanel')}.hide();return false;"/>
     <f:facet name="header">
         <h:outputText escape="true" value="Выбор организации" />
     </f:facet>

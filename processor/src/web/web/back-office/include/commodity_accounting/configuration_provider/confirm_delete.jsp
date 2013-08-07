@@ -10,6 +10,7 @@
 
 <%--@elvariable id="configurationProviderDeletePage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderDeletePage"--%>
 <rich:modalPanel id="removedСonfigurationProviderItemDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
+    <rich:hotKey key="esc" handler="#{rich:component('removedСonfigurationProviderItemDeletePanel')}.hide();return false;"/>
     <f:facet name="header">
         <h:outputText value="Удаление конфигурации поставщика" styleClass="output-text" />
     </f:facet>

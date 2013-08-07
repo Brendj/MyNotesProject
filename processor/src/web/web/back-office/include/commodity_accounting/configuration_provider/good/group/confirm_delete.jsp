@@ -11,6 +11,7 @@
 <%--@elvariable id="goodGroupEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupEditPage"--%>
 <%--@elvariable id="goodGroupListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupListPage"--%>
 <rich:modalPanel id="removedGoodGroupItemDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
+    <rich:hotKey key="esc" handler="#{rich:component('removedGoodGroupItemDeletePanel')}.hide();return false;"/>
     <f:facet name="header">
         <h:outputText value="Удаление группы товаров из справочника" styleClass="output-text" />
     </f:facet>

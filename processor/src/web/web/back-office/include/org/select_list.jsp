@@ -10,6 +10,7 @@
 
 <%--@elvariable id="orgListSelectPage" type="ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage"--%>
 <rich:modalPanel id="modalOrgListSelectorPanel" autosized="true" headerClass="modal-panel-header">
+    <rich:hotKey key="esc" handler="#{rich:component('modalOrgListSelectorPanel')}.hide();return false;"/>
     <f:facet name="header">
         <h:outputText escape="true" value="Выбор организаций" />
     </f:facet>

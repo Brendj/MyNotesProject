@@ -9,6 +9,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <rich:modalPanel id="posDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
+    <rich:hotKey key="esc" handler="#{rich:component('posDeletePanel')}.hide();return false;"/>
     <f:facet name="header">
         <h:outputText value="Удаление точки продажи" styleClass="output-text" />
     </f:facet>

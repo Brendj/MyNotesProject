@@ -11,6 +11,7 @@
 <%--@elvariable id="productListItemsPanel" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.technologicalMap.technologicalMapProduct.ProductListItemsPanel"--%>
 
 <rich:modalPanel id="modalTechnologicalMapListSelectorPanel" autosized="true" headerClass="modal-panel-header">
+    <rich:hotKey key="esc" handler="#{rich:component('modalTechnologicalMapListSelectorPanel')}.hide();return false;"/>
     <f:facet name="header">
         <h:outputText escape="true" value="Выбор продуктов" />
     </f:facet>
@@ -37,7 +38,7 @@
             </tr>
             <tr>
                 <td style="text-align: center;">
-                    <rich:dataTable value="#{productListItemsPanel.productItems}" var="item" rows="8"
+                    <rich:dataTable value="#{productListItemsPanel.productItems}" var="item" rows="15"
                                     width="100%" align="center" id="modalTechnologicalMapListSelectorTechnologicalMapTable"
                                     footerClass="data-table-footer" columnClasses="left-aligned-column"
                                     rowClasses="select-panel-row" onRowMouseOver="this.style.backgroundColor='#e6e6e6'"

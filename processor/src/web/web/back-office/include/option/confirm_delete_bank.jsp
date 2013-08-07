@@ -10,6 +10,7 @@
 
 <%--@elvariable id="bankDeletePage" type="ru.axetta.ecafe.processor.web.ui.option.banks.BankDeletePage"--%>
 <rich:modalPanel id="removedBankItemDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
+    <rich:hotKey key="esc" handler="#{rich:component('removedBankItemDeletePanel')}.hide();return false;"/>
     <f:facet name="header">
         <h:outputText value="Удаление Банка" styleClass="output-text" />
     </f:facet>

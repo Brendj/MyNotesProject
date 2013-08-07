@@ -9,6 +9,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <rich:modalPanel id="reportRuleDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
+    <rich:hotKey key="esc" handler="#{rich:component('reportRuleDeletePanel')}.hide();return false;"/>
     <f:facet name="header">
         <h:outputText value="Удаление правила обработки отчета" styleClass="output-text" />
     </f:facet>

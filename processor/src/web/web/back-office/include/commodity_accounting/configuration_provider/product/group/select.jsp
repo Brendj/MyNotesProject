@@ -10,6 +10,7 @@
 
 <%--@elvariable id="productGroupItemsPanel" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.group.ProductGroupItemsPanel"--%>
 <rich:modalPanel id="productGroupSelectModalPanel" autosized="true" width="200" headerClass="modal-panel-header">
+    <rich:hotKey key="esc" handler="#{rich:component('productGroupSelectModalPanel')}.hide();return false;"/>
     <f:facet name="header">
         <h:outputText escape="true" value="Выберите группу" />
     </f:facet>
@@ -41,7 +42,7 @@
             <tr>
                 <td style="text-align: center;">
                     <rich:dataTable value="#{productGroupItemsPanel.productGroupList}" var="productGroup" rowKeyVar="row"
-                                    width="100%" align="center" id="modalProductGroupSelectorTable" rows="8"
+                                    width="100%" align="center" id="modalProductGroupSelectorTable" rows="15"
                                     footerClass="data-table-footer" columnClasses="left-aligned-column"
                                     rowClasses="select-panel-row" onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
                                     onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">

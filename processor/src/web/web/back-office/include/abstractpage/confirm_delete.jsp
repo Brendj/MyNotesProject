@@ -10,6 +10,7 @@
 
 <%--@elvariable id="uvDeletePage" type="ru.axetta.ecafe.processor.web.ui.abstractpage.UvDeletePage"--%>
 <rich:modalPanel id="uvDeleteConfirmPanel" autosized="true" width="200" headerClass="modal-panel-header">
+    <rich:hotKey key="esc" handler="#{rich:component('uvDeleteConfirmPanel')}.hide();return false;"/>
     <f:facet name="header">
         <h:outputText value="Удаление объекта" styleClass="output-text" />
     </f:facet>

@@ -9,6 +9,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <rich:modalPanel id="modalCategorySelectorPanel" autosized="true" headerClass="modal-panel-header">
+    <rich:hotKey key="esc" handler="#{rich:component('modalCategorySelectorPanel')}.hide();return false;"/>
     <f:facet name="header">
         <h:outputText escape="true" value="Выбор категории" />
     </f:facet>
@@ -41,7 +42,7 @@
             <tr>
                 <td style="text-align: center;">
                     <rich:dataTable width="100%" align="center" id="modalCategorySelectorTable"
-                                    value="#{mainPage.categorySelectPage.items}" var="item" rows="8"
+                                    value="#{mainPage.categorySelectPage.items}" var="item" rows="15"
                                     footerClass="data-table-footer" columnClasses="left-aligned-column"
                                     rowClasses="select-panel-row" onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
                                     onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">

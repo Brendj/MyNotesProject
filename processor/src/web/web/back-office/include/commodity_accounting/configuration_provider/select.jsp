@@ -10,6 +10,7 @@
 
 <%--@elvariable id="configurationProviderItemsPanel" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel"--%>
 <rich:modalPanel id="configurationProviderSelectModalPanel" autosized="true" width="200" headerClass="modal-panel-header">
+    <rich:hotKey key="esc" handler="#{rich:component('configurationProviderSelectModalPanel')}.hide();return false;"/>
     <f:facet name="header">
         <h:outputText escape="true" value="Выберите производственную конфигурацию" />
     </f:facet>
@@ -41,7 +42,7 @@
             <tr>
                 <td style="text-align: center;">
                     <rich:dataTable value="#{configurationProviderItemsPanel.configurationProviderList}" var="configurationProvider" rowKeyVar="row"
-                                    width="100%" align="center" id="modalСonfigurationProviderSelectorTable" rows="8"
+                                    width="100%" align="center" id="modalСonfigurationProviderSelectorTable" rows="15"
                                     footerClass="data-table-footer" columnClasses="left-aligned-column"
                                     rowClasses="select-panel-row" onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
                                     onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
