@@ -18,7 +18,6 @@ import org.hibernate.criterion.*;
 import org.hibernate.transform.Transformers;
 
 import java.util.*;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -52,6 +51,7 @@ public class OrgListSelectPage extends BasicPage {
     private boolean allOrgFilterDisabled = false;
     private boolean schoolFilterDisabled = false;
     private boolean supplierFilterDisabled = false;
+    private Map<Long, String> selectedOrgs = new HashMap<Long, String>();
 
     public void pushCompleteHandlerList(CompleteHandlerList handlerList) {
         completeHandlerLists.push(handlerList);
@@ -170,13 +170,6 @@ public class OrgListSelectPage extends BasicPage {
         }
 
         this.items = items;
-    }
-
-    HashMap<Long, String> selectedOrgs;
-    
-    public void onShow() {
-        selectedOrgs = new HashMap<Long, String>();
-        this.items = new LinkedList<OrgShortItem>();
     }
     
     public void fill(Session session) throws Exception {
