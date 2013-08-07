@@ -129,47 +129,6 @@ public class DAOUtils {
     /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
     public static List findNewerClients(Session persistenceSession, Collection<Org> organizations, long clientRegistryVersion)
             throws Exception {
-        //Set<CompositeIdOfClientGroup> clientGroups = new HashSet<CompositeIdOfClientGroup>();
-        //for (Org organization: organizations){
-        //    CompositeIdOfClientGroup deletedClientGroup = new CompositeIdOfClientGroup(organization.getIdOfOrg(),ClientGroup.Predefined.CLIENT_DELETED.getValue());
-        //    CompositeIdOfClientGroup leavingClientGroup = new CompositeIdOfClientGroup(organization.getIdOfOrg(),ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-        //    clientGroups.add(deletedClientGroup);
-        //    clientGroups.add(leavingClientGroup);
-        //}
-        //Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
-        //clientGroupCriteria.add(Restrictions.in("compositeIdOfClientGroup",clientGroups));
-        //clientGroupCriteria.add(Restrictions.not(Restrictions.in("compositeIdOfClientGroup", clientGroups)));
-        //clientGroupCriteria.add(Restrictions.in("org",organizations));
-        //List<ClientGroup> deletingAndLeavingClientGroup = clientGroupCriteria.list();
-
-        //Criteria criteria = persistenceSession.createCriteria(Client.class);
-        //criteria.add(Restrictions.in("org", organizations));
-        //criteria.add(Restrictions.gt("clientRegistryVersion", clientRegistryVersion));
-        //
-        //List<Long> deletingAndLeavingClientGroup = new ArrayList<Long>(2);
-        //deletingAndLeavingClientGroup.add(ClientGroup.Predefined.CLIENT_DELETED.getValue());
-        //deletingAndLeavingClientGroup.add(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-        //
-        //Criterion clientGroupRestriction = Restrictions.disjunction()
-        //        .add(Restrictions.in("idOfClientGroup", deletingAndLeavingClientGroup))
-        //        .add(Restrictions.isNull("idOfClientGroup"));
-        //
-        //criteria.add(clientGroupRestriction);
-
-        //criteria.add(Restrictions.not(Restrictions.in("idOfClientGroup", deletingAndLeavingClientGroup)));
-        //criteria.add(Restrictions.isNull("idOfClientGroup"));
-        //if (!deletingAndLeavingClientGroup.isEmpty()){
-        //    //criteria.add(Restrictions.not(Restrictions.in("clientGroup", deletingAndLeavingClientGroup)));
-        //    Criterion clientGroupRestriction = Restrictions.disjunction().
-        //            add(Restrictions.in("clientGroup", deletingAndLeavingClientGroup))
-        //           .add(Restrictions.isNull("clientGroup"));
-        //    criteria.add(clientGroupRestriction);
-        //}
-
-
-        //return criteria.list();
-
-
         Query query = persistenceSession.createQuery("from Client cl where (cl.idOfClientGroup is null or cl.idOfClientGroup !=1100000060 or cl.idOfClientGroup !=1100000070)  and cl.org in :orgs and clientRegistryVersion>:version");
         query.setParameter("version", clientRegistryVersion);
         query.setParameterList("orgs", organizations);
@@ -179,22 +138,6 @@ public class DAOUtils {
     /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
     public static List findNewerClients(Session persistenceSession, Org organization, long clientRegistryVersion)
             throws Exception {
-
-        //Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
-        //CompositeIdOfClientGroup deletedClientGroup = new CompositeIdOfClientGroup(organization.getIdOfOrg(),ClientGroup.Predefined.CLIENT_DELETED.getValue());
-        //CompositeIdOfClientGroup leavingClientGroup = new CompositeIdOfClientGroup(organization.getIdOfOrg(),ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-        //clientGroupCriteria.add(Restrictions.in("compositeIdOfClientGroup",Arrays.asList(deletedClientGroup, leavingClientGroup)));
-        //List<ClientGroup> deletingAndLeavingClientGroup = clientGroupCriteria.list();
-        //
-        //Criteria criteria = persistenceSession.createCriteria(Client.class);
-        //criteria.add(Restrictions.eq("org", organization));
-        //criteria.add(Restrictions.gt("clientRegistryVersion", clientRegistryVersion));
-        //if (!deletingAndLeavingClientGroup.isEmpty()){
-        //    criteria.add(Restrictions.not(Restrictions.in("clientGroup", deletingAndLeavingClientGroup)));
-        //}
-        //
-        //return criteria.list();
-
         Query query = persistenceSession.createQuery("from Client cl where (cl.idOfClientGroup is null or cl.idOfClientGroup !=1100000060 or cl.idOfClientGroup !=1100000070)  and cl.org in :orgs and clientRegistryVersion>:version");
         query.setParameter("version", clientRegistryVersion);
         query.setParameter("orgs", organization);
@@ -265,16 +208,6 @@ public class DAOUtils {
         Criteria criteria = persistenceSession.createCriteria(User.class);
         criteria.add(Restrictions.eq("userName", userName));
         return (User)criteria.uniqueResult();
-    }
-
-    public static User findUser(EntityManager entityManager, String userName) throws Exception {
-        //javax.persistence.Query q = entityManager.createQuery("from User where userName=:userName");
-        //Criteria criteria = persistenceSession.createCriteria(User.class);
-        //q.setParameter()
-        javax.persistence.Query q = entityManager.createQuery("from User where userName=:userName");
-        q.setParameter("userName", userName);
-        //criteria.add(Restrictions.eq("userName", userName));
-        return (User) q.getSingleResult();
     }
 
     public static User getUserReference(Session persistenceSession, long idOfUser) throws Exception {
@@ -417,30 +350,11 @@ public class DAOUtils {
 
 
     public static List <Client> findClientsForOrgAndFriendly (EntityManager em, Org organization) throws Exception {
-        /*javax.persistence.Query query = entityManager.createQuery(
-                //"from Client client where (client.org = :org or client.org.idOfOrg in (select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=client.org.idOfOrg))");
-                "from Client client where client.org = :org");
-        query.setParameter("org", organization);
-        if (query.getResultList().isEmpty()) return Collections.emptyList();
-        return (List <Client>)query.getResultList();*/
-
         List <Org> orgs = findFriendlyOrgs (em, organization);
         return findClientsForOrgAndFriendly (em, organization, orgs);
     }
 
     public static List<Org> findFriendlyOrgs (EntityManager em, Org organization) throws Exception {
-        /*Session persistenceSession = (Session) entityManager.getDelegate();
-        Query query = persistenceSession.createQuery(
-                "select idoffriendlyorg from cf_friendly_organization where currentorg=? order by currentorg");
-        query.setParameter(0, organization.getIdOfOrg());
-        List <Org> res = new ArrayList <Org> ();
-        res.add(organization);
-        List resultList = query.list();
-        for (Object idoforg : resultList) {
-            res.add(DAOService.getInstance().getOrg((Long) idoforg));
-        }
-        return res;*/
-
         javax.persistence.Query query = em.createQuery("select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg");
         query.setParameter("idOfOrg", organization.getIdOfOrg());
         if (query.getResultList().isEmpty()) return new ArrayList<Org> ();
@@ -1289,7 +1203,7 @@ public class DAOUtils {
     /* получаем список всех клиентов у которых guid пустой */
     public static List<Long> extractIdFromClientsByGUIDIsNull(EntityManager entityManager) {
         TypedQuery<Long> query = entityManager.createQuery("select idOfClient from Client client where client.clientGUID is null or client.clientGUID=''", Long.class);
-        query.setMaxResults(2000);
+        //query.setMaxResults(2000);
         return query.getResultList();
     }
 

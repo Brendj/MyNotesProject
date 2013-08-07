@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +31,7 @@ import javax.persistence.PersistenceContext;
  */
 
 @Component
-
+@Scope("session")
 public class UserSettings extends BasicWorkspacePage {
 
     /* Properties */
@@ -44,10 +45,13 @@ public class UserSettings extends BasicWorkspacePage {
     private User currUser = null;
 
     @Autowired
-    RuntimeContext runtimeContext;
+    private RuntimeContext runtimeContext;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    private DAOService daoService;
+
+    //@PersistenceContext
+    //private EntityManager entityManager;
 
     public String getPageFilename() {
         return "user_setting";
@@ -67,14 +71,13 @@ public class UserSettings extends BasicWorkspacePage {
         email = currUser.getEmail();
     }
 
-    @Transactional
     public User getCurrentUser() throws Exception {
         FacesContext context = FacesContext.getCurrentInstance();
         String userName = context.getExternalContext().getRemoteUser();
-        return DAOUtils.findUser(entityManager,userName);
+        //return DAOUtils.findUser(entityManager,userName);
+        return daoService.findUserByUserName(userName);
     }
 
-    @Transactional
     public boolean updateInfoCurrentUser() throws Exception{
         boolean success=false;
         if(checkCurrentPassword(currPlainPassword)){
@@ -88,7 +91,7 @@ public class UserSettings extends BasicWorkspacePage {
             currUser.setUserName(userName);
             currUser.setPhone(phone);
             currUser.setEmail(email);
-            currUser = DAOService.getInstance().setUserInfo(currUser);
+            currUser = daoService.setUserInfo(currUser);
             success = true;
         }
         return success;

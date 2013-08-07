@@ -65,13 +65,13 @@ public class ProductGroupListPage extends BasicWorkspacePage implements Configur
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
         if(selectedConfigurationProvider!=null){
-            if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+            if(!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
                 productGroupList = daoService.findProductGroupByConfigurationProvider(selectedConfigurationProvider.getIdOfConfigurationProvider(), deletedStatusSelected);
             } else {
                 productGroupList = daoService.findProductGroupByConfigurationProvider(selectedConfigurationProvider.getIdOfConfigurationProvider(),orgOwners, deletedStatusSelected);
             }
         } else {
-            if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+            if(!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
                 productGroupList = daoService.findProductGroupByConfigurationProvider(deletedStatusSelected);
             } else {
                 productGroupList = daoService.findProductGroupByConfigurationProvider(orgOwners,deletedStatusSelected);

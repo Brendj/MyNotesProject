@@ -45,8 +45,6 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
     private SelectedConfigurationProviderGroupPage selectedConfigurationProviderGroupPage;
     @Autowired
     private DAOService daoService;
-    @PersistenceContext
-    private EntityManager entityManager;
 
     @Override
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
@@ -70,9 +68,8 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
         selectedConfigurationProviderGroupPage.show();
         currentConfigurationProvider = selectedConfigurationProviderGroupPage.getSelectConfigurationProvider();
         StringBuilder stringBuilder = new StringBuilder();
-        TypedQuery<Org> query = entityManager.createQuery("from Org where configurationProvider=:configurationProvider",Org.class);
-        query.setParameter("configurationProvider",currentConfigurationProvider);
-        for(Org org: query.getResultList()){
+        List<Org> orgs = daoService.findOrgsByConfigurationProvider(currentConfigurationProvider);
+        for(Org org: orgs){
             idOfOrgList.add(org.getIdOfOrg());
             stringBuilder = stringBuilder.append(org.getShortName() + "; ");
         }

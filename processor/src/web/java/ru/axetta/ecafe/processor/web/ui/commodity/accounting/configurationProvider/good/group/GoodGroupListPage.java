@@ -57,7 +57,7 @@ public class GoodGroupListPage extends BasicWorkspacePage {
     public void reload() throws Exception{
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
-        if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+        if(!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
             goodGroupList = daoService.findGoodGroupBySuplifier(deletedStatusSelected);
         } else {
             goodGroupList = daoService.findGoodGroupBySuplifier(orgOwners, deletedStatusSelected);

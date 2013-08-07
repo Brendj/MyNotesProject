@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvi
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.slf4j.Logger;
@@ -34,10 +35,10 @@ public class GoodViewPage extends BasicWorkspacePage {
     private Good currentGood;
     private Product currentProduct;
     private TechnologicalMap currentTechnologicalMap;
-    @PersistenceContext
-    private EntityManager entityManager;
     @Autowired
     private SelectedGoodGroupPage selectedGoodGroupPage;
+    @Autowired
+    private DAOService daoService;
 
     @Override
     public void onShow() throws Exception {
@@ -48,14 +49,13 @@ public class GoodViewPage extends BasicWorkspacePage {
         reload();
     }
 
-    @Transactional
     protected void reload(){
         if(currentGood!=null){
             if(currentGood.getTechnologicalMap()!=null){
-                currentTechnologicalMap = entityManager.merge(currentGood.getTechnologicalMap());
+                currentTechnologicalMap = daoService.saveEntity(currentGood.getTechnologicalMap());
             }
             if(currentGood.getProduct()!=null){
-                currentProduct = entityManager.merge(currentGood.getProduct());
+                currentProduct = daoService.saveEntity(currentGood.getProduct());
             }
         }
     }

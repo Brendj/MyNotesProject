@@ -67,7 +67,7 @@ public class TechnologicalMapGroupListPage extends BasicWorkspacePage implements
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
         if(selectedConfigurationProvider!=null){
-            if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+            if(!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
                 technologicalMapGroupList = daoService.findTechnologicalMapGroupByConfigurationProvider(
                         selectedConfigurationProvider.getIdOfConfigurationProvider(), deletedStatusSelected);
             } else {
@@ -75,7 +75,7 @@ public class TechnologicalMapGroupListPage extends BasicWorkspacePage implements
                         selectedConfigurationProvider.getIdOfConfigurationProvider(), orgOwners, deletedStatusSelected);
             }
         } else {
-            if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+            if(!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
                 technologicalMapGroupList = daoService.findTechnologicalMapGroupByConfigurationProvider(deletedStatusSelected);
             } else {
                 technologicalMapGroupList = daoService.findTechnologicalMapGroupByConfigurationProvider(orgOwners, false);

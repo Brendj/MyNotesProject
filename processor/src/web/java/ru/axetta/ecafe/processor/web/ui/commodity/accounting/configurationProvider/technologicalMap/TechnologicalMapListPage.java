@@ -104,7 +104,7 @@ public class TechnologicalMapListPage extends BasicWorkspacePage implements Conf
         if(selectedTechnologicalMapGroup==null){
             /* проверка на отсутвие конфигурации провайдера */
             if(selectedConfigurationProvider!=null){
-                if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+                if(!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
                     technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(
                             selectedConfigurationProvider.getIdOfConfigurationProvider(), deletedStatusSelected);
                 } else {
@@ -112,7 +112,7 @@ public class TechnologicalMapListPage extends BasicWorkspacePage implements Conf
                             selectedConfigurationProvider.getIdOfConfigurationProvider(), orgOwners, deletedStatusSelected);
                 }
             } else {
-                if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+                if(!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
                     technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(deletedStatusSelected);
                 } else {
                     technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(orgOwners, deletedStatusSelected);
@@ -128,7 +128,7 @@ public class TechnologicalMapListPage extends BasicWorkspacePage implements Conf
                             selectedConfigurationProvider.getIdOfConfigurationProvider(), orgOwners, deletedStatusSelected);
                 }
             } else {
-                if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+                if(!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
                     technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(selectedTechnologicalMapGroup,deletedStatusSelected);
                 } else {
                     technologicalMapList = daoService.findTechnologicalMapByConfigurationProvider(selectedTechnologicalMapGroup, orgOwners, deletedStatusSelected);

@@ -88,7 +88,7 @@ public class ProductPanel extends BasicPage {
     private void retrieveProduct() throws Exception {
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
-        if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+        if(!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
             if (StringUtils.isEmpty(filter)){
                 productList = daoService.findProductByConfigurationProvider(filter);
             }else {

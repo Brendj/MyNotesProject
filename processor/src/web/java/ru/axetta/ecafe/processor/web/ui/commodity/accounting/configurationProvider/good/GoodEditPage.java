@@ -47,8 +47,6 @@ public class GoodEditPage extends BasicWorkspacePage implements GoodGroupSelect,
     private Product currentProduct;
     private TechnologicalMap currentTechnologicalMap;
     private List<SelectItem> selectItemList = new LinkedList<SelectItem>();
-    @PersistenceContext
-    private EntityManager entityManager;
     @Autowired
     private GoodGroupItemsPanel goodGroupItemsPanel;
     @Autowired
@@ -78,13 +76,6 @@ public class GoodEditPage extends BasicWorkspacePage implements GoodGroupSelect,
         }
         unitScale = currentGood.getUnitsScale().ordinal();
         this.selectItemList = new ArrayList<SelectItem>();
-        //this.selectItemList.add(new SelectItem(0,Good.UNIT_SCALES[currentGood.getUnitsScale()]));
-        //this.selectItemList.add(new SelectItem(currentGood.getUnitsScale().ordinal(),currentGood.getUnitsScale().toString()));
-        //for (Integer i=0;i<Good.UNIT_SCALES.length; i++){
-        //    if(!i.equals(currentGood.getUnitsScale())) {
-        //        this.selectItemList.add(new SelectItem(i,Good.UNIT_SCALES[i]));
-        //    }
-        //}
         for (UnitScale unitScale: UnitScale.values()){
             this.selectItemList.add(new SelectItem(unitScale.ordinal(),unitScale.toString()));
         }
@@ -96,12 +87,7 @@ public class GoodEditPage extends BasicWorkspacePage implements GoodGroupSelect,
                 printWarn("Поле 'Полное наименование пищевого продукта' обязательное.");
                 return null;
             }
-            //if(currentGood.ge()==null || currentGood.getProductName().equals("")){
-            //    printError("Поле 'Товарное название' обязательное.");
-            //    return null;
-            //}
-            //Product p = entityManager.find(Product.class, currentProduct.getGlobalId());
-            Good g = entityManager.find(Good.class, currentGood.getGlobalId());
+            Good g = daoService.getGood(currentGood.getGlobalId());
             currentGood.setUnitsScale(UnitScale.fromInteger(unitScale));
             g.fill(currentGood);
             g.setLastUpdate(new Date());
@@ -117,7 +103,7 @@ public class GoodEditPage extends BasicWorkspacePage implements GoodGroupSelect,
             g.setGoodGroup(currentGoodGroup);
             g.setGlobalVersion(daoService.updateVersionByDistributedObjects(Good.class.getSimpleName()));
             daoService.mergeDistributedObject(g, g.getGlobalVersion()+1);
-            currentGood = entityManager.find(Good.class, currentGood.getGlobalId());
+            currentGood = daoService.getGood(currentGood.getGlobalId());
             selectedGoodGroupPage.setCurrentGood(currentGood);
             printMessage("Товар сохранен успешно.");
         } catch (Exception e) {

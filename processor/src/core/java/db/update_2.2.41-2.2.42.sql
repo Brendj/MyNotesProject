@@ -115,3 +115,5 @@ create table CF_ComplexRoles(
   ExtendRoleName varchar(128),
   CONSTRAINT CF_ComplexRole_pk PRIMARY KEY (IdOfRole)
 );
+
+--! ФИНАЛИЗИРОВАН (Кадыров, 130807) НЕ МЕНЯТЬ

@@ -50,6 +50,17 @@ public class DAOService {
     }
 
 
+    public User findUserByUserName(String userName) throws Exception {
+        javax.persistence.Query q = entityManager.createQuery("from User where userName=:userName");
+        q.setParameter("userName", userName);
+        return (User) q.getSingleResult();
+    }
+
+
+    public User setUserInfo(User user) {
+        return entityManager.merge(user);
+    }
+
     public Boolean isMenuExchange(Long idOfOrg){
         TypedQuery<Long> query = entityManager.createQuery("select idOfSourceOrg from MenuExchangeRule where idOfSourceOrg = :idOfSourceOrg",Long.class);
         query.setParameter("idOfSourceOrg",idOfOrg);
@@ -146,6 +157,7 @@ public class DAOService {
         return list.get(0);
     }
 
+
     public ConfigurationProvider getConfigurationProvider(Long idOfConfigurationProvider) throws Exception {
         return entityManager.find(ConfigurationProvider.class, idOfConfigurationProvider);
     }
@@ -202,11 +214,11 @@ public class DAOService {
     }
 
 
+
     public void removeGoodGroup(GoodGroup goodGroup){
          GoodGroup group = entityManager.merge(goodGroup);
          entityManager.remove(group);
     }
-
 
 
     public void removeSetting(ECafeSettings eCafeSettings){
@@ -256,10 +268,10 @@ public class DAOService {
         return entityManager.find(distributedObject.getClass(), distributedObjectList.get(0).getGlobalId());
     }
 
-
     public void persistEntity(Object entity) throws Exception {
         entityManager.persist(entity);
     }
+
 
     public void deleteEntity(Object entity) {
         entity = entityManager.merge(entity);
@@ -267,7 +279,6 @@ public class DAOService {
             entityManager.remove(entity);
         }
     }
-
 
     public Long getContractIdByCardNo(long lCardId) throws Exception {
         TypedQuery<Long> query = entityManager.createQuery("select card.client.contractId from Card card where card.cardNo=:cardNo", Long.class);
@@ -279,6 +290,7 @@ public class DAOService {
             return list.get(0);
         }
     }
+
 
     public Long getContractIdByTempCardNoAndCheckValidDate(long lCardId) throws Exception {
         /* так как в поле хранится дата на 00:00 ночи текущего дня вычтем из текущего дня 24 часа в милисекудах */
@@ -367,11 +379,6 @@ public class DAOService {
             return null;
         }
         return (Org) l.get(0);
-    }
-
-
-    public User setUserInfo(User user) {
-        return entityManager.merge(user);
     }
 
 
@@ -1499,4 +1506,13 @@ public class DAOService {
         return q.getResultList();
     }
 
+    public List<Org> findOrgsByConfigurationProvider(ConfigurationProvider currentConfigurationProvider) {
+        TypedQuery<Org> query = entityManager.createQuery("from Org where configurationProvider=:configurationProvider",Org.class);
+        query.setParameter("configurationProvider",currentConfigurationProvider);
+        return query.getResultList();
+    }
+
+    public Good getGood(Long globalId) {
+        return entityManager.find(Good.class, globalId);
+    }
 }

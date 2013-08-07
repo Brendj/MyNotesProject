@@ -66,13 +66,13 @@ public class GoodListPage extends BasicWorkspacePage implements GoodGroupSelect{
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
         if(selectedGoodGroup==null){
-            if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+            if(!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
                 goodList = daoService.findGoods(deletedStatusSelected);
             } else {
                 goodList = daoService.findGoods(orgOwners, deletedStatusSelected);
             }
         } else {
-            if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
+            if(!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
                 goodList = daoService.findGoodsByGoodGroup(selectedGoodGroup,deletedStatusSelected);
             } else {
                 goodList = daoService.findGoodsByGoodGroup(selectedGoodGroup,orgOwners, deletedStatusSelected);

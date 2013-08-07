@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvi
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.GoodListPage;
 
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,23 +41,22 @@ public class GoodGroupViewPage extends BasicWorkspacePage {
     private SelectedGoodGroupGroupPage selectedGoodGroupGroupPage;
     @Autowired
     private GoodListPage goodListPage;
-    @PersistenceContext
-    private EntityManager entityManager;
+    @Autowired
+    private DAOService daoService;
 
     @Override
     public void onShow() throws Exception {
         selectedGoodGroupGroupPage.onShow();
         currentGoodGroup = selectedGoodGroupGroupPage.getCurrentGoodGroup();
-        TypedQuery<Good> query = entityManager.createQuery("from Good where goodGroup=:goodGroup",Good.class);
-        query.setParameter("goodGroup",currentGoodGroup);
-        countGoods = query.getResultList().size();
-        currentOrg = entityManager.find(Org.class,currentGoodGroup.getOrgOwner());
+        List<Good> goods = daoService.findGoodsByGoodGroup(currentGoodGroup, false);
+        countGoods = goods.size();
+        currentOrg = daoService.getOrg(currentGoodGroup.getOrgOwner());
     }
 
     public Object showGoods() throws Exception{
         goodListPage.setSelectedGoodGroup(currentGoodGroup);
-        /* Показать и удаленный */
-        goodListPage.setDeletedStatusSelected(true);
+        /* Не Показать удаленные */
+        goodListPage.setDeletedStatusSelected(false);
         goodListPage.reload();
         goodListPage.show();
         return null;
