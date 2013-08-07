@@ -23,10 +23,12 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class StatusSyncReport extends BasicReport {
-    private final List<Sync> syncItems;
+
+    private List<Sync> syncItems = new ArrayList<Sync>();
 
     public static class Builder {
 
+        @SuppressWarnings("unchecked")
         public StatusSyncReport build(Session session) throws Exception {
             Date generateTime = new Date();
             Calendar localCalendar = Calendar.getInstance();
@@ -39,24 +41,20 @@ public class StatusSyncReport extends BasicReport {
             localCalendar.add(Calendar.DATE, 1);
             Date endDate = localCalendar.getTime();
 
-            Query q = session.createQuery("select sh.org.idOfOrg as idOfOrg, max(sh.syncEndTime) as maxsyncEndTime from SyncHistory sh where sh.syncEndTime<=:today group by idOfOrg");
-            q.setParameter("today",startDate);
-            List resultList = q.list();
-
-            Map<Long, Date> lastDateOrgMap = new HashMap<Long, Date>();
-            for (Object result : resultList) {
-                Object[] syncHistory = (Object[]) result;
-                lastDateOrgMap.put(Long.parseLong(syncHistory[0].toString()), (Date) syncHistory[1]);
+            Query q = session.createQuery("select sh.org.idOfOrg as idOfOrg, max(sh.syncEndTime) \n" +
+                    "from SyncHistory as sh \n" +
+                    "where sh.syncEndTime <= :today group by idOfOrg");
+            q.setParameter("today", startDate);
+            List<Object[]> resultList = (List<Object[]>) q.list();
+            Map<Long, Date> todayMap = new HashMap<Long, Date>();
+            for (Object[] result : resultList) {
+                todayMap.put((Long) result[0], (Date) result[1]);
             }
 
             q = session.createQuery("select sh.org.idOfOrg as idOfOrg from SyncHistory sh where sh.syncEndTime >= :startDate and sh.syncEndTime < :endDate group by idOfOrg");
             q.setParameter("startDate", startDate);
             q.setParameter("endDate", endDate);
-            resultList = q.list();
-            Set<Long> todayDateOrgSet = new HashSet<Long>();
-            for (Object result : resultList) {
-                todayDateOrgSet.add(Long.parseLong(result.toString()));
-            }
+            List<Long> lastDateList = (List<Long>) q.list();
 
             Criteria orgCriteria = session.createCriteria(Org.class);
             orgCriteria.setProjection(Projections.projectionList()
@@ -68,11 +66,21 @@ public class StatusSyncReport extends BasicReport {
             orgCriteria.setResultTransformer(Transformers.aliasToBean(BasicReportJob.OrgShortItem.class));
             List<BasicReportJob.OrgShortItem> orgItems = orgCriteria.list();
 
+            q = session.createQuery("select she.message as message \n" +
+                    "from SyncHistory sh join sh.syncHistoryExceptions as she \n" +
+                    "where sh.syncEndTime = :time and sh.org.idOfOrg = :orgId");
             List<Sync> syncItems = new ArrayList<Sync>();
             for (BasicReportJob.OrgShortItem org : orgItems) {
-                boolean snchrnzd = todayDateOrgSet.contains(org.getIdOfOrg());
-                Date lastSyncTime = lastDateOrgMap.get(org.getIdOfOrg());
-                syncItems.add(new Sync(org.getIdOfOrg(), org.getOfficialName(), snchrnzd, lastSyncTime));
+                Long orgId = org.getIdOfOrg();
+                Sync sync = new Sync(orgId, org.getOfficialName(), lastDateList.contains(orgId), todayMap.get(orgId));
+                // вытягиваем сообщения об ошибках.
+                if (todayMap.containsKey(orgId)) {
+                    q.setParameter("time", todayMap.get(orgId));
+                    q.setParameter("orgId", orgId);
+                    List<String> messageList = q.list();
+                    sync.getSyncErrors().addAll(messageList);
+                }
+                syncItems.add(sync);
             }
             return new StatusSyncReport(generateTime, new Date().getTime() - generateTime.getTime(), syncItems);
         }
@@ -81,7 +89,6 @@ public class StatusSyncReport extends BasicReport {
 
     public StatusSyncReport() {
         super();
-        this.syncItems = Collections.emptyList();
     }
 
     public StatusSyncReport(Date generateTime, long generateDuration, List<Sync> syncItems) {
@@ -98,6 +105,7 @@ public class StatusSyncReport extends BasicReport {
         private String officialName;
         private boolean snchrnzd;
         private Date lastSyncTime;
+        private List<String> syncErrors = new ArrayList<String>();
 
         public Sync(long idOfOrg, String officialName, boolean snchrnzd, Date lastSyncTime) {
             this.idOfOrg = idOfOrg;
@@ -120,6 +128,18 @@ public class StatusSyncReport extends BasicReport {
 
         public Date getLastSyncTime() {
             return lastSyncTime;
+        }
+
+        public void setLastSyncTime(Date lastSyncTime) {
+            this.lastSyncTime = lastSyncTime;
+        }
+
+        public List<String> getSyncErrors() {
+            return syncErrors;
+        }
+
+        public void setSyncErrors(List<String> syncErrors) {
+            this.syncErrors = syncErrors;
         }
     }
 }

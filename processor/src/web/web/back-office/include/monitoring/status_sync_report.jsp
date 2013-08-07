@@ -41,7 +41,7 @@
                     <rich:column headerClass="center-aligned-column">
                         <h:outputText styleClass="column-header" escape="true" value="Время последней синхронизации" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" rendered="false">
+                    <rich:column headerClass="center-aligned-column">
                         <h:outputText styleClass="column-header" escape="true" value="Наличие ошибок в полной синхронизации" />
                     </rich:column>
                 </rich:columnGroup>
@@ -61,10 +61,12 @@
             <rich:column styleClass="center-aligned-column">
                 <h:outputText styleClass="output-text" value="#{statusSync.lastSyncTime}" converter="timeConverter" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="false">
-                <a4j:commandButton value="Посмотреть" action="#{mainPage.buildStatusSyncReport}"
-                                   reRender="mainMenu, workspaceTogglePanel"
-                                   styleClass="command-button" status="statusSyncReportGenerateStatus">
+            <rich:column styleClass="center-aligned-column">
+                <a4j:commandButton value="Посмотреть" action="#{mainPage.statusSyncReportPage.doCurrentStatusSync}"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('syncErrorsWindow')}.show();"
+                                   reRender="syncErrorsTable" styleClass="command-button"
+                                   rendered="#{not empty statusSync.syncErrors}">
+                    <f:setPropertyActionListener value="#{statusSync}" target="#{mainPage.statusSyncReportPage.currentStatusSync}"/>
                 </a4j:commandButton>
             </rich:column>
             <f:facet name="footer">

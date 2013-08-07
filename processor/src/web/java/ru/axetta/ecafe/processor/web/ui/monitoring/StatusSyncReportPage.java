@@ -17,7 +17,9 @@ import org.hibernate.Session;
  * To change this template use File | Settings | File Templates.
  */
 public class StatusSyncReportPage extends OnlineReportPage {
+
     private StatusSyncReport statusSyncReport;
+    private StatusSyncReport.Sync currentStatusSync;
 
     public String getPageFilename() {
         return "monitoring/status_sync_report";
@@ -33,4 +35,15 @@ public class StatusSyncReportPage extends OnlineReportPage {
         this.statusSyncReport = reportBuilder.build(session);
     }
 
+    public void setCurrentStatusSync(StatusSyncReport.Sync currentStatusSync) {
+        this.currentStatusSync = currentStatusSync;
+    }
+
+    public StatusSyncReport.Sync getCurrentStatusSync() {
+        return currentStatusSync;
+    }
+
+    public Object doCurrentStatusSync() {
+        return null;
+    }
 }

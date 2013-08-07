@@ -45,7 +45,7 @@
         <property name="needAccountTranslate" column="NeedAccountTranslate"
                   type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <set name="usersInternal" inverse="true" cascade="all">
-            <key column="IdOfContragent"/>
+            <key column="IdOfUser"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.User"/>
         </set>
         <set name="contragentPaymentsInternal" inverse="true" cascade="all">

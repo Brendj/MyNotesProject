@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,6 +25,7 @@ public class SyncHistory {
     private Long idOfPacket;
     private String clientVersion;
     private String remoteAddress;
+    private Set<SyncHistoryException> syncHistoryExceptions = new HashSet<SyncHistoryException>();
 
     public String getRemoteAddress() {
         return remoteAddress;
@@ -102,6 +105,14 @@ public class SyncHistory {
     private void setIdOfPacket(Long idOfPacket) {
         // For Hibernate only
         this.idOfPacket = idOfPacket;
+    }
+
+    public Set<SyncHistoryException> getSyncHistoryExceptions() {
+        return syncHistoryExceptions;
+    }
+
+    public void setSyncHistoryExceptions(Set<SyncHistoryException> syncHistoryExceptions) {
+        this.syncHistoryExceptions = syncHistoryExceptions;
     }
 
     @Override
