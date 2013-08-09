@@ -58,6 +58,8 @@ public class ClientListEditPage extends BasicWorkspacePage {
     private EntityManager entityManager;
 
     public static final String NO_GROUP = "- Без группы -";
+    public static final String GROUP_NO_CLIENTS = "- Клиенты отсутствуют -";
+
     private static final long DAY = 86400000;
     public static final String DATE_FORMAT = "dd.MM.yyyy HH:mm:ss";
     public static final String GROUP_TYPE = "group";
@@ -470,7 +472,7 @@ public class ClientListEditPage extends BasicWorkspacePage {
             } else {
                 //  Если клиентов нет, то добавляем одного пустого клиента, чтобы дерево отобразило элемент как папку
                 TreeNodeImpl clientNode = new TreeNodeImpl();
-                clientNode.setData("");
+                clientNode.setData(GROUP_NO_CLIENTS);
                 groupNode.addChild(new Integer(clientCounter), clientNode);
                 clientCounter++;
             }
