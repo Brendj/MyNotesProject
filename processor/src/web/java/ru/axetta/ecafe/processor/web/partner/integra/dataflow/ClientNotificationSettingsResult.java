@@ -15,23 +15,40 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class ClientNotificationSettingsResult {
-    public List<ClientNotificationSettingsItem> settings;
-    public Long resultCode;
-    public String description;
+
+    private List<ClientNotificationSettingsItem> settings = new ArrayList<ClientNotificationSettingsItem>();
+    private Long resultCode;
+    private String description;
 
     public ClientNotificationSettingsResult(Long resultCode, String desc) {
-
         this.resultCode = resultCode;
         this.description = desc;
     }
 
-    public ClientNotificationSettingsResult (){}
-
+    public ClientNotificationSettingsResult() {
+    }
 
     public List<ClientNotificationSettingsItem> getSettings() {
-        if (settings == null) {
-            settings = new ArrayList<ClientNotificationSettingsItem>();
-        }
-        return this.settings;
+        return settings;
+    }
+
+    public void setSettings(List<ClientNotificationSettingsItem> settings) {
+        this.settings = settings;
+    }
+
+    public Long getResultCode() {
+        return resultCode;
+    }
+
+    public void setResultCode(Long resultCode) {
+        this.resultCode = resultCode;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

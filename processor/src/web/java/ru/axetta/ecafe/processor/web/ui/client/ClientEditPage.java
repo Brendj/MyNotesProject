@@ -4,22 +4,19 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.model.SelectItem;
 import java.util.*;
@@ -154,43 +151,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
     }
 
-
-    public static class NotificationSettingItem {
-
-        private Long notifyType;
-        private String notifyName;
-        private boolean enabled;
-
-        public Long getNotifyType() {
-            return notifyType;
-        }
-
-        public String getNotifyName() {
-            return notifyName;
-        }
-
-        public boolean getEnabled() {
-            return enabled;
-        }
-
-        public void setEnabled(boolean enabled) {
-            this.enabled = enabled;
-        }
-
-        public NotificationSettingItem(ClientNotificationSetting.Predefined type,
-                Set<ClientNotificationSetting> settings) {
-            this.enabled = false;
-            this.notifyType = type.getValue();
-            this.notifyName = type.getName();
-            for (ClientNotificationSetting setting : settings) {
-                if (setting.getNotifyType() == this.notifyType) {
-                    this.enabled = true;
-                    break;
-                }
-            }
-        }
-    }
-
     private List<CategoryDiscountItem> categoryDiscounts;
     private List<NotificationSettingItem> notificationSettings;
 
@@ -205,7 +165,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     public int getNotificationSettingsCount() {
         int cnt = 0;
         for (NotificationSettingItem i : notificationSettings) {
-            if (i.enabled) {
+            if (i.isEnabled()) {
                 cnt++;
             }
         }
@@ -531,19 +491,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                     categoryDiscount.getIdOfCategoryDiscount(), categoryDiscount.getCategoryName()));
         }
         Set<ClientNotificationSetting> settings = client.getNotificationSettings();
-        //  Если настройки пустые изначально, это обозначает, что у пользователя настройки по умолчанию, а
-        //  следовательно необходимо указать их (в список включенных помещаем все, у которых стоит флаг default)
-        if (settings.isEmpty()) {
-            for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
-                if (!predefined.isEnabledAtDefault()) {
-                    continue;
-                }
-                settings.add(new ClientNotificationSetting(client, predefined.getValue()));
-            }
-        }
         notificationSettings = new ArrayList<NotificationSettingItem>();
         for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
-            if (predefined.getValue() == ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue()) {
+            if (predefined.getValue().equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
                 continue;
             }
             notificationSettings.add(new NotificationSettingItem(predefined, settings));
@@ -716,19 +666,18 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 clientCategories.length() == 0 ? "" : clientCategories.substring(0, clientCategories.length() - 1));
         client.setCategories(categoryDiscountSet);
         /* Удаление всех существующих настроек оповещения смс */
-        removeSMSSettings(client.getNotificationSettings());
+        client.getNotificationSettings().clear();
+        // Причина вызова flush() описана здесь https://forum.hibernate.org/viewtopic.php?t=934483 :)
+        persistenceSession.flush();
         /* настройки смс оповещений */
-        this.notificationSettingsSet = new HashSet<ClientNotificationSetting>();
         for (NotificationSettingItem item : notificationSettings) {
-            if (item.enabled) {
+            if (item.isEnabled()) {
                 ClientNotificationSetting newSetting = new ClientNotificationSetting(client, item.getNotifyType());
-                notificationSettingsSet.add(newSetting);
+                client.getNotificationSettings().add(newSetting);
             }
         }
-        ClientNotificationSetting newSetting = new ClientNotificationSetting(client,
-                ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue());
-        notificationSettingsSet.add(newSetting);
-        client.setNotificationSettings(notificationSettingsSet);
+        client.getNotificationSettings().add(new ClientNotificationSetting(client,
+                ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue()));
         if (isReplaceOrg) {
             ClientGroup clientGroup = DAOUtils
                     .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, org.getIdOfOrg(),
@@ -758,29 +707,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         persistenceSession.update(client);
 
         fill(client);
-    }
-
-    public void removeSMSSettings(Set<ClientNotificationSetting> notificationSettings) throws Exception {
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            for (ClientNotificationSetting currentSetting : notificationSettings) {
-                currentSetting = (ClientNotificationSetting) persistenceSession.merge(currentSetting);
-                persistenceSession.delete(currentSetting);
-            }
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            getLogger().error("Failed to remove active settings", e);
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, getLogger());
-            HibernateUtils.close(persistenceSession, getLogger());
-
-        }
     }
 
     public void removeClient(Session persistenceSession) throws Exception {
@@ -857,7 +783,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private String filter = "Не выбрано";
     private List<Long> idOfCategoryList = new ArrayList<Long>();
     private Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
-    private Set<ClientNotificationSetting> notificationSettingsSet = new HashSet<ClientNotificationSetting>();
 
     public String getFilter() {
         return filter;

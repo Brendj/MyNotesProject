@@ -14,6 +14,7 @@
 <%@ page import="ru.axetta.ecafe.processor.core.utils.HibernateUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.web.ui.client.items.NotificationSettingItem" %>
 <%@ page import="ru.axetta.ecafe.processor.web.util.ClientRoomNotificationSettingsUtils" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
@@ -126,7 +127,7 @@
                             client.setUpdateTime(new Date());
                             client.setExpenditureLimit(expenditureLimit);
                             persistenceSession.update(client);
-                            ClientRoomNotificationSettingsUtils.setNotificationSettings (client, request, NOTIFY_RULE_PARAM, HTML_TRUE);
+                            ClientRoomNotificationSettingsUtils.setNotificationSettings(persistenceSession, client, request, NOTIFY_RULE_PARAM, HTML_TRUE);
                             dataProcessSucceed = true;
                         }
                     } else {
@@ -156,7 +157,7 @@
             Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
             clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
             Client client = (Client) clientCriteria.uniqueResult();
-            List <ClientRoomNotificationSettingsUtils.Item> notifications = ClientRoomNotificationSettingsUtils.getNotificationSettings(client);
+            List <NotificationSettingItem> notifications = ClientRoomNotificationSettingsUtils.getNotificationSettings(client);
 %>
 
 <form action="<%=StringEscapeUtils.escapeHtml(response.encodeURL(formAction.toString()))%>" method="post"
@@ -325,12 +326,12 @@
             <td>
                 <table cellpadding="0" cellspacing="0" border="0">
                     <%
-                    for (ClientRoomNotificationSettingsUtils.Item it : notifications) {
+                    for (NotificationSettingItem it : notifications) {
                         %>
                         <tr>
-                            <td><%=it.getNotificationTypeName()%></td>
+                            <td><%=it.getNotifyName()%></td>
                             <td>
-                                <input type="checkbox" name="<%=NOTIFY_RULE_PARAM%>-<%= it.getNotificationType() %>" size="16" maxlength="64" class="input-text"
+                                <input type="checkbox" name="<%=NOTIFY_RULE_PARAM%>-<%= it.getNotifyType() %>" size="16" maxlength="64" class="input-text"
                                        <%=it.isEnabled() ? HTML_CHECKED : ""%>
                                         <%=RuntimeContext.getInstance().getOptionValueBool(
                                                 Option.OPTION_DISABLE_SMSNOTIFY_EDIT_IN_CLIENT_ROOM) ? "disabled=\"disabled\" onclick=\"return false\" onkeydown=\"return false\"" : ""%>/>

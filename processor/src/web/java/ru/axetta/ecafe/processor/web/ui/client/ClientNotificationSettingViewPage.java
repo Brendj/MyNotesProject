@@ -6,8 +6,12 @@ package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting;
+import ru.axetta.ecafe.processor.web.ui.client.items.NotificationSettingItem;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,48 +22,16 @@ import java.util.*;
  */
 public class ClientNotificationSettingViewPage {
 
-    public static class Item {
+    private List<NotificationSettingItem> items = new ArrayList<NotificationSettingItem>();
 
-        private Long notifyType;
-        private String notifyName;
-        private boolean enabled;
-
-        public Long getNotifyType() {
-            return notifyType;
-        }
-
-        public String getNotifyName() {
-            return notifyName;
-        }
-
-        public boolean getEnabled() {
-            return enabled;
-        }
-
-        public Item(ClientNotificationSetting.Predefined type, Set<ClientNotificationSetting> settings) {
-            this.enabled = false;
-            this.notifyType = type.getValue();
-            this.notifyName = type.getName();
-            for (ClientNotificationSetting setting : settings) {
-                if (setting.getNotifyType() == this.notifyType) {
-                    this.enabled = true;
-                    break;
-                }
-            }
-        }
-    }
-
-
-    private List<Item> items = Collections.emptyList();
-
-    public List<Item> getItems() {
+    public List<NotificationSettingItem> getItems() {
         return items;
     }
 
     public int getItemCount() {
         int cnt = 0;
-        for (Item i : items) {
-            if (i.enabled) {
+        for (NotificationSettingItem i : items) {
+            if (i.isEnabled()) {
                 cnt++;
             }
         }
@@ -67,23 +39,13 @@ public class ClientNotificationSettingViewPage {
     }
 
     public void fill(Client client) throws Exception {
-        List<Item> items = new LinkedList<Item>();
+        List<NotificationSettingItem> items = new LinkedList<NotificationSettingItem>();
         Set<ClientNotificationSetting> settings = client.getNotificationSettings();
-        //  Если настройки пустые изначально, это обозначает, что у пользователя настройки по умолчанию, а
-        //  следовательно необходимо указать их (в список включенных помещаем все, у которых стоит флаг default)
-        if (settings.isEmpty()) {
-            for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
-                if (!predefined.isEnabledAtDefault()) {
-                    continue;
-                }
-                settings.add(new ClientNotificationSetting(client, predefined.getValue()));
-            }
-        }
         for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
-            if (predefined.getValue() == ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue()) {
+            if (predefined.getValue().equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
                 continue;
             }
-            items.add(new Item(predefined, settings));
+            items.add(new NotificationSettingItem(predefined, settings));
         }
         this.items = items;
     }

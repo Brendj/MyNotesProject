@@ -213,6 +213,12 @@ public class Client {
         this.expenditureLimit = expenditureLimit;
         this.categoriesDiscounts = categoriesDiscounts;
         this.canConfirmGroupPayment = false;
+        // При создании клиента проставляем ему настройки оповещений по умолчанию.
+        for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
+            if (predefined.isEnabledAtDefault()) {
+                notificationSettings.add(new ClientNotificationSetting(this, predefined.getValue()));
+            }
+        }
     }
 
     public Set<GuardSan> getGuardSan() {

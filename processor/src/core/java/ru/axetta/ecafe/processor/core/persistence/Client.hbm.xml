@@ -65,7 +65,7 @@
         <property name="externalId" column="ExternalId" type="long" not-null="false"/>
         <property name="clientGUID" column="ClientGUID" type="string" length="40" not-null="false"/>
 
-        <set name="notificationSettings" lazy="true" inverse="true" cascade="all">
+        <set name="notificationSettings" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="IdOfClient"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting"/>
         </set>

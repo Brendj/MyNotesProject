@@ -15,7 +15,6 @@ import ru.axetta.ecafe.util.DigitalSignatureUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.*;
-import org.hibernate.Query;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
@@ -24,7 +23,8 @@ import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.*;
@@ -104,10 +104,12 @@ public class DAOUtils {
         return (Client) persistenceSession.load(Client.class, idOfClient);
     }
 
+    @SuppressWarnings("unchecked")
     public static Client findClientByContractId(Session persistenceSession, long contractId) throws Exception {
-        Criteria clientWithSameContractCriteria = persistenceSession.createCriteria(Client.class);
-        clientWithSameContractCriteria.add(Restrictions.eq("contractId", contractId));
-        return (Client) clientWithSameContractCriteria.uniqueResult();
+        Criteria contractCriteria = persistenceSession.createCriteria(Client.class);
+        contractCriteria.add(Restrictions.eq("contractId", contractId));
+        List<Client> resultList = (List<Client>) contractCriteria.list();
+        return resultList.isEmpty() ? null : resultList.get(0);
     }
 
     public static Client findClientByGuid(EntityManager em, String guid) {
@@ -1205,6 +1207,19 @@ public class DAOUtils {
         TypedQuery<Long> query = entityManager.createQuery("select idOfClient from Client client where client.clientGUID is null or client.clientGUID=''", Long.class);
         //query.setMaxResults(2000);
         return query.getResultList();
+    }
+
+    public static boolean isNextGradeTransfer(Session session, Long idOfOrg) {
+        Query query = session.createQuery("select org.nextGradeParam from Org org where org.idOfOrg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        Boolean f = (Boolean) query.uniqueResult();
+        return f == null ? false : f;
+    }
+
+    public static void disableNextGradeTransfer(Session session, Long idOfOrg) {
+        Query query = session.createQuery("update Org o set o.nextGradeParam = false where id = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.executeUpdate();
     }
 
     public static boolean isFullSyncByOrg(Session session, Long idOfOrg) {

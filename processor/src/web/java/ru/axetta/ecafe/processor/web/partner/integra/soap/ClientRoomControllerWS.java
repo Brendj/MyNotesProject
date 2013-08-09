@@ -7,50 +7,47 @@ package ru.axetta.ecafe.processor.web.partner.integra.soap;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
 import ru.axetta.ecafe.processor.core.client.RequestWebParam;
+import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService;
 import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
-import ru.axetta.ecafe.processor.core.persistence.questionary.*;
+import ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary;
+import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
+import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryStatus;
+import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService;
 import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
-import ru.axetta.ecafe.processor.web.util.EntityManagerUtils;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -63,8 +60,6 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -3476,7 +3471,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         List<ClientNotificationSettingsItem> list = new ArrayList<ClientNotificationSettingsItem>();
         try {
             for (ClientNotificationSetting.Predefined predef : ClientNotificationSetting.Predefined.values()) {
-                if (predef.getValue() == ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue()){
+                if (predef.getValue().equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
                     continue;
                 }
                 ClientNotificationSettingsItem it = new ClientNotificationSettingsItem();
@@ -3484,10 +3479,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 it.setNameOfNotification(predef.getName());
                 list.add(it);
             }
-            res.settings = list;
+            res.setSettings(list);
         } catch (Exception e) {
-            res.resultCode = RC_INTERNAL_ERROR;
-            res.description = RC_INTERNAL_ERROR_DESC;
+            res.setResultCode(RC_INTERNAL_ERROR);
+            res.setDescription(RC_INTERNAL_ERROR_DESC);
             logger.error(e.getMessage(), e);
         }
         return res;
@@ -3495,6 +3490,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
 
     @Override
+    @SuppressWarnings("unchecked")
     public ClientNotificationSettingsResult getClientNotificationSettings(@WebParam(name = "contractId") Long contractId) {
 
         //authenticateRequest(contractId);
@@ -3506,56 +3502,30 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         List<ClientNotificationSettingsItem> list = new ArrayList<ClientNotificationSettingsItem>();
         try {
             persistenceSession = runtimeContext.createPersistenceSession();
-            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-            clientCriteria.add(Restrictions.eq("contractId", contractId));
-            Client client = (Client) clientCriteria.uniqueResult();
+            Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
             if (client == null) {
-                res.resultCode = RC_CLIENT_NOT_FOUND;
-                res.description = RC_CLIENT_NOT_FOUND_DESC;
+                res.setResultCode(RC_CLIENT_NOT_FOUND);
+                res.setDescription(RC_CLIENT_NOT_FOUND_DESC);
                 return res;
             }
 
-
-            org.hibernate.Query q = persistenceSession.createSQLQuery("select notifytype "
-                    + "from cf_clientsnotificationsettings "
-                    + "where cf_clientsnotificationsettings.idofclient=:idofclient");
-            q.setLong("idofclient", client.getIdOfClient());
-
-            for (Object entry : q.list()) {
-                long type = ((BigInteger) entry).longValue();
-
-                if (type == ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue()) {
+            for (ClientNotificationSetting setting : client.getNotificationSettings()) {
+                if (setting.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
                     continue;
                 }
-
                 ClientNotificationSettingsItem it = new ClientNotificationSettingsItem();
-                it.setTypeOfNotification(type);
-                it.setNameOfNotification(ClientNotificationSetting.Predefined.parse(type).getName());
+                it.setTypeOfNotification(setting.getNotifyType());
+                it.setNameOfNotification(ClientNotificationSetting.Predefined.parse(setting.getNotifyType()).getName());
                 list.add(it);
             }
-            if (list.size() < 1) {
-                for (ClientNotificationSetting.Predefined pd : ClientNotificationSetting.Predefined.values()) {
-                    if (pd.getValue().equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue()) ||
-                            !pd.isEnabledAtDefault()) {
-                        continue;
-                    }
-                    ClientNotificationSettingsItem it = new ClientNotificationSettingsItem();
-                    it.setTypeOfNotification(pd.getValue());
-                    it.setNameOfNotification(pd.getName());
-                    list.add(it);
-                }
-            }
-
-            res.settings = list;
-            persistenceSession.flush();
+            res.setSettings(list);
         } catch (Exception e) {
-            res.resultCode = RC_INTERNAL_ERROR;
-            res.description = RC_INTERNAL_ERROR_DESC;
+            res.setResultCode(RC_INTERNAL_ERROR);
+            res.setDescription(RC_INTERNAL_ERROR_DESC);
             logger.error(e.getMessage(), e);
         } finally {
             HibernateUtils.close(persistenceSession, logger);
         }
-
         return res;
     }
 
@@ -3568,27 +3538,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         ClientNotificationChangeResult res = new ClientNotificationChangeResult(RC_OK, RC_OK_DESC);
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
-
-
+        Transaction persistenceTransaction = null;
         try {
             persistenceSession = runtimeContext.createPersistenceSession();
-
-            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-            clientCriteria.add(Restrictions.eq("contractId", contractId));
-            Client client = (Client) clientCriteria.uniqueResult();
-
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
             if (client == null) {
                 res.resultCode = RC_CLIENT_NOT_FOUND;
                 res.description = RC_CLIENT_NOT_FOUND_DESC;
                 return res;
             }
-
-
-
             Set<ClientNotificationSetting> currentSettings = client.getNotificationSettings();
-            removeSMSSettings(currentSettings);
-
-            Set <ClientNotificationSetting> newSettings = new HashSet<ClientNotificationSetting>();
+            currentSettings.clear();
+            // Причина вызова flush() описана здесь https://forum.hibernate.org/viewtopic.php?t=934483 :)
+            persistenceSession.flush();
             if (notificationTypes != null) {
                 for (Long type : notificationTypes) {
                     ClientNotificationSetting.Predefined pd = ClientNotificationSetting.Predefined.parse(type);
@@ -3596,24 +3559,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             .equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
                         continue;
                     }
-                    newSettings.add(new ClientNotificationSetting(client, pd.getValue()));
+                    currentSettings.add(new ClientNotificationSetting(client, pd.getValue()));
                 }
             }
-            ClientNotificationSetting changeSetting = new ClientNotificationSetting(client,
-                    ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue());
-            newSettings.add(changeSetting);
-            client.setNotificationSettings(newSettings);
-            persistenceSession.update(client);
-
-            persistenceSession.flush();
+            currentSettings.add(new ClientNotificationSetting(client,
+                    ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue()));
+            persistenceTransaction.commit();
         } catch (Exception e) {
             res.resultCode = RC_INTERNAL_ERROR;
             res.description = RC_INTERNAL_ERROR_DESC;
             logger.error(e.getMessage(), e);
+            HibernateUtils.rollback(persistenceTransaction, logger);
         } finally {
             HibernateUtils.close(persistenceSession, logger);
         }
-
         return res;
     }
 
@@ -3682,28 +3641,5 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         }
         return studentsConfirmPaymentData;
-    }
-
-    public void removeSMSSettings(Set<ClientNotificationSetting> notificationSettings) throws Exception {
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            for (ClientNotificationSetting currentSetting : notificationSettings) {
-                currentSetting = (ClientNotificationSetting) persistenceSession.merge(currentSetting);
-                persistenceSession.delete(currentSetting);
-            }
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed to remove active settings", e);
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-
-        }
     }
 }
