@@ -16,7 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -44,7 +47,7 @@ public class ClientGuardSanRebuildService {
     }
 
 
-    public static final String clearGuardSan (String guardSan) {
+    public static String clearGuardSan(String guardSan) {
         guardSan = guardSan.replaceAll("(?![0-9]).", "");
         if (guardSan.length() > 11) {
             guardSan = guardSan.substring(0, 11);

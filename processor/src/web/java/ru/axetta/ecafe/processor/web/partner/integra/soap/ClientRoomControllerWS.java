@@ -2316,9 +2316,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Set <GuardSan> guardSans = Collections.EMPTY_SET;
             //String clientGuardSan = (String) clientObject[1];
             try {
-                Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-                clientCriteria.add(Restrictions.eq("idOfClient", idOfClient));
-                cl = (Client) clientCriteria.uniqueResult();
+                cl = DAOUtils.findClient(persistenceSession, idOfClient);
                 guardSans = cl.getGuardSan();
             } catch (Exception e) {
                 data.resultCode = RC_INTERNAL_ERROR;

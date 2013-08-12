@@ -85,11 +85,10 @@ public class DAOUtils {
         return clientList;
     }
 
-    public static List findClientsByContract (Session persistenceSession, Long idOfContract) {
-        org.hibernate.Query query = persistenceSession.createSQLQuery("select distinct CF_Clients.IdOfClient "
-                                                                    + "from CF_Clients  "
-                                                                    + "where CF_Clients.IdOfContract=:contractId");
-        query.setParameter("contractId", idOfContract);
+    public static List findClientsByContract(Session persistenceSession, Long contractId) {
+        org.hibernate.Query query = persistenceSession
+                .createSQLQuery("select CF_Clients.IdOfClient from CF_Clients where CF_Clients.contractId=:contractId");
+        query.setParameter("contractId", contractId);
         List clientList = query.list();
         return clientList;
     }
