@@ -1357,4 +1357,15 @@ public class DAOUtils {
         query.setParameter("idOfOrg", idOfOrg);
         return query.list();
     }
+
+    public static String extraxtORGNFromOrgByIdOfOrg(Session session, long idOfOrg) {
+        Query query = session.createQuery("select o.OGRN from Org o where o.idOfOrg=:idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        List list = query.list();
+        if(list==null || list.isEmpty()){
+            return "";
+        } else {
+            return (String) list.get(0);
+        }
+    }
 }
