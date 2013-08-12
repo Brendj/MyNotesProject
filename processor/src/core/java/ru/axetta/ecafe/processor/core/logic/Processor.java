@@ -941,7 +941,8 @@ public class Processor implements SyncProcessor,
                                 .isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
                             SyncHistory syncHistory = addSyncHistory(request.getIdOfOrg(), idOfPacket, new Date(), request.getClientVersion(),
                                     request.getRemoteAddr());
-                            createSyncHistory(request.getIdOfOrg(),syncHistory, "no license slots available");
+                            final String s = String.format("Failed to process PaymentRegistry, IdOfOrg == %s, no license slots available", request.getIdOfOrg());
+                            createSyncHistory(request.getIdOfOrg(),syncHistory, s);
                             throw new Exception("no license slots available");
                         }
                     }
@@ -2506,16 +2507,16 @@ public class Processor implements SyncProcessor,
                                     || e.getPassDirection() == EnterEvent.RE_EXIT) && e.getIdOfCard() != null) {
                         Card card = DAOUtils.findCardByCardNo(persistenceSession, e.getIdOfCard());
                         if (card == null) {
-                            logger.error(String.format(
-                                    "Не найдена карта по событию прохода: idOfOrg=%d, idOfEnterEvent=%d, idOfCard=%d",
-                                    enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg(),
-                                    enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent(), e.getIdOfCard()));
+                            final CompositeIdOfEnterEvent compositeIdOfEnterEvent = enterEvent
+                                    .getCompositeIdOfEnterEvent();
+                            final String message = "Не найдена карта по событию прохода: idOfOrg=%d, idOfEnterEvent=%d, idOfCard=%d";
+                            logger.error(String.format(message,
+                                    compositeIdOfEnterEvent.getIdOfOrg(),
+                                    compositeIdOfEnterEvent.getIdOfEnterEvent(), e.getIdOfCard()));
                         }
 
                         if (card != null && card.getCardType() == Card.TYPE_UEC) {
-                            Criteria orgCriteria = persistenceSession.createCriteria(Org.class);
-                            orgCriteria.add(Restrictions.eq("idOfOrg", e.getIdOfOrg()));
-                            Org org = (Org) orgCriteria.uniqueResult();
+                            String OGRN = DAOUtils.extraxtORGNFromOrgByIdOfOrg(persistenceSession, e.getIdOfOrg());
                             String transCode;
                             switch (e.getPassDirection()) {
                                 case EnterEvent.ENTRY:
@@ -2533,7 +2534,7 @@ public class Processor implements SyncProcessor,
                                 TransactionJournal transactionJournal = new TransactionJournal(
                                         enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg(),
                                         enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent(), new Date(),
-                                        org.getOGRN(), TransactionJournal.SERVICE_CODE_SCHL_ACC, transCode,
+                                        OGRN /*org.getOGRN()*/, TransactionJournal.SERVICE_CODE_SCHL_ACC, transCode,
                                         TransactionJournal.CARD_TYPE_CODE_UEC,
                                         TransactionJournal.CARD_TYPE_ID_CODE_MUID, Card.TYPE_NAMES[card.getCardType()],
                                         Long.toHexString(card.getCardNo()), client.getSan(), client.getContractId(),

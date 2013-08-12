@@ -11,15 +11,15 @@ ALTER TABLE cf_internal_disposing_document_positions ADD COLUMN totalcountmust b
 -- Таблица регистрации временных карт
 CREATE TABLE cf_cards_temp (
   IdOfCartTemp bigserial,
-  IdOfOrg bigint,                        --! идентификатор организациии
-  IdOfClient bigInt,                     --! Идентификатор клиента
-  IdOfVisitor bigint,                    --!  Идентификатор посетителя
-  myclienttype bigint ,                  --! Признак карты посетителя , bit, 1- карта посетителя, 0 — карта клиента, not null
-  CardNo bigint NOT NULL,                --! номер карты
-  CardPrintedNo character varying(24),   --! номер нанесенный на карту
-  CardStation int not null default 0,    --! int16 или int8, not null, значения-  0 — свободна, 1 — выдана , 3 — заблокирована (? не уверен, что блокировка нужна)
-  CreateDate bigint not null,             --! Дата и время регистрации карты
-  ValidDate bigint,                      --! Дата завершения действия карты
+  IdOfOrg bigint,
+  IdOfClient bigInt,
+  IdOfVisitor bigint,
+  myclienttype bigint ,
+  CardNo bigint NOT NULL,
+  CardPrintedNo character varying(24),
+  CardStation int not null default 0,
+  CreateDate bigint not null,
+  ValidDate bigint,
   CONSTRAINT cf_cards_temp_pk PRIMARY KEY (IdOfCartTemp),
   CONSTRAINT cf_cards_temp_organization FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg),
   CONSTRAINT CardNo_Unique UNIQUE (CardNo)
@@ -27,14 +27,14 @@ CREATE TABLE cf_cards_temp (
 
 -- Таблица зарегистрированных операций по временным картам
 CREATE TABLE cf_card_temp_operations(
-  IdOfCardTempOperation bigserial not null,      --! первичный ключ процесинга
-  LocalIdOperation bigint NOT NULL,           --! первичный ключ школы
-  IdOfOrg bigint not null,                    --! внешний ключ на IdOfOrg из соотв. таблицы — равен идентификатору организации, на которую зарегистрирована врем. карта или, в случае врем. карты посетителя — идентификатору организации, в которой была произведена эта операция.
-  IdOfCartTemp bigint not null,               --! внешний ключ или на физ. идентификатор временной карты или на первичный ключ соотв. записи из TempCards
-  IdOfClient bigint,                          --! Идентификатор клиента
-  IdOfVisitor bigint,                         --! Идентификатор посетителя
-  OperationType int not null,                 --! Тип операции- int16 или int8, not null, значения-  0 — регистрация, 1 — выдача ,2 – возврат, 3 — блокировка
-  OperationDate bigint not null,              --! Дата и время операции
+  IdOfCardTempOperation bigserial not null,
+  LocalIdOperation bigint NOT NULL,
+  IdOfOrg bigint not null,
+  IdOfCartTemp bigint not null,
+  IdOfClient bigint,
+  IdOfVisitor bigint,
+  OperationType int not null,
+  OperationDate bigint not null,
   CONSTRAINT cf_card_temp_operations_pk PRIMARY KEY (IdOfCardTempOperation),
   CONSTRAINT cf_card_temp_operations_organization FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg),
   CONSTRAINT cf_card_temp_operation_org_local_id UNIQUE (IdOfOrg , LocalIdOperation )
@@ -42,14 +42,14 @@ CREATE TABLE cf_card_temp_operations(
 
 -- Таблица посетителей
 CREATE TABLE cf_visitors(
-  IdOfVisitor bigserial not null,                --! первичный ключ
-  IdOfPerson BIGINT NOT NULL,                    --! внешний ключ на ФИО посетителя
-  PassportNumber varchar(50),                    --! Серийный номер паспорта
-  PassportDate BIGINT,                           --! Дата выдачи паспорта
-  WarTicketNumber varchar(50),                   --! Серийный номер водительского удостоверения (ВУ)
-  WarTicketDate BIGINT,                          --! Дата выдачи ВУ
-  DriverLicenceNumber varchar(50),               --! Серийный номер военного билета (ВБ)
-  DriverLicenceDate BIGINT,                      --! Дата выдачи ВБ
+  IdOfVisitor bigserial not null,
+  IdOfPerson BIGINT NOT NULL,
+  PassportNumber varchar(50),
+  PassportDate BIGINT,
+  WarTicketNumber varchar(50),
+  WarTicketDate BIGINT,
+  DriverLicenceNumber varchar(50),
+  DriverLicenceDate BIGINT,
   CONSTRAINT cf_visitors_pk PRIMARY KEY (IdOfVisitor),
   CONSTRAINT cf_visitors_IdOfPerson_fk FOREIGN KEY (IdOfPerson) REFERENCES CF_Persons (IdOfPerson)
 );
@@ -116,4 +116,4 @@ create table CF_ComplexRoles(
   CONSTRAINT CF_ComplexRole_pk PRIMARY KEY (IdOfRole)
 );
 
---! ФИНАЛИЗИРОВАН (Кадыров, 130807) НЕ МЕНЯТЬ
+--! ФИНАЛИЗИРОВАН (Кадыров, 130809) НЕ МЕНЯТЬ

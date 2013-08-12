@@ -2567,6 +2567,6 @@ create table CF_ComplexRoles(
 
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
-  VALUES(2, 2, 42, 130403, 0, '');
+  VALUES(2, 2, 42, 130809, 0, '');
 
 
