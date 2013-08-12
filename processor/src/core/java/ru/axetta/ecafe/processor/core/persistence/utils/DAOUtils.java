@@ -408,14 +408,26 @@ public class DAOUtils {
         return !query.list().isEmpty();
     }
 
-    public static Long findClientByFullName(EntityManager em, Org organization, String surname, String firstName, String secondName)
+    public static Long findClientByFullName(EntityManager em, Org organization, String surname, String firstName, String secondName) throws Exception {
+        return findClientByFullName(em, organization, surname, firstName, secondName, false);
+    }
+
+
+    public static Long findClientByFullName(EntityManager em, Org organization, String surname, String firstName, String secondName, boolean dismissPredefinedGroups)
             throws Exception {
+
+
+        String predefinedGroups = "";
+        if (dismissPredefinedGroups) {
+            predefinedGroups = " cf_clients.idofclientgroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " ";
+        }
 
 
         javax.persistence.Query q = em.createNativeQuery("select cf_clients.idofclient "+
                 "from cf_clients "+
                 "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "+
                 "where trim(upper(cf_persons.Surname))=:surname and trim(upper(cf_persons.FirstName))=:firstName and trim(upper(cf_persons.SecondName))=:secondName and "+
+                predefinedGroups +
                 "(cf_clients.idoforg in (select cf_friendly_organization.friendlyorg from cf_friendly_organization where cf_friendly_organization.currentorg=:org))");
         q.setParameter("org", organization.getIdOfOrg());
         q.setParameter("surname", StringUtils.upperCase(surname).trim());

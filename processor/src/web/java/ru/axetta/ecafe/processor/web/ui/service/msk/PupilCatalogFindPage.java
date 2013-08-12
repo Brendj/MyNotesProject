@@ -200,7 +200,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
                 }
                 Long res = DAOUtils
                         .findClientByFullName(em, org, emptyIfNull(i.getFamilyName()), emptyIfNull(i.getFirstName()),
-                                emptyIfNull(i.getSecondName()));
+                                emptyIfNull(i.getSecondName()), true);
                 if (res == null) {
                     continue;
                 }
