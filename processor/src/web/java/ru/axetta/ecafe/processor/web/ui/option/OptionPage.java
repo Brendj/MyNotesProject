@@ -21,8 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +40,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean withOperator;
     private Boolean cleanMenu;
     private Integer menuDaysForDeletion;
+    private Integer srcOrgMenuDaysForDeletion;
     private Boolean journalTransactions;
     private Boolean sendJournalTransactionsToNFP;
     private String nfpServiceAddress;
@@ -177,6 +176,14 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void setMenuDaysForDeletion(Integer menuDaysForDeletion) {
         this.menuDaysForDeletion = menuDaysForDeletion;
+    }
+
+    public Integer getSrcOrgMenuDaysForDeletion() {
+        return srcOrgMenuDaysForDeletion;
+    }
+
+    public void setSrcOrgMenuDaysForDeletion(Integer srcOrgMenuDaysForDeletion) {
+        this.srcOrgMenuDaysForDeletion = srcOrgMenuDaysForDeletion;
     }
 
     public Boolean getSmppClientStatus() {
@@ -443,6 +450,7 @@ public class OptionPage extends BasicWorkspacePage {
         notifyBySMSAboutEnterEvent = runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT);
         cleanMenu = runtimeContext.getOptionValueBool(Option.OPTION_CLEAN_MENU);
         menuDaysForDeletion = runtimeContext.getOptionValueInt(Option.OPTION_MENU_DAYS_FOR_DELETION);
+        srcOrgMenuDaysForDeletion = runtimeContext.getOptionValueInt(Option.OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION);
         journalTransactions = runtimeContext.getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS);
         sendJournalTransactionsToNFP = runtimeContext.getOptionValueBool(Option.OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP);
         nfpServiceAddress = runtimeContext.getOptionValueString(Option.OPTION_NFP_SERVICE_ADDRESS);
@@ -527,6 +535,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT, notifyBySMSAboutEnterEvent);
             runtimeContext.setOptionValue(Option.OPTION_CLEAN_MENU, cleanMenu);
             runtimeContext.setOptionValue(Option.OPTION_MENU_DAYS_FOR_DELETION, menuDaysForDeletion);
+            runtimeContext.setOptionValue(Option.OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION, srcOrgMenuDaysForDeletion);
             runtimeContext.setOptionValue(Option.OPTION_JOURNAL_TRANSACTIONS, journalTransactions);
             runtimeContext.setOptionValue(Option.OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP, sendJournalTransactionsToNFP);
             runtimeContext.setOptionValue(Option.OPTION_NFP_SERVICE_ADDRESS, nfpServiceAddress);

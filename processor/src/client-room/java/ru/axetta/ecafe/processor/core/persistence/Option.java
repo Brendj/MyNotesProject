@@ -22,7 +22,8 @@ public class Option {
             OPTION_CHRONOPAY_SECTION=1000,
             OPTION_CHRONOPAY_RATE=1001,
             OPTION_RBK_SECTION=1002,
-            OPTION_RBK_RATE=1003;
+            OPTION_RBK_RATE=1003,
+            OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION=1004;
 
 
 
@@ -40,6 +41,7 @@ public class Option {
             case OPTION_RBK_SECTION: return "1";
             case OPTION_CHRONOPAY_RATE: return "3.3";
             case OPTION_RBK_RATE: return  "3";
+            case OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION: return "365";
         }
         return null;
     }

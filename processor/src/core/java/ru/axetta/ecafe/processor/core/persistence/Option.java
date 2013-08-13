@@ -29,7 +29,8 @@ public class Option {
         CHRONOPAY_SECTION(1000),
         CHRONOPAY_RATE(1001),
         RBK_SECTION(1002),
-        RBK_RATE(1003);
+        RBK_RATE(1003),
+        SRC_ORG_MENU_DAYS_FOR_DELETION(1004);
         private int value;
 
         private Options(int value) {
@@ -58,6 +59,7 @@ public class Option {
             OPTION_CHRONOPAY_RATE=1001,
             OPTION_RBK_SECTION=1002,
             OPTION_RBK_RATE=1003,
+            OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION=1004,
             OPTION_NSI_LAST_SYNC_TIME=10001,
             OPTION_STOP_LIST_LAST_UPDATE=10010,
             OPTION_MSR_STOPLIST_UPD_TIME=10011,
@@ -109,6 +111,7 @@ public class Option {
             OPTION_RBK_SECTION, "1", 
             OPTION_CHRONOPAY_RATE, "3.3", 
             OPTION_RBK_RATE, "3",
+            OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION, "365",
             OPTION_NSI_LAST_SYNC_TIME, null,
             OPTION_STOP_LIST_LAST_UPDATE, null,
             OPTION_MSR_STOPLIST_ON, "0",

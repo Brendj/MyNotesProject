@@ -23,9 +23,11 @@ import java.util.Date;
 @Component
 @Scope("singleton")
 public class MaintananceService {
+
     private Logger logger = LoggerFactory.getLogger(MaintananceService.class);
 
     private Date lastCleanDate;
+    private Date srcOrgLastCleanDate;
     private Integer maintananceHour;
 
     @PersistenceContext
@@ -35,56 +37,75 @@ public class MaintananceService {
     private RuntimeContext runtimeContext;
 
 
-    @Transactional
     public void run() {
-        if (!RuntimeContext.getInstance().isMainNode()) return;
-        ////
-        if (maintananceHour==null) {
-            maintananceHour = runtimeContext.getPropertiesValue(RuntimeContext.PARAM_NAME_DB_MAINTANANCE_HOUR, 22);
-            logger.info("DB maintanance hour: "+maintananceHour+", current hour: "+Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+        if (!RuntimeContext.getInstance().isMainNode()) {
+            return;
         }
-        if (!runtimeContext.getOptionValueBool(Option.OPTION_CLEAN_MENU)) return;
-        if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)==maintananceHour && (lastCleanDate==null || System.currentTimeMillis()-lastCleanDate.getTime()>12*60*60*1000)) {
-            logger.info("Starting DB maintanance procedures...");
-            lastCleanDate = new Date();
-            try {
-                String report = clean();
-                logger.info("DB maintanance procedures finished successfully. " + report);
-            } catch (Exception e) {
-                logger.error("Database cleaning failed", e);
+        if (!runtimeContext.getOptionValueBool(Option.OPTION_CLEAN_MENU)) {
+            return;
+        }
+        if (maintananceHour == null) {
+            maintananceHour = runtimeContext.getPropertiesValue(RuntimeContext.PARAM_NAME_DB_MAINTANANCE_HOUR, 22);
+            logger.info("DB maintanance hour: " + maintananceHour + ", current hour: " + Calendar.getInstance()
+                    .get(Calendar.HOUR_OF_DAY));
+        }
+        if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) == maintananceHour) {
+            if (lastCleanDate == null || System.currentTimeMillis() - lastCleanDate.getTime() > 12 * 60 * 60 * 1000) {
+                logger.info("Starting DB maintanance procedures...");
+                lastCleanDate = new Date();
+                try {
+                    String report = clean(false);
+                    logger.info("DB maintanance procedures finished successfully. " + report);
+                } catch (Exception e) {
+                    logger.error("Database cleaning failed", e);
+                }
+            }
+            // Очистка организаций-поставщиков.
+            if (srcOrgLastCleanDate == null || System.currentTimeMillis() - srcOrgLastCleanDate.getTime() > 12 * 60 * 60 * 1000) {
+                logger.info("Starting DB maintanance procedures: source organizations...");
+                srcOrgLastCleanDate = new Date();
+                try {
+                    String report = clean(true);
+                    logger.info("DB maintanance procedures finished successfully. " + report);
+                } catch (Exception e) {
+                    logger.error("Database cleaning failed", e);
+                }
             }
         }
     }
 
-    public String clean() throws Exception {
-        int menuDaysForDeletion = runtimeContext.getOptionValueInt(Option.OPTION_MENU_DAYS_FOR_DELETION);
-        if (menuDaysForDeletion<0) menuDaysForDeletion=1;
+    @Transactional
+    public String clean(boolean isSource) throws Exception {
+        long menuDaysForDeletion = runtimeContext.getOptionValueInt(
+                isSource ? Option.OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION : Option.OPTION_MENU_DAYS_FOR_DELETION);
+        if (menuDaysForDeletion < 0) {
+            menuDaysForDeletion = 1;
+        }
+        long timeToClean = System.currentTimeMillis() - menuDaysForDeletion * 24 * 60 * 60 * 1000;
 
-        int menuDeletedCount = 0;
-        int menuDetailDeletedCount = 0;
-        int menuExchangeDeletedCount = 0;
+        String orgFilter = (isSource ? "" : "not") + " in (select distinct mer.idOfSourceOrg from CF_MenuExchangeRules mer)";
 
         logger.info("Cleaning menu details...");
-        Query query = entityManager.createNativeQuery("delete from CF_MenuDetails md where md.IdOfMenu in (select m.IdOfMenu from CF_Menu m where m.MenuDate < :date)");
-        long timeToClean = System.currentTimeMillis()-(long)menuDaysForDeletion*24*60*60*1000;
-        query.setParameter("date", timeToClean);
-        menuDetailDeletedCount = query.executeUpdate();
+        Query query = entityManager.createNativeQuery("delete from CF_MenuDetails md where md.IdOfMenu in \n" +
+                "(select m.IdOfMenu from CF_Menu m where m.IdOfOrg " + orgFilter + "and m.MenuDate < :date)")
+                .setParameter("date", timeToClean);
+        int menuDetailDeletedCount = query.executeUpdate();
 
         logger.info("Cleaning menu...");
-        query = entityManager.createNativeQuery("delete from CF_Menu m where m.MenuDate < :date");
-        query.setParameter("date", timeToClean);
-        menuDeletedCount = query.executeUpdate();
+        query = entityManager
+                .createNativeQuery("delete from CF_Menu m where m.IdOfOrg " + orgFilter + " and m.MenuDate < :date")
+                .setParameter("date", timeToClean);
+        int menuDeletedCount = query.executeUpdate();
 
         logger.info("Cleaning menu exchange...");
-        query = entityManager.createNativeQuery("delete from CF_MenuExchange me where me.MenuDate < :date and me.menuDate<>:nullDate");
-        query.setParameter("date", timeToClean);
+        query = entityManager.createNativeQuery("delete from CF_MenuExchange me where me.IdOfOrg " + orgFilter
+                + " and me.MenuDate < :date and me.menuDate <> :nullDate")
+                .setParameter("date", timeToClean).setParameter("nullDate", 0);
         // исключаем меню с секцией Settings, у него нулевая дата
-        query.setParameter("nullDate", 0);
-        menuExchangeDeletedCount = query.executeUpdate();
+        int menuExchangeDeletedCount = query.executeUpdate();
 
-        return ("Deleted all records before - " + new Date(timeToClean) + ", deleted records count: menu - " + menuDeletedCount +
-                ", menu detail - " + menuDetailDeletedCount
-                + ", menu exchange - " + menuExchangeDeletedCount);
+        return ("Deleted all records before - " + new Date(timeToClean) + ", deleted records count: menu - "
+                + menuDeletedCount +
+                ", menu detail - " + menuDetailDeletedCount + ", menu exchange - " + menuExchangeDeletedCount);
     }
-
 }

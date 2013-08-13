@@ -20,12 +20,22 @@
                           styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{optionPage.notifyBySMSAboutEnterEvent}" styleClass="output-text" />
         </h:panelGrid>
-        <h:panelGroup styleClass="borderless-grid">
-            <h:outputText escape="true" value="Удалять записи меню в базе" styleClass="output-text" />
-            <h:selectBooleanCheckbox value="#{optionPage.cleanMenu}" styleClass="output-text" />
-            <h:outputText escape="true" value="Хранить дней от текущей даты " styleClass="output-text" />
-            <h:inputText value="#{optionPage.menuDaysForDeletion}" styleClass="input-text" size="3" />
-        </h:panelGroup>
+        <h:panelGrid styleClass="borderless-grid" columns="1">
+            <h:panelGroup styleClass="borderless-div">
+                <h:outputText escape="true" value="Удалять записи меню в базе" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{optionPage.cleanMenu}" styleClass="output-text">
+                    <a4j:support event="onchange" reRender="menuDaysForDeletion,srcOrgMenuDaysForDeletion" />
+                </h:selectBooleanCheckbox>
+            </h:panelGroup>
+            <h:panelGrid style="margin-left: 20px;" columns="2">
+                <h:outputText escape="true" value="Хранить дней от текущей даты " styleClass="output-text" />
+                <h:inputText value="#{optionPage.menuDaysForDeletion}" id="menuDaysForDeletion" styleClass="input-text"
+                             size="3" disabled="#{not optionPage.cleanMenu}" />
+                <h:outputText escape="true" value="для организаций-поставщиков" styleClass="output-text" />
+                <h:inputText value="#{optionPage.srcOrgMenuDaysForDeletion}" id="srcOrgMenuDaysForDeletion"
+                             styleClass="input-text" size="3" disabled="#{not optionPage.cleanMenu}" />
+            </h:panelGrid>
+        </h:panelGrid>
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <h:outputText escape="true" value="Лимит овердрафта по-умолчанию для новых клиентов"
                           styleClass="output-text" />
