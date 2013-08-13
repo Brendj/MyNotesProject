@@ -2434,13 +2434,12 @@ public class Processor implements SyncProcessor,
                 if (DAOUtils.existEnterEvent(persistenceSession, e.getIdOfOrg(), e.getIdOfEnterEvent())) {
                     EnterEvent ee = DAOUtils.findEnterEvent(persistenceSession,
                             new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), e.getIdOfOrg()));
-                    // if enter event exists (may be last sync result was not transferred to client)
-                    if (((ee.getClient() == null && e.getIdOfClient() == null) || (ee.getClient() != null && ee
-                            .getClient().getIdOfClient().equals(e.getIdOfClient()))) && ee.getEvtDateTime()
-                            .equals(e.getEvtDateTime()) && (
-                            (ee.getIdOfTempCard() == null && e.getIdOfTempCard() == null) || (
-                                    ee.getIdOfTempCard() != null && ee.getIdOfTempCard()
-                                            .equals(e.getIdOfTempCard())))) {
+                    // Если ENTER событие существует (может быть последний результат синхронизации не был передан клиенту)
+final boolean checkClient = (ee.getClient() == null && e.getIdOfClient() == null) || (ee.getClient() != null && ee
+                                    .getClient().getIdOfClient().equals(e.getIdOfClient()));
+final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard() == null) || (ee.getIdOfTempCard() != null && ee.getIdOfTempCard().equals(e.getIdOfTempCard()));
+
+                    if (checkClient && ee.getEvtDateTime().equals(e.getEvtDateTime()) && checkTempCard) {
                         SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(
                                 e.getIdOfEnterEvent(), SyncResponse.ResEnterEvents.Item.RC_OK,
                                 "Enter event already registered");
@@ -2494,10 +2493,9 @@ public class Processor implements SyncProcessor,
                             (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT ||
                                     e.getPassDirection() == EnterEvent.RE_ENTRY
                                     || e.getPassDirection() == EnterEvent.RE_EXIT)) {
-                        RuntimeContext.getAppContext().getBean(EventNotificationService.class)
-                                .sendNotificationAsync(client, EventNotificationService.NOTIFICATION_ENTER_EVENT,
-                                        generateNotificationParams(persistenceSession, client, e.getPassDirection(),
-                                                e.getEvtDateTime()));
+   final EventNotificationService notificationService = RuntimeContext.getAppContext().getBean(EventNotificationService.class);
+   final String[] values = generateNotificationParams(persistenceSession, client, e.getPassDirection(), e.getEvtDateTime());
+     notificationService.sendNotificationAsync(client,EventNotificationService.NOTIFICATION_ENTER_EVENT, values);
                     }
 
                     /// Формирование журнала транзакции
@@ -2506,9 +2504,8 @@ public class Processor implements SyncProcessor,
                                     e.getPassDirection() == EnterEvent.RE_ENTRY
                                     || e.getPassDirection() == EnterEvent.RE_EXIT) && e.getIdOfCard() != null) {
                         Card card = DAOUtils.findCardByCardNo(persistenceSession, e.getIdOfCard());
+                        final CompositeIdOfEnterEvent compositeIdOfEnterEvent = enterEvent.getCompositeIdOfEnterEvent();
                         if (card == null) {
-                            final CompositeIdOfEnterEvent compositeIdOfEnterEvent = enterEvent
-                                    .getCompositeIdOfEnterEvent();
                             final String message = "Не найдена карта по событию прохода: idOfOrg=%d, idOfEnterEvent=%d, idOfCard=%d";
                             logger.error(String.format(message,
                                     compositeIdOfEnterEvent.getIdOfOrg(),
@@ -2532,8 +2529,8 @@ public class Processor implements SyncProcessor,
                             }
                             if (transCode != null) {
                                 TransactionJournal transactionJournal = new TransactionJournal(
-                                        enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg(),
-                                        enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent(), new Date(),
+                                        compositeIdOfEnterEvent.getIdOfOrg(),
+                                        compositeIdOfEnterEvent.getIdOfEnterEvent(), new Date(),
                                         OGRN /*org.getOGRN()*/, TransactionJournal.SERVICE_CODE_SCHL_ACC, transCode,
                                         TransactionJournal.CARD_TYPE_CODE_UEC,
                                         TransactionJournal.CARD_TYPE_ID_CODE_MUID, Card.TYPE_NAMES[card.getCardType()],
@@ -2551,8 +2548,8 @@ public class Processor implements SyncProcessor,
                 logger.error("Save enter event to database error: ", e);
                 resEnterEvents = new SyncResponse.ResEnterEvents();
                 for (SyncRequest.EnterEvents.EnterEvent ee : enterEvents.getEvents()) {
-                    SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(ee.getIdOfEnterEvent(),
-                            1, "Save to data base error");
+                    SyncResponse.ResEnterEvents.Item item;
+                    item = new SyncResponse.ResEnterEvents.Item(ee.getIdOfEnterEvent(),1, "Save to data base error");
                     resEnterEvents.addItem(item);
                 }
             } finally {

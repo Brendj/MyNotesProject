@@ -14,7 +14,9 @@ import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -105,19 +107,23 @@ public class GoodRequest extends DistributedObject {
         return this.state.ordinal();
     }
 
-    Set<GoodRequestPosition> getGoodRequestPositionInternal() {
+    public List<GoodRequestPosition> getGoodRequestPosition(){
+        return new ArrayList<GoodRequestPosition>(getGoodRequestPositionInternal());
+    }
+
+    public Set<GoodRequestPosition> getGoodRequestPositionInternal() {
         return goodRequestPositionInternal;
     }
 
-    void setGoodRequestPositionInternal(Set<GoodRequestPosition> goodRequestPositionInternal) {
+    public void setGoodRequestPositionInternal(Set<GoodRequestPosition> goodRequestPositionInternal) {
         this.goodRequestPositionInternal = goodRequestPositionInternal;
     }
 
-    Set<StateChange> getStateChangeInternal() {
+    public Set<StateChange> getStateChangeInternal() {
         return stateChangeInternal;
     }
 
-    void setStateChangeInternal(Set<StateChange> stateChangeInternal) {
+    public void setStateChangeInternal(Set<StateChange> stateChangeInternal) {
         this.stateChangeInternal = stateChangeInternal;
     }
 
