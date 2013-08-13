@@ -166,6 +166,36 @@
         <element id="library" level="project" name="postgresql-9.1-901.jdbc4" />
       </root>
     </artifact>
+    <artifact type="exploded-war" name="org-room:war exploded">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/org_room_war_exploded</output-path>
+      <root id="root">
+        <element id="directory" name="WEB-INF">
+          <element id="directory" name="classes">
+            <element id="module-output" name="org-room" />
+            <element id="module-output" name="core" />
+            <element id="module-output" name="util" />
+          </element>
+          <element id="directory" name="lib">
+            <element id="library" level="project" name="richfaces-api-3.3.1.GA" />
+            <element id="library" level="project" name="junit" />
+            <element id="file-copy" path="$PROJECT_DIR$/../lib/xmlsec.jar" />
+            <element id="file-copy" path="$PROJECT_DIR$/../lib/xmldsig.jar" />
+            <element id="library" level="project" name="axetta_charset" />
+            <element id="file-copy" path="$PROJECT_DIR$/../lib/icu4j-4_0_1.jar" />
+            <element id="file-copy" path="$PROJECT_DIR$/../lib/visualization-datasource-1.1.1.jar" />
+            <element id="library" level="project" name="axetta_smpp" />
+            <element id="library" level="project" name="jasperlib" />
+          </element>
+        </element>
+        <element id="javaee-facet-resources" facet="org-room/web/Web" />
+      </root>
+    </artifact>
+    <artifact type="war" name="org-room:war">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/org_room_war</output-path>
+      <root id="archive" name="org-room_war.war">
+        <element id="artifact" artifact-name="org-room:war exploded" />
+      </root>
+    </artifact>
   </component>
   <component name="ClearCaseSharedConfig">
     <option name="myUseUcmModel" value="true" />
@@ -770,6 +800,7 @@
     <file url="file://$PROJECT_DIR$/../../src/web/web/client-room/mos/uec.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/settings.jsp" />
     <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/discountrule/complex_roles.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/monitoring/sync_errors_window.jsp" />
   </component>
   <component name="FacetAutodetectingManager">
     <autodetection-disabled>
@@ -1175,6 +1206,7 @@
     <option name="projectName" value="processor" />
   </component>
   <component name="ProjectDictionaryState">
+    <dictionary name="damir" />
     <dictionary name="Developer">
       <words>
         <w>contragent</w>
@@ -1213,6 +1245,7 @@
       <module fileurl="file://$PROJECT_DIR$/dashboard-ws-client.iml" filepath="$PROJECT_DIR$/dashboard-ws-client.iml" />
       <module fileurl="file://$PROJECT_DIR$/../../src/testmodule/datatest/datatest.iml" filepath="$PROJECT_DIR$/../../src/testmodule/datatest/datatest.iml" />
       <module fileurl="file://$PROJECT_DIR$/j2ee.iml" filepath="$PROJECT_DIR$/j2ee.iml" />
+      <module fileurl="file://$PROJECT_DIR$/org-room.iml" filepath="$PROJECT_DIR$/org-room.iml" />
       <module fileurl="file://$PROJECT_DIR$/payconv.iml" filepath="$PROJECT_DIR$/payconv.iml" />
       <module fileurl="file://$PROJECT_DIR$/pubkey.iml" filepath="$PROJECT_DIR$/pubkey.iml" />
       <module fileurl="file://$PROJECT_DIR$/smpp/smpp.iml" filepath="$PROJECT_DIR$/smpp/smpp.iml" />
@@ -1251,42 +1284,17 @@
     </option>
   </component>
   <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/../../src/core/database/derby/clearDOTable.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.10-2.2.11.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.11-2.2.12.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.12-2.2.13.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.13-2.2.14.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.14-2.2.15.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.15-2.2.16.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.16-2.2.17.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.17-2.2.18.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.18-2.2.19.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.19-2.2.20.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.20-2.2.21.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.21-2.2.22.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.22-2.2.23.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.23-2.2.24.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.24-2.2.25.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.25-2.2.26.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.26-2.2.27.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.27-2.2.28.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.28-2.2.29.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.29-2.2.30.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.30-2.2.31.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.31-2.2.32.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.32-2.2.33.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.33-2.2.34.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.34-2.2.35.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.35-2.2.36.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.36-2.2.37.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.37-2.2.38.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.38-2.2.39.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.39-2.2.40.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.40-2.2.41.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.41-2.2.42.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.8-2.2.9.sql" dialect="PostgreSQL" />
-    <file url="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.9-2.2.10.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/smpp" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/client-room" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/core" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/dashboard-ws-client" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/j2ee" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/payconv" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/pubkey" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/synctest" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/testmodule" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/util" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/web" dialect="PostgreSQL" />
   </component>
   <component name="SvnBranchConfigurationManager">
     <option name="myConfigurationMap">
@@ -1381,6 +1389,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="svn" />
     <mapping directory="$PROJECT_DIR$/../../src/client-room" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../../src/org-room" vcs="svn" />
     <mapping directory="$PROJECT_DIR$/../../src/testmodule" vcs="svn" />
   </component>
   <component name="WebServicesPlugin" addRequiredLibraries="true" />
