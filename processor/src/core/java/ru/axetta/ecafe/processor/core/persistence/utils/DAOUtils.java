@@ -418,7 +418,7 @@ public class DAOUtils {
 
         String predefinedGroups = "";
         if (dismissPredefinedGroups) {
-            predefinedGroups = " cf_clients.idofclientgroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " ";
+            predefinedGroups = " cf_clients.idofclientgroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and ";
         }
 
 
