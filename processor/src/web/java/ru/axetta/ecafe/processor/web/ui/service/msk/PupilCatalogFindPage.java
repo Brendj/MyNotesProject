@@ -13,7 +13,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
-import ru.axetta.ecafe.processor.web.ui.report.rule.ReportRuleEditPage;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -29,11 +28,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 @Component
 @Scope("session")
@@ -292,8 +290,16 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
         }
     }
 
+    public void buildComparisonCSVFile () {
+        try {
+            buildComparisonCSVFile(true);
+        } catch (Exception e) {
+            logger.error("Failed to build comparison CSV file", e);
+        }
+    }
 
-    public void buildComparisonCSVFile() {
+
+    public void buildComparisonCSVFile(boolean tmp) {
         /*
                                                              ДЛЯ ТЕСТА!!!
         pupilInfos = new ArrayList<Item>();
