@@ -174,5 +174,10 @@ public class CalendarUtils {
         truncateToMonth(calendar);
         return calendar.getTime();
     }
+
+    public static Boolean isDateEqLtCurrentDate(Date thisDate){
+        return (thisDate!=null && System.currentTimeMillis()<=thisDate.getTime());
+    }
+
     private CalendarUtils() {}
 }
