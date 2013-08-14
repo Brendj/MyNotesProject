@@ -18,8 +18,8 @@
 	<resource-root path="poi-3.6-20091214.jar"/>
 	<resource-root path="quartz-1.8.1.jar"/>
 	<resource-root path="XMLDSigRI.jar"/>
-	<resource-root path="xmldsig.jar" /> 
-	<resource-root path="xmlsec.jar" /> 
+	<resource-root path="xmldsig.jar" />  <!-- REMOVE FOR JBOSS >=7.1.1-->
+	<resource-root path="xmlsec.jar" />   <!-- REMOVE FOR JBOSS >=7.1.1-->
   </resources>
     <dependencies>
        <module name="org.apache.santuario.xmlsec" />
