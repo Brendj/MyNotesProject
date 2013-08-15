@@ -861,8 +861,7 @@ public class Processor implements SyncProcessor,
         List<Long> errorClientIds = new ArrayList<Long>();
 
         try {
-            processSyncClientParamRegistry(idOfSync, request.getIdOfOrg(), request.getClientParamRegistry(),
-                    errorClientIds);
+            processSyncClientParamRegistry(idOfSync, request.getIdOfOrg(), request.getClientParamRegistry(),errorClientIds);
         } catch (Exception e) {
             logger.error(
                     String.format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg()),
@@ -1532,10 +1531,12 @@ public class Processor implements SyncProcessor,
                 }*/
                 try {
                     //processSyncClientParamRegistryItem(idOfSync, idOfOrg, clientParamItem, orgMap, version);
-                    processSyncClientParamRegistryItem(syncHistory.getIdOfSync(), clientParamItem, orgMap, version, errorClientIds);
+                    processSyncClientParamRegistryItem(clientParamItem, orgMap, version, errorClientIds);
                 } catch (Exception e) {
                     String message = String.format("Failed to process clientParamItem == %s", idOfOrg);
-                    createSyncHistory(idOfOrg,syncHistory, message);
+                    if(syncHistory!=null) {
+                        createSyncHistory(idOfOrg,syncHistory, message);
+                    }
                     logger.error(message, e);
                 }
             }
@@ -1546,8 +1547,7 @@ public class Processor implements SyncProcessor,
 
     }
 
-    private void processSyncClientParamRegistryItem(Long idOfSync, //Long idOfOrg,
-            SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem,
+    private void processSyncClientParamRegistryItem(SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem,
             HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version, List<Long> errorClientIds) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
