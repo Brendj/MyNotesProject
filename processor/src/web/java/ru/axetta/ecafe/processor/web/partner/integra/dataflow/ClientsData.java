@@ -12,7 +12,7 @@ package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
  * To change this template use File | Settings | File Templates.
  */
 public class ClientsData {
-    public ClientList clientList;
+    public ClientList clientList = new ClientList();
     public Long resultCode;
     public String description;
 
