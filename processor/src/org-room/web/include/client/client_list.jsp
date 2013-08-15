@@ -27,22 +27,34 @@
     }
 </style>
 
-
-
 <%--@elvariable id="clientListEditPage" type="ru.axetta.ecafe.processor.web.ui.client.ClientListEditPage"--%>
 <h:panelGrid id="clientListViewGrid" binding="#{clientListEditPage.pageComponent}" styleClass="borderless-grid">
     <a4j:form>
+
     <table width="100%" cellspacing="4px" cellpadding="0">
         <tr>
             <%-- Дерево клиентов --%>
             <td style="vertical-align: top;">
                 <a4j:region>
                     <h:panelGrid columns="2" styleClass="borderless-grid" style="padding-bottom: 10px">
-                        <a4j:commandButton image="/images/icon/plus.png" action="#{clientListEditPage.doRegisterClient}"
-                                           reRender="editPanels, clientCardPanel" styleClass="command-button" status="clientLookupStatus" />
-                        <a4j:commandLink value="Регистрация клиента" action="#{clientListEditPage.doRegisterClient}"
-                                           reRender="editPanels, clientCardPanel" styleClass="command-button" status="clientLookupStatus" />
+                        <h:panelGrid columns="2" styleClass="borderless-grid">
+                            <a4j:commandButton image="/images/icon/add_client.png" action="#{clientListEditPage.doRegisterClient}"
+                                               reRender="editPanels, clientCardPanel" styleClass="command-button" status="clientLookupStatus" />
+                            <a4j:commandLink value="Регистрация клиента" action="#{clientListEditPage.doRegisterClient}"
+                                               reRender="editPanels, clientCardPanel" styleClass="command-button" status="clientLookupStatus" />
+                        </h:panelGrid>
+                        <h:panelGrid columns="2" styleClass="borderless-grid">
+                            <h:outputLink value="#" id="createGroupCommandLink" styleClass="command-button">
+                                <h:graphicImage url="/images/icon/add_clients.png" />
+                                Добавить группу
+                                <a4j:support event="onclick" action="#{mainPage.doShowSelectCreateGroupModal}" reRender="groupCreatePanel"
+                                             oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('groupCreatePanel')}.show();"/>
+                                <%--<rich:componentControl for="groupCreatePanel" attachTo="createGroupCommandLink"
+                                                       operation="show" event="onclick"/>--%>
+                            </h:outputLink>
+                        </h:panelGrid>
                     </h:panelGrid>
+
                     <rich:panel id="clientTree" style="width:300px; height: 550px; overflow:auto;">
                         <rich:tree style="width:285px; height: 500px" nodeSelectListener="#{clientListEditPage.doSelectClient}"
                                    reRender="editPanels, clientCardPanel" ajaxSubmitSelection="true" switchType="client" binding="#{clientListEditPage.treeComponent}"
@@ -71,6 +83,11 @@
             <td style="vertical-align: top; align: left; padding-top: 50px;">
                 <h:panelGrid id="editPanels">
                     <a4j:region>
+                    <%--<rich:jQuery selector="#phoneInput" query="setMask({mask:'(999) 999-9999'})" timing="immediate"/>--%>
+                    <rich:jQuery selector="#phoneInput" query="mask('(999) 999-9999')" timing="immediate"/>
+                    <rich:jQuery selector="#mobileInput" query="mask('(999) 999-9999')" timing="immediate"/>
+                    <rich:jQuery selector="#faxInput" query="mask('(999) 999-9999')" timing="immediate"/>
+
                     <h:panelGrid id="classEditPanel" rendered="#{clientListEditPage.showClassEditPanel}">
                         <h:panelGrid styleClass="borderless-grid" columns="2" style="vertical-align: top;">
                             <h:outputText escape="true" value="Классный руководитель" styleClass="output-text-mod" />
@@ -107,19 +124,19 @@
                                     <h:outputText escape="true" value="Адрес" styleClass="output-text-mod" />
                                     <h:inputText value="#{clientListEditPage.selectedClient.address}" styleClass="output-text" style="width: 390px;" />
                                     <h:outputText escape="true" value="Телефон" styleClass="output-text-mod" />
-                                    <h:inputText value="#{clientListEditPage.selectedClient.phone}" styleClass="output-text" style="width: 390px;" />
+                                    <h:inputText id="phoneInput" value="#{clientListEditPage.selectedClient.phone}" styleClass="output-text" style="width: 390px;" />
                                     <h:outputText escape="true" value="Моб. телефон" styleClass="output-text-mod" />
                                     <h:panelGrid columns="4" styleClass="borderless-grid">
                                         <h:outputText escape="true" value="+" styleClass="output-text" />
-                                        <h:inputText value="#{clientListEditPage.selectedClient.mobile}" styleClass="output-text" style="width: 220px;" />
+                                        <h:inputText id="mobileInput" value="#{clientListEditPage.selectedClient.mobile}" styleClass="output-text" style="width: 220px;" />
                                         <h:selectBooleanCheckbox value="#{clientListEditPage.selectedClient.notifyViaSMS}" styleClass="output-text" />
                                         <h:outputText escape="true" value="Уведомлять по СМС" styleClass="output-text-mod" style="white-space: nowrap;" />
                                     </h:panelGrid>
                                     <h:outputText escape="true" value="Факс" styleClass="output-text-mod" />
-                                    <h:inputText value="#{clientListEditPage.selectedClient.fax}" styleClass="output-text" style="width: 390px;" />
+                                    <h:inputText id="faxInput" value="#{clientListEditPage.selectedClient.fax}" styleClass="output-text" style="width: 390px;" />
                                     <h:outputText escape="true" value="E-mail" styleClass="output-text-mod" />
                                     <h:panelGrid columns="3" styleClass="borderless-grid">
-                                        <h:inputText value="#{clientListEditPage.selectedClient.email}" styleClass="output-text" style="width: 240px;" />
+                                        <h:inputText id="emailInput" value="#{clientListEditPage.selectedClient.email}" styleClass="output-text" style="width: 240px;" />
                                         <h:selectBooleanCheckbox value="#{clientListEditPage.selectedClient.notifyViaEmail}" styleClass="output-text" />
                                         <h:outputText escape="true" value="Уведомлять по Email" styleClass="output-text-mod" style="white-space: nowrap;" />
                                     </h:panelGrid>
@@ -142,21 +159,24 @@
                                 </h:panelGrid>
                             </rich:tab>
                             <rich:tab label="Льготы">
-                                <h:panelGrid columns="2" styleClass="borderless-grid">
-                                    <h:outputText escape="true" value="Льготы" styleClass="output-text-mod" />
-                                    <h:selectOneMenu id="discountMode" value="#{clientListEditPage.selectedClient.discountMode}" style="width:335px;" >
-                                        <f:selectItems value="#{clientListEditPage.discountModes}"/>
-                                    </h:selectOneMenu>
-                                    <h:outputText escape="true" value="Категории" styleClass="output-text-mod" />
-                                    <h:panelGrid columns="2" styleClass="borderless-grid">
-                                        <h:outputText escape="true" value="#{clientListEditPage.selectedClient.discountCategories}" styleClass="output-text" />
-                                        <a4j:commandButton value="Редактировать" />
-                                    </h:panelGrid>
-                                    <h:outputText escape="true" value="Правила для категорий" styleClass="output-text-mod" />
-                                    <h:panelGrid columns="2" styleClass="borderless-grid">
-                                        <h:outputText escape="true" value="#{clientListEditPage.selectedClient.discountRules}" styleClass="output-text" />
-                                        <a4j:commandButton value="Подробнее" />
-                                    </h:panelGrid>
+                                <h:panelGrid columns="1" styleClass="borderless-grid">
+                                    <rich:panel style="width:450px; height: 200px; overflow:auto; background: none;">
+                                        <h:panelGrid columns="2" styleClass="borderless-grid">
+                                            <h:selectBooleanCheckbox value="true" styleClass="output-text" disabled="true"
+                                                                     rendered="#{not empty clientListEditPage.selectedClient.clientGroupDiscount}" />
+                                            <h:outputText escape="true" value="#{clientListEditPage.selectedClient.clientGroupDiscount}" styleClass="output-text-mod"
+                                                          rendered="#{not empty clientListEditPage.selectedClient.clientGroupDiscount}" />
+                                            <h:selectBooleanCheckbox value="true" styleClass="output-text" disabled="true"
+                                                                     rendered="#{not empty clientListEditPage.selectedClient.clientSuperGroupDiscount}" />
+                                            <h:outputText escape="true" value="#{clientListEditPage.selectedClient.clientSuperGroupDiscount}" styleClass="output-text-mod"
+                                                          rendered="#{not empty clientListEditPage.selectedClient.clientSuperGroupDiscount}" />
+
+                                            <c:forEach items="#{clientListEditPage.categoryDiscounts}" var="i">
+                                                <h:selectBooleanCheckbox value="#{clientListEditPage.selectedClient.discounts[i.idofcategorydiscount]}" styleClass="output-text" />
+                                                <h:outputText escape="true" value="#{i.name}" styleClass="output-text-mod" />
+                                            </c:forEach>
+                                        </h:panelGrid>
+                                    </rich:panel>
                                 </h:panelGrid>
                             </rich:tab>
                             <rich:tab label="Посещения">

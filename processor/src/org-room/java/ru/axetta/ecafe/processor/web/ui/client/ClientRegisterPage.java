@@ -7,12 +7,16 @@ package ru.axetta.ecafe.processor.web.ui.client;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.dao.DAOServices;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -333,18 +337,33 @@ public class ClientRegisterPage extends BasicWorkspacePage {
         updateRequired = doClientUpdate(fieldConfig, ClientManager.FieldId.COMMENTS, client.getRemarks(),
                 cl == null ? null : cl.getRemarks(), updateRequired);
 
+        Long newIdOfClient = null;
         try {
             if (cl == null) {
-                ClientManager.registerClientTransactionFree(org.getIdOfOrg(),
+                newIdOfClient = ClientManager.registerClientTransactionFree(org.getIdOfOrg(),
                         (ClientManager.ClientFieldConfig) fieldConfig, checkFullname, session);
             } else {
-                ClientManager
+                newIdOfClient = ClientManager
                         .modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) fieldConfig, org, "",
                                 cl, session);
             }
         } catch (Exception e) {
             throw e;
         }
+
+
+        if (newIdOfClient != null && cl == null) {
+            cl = (ru.axetta.ecafe.processor.core.persistence.Client) session
+                    .get(ru.axetta.ecafe.processor.core.persistence.Client.class, newIdOfClient);
+        }
+        List<Long> idOfCategoryList = new ArrayList<Long>();
+        for (Long idofcategorydiscount : client.getDiscounts().keySet()) {
+            if (client.getDiscounts().get(idofcategorydiscount).equals(Boolean.FALSE)) {
+                continue;
+            }
+            idOfCategoryList.add(idofcategorydiscount);
+        }
+        ClientManager.setCategories(session, cl, idOfCategoryList);
     }
 
     public static boolean doClientUpdate(FieldProcessor.Config fieldConfig, Object fieldID, String reesterValue,

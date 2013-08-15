@@ -19,9 +19,12 @@
     <link rel="stylesheet" href="<c:url value="/styles.css"/>" type="text/css">
 </head>
 
+
+<a4j:loadScript src="/scripts/jquery.maskedinput.min.js"/>
+
 <body style="margin: 4px; padding: 0;">
 
-    <f:subview id="groupCreatorSubView">
+    <f:subview id="groupCreateSubView">
         <c:import url="include/modal/group/create.jsp" />
     </f:subview>
 

@@ -15,7 +15,7 @@ import javax.faces.component.UIComponent;
  */
 public class BasicPage {
 
-    private UIComponent pageComponent;
+    protected UIComponent pageComponent;
 
     public UIComponent getPageComponent() {
         return pageComponent;

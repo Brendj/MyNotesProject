@@ -13,13 +13,18 @@ import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ClientManager {
 
@@ -405,6 +410,24 @@ public class ClientManager {
             return client.getIdOfClient();
         } catch (Exception e) {
             logger.info("Ошибка при обновлении данных клиента", e);
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    public static boolean setCategories(Session session, Client cl, List<Long> idOfCategoryList) throws Exception {
+        try {
+            Set<CategoryDiscount> categories = new HashSet <CategoryDiscount>();
+            Criteria categoryCriteria = session.createCriteria(CategoryDiscount.class);
+            categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", idOfCategoryList));
+            for (Object object : categoryCriteria.list()) {
+                CategoryDiscount categoryDiscount = (CategoryDiscount) object;
+                categories.add(categoryDiscount);
+            }
+            cl.setCategories(categories);
+            session.save(cl);
+            return true;
+        } catch (Exception e) {
+            logger.info("Не удалось установить категории для клиента");
             throw new Exception(e.getMessage());
         }
     }

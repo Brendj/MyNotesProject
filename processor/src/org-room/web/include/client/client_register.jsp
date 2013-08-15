@@ -101,7 +101,8 @@
                     <f:facet name="header">
                         <h:outputText value="Телефон"/>
                     </f:facet>
-                    <h:inputText value="#{client.phone}" style="width:150px;" disabled="#{client.added}">
+                    <rich:jQuery selector="#phoneInput" query="mask('(999) 999-9999')" timing="immediate"/>
+                    <h:inputText value="#{client.phone}" style="width:150px;" disabled="#{client.added}" id="phoneInput">
                         <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" reRender="clientsToRegister"/>
                     </h:inputText>
                 </rich:column>
@@ -109,7 +110,8 @@
                     <f:facet name="header">
                         <h:outputText value="Моб. телефон"/>
                     </f:facet>
-                    <h:inputText value="#{client.mobile}" style="width:150px;" disabled="#{client.added}">
+                    <rich:jQuery selector="#mobileInput" query="mask('(999) 999-9999')" timing="immediate"/>
+                    <h:inputText id="mobileInput" value="#{client.mobile}" style="width:150px;" disabled="#{client.added}">
                         <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" reRender="clientsToRegister"/>
                     </h:inputText>
                 </rich:column>
@@ -125,7 +127,8 @@
                     <f:facet name="header">
                         <h:outputText value="Факс"/>
                     </f:facet>
-                    <h:inputText value="#{client.fax}" style="width:150px;" disabled="#{client.added}">
+                    <rich:jQuery selector="#faxInput" query="mask('(999) 999-9999')" timing="immediate"/>
+                    <h:inputText id="faxInput" value="#{client.fax}" style="width:150px;" disabled="#{client.added}">
                         <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" reRender="clientsToRegister"/>
                     </h:inputText>
                 </rich:column>

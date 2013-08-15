@@ -35,6 +35,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import ru.axetta.ecafe.processor.web.ui.Constants;
+import ru.axetta.ecafe.processor.web.ui.modal.group.GroupCreateEvent;
+import ru.axetta.ecafe.processor.web.ui.modal.group.GroupCreateListener;
 
 import java.math.BigInteger;
 import java.text.DateFormat;
@@ -52,7 +54,7 @@ import java.util.regex.Pattern;
  */
 @Component
 @Scope("session")
-public class ClientListEditPage extends BasicWorkspacePage {
+public class ClientListEditPage extends BasicWorkspacePage implements GroupCreateListener {
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -78,6 +80,7 @@ public class ClientListEditPage extends BasicWorkspacePage {
     private String errorMessages;
     private String infoMessages;
     private Date enterEventDate;
+    private List<CategoryDiscount> categoryDiscounts;
 
 
 
@@ -192,6 +195,7 @@ public class ClientListEditPage extends BasicWorkspacePage {
 
         loadGroups(session);
         buildGroupsTree(clients);
+        loadDiscounts(session);
     }
 
     @Transactional
@@ -256,6 +260,16 @@ public class ClientListEditPage extends BasicWorkspacePage {
             Integer passDirection = HibernateUtils.getDbInt(o[23]);
             passDirection = passDirection == null ? EnterEvent.EXIT : passDirection;
 
+            if (phone.length() > 0 && phone.startsWith("7")) {
+                phone = phone.substring(1);
+            }
+            if (mobile.length() > 0 && mobile.startsWith("7")) {
+                mobile = mobile.substring(1);
+            }
+            if (fax.length() > 0 && fax.startsWith("7")) {
+                fax = fax.substring(1);
+            }
+
             selectedClient.setFirstName(firstName);
             selectedClient.setSecondName(secondName);
             selectedClient.setSurname(surname);
@@ -294,7 +308,34 @@ public class ClientListEditPage extends BasicWorkspacePage {
 
         loadEnterEvents(session, new Date());
         loadMigrationHistory(session);
+        loadClientDiscounts(session);
     }
+
+    @Transactional
+    public void loadClientDiscounts() {
+        Session session = null;
+        try {
+            session = (Session) entityManager.getDelegate();
+            loadMigrationHistory(session);
+        } catch (Exception e) {
+            logger.error("Failed to load group for org", e);
+        } finally {
+            //HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void loadClientDiscounts(Session session) {
+        selectedClient.initDiscounts(categoryDiscounts);
+        org.hibernate.Query q = session.createSQLQuery("select idofcategorydiscount "
+                                                        + "from cf_clients_categorydiscounts "
+                                                        + "where idofclient=:idofclient");
+        q.setLong("idofclient", selectedClient.getIdOfClient());
+        List resultList = q.list();
+        for (Object entry : resultList) {
+            selectedClient.getDiscounts().put(((BigInteger)entry).longValue(), Boolean.TRUE);
+        }
+    }
+
 
     @Transactional
     public void loadMigrationHistory(Date date) {
@@ -410,6 +451,36 @@ public class ClientListEditPage extends BasicWorkspacePage {
     }
 
     @Transactional
+    public void loadDiscounts() throws Exception {
+        Session session = null;
+        try {
+            session = (Session) entityManager.getDelegate();
+            loadDiscounts(session);
+        } catch (Exception e) {
+            logger.error("Failed to load group for org", e);
+        } finally {
+            //HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void loadDiscounts(Session session) {
+        if (categoryDiscounts == null) {
+            categoryDiscounts = new ArrayList<CategoryDiscount>();
+        } else {
+            return;
+        }
+        org.hibernate.Query q = session.createSQLQuery("select idofcategorydiscount, categoryname "
+                                                    + "from cf_categorydiscounts where idofcategorydiscount>0");
+        List resultList = q.list();
+        for (Object entry : resultList) {
+            Object o[] = (Object[]) entry;
+            Long idofcategorydiscount = HibernateUtils.getDbLong(o[0]);
+            String name = HibernateUtils.getDbString(o[1]);
+            categoryDiscounts.add(new CategoryDiscount(idofcategorydiscount, name));
+        }
+    }
+
+    @Transactional
     public void loadTeachers() {
 
     }
@@ -471,10 +542,12 @@ public class ClientListEditPage extends BasicWorkspacePage {
                 }
             } else {
                 //  Если клиентов нет, то добавляем одного пустого клиента, чтобы дерево отобразило элемент как папку
-                TreeNodeImpl clientNode = new TreeNodeImpl();
-                clientNode.setData(GROUP_NO_CLIENTS);
-                groupNode.addChild(new Integer(clientCounter), clientNode);
-                clientCounter++;
+                if (lookupClientName == null || lookupClientName.length() < 1) {
+                    TreeNodeImpl clientNode = new TreeNodeImpl();
+                    clientNode.setData(GROUP_NO_CLIENTS);
+                    groupNode.addChild(new Integer(clientCounter), clientNode);
+                    clientCounter++;
+                    }
             }
 
             tree.addChild(new Integer(groupCounter), groupNode);
@@ -540,7 +613,6 @@ public class ClientListEditPage extends BasicWorkspacePage {
 
             //  Обновляем дерево и клиента
             //RuntimeContext.getAppContext().getBean(ClientListEditPage.class).fill(session, false);
-            loadSelectedClientData(session);
             sendInfo(change ? "Данные клиента изменены" : "Клиент успешно зарегистрирован");
         } catch (Exception e) {
             logger.error("Failed to apply client changes", e);
@@ -629,6 +701,7 @@ public class ClientListEditPage extends BasicWorkspacePage {
     public void doApplyChanges() {
         RuntimeContext.getAppContext().getBean(ClientListEditPage.class).applyChanges();
         RuntimeContext.getAppContext().getBean(ClientListEditPage.class).fill(false);
+        RuntimeContext.getAppContext().getBean(ClientListEditPage.class).loadSelectedClientData();
     }
 
     public void doCancelChanges() {
@@ -676,6 +749,10 @@ public class ClientListEditPage extends BasicWorkspacePage {
         return res;
     }
 
+    public List<CategoryDiscount> getCategoryDiscounts () {
+        return categoryDiscounts;
+    }
+
     public boolean getShowClientEditPanel() {
         return isLeafSelected;
     }
@@ -688,6 +765,14 @@ public class ClientListEditPage extends BasicWorkspacePage {
         List<SelectItem> res = new ArrayList<SelectItem>();
         res.add(new SelectItem("Льгота", "Льгота"));
         return res;
+    }
+
+    public void onGroupCreateEvent(GroupCreateEvent event) {
+        if (!event.isSucceed()) {
+            return;
+        }
+
+        RuntimeContext.getAppContext().getBean(ClientListEditPage.class).fill(false);
     }
 
 
@@ -855,6 +940,7 @@ public class ClientListEditPage extends BasicWorkspacePage {
         private List<EnterEvents> enterEvents;
         private List<MigrationHistory> migrations;
         private String discountMode;
+        private Map<Long, Boolean> discounts;
 
 
         public SelectedClient() {
@@ -1024,6 +1110,53 @@ public class ClientListEditPage extends BasicWorkspacePage {
         public void setDiscountMode(String discountMode) {
             this.discountMode = discountMode;
         }
+        
+        public String getClientGroupDiscount () {
+            try {
+                int i = Integer.parseInt(clientGroup.substring(0, 1));
+                return i + " класс";
+            } catch (Exception e) {
+                return "";
+            }
+        }
+
+        public String getClientSuperGroupDiscount () {
+            try {
+                int i = Integer.parseInt(clientGroup.substring(0, 1));
+                if (i < 4) {
+                    return "Младшие классы";
+                } else if (i > 3 && i < 10) {
+                    return "Средние классы";
+                } else if (i > 9) {
+                    return "Старшие классы";
+                }
+                return "";
+            } catch (Exception e) {
+                return "";
+            }
+        }
+
+        public Map<Long, Boolean> getDiscounts () {
+            return discounts;
+        }
+
+        private SelectedClient initDiscounts (List<CategoryDiscount> baseDiscounts) {
+            if (discounts != null) {
+                discounts.clear();
+            } else {
+                discounts = new HashMap<Long, Boolean>();
+            }
+
+            for (CategoryDiscount discount : baseDiscounts) {
+                discounts.put(discount.idofcategorydiscount, Boolean.FALSE);
+            }
+            return this;
+        }
+
+
+
+
+
 
         public static class EnterEvents {
 
@@ -1199,6 +1332,25 @@ public class ClientListEditPage extends BasicWorkspacePage {
             } catch (Exception e) {
                 return s1.compareTo(s2);
             }
+        }
+    }
+
+
+    public static class CategoryDiscount {
+        private long idofcategorydiscount;
+        private String name;
+
+        public CategoryDiscount (long idofcategorydiscount, String name) {
+            this.idofcategorydiscount = idofcategorydiscount;
+            this.name = name;
+        }
+
+        public long getIdofcategorydiscount() {
+            return idofcategorydiscount;
+        }
+
+        public String getName() {
+            return name;
         }
     }
 }
