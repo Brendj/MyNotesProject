@@ -715,14 +715,6 @@ public class DAOUtils {
         return ((Long)q.uniqueResult())!=0;
     }
 
-    @SuppressWarnings("unchecked")
-    public static List<Contragent> getContragentsWithClassIds(EntityManager em, Integer[] classId) {
-        List<Integer> classIds = Arrays.asList(classId);
-        javax.persistence.Query q = em.createQuery("from Contragent where classId in (:classIds)");
-        q.setParameter("classIds", classIds);
-        return (List<Contragent>)q.getResultList();
-    }
-
     public static CategoryDiscount getCategoryDiscount(EntityManager em, Long categoryId) {
         javax.persistence.Query q = em.createQuery("from CategoryDiscount where idOfCategoryDiscount = :idOfCategoryDiscount");
         q.setParameter("idOfCategoryDiscount", categoryId);

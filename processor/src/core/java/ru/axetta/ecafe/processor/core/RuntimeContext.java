@@ -16,7 +16,6 @@ import ru.axetta.ecafe.processor.core.mail.Postman;
 import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
 import ru.axetta.ecafe.processor.core.partner.elecsnet.ElecsnetConfig;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
-import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.partner.sbrt.SBRTConfig;
@@ -25,7 +24,6 @@ import ru.axetta.ecafe.processor.core.payment.PaymentLogger;
 import ru.axetta.ecafe.processor.core.payment.PaymentProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterationStatus;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterations;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintPossibleCauses;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -539,111 +537,114 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     @PersistenceContext
-    EntityManager em;
+    private EntityManager entityManager;
 
     @Autowired
     private DAOService daoService;
+
+    @Autowired
+    private DBUpdater updater;
+
+
 
     @Transactional
     public void initDB() throws Exception {
         // Configure runtime context
         try {
-
-            //persistenceSession = sessionFactory.openSession();
-            //persistenceTransaction = persistenceSession.beginTransaction();
             // check DB version
-            currentSchemaVersionInfo = getAppContext().getBean(DBUpdater.class).checkDbVersion();
-            //
-            loadOptionValues();
-            // Check for Operator, Budget, Client type of contragents existence
-            boolean operatorExists = false;
-            boolean budgetExists = false;
-            boolean clientExists = false;
-            List<Contragent> contragentList = DAOUtils.getContragentsWithClassIds(em,
-                    new Integer[]{Contragent.OPERATOR, Contragent.BUDGET, Contragent.CLIENT});
-            // Create if not
-            for (Contragent contragent : contragentList) {
-                if (contragent.getClassId().equals(Contragent.OPERATOR)) {
-                    operatorExists = true;
-                    logger.info("Contragent with class \"Operator\" exists, name \"" + contragent.getContragentName()
-                            + "\"");
+            if(isMainNode()){
+                currentSchemaVersionInfo = updater.checkDbVersion();
+                //
+                loadOptionValues();
+                // Check for Operator, Budget, Client type of contragents existence
+                boolean operatorExists = false;
+                boolean budgetExists = false;
+                boolean clientExists = false;
+                final List<Integer> classId = Arrays.asList(Contragent.OPERATOR, Contragent.BUDGET, Contragent.CLIENT);
+                List<Contragent> contragentList = daoService.getContragentsWithClassIds(classId);
+                // Create if not
+                for (Contragent contragent : contragentList) {
+                    if (contragent.getClassId().equals(Contragent.OPERATOR)) {
+                        operatorExists = true;
+                        logger.info("Contragent with class \"Operator\" exists, name \"" + contragent.getContragentName()
+                                + "\"");
+                    }
+                    if (contragent.getClassId().equals(Contragent.BUDGET)) {
+                        budgetExists = true;
+                        logger.info(
+                                "Contragent with class \"Budget\" exists, name \"" + contragent.getContragentName() + "\"");
+                    }
+                    if (contragent.getClassId().equals(Contragent.CLIENT)) {
+                        clientExists = true;
+                        logger.info(
+                                "Contragent with class \"Client\" exists, name \"" + contragent.getContragentName() + "\"");
+                    }
                 }
-                if (contragent.getClassId().equals(Contragent.BUDGET)) {
-                    budgetExists = true;
-                    logger.info(
-                            "Contragent with class \"Budget\" exists, name \"" + contragent.getContragentName() + "\"");
+
+                if (!operatorExists) {
+                    createContragent("Оператор", 3);
                 }
-                if (contragent.getClassId().equals(Contragent.CLIENT)) {
-                    clientExists = true;
-                    logger.info(
-                            "Contragent with class \"Client\" exists, name \"" + contragent.getContragentName() + "\"");
+                if (!budgetExists) {
+                    createContragent("Бюджет", 4);
                 }
-            }
-
-            if (!operatorExists) {
-                createContragent("Оператор", 3);
-            }
-            if (!budgetExists) {
-                createContragent("Бюджет", 4);
-            }
-            if (!clientExists) {
-                createContragent("Клиент", 5);
-            }
-
-            logger.info("Initialize default client category");
-            HashMap<Long, String> initCategory = new HashMap<Long, String>();
-            initCategory.put(-90L, "Начальные классы");
-            initCategory.put(-91L, "Средние классы");
-            initCategory.put(-92L, "Старшие классы");
-            initCategory.put(-101L, "1 класс");
-            initCategory.put(-102L, "2 класс");
-            initCategory.put(-103L, "3 класс");
-            initCategory.put(-104L, "4 класс");
-            initCategory.put(-105L, "5 класс");
-            initCategory.put(-106L, "6 класс");
-            initCategory.put(-107L, "7 класс");
-            initCategory.put(-108L, "8 класс");
-            initCategory.put(-109L, "9 класс");
-            initCategory.put(-110L, "10 класс");
-            initCategory.put(-111L, "11 класс");
-            initCategory.put(-200L, "Сотрудник");
-            initCategory.put(-201L, "Ученик");
-            for (Map.Entry me : initCategory.entrySet()) {
-                CategoryDiscount cd = DAOUtils.getCategoryDiscount(em, (Long) me.getKey());
-                if (cd == null) {
-                    createCategoryDiscount((Long) me.getKey(), String.valueOf(me.getValue()), "", "");
+                if (!clientExists) {
+                    createContragent("Клиент", 5);
                 }
-            }
 
-            DAOUtils.clearGoodComplaintIterationStatus(em);
-            for (GoodComplaintIterationStatus iterationStatus : GoodComplaintIterationStatus.values()) {
-                em.persist(iterationStatus);
-            }
+                logger.info("Initialize default client category");
+                HashMap<Long, String> initCategory = new HashMap<Long, String>();
+                initCategory.put(-90L, "Начальные классы");
+                initCategory.put(-91L, "Средние классы");
+                initCategory.put(-92L, "Старшие классы");
+                initCategory.put(-101L, "1 класс");
+                initCategory.put(-102L, "2 класс");
+                initCategory.put(-103L, "3 класс");
+                initCategory.put(-104L, "4 класс");
+                initCategory.put(-105L, "5 класс");
+                initCategory.put(-106L, "6 класс");
+                initCategory.put(-107L, "7 класс");
+                initCategory.put(-108L, "8 класс");
+                initCategory.put(-109L, "9 класс");
+                initCategory.put(-110L, "10 класс");
+                initCategory.put(-111L, "11 класс");
+                initCategory.put(-200L, "Сотрудник");
+                initCategory.put(-201L, "Ученик");
+                for (Map.Entry me : initCategory.entrySet()) {
+                    CategoryDiscount cd = DAOUtils.getCategoryDiscount(entityManager, (Long) me.getKey());
+                    if (cd == null) {
+                        createCategoryDiscount((Long) me.getKey(), String.valueOf(me.getValue()), "", "");
+                    }
+                }
 
-            DAOUtils.clearGoodComplaintPossibleCauses(em);
-            for (GoodComplaintPossibleCauses possibleCauses : GoodComplaintPossibleCauses.values()) {
-                em.persist(possibleCauses);
-            }
+                DAOUtils.clearGoodComplaintIterationStatus(entityManager);
+                for (GoodComplaintIterationStatus iterationStatus : GoodComplaintIterationStatus.values()) {
+                    entityManager.persist(iterationStatus);
+                }
 
-            /**
-             *  Дополняем всем клиентам guid у тех у кого они пусты
-             *  */
-            List<Long> clients = DAOUtils.extractIdFromClientsByGUIDIsNull(em);
-            logger.info("Generate update uuid in client: "+clients.size());
-            daoService.updateClientSetGUID(clients);
+                DAOUtils.clearGoodComplaintPossibleCauses(entityManager);
+                for (GoodComplaintPossibleCauses possibleCauses : GoodComplaintPossibleCauses.values()) {
+                    entityManager.persist(possibleCauses);
+                }
 
-            /**
-             * Инициализируем список ролей для комплексов
-             * */
-            logger.info("Initialize default complex role");
-            for (long i = 0L; i < 50L; i++) {
-                ComplexRole complexRole = em.find(ComplexRole.class, i);
-                if (complexRole == null) {
-                    complexRole = new ComplexRole(i, String.format("Комплекс %d", i));
-                    em.merge(complexRole);
+                /**
+                 *  Дополняем всем клиентам guid у тех у кого они пусты
+                 *  */
+                List<Long> clients = DAOUtils.extractIdFromClientsByGUIDIsNull(entityManager);
+                logger.info("Generate update uuid in client: "+clients.size());
+                daoService.updateClientSetGUID(clients);
+
+                /**
+                 * Инициализируем список ролей для комплексов
+                 * */
+                logger.info("Initialize default complex role");
+                for (long i = 0L; i < 50L; i++) {
+                    ComplexRole complexRole = entityManager.find(ComplexRole.class, i);
+                    if (complexRole == null) {
+                        complexRole = new ComplexRole(i, String.format("Комплекс %d", i));
+                        entityManager.merge(complexRole);
+                    }
                 }
             }
-
         } catch (Exception e) {
             logger.error("Failed to init application.", e);
             throw e;
@@ -658,17 +659,17 @@ public class RuntimeContext implements ApplicationContextAware {
         CategoryDiscount categoryDiscount = new CategoryDiscount(idOfCategoryDiscount, categoryName, discountRules,
                 description, currentTime, currentTime);
         categoryDiscount.setCategoryType(CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT);
-        em.persist(categoryDiscount);
+        entityManager.persist(categoryDiscount);
         logger.info("Category with name \"" + categoryName + "\" created");
     }
 
     public void createContragent(String contragentName, Integer classId) throws Exception {
         Person contactPerson = new Person("Иван", "Иванов", "");
-        em.persist(contactPerson);
+        entityManager.persist(contactPerson);
         Date currentTime = new Date();
         Contragent contragent = new Contragent(contactPerson, contragentName, classId, 1, "", "", currentTime,
                 currentTime, "", "", "", false);
-        em.persist(contragent);
+        entityManager.persist(contragent);
         String className = Contragent.getClassAsString(classId);
         logger.info("Contragent with class \"" + className + "\" created, name \"" + contragentName + "\"");
     }
@@ -1121,7 +1122,7 @@ public class RuntimeContext implements ApplicationContextAware {
         optionsValues = new HashMap<Integer, String>();
         for (int n = 0; n < Option.OPTIONS_INITIALIZER.length; n += 2) {
             Integer nOption = (Integer) Option.OPTIONS_INITIALIZER[n];
-            String v = DAOUtils.getOptionValue(em, nOption, (String) Option.OPTIONS_INITIALIZER[n + 1]);
+            String v = DAOUtils.getOptionValue(entityManager, nOption, (String) Option.OPTIONS_INITIALIZER[n + 1]);
             optionsValues.put(nOption, v);
         }
     }
@@ -1181,8 +1182,8 @@ public class RuntimeContext implements ApplicationContextAware {
     public void setOptionValueWithSave(int optionId, Object value) {
         setOptionValue(optionId, value + "");
         Option o = new Option((long) optionId, value + "");
-        o = em.merge(o);
-        em.persist(o);
+        o = entityManager.merge(o);
+        entityManager.persist(o);
     }
 
     public void setOptionValue(int optionId, double value) {
@@ -1193,8 +1194,8 @@ public class RuntimeContext implements ApplicationContextAware {
     public void saveOptionValues() {
         for (Map.Entry<Integer, String> e : optionsValues.entrySet()) {
             Option o = new Option((long) e.getKey(), e.getValue());
-            o = em.merge(o);
-            em.persist(o);
+            o = entityManager.merge(o);
+            entityManager.persist(o);
         }
     }
 

@@ -45,17 +45,21 @@ public class DAOService {
         return RuntimeContext.getAppContext().getBean(DAOService.class);
     }
 
+    public List<Contragent> getContragentsWithClassIds(List<Integer> classIds) {
+        TypedQuery<Contragent> q = entityManager.createQuery("from Contragent where classId in (:classIds)", Contragent.class);
+        q.setParameter("classIds", classIds);
+        return q.getResultList();
+    }
+
     public List<TransactionJournal> fetchTransactionJournal(int nRecs) {
         return DAOUtils.fetchTransactionJournalRecs(entityManager, nRecs);
     }
-
 
     public User findUserByUserName(String userName) throws Exception {
         javax.persistence.Query q = entityManager.createQuery("from User where userName=:userName");
         q.setParameter("userName", userName);
         return (User) q.getSingleResult();
     }
-
 
     public User setUserInfo(User user) {
         return entityManager.merge(user);
