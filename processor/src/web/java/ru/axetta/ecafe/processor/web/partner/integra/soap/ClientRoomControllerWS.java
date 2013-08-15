@@ -2086,16 +2086,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            String sql = "select IdOfClient from CF_GuardSan where GuardSan=:guardSan";
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            org.hibernate.Query q = persistenceSession.createSQLQuery(sql);
-            q.setParameter("guardSan", guardSan);
 
-            List<BigInteger> idOfClients = q.list();
-            for (BigInteger id : idOfClients) {
-                long idOfClient = id.longValue();
-                Client cl = DAOService.getInstance().findClientById(idOfClient);
+            List<Long> idOfClients = DAOUtils.extractIDFromGuardSanByGuardSan(persistenceSession, guardSan);
+
+            data.clientList = new ClientList();
+            for (Long idOfClient : idOfClients) {
+                Client cl = DAOUtils.findClient(persistenceSession, idOfClient);
                 ClientItem clientItem = new ClientItem();
                 clientItem.setContractId(cl.getContractId());
                 clientItem.setSan(cl.getSan());
