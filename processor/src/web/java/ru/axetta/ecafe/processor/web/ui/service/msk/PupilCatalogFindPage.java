@@ -397,11 +397,27 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
                     responseOutputStream.write(str.getBytes());
                 }
                 for (Client cl : missedRegisterClients) {
+                    String surname = "";
+                    String firstName = "";
+                    String secondName = "";
+                    String group = "";
+                    if (cl.getPerson() != null) {
+                        surname = cl.getPerson().getSurname();
+                        firstName = cl.getPerson().getFirstName();
+                        secondName = cl.getPerson().getSecondName();
+                        surname = surname == null ? "" : surname;
+                        firstName = firstName == null ? "" : firstName;
+                        secondName = secondName == null ? "" : secondName;
+                    }
+                    if (cl.getClientGroup() != null) {
+                        group = cl.getClientGroup().getGroupName();
+                        group = group == null ? "" : group;
+                    }
                     str = cl.getContractId() + ";" +
-                            cl.getPerson().getSurname() + ";" +
-                            cl.getPerson().getFirstName() + ";" +
-                            cl.getPerson().getSecondName() + ";" +
-                            cl.getClientGroup().getGroupName() + ";" +
+                            surname + ";" +
+                            firstName + ";" +
+                            secondName + ";" +
+                            group + ";" +
                             "Да;" +
                             "Нет;;\n";
                     responseOutputStream.write(str.getBytes());
