@@ -189,14 +189,6 @@ public class DAOUtils {
         return (CardTemp) criteria.uniqueResult();
     }
 
-    //public static Client findClientByCardNo(EntityManager em, long cardNo) throws Exception {
-    //    javax.persistence.Query q = em.createQuery("from Card where cardNo=:cardNo");
-    //    q.setParameter("cardNo", cardNo);
-    //    List l = q.getResultList();
-    //    if (l.size()==0) return null;
-    //    return ((Card)l.get(0)).getClient();
-    //}
-
     public static Client findClientByContractId(EntityManager em, long cardNo) throws Exception {
         return findClientByContractId((Session)em.getDelegate(), cardNo);
     }
@@ -1378,5 +1370,11 @@ public class DAOUtils {
         } else {
             return (String) list.get(0);
         }
+    }
+
+    public static List<Long> extractIDFromGuardSanByGuardSan(Session persistenceSession, String guardSan) {
+        Query q = persistenceSession.createQuery("select gs.client.idOfClient from GuardSan gs where gs.guardSan=:guardSan");
+        q.setParameter("guardSan", guardSan);
+        return q.list();
     }
 }
