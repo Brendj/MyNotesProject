@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -23,6 +24,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.faces.context.ExternalContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
@@ -84,10 +86,10 @@ public class ClientRegisterPage extends BasicWorkspacePage {
     }
 
     public Org getOrg(Session session) {
-        if (org != null) {
+        if (org != null && org.getIdOfOrg().longValue() == MainPage.getSessionInstance().getIdoforg().longValue()) {
             return org;
         }
-        org = (Org) session.get(Org.class, 0L);
+        org = (Org) session.get(Org.class, MainPage.getSessionInstance().getIdoforg());
         return org;
     }
 
@@ -165,6 +167,11 @@ public class ClientRegisterPage extends BasicWorkspacePage {
      * GUI
      * ****************************************************************************************************************
      */
+    @Override
+    public void onShow() throws Exception {
+        RuntimeContext.getAppContext().getBean(ClientRegisterPage.class).fill(true);
+    }
+
     public List<RegisterClient> getClientsForRegister() {
         return clientsForRegister;
     }
@@ -281,6 +288,10 @@ public class ClientRegisterPage extends BasicWorkspacePage {
         this.registerTwins = registerTwins;
     }
 
+
+
+
+
     /**
      * ****************************************************************************************************************
      * Работа с данными
@@ -376,19 +387,6 @@ public class ClientRegisterPage extends BasicWorkspacePage {
 
     private static String emptyIfNull(String str) {
         return str == null ? "" : str;
-    }
-
-
-
-
-    /**
-     * ****************************************************************************************************************
-     * Работа с UI
-     * ****************************************************************************************************************
-     */
-    @Override
-    public void onShow() throws Exception {
-        RuntimeContext.getAppContext().getBean(ClientRegisterPage.class).fill(true);
     }
 
 

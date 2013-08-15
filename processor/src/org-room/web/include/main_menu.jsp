@@ -41,6 +41,21 @@
                            action="#{clientRegisterPage.show}" reRender="workspaceForm" />
         </rich:dropDownMenu>
 
+        <%-- Управление заявками на питание --%>
+        <rich:dropDownMenu>
+            <f:facet name="label">
+                <h:panelGroup>
+                    <h:graphicImage value="/images/icon/calendar.png" styleClass="pic"/>
+                    <h:outputText value="Заявки"/>
+                    <%-- <h:commandLink action="#{mainPage.doShowclientListEditPage}" value="Клиенты"
+                                   style="text-decoration: none"/> --%>
+                </h:panelGroup>
+            </f:facet>
+            <%--<rich:menuItem submitMode="ajax" id="сдфшьыEditPageMenuItem"
+                           binding="#{clientListEditPage.mainMenuComponent}" value="Заявки на питание"
+                           action="#{clientListEditPage.show}" reRender="workspaceForm" />--%>
+        </rich:dropDownMenu>
+
         <%-- Групповое питание --%>
         <rich:dropDownMenu>
             <f:facet name="label">
@@ -60,6 +75,23 @@
                     <h:outputText value="Отчеты"/>
                 </h:panelGroup>
             </f:facet>
+        </rich:dropDownMenu>
+
+
+
+
+
+        <%-- Выбор организаци --%>
+        <rich:dropDownMenu>
+            <f:facet name="label">
+                <h:panelGroup>
+                    <h:graphicImage value="/images/icon/user-group-icon.png" styleClass="pic"/>
+                    <h:outputText value="Выбрать ОУ"/>
+                </h:panelGroup>
+            </f:facet>
+            <rich:menuItem submitMode="ajax" id="defaultPageEditPageMenuItem"
+                           binding="#{defaultWorkspacePage.mainMenuComponent}" value="Выбрать ОУ"
+                           action="#{defaultWorkspacePage.show}" reRender="workspaceForm" />
         </rich:dropDownMenu>
     </rich:toolBar>
 </h:form>

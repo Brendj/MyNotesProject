@@ -35,6 +35,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import ru.axetta.ecafe.processor.web.ui.Constants;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.modal.group.GroupCreateEvent;
 import ru.axetta.ecafe.processor.web.ui.modal.group.GroupCreateListener;
 
@@ -109,10 +110,10 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
     }
 
     public Org getOrg(Session session) {
-        if (org != null) {
+        if (org != null && org.getIdOfOrg().longValue() == MainPage.getSessionInstance().getIdoforg().longValue()) {
             return org;
         }
-        org = (Org) session.get(Org.class, 0L);
+        org = (Org) session.get(Org.class, MainPage.getSessionInstance().getIdoforg());
         return org;
     }
 

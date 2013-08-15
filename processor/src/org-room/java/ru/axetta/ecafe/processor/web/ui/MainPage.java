@@ -36,6 +36,14 @@ public class MainPage {
 
     private HtmlPanelMenu mainMenu;
     private BasicWorkspacePage currentWorkspacePage = new DefaultWorkspacePage();
+    private Long idoforg = null;
+
+    public void setIdoforg (Long idoforg) {
+        this.idoforg = idoforg;
+    }
+    public Long getIdoforg () {
+        return idoforg;
+    }
 
 
     public static MainPage getSessionInstance() {
