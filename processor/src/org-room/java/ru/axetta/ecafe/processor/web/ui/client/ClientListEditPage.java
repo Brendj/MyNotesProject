@@ -1113,7 +1113,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         
         public String getClientGroupDiscount () {
             try {
-                int i = Integer.parseInt(clientGroup.substring(0, 1));
+                int i = Integer.parseInt(clientGroup.replaceAll("[^0-9]", ""));
                 return i + " класс";
             } catch (Exception e) {
                 return "";
@@ -1122,7 +1122,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
 
         public String getClientSuperGroupDiscount () {
             try {
-                int i = Integer.parseInt(clientGroup.substring(0, 1));
+                int i = Integer.parseInt(clientGroup.replaceAll("[^0-9]", ""));
                 if (i < 4) {
                     return "Младшие классы";
                 } else if (i > 3 && i < 10) {
