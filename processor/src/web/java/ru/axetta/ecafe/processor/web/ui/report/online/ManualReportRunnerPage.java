@@ -280,7 +280,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
         this.items = newRuleItems;
 
         //  Если заходят на страницу в первый раз, то делаем выбранным первое правило
-        if (ruleItem == null || ruleItem.length() < 1) {
+        if ((ruleItem == null || ruleItem.length() < 1) && items.size() > 0) {
             ruleItem = items.get(0).getRuleName();
             ruleId = items.get(0).getIdOfReportHandleRule();
             reportType = proxy.getReportHandlerType(ruleId);
