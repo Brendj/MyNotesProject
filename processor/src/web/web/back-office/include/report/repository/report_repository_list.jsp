@@ -32,7 +32,7 @@ function checkReporitoryDate () {
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:panelGrid columns="1">
                 <h:outputText escape="true" value="Название правила" styleClass="output-text" />
-                <h:selectOneListbox value="#{reportRepositoryListPage.filter.ruleName}" style="width:200px; height: 200px" >
+                <h:selectOneListbox value="#{reportRepositoryListPage.filter.ruleName}" style="width:400px; height: 200px" >
                     <f:selectItems value="#{reportRepositoryListPage.ruleNameItems}"/>
                 </h:selectOneListbox>
                 <%--<rich:comboBox value="#{reportRepositoryListPage.filter.ruleName}" width="400px" styleClass="input-text">
