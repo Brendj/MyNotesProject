@@ -77,7 +77,7 @@ public class ContractSelectPage extends BasicPage {
 
     public void completeContractSelection(Session session) throws Exception {
         if (!completeHandlers.empty()) {
-            completeHandlers.peek().completeContractSelection(session, selectedItem.getIdOfContract(), multiContrFlag,
+            completeHandlers.peek().completeContractSelection(session, getSelectedItem().getIdOfContract(), multiContrFlag,
                     classTypesString);
             completeHandlers.pop();
         }
@@ -97,6 +97,10 @@ public class ContractSelectPage extends BasicPage {
         } else {
             this.selectedItem = selected;
         }
+    }
+
+    public void cancelSelection () {
+        this.selectedItem = new Item();
     }
 
     public String getFilter() {

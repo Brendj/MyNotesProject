@@ -30,7 +30,7 @@
                                          reRender="modalContractSelectorForm" styleClass="command-link">
                             <h:graphicImage value="/images/16x16/search.png" style="border: 0;" />
                         </a4j:commandLink>
-                        <a4j:commandLink action="#{mainPage.showContractSelectPage}"
+                        <a4j:commandLink action="#{mainPage.contractSelectPage.cancelSelection}"
                                          reRender="modalContractSelectorForm" styleClass="command-link">
                             <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                             <f:setPropertyActionListener value="" target="#{mainPage.contractSelectPage.filter}" />
