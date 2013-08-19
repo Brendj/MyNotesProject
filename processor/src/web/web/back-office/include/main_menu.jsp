@@ -713,7 +713,6 @@
     --%>
 </rich:panelMenuGroup>
 
-
 <rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"
                      label="Мониторинг" rendered="#{mainPage.eligibleToMonitor}">
     <a4j:support event="onclick" action="#{mainPage.showMonitoringGroupPage}" reRender="workspaceForm" />
@@ -741,7 +740,6 @@
     <rich:panelMenuItem id="projectStateMenuItem" label="Ключевые показатели"
                         onclick="window.open('/processor/back-office/project_state.jsp', 'Ключевые показатели')" />
 </rich:panelMenuGroup>
-
 
 <rich:panelMenuGroup id="reportOnlineGroupMenu" binding="#{mainPage.reportOnlineGroupPage.mainMenuComponent}"
                      label="Онлайн отчеты" rendered="#{mainPage.eligibleToWorkOnlineReport}">
@@ -921,6 +919,68 @@
 
         <rich:panelMenuItem id="createUserMenuItem" binding="#{mainPage.userCreatePage.mainMenuComponent}"
                             label="Создание" action="#{mainPage.showUserCreatePage}" reRender="workspaceForm" />
+
+    </rich:panelMenuGroup>
+
+    <%--@elvariable id="employeesGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeesGroupPage"--%>
+    <rich:panelMenuGroup id="employeesGroupMenu" label="Инженеры" binding="#{employeesGroupPage.mainMenuComponent}">
+
+        <%--@elvariable id="employeeListPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeListPage"--%>
+        <%--@elvariable id="employeeGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeGroupPage"--%>
+        <%--@elvariable id="employeeViewPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeViewPage"--%>
+        <%--@elvariable id="employeeEditPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeEditPage"--%>
+        <%--@elvariable id="employeeCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCreatePage"--%>
+        <%--@elvariable id="employeeHistoryReportPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeHistoryReportPage"--%>
+
+        <rich:panelMenuItem id="showEmployeeListMenuItem" binding="#{employeeListPage.mainMenuComponent}"
+                            label="Список" action="#{employeeListPage.show}" reRender="workspaceForm" />
+
+        <rich:panelMenuGroup id="selectedEmployeeGroupMenu" label="#{employeeGroupPage.currentEmployee.shortFullName}"
+                             binding="#{employeeGroupPage.mainMenuComponent}" rendered="false">
+            <a4j:support event="onclick" action="#{employeeGroupPage.show}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="viewEmployeeMenuItem" binding="#{employeeViewPage.mainMenuComponent}"
+                                label="Просмотр" action="#{employeeViewPage.show}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="editEmployeeMenuItem" binding="#{employeeEditPage.mainMenuComponent}"
+                                label="Редактировать" action="#{employeeEditPage.show}" reRender="workspaceForm" />
+
+        </rich:panelMenuGroup>
+
+        <rich:panelMenuItem id="createEmployeeListMenuItem" binding="#{employeeCreatePage.mainMenuComponent}"
+                            label="Создание" action="#{employeeCreatePage.show}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="employeeHistoryReportMenuItem" binding="#{employeeHistoryReportPage.mainMenuComponent}"
+                            label="Отчет" action="#{employeeHistoryReportPage.show}" reRender="workspaceForm" />
+
+    </rich:panelMenuGroup>
+
+    <%--@elvariable id="employeesCardGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeesCardGroupPage"--%>
+    <rich:panelMenuGroup id="employeesCardGroupMenu" label="Карты инженеров" binding="#{employeesCardGroupPage.mainMenuComponent}">
+
+        <%--@elvariable id="employeeCardListPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardListPage"--%>
+        <%--@elvariable id="employeeCardGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardGroupPage"--%>
+        <%--@elvariable id="employeeCardViewPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardViewPage"--%>
+        <%--@elvariable id="employeeCardEditPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardEditPage"--%>
+        <%--@elvariable id="employeeCardCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardCreatePage"--%>
+
+        <rich:panelMenuItem id="showEmployeeCardListMenuItem" binding="#{employeeCardListPage.mainMenuComponent}"
+                            label="Список" action="#{employeeCardListPage.show}" reRender="workspaceForm" />
+
+        <rich:panelMenuGroup id="selectedEmployeeCardGroupMenu" label="#{employeeCardGroupPage.currentCard.cardPrintedNo}"
+                             binding="#{employeeCardGroupPage.mainMenuComponent}" rendered="false">
+            <a4j:support event="onclick" action="#{employeeCardGroupPage.show}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="viewEmployeeCardMenuItem" binding="#{employeeCardViewPage.mainMenuComponent}"
+                                label="Просмотр" action="#{employeeCardViewPage.show}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="editEmployeeCardMenuItem" binding="#{employeeCardEditPage.mainMenuComponent}"
+                                label="Редактировать" action="#{employeeCardEditPage.show}" reRender="workspaceForm" />
+
+        </rich:panelMenuGroup>
+
+        <rich:panelMenuItem id="createEmployeeCardListMenuItem" binding="#{employeeCardCreatePage.mainMenuComponent}"
+                            label="Создание" action="#{employeeCardCreatePage.show}" reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
 

@@ -24,15 +24,7 @@ public class CardTemp {
     private Date validDate;
     private Client client;
     private Visitor visitor;
-    private Long myclienttype;
-
-    public Long getMyclienttype() {
-        return myclienttype;
-    }
-
-    public void setMyclienttype(Long myclienttype) {
-        this.myclienttype = myclienttype;
-    }
+    private ClientTypeEnum clientTypeEnum;
 
     /* Конструктор регистрации врекменой карты, но не выдавая его ни кому */
     public CardTemp(Org org, Long cardNo,  String cardPrintedNo) {
@@ -41,15 +33,23 @@ public class CardTemp {
         this.cardPrintedNo = cardPrintedNo;
         this.cardStation = CardOperationStation.REGISTRATION;
         this.createDate = new Date();
-        this.myclienttype = 0L;
+        this.clientTypeEnum = ClientTypeEnum.CLIENT;
     }
 
-    public CardTemp(Long cardNo,  String cardPrintedNo) {
+    public CardTemp(Long cardNo,  String cardPrintedNo, ClientTypeEnum clientType) {
         this.cardNo = cardNo;
         this.cardPrintedNo = cardPrintedNo;
         this.cardStation = CardOperationStation.REGISTRATION;
         this.createDate = new Date();
-        this.myclienttype = 1L;
+        this.clientTypeEnum = clientType;
+    }
+
+    public CardTemp(Long cardNo,  String cardPrintedNo,CardOperationStation cardOperationStation,  ClientTypeEnum clientType) {
+        this.cardNo = cardNo;
+        this.cardPrintedNo = cardPrintedNo;
+        this.cardStation = cardOperationStation;
+        this.createDate = new Date();
+        this.clientTypeEnum = clientType;
     }
 
     public Long getIdOfCartTemp() {
@@ -107,21 +107,21 @@ public class CardTemp {
     public void setValidDate(Date closeDate) {
         this.validDate = closeDate;
     }
-    //
-    //public long getCustomerType() {
-    //    return customerType;
-    //}
-    //
-    //public void setCustomerType(long customerType) {
-    //    this.customerType = customerType;
-    //}
+
+    public ClientTypeEnum getClientTypeEnum() {
+        return clientTypeEnum;
+    }
+
+    public void setClientTypeEnum(ClientTypeEnum clientTypeEnum) {
+        this.clientTypeEnum = clientTypeEnum;
+    }
 
     public Client getClient() {
         return client;
     }
 
     public void setClient(Client client) {
-        this.myclienttype=0L;
+        this.clientTypeEnum =ClientTypeEnum.CLIENT;
         this.visitor = null;
         this.client = client;
     }
@@ -143,7 +143,7 @@ public class CardTemp {
                 "id=" + idOfCartTemp +
                 ", cardNo=" + cardNo +
                 (org==null?"":", org=" + org) +
-                ", customerType=" + myclienttype +
+                ", customerType=" + clientTypeEnum +
                 (client==null?"":", client=" + client) +
                 (visitor==null?"":", visitor=" + visitor) +
                 ", cardPrintedNo='" + cardPrintedNo + '\'' +

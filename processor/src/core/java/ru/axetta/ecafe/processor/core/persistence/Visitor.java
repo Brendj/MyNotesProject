@@ -1,6 +1,10 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,6 +23,8 @@ public class Visitor {
     private Date driverLicenceDate;
     private String warTicketNumber;
     private Date warTicketDate;
+    private VisitorType visitorType;
+    private Set<CardTemp> cards = new HashSet<CardTemp>();
 
     protected Visitor() {}
 
@@ -90,11 +96,25 @@ public class Visitor {
         this.idOfVisitor = idOfVisitor;
     }
 
+    public Set<CardTemp> getCards() {
+        return cards;
+    }
+
+    public void setCards(Set<CardTemp> cards) {
+        this.cards = cards;
+    }
+
+    public VisitorType getVisitorType() {
+        return visitorType;
+    }
+
+    public void setVisitorType(VisitorType visitorType) {
+        this.visitorType = visitorType;
+    }
+
     @Override
     public String toString() {
-        return "Visitor{" +
-                "idOfVisitor=" + idOfVisitor +
-                '}';
+        return "Visitor{idOfVisitor=" + idOfVisitor +'}';
     }
 
     @Override
@@ -118,5 +138,9 @@ public class Visitor {
     @Override
     public int hashCode() {
         return idOfVisitor.hashCode();
+    }
+
+    public static boolean isEmptyDocumentParams(String number, Date validDate) {
+        return (validDate==null || StringUtils.isEmpty(number));
     }
 }

@@ -14,9 +14,6 @@ import ru.axetta.ecafe.processor.web.internal.front.items.TempCardOperationItem;
 import ru.axetta.ecafe.processor.web.internal.front.items.VisitorItem;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -36,6 +33,10 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
+
+import static ru.axetta.ecafe.processor.core.persistence.Person.isEmptyFullNameFields;
+import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyDocumentParams;
+import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.isDateEqLtCurrentDate;
 
 @WebService(targetNamespace = "http://ru.axetta.ecafe")
 public class FrontController extends HttpServlet {
@@ -104,7 +105,7 @@ public class FrontController extends HttpServlet {
                 throw new FrontControllerException("Карта уже зарегистрирована как временная карта клиента");
             }
 
-            if(ct.getMyclienttype().equals(0L)){
+            if(ct.getClientTypeEnum()==ClientTypeEnum.CLIENT){
                 /**
                  * В случае совпадения id временной карты с id врем. карты клиента системы («нашей карты»)
                  * в таблице временных карт, выбрасывать исключение с сообщением «Карта уже зарегистрирована
@@ -189,7 +190,7 @@ public class FrontController extends HttpServlet {
              * Если хотя бы одно из полей имени == null выбрасывать исключение с
              * сообщением «все поля ФИО должны быть заполнены»
              * */
-            if(StringUtils.isEmpty(visitorItem.getFirstName()) || StringUtils.isEmpty(visitorItem.getSurname()) || StringUtils.isEmpty(visitorItem.getSecondName())) {
+            if(isEmptyFullNameFields(visitorItem.getFirstName(), visitorItem.getSurname(), visitorItem.getSecondName())) {
                 throw new  FrontControllerException("Все поля ФИО должны быть заполнены");
             }
 
@@ -197,9 +198,9 @@ public class FrontController extends HttpServlet {
             * Если поле-массив PersonDocuments не содержит ни одного описания удостоверния личности,
             * выбрасывать исключение с сообщением «Отсутствует информация об удостоверении личности»
             * */
-            if((visitorItem.getDriverLicenceDate()==null || StringUtils.isEmpty(visitorItem.getDriverLicenceNumber())) &&
-                    (visitorItem.getPassportDate()==null || StringUtils.isEmpty(visitorItem.getPassportNumber())) &&
-                    (visitorItem.getWarTicketDate()==null || StringUtils.isEmpty(visitorItem.getWarTicketNumber()))
+            if(isEmptyDocumentParams(visitorItem.getDriverLicenceNumber(), visitorItem.getDriverLicenceDate()) &&
+                    isEmptyDocumentParams(visitorItem.getPassportNumber(), visitorItem.getPassportDate()) &&
+                    isEmptyDocumentParams(visitorItem.getWarTicketNumber(), visitorItem.getWarTicketDate())
                     ) {
                 throw new  FrontControllerException("Отсутствует информация об удостоверении личности");
             }
@@ -208,10 +209,9 @@ public class FrontController extends HttpServlet {
             * Если в  поле-массиве PersonDocuments у какого-либо документа для даты выдачи
             * будет указана еще не наступившая дата, выбрасывать исключение с сообщением «Неверная дата выдачи документа»
             * */
-            if( (visitorItem.getDriverLicenceDate()!=null && System.currentTimeMillis()<=visitorItem.getDriverLicenceDate().getTime()) ||
-                    (visitorItem.getPassportDate()!=null && System.currentTimeMillis()<=visitorItem.getPassportDate().getTime()) ||
-                    (visitorItem.getWarTicketDate()!=null && System.currentTimeMillis()<=visitorItem.getWarTicketDate().getTime())
-                    ){
+            if( isDateEqLtCurrentDate(visitorItem.getDriverLicenceDate()) ||
+                    isDateEqLtCurrentDate(visitorItem.getPassportDate()) ||
+                    isDateEqLtCurrentDate(visitorItem.getWarTicketDate())){
                 throw new FrontControllerException("Неверное значение даты окончания действия карты");
             }
 
@@ -225,6 +225,7 @@ public class FrontController extends HttpServlet {
                 visitor.setDriverLicenceDate(visitorItem.getDriverLicenceDate());
                 visitor.setWarTicketNumber(visitorItem.getWarTicketNumber());
                 visitor.setWarTicketDate(visitorItem.getWarTicketDate());
+                visitor.setVisitorType(VisitorType.DEFAULT);
                 persistenceSession.save(visitor);
                 idOfVisitor = visitor.getIdOfVisitor();
             } else {
@@ -243,6 +244,7 @@ public class FrontController extends HttpServlet {
                     visitor.setDriverLicenceDate(visitorItem.getDriverLicenceDate());
                     visitor.setWarTicketNumber(visitorItem.getWarTicketNumber());
                     visitor.setWarTicketDate(visitorItem.getWarTicketDate());
+                    visitor.setVisitorType(VisitorType.DEFAULT);
                     persistenceSession.save(visitor);
                     idOfVisitor = visitor.getIdOfVisitor();
                 }
@@ -291,7 +293,7 @@ public class FrontController extends HttpServlet {
             CardTemp cardTemp = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
 
             if(cardTemp==null){
-                cardTemp = new CardTemp(cardNo, String.valueOf(cardNo));
+                cardTemp = new CardTemp(cardNo, String.valueOf(cardNo), ClientTypeEnum.VISITOR);
                 cardTemp.setVisitor(visitor);
                 persistenceSession.save(cardTemp);
             } else {
@@ -299,7 +301,7 @@ public class FrontController extends HttpServlet {
                  * Если id карты совпадает с идентификатором временной карты и карта является временной картой системы
                  * («наша карта»), то выбрасывать исключение «карта уже зарегистрирована как временная»
                  * */
-                if(cardTemp.getMyclienttype().equals(0L)){
+                if(cardTemp.getClientTypeEnum() == ClientTypeEnum.CLIENT){
                     throw new FrontControllerException(String.format("карта уже зарегистрирована как временная"));
                 } else {
                     if(cardTemp.getVisitor()==null){
@@ -308,7 +310,7 @@ public class FrontController extends HttpServlet {
                          * регистрируем временную карту с идентификатором  idOfTempCard
                          * */
                         cardTemp.setVisitor(visitor);
-                        cardTemp.setMyclienttype(1L);
+                        cardTemp.setClientTypeEnum(ClientTypeEnum.VISITOR);
                         persistenceSession.save(cardTemp);
                     } else {
                         /**

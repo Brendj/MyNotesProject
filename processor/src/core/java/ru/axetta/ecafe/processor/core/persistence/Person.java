@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -230,6 +232,10 @@ public class Person {
     @Override
     public int hashCode() {
         return idOfPerson.hashCode();
+    }
+
+    public static boolean isEmptyFullNameFields(String firstName, String surname, String secondName) {
+        return StringUtils.isEmpty(firstName) || StringUtils.isEmpty(surname) || StringUtils.isEmpty(secondName);
     }
 
     @Override

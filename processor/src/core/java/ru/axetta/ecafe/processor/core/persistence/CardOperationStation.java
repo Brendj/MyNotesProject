@@ -8,7 +8,22 @@ package ru.axetta.ecafe.processor.core.persistence;
  * To change this template use File | Settings | File Templates.
  */
 public enum CardOperationStation {
-    REGISTRATION,ISSUE,RETURN_OF,BLOCKING;
+
+    REGISTRATION("Зарегестрирована"),
+    ISSUE("Выдана"),
+    RETURN_OF("Возращена"),
+    BLOCKING("Заблокирована");
+
+    private final String description;
+
+    private CardOperationStation(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return description;
+    }
 
     public static CardOperationStation value(int ordinal){
         if(ordinal>-1 && ordinal<CardOperationStation.values().length){

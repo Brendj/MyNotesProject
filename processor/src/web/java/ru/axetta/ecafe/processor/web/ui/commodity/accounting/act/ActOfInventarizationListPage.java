@@ -71,6 +71,12 @@ public class ActOfInventarizationListPage extends AbstractListPage<ActOfInventar
         return filter;
     }
 
+    @Override
+    public Object resetFilter() {
+        shortName=null;
+        return super.resetFilter();
+    }
+
     public String getShortName() {
         return shortName;
     }

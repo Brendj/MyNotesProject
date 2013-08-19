@@ -14,6 +14,13 @@
         <many-to-one name="person" class="ru.axetta.ecafe.processor.core.persistence.Person" column="IdOfPerson"
                      not-null="true" fetch="join"/>
 
+        <property name="VisitorType" column="VisitorType">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.VisitorType</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+
         <!-- Информация по паспорту -->
         <property name="passportNumber" column="PassportNumber" type="string"/>
         <property name="passportDate" column="PassportDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
@@ -25,5 +32,11 @@
         <!-- Информация по военному билету -->
         <property name="warTicketNumber" column="WarTicketNumber" type="string"/>
         <property name="warTicketDate" column="WarTicketDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+
+        <set name="cards" inverse="true" cascade="all">
+            <key column="IdOfVisitor"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.CardTemp"/>
+        </set>
+
     </class>
 </hibernate-mapping>

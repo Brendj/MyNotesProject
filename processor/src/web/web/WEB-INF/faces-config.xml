@@ -163,6 +163,12 @@
         <converter-class>ru.axetta.ecafe.processor.web.ui.converter.UnitScaleConverter</converter-class>
     </converter>
 
+    <converter>
+        <description>Card Station Converter</description>
+        <converter-id>cardStationConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.CardStationConverter</converter-class>
+    </converter>
+
     <navigation-rule>
         <from-view-id>/back-office/index.jsp</from-view-id>
         <navigation-case>
