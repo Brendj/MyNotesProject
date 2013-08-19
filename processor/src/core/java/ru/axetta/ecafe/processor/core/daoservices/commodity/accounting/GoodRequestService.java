@@ -2,7 +2,7 @@
  * Copyright (c) 2013. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.org.goodRequest;
+package ru.axetta.ecafe.processor.core.daoservices.commodity.accounting;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.DocumentState;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequest;
