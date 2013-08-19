@@ -43,7 +43,7 @@
         <property name="jpaDialect" ref="jpaDialect"/>
     </bean>
 
-    <bean id="TEST" class="ru.axetta.ecafe.processor.core.test.synch.TestDBInit">
+    <bean id="testDBInit" class="ru.axetta.ecafe.processor.core.test.synch.TestDBInit">
         <property name="platformTransactionManager" ref="transactionManager"/>
     </bean>
 

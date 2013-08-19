@@ -110,6 +110,7 @@
     <orderEntry type="library" name="jasperlib" level="project" />
     <orderEntry type="library" name="junit" level="project" />
     <orderEntry type="library" name="jboss_J2EE" level="project" />
+    <orderEntry type="library" name="h2-1.3.161" level="project" />
   </component>
 </module>
 

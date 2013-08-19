@@ -339,7 +339,14 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
         }
         List<Item> missedISPPClients = new ArrayList<Item>();
         List<Client> missedRegisterClients = new ArrayList<Client>();
-        List<Client> orgClients = DAOService.getInstance().getClientsByOrgId(org.getIdOfOrg());
+        List<Client> orgClients = null;
+        try {
+            orgClients = DAOService.getInstance().findClientsForOrgAndFriendly(org.getIdOfOrg(), true);
+        } catch (Exception e) {
+            logger.error("Failed to load clients", e);
+            printError("Ошибка загрузки клиентов из БД: "+e);
+            return;
+        }
         //  Проверяем данные из Реестров и ищем клиентов в ИС ПП
         for (Item i : pupilInfos) {
             String lookupGuid = i.getGuid();

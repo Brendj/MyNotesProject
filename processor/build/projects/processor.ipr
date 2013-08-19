@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="AntConfiguration">
-    <buildFile url="file://$PROJECT_DIR$/processor.xml" />
+    <defaultAnt bundledAnt="true" />
+    <buildFile url="file://$PROJECT_DIR$/processor.xml">
+      <additionalClassPath />
+      <antReference projectDefault="true" />
+      <customJdkName value="" />
+      <maximumHeapSize value="128" />
+      <maximumStackSize value="2" />
+      <properties />
+    </buildFile>
   </component>
   <component name="ArtifactManager">
     <artifact build-on-make="true" name="payconv:jar">
@@ -483,11 +491,7 @@
       <entry name="*.sql" />
       <entry name="*.CharsetProvider" />
     </wildcardResourcePatterns>
-    <annotationProcessing>
-      <profile default="true" name="Default" enabled="false">
-        <processorPath useClasspath="true" />
-      </profile>
-    </annotationProcessing>
+    <annotationProcessing enabled="false" useClasspath="true" />
   </component>
   <component name="CopyrightManager" default="ecafe">
     <copyright>
@@ -499,53 +503,7 @@
     </copyright>
     <module2copyright />
   </component>
-  <component name="DataSourceManagerImpl" format="xml" hash="3113903199">
-    <data-source source="LOCAL" name="Moscow Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
-      <identifier-quote-string>&quot;</identifier-quote-string>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://172.18.16.14:5432/amoscow</jdbc-url>
-      <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>amoscow.public</schema-pattern>
-      <default-schemas>amoscow.public</default-schemas>
-      <libraries>
-        <library>
-          <url>jar://D:/home/java/testing/report/lib/postgresql-9.1-901.jdbc4.jar!/</url>
-        </library>
-      </libraries>
-    </data-source>
-    <data-source source="LOCAL" name="Kazan Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="f29aa7e6-4670-495a-8741-1713d2cee403">
-      <identifier-quote-string>&quot;</identifier-quote-string>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://192.168.15.158:5432/akazan</jdbc-url>
-      <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>akazan.public</schema-pattern>
-      <default-schemas>akazan.public</default-schemas>
-      <libraries>
-        <library>
-          <url>jar://D:/home/java/testing/report/lib/postgresql-9.1-901.jdbc4.jar!/</url>
-        </library>
-      </libraries>
-    </data-source>
-    <data-source source="LOCAL" name="Local MoscowDB" product="PostgreSQL" version="9.1.1" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="cedfba61-0f44-4ced-9708-18045311d229">
-      <identifier-quote-string>&quot;</identifier-quote-string>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/vmoscow</jdbc-url>
-      <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>vmoscow.public</schema-pattern>
-      <default-schemas>vmoscow.public</default-schemas>
-      <libraries>
-        <library>
-          <url>jar://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar!/</url>
-        </library>
-      </libraries>
-    </data-source>
-  </component>
+  <component name="DataSourceManagerImpl" compressed="false" hash="3113903199" />
   <component name="DependencyValidationManager">
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
@@ -1195,7 +1153,6 @@
           <option name="PARENT_SETTINGS_INSTALLED" value="true" />
         </codeStyleSettings>
         <codeStyleSettings language="SQL">
-          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
           <option name="PARENT_SETTINGS_INSTALLED" value="true" />
         </codeStyleSettings>
       </value>
@@ -1581,6 +1538,13 @@
         <root url="jar://$PROJECT_DIR$/../lib/icu4j-4_0_1.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/visualization-datasource-1.1.1.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/guava-10.0.1.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="h2-1.3.161">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/h2-1.3.161.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

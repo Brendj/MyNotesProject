@@ -19,27 +19,7 @@
       </facet>
     </facet>
     <facet type="Spring" name="Spring">
-      <configuration>
-        <fileset id="fileset" name="Spring Application Context" removed="false">
-          <file>file://$MODULE_DIR$/../../src/web/web/WEB-INF/jbossws-cxf.xml</file>
-          <file>file://$MODULE_DIR$/../../src/web/web/WEB-INF/jbossws-cxf_1.xml</file>
-          <file>file://$MODULE_DIR$/../../src/web/web/WEB-INF/services-app.xml</file>
-          <file>file://$MODULE_DIR$/../../src/web/web/WEB-INF/services-servlet.xml</file>
-          <file>jar://$MODULE_DIR$/../lib/apache/cxf/cxf-rt-ws-security-2.4.4.jar!/META-INF/cxf/cxf-extension-ws-security.xml</file>
-          <file>file://$MODULE_DIR$/../lib/apache/cxf/cxf-rt-ws-security-2.4.4.jar</file>
-          <file>jar://$MODULE_DIR$/../lib/apache/cxf/cxf-rt-ws-policy-2.4.4.jar!/META-INF/cxf/cxf-extension-policy.xml</file>
-          <file>file://$MODULE_DIR$/../lib/apache/cxf/cxf-rt-ws-policy-2.4.4.jar</file>
-          <file>jar://$MODULE_DIR$/../lib/apache/cxf/cxf-rt-core-2.4.4.jar!/META-INF/cxf/cxf.xml</file>
-          <file>file://$MODULE_DIR$/../lib/apache/cxf/cxf-rt-core-2.4.4.jar</file>
-          <file>jar://$MODULE_DIR$/../lib/apache/cxf/cxf-rt-bindings-soap-2.4.4.jar!/META-INF/cxf/cxf-extension-soap.xml</file>
-          <file>file://$MODULE_DIR$/../lib/apache/cxf/cxf-rt-bindings-soap-2.4.4.jar</file>
-          <file>jar://$MODULE_DIR$/../lib/apache/cxf/cxf-rt-transports-http-2.4.4.jar!/META-INF/cxf/cxf-extension-http.xml</file>
-          <file>jar://$MODULE_DIR$/../lib/apache/cxf/cxf-rt-transports-http-2.4.4.jar!/META-INF/cxf/osgi/cxf-extension-osgi.xml</file>
-          <file>jar://$MODULE_DIR$/../lib/apache/cxf/cxf-rt-transports-http-2.4.4.jar!/META-INF/cxf/cxf-servlet.xml</file>
-          <file>jar://$MODULE_DIR$/../lib/apache/cxf/cxf-rt-transports-http-2.4.4.jar!/META-INF/spring/osgiservlet.xml</file>
-          <file>file://$MODULE_DIR$/../lib/apache/cxf/cxf-rt-transports-http-2.4.4.jar</file>
-        </fileset>
-      </configuration>
+      <configuration />
     </facet>
     <facet type="hibernate" name="Hibernate">
       <configuration>
@@ -56,7 +36,7 @@
         <setting name="validation-enabled" value="true" />
         <setting name="provider-name" value="Hibernate" />
         <datasource-mapping>
-          <factory-entry name="processor" value="cedfba61-0f44-4ced-9708-18045311d229" />
+          <factory-entry name="processor" />
         </datasource-mapping>
         <deploymentDescriptor name="persistence.xml" url="file://$MODULE_DIR$/../../src/web/web/WEB-INF/classes/META-INF/persistence.xml" />
       </configuration>
@@ -118,10 +98,9 @@
     <orderEntry type="library" scope="PROVIDED" name="commons" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="cxf" level="project" />
     <orderEntry type="library" name="jasperlib" level="project" />
-    <orderEntry type="library" name="hibernate-4.0.1" level="project" />
-    <orderEntry type="library" name="jsf-impl-1.2_15-jbossorg-2" level="project" />
-    <orderEntry type="library" name="groovy-all-1.5.5" level="project" />
-    <orderEntry type="library" name="jboss_J2EE" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="hibernate-4.0.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="jsf-impl-1.2_15-jbossorg-2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="jboss_J2EE" level="project" />
   </component>
 </module>
 

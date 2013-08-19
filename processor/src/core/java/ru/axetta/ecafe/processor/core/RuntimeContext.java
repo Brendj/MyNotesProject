@@ -92,7 +92,7 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     public static boolean isTestRunning() {
-        return getAppContext().containsBean("TEST");
+        return getAppContext().containsBean("testDBInit");
     }
 
     public static class NotInitializedException extends RuntimeException {

@@ -1519,4 +1519,15 @@ public class DAOService {
     public Good getGood(Long globalId) {
         return entityManager.find(Good.class, globalId);
     }
+
+    public List<Client> findClientsForOrgAndFriendly(Long idOfOrg, boolean lazyLoadInit) throws Exception {
+        List<Client> cl = DAOUtils.findClientsForOrgAndFriendly(entityManager, entityManager.find(Org.class, idOfOrg));
+        if (lazyLoadInit) {
+            for (Client c: cl) {
+                c.getPerson().getSurname();
+                c.getClientGroup().getGroupName();
+            }
+        }
+        return cl;
+    }
 }
