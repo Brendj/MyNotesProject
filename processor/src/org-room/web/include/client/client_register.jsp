@@ -27,6 +27,9 @@
     }
 </style>
 
+<%-- Событие для добавления строки по изменению поля
+<a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" reRender="clientsToRegister"/>
+--%>
 
 
 <%--@elvariable id="clientRegisterPage" type="ru.axetta.ecafe.processor.web.ui.client.ClientRegisterPage"--%>
@@ -61,7 +64,6 @@
                         <h:outputText value="Фамилия"/>
                     </f:facet>
                     <h:inputText value="#{client.surname}" style="width:150px;" disabled="#{client.added}">
-                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" reRender="clientsToRegister"/>
                     </h:inputText>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};">
@@ -69,7 +71,6 @@
                         <h:outputText value="Имя"/>
                     </f:facet>
                     <h:inputText value="#{client.firstName}" style="width:150px;" disabled="#{client.added}">
-                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" reRender="clientsToRegister"/>
                     </h:inputText>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};">
@@ -77,7 +78,6 @@
                         <h:outputText value="Отчество"/>
                     </f:facet>
                     <h:inputText value="#{client.secondName}" style="width:150px;" disabled="#{client.added}">
-                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" reRender="clientsToRegister"/>
                     </h:inputText>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};">
@@ -86,7 +86,6 @@
                     </f:facet>
                     <h:selectOneMenu id="clientGroup" value="#{client.clientGroup}" style="width:150px;" disabled="#{client.added}" >
                         <f:selectItems value="#{clientRegisterPage.groups}"/>
-                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" reRender="clientsToRegister"/>
                     </h:selectOneMenu>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};" rendered="#{clientRegisterPage.showAddress}">
@@ -94,7 +93,6 @@
                         <h:outputText value="Адрес"/>
                     </f:facet>
                     <h:inputText value="#{client.address}" style="width:150px;" disabled="#{client.added}">
-                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" reRender="clientsToRegister"/>
                     </h:inputText>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};" rendered="#{clientRegisterPage.showPhone}">
@@ -103,7 +101,6 @@
                     </f:facet>
                     <rich:jQuery selector="#phoneInput" query="mask('(999) 999-9999')" timing="immediate"/>
                     <h:inputText value="#{client.phone}" style="width:150px;" disabled="#{client.added}" id="phoneInput">
-                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" reRender="clientsToRegister"/>
                     </h:inputText>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};" rendered="#{clientRegisterPage.showMobile}">
@@ -112,7 +109,6 @@
                     </f:facet>
                     <rich:jQuery selector="#mobileInput" query="mask('(999) 999-9999')" timing="immediate"/>
                     <h:inputText id="mobileInput" value="#{client.mobile}" style="width:150px;" disabled="#{client.added}">
-                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" reRender="clientsToRegister"/>
                     </h:inputText>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};" rendered="#{clientRegisterPage.showMobile}">
@@ -120,7 +116,6 @@
                         <h:outputText value="Уведомлять по СМС"/>
                     </f:facet>
                     <h:selectBooleanCheckbox value="#{client.notifyViaSMS}" styleClass="output-text" disabled="#{client.added}" >
-                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" reRender="clientsToRegister" />
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};" rendered="#{clientRegisterPage.showFax}">
@@ -129,7 +124,6 @@
                     </f:facet>
                     <rich:jQuery selector="#faxInput" query="mask('(999) 999-9999')" timing="immediate"/>
                     <h:inputText id="faxInput" value="#{client.fax}" style="width:150px;" disabled="#{client.added}">
-                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" reRender="clientsToRegister"/>
                     </h:inputText>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};" rendered="#{clientRegisterPage.showEmail}">
@@ -137,7 +131,6 @@
                         <h:outputText value="E-mail"/>
                     </f:facet>
                     <h:inputText value="#{client.email}" style="width:150px;" disabled="#{client.added}">
-                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" reRender="clientsToRegister"/>
                     </h:inputText>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};" rendered="#{clientRegisterPage.showEmail}">
@@ -145,7 +138,6 @@
                         <h:outputText value="Уведомлять по E-mail"/>
                     </f:facet>
                     <h:selectBooleanCheckbox value="#{client.notifyViaEmail}" disabled="#{client.added}" styleClass="output-text" >
-                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" reRender="clientsToRegister" />
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};" rendered="#{clientRegisterPage.showRemarks}">
@@ -153,7 +145,6 @@
                         <h:outputText value="Примечание"/>
                     </f:facet>
                     <h:inputText value="#{client.remarks}" style="width:150px;" disabled="#{client.added}">
-                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" reRender="clientsToRegister"/>
                     </h:inputText>
                 </rich:column>
 

@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientListEditPage;
 import ru.axetta.ecafe.processor.web.ui.discount.SetupDiscountPage;
+import ru.axetta.ecafe.processor.web.ui.modal.YesNoConfirmPanel;
 import ru.axetta.ecafe.processor.web.ui.modal.group.GroupCreatePanel;
 
 import org.apache.commons.lang.StringUtils;
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import javax.servlet.http.HttpSession;
 
 /**
@@ -36,7 +38,7 @@ public class MainPage {
 
     private HtmlPanelMenu mainMenu;
     private BasicWorkspacePage currentWorkspacePage = new DefaultWorkspacePage();
-    private Long idoforg = null;
+    private Long idoforg = 0L;
 
     public void setIdoforg (Long idoforg) {
         this.idoforg = idoforg;
@@ -106,9 +108,16 @@ public class MainPage {
         GroupCreatePanel panel = RuntimeContext.getAppContext().getBean(GroupCreatePanel.class);
         panel.fill();
         panel.addCallbackListener(currentWorkspacePage);
-        /*panel.show();
-        UIModalPanel modal = (UIModalPanel) panel.getPageComponent();
-        modal.*/
+    }
+
+    public void doShowYesNoConfirmModal (ActionEvent actionEvent) {
+        doShowYesNoConfirmModal();
+    }
+
+    public void doShowYesNoConfirmModal () {
+        YesNoConfirmPanel panel = RuntimeContext.getAppContext().getBean(YesNoConfirmPanel.class);
+        panel.fill();
+        panel.addCallbackListener(currentWorkspacePage);
     }
 
     public Object doShowSetupDiscountPage () {

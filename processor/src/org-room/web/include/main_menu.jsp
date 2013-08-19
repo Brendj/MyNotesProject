@@ -51,9 +51,9 @@
                                    style="text-decoration: none"/> --%>
                 </h:panelGroup>
             </f:facet>
-            <%--<rich:menuItem submitMode="ajax" id="сдфшьыEditPageMenuItem"
-                           binding="#{clientListEditPage.mainMenuComponent}" value="Заявки на питание"
-                           action="#{clientListEditPage.show}" reRender="workspaceForm" />--%>
+            <rich:menuItem submitMode="ajax" id="claimEditPageMenuItem"
+                           binding="#{claimCalendarEditPage.mainMenuComponent}" value="Заявки на питание"
+                           action="#{claimCalendarEditPage.show}" reRender="workspaceForm" />
         </rich:dropDownMenu>
 
         <%-- Групповое питание --%>

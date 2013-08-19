@@ -96,8 +96,8 @@ public class GoodRequestService {
     }
 
     @Transactional(readOnly = true)
-    public GoodRequest findGoodRequestPositionById(Long id){
-        TypedQuery<GoodRequest> query = entityManager.createQuery("from GoodRequestPosition where id=:id", GoodRequest.class);
+    public GoodRequestPosition findGoodRequestPositionById(Long id){
+        TypedQuery<GoodRequestPosition> query = entityManager.createQuery("from GoodRequestPosition where id=:id", GoodRequestPosition.class);
         query.setParameter("id",id);
         return query.getSingleResult();
     }

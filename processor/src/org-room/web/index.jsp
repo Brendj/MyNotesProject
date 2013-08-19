@@ -27,6 +27,9 @@
     <f:subview id="groupCreateSubView">
         <c:import url="include/modal/group/create.jsp" />
     </f:subview>
+    <f:subview id="yesNoConfirmSubView">
+        <c:import url="include/modal/yesnoconfirm.jsp" />
+    </f:subview>
 
     <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">
             <%-- Заголовок страницы --%>

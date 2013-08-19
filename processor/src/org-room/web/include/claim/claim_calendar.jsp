@@ -5,16 +5,114 @@
 <%--
   Created by IntelliJ IDEA.
   User: chirikov
-  Date: 15.08.13
-  Time: 15:44
+  Date: 30.07.13
+  Time: 13:39
   To change this template use File | Settings | File Templates.
 --%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
-<head>
-    <title></title>
-</head>
-<body>
+<%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 
-</body>
-</html>
+<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
+<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
+<%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
+<%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+<style>
+    .output-text-mod {
+        font-family: Tahoma, Arial, Sans-Serif;
+        font-size: 10pt;
+        color: #000;
+        white-space: nowrap;
+        padding-right: 10px;
+    }
+</style>
+
+
+
+<%--@elvariable id="claimCalendarEditPage" type="ru.axetta.ecafe.processor.web.ui.claim.ClaimCalendarEditPage"--%>
+<a4j:form>
+    <h:panelGrid id="claimCalendarEditPage" binding="#{claimCalendarEditPage.pageComponent}" styleClass="borderless-grid">
+
+
+        <a4j:region>
+        <h:panelGrid id="months" styleClass="borderless-grid">
+            <h:selectOneMenu id="month" value="#{claimCalendarEditPage.month}" style="width:150px;" disabled="#{client.added}" rendered="#{!claimCalendarEditPage.changesMade}">
+                <f:selectItems value="#{claimCalendarEditPage.months}"/>
+                <a4j:support event="onchange" actionListener="#{claimCalendarEditPage.doChangeMonth}" reRender="claimsCalendar, controls"/>
+            </h:selectOneMenu>
+
+
+            <h:selectOneMenu id="monthWithConfirm" value="#{claimCalendarEditPage.month}" style="width:150px;" disabled="#{client.added}" rendered="#{claimCalendarEditPage.changesMade}" >
+                <f:selectItems value="#{claimCalendarEditPage.months}"/>
+                <a4j:support event="onchange" reRender="yesNoConfirmPanel" action="#{mainPage.doShowYesNoConfirmModal}"
+                             oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.show();"/>
+            </h:selectOneMenu>
+        </h:panelGrid>
+        </a4j:region>
+
+        <a4j:region>
+        <rich:panel id="claimsCalendar" style="width:1200px; height: 550px; overflow:auto; background: none;">
+            <rich:dataTable value="#{claimCalendarEditPage.entries}" var="e"
+                            width="350px" rows="15"
+                            id="table" rowKeyVar="row">
+                <rich:column>
+                    <f:facet name="header">
+                        <h:outputText value="№"></h:outputText>
+                    </f:facet>
+                    <h:outputText value="#{row+1}"></h:outputText>
+                </rich:column>
+                <rich:column>
+                    <f:facet name="header">
+                        <h:outputText value="Комплекс" />
+                    </f:facet>
+                    <h:outputText styleClass="output-text-mod" value="#{e.food}" />
+                </rich:column>
+                <rich:columns value="#{claimCalendarEditPage.columns}"
+                              var="col" styleClass="left-aligned-column"
+                              index="ind" headerClass="center-aligned-column" >
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="#{col.title}" />
+                    </f:facet>
+
+                    <rich:inplaceInput layout="block" value="#{e.data[col.date]}"
+                                       converterMessage="Price value should be integer. Price at row #{row+1} can't be changed."
+                                       id="inplace"
+                                       changedHoverClass="hover" viewHoverClass="hover"
+                                       viewClass="inplace" changedClass="inplace"
+                                       selectOnEdit="true" editEvent="ondblclick">
+                        <a4j:support event="onchange" reRender="controls,months" actionListener="#{claimCalendarEditPage.doValueChange}" />
+                    </rich:inplaceInput>
+                </rich:columns>
+                <%--<rich:column>
+                    <f:facet name="header">
+                        <h:outputText value="Price" />
+                    </f:facet>
+                </rich:column>--%>
+                <f:facet name="footer">
+                    <rich:datascroller ajaxSingle="false"/>
+                </f:facet>
+            </rich:dataTable>
+        </rich:panel>
+
+        <rich:panel style="width:1200px; background: none" id="controls">
+            <table cellpadding="0" cellspacing="0">
+                <tr>
+                    <td>
+                        <a4j:commandButton value="Применить" disabled="#{!claimCalendarEditPage.changesMade}" action="#{claimCalendarEditPage.doApply}">
+                        </a4j:commandButton>
+                    </td>
+                    <td>
+                        <a4j:status id="registerStatus">
+                            <f:facet name="start">
+                                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+                            </f:facet>
+                        </a4j:status>
+                    </td>
+                </tr>
+            </table>
+        </rich:panel>
+        </a4j:region>
+
+
+    </h:panelGrid>
+</a4j:form>
