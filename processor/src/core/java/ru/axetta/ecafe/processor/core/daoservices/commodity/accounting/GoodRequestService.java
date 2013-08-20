@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +27,8 @@ import java.util.UUID;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequestPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +47,7 @@ import java.util.UUID;
  * To change this template use File | Settings | File Templates.
  */
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class GoodRequestService {
 
     @PersistenceContext
@@ -228,4 +231,40 @@ public class GoodRequestService {
         goodRequestPosition = entityManager.merge(goodRequestPosition);
     }
 
+
+    public GoodRequest createGoodRequestWithPosition(long idoforg, long idofgood, long time, long totalCount, String comment) {
+        //  Формируем номер по маске {idOfOrg}-{yyMMdd}-ЗВК-{countToDay}. countToDay всегда первый
+        Date now = new Date(System.currentTimeMillis());
+        String number = "";
+        number = "" + idoforg;
+        number = number + "-" + new SimpleDateFormat("yyMMdd").format(now);
+        number = number + "-ЗВК-1";
+
+        Good good = DAOService.getInstance().getGood(idofgood);
+
+        //  Создание GoodRequest
+        GoodRequest goodRequest = new GoodRequest();
+        goodRequest.setOrgOwner(idoforg);
+        goodRequest.setDateOfGoodsRequest(new Date(time));
+        goodRequest.setDoneDate(new Date(time));
+        goodRequest.setNumber(number);
+        goodRequest.setState(DocumentState.CREATED);
+        goodRequest.setDeletedState(false);
+        goodRequest.setCreatedDate(now);
+        goodRequest.setComment(comment);
+        goodRequest = save(goodRequest);
+
+        //  Создание GoodRequestPosition
+        GoodRequestPosition pos = new GoodRequestPosition();
+        pos.setGoodRequest(goodRequest);
+        pos.setGood(good);
+        pos.setDeletedState(false);
+        pos.setOrgOwner(idoforg);
+        pos.setUnitsScale(good.getUnitsScale());
+        pos.setNetWeight(good.getNetWeight());
+        pos.setCreatedDate(now);
+        pos.setTotalCount(totalCount);
+        save(pos);
+        return goodRequest;
+    }
 }

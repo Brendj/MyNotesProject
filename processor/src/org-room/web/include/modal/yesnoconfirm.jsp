@@ -37,7 +37,6 @@
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.hide();"
                                    styleClass="command-button" style="width: 80px;"/>
                 <a4j:commandButton value="Нет" action="#{yesNoConfirmPanel.doNo}"
-                                   reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.hide();"
                                    styleClass="command-button" style="width: 80px;"/>
             </h:panelGrid>

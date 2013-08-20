@@ -1369,4 +1369,11 @@ public class DAOUtils {
         q.setParameter("guardSan", guardSan);
         return q.list();
     }
+
+
+    public static List<Good> getAllGoods (Session persistenceSession) {
+        Query query = persistenceSession.createQuery("from Good");
+        List list = query.list();
+        return list;
+    }
 }

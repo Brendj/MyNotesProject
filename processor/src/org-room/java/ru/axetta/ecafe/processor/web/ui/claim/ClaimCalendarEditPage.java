@@ -6,10 +6,14 @@ package ru.axetta.ecafe.processor.web.ui.claim;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestService;
+import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.DocumentState;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequestPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.modal.YesNoEvent;
 import ru.axetta.ecafe.processor.web.ui.modal.YesNoListener;
@@ -26,6 +30,7 @@ import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -40,10 +45,12 @@ import java.util.*;
 @Component
 @Scope("session")
 public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoListener{
+    public static final long DEFAULT_EDITABLE_DATE = 172800000L;
     public static final long MILLIS_IN_MONTH = 2628000000L;
     private static final Logger logger = LoggerFactory.getLogger(ClaimCalendarEditPage.class);
     private final DateFormat comboboxDF = new SimpleDateFormat ("MMMMM yyyy", new Locale("ru"));
     private final DateFormat columnDF = new SimpleDateFormat ("dd MMM", new Locale("ru"));
+    private static final String NEW_CLAIM_COMMENT = "- Добавлено в тонком клиенте -";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -105,7 +112,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
             session = (Session) entityManager.getDelegate();
             fill(session, buildData);
         } catch (Exception e) {
-            logger.error("Failed to load client by name", e);
+            logger.error("Failed to load claims data", e);
             sendError("Произошел критический сбой, пожалуйста, повторите попытку позже");
         } finally {
             //HibernateUtils.close(session, logger);
@@ -115,10 +122,10 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     public void fill(Session session, boolean buildData) throws Exception {
         //  Устанавливаем даты, за которые следует отобразить таблицу
         Calendar start = new GregorianCalendar();
-        start.setTimeInMillis(month);
+        start.setTimeInMillis(getMonth());
         resetDate(start);
         Calendar end = new GregorianCalendar();
-        end.setTimeInMillis(month);
+        end.setTimeInMillis(getMonth());
         end.set(Calendar.MONTH, end.get(Calendar.MONTH) + 1);
         resetDate(end);
 
@@ -134,10 +141,14 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         resetDate (dateFrom);
         resetDate (dateTo);
 
+
+        //  Загружаем все товары, которые есть
+        List<Good> goods = DAOUtils.getAllGoods(session);
+
         
         Map <String, List<long []>> tmpData = new TreeMap <String, List <long []>> ();
         entries.clear();
-        //  Загружам заявки из БД
+        //  Загружам заявки из БД через методы core модуля
         Integer deletedState = 2;
         List<DocumentState> stateList = new ArrayList<DocumentState>();
         for (DocumentState i: DocumentState.values()){
@@ -165,27 +176,24 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
             }
         }
 
-        for (String good : tmpData.keySet()) {
-            List <long []> e = tmpData.get(good);
-            Entry entry = new Entry (good);
-            for (long d [] : e) {
-                Calendar cal = Calendar.getInstance();
-                cal.setTimeInMillis(d[0]);
-                resetDate(cal);
-                entry.add(cal.getTimeInMillis(), d[1], d[2]);
+
+        //  Листаем ВСЕ товары и соотносим их с заявками
+        for (Good g : goods) {
+            String goodName = g.getFullName();
+            List <long []> e = tmpData.get(goodName);   //  Ищем по полному имени
+            Entry entry = new Entry (goodName, g.getGlobalId());
+            if (e != null && e.size() > 0) {
+                for (long d [] : e) {
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTimeInMillis(d[0]);
+                    resetDate(cal);
+                    entry.add(cal.getTimeInMillis(), d[1], d[2]);
+                }
             }
             entries.add(entry);
-        }/*
-
-        Entry e = new Entry ("Комплекс 1");
-        e.add(1375387200000L, 120);
-        e.add(1375560000000L, 140);
-        entries.add(e);
-
-        e = new Entry ("Комплекс 2");
-        e.add(1375473600000L, 130);
-        entries.add(e);*/
+        }
     }
+
 
     private void buildColumns (Calendar dateFrom, Calendar dateTo) {
         columns.clear();
@@ -198,7 +206,6 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
 
         for (; start<end; ) {
             columns.add(new DateColumn(startDate.getTimeInMillis(), columnDF.format(startDate.getTime())));
-
             startDate.set(Calendar.DAY_OF_MONTH, startDate.get(Calendar.DAY_OF_MONTH) + 1);
             start = startDate.getTimeInMillis();
         }
@@ -208,8 +215,11 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     public void save() {
         Session session = null;
         try {
+            resetMessages();
             session = (Session) entityManager.getDelegate();
             save(session);
+            sendInfo("Изменения в заявки успешно внесены");
+            changesMade = false;
         } catch (Exception e) {
             logger.error("Failed to load client by name", e);
             sendError("Произошел критический сбой, пожалуйста, повторите попытку позже");
@@ -221,12 +231,30 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     public void save(Session session) throws Exception {
         for (Entry e : entries) {
             for (long ts : e.data.keySet()) {
-                Long v = e.data.get(ts);
-                Long id = e.ids.get(ts);
+                Long v = e.getDataForDate(ts);
+                if (v == null) {
+                    continue;
+                }
+                List<Long> ids = e.ids.get(ts);
 
-                if (id != null) {
-                    GoodRequestPosition pos = goodRequestService.findGoodRequestPositionById(id);
-                    //goodRequestService.save();
+                //  Если списка id не существует, это обозначает что значения добавлены, необходимо создавать заявку
+                if (ids == null) {
+                    goodRequestService.createGoodRequestWithPosition(getOrg().getIdOfOrg(),
+                                                                     e.getIdofgood(), ts, v, NEW_CLAIM_COMMENT);
+                }
+                //  Иначе - скидываем у всех заявок значения в 0, кроме первой
+                else {
+                    //  Получаем каждую
+                    for (int i=0; i<ids.size(); i++) {
+                        GoodRequestPosition pos = goodRequestService.findGoodRequestPositionById(ids.get(i));
+                        if (i == 0) {
+                            pos.setTotalCount(v);
+                        } else {
+                            pos.setTotalCount(0L);
+                        }
+                        pos.setLastUpdate(new Date(System.currentTimeMillis()));
+                        goodRequestService.save(pos);
+                    }
                 }
             }
         }
@@ -241,6 +269,11 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
      * GUI
      * ****************************************************************************************************************
      */
+    @Override
+    public void onShow() throws Exception {
+        RuntimeContext.getAppContext().getBean(ClaimCalendarEditPage.class).fill();
+    }
+
     public void doChangeMonth (ActionEvent actionEvent) {
         prevMonth = month;
         RuntimeContext.getAppContext().getBean(ClaimCalendarEditPage.class).fill();
@@ -252,6 +285,42 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
 
     public void doApply () {
         RuntimeContext.getAppContext().getBean(ClaimCalendarEditPage.class).save();
+    }
+
+    public void doValidateValue (javax.faces.event.ValueChangeEvent event) {
+        resetMessages();
+        try {
+            String val = event.getNewValue().toString();
+            Long.parseLong(val);
+        } catch (Exception e) {
+            sendError("Значение не может быть сохранено, допускаются только цифровые значения");
+        }
+    }
+
+    public boolean isEditable (long ts) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTimeInMillis(ts);
+        Calendar now = new GregorianCalendar();
+        now.setTimeInMillis(System.currentTimeMillis()+ getEditableDateIncrement ());
+        resetDate(cal);
+        resetDate(now );
+        if (cal.getTimeInMillis() > now.getTimeInMillis()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public String getColumnFontColor (long ts) {
+        Calendar now = new GregorianCalendar();
+        now.setTimeInMillis(System.currentTimeMillis());
+        resetDate(now);
+        if (now.getTimeInMillis() == ts) {
+            return ""
+                    + "color: #DBFFDE;";
+        } else {
+            return "";
+        }
     }
 
     public List<Entry> getEntries() {
@@ -267,6 +336,13 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     }
 
     public Long getMonth() {
+        if (month == null) {
+            Calendar cal = new GregorianCalendar();
+            cal.setTimeInMillis(System.currentTimeMillis());
+            cal.set(Calendar.DAY_OF_MONTH, 1);
+            resetDate(cal);
+            return cal.getTimeInMillis();
+        }
         return month;
     }
 
@@ -286,8 +362,13 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         startDate.set(Calendar.MONTH, Calendar.SEPTEMBER);
         startDate.set(Calendar.DAY_OF_MONTH, 1);
         resetDate(startDate);
+        Calendar endDate = new GregorianCalendar();
+        endDate.set(Calendar.YEAR, 2014);
+        endDate.set(Calendar.MONTH, Calendar.SEPTEMBER);
+        endDate.set(Calendar.DAY_OF_MONTH, 1);
+        resetDate(endDate);
         long start = startDate.getTimeInMillis();
-        long end = System.currentTimeMillis();
+        long end = endDate.getTimeInMillis();
 
         for (; start<end; ) {
             String name = comboboxDF.format(startDate.getTime());
@@ -349,7 +430,15 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     public void sendInfo(String message) {
         infoMessages = message;
     }
-    
+
+    public String getInfoMessages() {
+        return infoMessages;
+    }
+
+    public String getErrorMessages() {
+        return errorMessages;
+    }
+
     private void resetDate (Calendar date) {
         date.set(Calendar.HOUR_OF_DAY, 0);
         date.set(Calendar.MINUTE, 0);
@@ -357,19 +446,41 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         date.set(Calendar.MILLISECOND, 0);
     }
 
+    public long getEditableDateIncrement() {
+        return DEFAULT_EDITABLE_DATE;
+    }
+
     public static class Entry {
+        private long idofgood;
         private String food;
         private Map<Long, Long> data;
-        private Map<Long, Long> ids;
+        private Map<Long, List<Long>> ids;
         
-        public Entry (String food) {
+        public Entry (String food, long idofgood) {
             this.food = food;
+            this.idofgood = idofgood;
             data = new HashMap<Long, Long>();
-            ids = new HashMap<Long, Long>();
+            ids = new HashMap<Long, List<Long>>();
+        }
+
+        public long getIdofgood() {
+            return idofgood;
         }
 
         public String getFood() {
             return food;
+        }
+        
+        public Long getDataForDate(long ts) {
+            Object o = data.get(ts);
+            if (o == null || o.toString().length() < 1) {
+                return null;
+            }
+            try {
+                return Long.parseLong(o.toString());
+            } catch (Exception e) {
+                return null;
+            }
         }
 
         public Map<Long, Long> getData() {
@@ -381,8 +492,19 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         }
 
         public void add(long date, long value, long idofgoodsrequestposition) {
+            //  Суммируем значения за одну дату
+            if (data.get(date) != null) {
+                value = data.get(date) + value;
+            }
             data.put(date, value);
-            ids.put(date, idofgoodsrequestposition);
+
+            //  Сохраняем несколько idofgoodsrequestposition в общем массиве за одну дату
+            List<Long> localIds = ids.get(date);
+            if (localIds == null) {
+                localIds = new ArrayList<Long> ();
+                ids.put(date, localIds);
+            }
+            localIds.add(idofgoodsrequestposition);
         }
     }
 

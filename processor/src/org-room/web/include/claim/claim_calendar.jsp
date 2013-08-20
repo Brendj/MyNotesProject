@@ -74,13 +74,15 @@
                         <h:outputText escape="true" value="#{col.title}" />
                     </f:facet>
 
-                    <rich:inplaceInput layout="block" value="#{e.data[col.date]}"
+                    <h:outputText rendered="#{!claimCalendarEditPage.isEditable(col.date)}" value="#{e.data[col.date]}"
+                                  styleClass="output-text" style="#{claimCalendarEditPage.getColumnFontColor(col.date)}" />
+
+                    <rich:inplaceInput layout="block" value="#{e.data[col.date]}" rendered="#{claimCalendarEditPage.isEditable(col.date)}"
                                        converterMessage="Price value should be integer. Price at row #{row+1} can't be changed."
-                                       id="inplace"
-                                       changedHoverClass="hover" viewHoverClass="hover"
+                                       id="inplace" changedHoverClass="hover" viewHoverClass="hover"
                                        viewClass="inplace" changedClass="inplace"
                                        selectOnEdit="true" editEvent="ondblclick">
-                        <a4j:support event="onchange" reRender="controls,months" actionListener="#{claimCalendarEditPage.doValueChange}" />
+                        <a4j:support event="onchange" reRender="controls,months,messages" actionListener="#{claimCalendarEditPage.doValueChange}" />
                     </rich:inplaceInput>
                 </rich:columns>
                 <%--<rich:column>
@@ -98,7 +100,16 @@
             <table cellpadding="0" cellspacing="0">
                 <tr>
                     <td>
-                        <a4j:commandButton value="Применить" disabled="#{!claimCalendarEditPage.changesMade}" action="#{claimCalendarEditPage.doApply}">
+                    <h:panelGrid id="messages">
+                        <h:outputText escape="true" value="#{claimCalendarEditPage.errorMessages}" rendered="#{not empty claimCalendarEditPage.errorMessages}" styleClass="error-messages" />
+                        <h:outputText escape="true" value="#{claimCalendarEditPage.infoMessages}" rendered="#{not empty claimCalendarEditPage.infoMessages}" styleClass="info-messages" />
+                    </h:panelGrid>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a4j:commandButton value="Применить" reRender="claimsCalendar,messages,months" disabled="#{!claimCalendarEditPage.changesMade}"
+                                           action="#{claimCalendarEditPage.doApply}">
                         </a4j:commandButton>
                     </td>
                     <td>
