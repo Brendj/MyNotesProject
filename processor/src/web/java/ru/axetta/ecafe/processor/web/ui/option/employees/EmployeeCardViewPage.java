@@ -32,9 +32,10 @@ public class EmployeeCardViewPage extends BasicWorkspacePage{
     @Override
     public void onShow() throws Exception {
         card = employeeCardGroupPage.getCurrentCard();
-        //List<CardItem> cardItems = serviceBean.findCardsByEmployee(employee.getIdOfVisitor());
-        //employee.clearCardItems();
-        //employee.addCard(cardItems);
+        if(card.getVisitorItem()==null){
+            VisitorItem visitorItem = serviceBean.getEmployeeByCard(card.getId());
+            card.setVisitorItem(visitorItem);
+        }
     }
 
     public CardItem getCard() {

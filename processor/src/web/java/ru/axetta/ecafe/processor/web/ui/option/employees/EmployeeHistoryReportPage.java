@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,7 +35,7 @@ public class EmployeeHistoryReportPage extends OnlineReportPage{
 
     @Override
     public void onShow() throws Exception {
-        cardEventOperationItems.clear();
+        cardEventOperationItems = new ArrayList<VisitorItem>();
     }
 
     public Object buildReport(){

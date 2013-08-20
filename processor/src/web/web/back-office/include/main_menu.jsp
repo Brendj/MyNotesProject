@@ -950,37 +950,37 @@
         <rich:panelMenuItem id="createEmployeeListMenuItem" binding="#{employeeCreatePage.mainMenuComponent}"
                             label="Создание" action="#{employeeCreatePage.show}" reRender="workspaceForm" />
 
-        <rich:panelMenuItem id="employeeHistoryReportMenuItem" binding="#{employeeHistoryReportPage.mainMenuComponent}"
-                            label="Отчет" action="#{employeeHistoryReportPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="employeesCardGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeesCardGroupPage"--%>
+        <rich:panelMenuGroup id="employeesCardGroupMenu" label="Карты" binding="#{employeesCardGroupPage.mainMenuComponent}">
 
-    </rich:panelMenuGroup>
+            <%--@elvariable id="employeeCardListPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardListPage"--%>
+            <%--@elvariable id="employeeCardGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardGroupPage"--%>
+            <%--@elvariable id="employeeCardViewPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardViewPage"--%>
+            <%--@elvariable id="employeeCardEditPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardEditPage"--%>
+            <%--@elvariable id="employeeCardCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardCreatePage"--%>
 
-    <%--@elvariable id="employeesCardGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeesCardGroupPage"--%>
-    <rich:panelMenuGroup id="employeesCardGroupMenu" label="Карты инженеров" binding="#{employeesCardGroupPage.mainMenuComponent}">
+            <rich:panelMenuItem id="showEmployeeCardListMenuItem" binding="#{employeeCardListPage.mainMenuComponent}"
+                                label="Список" action="#{employeeCardListPage.show}" reRender="workspaceForm" />
 
-        <%--@elvariable id="employeeCardListPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardListPage"--%>
-        <%--@elvariable id="employeeCardGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardGroupPage"--%>
-        <%--@elvariable id="employeeCardViewPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardViewPage"--%>
-        <%--@elvariable id="employeeCardEditPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardEditPage"--%>
-        <%--@elvariable id="employeeCardCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardCreatePage"--%>
+            <rich:panelMenuGroup id="selectedEmployeeCardGroupMenu" label="#{employeeCardGroupPage.currentCard.cardPrintedNo}"
+                                 binding="#{employeeCardGroupPage.mainMenuComponent}" rendered="false">
+                <a4j:support event="onclick" action="#{employeeCardGroupPage.show}" reRender="workspaceForm" />
 
-        <rich:panelMenuItem id="showEmployeeCardListMenuItem" binding="#{employeeCardListPage.mainMenuComponent}"
-                            label="Список" action="#{employeeCardListPage.show}" reRender="workspaceForm" />
+                <rich:panelMenuItem id="viewEmployeeCardMenuItem" binding="#{employeeCardViewPage.mainMenuComponent}"
+                                    label="Просмотр" action="#{employeeCardViewPage.show}" reRender="workspaceForm" />
 
-        <rich:panelMenuGroup id="selectedEmployeeCardGroupMenu" label="#{employeeCardGroupPage.currentCard.cardPrintedNo}"
-                             binding="#{employeeCardGroupPage.mainMenuComponent}" rendered="false">
-            <a4j:support event="onclick" action="#{employeeCardGroupPage.show}" reRender="workspaceForm" />
+                <rich:panelMenuItem id="editEmployeeCardMenuItem" binding="#{employeeCardEditPage.mainMenuComponent}"
+                                    label="Редактировать" action="#{employeeCardEditPage.show}" reRender="workspaceForm" />
 
-            <rich:panelMenuItem id="viewEmployeeCardMenuItem" binding="#{employeeCardViewPage.mainMenuComponent}"
-                                label="Просмотр" action="#{employeeCardViewPage.show}" reRender="workspaceForm" />
+            </rich:panelMenuGroup>
 
-            <rich:panelMenuItem id="editEmployeeCardMenuItem" binding="#{employeeCardEditPage.mainMenuComponent}"
-                                label="Редактировать" action="#{employeeCardEditPage.show}" reRender="workspaceForm" />
+            <rich:panelMenuItem id="createEmployeeCardListMenuItem" binding="#{employeeCardCreatePage.mainMenuComponent}"
+                                label="Создание" action="#{employeeCardCreatePage.show}" reRender="workspaceForm" />
 
         </rich:panelMenuGroup>
 
-        <rich:panelMenuItem id="createEmployeeCardListMenuItem" binding="#{employeeCardCreatePage.mainMenuComponent}"
-                            label="Создание" action="#{employeeCardCreatePage.show}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="employeeHistoryReportMenuItem" binding="#{employeeHistoryReportPage.mainMenuComponent}"
+                            label="Отчет по проходам" action="#{employeeHistoryReportPage.show}" reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
 

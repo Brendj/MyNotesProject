@@ -46,7 +46,7 @@
                 <rich:column headerClass="center-aligned-column">
                     <h:outputText escape="true" value="Название учреждения" styleClass="column-header" />
                 </rich:column>
-                <rich:column headerClass="center-aligned-column">
+                <rich:column headerClass="center-aligned-column" rendered="false">
                     <h:outputText escape="true" value="Тип" styleClass="column-header" />
                 </rich:column>
                 <rich:column headerClass="center-aligned-column">
@@ -77,7 +77,7 @@
             <rich:column headerClass="column-header">
                 <h:outputText escape="true" value="#{history.organization.shortName}" styleClass="output-text" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rendered="false">
                 <h:outputText escape="true" value="#{history.organization.refectoryType}" styleClass="output-text" />
             </rich:column>
             <rich:column headerClass="column-header">

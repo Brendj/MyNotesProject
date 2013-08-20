@@ -10,6 +10,7 @@
 
 <%-- Панель просмотра списка сотрудников --%>
 <%--@elvariable id="employeeCardEditPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardEditPage"--%>
+<%--@elvariable id="employeeSelectPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeSelectPage"--%>
 <h:panelGrid id="employeeCardEditGrid" binding="#{employeeCardEditPage.pageComponent}" styleClass="borderless-grid">
 
     <h:panelGrid columns="2">
@@ -18,12 +19,9 @@
         <h:panelGroup styleClass="borderless-div">
             <h:inputText value="#{employeeCardEditPage.card.visitorItem.shortFullName}" readonly="true" styleClass="input-text"
                          style="margin-right: 2px;" />
-            <a4j:commandButton value="..." action="#{employeeCardEditPage.show}" reRender="modalEmployeeSelectorPanel"
+            <a4j:commandButton value="..." action="#{employeeSelectPage.show}" reRender="modalEmployeeSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalEmployeeSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;"/>
-            <a4j:commandButton value="..." action="#{mainPage.showClientSelectPage}" reRender="modalClientSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" rendered="false"/>
         </h:panelGroup>
 
         <h:outputLabel escape="true" value="Номер карты" styleClass="output-text" />

@@ -11,7 +11,7 @@ public enum CardOperationStation {
 
     REGISTRATION("Зарегестрирована"),
     ISSUE("Выдана"),
-    RETURN_OF("Возращена"),
+    RETURN_OF("Возвращена"),
     BLOCKING("Заблокирована");
 
     private final String description;

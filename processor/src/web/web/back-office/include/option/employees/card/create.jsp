@@ -22,9 +22,6 @@
              <a4j:commandButton value="..." action="#{employeeSelectPage.show}" reRender="modalEmployeeSelectorPanel"
                                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalEmployeeSelectorPanel')}.show();"
                                 styleClass="command-link" style="width: 25px;"/>
-             <a4j:commandButton value="..." action="#{mainPage.showClientSelectPage}" reRender="modalClientSelectorPanel"
-                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
-                                styleClass="command-link" style="width: 25px;" rendered="false"/>
          </h:panelGroup>
 
          <h:outputLabel escape="true" value="Номер карты" styleClass="output-text" />

@@ -35,6 +35,10 @@ public class EmployeeCardEditPage extends BasicWorkspacePage implements SelectEm
     @Override
     public void onShow() throws Exception {
         card = employeeCardGroupPage.getCurrentCard();
+        if(card.getVisitorItem()==null){
+            VisitorItem visitorItem = serviceBean.getEmployeeByCard(card.getId());
+            card.setVisitorItem(visitorItem);
+        }
     }
 
     @Override

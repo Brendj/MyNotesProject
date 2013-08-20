@@ -43,69 +43,6 @@
 
      </h:panelGrid>
 
-    <rich:panel headerClass="workspace-panel-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Карты (#{employeeEditPage.employee.countCardItems})" />
-        </f:facet>
-        <rich:dataTable id="clientCardTable" value="#{employeeEditPage.employee.cardItems}" var="card"
-                        rows="8"
-                        columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column"
-                        footerClass="data-table-footer">
-            <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:outputText escape="true" value="Номер карты" />
-                </f:facet>
-                <a4j:commandLink reRender="mainMenu, workspaceForm" styleClass="command-link">
-                    <h:outputText escape="true" value="#{card.cardNo}" converter="cardNoConverter"
-                                  styleClass="output-text" />
-                </a4j:commandLink>
-            </rich:column>
-            <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:outputText escape="true" value="Статус" />
-                </f:facet>
-                <h:outputText escape="true" value="#{card.cardStation}" styleClass="output-text" />
-            </rich:column>
-            <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:outputText escape="true" value="Дата создания" />
-                </f:facet>
-                <h:outputText escape="true" value="#{card.createDate}" converter="timeConverter" styleClass="output-text" />
-            </rich:column>
-            <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:outputText escape="true" value="Последний день действия" />
-                </f:facet>
-                <h:outputText escape="true" value="#{card.validDate}" converter="timeConverter" styleClass="output-text" />
-            </rich:column>
-            <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:outputText escape="true" value="Редактировать" />
-                </f:facet>
-                <a4j:commandLink reRender="mainMenu, workspaceForm" styleClass="command-link">
-                    <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
-                </a4j:commandLink>
-            </rich:column>
-            <f:facet name="footer">
-                <rich:datascroller for="clientCardTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
-                                   stepControls="auto" boundaryControls="hide">
-                    <f:facet name="previous">
-                        <h:graphicImage value="/images/16x16/left-arrow.png" />
-                    </f:facet>
-                    <f:facet name="next">
-                        <h:graphicImage value="/images/16x16/right-arrow.png" />
-                    </f:facet>
-                </rich:datascroller>
-            </f:facet>
-        </rich:dataTable>
-
-        <h:panelGrid styleClass="borderless-grid" columns="2">
-            <a4j:commandButton value="Добавить карту" action="#{employeeEditPage.addCard}"
-                               reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
-        </h:panelGrid>
-
-    </rich:panel>
-
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Сохранить" action="#{employeeEditPage.save}"
                            reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />

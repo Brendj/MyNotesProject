@@ -17,6 +17,7 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,10 +40,6 @@ public class EmployeeServiceBean {
 
     final String FIND_ALL_EMPLOYEE_ITEMS = "select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(v) from Visitor v where v.VisitorType=1 order by v.idOfVisitor";
     final String FIND_ALL_EMPLOYEE_ITEMS_ORDER_BY_NAME = "select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(v) from Visitor v where v.VisitorType=1 order by v.person.firstName";
-    final String GET_EMPLOYEE_ITEMS_BY_ID = "select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(v) from Visitor v where v.VisitorType=1 and v.idOfVisitor=:idOfVisitor order by v.idOfVisitor";
-    //final String EXTRACT_EMPLOYEE_ID = "select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(v) from Visitor v where v.VisitorType=1 order by v.idOfVisitor";
-    final String FIND_ALL = "from Visitor v left join v.cards card order by v.idOfVisitor";
-    final String FIND_ALL_TEMP_CARD = "from CardTemp ct";
     final String FIND_ALL_TEMP_CARD_BY_EMPLOYEE = "select new ru.axetta.ecafe.processor.core.daoservices.employees.CardItem(ct) from CardTemp ct where ct.visitor.idOfVisitor=:idOfVisitor and ct.clientTypeEnum=2 order by ct.createDate desc";
     final String FIND_ALL_TEMP_CARD_BY_EMPLOYEE_TYPE = "select new ru.axetta.ecafe.processor.core.daoservices.employees.CardItem(ct, ct.visitor) from CardTemp ct where ct.clientTypeEnum=2 order by ct.createDate desc";
     final String FIND_ENTER_EVENT_BY_EMPLOYEE ="select new ru.axetta.ecafe.processor.core.daoservices.employees.CardEventOperationItem(ee.evtDateTime, ee.passDirection, ee.org.idOfOrg, ee.org.shortName, ee.org.refectoryType) from EnterEvent ee where ee.idOfVisitor=:idOfVisitor and ee.evtDateTime between :beginDate and :endDate order by ee.evtDateTime desc, ee.idOfVisitor asc";
@@ -50,62 +47,30 @@ public class EmployeeServiceBean {
     @PersistenceContext
     private EntityManager entityManager;
 
-    @PostConstruct
-    public void init(){
-    }
-
     @Transactional(readOnly = true)
     public List<VisitorItem> findAllEmployees(){
-        Query query = entityManager.createQuery(FIND_ALL_EMPLOYEE_ITEMS);
+        TypedQuery<VisitorItem> query = entityManager.createQuery(FIND_ALL_EMPLOYEE_ITEMS, VisitorItem.class);
         return query.getResultList();
     }
-
-    //@Transactional(readOnly = true)
-    //public List<CardEventOperationItem> generateEmployeeReport(Date beginDate, Date endDate){
-    //    List<CardEventOperationItem> cardEventOperationItems = new ArrayList<CardEventOperationItem>();
-    //    Calendar calendar = Calendar.getInstance();
-    //    calendar.setTime(beginDate);
-    //    Query query = entityManager.createQuery(FIND_ALL_EMPLOYEE_ITEMS_ORDER_BY_NAME);
-    //    List<VisitorItem> visitorItemList = query.getResultList();
-    //    if (visitorItemList!=null && !visitorItemList.isEmpty()){
-    //        for (VisitorItem visitorItem: visitorItemList){
-    //            while (endDate.getTime()>calendar.getTimeInMillis()){
-    //                query = entityManager.createQuery(FIND_ENTER_EVENT_BY_EMPLOYEE);
-    //                query.setParameter("idOfVisitor", visitorItem.getIdOfVisitor());
-    //                query.setParameter("beginDate",beginDate);
-    //                query.setParameter("endDate",endDate);
-    //                cardEventOperationItems = query.getResultList();
-    //                int cardEventOperationItemsSize = cardEventOperationItems.size();
-    //                for (int i = 0;i < cardEventOperationItemsSize; i++) {
-    //                    CardEventOperationItem item = cardEventOperationItems.get(i);
-    //                    item.setEmployee(visitorItem);
-    //                    cardEventOperationItems.set(i, item);
-    //                }
-    //                calendar.add(Calendar.DATE,1);
-    //            }
-    //        }
-    //    }
-    //    return cardEventOperationItems;
-    //}
 
     @Transactional(readOnly = true)
     public List<VisitorItem> generateEmployeeHistoryReport(Date beginDate, Date endDate){
         List<VisitorItem> reportResult = new ArrayList<VisitorItem>();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(beginDate);
-        Query query = entityManager.createQuery(FIND_ALL_EMPLOYEE_ITEMS_ORDER_BY_NAME);
-        List<VisitorItem> visitorItemList = query.getResultList();
+        TypedQuery<VisitorItem> visitorItemTypedQuery = entityManager.createQuery(FIND_ALL_EMPLOYEE_ITEMS_ORDER_BY_NAME, VisitorItem.class);
+        List<VisitorItem> visitorItemList = visitorItemTypedQuery.getResultList();
         while (endDate.getTime()>calendar.getTimeInMillis()){
             VisitorItem currentVisitor = null;
             Date startDate = calendar.getTime();
             calendar.add(Calendar.DATE,1);
             Date finishDate = calendar.getTime();
             for (VisitorItem item: visitorItemList){
-                query = entityManager.createQuery(FIND_ENTER_EVENT_BY_EMPLOYEE);
-                query.setParameter("idOfVisitor", item.getIdOfVisitor());
-                query.setParameter("beginDate",startDate);
-                query.setParameter("endDate",finishDate);
-                List<CardEventOperationItem> cardEventOperationItems = query.getResultList();
+                TypedQuery<CardEventOperationItem> cardEventOperationItemTypedQuery = entityManager.createQuery(FIND_ENTER_EVENT_BY_EMPLOYEE, CardEventOperationItem.class);
+                cardEventOperationItemTypedQuery.setParameter("idOfVisitor", item.getIdOfVisitor());
+                cardEventOperationItemTypedQuery.setParameter("beginDate",startDate);
+                cardEventOperationItemTypedQuery.setParameter("endDate",finishDate);
+                List<CardEventOperationItem> cardEventOperationItems = cardEventOperationItemTypedQuery.getResultList();
                 if(cardEventOperationItems!=null && !cardEventOperationItems.isEmpty()){
                     currentVisitor = new VisitorItem(item);
                     currentVisitor.setOperationDate(startDate);
@@ -117,24 +82,6 @@ public class EmployeeServiceBean {
             }
 
         }
-        //if (visitorItemList!=null && !visitorItemList.isEmpty()){
-        //    for (VisitorItem visitorItem: visitorItemList){
-        //        while (endDate.getTime()>calendar.getTimeInMillis()){
-        //            query = entityManager.createQuery(FIND_ENTER_EVENT_BY_EMPLOYEE);
-        //            query.setParameter("idOfVisitor", visitorItem.getIdOfVisitor());
-        //            query.setParameter("beginDate",beginDate);
-        //            query.setParameter("endDate",endDate);
-        //            cardEventOperationItems = query.getResultList();
-        //            int cardEventOperationItemsSize = cardEventOperationItems.size();
-        //            for (int i = 0;i < cardEventOperationItemsSize; i++) {
-        //                CardEventOperationItem item = cardEventOperationItems.get(i);
-        //                item.setEmployee(visitorItem);
-        //                cardEventOperationItems.set(i, item);
-        //            }
-        //            calendar.add(Calendar.DATE,1);
-        //        }
-        //    }
-        //}
         return reportResult;
     }
 
@@ -142,13 +89,13 @@ public class EmployeeServiceBean {
     public Long saveEmployeeCard(CardItem cardItem, Long idOfEmployer) throws Exception{
         Card c = DAOUtils.findCardByCardNo((Session) entityManager.getDelegate(), cardItem.getCardNo());
         if (c != null) {
-            final String format = "Карта уже зарегистрирована на клиента: %d";
+            final String format = "карта уже зарегистрирована на клиента: %d.";
             final String message = String.format(format, c.getClient().getIdOfClient());
             throw new Exception(message);
         }
         Visitor visitor = entityManager.find(Visitor.class, idOfEmployer);
         if(visitor.getVisitorType()!=VisitorType.EMPLOYEE){
-            throw new Exception("Клиент не является инженером");
+            throw new Exception("клиент не является инженером.");
         }
         CardTemp cardTemp = DAOUtils.findCardTempByCardNo((Session) entityManager.getDelegate(), cardItem.getCardNo());
         String cardPrintedNo;
@@ -158,13 +105,22 @@ public class EmployeeServiceBean {
             cardPrintedNo = cardItem.getCardPrintedNo();
         }
         if (cardTemp != null) {
-            if(cardTemp.getClientTypeEnum()!= ClientTypeEnum.EMPLOYEE) {
-                throw new Exception("Карта не предназначена для сотрудников");
-            }
-            if(cardTemp.getCardPrintedNo()!=null && !cardTemp.getCardPrintedNo().equals(cardPrintedNo)){
+            if(cardItem.getId()==null){
+                if(cardTemp.getClientTypeEnum()!= ClientTypeEnum.EMPLOYEE) {
+                    throw new Exception("карта не предназначена для сотрудников.");
+                }
+                if(cardTemp.getCardPrintedNo()!=null && !cardTemp.getCardPrintedNo().equals(cardPrintedNo)){
+                    //cardTemp.setCardPrintedNo(cardPrintedNo);
+                } else {
+                    throw new Exception("карта уже зарегистрирована на временная.");
+                }
+            }  else {
+                cardTemp.setVisitor(visitor);
+                cardTemp.setCardNo(cardTemp.getCardNo());
                 cardTemp.setCardPrintedNo(cardPrintedNo);
-            } else {
-                throw new Exception("Временная карта уже зарегистрирована на временная");
+                cardTemp.setValidDate(cardItem.getValidDate());
+                cardTemp.setCardStation(cardItem.getCardStation());
+                entityManager.merge(cardTemp);
             }
         } else {
             if(cardItem.getId()==null){
@@ -187,7 +143,7 @@ public class EmployeeServiceBean {
 
     public Long saveEmployee(VisitorItem visitorItem) throws Exception{
         if(isEmptyFullNameFields(visitorItem.getFirstName(), visitorItem.getSurname(), visitorItem.getSecondName())) {
-            throw new  Exception("Все поля ФИО должны быть заполнены");
+            throw new  Exception("все поля ФИО должны быть заполнены.");
         }
 
         /**
@@ -197,7 +153,7 @@ public class EmployeeServiceBean {
         if(isEmptyDocumentParams(visitorItem.getDriverLicenceNumber(), visitorItem.getDriverLicenceDate()) &&
                 isEmptyDocumentParams(visitorItem.getPassportNumber(), visitorItem.getPassportDate()) &&
                 isEmptyDocumentParams(visitorItem.getWarTicketNumber(), visitorItem.getWarTicketDate())) {
-            throw new Exception("Отсутствует информация об удостоверении личности");
+            throw new Exception("отсутствует информация об удостоверении личности.");
         }
 
         /**
@@ -207,7 +163,7 @@ public class EmployeeServiceBean {
         if( isDateEqLtCurrentDate(visitorItem.getDriverLicenceDate()) ||
                 isDateEqLtCurrentDate(visitorItem.getPassportDate()) ||
                 isDateEqLtCurrentDate(visitorItem.getWarTicketDate())){
-            throw new Exception("Неверное значение даты окончания действия карты");
+            throw new Exception("неверное значение даты окончания действия карты.");
         }
 
         if(visitorItem.getIdOfVisitor()==null){
@@ -226,7 +182,7 @@ public class EmployeeServiceBean {
         } else {
             Visitor visitor = entityManager.find(Visitor.class, visitorItem.getIdOfVisitor());
             if(visitor==null){
-                throw new Exception("Сотрудник не найден");
+                throw new Exception("сотрудник не найден.");
             } else {
                 Person person = visitor.getPerson();
                 person.setFirstName(visitorItem.getFirstName());
@@ -248,14 +204,30 @@ public class EmployeeServiceBean {
 
     @Transactional(readOnly = true)
     public List<CardItem> findCardsByEmployee(Long idOfVisitor) {
-        Query query = entityManager.createQuery(FIND_ALL_TEMP_CARD_BY_EMPLOYEE);
+        TypedQuery<CardItem> query = entityManager.createQuery(FIND_ALL_TEMP_CARD_BY_EMPLOYEE, CardItem.class);
         query.setParameter("idOfVisitor",idOfVisitor);
         return query.getResultList();
     }
 
     @Transactional(readOnly = true)
     public List<CardItem> findCardsByEmployeeTypes() {
-        Query query = entityManager.createQuery(FIND_ALL_TEMP_CARD_BY_EMPLOYEE_TYPE);
+        TypedQuery<CardItem> query = entityManager.createQuery(FIND_ALL_TEMP_CARD_BY_EMPLOYEE_TYPE, CardItem.class);
         return query.getResultList();
+    }
+
+    @Transactional(readOnly = true)
+    public VisitorItem getEmployeeByCard(Long id) throws Exception {
+        TypedQuery<VisitorItem> query = entityManager.createQuery("select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(ct.visitor) from CardTemp ct where ct.id=:id", VisitorItem.class);
+        query.setParameter("id", id);
+        List<VisitorItem> items = query.getResultList();
+        if(items==null || items.isEmpty()){
+            return null;
+        } else {
+            if (items.size() == 1)
+                return items.get(0);
+            else {
+                throw new Exception("карта имеет много владельцев.");
+            }
+        }
     }
 }

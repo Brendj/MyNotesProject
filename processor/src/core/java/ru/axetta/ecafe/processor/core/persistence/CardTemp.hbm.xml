@@ -12,7 +12,7 @@
         </id>
         <property name="cardNo" column="CardNo" type="long" not-null="true" unique="true"/>
         <!--<property name="visitorType" column="VisitorType" type="integer"/>-->
-        <property name="clientTypeEnum" column="VisitorType" update="false">
+        <property name="clientTypeEnum" column="VisitorType" update="false" >
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ClientTypeEnum</param>
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER-->

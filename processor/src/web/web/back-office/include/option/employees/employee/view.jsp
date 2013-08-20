@@ -11,6 +11,9 @@
 <%-- Панель просмотра списка сотрудников --%>
 <%--@elvariable id="employeeViewPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeViewPage"--%>
 <%--@elvariable id="employeeEditPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeEditPage"--%>
+<%--@elvariable id="employeeCardEditPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardEditPage"--%>
+<%--@elvariable id="employeeCardViewPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardViewPage"--%>
+<%--@elvariable id="employeeCardGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeCardGroupPage"--%>
 <h:panelGrid id="employeeViewGrid" binding="#{employeeViewPage.pageComponent}" styleClass="borderless-grid">
 
      <h:panelGrid columns="2">
@@ -52,9 +55,9 @@
                 <f:facet name="header">
                     <h:outputText escape="true" value="Номер карты" />
                 </f:facet>
-                <a4j:commandLink reRender="mainMenu, workspaceForm" styleClass="command-link">
-                    <h:outputText escape="true" value="#{card.cardNo}" converter="cardNoConverter"
-                                  styleClass="output-text" />
+                <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{employeeCardViewPage.show}" styleClass="command-link">
+                    <h:outputText escape="true" value="#{card.cardNo}" converter="cardNoConverter" styleClass="output-text" />
+                    <f:setPropertyActionListener value="#{card}" target="#{employeeCardGroupPage.currentCard}"/>
                 </a4j:commandLink>
             </rich:column>
             <rich:column headerClass="column-header">
@@ -79,8 +82,9 @@
                 <f:facet name="header">
                     <h:outputText escape="true" value="Редактировать" />
                 </f:facet>
-                <a4j:commandLink reRender="mainMenu, workspaceForm" styleClass="command-link">
+                <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{employeeCardEditPage.show}" styleClass="command-link">
                     <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
+                    <f:setPropertyActionListener value="#{card}" target="#{employeeCardGroupPage.currentCard}"/>
                 </a4j:commandLink>
             </rich:column>
             <f:facet name="footer">
