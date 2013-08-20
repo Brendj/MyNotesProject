@@ -1524,8 +1524,17 @@ public class DAOService {
         List<Client> cl = DAOUtils.findClientsForOrgAndFriendly(entityManager, entityManager.find(Org.class, idOfOrg));
         if (lazyLoadInit) {
             for (Client c: cl) {
-                c.getPerson().getSurname();
-                c.getClientGroup().getGroupName();
+                if (c == null) {
+                    continue;
+                }
+                Person p = c.getPerson();
+                if (p != null) {
+                    p.getSurname();
+                }
+                ClientGroup clg = c.getClientGroup();
+                if (clg != null) {
+                    clg.getGroupName();
+                }
             }
         }
         return cl;
