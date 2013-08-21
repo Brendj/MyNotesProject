@@ -688,14 +688,14 @@ public class Manager {
 
     private long getGlobalIDByGUID(Session session, DistributedObject distributedObject) {
 
-        //String where = String.format("select id from %s where guid='%s'",distributedObject.getClass().getSimpleName(), distributedObject.getGuid());
-        //Query query = session.createQuery(where);
-        //List list = query.list();
+        String where = String.format("select id from %s where guid='%s'",distributedObject.getClass().getSimpleName(), distributedObject.getGuid());
+        Query query = session.createQuery(where);
+        List list = query.list();
 
-        Criteria criteria = session.createCriteria(distributedObject.getClass());
-        criteria.add(Restrictions.eq("guid",distributedObject.getGuid()));
+        //Criteria criteria = session.createCriteria(distributedObject.getClass());
+        //criteria.add(Restrictions.eq("guid",distributedObject.getGuid()));
         Long result = -1L;
-        List list = criteria.list();
+        //List list = criteria.list();
         if(!(list == null || list.isEmpty())){
             result = (Long) list.get(0);
         }
