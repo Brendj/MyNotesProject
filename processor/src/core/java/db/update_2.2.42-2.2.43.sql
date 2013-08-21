@@ -14,3 +14,5 @@ ALTER TABLE cf_visitors ADD COLUMN VisitorType integer NOT NULL DEFAULT 0;
 
 -- Добавлен индекс для отчета по проходам инженеров
 CREATE INDEX cf_enterevents_idvisevtdt_idx ON cf_enterevents USING btree (idofvisitor , evtdatetime );
+
+--! ФИНАЛИЗИРОВАН (Кадыров, 130821) НЕ МЕНЯТЬ

@@ -888,9 +888,10 @@ CREATE TABLE CF_EnterEvents (
   CONSTRAINT CF_EnterEvents_pk PRIMARY KEY (IdOfEnterEvent, IdOfOrg)
 );
 
-create index cf_enterevents_idofclient_idx on cf_enterevents(idOfClient); --v25
-create index cf_enterevents_idevtdt_idx on cf_enterevents(IdOfClient, EvtDateTime); --v25
+CREATE INDEX cf_enterevents_idofclient_idx on cf_enterevents(idOfClient); --v25
+CREATE INDEX cf_enterevents_idevtdt_idx on cf_enterevents(IdOfClient, EvtDateTime); --v25
 CREATE index cf_enterevents_org_event_idx ON cf_enterevents(idOfOrg, idOfEnterEvent); --v36
+CREATE INDEX cf_enterevents_idvisevtdt_idx ON cf_enterevents USING btree (idofvisitor , evtdatetime ); --v43
 
 CREATE TABLE CF_Options (
   IdOfOption    BIGINT  NOT NULL,
@@ -2493,7 +2494,7 @@ CREATE TABLE cf_cards_temp (
   IdOfOrg bigint,                        --! идентификатор организациии
   IdOfClient bigInt,                     --! Идентификатор клиента
   IdOfVisitor bigint,                    --!  Идентификатор посетителя
-  myclienttype bigint ,                  --! Признак карты посетителя , bit, 1- карта посетителя, 0 — карта клиента, not null
+  VisitorType bigint not null default 0,                  --! Признак карты посетителя , bit, 1- карта посетителя, 0 — карта клиента, not null
   CardNo bigint NOT NULL,                --! номер карты
   CardPrintedNo character varying(24),   --! номер нанесенный на карту
   CardStation int not null default 0,    --! int16 или int8, not null, значения-  0 — свободна, 1 — выдана , 3 — заблокирована (? не уверен, что блокировка нужна)
@@ -2529,6 +2530,7 @@ CREATE TABLE cf_visitors(
   WarTicketDate BIGINT,                          --! Дата выдачи ВУ
   DriverLicenceNumber varchar(50),               --! Серийный номер военного билета (ВБ)
   DriverLicenceDate BIGINT,                      --! Дата выдачи ВБ
+  VisitorType integer NOT NULL DEFAULT 0,        --! Добавлен тип постетителя (DEFAULT 0 обычный, EMPLOYEE 1 инженер)
   CONSTRAINT cf_visitors_pk PRIMARY KEY (IdOfVisitor),
   CONSTRAINT cf_visitors_IdOfPerson_fk FOREIGN KEY (IdOfPerson) REFERENCES CF_Persons (IdOfPerson)
 );
