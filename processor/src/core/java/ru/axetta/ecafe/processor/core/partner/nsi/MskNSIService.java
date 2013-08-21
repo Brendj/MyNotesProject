@@ -23,6 +23,8 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 /*import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;*/
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -104,6 +106,7 @@ public class MskNSIService {
                 new QName("http://rstyle.com/nsi/services", "NSIServiceService"));
         nsiService = nsiServicePort.getNSIService();
 
+
     }
 
     public List<QueryResult> executeQuery(String queryText) throws Exception {
@@ -122,9 +125,10 @@ public class MskNSIService {
         setTimeouts (provider, new Long (60000), new Long (180000));
         //provider.getRequestContext().put("jaxb-validation-event-handle", null);
         Client client = ClientProxy.getClient(nsiService);
-        /*HTTPConduit conduit = (HTTPConduit)client.getConduit();
+        HTTPConduit conduit = (HTTPConduit)client.getConduit();
         HTTPClientPolicy policy = conduit.getClient();
-        policy.setReceiveTimeout(60*10*1000);*/
+        policy.setReceiveTimeout(10 * 60 * 1000);
+        policy.setConnectionTimeout(10 * 60 * 1000);
 
         OrgExternalType recipient = new OrgExternalType();
         recipient.setName("NSI");
