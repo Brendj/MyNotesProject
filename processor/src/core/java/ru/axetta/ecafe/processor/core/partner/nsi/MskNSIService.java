@@ -21,8 +21,6 @@ import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
-/*import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;*/
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.slf4j.Logger;
@@ -38,6 +36,9 @@ import javax.xml.ws.BindingProvider;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.util.*;
+
+/*import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;*/
 
 @Component
 @Scope("singleton")
@@ -120,9 +121,9 @@ public class MskNSIService {
         NSIRequestType request = new NSIRequestType();
         BindingProvider provider = (BindingProvider) nsiService;
         provider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
-        provider.getRequestContext().put("com.sun.xml.ws.request.timeout", 15000);
         provider.getRequestContext().put("set-jaxb-validation-event-handler", false);
-        setTimeouts (provider, new Long (60000), new Long (180000));
+        /*provider.getRequestContext().put("com.sun.xml.ws.request.timeout", 15000);
+        setTimeouts (provider, new Long (60000), new Long (180000));*/
         //provider.getRequestContext().put("jaxb-validation-event-handle", null);
         Client client = ClientProxy.getClient(nsiService);
         HTTPConduit conduit = (HTTPConduit)client.getConduit();
