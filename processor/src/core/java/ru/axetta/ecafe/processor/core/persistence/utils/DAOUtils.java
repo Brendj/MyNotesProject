@@ -347,6 +347,7 @@ public class DAOUtils {
         return findClientsForOrgAndFriendly (em, organization, orgs);
     }
 
+    @SuppressWarnings("unchecked")
     public static List<Org> findFriendlyOrgs (EntityManager em, Org organization) throws Exception {
         javax.persistence.Query query = em.createQuery("select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg");
         query.setParameter("idOfOrg", organization.getIdOfOrg());

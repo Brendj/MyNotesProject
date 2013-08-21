@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -360,14 +361,16 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
         }
         //  Проверяем всех клиентов из ИС ПП на их присутствие в Реестах
         for (Client cl : orgClients) {
-            if (cl.getClientGUID() == null || cl.getClientGUID().length() < 1) {
+            if (cl.getClientGroup()!=null && cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()> ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue()) {
                 continue;
             }
             boolean found = false;
-            for (Item i : pupilInfos) {
-                if (cl.getClientGUID().equals(i.getGuid())) {
-                    found = true;
-                    break;
+            if (cl.getClientGUID()!=null) {
+                for (Item i : pupilInfos) {
+                    if (cl.getClientGUID().equals(i.getGuid())) {
+                        found = true;
+                        break;
+                    }
                 }
             }
             if (!found) {
@@ -395,9 +398,9 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
                 responseOutputStream.write(str.getBytes());
                 for (Item i : missedISPPClients) {
                     str = ";" +
-                            i.getFamilyName() + ";" +
-                            i.getFirstName() + ";" +
-                            i.getSecondName() + ";" +
+                            (i.getFamilyName()==null?"":i.getFamilyName()) + ";" +
+                            (i.getFirstName()==null?"":i.getFirstName()) + ";" +
+                            (i.getSecondName()==null?"":i.getSecondName()) + ";" +
                             i.getGroup() + ";" +
                             "Нет;" +
                             "Да;;\n";

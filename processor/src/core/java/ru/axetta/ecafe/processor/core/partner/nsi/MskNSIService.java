@@ -148,7 +148,7 @@ public class MskNSIService {
         request.getMessageData().getAppData().getContext().setCompany(Config.getCompany());
         if (importIteration >= 0) {
             request.getMessageData().getAppData().setFrom(new Long(1 + SERVICE_ROWS_LIMIT * (importIteration - 1)));
-            request.getMessageData().getAppData().setLimit(SERVICE_ROWS_LIMIT * importIteration);
+            request.getMessageData().getAppData().setLimit(SERVICE_ROWS_LIMIT );
         }
         request.getMessageData().getAppData().setQuery(queryText);
 
