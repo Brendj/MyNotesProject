@@ -311,13 +311,12 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         }
     }
     
-    public String getColumnFontColor (long ts) {
+    public String getColumnColor (long ts) {
         Calendar now = new GregorianCalendar();
         now.setTimeInMillis(System.currentTimeMillis());
         resetDate(now);
         if (now.getTimeInMillis() == ts) {
-            return ""
-                    + "color: #DBFFDE;";
+            return "background-color: #E0FFE7";
         } else {
             return "";
         }

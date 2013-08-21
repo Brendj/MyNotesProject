@@ -68,14 +68,14 @@
                     <h:outputText styleClass="output-text-mod" value="#{e.food}" />
                 </rich:column>
                 <rich:columns value="#{claimCalendarEditPage.columns}"
-                              var="col" styleClass="left-aligned-column"
+                              var="col" styleClass="left-aligned-column" style="#{claimCalendarEditPage.getColumnColor(col.date)}"
                               index="ind" headerClass="center-aligned-column" >
                     <f:facet name="header">
                         <h:outputText escape="true" value="#{col.title}" />
                     </f:facet>
 
                     <h:outputText rendered="#{!claimCalendarEditPage.isEditable(col.date)}" value="#{e.data[col.date]}"
-                                  styleClass="output-text" style="#{claimCalendarEditPage.getColumnFontColor(col.date)}" />
+                                  styleClass="output-text" />
 
                     <rich:inplaceInput layout="block" value="#{e.data[col.date]}" rendered="#{claimCalendarEditPage.isEditable(col.date)}"
                                        converterMessage="Price value should be integer. Price at row #{row+1} can't be changed."
