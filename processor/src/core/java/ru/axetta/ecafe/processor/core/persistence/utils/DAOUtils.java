@@ -1121,13 +1121,14 @@ public class DAOUtils {
 
     @SuppressWarnings("unchecked")
     public static <T extends DistributedObject> T findDistributedObjectByRefGUID(Class<T> clazz, Session session, String guid){
-        //Criteria criteria = session.createCriteria(DistributedObject.class);
-        //criteria.add(Restrictions.eq("guid",guid));
+        Criteria criteria = session.createCriteria(DistributedObject.class);
+        criteria.add(Restrictions.eq("guid",guid));
         //return (DistributedObject) criteria.uniqueResult();
-        String sql = "from "+clazz.getClass()+" where guid=:guid";
-        Query query = session.createQuery(sql);
-        query.setParameter("guid", guid);
-        List list = query.list();
+        //String sql = "from "+clazz.getClass()+" where guid=:guid";
+        //Query query = session.createQuery(sql);
+        //query.setParameter("guid", guid);
+        //List list = query.list();
+        List list = criteria.list();
         if(list==null || list.isEmpty()){
             return null;
         } else {
