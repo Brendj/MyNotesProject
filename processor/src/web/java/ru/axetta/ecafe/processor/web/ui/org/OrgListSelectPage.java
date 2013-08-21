@@ -155,6 +155,7 @@ public class OrgListSelectPage extends BasicPage {
         String[] idOfOrgs = orgFilter.split(",");
         Set<String> longSet = new HashSet<String>(Arrays.asList(idOfOrgs));
         ///
+        selectedOrgs.clear();
         for (String sId : longSet) {
             try{
                 Long id = Long.parseLong(sId.trim());
@@ -175,6 +176,7 @@ public class OrgListSelectPage extends BasicPage {
     public void fill(Session session) throws Exception {
         updateSelectedOrgs();
         List<OrgShortItem> items = retrieveOrgs(session);
+        selectedOrgs.clear();
         for (OrgShortItem orgShortItem: items){
             orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
         }

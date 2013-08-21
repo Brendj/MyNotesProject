@@ -36,7 +36,6 @@ public class OrgEditPage extends BasicWorkspacePage
     private String tag;
     private String address;
     private String phone;
-    private Long officialPersonId;
     private String officialPersonFirstName;
     private String officialPersonSurname;
     private String officialPersonSecondName;
@@ -66,7 +65,6 @@ public class OrgEditPage extends BasicWorkspacePage
     private String guid;
     private ConfigurationProvider configurationProvider;
     private String configurationProviderName;
-    private Set<Org> orgSet = new HashSet<Org>();
     private List<Long> idOfOrgList = new ArrayList<Long>();
     private String city;
     private String district;
@@ -165,37 +163,21 @@ public class OrgEditPage extends BasicWorkspacePage
             }
         }
 
-
-        if(idOfOrgList==null || idOfOrgList.isEmpty()){
-            for (Org o: org.getFriendlyOrg()){
-                o.setFriendlyOrg(new HashSet<Org>(0));
-            }
-            org.setFriendlyOrg(new HashSet<Org>(0));
-        }
-        else{
-            /*TODO: проверить изменился ли список организаций если да то изменить список и изменить версии у клиентов*/
-            Map<Long,Org> friendlyOrgMap = DAOUtils.getOrgsByIdList(session, this.idOfOrgList);
-            /* списки не совпали то добавляем */
-            Boolean containsOrg = friendlyIdOfOrgList.containsAll(friendlyOrgMap.keySet()) && friendlyOrgMap.keySet().containsAll(
-                    friendlyIdOfOrgList);
-            if (!containsOrg){
-                List result = DAOUtils.getClientsByOrgList(session, friendlyOrgMap.keySet());
-                for (Object object: result){
-                    Client client = (Client) object;
-                    long version = DAOUtils.updateClientRegistryVersion(session);
-                    client.setClientRegistryVersion(version);
-                    session.update(client);
+        Set<Org> friendlyOrg = org.getFriendlyOrg();
+        if(idOfOrgList!=null && !idOfOrgList.isEmpty()){
+            HashSet<Org> selectOrg = DAOUtils.findOrgById(session, idOfOrgList);
+            if(!selectOrg.equals(friendlyOrg)){
+                friendlyOrg.removeAll(selectOrg);
+                for (Org o: friendlyOrg){
+                    int count = DAOUtils.clearFriendlyOrgByOrg(session, o.getIdOfOrg());
                 }
-                /* связываем между собой организации */
-                //org.getFriendlyOrg().addAll(friendlyOrgMap.values());
-                friendlyOrgMap.put(org.getIdOfOrg(),org);
-                Collection<Org> orgCollection = friendlyOrgMap.values();
-                //orgCollection.add(org);
-                for (Org o: orgCollection){
-                    List<Org> os = new ArrayList<Org>(orgCollection);
-                    os.remove(o);
-                    //o.getFriendlyOrg().add(org);
-                    o.getFriendlyOrg().addAll(os);
+                for (Org o: selectOrg){
+                    for (Client client: o.getClients()){
+                        long version = DAOUtils.updateClientRegistryVersion(session);
+                        client.setClientRegistryVersion(version);
+                        session.update(client);
+                    }
+                    o.setFriendlyOrg(selectOrg);
                 }
             }
         }
@@ -219,9 +201,6 @@ public class OrgEditPage extends BasicWorkspacePage
         DAOUtils.updateMenuExchangeLink(session, menuExchangeSourceOrg, idOfOrg);
     }
 
-
-
-
     private void fill(Org org) throws Exception {
         this.idOfOrg = org.getIdOfOrg();
         this.shortName = org.getShortName();
@@ -235,7 +214,6 @@ public class OrgEditPage extends BasicWorkspacePage
         this.address = org.getAddress();
         this.phone = org.getPhone();
         Person officialPerson = org.getOfficialPerson();
-        this.officialPersonId = officialPerson.getIdOfPerson();
         this.officialPersonFirstName = officialPerson.getFirstName();
         this.officialPersonSurname = officialPerson.getSurname();
         this.officialPersonSecondName = officialPerson.getSecondName();
@@ -289,11 +267,6 @@ public class OrgEditPage extends BasicWorkspacePage
         }
 
         select(org.getConfigurationProvider());
-        //if(org.getConfigurationProvider()!=null){
-        //    this.configurationProviderName = org.getConfigurationProvider().getName();
-        //} else {
-        //    this.configurationProviderName = "";
-        //}
         friendlyIdOfOrgList.clear();
         idOfOrgList.clear();
         filterFriendlyOrgs = "Не выбрано";
@@ -326,40 +299,6 @@ public class OrgEditPage extends BasicWorkspacePage
                 filterFriendlyOrgs = "Не выбрано.";
             }
         }
-    }
-
-    /*public void setMenuExchangeSourceOrg(Long menuExchangeSourceOrg) {
-       this.menuExchangeSourceOrg = menuExchangeSourceOrg;
-   } */
-
-    public Long getMenuExchangeSourceOrg() {
-        return menuExchangeSourceOrg;
-    }
-
-    public String getMenuExchangeSourceOrgName() {
-        return menuExchangeSourceOrgName;
-    }
-
-    private void reloadMenuExchangeSourceOrgName(Session session) {
-        if (menuExchangeSourceOrg == null) {
-            menuExchangeSourceOrgName = null;
-        } else {
-            Org org = (Org) session.load(Org.class, menuExchangeSourceOrg);
-            menuExchangeSourceOrgName = org.getShortName();
-        }
-    }
-
-    public String getIdOfCategoryOrgList() {
-        return idOfCategoryOrgList.toString().replaceAll("[^0-9,]","");
-    }
-
-    public String getIdOfFriendlyOrgList() {
-        return friendlyIdOfOrgList.toString().replaceAll("[^0-9,]","");
-    }
-
-    public String getFilterCategoryOrg() {
-        if (idOfCategoryOrgList.isEmpty()) return "Нет";
-        return filterCategoryOrg;
     }
 
     @Override
@@ -410,14 +349,39 @@ public class OrgEditPage extends BasicWorkspacePage
         return "org/edit";
     }
 
-
-    /* Getters and Setters */
-    public String getFriendlyFilterOrgs() {
-        return filterFriendlyOrgs;
+    private void reloadMenuExchangeSourceOrgName(Session session) {
+        if (menuExchangeSourceOrg == null) {
+            menuExchangeSourceOrgName = null;
+        } else {
+            Org org = (Org) session.load(Org.class, menuExchangeSourceOrg);
+            menuExchangeSourceOrgName = org.getShortName();
+        }
     }
 
-    public void setFilterFriendlyOrgs(String filterFriendlyOrgs) {
-        this.filterFriendlyOrgs = filterFriendlyOrgs;
+    /* Getters and Setters */
+    public Long getMenuExchangeSourceOrg() {
+        return menuExchangeSourceOrg;
+    }
+
+    public String getMenuExchangeSourceOrgName() {
+        return menuExchangeSourceOrgName;
+    }
+
+    public String getIdOfCategoryOrgList() {
+        return idOfCategoryOrgList.toString().replaceAll("[^0-9,]","");
+    }
+
+    public String getIdOfFriendlyOrgList() {
+        return friendlyIdOfOrgList.toString().replaceAll("[^0-9,]","");
+    }
+
+    public String getFilterCategoryOrg() {
+        if (idOfCategoryOrgList.isEmpty()) return "Нет";
+        return filterCategoryOrg;
+    }
+
+    public String getFriendlyFilterOrgs() {
+        return filterFriendlyOrgs;
     }
 
     public String getConfigurationProviderName() {
@@ -534,14 +498,6 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public Long getOfficialPersonId() {
-        return officialPersonId;
-    }
-
-    public void setOfficialPersonId(Long officialPersonId) {
-        this.officialPersonId = officialPersonId;
     }
 
     public String getOfficialPersonFirstName() {

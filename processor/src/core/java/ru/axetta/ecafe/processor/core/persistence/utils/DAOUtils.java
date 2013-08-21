@@ -1370,10 +1370,22 @@ public class DAOUtils {
         return q.list();
     }
 
-
     public static List<Good> getAllGoods (Session persistenceSession) {
         Query query = persistenceSession.createQuery("from Good");
         List list = query.list();
         return list;
     }
+
+    public static int clearFriendlyOrgByOrg(Session session, Long idOfOrg) {
+        Query query = session.createSQLQuery("DELETE FROM cf_friendly_organization WHERE (currentorg=:idOfOrg or friendlyorg=:idOfOrg) and not (currentorg=friendlyorg)");
+        query.setParameter("idOfOrg",idOfOrg);
+        return query.executeUpdate();
+    }
+
+    public static HashSet<Org> findOrgById(Session session, List<Long> idOfOrgList) {
+        Query query = session.createQuery("from Org org where org.id in :id");
+        query.setParameterList("id", idOfOrgList);
+        return new HashSet<Org>(query.list());
+    }
+
 }
