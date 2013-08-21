@@ -45,7 +45,7 @@ import java.util.*;
 @Component
 @Scope("session")
 public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoListener{
-    public static final long DEFAULT_EDITABLE_DATE = 172800000L;
+    public static final long DEFAULT_EDITABLE_DAYS = 2L;
     public static final long MILLIS_IN_MONTH = 2628000000L;
     private static final Logger logger = LoggerFactory.getLogger(ClaimCalendarEditPage.class);
     private final DateFormat comboboxDF = new SimpleDateFormat ("MMMMM yyyy", new Locale("ru"));
@@ -446,7 +446,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     }
 
     public long getEditableDateIncrement() {
-        return DEFAULT_EDITABLE_DATE;
+        return DEFAULT_EDITABLE_DAYS * 86400000L;
     }
 
     public static class Entry {

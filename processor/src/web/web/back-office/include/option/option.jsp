@@ -289,6 +289,12 @@
             <h:selectBooleanCheckbox value="#{optionPage.disableSMSNotifyEditInClientRoom}" styleClass="output-text" />
         </h:panelGrid>
     </rich:tab>
+    <rich:tab label="Тонкий клиент">
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Редактировать заявки с (дни)" styleClass="output-text" />
+            <h:inputText value="#{optionPage.thinClientMinClaimsEditableDays}" styleClass="output-text" />
+        </h:panelGrid>
+    </rich:tab>
 </rich:tabPanel>
 
 <h:panelGroup style="margin-top: 10px">

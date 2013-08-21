@@ -78,6 +78,8 @@ public class OptionPage extends BasicWorkspacePage {
     private Integer syncLimits;
     private Integer retryAfter;
     private String syncRegisterSupportEmail;
+    private Integer thinClientMinClaimsEditableDays;
+
 
     private List<BankOptionItem> banks;
 
@@ -434,6 +436,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.syncRegisterSupportEmail = syncRegisterSupportEmail;
     }
 
+    public Integer getThinClientMinClaimsEditableDays() {
+        return thinClientMinClaimsEditableDays;
+    }
+
+    public void setThinClientMinClaimsEditableDays(Integer thinClientMinClaimsEditableDays) {
+        this.thinClientMinClaimsEditableDays = thinClientMinClaimsEditableDays;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -486,6 +496,7 @@ public class OptionPage extends BasicWorkspacePage {
         syncRegisterLogging = runtimeContext.getOptionValueBool(Option.OPTION_MSK_NSI_LOG);
         syncRegisterMaxAttempts = runtimeContext.getOptionValueInt(Option.OPTION_MSK_NSI_MAX_ATTEMPTS);
         syncRegisterSupportEmail = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_SUPPORT_EMAIL);
+        thinClientMinClaimsEditableDays = runtimeContext.getOptionValueInt(Option.OPTION_THIN_CLIENT_MIN__CLAIMS_EDITABLE_DAYS);
 
 
         syncLimits = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS);
@@ -582,6 +593,8 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS, RNIPPaymentsAlias);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD, RNIPPaymentsPassword);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_STORE_NAME, RNIPPaymentsStore);
+
+            runtimeContext.setOptionValue(Option.OPTION_THIN_CLIENT_MIN__CLAIMS_EDITABLE_DAYS, thinClientMinClaimsEditableDays);
 
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_LIMITS, syncLimits);
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_RETRY_AFTER, retryAfter);
