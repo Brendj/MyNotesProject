@@ -731,12 +731,6 @@
                         label="Статус синхронизации" action="#{mainPage.showStatusSyncReportPage}"
                         reRender="workspaceForm" />
 
-    <%--@elvariable id="aggregateCostsAndSalesReportPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.AggregateCostsAndSalesReportPage"--%>
-    <rich:panelMenuItem id="aggregateCostsAndSalesReportMenuItem"
-                        binding="#{aggregateCostsAndSalesReportPage.mainMenuComponent}"
-                        label="Отчет по показателям цен и продаж" action="#{aggregateCostsAndSalesReportPage.show}"
-                        reRender="workspaceForm" />
-
     <rich:panelMenuItem id="projectStateMenuItem" label="Ключевые показатели"
                         onclick="window.open('/processor/back-office/project_state.jsp', 'Ключевые показатели')" />
 </rich:panelMenuGroup>
@@ -777,6 +771,7 @@
                             action="#{mainPage.showOrgDiscountsReportPage}" reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
+
     <rich:panelMenuGroup id="goodRequestsGroupMenu" binding="#{mainPage.goodRequestsGroupMenu.mainMenuComponent}"
                          label="Отчет по заявкам">
         <a4j:support event="onclick" action="#{mainPage.showGoodRequestsGroupMenu}" reRender="workspaceForm" />
@@ -807,6 +802,12 @@
     <rich:panelMenuItem id="registerStampReportMenuItem"
                         binding="#{registerStampPage.mainMenuComponent}" label="Реестр талонов"
                         action="#{registerStampPage.show}" reRender="workspaceForm" />
+
+    <%--@elvariable id="aggregateCostsAndSalesReportPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.AggregateCostsAndSalesReportPage"--%>
+    <rich:panelMenuItem id="aggregateCostsAndSalesReportMenuItem"
+                        binding="#{aggregateCostsAndSalesReportPage.mainMenuComponent}"
+                        label="Отчет по показателям цен и продаж" action="#{aggregateCostsAndSalesReportPage.show}"
+                        reRender="workspaceForm" />
 
     <rich:panelMenuItem id="clientReportMenuItem" binding="#{mainPage.clientReportPage.mainMenuComponent}"
                         label="Отчет по учащимся" action="#{mainPage.showClientReportPage}" reRender="workspaceForm" />
@@ -848,36 +849,6 @@
                         label="Просмотр" action="#{reportRepositoryListPage.show}" reRender="workspaceForm" />
 </rich:panelMenuGroup>
 
-<rich:panelMenuGroup id="eventNotificationGroupMenu" binding="#{mainPage.eventNotificationGroupPage.mainMenuComponent}"
-                     label="Уведомления о событиях" rendered="#{mainPage.eligibleToViewReports}">
-    <a4j:support event="onclick" action="#{mainPage.showEventNotificationGroupPage}" reRender="workspaceForm" />
-
-    <rich:panelMenuItem id="eventNotificationRuleListMenuItem"
-                        binding="#{mainPage.eventNotificationListPage.mainMenuComponent}" label="Список правил"
-                        action="#{mainPage.showEventNotificationListPage}" reRender="workspaceForm" />
-
-    <rich:panelMenuGroup id="selectedEventNotificationGroupMenu" rendered="false"
-                         binding="#{mainPage.selectedEventNotificationGroupPage.mainMenuComponent}"
-                         label="#{mainPage.selectedEventNotificationGroupPage.title}">
-        <a4j:support event="onclick" action="#{mainPage.showSelectedEventNotificationGroupPage}"
-                     reRender="workspaceForm" />
-
-        <rich:panelMenuItem id="eventNotificationRuleViewMenuItem"
-                            binding="#{mainPage.eventNotificationViewPage.mainMenuComponent}" label="Просмотр"
-                            action="#{mainPage.showEventNotificationViewPage}" reRender="workspaceForm" />
-
-        <rich:panelMenuItem id="eventNotificationRuleEditMenuItem"
-                            binding="#{mainPage.eventNotificationEditPage.mainMenuComponent}" label="Редактирование"
-                            action="#{mainPage.showEventNotificationEditPage}" reRender="workspaceForm" />
-
-    </rich:panelMenuGroup>
-
-    <rich:panelMenuItem id="eventNotificationRuleCreateMenuItem"
-                        binding="#{mainPage.eventNotificationCreatePage.mainMenuComponent}" label="Добавить уведомление"
-                        action="#{mainPage.showEventNotificationCreatePage}" reRender="workspaceForm" />
-
-</rich:panelMenuGroup>
-
 <rich:panelMenuGroup id="optionGroupMenu" label="Настройки" binding="#{mainPage.optionGroupPage.mainMenuComponent}"
                      rendered="#{mainPage.eligibleToEditOptions}">
     <a4j:support event="onclick" action="#{mainPage.showOptionGroupPage}" reRender="workspaceForm" />
@@ -896,6 +867,36 @@
 
         <rich:panelMenuItem id="showLicInfoMenuItem" binding="#{licInfoPage.mainMenuComponent}" label="Лицензии"
                             action="#{licInfoPage.show}" reRender="workspaceForm" />
+
+    </rich:panelMenuGroup>
+
+    <rich:panelMenuGroup id="eventNotificationGroupMenu" binding="#{mainPage.eventNotificationGroupPage.mainMenuComponent}"
+                         label="Уведомления о событиях" rendered="#{mainPage.eligibleToViewReports}">
+        <a4j:support event="onclick" action="#{mainPage.showEventNotificationGroupPage}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="eventNotificationRuleListMenuItem"
+                            binding="#{mainPage.eventNotificationListPage.mainMenuComponent}" label="Список правил"
+                            action="#{mainPage.showEventNotificationListPage}" reRender="workspaceForm" />
+
+        <rich:panelMenuGroup id="selectedEventNotificationGroupMenu" rendered="false"
+                             binding="#{mainPage.selectedEventNotificationGroupPage.mainMenuComponent}"
+                             label="#{mainPage.selectedEventNotificationGroupPage.title}">
+            <a4j:support event="onclick" action="#{mainPage.showSelectedEventNotificationGroupPage}"
+                         reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="eventNotificationRuleViewMenuItem"
+                                binding="#{mainPage.eventNotificationViewPage.mainMenuComponent}" label="Просмотр"
+                                action="#{mainPage.showEventNotificationViewPage}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="eventNotificationRuleEditMenuItem"
+                                binding="#{mainPage.eventNotificationEditPage.mainMenuComponent}" label="Редактирование"
+                                action="#{mainPage.showEventNotificationEditPage}" reRender="workspaceForm" />
+
+        </rich:panelMenuGroup>
+
+        <rich:panelMenuItem id="eventNotificationRuleCreateMenuItem"
+                            binding="#{mainPage.eventNotificationCreatePage.mainMenuComponent}" label="Добавить уведомление"
+                            action="#{mainPage.showEventNotificationCreatePage}" reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
 
