@@ -1370,7 +1370,18 @@ public class DAOUtils {
     }
 
     public static List<Good> getAllGoods (Session persistenceSession) {
-        Query query = persistenceSession.createQuery("from Good");
+        return getAllGoods (persistenceSession, null);
+    }
+
+    public static List<Good> getAllGoods (Session persistenceSession, Long idofgoodsgroup) {
+        String sql = "from Good good";
+        if (idofgoodsgroup != null && idofgoodsgroup != Long.MIN_VALUE) {
+            sql += " where good.goodGroup.globalId=:idofgoodsgroup";
+        }
+        Query query = persistenceSession.createQuery(sql);
+        if (idofgoodsgroup != null && idofgoodsgroup != Long.MIN_VALUE) {
+            query.setLong("idofgoodsgroup", idofgoodsgroup);
+        }
         List list = query.list();
         return list;
     }
