@@ -69,7 +69,7 @@ public class ConfigurationProviderItemsPanel extends BasicPage {
     @PostConstruct
     public void reload() throws Exception {
         try {
-            retrieveProduct();
+            retrieveConfigurationProvider();
             selectConfigurationProvider = new ConfigurationProvider();
             filter="";
         } catch (Exception e) {
@@ -80,7 +80,7 @@ public class ConfigurationProviderItemsPanel extends BasicPage {
 
     public Object updateConfigurationProviderSelectPage(){
         try {
-            retrieveProduct();
+            retrieveConfigurationProvider();
         } catch (Exception e) {
             printError("Ошибка при загрузке страницы: "+e.getMessage());
             logger.error("Error load page", e);
@@ -88,7 +88,7 @@ public class ConfigurationProviderItemsPanel extends BasicPage {
         return null;
     }
 
-    private void retrieveProduct() throws Exception {
+    private void retrieveConfigurationProvider() throws Exception {
         User user = MainPage.getSessionInstance().getCurrentUser();
         if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification())){
             if(StringUtils.isEmpty(filter)){

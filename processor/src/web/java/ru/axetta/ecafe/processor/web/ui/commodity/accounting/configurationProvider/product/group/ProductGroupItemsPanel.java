@@ -76,6 +76,7 @@ public class ProductGroupItemsPanel extends BasicPage {
          productGroupList = new ArrayList<ProductGroup>();
          selectProductGroup = new ProductGroup();
          filter="";
+        retrieveProduct();
     }
 
     public Object updateConfigurationProviderSelectPage(){

@@ -74,6 +74,7 @@ public class TechnologicalMapGroupItemsPanel extends BasicPage {
          technologicalMapGroupList = new ArrayList<TechnologicalMapGroup>();
          selectTechnologicalMapGroup = new TechnologicalMapGroup();
          filter="";
+        retrieveTechnologicalMap();
     }
 
     public Object updateConfigurationProviderSelectPage(){

@@ -77,6 +77,7 @@ public class TechnologicalMapPanel extends BasicPage {
     public void reload() throws Exception {
          technologicalMapList = new ArrayList<TechnologicalMap>();
          filter="";
+        retrieveTechnologicalMap();
     }
 
     public Object updateTechnologicalMapSelectPage(){

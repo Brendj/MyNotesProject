@@ -76,6 +76,7 @@ public class GoodGroupItemsPanel extends BasicPage {
     public void reload() throws Exception {
          goodGroupList = new ArrayList<GoodGroup>();
          filter="";
+        retrieveGoods();
     }
 
     public Object updateConfigurationProviderSelectPage(){

@@ -73,6 +73,7 @@ public class ProductPanel extends BasicPage {
     public void reload() throws Exception {
          productList = new ArrayList<Product>();
          filter="";
+        retrieveProduct();
     }
 
     public Object updateProductSelectPage(){
