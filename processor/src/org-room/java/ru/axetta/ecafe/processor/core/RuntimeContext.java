@@ -54,6 +54,7 @@ import java.util.concurrent.TimeUnit;
 @Scope("singleton")
 public class RuntimeContext implements ApplicationContextAware {
 
+    @PersistenceContext
     EntityManager em;
     // Logger
     private static final Logger logger = LoggerFactory.getLogger(RuntimeContext.class);
@@ -157,7 +158,8 @@ public class RuntimeContext implements ApplicationContextAware {
     public void initDB() throws Exception {
 
         try {
-            loadOptionValues();
+            //getAppContext().getBean(RuntimeContext.class).initiateEntityManager();
+            getAppContext().getBean(RuntimeContext.class).loadOptionValues();
         } catch (Exception e) {
             logger.error("Failed to init application.", e);
             throw e;
@@ -171,9 +173,9 @@ public class RuntimeContext implements ApplicationContextAware {
         optionsValues = new HashMap<Integer, String>();
         for (int n = 0; n < Option.OPTIONS_INITIALIZER.length; n += 2) {
             Integer nOption = (Integer) Option.OPTIONS_INITIALIZER[n];
-            //String v = DAOUtils.getOptionValue(em, nOption, (String) Option.OPTIONS_INITIALIZER[n + 1]);
-            //optionsValues.put(nOption, v);
-            optionsValues.put(nOption, "" + nOption);
+            String v = DAOUtils.getOptionValue(em, nOption, (String) Option.OPTIONS_INITIALIZER[n + 1]);
+            optionsValues.put(nOption, v);
+            //optionsValues.put(nOption, "" + nOption);
         }
     }
 

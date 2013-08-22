@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.claim;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestService;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.DocumentState;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequest;
@@ -446,7 +447,8 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     }
 
     public long getEditableDateIncrement() {
-        return DEFAULT_EDITABLE_DAYS * 86400000L;
+        int v = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_THIN_CLIENT_MIN__CLAIMS_EDITABLE_DAYS);
+        return v * 86400000L;
     }
 
     public static class Entry {
