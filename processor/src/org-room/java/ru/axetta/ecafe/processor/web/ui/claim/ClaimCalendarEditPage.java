@@ -132,6 +132,8 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         end.setTimeInMillis(getMonth());
         end.set(Calendar.MONTH, end.get(Calendar.MONTH) + 1);
         resetDate(end);
+        resetDate(start);
+        resetDate (end);
 
         //  Загружаем данные и обновляем колонки
         if (buildData) {
@@ -142,10 +144,11 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         buildGoodsGroups(session);
     }
 
-    private void buildData(Session session, Calendar dateFrom, Calendar dateTo) {
-        resetDate (dateFrom);
-        resetDate (dateTo);
-
+    private void buildData(Session session, Calendar start, Calendar end) {
+        Calendar dateFrom = new GregorianCalendar();
+        dateFrom.setTimeInMillis(start.getTimeInMillis() - getCalendarPadding());
+        Calendar dateTo = new GregorianCalendar();
+        dateTo.setTimeInMillis(end.getTimeInMillis() - getCalendarPadding());
 
         //  Загружаем все товары, которые есть
         List<Good> goods = DAOUtils.getAllGoods(session, goodGroup);
@@ -169,7 +172,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
                 pos = entityManager.merge(pos);
 
                 String good = pos.getGood().getFullName();
-                Long count = pos.getTotalCount();
+                Long count = pos.getTotalCount() / 1000;
                 long ts = gr.getDateOfGoodsRequest().getTime();
                 Long idofgoodsrequestposition = pos.getGlobalId();
 
@@ -217,8 +220,8 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
 
     private void buildColumns (Calendar dateFrom, Calendar dateTo) {
         columns.clear();
-        long start = dateFrom.getTimeInMillis() - RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_THIN_CLIENT_PRE_POST_DATE) * 86400000L;
-        long end = dateTo.getTimeInMillis() + RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_THIN_CLIENT_PRE_POST_DATE) * 86400000L;
+        long start = dateFrom.getTimeInMillis() - getCalendarPadding();
+        long end = dateTo.getTimeInMillis() + getCalendarPadding();
         Calendar startDate = new GregorianCalendar();
         startDate.setTimeInMillis(start);
         Calendar endDate = new GregorianCalendar();
@@ -263,6 +266,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
                 if (v == null) {
                     continue;
                 }
+                v = v * 1000;
                 List<Long> ids = e.ids.get(ts);
 
                 //  Если списка id не существует, это обозначает что значения добавлены, необходимо создавать заявку
@@ -274,6 +278,9 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
                 else {
                     //  Получаем каждую
                     for (int i=0; i<ids.size(); i++) {
+                        if (ids.get(i).longValue() == Long.MIN_VALUE) {
+                            continue;
+                        }
                         GoodRequestPosition pos = goodRequestService.findGoodRequestPositionById(ids.get(i));
                         if (i == 0) {
                             pos.setTotalCount(v);
@@ -530,6 +537,10 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     public long getEditableDateIncrement() {
         int v = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_THIN_CLIENT_MIN__CLAIMS_EDITABLE_DAYS);
         return v * 86400000L;
+    }
+
+    public long getCalendarPadding () {
+        return RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_THIN_CLIENT_PRE_POST_DATE) * 86400000L;
     }
 
     public static class Entry {

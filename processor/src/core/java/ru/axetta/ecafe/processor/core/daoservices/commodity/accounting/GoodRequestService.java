@@ -282,7 +282,7 @@ public class GoodRequestService {
         goodRequest.setDateOfGoodsRequest(new Date(time));
         goodRequest.setDoneDate(new Date(time));
         goodRequest.setNumber(number);
-        goodRequest.setState(DocumentState.CREATED);
+        goodRequest.setState(DocumentState.FOLLOW);
         goodRequest.setDeletedState(false);
         goodRequest.setCreatedDate(now);
         goodRequest.setComment(comment);
