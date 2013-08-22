@@ -357,15 +357,29 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     }
 
     public String getColumnColor (long ts) {
+        //  Готовим даты
         Calendar mon = new GregorianCalendar();
         mon.setTimeInMillis(getMonth());
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(ts);
         Calendar now = new GregorianCalendar();
         now.setTimeInMillis(System.currentTimeMillis());
+        Calendar edit = new GregorianCalendar();
+        edit.setTimeInMillis(System.currentTimeMillis()+ getEditableDateIncrement ());
         resetDate(now);
+        resetDate(cal);
+        resetDate(mon);
+        resetDate(edit);
+
+
+        //  Если выходит за границы месяца, т.е. являются добавочными датами с других месяцов, то СЕРЫЙ
         if (mon.get(Calendar.MONTH) != cal.get(Calendar.MONTH)) {
-            return "background-color: #DEDEDE; color: #BDBDBD;";
+            return "background-color: #DEDEDE;";
+        //  Если это не редактируемые следующие дни, то ЖЕЛТЫЙ
+        } else if (cal.getTimeInMillis() > now.getTimeInMillis() &&
+                   cal.getTimeInMillis() <= edit.getTimeInMillis()) {
+            return "background-color: #FDFFE0";
+        //  Если текущий день, то ЗЕЛЕНЫЙ
         } else if (now.getTimeInMillis() == ts) {
             return "background-color: #E0FFE7";
         } else {
