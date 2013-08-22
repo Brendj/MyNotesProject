@@ -13,6 +13,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,9 +53,14 @@ public class GoodRequestService {
 
     @PersistenceContext
     private EntityManager entityManager;
-
+    
     @SuppressWarnings("unchecked")
     public List<GoodRequest> findByFilter(Long idOfOrg, List<DocumentState> stateList, Date startDate,Date endDate,  Integer deletedState){
+        return findByFilter(idOfOrg, stateList, startDate, endDate, deletedState, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<GoodRequest> findByFilter(Long idOfOrg, List<DocumentState> stateList, Date startDate,Date endDate,  Integer deletedState, Long idofgoodsgroup){
         Session session =  (Session) entityManager.getDelegate();
         Criteria criteria = session.createCriteria(GoodRequest.class);
         criteria.add(Restrictions.between("doneDate", startDate, endDate));
@@ -68,12 +74,40 @@ public class GoodRequestService {
         if (idOfOrg != null) {
             criteria.add(Restrictions.eq("orgOwner",idOfOrg));
         }
+        if (idofgoodsgroup != null && idofgoodsgroup != Long.MIN_VALUE) {
+            criteria.createCriteria("goodRequestPositionInternal").createCriteria("good").createCriteria("goodGroup").add(Restrictions.eq("globalId", idofgoodsgroup));
+        }
         if ((stateList != null) && !stateList.isEmpty()) {
             criteria.add(Restrictions.in("state",stateList));
         }
         criteria.addOrder(Order.desc("doneDate"));
         return criteria.list();
     }
+
+    /*@SuppressWarnings("unchecked")
+    public List<GoodRequest> findByFilter(Long idOfOrg, Date startDate,Date endDate, Long idofgoodsgroup){
+        String idofgoodsgroupRest = "";
+        String idofgoodsgroupJoin = "";
+        if (idofgoodsgroup != null) {
+            idofgoodsgroupRest = "and cf_goods.idofgoodsgroup=:idofgoodsgroup ";
+            idofgoodsgroupJoin = "left join cf_goods on cf_goods_requests_positions.idofgood=cf_goods.idofgood ";
+        }
+        String sql = "select distinct(cf_goods_requests.idofgoodsrequest) "
+                + "from cf_goods_requests "
+                + "left join cf_goods_requests_positions on cf_goods_requests.idofgoodsrequest=cf_goods_requests_positions.idofgoodsrequest "
+                + idofgoodsgroupJoin
+                + "where cf_goods_requests.donedate between (:startdate and :enddate) and cf_goods_requests.orgowner=:orgOwner "+ idofgoodsgroupRest
+                + "order by 1";
+        List<Long> query = entityManager.createNativeQuery(sql);
+        query.setParameter("orgOwner", idOfOrg);
+        query.setParameter("startDate", startDate.getTime());
+        query.setParameter("endDate", endDate.getTime());
+        if (idofgoodsgroup != null) {
+            query.setParameter("idofgoodsgroup", idofgoodsgroup);
+        }
+
+        return query.getResultList();
+    }*/
 
 
 
