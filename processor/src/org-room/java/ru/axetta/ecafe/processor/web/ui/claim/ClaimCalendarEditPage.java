@@ -288,6 +288,10 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         RuntimeContext.getAppContext().getBean(ClaimCalendarEditPage.class).save();
     }
 
+    public void doCancel () {
+        RuntimeContext.getAppContext().getBean(ClaimCalendarEditPage.class).fill();
+    }
+
     public void doValidateValue (javax.faces.event.ValueChangeEvent event) {
         resetMessages();
         try {

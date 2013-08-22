@@ -29,9 +29,17 @@
 
 
 
+<script type="text/javascript">
+    /*var width = window.innerWidth ||
+            html.clientWidth  ||
+            body.clientWidth  ||
+            screen.availWidth;
+    RichFaces.$('claimsCalendar').style.width = width - 100;*/
+</script>
+
 <%--@elvariable id="claimCalendarEditPage" type="ru.axetta.ecafe.processor.web.ui.claim.ClaimCalendarEditPage"--%>
-<a4j:form>
-    <h:panelGrid id="claimCalendarEditPage" binding="#{claimCalendarEditPage.pageComponent}" styleClass="borderless-grid">
+<a4j:form id="claimCalendarForm">
+    <h:panelGrid id="claimCalendarEditPage" binding="#{claimCalendarEditPage.pageComponent}" styleClass="borderless-grid" style="width: 100%">
 
 
         <a4j:region>
@@ -51,10 +59,10 @@
         </a4j:region>
 
         <a4j:region>
-        <rich:panel id="claimsCalendar" style="width:1200px; height: 550px; overflow:auto; background: none;">
+        <div style="width: 1350px; overflow: auto;">
+        <rich:panel id="claimsCalendar" style="height: 450px; overflow: auto;">
             <rich:dataTable value="#{claimCalendarEditPage.entries}" var="e"
-                            width="350px" rows="15"
-                            id="table" rowKeyVar="row">
+                            width="350px" rows="15" id="table" rowKeyVar="row">
                 <rich:column>
                     <f:facet name="header">
                         <h:outputText value="№"></h:outputText>
@@ -95,8 +103,9 @@
                 </f:facet>
             </rich:dataTable>
         </rich:panel>
+        </div>
 
-        <rich:panel style="width:1200px; background: none" id="controls">
+        <rich:panel style="width: 100%; background: none" id="controls">
             <table cellpadding="0" cellspacing="0">
                 <tr>
                     <td>
@@ -110,6 +119,10 @@
                     <td>
                         <a4j:commandButton value="Применить" reRender="claimsCalendar,messages,months" disabled="#{!claimCalendarEditPage.changesMade}"
                                            action="#{claimCalendarEditPage.doApply}">
+                        </a4j:commandButton>
+
+                        <a4j:commandButton value="Отменить" reRender="claimsCalendar,messages,months" disabled="#{!claimCalendarEditPage.changesMade}"
+                                           action="#{claimCalendarEditPage.doCancel}">
                         </a4j:commandButton>
                     </td>
                     <td>

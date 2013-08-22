@@ -25,6 +25,12 @@
         white-space: nowrap;
         padding-right: 10px;
     }
+    .datagrid_col1 {
+        width: 75%;
+    }
+    .datagrid_col2 {
+        width: 20%;
+    }
 </style>
 
 <%-- Событие для добавления строки по изменению поля
@@ -34,7 +40,7 @@
 
 <%--@elvariable id="clientRegisterPage" type="ru.axetta.ecafe.processor.web.ui.client.ClientRegisterPage"--%>
 <a4j:form>
-<h:panelGrid id="clientRegisterGrid" binding="#{clientRegisterPage.pageComponent}" styleClass="borderless-grid">
+<h:panelGrid id="clientRegisterGrid" binding="#{clientRegisterPage.pageComponent}" styleClass="borderless-grid" style="width: 100%;">
 
     <a4j:region>
     <h:panelGrid columns="4" styleClass="borderless-grid">
@@ -50,11 +56,9 @@
     </h:panelGrid>
 
 
-    <h:panelGrid columns="2" styleClass="borderless-grid">
-        <rich:panel style="width:1000px; height: 500px; overflow:auto; background: none;">
-            <rich:dataTable id="clientsToRegister" value="#{clientRegisterPage.clientsForRegister}"
-                            var="client" rows="10" width="100%">
-
+    <h:panelGrid columns="2" styleClass="borderless-grid" style="width: 100%;" columnClasses="datagrid_col1,datagrid_col2">
+        <rich:panel style="width: 1100px; height: 400px; overflow: auto;">
+            <rich:dataTable id="clientsToRegister" value="#{clientRegisterPage.clientsForRegister}" var="client">
                 <rich:column style="text-align: center; background-color: #{client.color};">
                     <a4j:commandButton image="/images/icon/cancel.png" action="#{clientRegisterPage.doRemoveClient(client)}" style="padding-bottom: 10px"
                                        reRender="clientsToRegister" styleClass="command-button" />
@@ -155,41 +159,43 @@
             </rich:dataTable>
         </rich:panel>
 
-        <rich:simpleTogglePanel label="Отображаемые поля" switchType="client" style="width: 200px"
-                                opened="true" headerClass="filter-panel-header">
-            <a4j:region>
-            <h:panelGrid columns="2" styleClass="borderless-grid" style="padding-bottom: 20px">
-                <h:outputText escape="true" value="Адрес" styleClass="output-text-mod" />
-                <h:selectBooleanCheckbox value="#{clientRegisterPage.showAddress}" styleClass="output-text" >
-                    <a4j:support event="onchange" reRender="clientsToRegister" />
-                </h:selectBooleanCheckbox>
-                <h:outputText escape="true" value="Телефон" styleClass="output-text-mod" />
-                <h:selectBooleanCheckbox value="#{clientRegisterPage.showPhone}" styleClass="output-text" >
-                    <a4j:support event="onchange" reRender="clientsToRegister" />
-                </h:selectBooleanCheckbox>
-                <h:outputText escape="true" value="Моб. телефон" styleClass="output-text-mod" />
-                <h:selectBooleanCheckbox value="#{clientRegisterPage.showMobile}" styleClass="output-text" >
-                    <a4j:support event="onchange" reRender="clientsToRegister" />
-                </h:selectBooleanCheckbox>
-                <h:outputText escape="true" value="Факс" styleClass="output-text-mod" />
-                <h:selectBooleanCheckbox value="#{clientRegisterPage.showFax}" styleClass="output-text" >
-                    <a4j:support event="onchange" reRender="clientsToRegister" />
-                </h:selectBooleanCheckbox>
-                <h:outputText escape="true" value="E-mail" styleClass="output-text-mod" />
-                <h:selectBooleanCheckbox value="#{clientRegisterPage.showEmail}" styleClass="output-text" >
-                    <a4j:support event="onchange" reRender="clientsToRegister" />
-                </h:selectBooleanCheckbox>
-                <h:outputText escape="true" value="Примечания" styleClass="output-text-mod" />
-                <h:selectBooleanCheckbox value="#{clientRegisterPage.showRemarks}" styleClass="output-text" >
-                    <a4j:support event="onchange" reRender="clientsToRegister" />
-                </h:selectBooleanCheckbox>
-            </h:panelGrid>
-            </a4j:region>
-        </rich:simpleTogglePanel>
+        <rich:panel style="width: 100%; height: 400px">
+            <rich:simpleTogglePanel label="Отображаемые поля" switchType="client" style="width: 100%;"
+                                    opened="true" headerClass="filter-panel-header">
+                <a4j:region>
+                <h:panelGrid columns="2" styleClass="borderless-grid" style="padding-bottom: 20px">
+                    <h:outputText escape="true" value="Адрес" styleClass="output-text-mod" />
+                    <h:selectBooleanCheckbox value="#{clientRegisterPage.showAddress}" styleClass="output-text" >
+                        <a4j:support event="onchange" reRender="clientsToRegister" />
+                    </h:selectBooleanCheckbox>
+                    <h:outputText escape="true" value="Телефон" styleClass="output-text-mod" />
+                    <h:selectBooleanCheckbox value="#{clientRegisterPage.showPhone}" styleClass="output-text" >
+                        <a4j:support event="onchange" reRender="clientsToRegister" />
+                    </h:selectBooleanCheckbox>
+                    <h:outputText escape="true" value="Моб. телефон" styleClass="output-text-mod" />
+                    <h:selectBooleanCheckbox value="#{clientRegisterPage.showMobile}" styleClass="output-text" >
+                        <a4j:support event="onchange" reRender="clientsToRegister" />
+                    </h:selectBooleanCheckbox>
+                    <h:outputText escape="true" value="Факс" styleClass="output-text-mod" />
+                    <h:selectBooleanCheckbox value="#{clientRegisterPage.showFax}" styleClass="output-text" >
+                        <a4j:support event="onchange" reRender="clientsToRegister" />
+                    </h:selectBooleanCheckbox>
+                    <h:outputText escape="true" value="E-mail" styleClass="output-text-mod" />
+                    <h:selectBooleanCheckbox value="#{clientRegisterPage.showEmail}" styleClass="output-text" >
+                        <a4j:support event="onchange" reRender="clientsToRegister" />
+                    </h:selectBooleanCheckbox>
+                    <h:outputText escape="true" value="Примечания" styleClass="output-text-mod" />
+                    <h:selectBooleanCheckbox value="#{clientRegisterPage.showRemarks}" styleClass="output-text" >
+                        <a4j:support event="onchange" reRender="clientsToRegister" />
+                    </h:selectBooleanCheckbox>
+                </h:panelGrid>
+                </a4j:region>
+            </rich:simpleTogglePanel>
+        </rich:panel>
     </h:panelGrid>
     </a4j:region>
 
-    <rich:panel style="width:1000px; background: none">
+    <rich:panel style="width:100%; background: none">
     <table cellpadding="0" cellspacing="0">
         <tr>
             <td style="width: 99%">
