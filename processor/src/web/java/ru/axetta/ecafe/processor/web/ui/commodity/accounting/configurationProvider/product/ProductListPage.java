@@ -12,6 +12,8 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Pr
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
+import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderSelect;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.group.ProductGroupItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.group.ProductGroupSelect;
 
@@ -20,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
 import java.util.List;
 
 /**
@@ -31,7 +34,7 @@ import java.util.List;
  */
 @Component
 @Scope("session")
-public class ProductListPage extends BasicWorkspacePage implements ProductGroupSelect {
+public class ProductListPage extends BasicWorkspacePage implements ProductGroupSelect, ConfigurationProviderSelect {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductListPage.class);
     private List<Product> productList;
@@ -42,6 +45,8 @@ public class ProductListPage extends BasicWorkspacePage implements ProductGroupS
     private DAOService daoService;
     @Autowired
     private ProductGroupItemsPanel productGroupItemsPanel;
+    @Autowired
+    private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
     @Autowired
     private ContextDAOServices contextDAOServices;
 
@@ -60,42 +65,23 @@ public class ProductListPage extends BasicWorkspacePage implements ProductGroupS
 
     public Object onClear() throws Exception{
         selectedProductGroup = null;
+        selectedConfigurationProvider = null;
         return null;
     }
 
-    public void reload() throws Exception{
+    public void reload() throws Exception {
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
-        if(selectedProductGroup!=null){
-            if(selectedConfigurationProvider!=null){
-                if(orgOwners==null || orgOwners.isEmpty()){
-                    productList = daoService.findProductByConfigurationProvider(selectedProductGroup, selectedConfigurationProvider.getIdOfConfigurationProvider(), deletedStatusSelected);
-                } else {
-                    productList = daoService.findProductByConfigurationProvider(selectedProductGroup, selectedConfigurationProvider.getIdOfConfigurationProvider(),orgOwners, deletedStatusSelected);
-                }
-            } else {
-                if(orgOwners==null || orgOwners.isEmpty()){
-                    productList = daoService.findProductByConfigurationProvider(selectedProductGroup, deletedStatusSelected);
-                } else {
-                    productList = daoService.findProductByConfigurationProvider(selectedProductGroup, orgOwners, deletedStatusSelected);
-                }
-            }
-        } else {
-            if(selectedConfigurationProvider!=null){
-                if(orgOwners==null || orgOwners.isEmpty()){
-                    productList = daoService.findProductByConfigurationProvider(selectedConfigurationProvider.getIdOfConfigurationProvider(), deletedStatusSelected);
-                } else {
-                    productList = daoService.findProductByConfigurationProvider(selectedConfigurationProvider.getIdOfConfigurationProvider(),orgOwners, deletedStatusSelected);
-                }
-            } else {
-                if(orgOwners==null || orgOwners.isEmpty()){
-                    productList = daoService.findProductByConfigurationProvider(deletedStatusSelected);
-                } else {
-                    productList = daoService.findProductByConfigurationProvider(orgOwners, deletedStatusSelected);
-                }
-            }
-        }
+        productList = daoService
+                .findProductByConfigurationProvider(selectedProductGroup, selectedConfigurationProvider.getIdOfConfigurationProvider(),
+                        deletedStatusSelected, orgOwners, null);
+    }
 
+    public Object selectConfigurationProvider() throws Exception {
+        configurationProviderItemsPanel.reload();
+        configurationProviderItemsPanel.setSelectConfigurationProvider(selectedConfigurationProvider);
+        configurationProviderItemsPanel.pushCompleteHandler(this);
+        return null;
     }
 
     public Object selectProductGroup() throws Exception{
@@ -108,6 +94,11 @@ public class ProductListPage extends BasicWorkspacePage implements ProductGroupS
     @Override
     public void select(ProductGroup productGroup) {
         selectedProductGroup = productGroup;
+    }
+
+    @Override
+    public void select(ConfigurationProvider configurationProvider) {
+        selectedConfigurationProvider = configurationProvider;
     }
 
     public String getPageTitle() {

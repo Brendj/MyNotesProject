@@ -16,6 +16,9 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Se
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Conjunction;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1175,112 +1178,33 @@ public class DAOService {
         return query.getResultList();
     }
 
-
-    public List<Product> findProductByConfigurationProvider(ProductGroup selectedProductGroup, Long idOfConfigurationProvider, Boolean deletedStatusSelected) {
-        TypedQuery<Product> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from Product where idOfConfigurationProvider=:idOfConfigurationProvider and productGroup=:selectedProductGroup order by globalId",Product.class);
-        } else {
-            query = entityManager.createQuery("from Product where idOfConfigurationProvider=:idOfConfigurationProvider and productGroup=:selectedProductGroup and deletedState=false order by globalId",Product.class);
-        }
-        query.setParameter("idOfConfigurationProvider",idOfConfigurationProvider);
-        query.setParameter("selectedProductGroup", selectedProductGroup);
-        return query.getResultList();
+    @SuppressWarnings("unchecked")
+    public List<Product> findProductByConfigurationProvider(ProductGroup pg, Long confProviderId, Boolean deleteSt, List<Long> orgOwners,
+            String productName) {
+        Session session = (Session) entityManager.getDelegate();
+        Criteria cr = session.createCriteria(Product.class);
+        Conjunction conj = Restrictions.conjunction();
+        if (pg != null)
+            conj.add(Restrictions.eq("productGroup", pg));
+        if (confProviderId != null)
+            conj.add(Restrictions.eq("idOfConfigurationProvider", confProviderId));
+        if (deleteSt != null && !deleteSt)
+            conj.add(Restrictions.eq("deletedState", false));
+        if (orgOwners != null && !orgOwners.isEmpty())
+            conj.add(Restrictions.in("orgOwner", orgOwners));
+        if (productName != null && !productName.isEmpty())
+            conj.add(Restrictions.ilike("productName", productName, MatchMode.ANYWHERE));
+        cr.add(conj).addOrder(Order.asc("globalId"));
+        return (List<Product>) cr.list();
     }
 
-    public List<Product> findProductByConfigurationProvider(ProductGroup selectedProductGroup, Long idOfConfigurationProvider, List<Long> orgOwners, Boolean deletedStatusSelected) {
-        TypedQuery<Product> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from Product where idOfConfigurationProvider=:idOfConfigurationProvider and productGroup=:selectedProductGroup and orgOwner in :orgOwners order by globalId",Product.class);
-        } else {
-            query = entityManager.createQuery("from Product where idOfConfigurationProvider=:idOfConfigurationProvider and productGroup=:selectedProductGroup and orgOwner in :orgOwners and deletedState=false order by globalId",Product.class);
-        }
-        query.setParameter("idOfConfigurationProvider",idOfConfigurationProvider);
-        query.setParameter("orgOwners", orgOwners);
-        query.setParameter("selectedProductGroup", selectedProductGroup);
-        return query.getResultList();
+    public List<Product> findProductByConfigurationProvider(List<Long> orgOwners, String productName) {
+        return findProductByConfigurationProvider(orgOwners, false, productName);
     }
 
-    public List<Product> findProductByConfigurationProvider(ProductGroup selectedProductGroup, Boolean deletedStatusSelected) {
-        TypedQuery<Product> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from Product where productGroup=:selectedProductGroup order by globalId",Product.class);
-        } else {
-            query = entityManager.createQuery("from Product where deletedState=false and productGroup=:selectedProductGroup order by globalId",Product.class);
-        }
-        query.setParameter("selectedProductGroup", selectedProductGroup);
-        return query.getResultList();
+    public List<Product> findProductByConfigurationProvider(List<Long> orgOwners, Boolean deletedStatusSelected, String productName) {
+        return findProductByConfigurationProvider(null, null, deletedStatusSelected, orgOwners, productName);
     }
-
-    public List<Product> findProductByConfigurationProvider(ProductGroup selectedProductGroup, List<Long> orgOwners, Boolean deletedStatusSelected) {
-        TypedQuery<Product> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from Product where orgOwner in :orgOwners and productGroup=:selectedProductGroup order by globalId",Product.class);
-        } else {
-            query = entityManager.createQuery("from Product where orgOwner in :orgOwners and productGroup=:selectedProductGroup and deletedState=false order by globalId",Product.class);
-        }
-        query.setParameter("orgOwners", orgOwners);
-        query.setParameter("selectedProductGroup", selectedProductGroup);
-        return query.getResultList();
-    }
-
-    public List<Product> findProductByConfigurationProvider(Long idOfConfigurationProvider, Boolean deletedStatusSelected) {
-        TypedQuery<Product> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from Product where idOfConfigurationProvider=:idOfConfigurationProvider order by globalId",Product.class);
-        } else {
-            query = entityManager.createQuery("from Product where idOfConfigurationProvider=:idOfConfigurationProvider and deletedState=false order by globalId",Product.class);
-        }
-        query.setParameter("idOfConfigurationProvider",idOfConfigurationProvider);
-        return query.getResultList();
-    }
-
-    public List<Product> findProductByConfigurationProvider(Long idOfConfigurationProvider, List<Long> orgOwners, Boolean deletedStatusSelected) {
-        TypedQuery<Product> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from Product where idOfConfigurationProvider=:idOfConfigurationProvider and orgOwner in :orgOwners order by globalId",Product.class);
-        } else {
-            query = entityManager.createQuery("from Product where idOfConfigurationProvider=:idOfConfigurationProvider and orgOwner in :orgOwners and deletedState=false order by globalId",Product.class);
-        }
-        query.setParameter("idOfConfigurationProvider",idOfConfigurationProvider);
-        query.setParameter("orgOwners", orgOwners);
-        return query.getResultList();
-    }
-
-    public List<Product> findProductByConfigurationProvider(Boolean deletedStatusSelected) {
-        TypedQuery<Product> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from Product order by globalId",Product.class);
-        } else {
-            query = entityManager.createQuery("from Product where deletedState=false  order by globalId",Product.class);
-        }
-        return query.getResultList();
-    }
-
-    public List<Product> findProductByConfigurationProvider(List<Long> orgOwners, Boolean deletedStatusSelected) {
-        TypedQuery<Product> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from Product where orgOwner in :orgOwners order by globalId",Product.class);
-        } else {
-            query = entityManager.createQuery("from Product where orgOwner in :orgOwners and deletedState=false order by globalId",Product.class);
-        }
-        query.setParameter("orgOwners", orgOwners);
-        return query.getResultList();
-    }
-
-
-    public List<Product> findProductByConfigurationProvider(String filter) {
-        TypedQuery<Product> query = entityManager.createQuery("from Product where UPPER(productName) like '%"+filter.toUpperCase()+"%' and deletedState=false order by globalId",Product.class);
-        return query.getResultList();
-    }
-
-    public List<Product> findProductByConfigurationProvider(List<Long> orgOwners, String filter) {
-        TypedQuery<Product> query = entityManager.createQuery("from Product where UPPER(productName) like '%"+filter.toUpperCase()+"%' and orgOwner in :orgOwners and deletedState=false order by globalId",Product.class);
-        query.setParameter("orgOwners", orgOwners);
-        return query.getResultList();
-    }
-
-
 
     public List<TechnologicalMapGroup> findTechnologicalMapGroupByConfigurationProvider(Long idOfConfigurationProvider, Boolean deletedStatusSelected) {
         TypedQuery<TechnologicalMapGroup> query;

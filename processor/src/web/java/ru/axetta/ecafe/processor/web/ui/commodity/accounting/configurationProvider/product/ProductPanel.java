@@ -11,7 +11,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,19 +88,8 @@ public class ProductPanel extends BasicPage {
     private void retrieveProduct() throws Exception {
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
-        if(!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
-            if (StringUtils.isEmpty(filter)){
-                productList = daoService.findProductByConfigurationProvider(filter);
-            }else {
-                productList = daoService.findProductByConfigurationProvider(true);
-            }
-        } else {
-            if (StringUtils.isEmpty(filter)){
-                productList = daoService.findProductByConfigurationProvider(orgOwners, filter);
-            }else {
-                productList = daoService.findProductByConfigurationProvider(orgOwners, true);
-            }
-        }
+        if (!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()))
+            productList = daoService.findProductByConfigurationProvider(orgOwners, true, filter);
     }
 
     public String getFilter() {

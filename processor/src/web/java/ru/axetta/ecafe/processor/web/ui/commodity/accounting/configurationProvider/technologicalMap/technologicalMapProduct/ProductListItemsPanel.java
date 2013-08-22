@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,10 @@ import org.springframework.stereotype.Component;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 /**
  * Created with IntelliJ IDEA.
@@ -113,19 +115,7 @@ public class ProductListItemsPanel extends BasicPage {
         //return entityManager.createQuery(query, Product.class).getResultList();
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
-        if(orgOwners==null || orgOwners.isEmpty()){
-            if (StringUtils.isEmpty(filter)){
-                return daoService.findProductByConfigurationProvider(filter);
-            }else {
-                return daoService.findProductByConfigurationProvider(false);
-            }
-        } else {
-            if (StringUtils.isEmpty(filter)){
-                return daoService.findProductByConfigurationProvider(orgOwners, filter);
-            }else {
-                return daoService.findProductByConfigurationProvider(orgOwners, false);
-            }
-        }
+        return daoService.findProductByConfigurationProvider(orgOwners, filter);
     }
 
     public TechnologicalMap getTechnologicalMap() {
