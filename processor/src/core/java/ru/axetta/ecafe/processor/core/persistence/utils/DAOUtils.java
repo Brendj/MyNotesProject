@@ -830,9 +830,6 @@ public class DAOUtils {
         return (CategoryOrg) q.getSingleResult();
     }
 
-
-
-
     @SuppressWarnings("unchecked")
     public static List<CategoryDiscount> getCategoryDiscountList(EntityManager entityManager) {
         javax.persistence.Query q = entityManager.createQuery("from CategoryDiscount order by idOfCategoryDiscount");

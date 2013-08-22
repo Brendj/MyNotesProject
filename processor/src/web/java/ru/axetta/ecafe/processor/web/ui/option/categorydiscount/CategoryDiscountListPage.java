@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.option.categorydiscount;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -17,6 +18,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,8 +34,8 @@ import java.util.List;
 @Scope("session")
 public class CategoryDiscountListPage extends BasicWorkspacePage implements ConfirmDeletePage.Listener {
 
-    @PersistenceContext
-    EntityManager entityManager;
+    @Autowired
+    private DAOService service;
 
     private List<CategoryDiscount> items = Collections.emptyList();
 
@@ -62,7 +64,7 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
             persistenceTransaction.commit();
             persistenceTransaction = null;
 
-            RuntimeContext.getAppContext().getBean(this.getClass()).reload();
+            reload();
         } catch (ConstraintViolationException vce){
             logAndPrintMessage(
                     "Ошибка при удалении категории: имеются зарегистрированные Правила скидок или Клиенты привязанные к категории",
@@ -79,12 +81,11 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
 
     @Override
     public void onShow() throws Exception {
-        RuntimeContext.getAppContext().getBean(this.getClass()).reload();
+        reload();
     }
 
-    @Transactional
     private void reload() {
-        items = DAOUtils.getCategoryDiscountList(entityManager);
+        items = service.getCategoryDiscountList();
     }
 
 

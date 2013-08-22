@@ -45,6 +45,11 @@ public class DAOService {
         return RuntimeContext.getAppContext().getBean(DAOService.class);
     }
 
+    public List<CategoryDiscount> getCategoryDiscountList() {
+        TypedQuery<CategoryDiscount> q = entityManager.createQuery("from CategoryDiscount order by idOfCategoryDiscount", CategoryDiscount.class);
+        return q.getResultList();
+    }
+
     public List<Contragent> getContragentsWithClassIds(List<Integer> classIds) {
         TypedQuery<Contragent> q = entityManager.createQuery("from Contragent where classId in (:classIds)", Contragent.class);
         q.setParameter("classIds", classIds);
