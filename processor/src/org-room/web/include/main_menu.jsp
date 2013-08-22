@@ -64,7 +64,9 @@
                     <h:outputText value="Групповое питание"/>
                 </h:panelGroup>
             </f:facet>
-            <rich:menuItem submitMode="ajax" value="Установка льгот" action="#{mainPage.doShowSetupDiscountPage}" reRender="workspaceForm"></rich:menuItem>
+            <rich:menuItem submitMode="ajax" id="discountEditPageMenuItem"
+                           binding="#{setupDiscountPage.mainMenuComponent}" value="Установка льгот"
+                           action="#{setupDiscountPage.show}" reRender="workspaceForm" />
         </rich:dropDownMenu>
 
         <%-- Отчеты --%>

@@ -159,7 +159,7 @@
             </rich:dataTable>
         </rich:panel>
 
-        <rich:panel style="width: 100%; height: 400px">
+        <rich:panel style="width: 100%; height: 300px">
             <rich:simpleTogglePanel label="Отображаемые поля" switchType="client" style="width: 100%;"
                                     opened="true" headerClass="filter-panel-header">
                 <a4j:region>

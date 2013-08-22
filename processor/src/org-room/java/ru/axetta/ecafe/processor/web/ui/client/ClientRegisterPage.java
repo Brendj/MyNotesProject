@@ -226,6 +226,7 @@ public class ClientRegisterPage extends BasicWorkspacePage {
             loadGroups();
         }
         List<SelectItem> res = new ArrayList<SelectItem>();
+        res.add(new SelectItem("", ""));
         for (String group : groups) {
             res.add(new SelectItem(group, group));
         }

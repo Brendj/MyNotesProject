@@ -52,6 +52,8 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     private final DateFormat comboboxDF = new SimpleDateFormat ("MMMMM yyyy", new Locale("ru"));
     private final DateFormat columnDF = new SimpleDateFormat ("dd MMM", new Locale("ru"));
     private static final String NEW_CLAIM_COMMENT = "- Добавлено в тонком клиенте -";
+    public static final String OVERALL_TITLE = "ИТОГО";
+    public static final long OVERALL_GLOBAL_ID = Long.MIN_VALUE;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -63,8 +65,9 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     private Org org;
     private List<Entry> entries = new ArrayList<Entry>();
     private List<DateColumn> columns = new ArrayList<DateColumn>();
+    private Map<Long, String> goodsGroups;
+    private Long goodGroup;
     private Long month;
-    private Long newMonth;
     private Long prevMonth;
     private boolean changesMade;
 
@@ -136,6 +139,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
             changesMade = false;
         }
         buildColumns(start, end);
+        buildGoodsGroups(session);
     }
 
     private void buildData(Session session, Calendar dateFrom, Calendar dateTo) {
@@ -144,9 +148,10 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
 
 
         //  Загружаем все товары, которые есть
-        List<Good> goods = DAOUtils.getAllGoods(session);
+        List<Good> goods = DAOUtils.getAllGoods(session, goodGroup);
+        Map <Long, Long> overall = new HashMap<Long, Long>();
 
-        
+
         Map <String, List<long []>> tmpData = new TreeMap <String, List <long []>> ();
         entries.clear();
         //  Загружам заявки из БД через методы core модуля
@@ -157,7 +162,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         }
         List<GoodRequest> goodRequestList = goodRequestService.findByFilter(getOrg().getIdOfOrg(),stateList,
                                                                             dateFrom.getTime(),dateTo.getTime(),
-                                                                            deletedState);
+                                                                            deletedState, goodGroup);
         for (GoodRequest gr : goodRequestList) {
             List<GoodRequestPosition> positions = goodRequestService.getGoodRequestPositionByGoodRequest(gr);
             for (GoodRequestPosition pos : positions) {
@@ -174,6 +179,12 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
                     tmpData.put(good, e);
                 }
                 e.add(new long[] { ts, count, idofgoodsrequestposition });
+
+                Long total = overall.get(ts);
+                if (total == null) {
+                    total = 0L;
+                }
+                overall.put(ts, total + count);
             }
         }
 
@@ -193,15 +204,23 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
             }
             entries.add(entry);
         }
+        Entry overallEntry = new Entry(OVERALL_TITLE, OVERALL_GLOBAL_ID);
+        for (Long ts : overall.keySet()) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTimeInMillis(ts);
+            resetDate(cal);
+            overallEntry.add(cal.getTimeInMillis(), overall.get(ts), OVERALL_GLOBAL_ID);
+        }
+        entries.add(overallEntry);
     }
 
 
     private void buildColumns (Calendar dateFrom, Calendar dateTo) {
         columns.clear();
-        long start = dateFrom.getTimeInMillis();
-        long end = dateTo.getTimeInMillis();
+        long start = dateFrom.getTimeInMillis() - RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_THIN_CLIENT_PRE_POST_DATE) * 86400000L;
+        long end = dateTo.getTimeInMillis() + RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_THIN_CLIENT_PRE_POST_DATE) * 86400000L;
         Calendar startDate = new GregorianCalendar();
-        startDate.setTimeInMillis(dateFrom.getTimeInMillis());
+        startDate.setTimeInMillis(start);
         Calendar endDate = new GregorianCalendar();
         endDate.setTimeInMillis(dateTo.getTimeInMillis());
 
@@ -212,6 +231,13 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         }
     }
 
+    private void buildGoodsGroups(Session session) {
+        if (goodsGroups != null) {
+            return;
+        }
+        goodsGroups = ru.axetta.ecafe.processor.core.dao.DAOServices.getInstance().loadGoodsGroups(session);
+    }
+
     @Transactional
     public void save() {
         Session session = null;
@@ -219,6 +245,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
             resetMessages();
             session = (Session) entityManager.getDelegate();
             save(session);
+            fill(session, true);
             sendInfo("Изменения в заявки успешно внесены");
             changesMade = false;
         } catch (Exception e) {
@@ -280,6 +307,10 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         RuntimeContext.getAppContext().getBean(ClaimCalendarEditPage.class).fill();
     }
 
+    public void doChangeGoodsGroup (ActionEvent actionEvent) {
+        RuntimeContext.getAppContext().getBean(ClaimCalendarEditPage.class).fill();
+    }
+
     public void doValueChange (ActionEvent actionEvent) {
         changesMade = true;
     }
@@ -302,25 +333,40 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         }
     }
 
-    public boolean isEditable (long ts) {
+    public boolean isEditable (long idofgood, long ts) {
+        //  Если это ИТОГО, то делаем его не редактируемым
+        if (idofgood == OVERALL_GLOBAL_ID) {
+            return false;
+        }
+
+        //  Сравниваем даты
+        Calendar mon = new GregorianCalendar();
+        mon.setTimeInMillis(getMonth());
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(ts);
         Calendar now = new GregorianCalendar();
         now.setTimeInMillis(System.currentTimeMillis()+ getEditableDateIncrement ());
         resetDate(cal);
-        resetDate(now );
+        resetDate(now);
         if (cal.getTimeInMillis() > now.getTimeInMillis()) {
-            return true;
-        } else {
-            return false;
+            if (mon.get(Calendar.MONTH) == cal.get(Calendar.MONTH)) {
+                return true;
+            }
         }
+        return false;
     }
-    
+
     public String getColumnColor (long ts) {
+        Calendar mon = new GregorianCalendar();
+        mon.setTimeInMillis(getMonth());
+        Calendar cal = new GregorianCalendar();
+        cal.setTimeInMillis(ts);
         Calendar now = new GregorianCalendar();
         now.setTimeInMillis(System.currentTimeMillis());
         resetDate(now);
-        if (now.getTimeInMillis() == ts) {
+        if (mon.get(Calendar.MONTH) != cal.get(Calendar.MONTH)) {
+            return "background-color: #DEDEDE; color: #BDBDBD;";
+        } else if (now.getTimeInMillis() == ts) {
             return "background-color: #E0FFE7";
         } else {
             return "";
@@ -357,6 +403,15 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     public boolean getChangesMade() {
         return changesMade;
     }
+    
+    public List<SelectItem> getGoodsGroups () {
+        List<SelectItem> result = new ArrayList<SelectItem>();
+        result.add(new SelectItem(Long.MIN_VALUE, "Все"));
+        for (Long idofgoodgroup : goodsGroups.keySet()) {
+            result.add(new SelectItem(idofgoodgroup, goodsGroups.get(idofgoodgroup)));
+        }
+        return result;
+    }
 
     public List<SelectItem> getMonths() {
         List<SelectItem> result = new ArrayList<SelectItem>();
@@ -382,6 +437,14 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
             start = startDate.getTimeInMillis();
         }
         return result;
+    }
+
+    public Long getGoodGroup() {
+        return goodGroup;
+    }
+
+    public void setGoodGroup(Long goodGroup) {
+        this.goodGroup = goodGroup;
     }
 
 
@@ -460,7 +523,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         private String food;
         private Map<Long, Long> data;
         private Map<Long, List<Long>> ids;
-        
+
         public Entry (String food, long idofgood) {
             this.food = food;
             this.idofgood = idofgood;
@@ -475,7 +538,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         public String getFood() {
             return food;
         }
-        
+
         public Long getDataForDate(long ts) {
             Object o = data.get(ts);
             if (o == null || o.toString().length() < 1) {

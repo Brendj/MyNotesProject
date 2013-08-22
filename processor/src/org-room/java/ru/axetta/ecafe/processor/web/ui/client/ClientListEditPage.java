@@ -470,13 +470,9 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         } else {
             return;
         }
-        org.hibernate.Query q = session.createSQLQuery("select idofcategorydiscount, categoryname "
-                                                    + "from cf_categorydiscounts where idofcategorydiscount>0");
-        List resultList = q.list();
-        for (Object entry : resultList) {
-            Object o[] = (Object[]) entry;
-            Long idofcategorydiscount = HibernateUtils.getDbLong(o[0]);
-            String name = HibernateUtils.getDbString(o[1]);
+        Map<Long, String> categories = DAOServices.getInstance().loadDiscountCategories(session);
+        for (Long idofcategorydiscount : categories.keySet()) {
+            String name = categories.get(idofcategorydiscount);
             categoryDiscounts.add(new CategoryDiscount(idofcategorydiscount, name));
         }
     }
@@ -728,6 +724,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
             loadGroups();
         }
         List<SelectItem> res = new ArrayList<SelectItem>();
+        res.add(new SelectItem("", ""));
         for (String group : groups) {
             res.add(new SelectItem(group, group));
         }

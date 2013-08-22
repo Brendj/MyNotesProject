@@ -29,34 +29,43 @@
 
 
 
-<script type="text/javascript">
-    /*var width = window.innerWidth ||
-            html.clientWidth  ||
-            body.clientWidth  ||
-            screen.availWidth;
-    RichFaces.$('claimsCalendar').style.width = width - 100;*/
-</script>
-
 <%--@elvariable id="claimCalendarEditPage" type="ru.axetta.ecafe.processor.web.ui.claim.ClaimCalendarEditPage"--%>
 <a4j:form id="claimCalendarForm">
     <h:panelGrid id="claimCalendarEditPage" binding="#{claimCalendarEditPage.pageComponent}" styleClass="borderless-grid" style="width: 100%">
 
 
-        <a4j:region>
-        <h:panelGrid id="months" styleClass="borderless-grid">
-            <h:selectOneMenu id="month" value="#{claimCalendarEditPage.month}" style="width:150px;" disabled="#{client.added}" rendered="#{!claimCalendarEditPage.changesMade}">
-                <f:selectItems value="#{claimCalendarEditPage.months}"/>
-                <a4j:support event="onchange" actionListener="#{claimCalendarEditPage.doChangeMonth}" reRender="claimsCalendar, controls"/>
-            </h:selectOneMenu>
+        <h:panelGrid columns="2">
+            <a4j:region>
+                <h:panelGrid id="months" styleClass="borderless-grid">
+                    <h:selectOneMenu id="month" value="#{claimCalendarEditPage.month}" style="width:150px;" rendered="#{!claimCalendarEditPage.changesMade}">
+                        <f:selectItems value="#{claimCalendarEditPage.months}"/>
+                        <a4j:support event="onchange" actionListener="#{claimCalendarEditPage.doChangeMonth}" reRender="claimsCalendar, controls"/>
+                    </h:selectOneMenu>
 
 
-            <h:selectOneMenu id="monthWithConfirm" value="#{claimCalendarEditPage.month}" style="width:150px;" disabled="#{client.added}" rendered="#{claimCalendarEditPage.changesMade}" >
-                <f:selectItems value="#{claimCalendarEditPage.months}"/>
-                <a4j:support event="onchange" reRender="yesNoConfirmPanel" action="#{mainPage.doShowYesNoConfirmModal}"
-                             oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.show();"/>
-            </h:selectOneMenu>
+                    <h:selectOneMenu id="monthWithConfirm" value="#{claimCalendarEditPage.month}" style="width:150px;" rendered="#{claimCalendarEditPage.changesMade}" >
+                        <f:selectItems value="#{claimCalendarEditPage.months}"/>
+                        <a4j:support event="onchange" reRender="yesNoConfirmPanel" action="#{mainPage.doShowYesNoConfirmModal}"
+                                     oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.show();"/>
+                    </h:selectOneMenu>
+                </h:panelGrid>
+            </a4j:region>
+
+            <a4j:region>
+                <h:panelGrid id="group" styleClass="borderless-grid">
+                    <h:selectOneMenu id="goodsGroup" value="#{claimCalendarEditPage.goodGroup}" style="width:150px;" rendered="#{!claimCalendarEditPage.changesMade}">
+                        <f:selectItems value="#{claimCalendarEditPage.goodsGroups}"/>
+                        <a4j:support event="onchange" actionListener="#{claimCalendarEditPage.doChangeGoodsGroup}" reRender="claimsCalendar, controls"/>
+                    </h:selectOneMenu>
+
+                    <h:selectOneMenu id="goodsGroupWithConfirm" value="#{claimCalendarEditPage.goodGroup}" style="width:150px;" rendered="#{claimCalendarEditPage.changesMade}" >
+                        <f:selectItems value="#{claimCalendarEditPage.goodsGroups}"/>
+                        <a4j:support event="onchange" reRender="yesNoConfirmPanel" action="#{mainPage.doShowYesNoConfirmModal}"
+                                     oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.show();"/>
+                    </h:selectOneMenu>
+                </h:panelGrid>
+            </a4j:region>
         </h:panelGrid>
-        </a4j:region>
 
         <a4j:region>
         <div style="width: 1350px; overflow: auto;">
@@ -82,15 +91,15 @@
                         <h:outputText escape="true" value="#{col.title}" />
                     </f:facet>
 
-                    <h:outputText rendered="#{!claimCalendarEditPage.isEditable(col.date)}" value="#{e.data[col.date]}"
+                    <h:outputText rendered="#{!claimCalendarEditPage.isEditable(e.idofgood,col.date)}" value="#{e.data[col.date]}"
                                   styleClass="output-text" />
 
-                    <rich:inplaceInput layout="block" value="#{e.data[col.date]}" rendered="#{claimCalendarEditPage.isEditable(col.date)}"
+                    <rich:inplaceInput layout="block" value="#{e.data[col.date]}" rendered="#{claimCalendarEditPage.isEditable(e.idofgood,col.date)}"
                                        converterMessage="Price value should be integer. Price at row #{row+1} can't be changed."
                                        id="inplace" changedHoverClass="hover" viewHoverClass="hover"
                                        viewClass="inplace" changedClass="inplace"
                                        selectOnEdit="true" editEvent="ondblclick">
-                        <a4j:support event="onchange" reRender="controls,months,messages" actionListener="#{claimCalendarEditPage.doValueChange}" />
+                        <a4j:support event="onchange" reRender="controls,months,group,messages" actionListener="#{claimCalendarEditPage.doValueChange}" />
                     </rich:inplaceInput>
                 </rich:columns>
                 <%--<rich:column>
@@ -117,11 +126,11 @@
                 </tr>
                 <tr>
                     <td>
-                        <a4j:commandButton value="Применить" reRender="claimsCalendar,messages,months" disabled="#{!claimCalendarEditPage.changesMade}"
+                        <a4j:commandButton value="Применить" reRender="claimsCalendar,messages,months,group" disabled="#{!claimCalendarEditPage.changesMade}"
                                            action="#{claimCalendarEditPage.doApply}">
                         </a4j:commandButton>
 
-                        <a4j:commandButton value="Отменить" reRender="claimsCalendar,messages,months" disabled="#{!claimCalendarEditPage.changesMade}"
+                        <a4j:commandButton value="Отменить" reRender="claimsCalendar,messages,months,group" disabled="#{!claimCalendarEditPage.changesMade}"
                                            action="#{claimCalendarEditPage.doCancel}">
                         </a4j:commandButton>
                     </td>

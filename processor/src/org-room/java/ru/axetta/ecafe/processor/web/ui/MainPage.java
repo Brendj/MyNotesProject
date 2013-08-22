@@ -88,16 +88,6 @@ public class MainPage {
     /*******************************************************************************************************************
      *                                     Список страниц
      ******************************************************************************************************************/
-    private final ClientListEditPage clientListEditPage = new ClientListEditPage();
-    private final SetupDiscountPage setupDiscountPage = new SetupDiscountPage ();
-
-    public SetupDiscountPage getSetupDiscountPage() {
-        return setupDiscountPage;
-    }
-
-    public ClientListEditPage getClientListEditPage() {
-        return clientListEditPage;
-    }
 
 
 
@@ -118,31 +108,5 @@ public class MainPage {
         YesNoConfirmPanel panel = RuntimeContext.getAppContext().getBean(YesNoConfirmPanel.class);
         panel.fill();
         panel.addCallbackListener(currentWorkspacePage);
-    }
-
-    public Object doShowSetupDiscountPage () {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            setupDiscountPage.fill(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            currentWorkspacePage = setupDiscountPage;
-        } catch (Exception e) {
-            logger.error("Failed to fill selected user group page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы пользователя",
-                            null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-        updateSelectedMainMenu();
-        return null;
     }
 }

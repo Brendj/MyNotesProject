@@ -16,10 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -71,16 +68,50 @@ public class DAOServices {
      * ****************************************************************************************************************
      */
     public List<String> loadGroups(Session session, long idoforg) {
+        return loadGroups (session, idoforg, false);
+    }
+
+    public List<String> loadGroups(Session session, long idoforg, boolean addAll) {
         List<String> groups = new ArrayList<String>();
         org.hibernate.Query q = session.createSQLQuery(SQL_LOAD_GROUPS);
         q.setLong("idoforg", idoforg);
         List resultList = q.list();
-        groups.add("");
         for (Object entry : resultList) {
             Object o[] = (Object[]) entry;
             Long idOfClientGroup = HibernateUtils.getDbLong(o[0]);
             String groupName = HibernateUtils.getDbString(o[1]);
             groups.add(groupName);
+        }
+        if (addAll) {
+            groups.add("Все");
+        }
+        return groups;
+    }
+    
+    public Map<Long, String> loadDiscountCategories (Session session) {
+        Map <Long, String> categories = new HashMap <Long, String> ();
+        org.hibernate.Query q = session.createSQLQuery("select idofcategorydiscount, categoryname "
+                + "from cf_categorydiscounts where idofcategorydiscount>0");
+        List resultList = q.list();
+        for (Object entry : resultList) {
+            Object o[] = (Object[]) entry;
+            Long idofcategorydiscount = HibernateUtils.getDbLong(o[0]);
+            String name = HibernateUtils.getDbString(o[1]);
+            categories.put(idofcategorydiscount, name);
+        }
+        return categories;
+    }
+
+    public Map<Long, String> loadGoodsGroups(Session session) {
+        Map <Long, String> groups = new HashMap <Long, String> ();
+        org.hibernate.Query q = session.createSQLQuery("select idofgoodsgroup, nameofgoodsgroup "
+                                                    + "from cf_goods_groups");
+        List resultList = q.list();
+        for (Object entry : resultList) {
+            Object o[] = (Object[]) entry;
+            Long idofcategorydiscount = HibernateUtils.getDbLong(o[0]);
+            String name = HibernateUtils.getDbString(o[1]);
+            groups.put(idofcategorydiscount, name);
         }
         return groups;
     }
