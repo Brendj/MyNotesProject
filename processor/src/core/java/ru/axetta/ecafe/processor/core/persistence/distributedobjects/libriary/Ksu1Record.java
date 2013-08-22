@@ -42,8 +42,8 @@ public class Ksu1Record extends DistributedObject {
     @Override
     public Ksu1Record parseAttributes(Node node) throws Exception {
 
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
+        //Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
+        //if(longOrgOwner != null) setOrgOwner(longOrgOwner);
 
         guidFund = getStringAttributeValue(node, "GuidFund", 36);
         guidAccompanyingDocument = getStringAttributeValue(node, "GuidAccompanyingDocument", 36);
@@ -55,6 +55,7 @@ public class Ksu1Record extends DistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
+        setOrgOwner(((Ksu1Record) distributedObject).getOrgOwner());
         setRecordNumber(((Ksu1Record) distributedObject).getRecordNumber());
         setFund(((Ksu1Record) distributedObject).getFund());
         setAccompanyingDocument(((Ksu1Record) distributedObject).getAccompanyingDocument());

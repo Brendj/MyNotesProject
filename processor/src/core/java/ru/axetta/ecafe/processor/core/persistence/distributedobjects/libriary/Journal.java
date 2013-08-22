@@ -31,9 +31,6 @@ public class Journal extends DistributedObject {
     @Override
     public Journal parseAttributes(Node node) throws Exception {
 
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-
         guidFund = getStringAttributeValue(node, "GuidFund", 36);
         guidPublication = getStringAttributeValue(node, "GuidPublication", 36);
 
@@ -61,6 +58,7 @@ public class Journal extends DistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
+        setOrgOwner(((Journal) distributedObject).getOrgOwner());
         setFund(((Journal) distributedObject).getFund());
         setPublication(((Journal) distributedObject).getPublication());
 

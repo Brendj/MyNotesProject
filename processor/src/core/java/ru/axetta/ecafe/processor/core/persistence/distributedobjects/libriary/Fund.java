@@ -22,10 +22,7 @@ import java.util.Set;
 public class Fund extends DistributedObject {
 
     @Override
-    protected void appendAttributes(Element element) {
-        setAttribute(element, "FundName", fundName);
-        setAttribute(element, "Stud", stud);
-    }
+    protected void appendAttributes(Element element) {}
 
     @Override
     public Fund parseAttributes(Node node) throws Exception{

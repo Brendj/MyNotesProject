@@ -33,10 +33,6 @@ public class Ksu2Record extends DistributedObject {
 
     @Override
     public Ksu2Record parseAttributes(Node node) throws Exception {
-
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-
         guidFund = getStringAttributeValue(node, "GuidFund", 36);
         guidRetirementReason = getStringAttributeValue(node, "GuidRetirementReason", 36);
         retirementDate = getDateOnlyAttributeValue(node, "RetirementDate");
@@ -66,6 +62,7 @@ public class Ksu2Record extends DistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
+        setOrgOwner(((Ksu2Record) distributedObject).getOrgOwner());
         setRecordNumber(((Ksu2Record) distributedObject).getRecordNumber());
         setFund(((Ksu2Record) distributedObject).getFund());
         setRetirementReason(((Ksu2Record) distributedObject).getRetirementReason());

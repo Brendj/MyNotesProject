@@ -26,8 +26,7 @@ import java.util.Set;
 public class Issuable extends DistributedObject {
 
     @Override
-    protected void appendAttributes(Element element) {
-    }
+    protected void appendAttributes(Element element) {}
 
     @Override
     protected Issuable parseAttributes(Node node) throws Exception {
@@ -39,9 +38,6 @@ public class Issuable extends DistributedObject {
         if (charType != null) {
             setType(charType);
         }
-
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
 
         guidInstance = getStringAttributeValue(node, "GuidInstance", 36);
         guidJournalItem = getStringAttributeValue(node, "GuidJournalItem", 36);
@@ -60,6 +56,7 @@ public class Issuable extends DistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
+        setOrgOwner(((Issuable) distributedObject).getOrgOwner());
         setBarcode(((Issuable) distributedObject).getBarcode());
         setType(((Issuable) distributedObject).getType());
         setBarcode(((Issuable) distributedObject).getBarcode());
