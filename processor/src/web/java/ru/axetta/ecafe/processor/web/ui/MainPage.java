@@ -1179,6 +1179,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             persistenceTransaction = persistenceSession.beginTransaction();
             selectedOrgGroupPage.fill(persistenceSession, selectedIdOfOrg);
             orgEditPage.fill(persistenceSession, selectedIdOfOrg);
+            orgFilterOfSelectOrgListSelectPage="";
             persistenceTransaction.commit();
             persistenceTransaction = null;
             selectedOrgGroupPage.showAndExpandMenuGroup();
@@ -1626,9 +1627,9 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                    orgListSelectPage.fill(persistenceSession);
+                    orgListSelectPage.fill(persistenceSession, false);
                 } else {
-                    orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage);
+                    orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -1683,7 +1684,12 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            orgListSelectPage.fill(persistenceSession);
+            if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
+                orgListSelectPage.fill(persistenceSession, true);
+            } else {
+                orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, true);
+            }
+            //orgListSelectPage.fill(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -1694,8 +1700,6 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-
-
         }
         return null;
     }

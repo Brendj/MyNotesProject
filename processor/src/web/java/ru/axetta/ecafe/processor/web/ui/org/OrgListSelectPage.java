@@ -150,12 +150,15 @@ public class OrgListSelectPage extends BasicPage {
         return supplierFilterDisabled;
     }
 
-    public void fill(Session session, String orgFilter) throws Exception {
-        updateSelectedOrgs();
+    public void fill(Session session, String orgFilter, Boolean isUpdate) throws Exception {
+        if(isUpdate) {
+            updateSelectedOrgs();
+        } else {
+            selectedOrgs.clear();
+        }
         String[] idOfOrgs = orgFilter.split(",");
         Set<String> longSet = new HashSet<String>(Arrays.asList(idOfOrgs));
         ///
-        selectedOrgs.clear();
         for (String sId : longSet) {
             try{
                 Long id = Long.parseLong(sId.trim());
@@ -173,10 +176,13 @@ public class OrgListSelectPage extends BasicPage {
         this.items = items;
     }
     
-    public void fill(Session session) throws Exception {
-        updateSelectedOrgs();
+    public void fill(Session session, Boolean isUpdate) throws Exception {
+        if(isUpdate) {
+            updateSelectedOrgs();
+        } else {
+            selectedOrgs.clear();
+        }
         List<OrgShortItem> items = retrieveOrgs(session);
-        selectedOrgs.clear();
         for (OrgShortItem orgShortItem: items){
             orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
         }

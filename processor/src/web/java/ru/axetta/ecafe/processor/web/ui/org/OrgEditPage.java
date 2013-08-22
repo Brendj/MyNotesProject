@@ -375,6 +375,10 @@ public class OrgEditPage extends BasicWorkspacePage
         return friendlyIdOfOrgList.toString().replaceAll("[^0-9,]","");
     }
 
+    public List<Long> getFriendlyIdOfOrgList() {
+        return friendlyIdOfOrgList;
+    }
+
     public String getFilterCategoryOrg() {
         if (idOfCategoryOrgList.isEmpty()) return "Нет";
         return filterCategoryOrg;
