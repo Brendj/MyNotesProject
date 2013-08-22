@@ -30,6 +30,18 @@
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
+            <h:outputText escape="true" value="Роль" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.roleName}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Контрагент" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.contragents}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
             <h:outputText escape="true" value="Последние изменения" />
         </f:facet>
         <h:outputText escape="true" value="#{item.updateTime}" converter="timeConverter" styleClass="output-text" />

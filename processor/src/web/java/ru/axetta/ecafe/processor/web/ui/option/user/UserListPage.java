@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.user;
 
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Function;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -28,17 +29,31 @@ public class UserListPage extends BasicWorkspacePage {
         private final String userName;
         private final Set<Long> functions;
         private final Date updateTime;
+        private final String roleName;
+        private final String contragents;
 
         public Item(User user) {
             this.idOfUser = user.getIdOfUser();
             this.userName = user.getUserName();
             this.updateTime = user.getUpdateTime();
+            this.roleName = user.getRoleName();
             Set<Long> itemFunctions = new HashSet<Long>();
             Set<Function> userFunctions = user.getFunctions();
             for (Function function : userFunctions) {
                 itemFunctions.add(function.getIdOfFunction());
             }
             this.functions = itemFunctions;
+            this.contragents = getUserContragents(user.getContragents());
+        }
+
+        private String getUserContragents(Set<Contragent> cSet) {
+            StringBuilder sb = new StringBuilder();
+            int i = 0;
+            for (Contragent c : cSet) {
+                i++;
+                sb.append(c.getContragentName()).append(i == cSet.size() ? "" : "; ");
+            }
+            return sb.toString();
         }
 
         public Long getIdOfUser() {
@@ -55,6 +70,14 @@ public class UserListPage extends BasicWorkspacePage {
 
         public Date getUpdateTime() {
             return updateTime;
+        }
+
+        public String getRoleName() {
+            return roleName;
+        }
+
+        public String getContragents() {
+            return contragents;
         }
     }
 
