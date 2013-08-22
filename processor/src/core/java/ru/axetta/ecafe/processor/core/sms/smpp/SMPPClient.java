@@ -48,7 +48,23 @@ public class SMPPClient extends ISmsService {
     public SendResponse sendTextMessage(String sender, String phoneNumber, String text) throws Exception {
         logger.info("start sending: " + text);
         long destination = Long.parseLong(phoneNumber);
-        SendResult sr = client.send(text, destination);
+        SendResult sr;
+        if(client.getState()==2){
+            sr = client.send(text, destination);
+        } else {
+            int count =0;
+            int err = -1;
+            while (count<5){
+                err = client.start(sourceAddress, smscIPAddress, smscPort, systemId, systemType, serviceType, password);
+                if(err==0) break;
+                count++;
+            }
+            if(err==0){
+                sr = client.send(text, destination);
+            } else {
+                sr = new SendResult(-3,"SMPP Client does not connect");
+            }
+        }
         if (sr.err != 0) {
             throw new Exception("sending error");
         } else {
@@ -68,7 +84,7 @@ public class SMPPClient extends ISmsService {
         }
     }
 
-    public SMPPClient(Config config, Properties properties, String PATH) {
+    public SMPPClient(Config config, Properties properties, String PATH) throws Exception{
         super(config);
         PATH = PATH+".smpp.";
         smppListener = new SMPPListener();
@@ -81,8 +97,9 @@ public class SMPPClient extends ISmsService {
         serviceType = properties.getProperty(PATH+"service-type", "");
         systemType = properties.getProperty(PATH+"system-type", "test");
         sourceAddress = properties.getProperty(PATH + "source-address", "5223");
-        serviceStatus = properties.getProperty(PATH+"service-status", "0").equals("1");
+        serviceStatus =  properties.getProperty(PATH+"service-status", "0").equals("1");
         //serviceStatus = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_SMPP_CLIENT_STATUS);
+        this.config = new Config(smscIPAddress, systemId, password, "","");
         startService();
     }
 
@@ -90,7 +107,7 @@ public class SMPPClient extends ISmsService {
         if(serviceStatus){
             int err = client.start(sourceAddress, smscIPAddress, smscPort, systemId, systemType, serviceType, password);
             if (err != 0) {
-                logger.error("SMPP Client connecting error");
+                logger.error("SMPP Client connecting error "+err);
             } else {
                 logger.info("SMPP Client connected");
             }
