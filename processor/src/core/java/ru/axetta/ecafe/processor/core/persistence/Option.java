@@ -91,7 +91,8 @@ public class Option {
             OPTION_MSK_NSI_LOG=100036,
             OPTION_MSK_NSI_MAX_ATTEMPTS=100037,
             OPTION_MSK_NSI_SUPPORT_EMAIL=100038,
-            OPTION_THIN_CLIENT_MIN__CLAIMS_EDITABLE_DAYS=100039
+            OPTION_THIN_CLIENT_MIN__CLAIMS_EDITABLE_DAYS=100039,
+            OPTION_THIN_CLIENT_PRE_POST_DATE=100040
     ;
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -140,7 +141,8 @@ public class Option {
             OPTION_MSK_NSI_LOG, "0",
             OPTION_MSK_NSI_MAX_ATTEMPTS, "5",
             OPTION_MSK_NSI_SUPPORT_EMAIL, "",
-            OPTION_THIN_CLIENT_MIN__CLAIMS_EDITABLE_DAYS, "2"
+            OPTION_THIN_CLIENT_MIN__CLAIMS_EDITABLE_DAYS, "2",
+            OPTION_THIN_CLIENT_PRE_POST_DATE, "2"
 };
 
     private Long idOfOption;
