@@ -10,9 +10,10 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.hibernate.Transaction;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.jboss.as.web.security.SecurityContextAssociationValve;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,7 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.security.Principal;
 import java.security.acl.Group;
@@ -171,9 +173,7 @@ public class JBossLoginModule implements LoginModule {
         username = nameCallback.getName();
         PasswordCallback passwordCallback = (PasswordCallback) callbacks[1];
         String plainPassword = new String(passwordCallback.getPassword());
-        if (logger.isDebugEnabled()) {
-            logger.debug(String.format("User \"%s\": try to login", username));
-        }
+        logger.debug("User \"{}\": try to login", username);
         if (StringUtils.isEmpty(username)) {
             throw new LoginException("Username missing");
         }
@@ -196,18 +196,27 @@ public class JBossLoginModule implements LoginModule {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-
-            Criteria userWithSameUserNameCriteria = persistenceSession.createCriteria(User.class);
-            userWithSameUserNameCriteria.add(Restrictions.eq("userName", username));
-            User user = (User) userWithSameUserNameCriteria.uniqueResult();
-            loginSucceeded = null != user && user.hasPassword(plainPassword);
-            if (loginSucceeded) {
-                userPrincipal = new PrincipalImpl(username);
-                if (logger.isDebugEnabled()) {
-                    logger.debug(String.format("User \"%s\": password validation successful", username));
-                }
+            Criteria userCriteria = persistenceSession.createCriteria(User.class);
+            userCriteria.add(Restrictions.eq("userName", username));
+            User user = (User) userCriteria.uniqueResult();
+            if (user == null)
+                throw new LoginException("User not found");
+            HttpServletRequest request = SecurityContextAssociationValve.getActiveRequest().getRequest();
+            if (user.isBlocked()) {
+                request.setAttribute("errorMessage", String.format("Пользователь с именем \"%s\" заблокирован", username));
+                String mess = String.format("User \"%s\" is blocked. Access denied.", username);
+                logger.debug(mess);
+                throw new LoginException(mess);
             }
-
+            if (user.hasPassword(plainPassword)) {
+                userPrincipal = new PrincipalImpl(username);
+                user.setLastEntryIP(request.getRemoteAddr());
+                user.setLastEntryTime(new Date());
+                logger.debug("User \"{}\": password validation successful", username);
+                loginSucceeded = true;
+            } else {
+                throw new LoginException("Password is invalid");
+            }
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -217,9 +226,7 @@ public class JBossLoginModule implements LoginModule {
     }
 
     public boolean commit() throws LoginException {
-        if (logger.isDebugEnabled()) {
-            logger.debug(String.format("User \"%s\": successfully logged in", username));
-        }
+        logger.debug("User \"{}\": successfully logged in", username);
         Group group = new GroupImpl("Roles");
         for (Principal role : ROLES) {
             group.addMember(role);
@@ -230,18 +237,14 @@ public class JBossLoginModule implements LoginModule {
     }
 
     public boolean abort() throws LoginException {
-        if (logger.isDebugEnabled()) {
-            logger.debug(String.format("User \"%s\": login aborted", username));
-        }
+        logger.debug("User \"{}\": login aborted", username);
         boolean result = loginSucceeded;
         loginSucceeded = false;
         return result;
     }
 
     public boolean logout() throws LoginException {
-        if (logger.isDebugEnabled()) {
-            logger.debug(String.format("User \"%s\": logged out", username));
-        }
+        logger.debug("User \"{}\": logged out", username);
         loginSucceeded = false;
         return true;
     }

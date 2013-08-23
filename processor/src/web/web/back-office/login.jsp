@@ -39,7 +39,8 @@
                               action="j_security_check" class="borderless-form">
                             <div align="center">
                                 <%if (null != request.getParameter("error")) {%>
-                                <h:outputText styleClass="error-output-text" value="Ошибка аутентификации" />
+                                <h:outputText styleClass="error-output-text"
+                                              value="#{not empty requestScope['errorMessage'] ? requestScope['errorMessage'] : 'Ошибка аутентификации'}" />
                                 <%}%>
                                 <h:panelGrid columns="2">
                                     <h:outputText value="Пользователь" styleClass="output-text" />

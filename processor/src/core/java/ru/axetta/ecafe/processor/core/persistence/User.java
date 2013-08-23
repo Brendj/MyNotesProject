@@ -77,6 +77,9 @@ public class User {
     private String email;
     private Integer idOfRole;
     private String roleName;
+    private String lastEntryIP;
+    private Date lastEntryTime;
+    private Boolean blocked;
 
     public String getRoleName() {
         return roleName;
@@ -198,6 +201,30 @@ public class User {
 
     public void setPassword(String plainPassword) throws Exception {
         this.cypheredPassword = encryptPassword(plainPassword);
+    }
+
+    public String getLastEntryIP() {
+        return lastEntryIP;
+    }
+
+    public void setLastEntryIP(String lastEntryIP) {
+        this.lastEntryIP = lastEntryIP;
+    }
+
+    public Date getLastEntryTime() {
+        return lastEntryTime;
+    }
+
+    public void setLastEntryTime(Date lastEntryTime) {
+        this.lastEntryTime = lastEntryTime;
+    }
+
+    public Boolean isBlocked() {
+        return blocked;
+    }
+
+    public void setBlocked(boolean blocked) {
+        this.blocked = blocked;
     }
 
     public boolean hasPassword(String plainPassword) throws Exception {
