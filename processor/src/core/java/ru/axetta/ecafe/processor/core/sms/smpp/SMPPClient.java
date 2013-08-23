@@ -49,7 +49,7 @@ public class SMPPClient extends ISmsService {
         logger.info("start sending: " + text);
         long destination = Long.parseLong(phoneNumber);
         SendResult sr;
-        if(client.getState()==2){
+        if(client.getStatus()==2){
             sr = client.send(text, destination);
         } else {
             int count =0;
