@@ -400,12 +400,9 @@ public class DAOUtils {
         return !query.list().isEmpty();
     }
 
-    public static Long findClientByFullName(EntityManager em, Org organization, String surname, String firstName, String secondName) throws Exception {
-        return findClientByFullName(em, organization, surname, firstName, secondName, false);
-    }
 
-
-    public static Long findClientByFullName(EntityManager em, Org organization, String surname, String firstName, String secondName, boolean dismissPredefinedGroups)
+    @SuppressWarnings("unchecked")
+    public static List<Object[]> findClientByFullName(EntityManager em, Org organization, String surname, String firstName, String secondName, boolean dismissPredefinedGroups)
             throws Exception {
 
 
@@ -415,7 +412,7 @@ public class DAOUtils {
         }
 
 
-        javax.persistence.Query q = em.createNativeQuery("select cf_clients.idofclient "+
+        javax.persistence.Query q = em.createNativeQuery("select cf_clients.idofclient, cf_persons.Surname||' '||cf_persons.FirstName||' '||cf_persons.SecondName "+
                 "from cf_clients "+
                 "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "+
                 "where trim(upper(cf_persons.Surname))=:surname and trim(upper(cf_persons.FirstName))=:firstName and trim(upper(cf_persons.SecondName))=:secondName and "+
@@ -428,8 +425,53 @@ public class DAOUtils {
         q.setMaxResults(2);
         List res = q.getResultList();
         if (res.isEmpty()) return null;
-        if (res.size()==2) return -1L;
-        return ((Number)res.get(0)).longValue();
+        return (List<Object[]>)res;
+        //if (res.size()==2) return -1L;
+        //return ((Number)res.get(0)).longValue();
+
+
+        /*javax.persistence.Query query = entityManager.createQuery(
+               "select idOfClient from Client client where (client.org = :org) and "
+               + "(trim(upper(client.person.surname)) = :surname) and "
+               + "(trim(upper(client.person.firstName)) = :firstName) and (trim(upper(client.person.secondName)) = :secondName)");
+       query.setParameter("org", organization);
+       query.setParameter("surname", StringUtils.upperCase(surname).trim());
+       query.setParameter("firstName", StringUtils.upperCase(firstName).trim());
+       query.setParameter("secondName", StringUtils.upperCase(secondName).trim());
+       query.setMaxResults(2);
+       if (query.getResultList().isEmpty()) return findClientByFullNameInFriendlyOrgs (entityManager, organization, surname, firstName, secondName);
+       if (query.getResultList().size()==2) return -1L;
+       return (Long)query.getResultList().get(0);*/
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<Object[]> findClientByFullNameFuzzy(EntityManager em, Org organization, String surname, String firstName, String secondName, boolean dismissPredefinedGroups)
+            throws Exception {
+
+        String predefinedGroups = "";
+        if (dismissPredefinedGroups) {
+            predefinedGroups = " cf_clients.idofclientgroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and ";
+        }
+        String fio=((surname==null?"":surname)+(firstName==null?"":firstName)+(secondName==null?"":secondName)).toLowerCase().replaceAll(" ", "");
+        javax.persistence.Query q = em.createNativeQuery("select cf_clients.idofclient, cf_persons.Surname||' '||cf_persons.FirstName||' '||cf_persons.SecondName "+
+                "from cf_clients "+
+                "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "+
+                "where (cf_clients.idoforg in (select cf_friendly_organization.friendlyorg from cf_friendly_organization where cf_friendly_organization.currentorg=:org)) and "+
+                predefinedGroups +
+                "(levenshtein(:fio, trim(lower(cf_persons.Surname))||trim(lower(cf_persons.FirstName))||trim(lower(cf_persons.SecondName)))<3 or "+
+                "(trim(lower(cf_persons.Surname))=:surname and trim(lower(cf_persons.FirstName))=:firstName and length(cf_persons.SecondName)=0)) "+
+                " order by levenshtein(:fio, trim(lower(cf_persons.Surname))||trim(lower(cf_persons.FirstName))||trim(lower(cf_persons.SecondName)))");
+        q.setParameter("org", organization.getIdOfOrg());
+        q.setParameter("surname", StringUtils.lowerCase(surname).trim());
+        q.setParameter("firstName", StringUtils.lowerCase(firstName).trim());
+        q.setParameter("fio", fio);
+        //q.setParameter("secondName", StringUtils.upperCase(secondName).trim());
+        q.setMaxResults(1);
+        List res = q.getResultList();
+        if (res.isEmpty()) return null;
+        //if (res.size()==2) return -1L;
+        return (List<Object[]>)res;
+        //return ((Number)((Object[])res.get(0))[0]).longValue();
 
 
         /*javax.persistence.Query query = entityManager.createQuery(

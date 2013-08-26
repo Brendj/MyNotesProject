@@ -236,6 +236,9 @@ CREATE TABLE CF_Users (
   email                   VARCHAR(128),                           --v14
   IdOfRole                BIGINT            NOT NULL DEFAULT 0,   --v32
   RoleName                VARCHAR(128),                           --v32
+  LastEntryIP             VARCHAR(15),         --v43
+  LastEntryTime           BIGINT,              --v43
+  IsBlocked               BOOLEAN NOT NULL,    --v43
   CONSTRAINT CF_Users_pk PRIMARY KEY (IdOfUser),
   CONSTRAINT CF_Users_ShortName UNIQUE (UserName),
   CONSTRAINT CF_Users_IdOfContragent_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent)

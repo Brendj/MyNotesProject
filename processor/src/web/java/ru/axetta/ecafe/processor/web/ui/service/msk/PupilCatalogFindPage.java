@@ -110,7 +110,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
 
         boolean toAdd, toBind;
         Long idOfClient, idOfClientForBind;
-        String findByFIOResult;
+        String findByFIOResult, fullNameOfClientForBind;
 
         public Item(ImportRegisterClientsService.PupilInfo pi) {
             this.copyFrom(pi);
@@ -122,6 +122,10 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
 
         public void setToAdd(boolean toAdd) {
             this.toAdd = toAdd;
+        }
+
+        public String getFullNameOfClientForBind() {
+            return fullNameOfClientForBind;
         }
 
         public Long getIdOfClient() {
@@ -175,6 +179,9 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
             List<ImportRegisterClientsService.PupilInfo> pis = nsiService
                     .getPupilsByOrgGUID(org.getGuid(), familyName, null);
             for (ImportRegisterClientsService.PupilInfo pi : pis) {
+                if (pi.getGroup().startsWith("Дошкол")) {
+                    continue; // исключаем дошкольников
+                }
                 Item i = new Item(pi);
                 i.idOfClient = DAOUtils.getClientIdByGuid(em, i.guid);
                 if (i.idOfClient == null) {
@@ -190,24 +197,39 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
     }
 
     @Transactional
+    public Object checkFullNameDuplicatesFuzzy() {
+        return checkFullNameDuplicatesLogic(true);
+    }
+
+    @Transactional
     public Object checkFullNameDuplicates() {
+        return checkFullNameDuplicatesLogic(false);
+    }
+
+    public Object checkFullNameDuplicatesLogic(boolean fuzzy) {
         try {
             for (Item i : pupilInfos) {
                 i.toBind = false;
                 if (i.idOfClient != null) {
                     continue;
                 }
-                Long res = DAOUtils
-                        .findClientByFullName(em, org, emptyIfNull(i.getFamilyName()), emptyIfNull(i.getFirstName()),
-                                emptyIfNull(i.getSecondName()), true);
-                if (res == null) {
+                List<Object[]> res;
+                if (fuzzy) {
+                    res = DAOUtils.findClientByFullNameFuzzy(em, org, emptyIfNull(i.getFamilyName()),
+                            emptyIfNull(i.getFirstName()), emptyIfNull(i.getSecondName()), true);
+                } else {
+                    res = DAOUtils.findClientByFullName(em, org, emptyIfNull(i.getFamilyName()),
+                            emptyIfNull(i.getFirstName()), emptyIfNull(i.getSecondName()), true);
+                }
+                if (res == null || res.size()==0) {
                     continue;
                 }
-                if (res == -1L) {
+                if (res.size()>1) {
                     i.findByFIOResult = ">1 записи";
                 } else {
-                    i.findByFIOResult = res + "";
-                    i.idOfClientForBind = res;
+                    i.idOfClientForBind = ((Number)res.get(0)[0]).longValue();
+                    i.findByFIOResult = i.idOfClientForBind + "";
+                    i.fullNameOfClientForBind = ((String)res.get(0)[1]);
                     i.toBind = i.idOfClientForBind != null;
                 }
             }
@@ -291,7 +313,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
         }
     }
 
-    public void buildComparisonCSVFile () {
+    public void buildComparisonCSVFile() {
         try {
             buildComparisonCSVFile(true);
         } catch (Exception e) {
@@ -345,7 +367,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
             orgClients = DAOService.getInstance().findClientsForOrgAndFriendly(org.getIdOfOrg(), true);
         } catch (Exception e) {
             logger.error("Failed to load clients", e);
-            printError("Ошибка загрузки клиентов из БД: "+e);
+            printError("Ошибка загрузки клиентов из БД: " + e);
             return;
         }
         //  Проверяем данные из Реестров и ищем клиентов в ИС ПП
@@ -361,11 +383,13 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
         }
         //  Проверяем всех клиентов из ИС ПП на их присутствие в Реестах
         for (Client cl : orgClients) {
-            if (cl.getClientGroup()!=null && cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()>=ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()) {
+            if (cl.getClientGroup() != null
+                    && cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() >= ClientGroup.Predefined
+                    .CLIENT_EMPLOYEES.getValue()) {
                 continue;
             }
             boolean found = false;
-            if (cl.getClientGUID()!=null) {
+            if (cl.getClientGUID() != null) {
                 for (Item i : pupilInfos) {
                     if (cl.getClientGUID().equals(i.getGuid())) {
                         found = true;
@@ -398,9 +422,9 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
                 responseOutputStream.write(str.getBytes());
                 for (Item i : missedISPPClients) {
                     str = ";" +
-                            (i.getFamilyName()==null?"":i.getFamilyName()) + ";" +
-                            (i.getFirstName()==null?"":i.getFirstName()) + ";" +
-                            (i.getSecondName()==null?"":i.getSecondName()) + ";" +
+                            (i.getFamilyName() == null ? "" : i.getFamilyName()) + ";" +
+                            (i.getFirstName() == null ? "" : i.getFirstName()) + ";" +
+                            (i.getSecondName() == null ? "" : i.getSecondName()) + ";" +
                             i.getGroup() + ";" +
                             "Нет;" +
                             "Да;;\n";

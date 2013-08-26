@@ -20,16 +20,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/core.iml" afterPath="$PROJECT_DIR$/core.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/payconv.iml" afterPath="$PROJECT_DIR$/payconv.iml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../../src/web/test/ru/axetta/test/StringFuzzy.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.ipr" afterPath="$PROJECT_DIR$/processor.ipr" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.iws" afterPath="$PROJECT_DIR$/processor.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pubkey.iml" afterPath="$PROJECT_DIR$/pubkey.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/web.iml" afterPath="$PROJECT_DIR$/web.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/test/META-INF/context.xml" afterPath="$PROJECT_DIR$/../../src/core/test/META-INF/context.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql" afterPath="$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/db/update.properties" afterPath="$PROJECT_DIR$/../../src/core/java/db/update.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/db/update_2.2.43-2.2.44.sql" afterPath="$PROJECT_DIR$/../../src/core/java/db/update_2.2.43-2.2.44.sql" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/service/msk/PupilCatalogFindPage.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/service/msk/PupilCatalogFindPage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/service/msk/pupil_catalog_find_page.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/service/msk/pupil_catalog_find_page.jsp" />
     </list>
     <list id="e1ee075d-5eee-4550-8974-bf9883a857e2" name="Failed commit: Default" comment="В процессинге в таблице публикаций создан составной первичный ключ, изменены cущности и изменена логика синхронизации в связи с этим;" />
     <list id="5b6999d5-a6c7-470d-8a7d-cf1ed7c67d95" name="Failed commit: Failed commit: Default" comment="Добавлена обработка журнала посещений, во всех отчетах таймаут проставляется правильно. Удален неиспользуемый data dource embed-derby-ds. В config.properties изменен почтовый сервер на smtp.gmail.com и включен starttls." />
@@ -1799,37 +1798,9 @@
   <component name="DatabaseView">
     <flatten value="false" />
     <groupTables value="false" />
-    <sortChildren value="true" />
   </component>
   <component name="DebuggerManager">
-    <line_breakpoints default_suspend_policy="SuspendAll">
-      <breakpoint url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/handlers/temp/cards/operations/TempCardsOperationBuilder.java" line="18" class="ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperationBuilder" package="ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations">
-        <option name="ENABLED" value="true" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="true" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/commodity/accounting/configurationProvider/good/group/GoodGroupListPage.java" line="57" class="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupListPage" package="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group">
-        <option name="ENABLED" value="true" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="true" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
-    </line_breakpoints>
+    <ui_properties default_suspend_policy="SuspendAll" />
     <breakpoint_any default_suspend_policy="SuspendAll">
       <breakpoint>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -1862,7 +1833,34 @@
         <option name="LOG_MESSAGE" value="&#13;&#13;JAVA" />
       </breakpoint>
     </breakpoint_any>
-    <ui_properties default_suspend_policy="SuspendAll" />
+    <line_breakpoints default_suspend_policy="SuspendAll">
+      <breakpoint url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/handlers/temp/cards/operations/TempCardsOperationBuilder.java" line="18" class="ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperationBuilder" package="ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/commodity/accounting/configurationProvider/good/group/GoodGroupListPage.java" line="57" class="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupListPage" package="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+    </line_breakpoints>
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -1890,111 +1888,43 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="RuntimeContext.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/client-room/java/ru/axetta/ecafe/processor/core/RuntimeContext.java">
+      <file leaf-file-name="ClientPaymentsPage.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/ClientPaymentsPage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="21" column="29" selection-start="658" selection-end="658" vertical-scroll-proportion="0.0">
+            <state line="10" column="47" selection-start="223" selection-end="223" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="persistence.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/test/META-INF/persistence.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="21" column="17" selection-start="1171" selection-end="1171" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MskNSIService.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/partner/nsi/MskNSIService.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="274" column="64" selection-start="12577" selection-end="12577" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="PupilCatalogFindPage.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="PupilCatalogFindPage.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/service/msk/PupilCatalogFindPage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="422" column="32" selection-start="14709" selection-end="14709" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="context.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/test/META-INF/context.xml">
-          <provider editor-type-id="com.intellij.spring.perspectives.SpringBeansStructureEditorProvider">
-            <state />
-          </provider>
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="45" column="14" selection-start="2497" selection-end="2507" vertical-scroll-proportion="-14.15">
+            <state line="230" column="42" selection-start="7185" selection-end="7185" vertical-scroll-proportion="0.42793462">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RuntimeContext.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java">
+      <file leaf-file-name="pupil_catalog_find_page.jsp" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/msk/pupil_catalog_find_page.jsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="93" column="31" selection-start="4485" selection-end="4485" vertical-scroll-proportion="0.56792873">
-              <folding />
+            <state line="90" column="48" selection-start="4975" selection-end="4975" vertical-scroll-proportion="0.0">
+              <folding>
+                <marker date="1377541806561" expanded="true" signature="1224:1242" placeholder="{...}" />
+                <marker date="1377541806561" expanded="true" signature="1577:1589" placeholder="{...}" />
+                <marker date="1377541806561" expanded="true" signature="2691:2708" placeholder="{...}" />
+                <marker date="1377541806561" expanded="true" signature="8328:8343" placeholder="{...}" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DAOService.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java">
+      <file leaf-file-name="RuntimeContext.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/org-room/java/ru/axetta/ecafe/processor/core/RuntimeContext.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="1530" column="18" selection-start="73833" selection-end="73833" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#0#73842#0" expanded="true" />
-                <element signature="e#2884#2914#0" expanded="true" />
-                <marker date="1376930157778" expanded="true" signature="8995:9065" placeholder="DELETE FROM ..." />
-                <marker date="1376930157778" expanded="true" signature="9178:9239" placeholder="DELETE FROM ..." />
-                <marker date="1376930157778" expanded="true" signature="22179:22210" placeholder="SELECT COUNT..cf_clients..." />
-                <marker date="1376930157778" expanded="true" signature="22374:22445" placeholder="SELECT COUNT..cf_clients..." />
-                <marker date="1376930157778" expanded="true" signature="22608:22677" placeholder="SELECT COUNT..cf_clients..." />
-                <marker date="1376930157778" expanded="true" signature="22859:22980" placeholder="select count..cf_clientpayments..." />
-                <marker date="1376930157778" expanded="true" signature="23154:23207" placeholder="SELECT COUNT..cf_enterevents..." />
-                <marker date="1376930157778" expanded="true" signature="23373:23411" placeholder="SELECT COUNT..cf_clientpayments..." />
-                <marker date="1376930157778" expanded="true" signature="23569:23599" placeholder="SELECT COUNT..cf_orders..." />
-                <marker date="1376930157778" expanded="true" signature="23758:23793" placeholder="SELECT COUNT..cf_enterevents..." />
-                <marker date="1376930157778" expanded="true" signature="23950:23983" placeholder="SELECT COUNT..cf_clientsms..." />
-                <marker date="1376930157778" expanded="true" signature="24180:24306" placeholder="select count..cf_orders..." />
-                <marker date="1376930157778" expanded="true" signature="24484:24629" placeholder="select count..cf_orders..." />
-                <marker date="1376930157778" expanded="true" signature="24796:24940" placeholder="select count..cf_orders..." />
-                <element signature="e#25012#25042#0" expanded="true" />
-                <marker date="1376930157778" expanded="true" signature="25196:25494" placeholder="SELECT contr..cf_clientpayments..." />
-                <element signature="e#25668#25698#0" expanded="true" />
-                <marker date="1376930157778" expanded="true" signature="25834:26048" placeholder="SELECT cp.id..cf_clientpayments..." />
-                <element signature="e#26116#26146#0" expanded="true" />
-                <marker date="1376930157778" expanded="true" signature="26308:26568" placeholder="SELECT cp.id..cf_clientpayments..." />
-                <marker date="1376930157778" expanded="true" signature="26866:26943" placeholder="UPDATE cf_ca..." />
-                <element signature="e#27124#27154#0" expanded="true" />
-                <marker date="1376930157778" expanded="true" signature="27341:27824" placeholder="SELECT cf_en..cf_enterevents..." />
-                <marker date="1376930157778" expanded="true" signature="27863:28398" placeholder="SELECT cf_en..cf_enterevents..." />
-                <element signature="e#29471#29501#0" expanded="true" />
-                <marker date="1376930157778" expanded="true" signature="29711:30163" placeholder="SELECT cf_or..cf_orders..." />
-                <marker date="1376930157778" expanded="true" signature="30202:30706" placeholder="SELECT cf_or..cf_orders..." />
-                <element signature="e#31779#31809#0" expanded="true" />
-                <marker date="1376930157778" expanded="true" signature="32017:32591" placeholder="SELECT idofo..cf_clients..." />
-                <marker date="1376930157778" expanded="true" signature="32630:33328" placeholder="SELECT idofo..cf_clients..." />
-                <element signature="e#34414#34444#0" expanded="true" />
-                <marker date="1376930157778" expanded="true" signature="34648:35068" placeholder="SELECT cf_or..cf_orders..." />
-                <marker date="1376930157778" expanded="true" signature="35107:35599" placeholder="SELECT cf_or..cf_orders..." />
-                <element signature="e#36682#36712#0" expanded="true" />
-                <marker date="1376930157778" expanded="true" signature="36917:37151" placeholder="SELECT cf_or..cf_orders..." />
-                <element signature="e#37674#37704#0" expanded="true" />
-                <marker date="1376930157778" expanded="true" signature="37945:38050" placeholder="UPDATE cf_cl..." />
-                <element signature="e#39394#39424#0" expanded="true" />
-              </folding>
+            <state line="291" column="13" selection-start="10096" selection-end="10096" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -2002,36 +1932,78 @@
       <file leaf-file-name="DAOUtils.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="344" column="32" selection-start="16272" selection-end="16272" vertical-scroll-proportion="0.0">
+            <state line="461" column="36" selection-start="23178" selection-end="23178" vertical-scroll-proportion="0.0">
               <folding>
-                <marker date="1376927812386" expanded="true" signature="19987:20512" placeholder="select cf_cl..cf_clients..." />
-                <marker date="1376927812386" expanded="true" signature="20390:20510" placeholder="select cf_fr..cf_friendly_organization..." />
+                <element signature="e#4500#4530#0" expanded="true" />
+                <element signature="e#16501#16531#0" expanded="true" />
+                <element signature="e#19301#19331#0" expanded="true" />
+                <marker date="1377542039411" expanded="true" signature="19814:20414" placeholder="select cf_cl..cf_clients..." />
+                <marker date="1377542039411" expanded="true" signature="20292:20412" placeholder="select cf_fr..cf_friendly_organization..." />
+                <element signature="e#21889#21919#0" expanded="true" />
+                <marker date="1377542039411" expanded="true" signature="22551:23439" placeholder="select cf_cl..cf_clients..." />
+                <marker date="1377542039411" expanded="true" signature="22829:22949" placeholder="select cf_fr..cf_friendly_organization..." />
+                <element signature="e#27305#27335#0" expanded="true" />
+                <element signature="e#28546#28576#0" expanded="true" />
+                <element signature="e#33589#33619#0" expanded="true" />
+                <element signature="e#34435#34465#0" expanded="true" />
+                <element signature="e#35500#35530#0" expanded="true" />
+                <element signature="e#35903#35933#0" expanded="true" />
+                <element signature="e#37797#37827#0" expanded="true" />
+                <element signature="e#42455#42485#0" expanded="true" />
+                <element signature="e#45002#45032#0" expanded="true" />
+                <element signature="e#47658#47688#0" expanded="true" />
+                <element signature="e#56373#56403#0" expanded="true" />
+                <element signature="e#58625#58655#0" expanded="true" />
+                <element signature="e#59216#59246#0" expanded="true" />
+                <element signature="e#60013#60043#0" expanded="true" />
+                <element signature="e#70954#70984#0" expanded="true" />
+                <element signature="e#71582#71612#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ImportRegisterClientsService.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/service/ImportRegisterClientsService.java">
+      <file leaf-file-name="MskNSIService.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/partner/nsi/MskNSIService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="179" column="79" selection-start="7602" selection-end="7630" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="e#0#19052#0" expanded="true" />
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state line="220" column="62" selection-start="9593" selection-end="9593" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="create.jsp" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/employees/card/create.jsp">
+      <file leaf-file-name="StringFuzzy.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/test/ru/axetta/test/StringFuzzy.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="28" selection-start="841" selection-end="841" vertical-scroll-proportion="0.0">
-              <folding>
-                <marker date="1376927816808" expanded="true" signature="1142:1160" placeholder="{...}" />
-                <marker date="1376927816808" expanded="true" signature="1494:1506" placeholder="{...}" />
-                <marker date="1376927816808" expanded="true" signature="1841:1853" placeholder="{...}" />
-              </folding>
+            <state line="5" column="57" selection-start="88" selection-end="88" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HMACSHA1Test.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/test/ru/axetta/test/HMACSHA1Test.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="14" column="13" selection-start="274" selection-end="274" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="EnterEventReportPage.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/EnterEventReportPage.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="32" column="47" selection-start="912" selection-end="912" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="EnterEventReport.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/EnterEventReport.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="4" column="46" selection-start="64" selection-end="110" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -2106,22 +2078,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/../../src/org-room/web/WEB-INF/services-app.xml" />
-        <option value="$PROJECT_DIR$/../../src/core/test/META-INF/persistence.xml" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/documents/GoodRequest.java" />
-        <option value="$PROJECT_DIR$/../../src/org-room/web/include/goodrequest/test.jsp" />
-        <option value="$PROJECT_DIR$/../../src/org-room/java/ru/axetta/ecafe/processor/web/ui/good/request/GoodRequestTestPage.java" />
-        <option value="$PROJECT_DIR$/../../src/org-room/java/ru/axetta/ecafe/processor/web/ui/MainPage.java" />
-        <option value="$PROJECT_DIR$/../../src/org-room/web/WEB-INF/classes/META-INF/persistence.xml" />
-        <option value="$PROJECT_DIR$/../../src/org-room/web/include/main_menu.jsp" />
-        <option value="$PROJECT_DIR$/../../src/org-room/java/ru/axetta/ecafe/processor/web/ui/client/ClientListEditPage.java" />
         <option value="$PROJECT_DIR$/../../src/org-room/java/ru/axetta/ecafe/processor/core/dao/GoodRequestService.java" />
         <option value="$PROJECT_DIR$/../../src/org-room/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" />
         <option value="$PROJECT_DIR$/../../src/web/web/WEB-INF/jbossws-cxf.xml" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/service/msk/PupilCatalogFindPage.java" />
         <option value="$PROJECT_DIR$/../../src/core/test/META-INF/context.xml" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/db/update_2.2.42-2.2.43.sql" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/partner/nsi/MskNSIService.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sms/smpp/SMPPClient.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/db/update_2.2.43-2.2.44.sql" />
+        <option value="$PROJECT_DIR$/../../src/core/java/db/update.properties" />
+        <option value="$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql" />
+        <option value="$PROJECT_DIR$/../../src/web/test/ru/axetta/test/StringFuzzy.java" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/service/msk/pupil_catalog_find_page.jsp" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" />
+        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/service/msk/PupilCatalogFindPage.java" />
       </list>
     </option>
   </component>
@@ -2376,6 +2348,16 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope">
+        <subPane subId="Project Files">
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -2384,14 +2366,206 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
           </PATH>
-        </subPane>
-      </pane>
-      <pane id="Scope">
-        <subPane subId="Project Files">
           <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="back-office" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="axetta" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="axetta" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="report" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="report" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="online" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
@@ -2433,7 +2607,7 @@
     <property name="JdbcConsole.Extract.ClosingQuote" value="'" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.includeInheritedMembers" value="false" />
-    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.last.edited" value="Libraries" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit4" />
     <property name="OverrideImplement.combined" value="true" />
     <property name="project.structure.proportion" value="0.09832842" />
@@ -2518,34 +2692,7 @@
       <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="Remote.Remote">
-    <configuration default="false" name="TeralectSmsServiceTest" type="JUnit" factoryName="JUnit" temporary="true">
-      <extension name="coverage" enabled="false" merge="false" runner="emma" />
-      <module name="core" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="TeralectSmsServiceTest" />
-      <option name="METHOD_NAME" />
-      <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" />
-      <option name="PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="moduleWithDependencies" />
-      </option>
-      <envs />
-      <patterns />
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="37786" />
-        <option name="TRANSPORT" value="0" />
-        <option name="LOCAL" value="true" />
-      </RunnerSettings>
-      <ConfigurationWrapper RunnerId="Debug" />
-      <method />
-    </configuration>
+  <component name="RunManager" selected="JUnit.StringFuzzy">
     <configuration default="false" name="DESTest" type="JUnit" factoryName="JUnit" temporary="true">
       <extension name="coverage" enabled="false" merge="false" runner="emma" />
       <module name="core" />
@@ -2652,6 +2799,34 @@
       <option name="VM_PARAMETERS" value="" />
       <option name="USER_CFG_CLASS" />
       <option name="CONTEXT_PROVIDER" />
+      <method />
+    </configuration>
+    <configuration default="false" name="StringFuzzy" type="JUnit" factoryName="JUnit" temporary="true">
+      <extension name="coverage" enabled="false" merge="false" runner="emma">
+        <pattern>
+          <option name="PATTERN" value="ru.axetta.test.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <module name="web" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" value="ru.axetta.test" />
+      <option name="MAIN_CLASS_NAME" value="ru.axetta.test.StringFuzzy" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="moduleWithDependencies" />
+      </option>
+      <envs />
+      <patterns />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
       <method />
     </configuration>
     <configuration default="true" type="JBossConfiguration" factoryName="Remote">
@@ -3523,11 +3698,11 @@
       <method />
     </configuration>
     <list size="27">
-      <item index="0" class="java.lang.String" itemvalue="JUnit.TeralectSmsServiceTest" />
-      <item index="1" class="java.lang.String" itemvalue="JUnit.DESTest" />
-      <item index="2" class="java.lang.String" itemvalue="JUnit.Way4PaymentTest" />
-      <item index="3" class="java.lang.String" itemvalue="JUnit.IntegraTest" />
-      <item index="4" class="java.lang.String" itemvalue="Query Language Console.Default" />
+      <item index="0" class="java.lang.String" itemvalue="JUnit.DESTest" />
+      <item index="1" class="java.lang.String" itemvalue="JUnit.Way4PaymentTest" />
+      <item index="2" class="java.lang.String" itemvalue="JUnit.IntegraTest" />
+      <item index="3" class="java.lang.String" itemvalue="Query Language Console.Default" />
+      <item index="4" class="java.lang.String" itemvalue="JUnit.StringFuzzy" />
       <item index="5" class="java.lang.String" itemvalue="Application.synctest at freexter.com" />
       <item index="6" class="java.lang.String" itemvalue="Application.pubkey" />
       <item index="7" class="java.lang.String" itemvalue="Application.synctest" />
@@ -3900,12 +4075,12 @@
     <frame x="-8" y="-8" width="1616" height="876" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3897059" sideWeight="0.7794457" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38968667" sideWeight="0.68857145" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32996634" sideWeight="0.16872682" order="30" side_tool="false" content_ui="tabs" />
       <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21260816" sideWeight="0.27833894" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="JavaEE:App" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2613219" sideWeight="0.1565601" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3119777" sideWeight="0.49786097" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.31058496" sideWeight="0.49786097" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24934725" sideWeight="0.76529163" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4365881" sideWeight="0.57711136" order="31" side_tool="false" content_ui="tabs" x="100" y="294" width="710" height="371" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23081683" sideWeight="0.13377193" order="5" side_tool="true" content_ui="tabs" />
@@ -3921,8 +4096,8 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3977968" sideWeight="0.74310917" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="EJB" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2613219" sideWeight="0.21940464" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32864138" sideWeight="0.7794457" order="12" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32967743" sideWeight="0.68802226" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32855567" sideWeight="0.4853121" order="32" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32967743" sideWeight="0.69916433" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32729805" sideWeight="0.4853121" order="32" side_tool="false" content_ui="tabs" />
       <window_info id="Hibernate Tools" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Phing Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32994652" sideWeight="0.85272145" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Problems" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
@@ -4153,162 +4328,118 @@
     </option>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/jbossws-cxf.xml">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.42-2.2.43.sql">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="105" column="84" selection-start="5802" selection-end="5802" vertical-scroll-proportion="2.0575118" />
+        <state line="17" column="45" selection-start="802" selection-end="847" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/internal/KsPasswordCallback.java">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="24" selection-start="772" selection-end="772" vertical-scroll-proportion="0.33410406" />
+        <state line="36" column="20" selection-start="773" selection-end="773" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/integra/soap/ClientRoomControllerWS.java">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.43-2.2.44.sql">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="2899" column="12" selection-start="139216" selection-end="139216" vertical-scroll-proportion="0.5964286" />
+        <state line="10" column="54" selection-start="529" selection-end="529" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/jbossws-cxf_1.xml">
+    <entry file="file://$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="32" column="41" selection-start="2043" selection-end="2043" vertical-scroll-proportion="0.26173708" />
+        <state line="239" column="47" selection-start="10932" selection-end="10932" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/util/ClientRoomNotificationSettingsUtils.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/OnlineReportPage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="25" selection-start="480" selection-end="480" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="20" column="22" selection-start="655" selection-end="655" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/job/ReportJobViewPage.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/DeliveredServicesReportPage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="110" column="43" selection-start="3819" selection-end="3819" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="41" column="40" selection-start="1582" selection-end="1609" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/client-room/java/ru/axetta/ecafe/processor/core/RuntimeContext.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/ClientPaymentsPage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="29" selection-start="658" selection-end="658" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="10" column="47" selection-start="223" selection-end="223" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/employees/card/create.jsp">
+    <entry file="file://$PROJECT_DIR$/../../src/org-room/java/ru/axetta/ecafe/processor/core/RuntimeContext.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="28" selection-start="841" selection-end="841" vertical-scroll-proportion="0.0">
-          <folding>
-            <marker date="1376927816808" expanded="true" signature="1142:1160" placeholder="{...}" />
-            <marker date="1376927816808" expanded="true" signature="1494:1506" placeholder="{...}" />
-            <marker date="1376927816808" expanded="true" signature="1841:1853" placeholder="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/test/META-INF/persistence.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="17" selection-start="1171" selection-end="1171" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/service/ImportRegisterClientsService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="179" column="79" selection-start="7602" selection-end="7630" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#0#19052#0" expanded="true" />
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
+        <state line="291" column="13" selection-start="10096" selection-end="10096" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/partner/nsi/MskNSIService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="274" column="64" selection-start="12577" selection-end="12577" vertical-scroll-proportion="0.0">
-          <folding />
+        <state line="220" column="62" selection-start="9593" selection-end="9593" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/test/ru/axetta/test/StringFuzzy.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="5" column="57" selection-start="88" selection-end="88" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/test/ru/axetta/test/HMACSHA1Test.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="14" column="13" selection-start="274" selection-end="274" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/online/EnterEventReportPage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="32" column="47" selection-start="912" selection-end="912" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/EnterEventReport.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="46" selection-start="64" selection-end="110" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/msk/pupil_catalog_find_page.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="90" column="48" selection-start="4975" selection-end="4975" vertical-scroll-proportion="0.0">
+          <folding>
+            <marker date="1377541806561" expanded="true" signature="1224:1242" placeholder="{...}" />
+            <marker date="1377541806561" expanded="true" signature="1577:1589" placeholder="{...}" />
+            <marker date="1377541806561" expanded="true" signature="2691:2708" placeholder="{...}" />
+            <marker date="1377541806561" expanded="true" signature="8328:8343" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="344" column="32" selection-start="16272" selection-end="16272" vertical-scroll-proportion="0.0">
+        <state line="461" column="36" selection-start="23178" selection-end="23178" vertical-scroll-proportion="0.0">
           <folding>
-            <marker date="1376927812386" expanded="true" signature="19987:20512" placeholder="select cf_cl..cf_clients..." />
-            <marker date="1376927812386" expanded="true" signature="20390:20510" placeholder="select cf_fr..cf_friendly_organization..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1530" column="18" selection-start="73833" selection-end="73833" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="e#0#73842#0" expanded="true" />
-            <element signature="e#2884#2914#0" expanded="true" />
-            <marker date="1376930157778" expanded="true" signature="8995:9065" placeholder="DELETE FROM ..." />
-            <marker date="1376930157778" expanded="true" signature="9178:9239" placeholder="DELETE FROM ..." />
-            <marker date="1376930157778" expanded="true" signature="22179:22210" placeholder="SELECT COUNT..cf_clients..." />
-            <marker date="1376930157778" expanded="true" signature="22374:22445" placeholder="SELECT COUNT..cf_clients..." />
-            <marker date="1376930157778" expanded="true" signature="22608:22677" placeholder="SELECT COUNT..cf_clients..." />
-            <marker date="1376930157778" expanded="true" signature="22859:22980" placeholder="select count..cf_clientpayments..." />
-            <marker date="1376930157778" expanded="true" signature="23154:23207" placeholder="SELECT COUNT..cf_enterevents..." />
-            <marker date="1376930157778" expanded="true" signature="23373:23411" placeholder="SELECT COUNT..cf_clientpayments..." />
-            <marker date="1376930157778" expanded="true" signature="23569:23599" placeholder="SELECT COUNT..cf_orders..." />
-            <marker date="1376930157778" expanded="true" signature="23758:23793" placeholder="SELECT COUNT..cf_enterevents..." />
-            <marker date="1376930157778" expanded="true" signature="23950:23983" placeholder="SELECT COUNT..cf_clientsms..." />
-            <marker date="1376930157778" expanded="true" signature="24180:24306" placeholder="select count..cf_orders..." />
-            <marker date="1376930157778" expanded="true" signature="24484:24629" placeholder="select count..cf_orders..." />
-            <marker date="1376930157778" expanded="true" signature="24796:24940" placeholder="select count..cf_orders..." />
-            <element signature="e#25012#25042#0" expanded="true" />
-            <marker date="1376930157778" expanded="true" signature="25196:25494" placeholder="SELECT contr..cf_clientpayments..." />
-            <element signature="e#25668#25698#0" expanded="true" />
-            <marker date="1376930157778" expanded="true" signature="25834:26048" placeholder="SELECT cp.id..cf_clientpayments..." />
-            <element signature="e#26116#26146#0" expanded="true" />
-            <marker date="1376930157778" expanded="true" signature="26308:26568" placeholder="SELECT cp.id..cf_clientpayments..." />
-            <marker date="1376930157778" expanded="true" signature="26866:26943" placeholder="UPDATE cf_ca..." />
-            <element signature="e#27124#27154#0" expanded="true" />
-            <marker date="1376930157778" expanded="true" signature="27341:27824" placeholder="SELECT cf_en..cf_enterevents..." />
-            <marker date="1376930157778" expanded="true" signature="27863:28398" placeholder="SELECT cf_en..cf_enterevents..." />
-            <element signature="e#29471#29501#0" expanded="true" />
-            <marker date="1376930157778" expanded="true" signature="29711:30163" placeholder="SELECT cf_or..cf_orders..." />
-            <marker date="1376930157778" expanded="true" signature="30202:30706" placeholder="SELECT cf_or..cf_orders..." />
-            <element signature="e#31779#31809#0" expanded="true" />
-            <marker date="1376930157778" expanded="true" signature="32017:32591" placeholder="SELECT idofo..cf_clients..." />
-            <marker date="1376930157778" expanded="true" signature="32630:33328" placeholder="SELECT idofo..cf_clients..." />
-            <element signature="e#34414#34444#0" expanded="true" />
-            <marker date="1376930157778" expanded="true" signature="34648:35068" placeholder="SELECT cf_or..cf_orders..." />
-            <marker date="1376930157778" expanded="true" signature="35107:35599" placeholder="SELECT cf_or..cf_orders..." />
-            <element signature="e#36682#36712#0" expanded="true" />
-            <marker date="1376930157778" expanded="true" signature="36917:37151" placeholder="SELECT cf_or..cf_orders..." />
-            <element signature="e#37674#37704#0" expanded="true" />
-            <marker date="1376930157778" expanded="true" signature="37945:38050" placeholder="UPDATE cf_cl..." />
-            <element signature="e#39394#39424#0" expanded="true" />
+            <element signature="e#4500#4530#0" expanded="true" />
+            <element signature="e#16501#16531#0" expanded="true" />
+            <element signature="e#19301#19331#0" expanded="true" />
+            <marker date="1377542039411" expanded="true" signature="19814:20414" placeholder="select cf_cl..cf_clients..." />
+            <marker date="1377542039411" expanded="true" signature="20292:20412" placeholder="select cf_fr..cf_friendly_organization..." />
+            <element signature="e#21889#21919#0" expanded="true" />
+            <marker date="1377542039411" expanded="true" signature="22551:23439" placeholder="select cf_cl..cf_clients..." />
+            <marker date="1377542039411" expanded="true" signature="22829:22949" placeholder="select cf_fr..cf_friendly_organization..." />
+            <element signature="e#27305#27335#0" expanded="true" />
+            <element signature="e#28546#28576#0" expanded="true" />
+            <element signature="e#33589#33619#0" expanded="true" />
+            <element signature="e#34435#34465#0" expanded="true" />
+            <element signature="e#35500#35530#0" expanded="true" />
+            <element signature="e#35903#35933#0" expanded="true" />
+            <element signature="e#37797#37827#0" expanded="true" />
+            <element signature="e#42455#42485#0" expanded="true" />
+            <element signature="e#45002#45032#0" expanded="true" />
+            <element signature="e#47658#47688#0" expanded="true" />
+            <element signature="e#56373#56403#0" expanded="true" />
+            <element signature="e#58625#58655#0" expanded="true" />
+            <element signature="e#59216#59246#0" expanded="true" />
+            <element signature="e#60013#60043#0" expanded="true" />
+            <element signature="e#70954#70984#0" expanded="true" />
+            <element signature="e#71582#71612#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/service/msk/PupilCatalogFindPage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="422" column="32" selection-start="14709" selection-end="14709" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/test/META-INF/context.xml">
-      <provider editor-type-id="com.intellij.spring.perspectives.SpringBeansStructureEditorProvider">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="45" column="14" selection-start="2497" selection-end="2507" vertical-scroll-proportion="-14.15">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="93" column="31" selection-start="4485" selection-end="4485" vertical-scroll-proportion="0.56792873">
+        <state line="230" column="42" selection-start="7185" selection-end="7185" vertical-scroll-proportion="0.42793462">
           <folding />
         </state>
       </provider>
@@ -4385,7 +4516,7 @@
       </state>
       <state key="ProjectLibrariesConfigurable.UI">
         <settings>
-          <last-edited>jsf-impl-1.2_15-jbossorg-2</last-edited>
+          <last-edited>jboss_J2EE</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>

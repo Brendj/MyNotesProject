@@ -80,6 +80,19 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
+                <h:outputText escape="true" value="#" />
+            </f:facet>
+            <h:outputText value="#{item.fullNameOfClientForBind}" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="К связи" />
+            </f:facet>
+            <h:selectBooleanCheckbox readonly="#{item.idOfClientForBind!=null}}" value="#{item.toBind}"
+                                     styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
                 <h:outputText escape="true" value="Дата рождения" />
             </f:facet>
             <h:outputText value="#{item.birthDate}" />
@@ -114,13 +127,6 @@
             </f:facet>
             <h:outputText value="#{item.findByFIOResult}" />
         </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="К связи" />
-            </f:facet>
-            <h:selectBooleanCheckbox readonly="#{item.idOfClientForBind!=null}}" value="#{item.toBind}"
-                                     styleClass="output-text" />
-        </rich:column>
         <f:facet name="footer">
             <h:panelGroup>
                 <rich:datascroller for="pupilCatalogFindTable" renderIfSinglePage="false" maxPages="5"
@@ -133,6 +139,8 @@
                     </f:facet>
                 </rich:datascroller>
                 <a4j:commandButton value="Найти по Ф.И.О." action="#{pupilCatalogFindPage.checkFullNameDuplicates}"
+                                   reRender="workspaceTogglePanel" styleClass="command-button" />
+                <a4j:commandButton value="Найти по Ф.И.О. (с допуском)" action="#{pupilCatalogFindPage.checkFullNameDuplicatesFuzzy}"
                                    reRender="workspaceTogglePanel" styleClass="command-button" />
                 <a4j:commandButton value="Связать" action="#{pupilCatalogFindPage.bindClients}"
                                    reRender="workspaceTogglePanel" styleClass="command-button" />
