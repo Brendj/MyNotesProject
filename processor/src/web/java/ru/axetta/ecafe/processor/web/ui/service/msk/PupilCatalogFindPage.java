@@ -361,7 +361,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
         }
         //  Проверяем всех клиентов из ИС ПП на их присутствие в Реестах
         for (Client cl : orgClients) {
-            if (cl.getClientGroup()!=null && cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()> ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue()) {
+            if (cl.getClientGroup()!=null && cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()>=ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()) {
                 continue;
             }
             boolean found = false;
