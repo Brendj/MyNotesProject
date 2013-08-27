@@ -1047,8 +1047,13 @@ public class ProjectStateReportService {
                         try {
                             r.addCell(Integer.parseInt(val));
                         } catch (NumberFormatException nfe) {
-                            r.addCell(new BigDecimal(Double.parseDouble(val))
-                                    .setScale(1, BigDecimal.ROUND_HALF_DOWN).doubleValue());
+                            if (val != null && val.length() > 0) {
+                                r.addCell(new BigDecimal(Double.parseDouble(val))
+                                        .setScale(1, BigDecimal.ROUND_HALF_DOWN).doubleValue());
+                            } else {
+                                r.addCell(new BigDecimal(0D)
+                                        .setScale(1, BigDecimal.ROUND_HALF_DOWN).doubleValue());
+                            }
                         }
                     }
                 }
@@ -1491,20 +1496,28 @@ public class ProjectStateReportService {
         Map<String, List<Item>> data = (Map<String, List<Item>>) dataSource;
 
         List<Item> list = data.get("Соб. Произв.");
-        data.put("Собственное производство", list);
-        data.remove("Соб. Произв.");
+        if (list != null) {
+            data.put("Собственное производство", list);
+            data.remove("Соб. Произв.");
+        }
 
         list = data.get("Напитки уп.");
-        data.put("Напитки упакованные", list);
-        data.remove("Напитки уп.");
+        if (list != null) {
+            data.put("Напитки упакованные", list);
+            data.remove("Напитки уп.");
+        }
 
         list = data.get("Молочная прод.");
-        data.put("Молочная продукция", list);
-        data.remove("Молочная прод.");
+        if (list != null) {
+            data.put("Молочная продукция", list);
+            data.remove("Молочная прод.");
+        }
 
         list = data.get("Гор. блюда");
-        data.put("Горячие блюда", list);
-        data.remove("Гор. блюда");
+        if (list != null) {
+            data.put("Горячие блюда", list);
+            data.remove("Гор. блюда");
+        }
     }
 
 
@@ -1622,10 +1635,12 @@ public class ProjectStateReportService {
 
     public void normalizeData (List <Item> vals, SimpleType t) {
         boolean found = false;
-        for (Item i : vals) {
-            if (t.getReportType() == i.type) {
-                found = true;
-                break;
+        if (vals != null) {
+            for (Item i : vals) {
+                if (t.getReportType() == i.type) {
+                    found = true;
+                    break;
+                }
             }
         }
         if (!found) {
