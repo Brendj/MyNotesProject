@@ -422,7 +422,7 @@ public class SetupDiscountPage extends BasicWorkspacePage {
     }
 
     public String getPageTitle() {
-        return "Заявки на питание";
+        return "Групповое питание";
     }
 
     public void resetMessages() {
@@ -549,7 +549,12 @@ public class SetupDiscountPage extends BasicWorkspacePage {
         }
 
         public String getTitle() {
-            return title;
+            String[] chars = title.split("");
+            StringBuilder stringBuilder = new StringBuilder();
+            for (String c : chars) {
+                stringBuilder.append(c).append("<br />");
+            }
+            return stringBuilder.toString();
         }
 
         public void setTitle(String title) {

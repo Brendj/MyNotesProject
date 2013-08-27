@@ -42,38 +42,9 @@
     .thin-center-aligned-column {
         text-align: center;
         vertical-align: middle;
-        width: 20px;
+        width: 1%;
         height: 250px;
-    }
-    .clientsgrid_col1 {
-        width: 1px;
-    }
-    .clientsgrid_col2 {
-        width: 400px;
-    }
-    .clientsgrid_col3 {
-        width: 70px;
-    }
-    .clientsgrid_col4 {
-        width: 20px;
-    }
-    .clientsgrid_col5 {
-        width: 20px;
-    }
-    .clientsgrid_col6 {
-        width: 20px;
-    }
-    .clientsgrid_col7 {
-        width: 20px;
-    }
-    .clientsgrid_col8 {
-        width: 20px;
-    }
-    .clientsgrid_col9 {
-        width: 20px;
-    }
-    .clientsgrid_col10 {
-        width: 20px;
+        line-height: 0.9;
     }
 </style>
 
@@ -98,7 +69,25 @@ function onstoploading(){
     <h:panelGrid id="setupDiscountGrid" binding="#{setupDiscountPage.pageComponent}" styleClass="borderless-grid" style="width: 100%;">
 
     <a4j:region>
-        <rich:panel id="clients" style="height: 550px; overflow: auto;">
+        <h:panelGrid columns="2">
+            <h:outputText value="Группа: " styleClass="output-text-mod"/>
+            <h:panelGrid id="groups" styleClass="borderless-grid">
+                <h:selectOneMenu id="group" value="#{setupDiscountPage.group}" style="width:200px;" styleClass="groupSelect">
+                    <f:selectItems value="#{setupDiscountPage.groups}"/>
+                    <a4j:support status="loadingStatus" event="onchange" actionListener="#{setupDiscountPage.doChangeGroup}" reRender="clients"/>
+                </h:selectOneMenu>
+            </h:panelGrid>
+
+            <h:outputText value="Категория: " styleClass="output-text-mod"/>
+            <h:panelGrid id="categories" styleClass="borderless-grid">
+                <h:selectOneMenu id="category" value="#{setupDiscountPage.category}" style="width:200px;" styleClass="categorySelect">
+                    <f:selectItems value="#{setupDiscountPage.categories}"/>
+                    <a4j:support status="loadingStatus" event="onchange" actionListener="#{setupDiscountPage.doChangeCategory}" reRender="clients"/>
+                </h:selectOneMenu>
+            </h:panelGrid>
+        </h:panelGrid>
+
+        <rich:panel id="clients" style="height: 500px; overflow: auto;">
             <rich:dataTable value="#{setupDiscountPage.clients}" var="cl" id="table" rowKeyVar="row"
                             columnClasses="clientsgrid_col1,clientsgrid_col2,clientsgrid_col3,clientsgrid_col4,clientsgrid_col5,clientsgrid_col6,clientsgrid_col7,clientsgrid_col8,clientsgrid_col9,clientsgrid_col10">
                 <rich:column headerClass="center-aligned-column">
@@ -107,16 +96,16 @@ function onstoploading(){
                     </f:facet>
                     <h:outputText value="#{row+1}" styleClass="output-text"></h:outputText>
                 </rich:column>
-                <rich:column headerClass="center-aligned-column" style="width: 150px;">
+                <rich:column headerClass="center-aligned-column" style="width: 99%;">
                     <f:facet name="header">
                         <h:outputText value="Клиент"></h:outputText>
                     </f:facet>
                     <h:outputText value="#{cl.fullName}" styleClass="output-text-mod"></h:outputText>
                 </rich:column>
                 <rich:columns value="#{setupDiscountPage.columns}" var="col" styleClass="left-aligned-column"
-                              index="ind" headerClass="thin-center-aligned-column" width="30px" >
+                              index="ind" headerClass="thin-center-aligned-column" width="1%" style="width: 1%;" >
                     <f:facet name="header">
-                        <h:outputText escape="true" value="#{col.title}" />
+                        <h:outputText escape="false" value="#{col.title}" />
                     </f:facet>
                     <h:selectBooleanCheckbox value="#{cl.rules[col.id]}" styleClass="checkboxes" rendered="#{cl.input}" >
                         <a4j:support event="onclick" status="loadingStatus" actionListener="#{setupDiscountPage.doChangeDiscount}" reRender="messages,clients">
@@ -129,41 +118,16 @@ function onstoploading(){
             </rich:dataTable>
         </rich:panel>
 
-        <table cellpadding="0" cellspacing="0">
-            <tr>
-                <td>
-                    <h:panelGrid id="groups" styleClass="borderless-grid">
-                        <h:selectOneMenu id="group" value="#{setupDiscountPage.group}" style="width:150px;" styleClass="groupSelect">
-                            <f:selectItems value="#{setupDiscountPage.groups}"/>
-                            <a4j:support status="loadingStatus" event="onchange" actionListener="#{setupDiscountPage.doChangeGroup}" reRender="clients"/>
-                        </h:selectOneMenu>
-                    </h:panelGrid>
-                </td>
-                <td>
-                    <h:panelGrid id="categories" styleClass="borderless-grid">
-                        <h:selectOneMenu id="category" value="#{setupDiscountPage.category}" style="width:350px;" styleClass="categorySelect">
-                            <f:selectItems value="#{setupDiscountPage.categories}"/>
-                            <a4j:support status="loadingStatus" event="onchange" actionListener="#{setupDiscountPage.doChangeCategory}" reRender="clients"/>
-                        </h:selectOneMenu>
-                    </h:panelGrid>
-                </td>
-                <td style="">
-                    <a4j:status id="loadingStatus" onstart="onstartloading()" onstop="onstoploading()">
-                        <f:facet name="start">
-                            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
-                        </f:facet>
-                    </a4j:status>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="3">
-                    <h:panelGrid id="messages" styleClass="borderless-grid">
-                        <h:outputText escape="true" value="#{setupDiscountPage.errorMessages}" rendered="#{not empty setupDiscountPage.errorMessages}" styleClass="error-messages" />
-                        <h:outputText escape="true" value="#{setupDiscountPage.infoMessages}" rendered="#{not empty setupDiscountPage.infoMessages}" styleClass="info-messages" />
-                    </h:panelGrid>
-                </td>
-            </tr>
-        </table>
+        <h:panelGrid id="messages" styleClass="borderless-grid" columns="2">
+            <a4j:status id="loadingStatus" onstart="onstartloading()" onstop="onstoploading()">
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+                </f:facet>
+            </a4j:status>
+            <h:outputText escape="true" value="#{setupDiscountPage.errorMessages}" rendered="#{not empty setupDiscountPage.errorMessages}" styleClass="error-messages" />
+            <h:outputText escape="true" value="#{setupDiscountPage.infoMessages}" rendered="#{not empty setupDiscountPage.infoMessages}" styleClass="info-messages" />
+        </h:panelGrid>
+
         </a4j:region>
     </h:panelGrid>
 </a4j:form>
