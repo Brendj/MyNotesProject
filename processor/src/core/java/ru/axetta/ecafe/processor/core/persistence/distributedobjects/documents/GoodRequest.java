@@ -9,6 +9,8 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssoc
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -37,43 +39,48 @@ public class GoodRequest extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"Date", getDateFormat().format(dateOfGoodsRequest));
-        setAttribute(element,"Number", number);
-        setAttribute(element,"State",state.ordinal());
-        setAttribute(element,"DoneDate", getDateFormat().format(doneDate));
-        setAttribute(element,"Comment", comment);
-        setAttribute(element, "GuidOfStaff", staff.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "Date", CalendarUtils.toStringFullDateTimeWithLocalTimeZone(dateOfGoodsRequest));
+        XMLUtils.setAttributeIfNotNull(element, "Number", number);
+        XMLUtils.setAttributeIfNotNull(element, "State", state.ordinal());
+        XMLUtils.setAttributeIfNotNull(element, "DoneDate", CalendarUtils.toStringFullDateTimeWithLocalTimeZone(doneDate));
+        XMLUtils.setAttributeIfNotNull(element, "Comment", comment);
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfStaff", staff.getGuid());
     }
 
     @Override
     protected GoodRequest parseAttributes(Node node) throws Exception {
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null){
-            if(DAOService.getInstance().isMenuExchange(getIdOfSyncOrg())){
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null) {
+            if (DAOService.getInstance().isMenuExchange(getIdOfSyncOrg())) {
                 /* случай когда требование создает поставщик */
-                throw new  DistributedObjectException("NOT_CREATED_A_GOOD_REQUEST_BECAUSE_YOU_HAVE_NO_RIGHT");
+                throw new DistributedObjectException("NOT_CREATED_A_GOOD_REQUEST_BECAUSE_YOU_HAVE_NO_RIGHT");
             }
             setOrgOwner(longOrgOwner);
         }
-        Date dateDateOfGoodsRequest = getDateTimeAttributeValue(node, "Date");
-        String stringNumber = getStringAttributeValue(node, "Number", 128);
-        if(stringNumber != null) setNumber(stringNumber);
-        Integer integerState = getIntegerAttributeValue(node,"State");
-        if(integerState != null) setState(DocumentState.values()[integerState]);
-        if(dateDateOfGoodsRequest!=null) setDateOfGoodsRequest(dateDateOfGoodsRequest);
-        Date dateDoneDate = getDateTimeAttributeValue(node, "DoneDate");
-        if(dateDoneDate!=null) setDoneDate(dateDoneDate);
-        String stringComment = getStringAttributeValue(node, "Comment", 128);
-        if(stringComment != null) setComment(stringComment);
-        guidOfStaff = getStringAttributeValue(node,"GuidOfStaff",36);
+        Date dateDateOfGoodsRequest = XMLUtils.getDateTimeAttributeValue(node, "Date");
+        String stringNumber = XMLUtils.getStringAttributeValue(node, "Number", 128);
+        if (stringNumber != null)
+            setNumber(stringNumber);
+        Integer integerState = XMLUtils.getIntegerAttributeValue(node, "State");
+        if (integerState != null)
+            setState(DocumentState.values()[integerState]);
+        if (dateDateOfGoodsRequest != null)
+            setDateOfGoodsRequest(dateDateOfGoodsRequest);
+        Date dateDoneDate = XMLUtils.getDateTimeAttributeValue(node, "DoneDate");
+        if (dateDoneDate != null)
+            setDoneDate(dateDoneDate);
+        String stringComment = XMLUtils.getStringAttributeValue(node, "Comment", 128);
+        if (stringComment != null)
+            setComment(stringComment);
+        guidOfStaff = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);
         setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((GoodRequest) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setDateOfGoodsRequest(((GoodRequest) distributedObject).getDateOfGoodsRequest());
         setNumber(((GoodRequest) distributedObject).getNumber());
         setState(((GoodRequest) distributedObject).getState());

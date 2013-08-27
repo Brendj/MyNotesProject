@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -24,29 +26,33 @@ public class ActOfInventarization extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"Date", getDateFormat().format(dateOfAct));
-        setAttribute(element, "Number", number);
-        setAttribute(element, "Commission", commission);
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "Date", CalendarUtils.toStringFullDateTimeWithLocalTimeZone(dateOfAct));
+        XMLUtils.setAttributeIfNotNull(element, "Number", number);
+        XMLUtils.setAttributeIfNotNull(element, "Commission", commission);
     }
 
     @Override
-    protected ActOfInventarization parseAttributes(Node node) throws Exception{
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        Date dateOfActOfDifference = getDateTimeAttributeValue(node, "Date");
-        if(dateOfActOfDifference != null) setDateOfAct(dateOfActOfDifference);
-        String stringNumber = getStringAttributeValue(node, "Number",128);
-        if(stringNumber != null) setNumber(stringNumber);
-        String stringCommission = getStringAttributeValue(node, "Commission",512);
-        if(stringCommission != null) setCommission(stringCommission);
+    protected ActOfInventarization parseAttributes(Node node) throws Exception {
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        Date dateOfActOfDifference = XMLUtils.getDateTimeAttributeValue(node, "Date");
+        if (dateOfActOfDifference != null)
+            setDateOfAct(dateOfActOfDifference);
+        String stringNumber = XMLUtils.getStringAttributeValue(node, "Number", 128);
+        if (stringNumber != null)
+            setNumber(stringNumber);
+        String stringCommission = XMLUtils.getStringAttributeValue(node, "Commission", 512);
+        if (stringCommission != null)
+            setCommission(stringCommission);
         setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((ActOfInventarization) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setDateOfAct(((ActOfInventarization) distributedObject).getDateOfAct());
         setNumber(((ActOfInventarization) distributedObject).getNumber());
         setCommission(((ActOfInventarization) distributedObject).getCommission());

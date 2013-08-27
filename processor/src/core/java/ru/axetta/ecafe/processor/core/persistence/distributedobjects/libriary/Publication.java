@@ -4,23 +4,22 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.Base64AndZip;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
+import ru.axetta.ecafe.processor.core.utils.rusmarc.ISBN;
+import ru.axetta.ecafe.processor.core.utils.rusmarc.Record;
+
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
-import ru.axetta.ecafe.processor.core.utils.Base64AndZip;
-import ru.axetta.ecafe.processor.core.utils.rusmarc.ISBN;
-import ru.axetta.ecafe.processor.core.utils.rusmarc.Record;
-
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
-import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -119,13 +118,12 @@ public class Publication extends DistributedObject {
     @Override
     protected void appendAttributes(Element element) {
         String decodedString = Base64AndZip.enCode(data);
-        setAttribute(element, "Data", decodedString);
+        XMLUtils.setAttributeIfNotNull(element, "Data", decodedString);
     }
 
     @Override
     protected Publication parseAttributes(Node node) throws Exception {
-
-        String data = getStringAttributeValue(node, "Data", 65536);
+        String data = XMLUtils.getStringAttributeValue(node, "Data", 65536);
         DataInputStream dataInputStream = new DataInputStream(
                 new ByteArrayInputStream(Base64AndZip.decode(data.getBytes())));
         Record record = new Record(dataInputStream);
@@ -141,9 +139,7 @@ public class Publication extends DistributedObject {
         setValidISBN(isbn1.getState() == ISBN.StateEnum.Normal);
 
         Integer stringHash = record.getStringForHash().hashCode();
-        if (stringHash != null) {
-            setHash(stringHash);
-        }
+        setHash(stringHash);
 
         String[] info = record.getInfo();
 

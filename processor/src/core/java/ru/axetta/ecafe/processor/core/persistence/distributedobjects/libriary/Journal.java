@@ -6,9 +6,9 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -30,30 +30,27 @@ public class Journal extends DistributedObject {
 
     @Override
     public Journal parseAttributes(Node node) throws Exception {
-
-        guidFund = getStringAttributeValue(node, "GuidFund", 36);
-        guidPublication = getStringAttributeValue(node, "GuidPublication", 36);
-
-        isNewspaper = (getIntegerAttributeValue(node, "IsNewspaper") == 1);
-        monthCount = getIntegerAttributeValue(node, "MonthCount");
-        count = getIntegerAttributeValue(node, "Count");
+        guidFund = XMLUtils.getStringAttributeValue(node, "GuidFund", 36);
+        guidPublication = XMLUtils.getStringAttributeValue(node, "GuidPublication", 36);
+        isNewspaper = XMLUtils.getBooleanAttributeValue(node, "IsNewspaper");
+        monthCount = XMLUtils.getIntegerAttributeValue(node, "MonthCount");
+        count = XMLUtils.getIntegerAttributeValue(node, "Count");
         setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
 
     @Override
-    public void preProcess(Session session) throws DistributedObjectException{
-
+    public void preProcess(Session session) throws DistributedObjectException {
         Publication p = DAOUtils.findDistributedObjectByRefGUID(Publication.class, session, guidPublication);
-        if(p==null){
-            DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication NOT_FOUND_VALUE");
+        if (p == null) {
+            DistributedObjectException distributedObjectException = new DistributedObjectException("Publication NOT_FOUND_VALUE");
             distributedObjectException.setData(guidPublication);
-            throw  distributedObjectException;
+            throw distributedObjectException;
         }
         setPublication(p);
-
         Fund f = DAOUtils.findDistributedObjectByRefGUID(Fund.class, session, guidFund);
-        if(f!=null) setFund(f);
+        if (f != null)
+            setFund(f);
     }
 
     @Override
@@ -61,7 +58,6 @@ public class Journal extends DistributedObject {
         setOrgOwner(((Journal) distributedObject).getOrgOwner());
         setFund(((Journal) distributedObject).getFund());
         setPublication(((Journal) distributedObject).getPublication());
-
         setNewspaper(((Journal) distributedObject).isNewspaper());
         setMonthCount(((Journal) distributedObject).getMonthCount());
         setCount(((Journal) distributedObject).getCount());
@@ -109,9 +105,8 @@ public class Journal extends DistributedObject {
 
     @Override
     public String toString() {
-        return String
-                .format("Journal{fund=%s, publication=%s, isNewspaper=%s, monthCount=%d, count=%d}", fund, publication,
-                        isNewspaper, monthCount, count);
+        return String.format("Journal{fund=%s, publication=%s, isNewspaper=%s, monthCount=%d, count=%d}", fund, publication, isNewspaper,
+                monthCount, count);
     }
 
     private Fund fund;

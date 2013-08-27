@@ -4,7 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.utils;
 
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -21,6 +24,9 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -46,16 +52,87 @@ public class XMLUtils {
         return doc.importNode(d.getDocumentElement(), true);
     }
 
-    public static String getStringAttributeValue(Node node, String attributeName,Integer length) throws Exception{
-        if(getAttributeValue(node, attributeName)==null) return null;
+    public static String getAttributeValue(Node node, String attributeName) {
+        Node attribute = node.getAttributes().getNamedItem(attributeName);
+        return attribute == null ? null : attribute.getTextContent().trim();
+    }
+
+    public static String getStringAttributeValue(Node node, String attributeName, int length) {
         String result = getAttributeValue(node, attributeName);
-        if(result.length()>length) return result.substring(0, length);
+        if (result == null)
+            return null;
+        if (result.length() > length)
+            return result.substring(0, length);
         return result;
     }
 
-    public static String getAttributeValue(Node node, String attributeName){
-        if(node.getAttributes().getNamedItem(attributeName)==null) return null;
-        return node.getAttributes().getNamedItem(attributeName).getTextContent().trim();
+    public static Long getLongAttributeValue(Node node, String attributeName) {
+        String value = getAttributeValue(node, attributeName);
+        return value == null || value.isEmpty() ? null : Long.valueOf(value);
+    }
+
+    public static Integer getIntegerAttributeValue(Node node, String attributeName) {
+        String value = getAttributeValue(node, attributeName);
+        return value == null || value.isEmpty() ? null : Integer.valueOf(value);
+    }
+
+    public static Date getDateAttributeValue(Node node, String attributeName) throws Exception {
+        String attributeValue = getAttributeValue(node, attributeName);
+        try {
+            return CalendarUtils.parseDate(attributeValue);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    public static Date getDateTimeAttributeValue(Node node, String attributeName)  throws Exception{
+        String attributeValue = getAttributeValue(node, attributeName);
+        try {
+            return CalendarUtils.parseFullDateTimeWithLocalTimeZone(attributeValue);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    public static Float getFloatAttributeValue(Node node, String attributeName) throws Exception {
+        String attributeValue = getAttributeValue(node, attributeName);
+        if (attributeValue == null || attributeValue.isEmpty())
+            return null;
+        String replacedString = attributeValue.replaceAll(",", ".");
+        try {
+            return Float.parseFloat(replacedString);
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    public static Boolean getBooleanAttributeValue(Node node, String attributeName) throws Exception {
+        String attributeValue = getAttributeValue(node, attributeName);
+        if (attributeValue == null || attributeValue.isEmpty())
+            return null;
+        return attributeValue.equals("1");
+    }
+
+    public static Character getCharacterAttributeValue(Node node, String attributeName) throws Exception {
+        String attributeValue = getAttributeValue(node, attributeName);
+        if (attributeValue == null || attributeValue.isEmpty())
+            return null;
+        try {
+            return attributeValue.charAt(0);
+        } catch (Exception e) {
+            throw new DistributedObjectException(e.getMessage());
+        }
+    }
+
+    public static List<Node> findNodesWithNameNotEqualsTo(Node parentNode, String name) {
+        List<Node> result = new ArrayList<Node>();
+        Node child = parentNode.getFirstChild();
+        while (child != null) {
+            if (Node.ELEMENT_NODE == child.getNodeType() && !name.equals(child.getNodeName()))
+                result.add(child);
+            child = child.getNextSibling();
+        }
+        return result;
     }
 
     public static Node findFirstChildElement(Node node, String name) throws Exception {
@@ -118,5 +195,13 @@ public class XMLUtils {
         return result;
     }
 
-
+    public static void setAttributeIfNotNull(Element element, String attrName, Object value) {
+        if (value != null) {
+            if (value instanceof Boolean) {
+                element.setAttribute(attrName, (Boolean) value ? "1" : "0");
+            } else {
+                element.setAttribute(attrName, value.toString());
+            }
+        }
+    }
 }

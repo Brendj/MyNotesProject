@@ -7,11 +7,12 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TradeMaterialGood;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TradeMaterialGood;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -42,47 +43,57 @@ public class InternalIncomingDocumentPosition extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"UnitsScale", unitsScale.ordinal());
-        setAttribute(element,"TotalCount", totalCount);
-        setAttribute(element, "NetWeight", netWeight);
-        setAttribute(element,"GoodsCreationDate", getDateFormat().format(goodsCreationDate));
-        setAttribute(element,"LifeTime", lifeTime);
-        setAttribute(element,"IncomingPrice", incomingPrice);
-        setAttribute(element,"NDS", nds);
-        setAttribute(element, "GuidOfInternalIncomingDocument", internalIncomingDocument.getGuid());
-        if(tradeMaterialGood != null) setAttribute(element, "GuidOfTradeMaterialGoods", tradeMaterialGood.getGuid());
-        setAttribute(element, "GuidOfGoods", good.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "UnitsScale", unitsScale.ordinal());
+        XMLUtils.setAttributeIfNotNull(element, "TotalCount", totalCount);
+        XMLUtils.setAttributeIfNotNull(element, "NetWeight", netWeight);
+        XMLUtils.setAttributeIfNotNull(element, "GoodsCreationDate",
+                CalendarUtils.toStringFullDateTimeWithLocalTimeZone(goodsCreationDate));
+        XMLUtils.setAttributeIfNotNull(element, "LifeTime", lifeTime);
+        XMLUtils.setAttributeIfNotNull(element, "IncomingPrice", incomingPrice);
+        XMLUtils.setAttributeIfNotNull(element, "NDS", nds);
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfInternalIncomingDocument", internalIncomingDocument.getGuid());
+        if (tradeMaterialGood != null)
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfTradeMaterialGoods", tradeMaterialGood.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfGoods", good.getGuid());
     }
 
     @Override
     protected InternalIncomingDocumentPosition parseAttributes(Node node) throws Exception {
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        Date dateOfGoodsCreationDate = getDateTimeAttributeValue(node, "GoodsCreationDate");
-        if(dateOfGoodsCreationDate != null) setGoodsCreationDate(dateOfGoodsCreationDate);
-        Integer integerUnitsScale = getIntegerAttributeValue(node, "UnitsScale");
-        if(integerUnitsScale != null) setUnitsScale(UnitScale.fromInteger(integerUnitsScale));
-        Long longTotalCount = getLongAttributeValue(node, "TotalCount");
-        if(longTotalCount != null) setTotalCount(longTotalCount);
-        Long longNetWeight = getLongAttributeValue(node, "NetWeight");
-        if(longTotalCount != null) setNetWeight(longNetWeight);
-        Long longLifeTime = getLongAttributeValue(node, "LifeTime");
-        if(longLifeTime != null) setLifeTime(longLifeTime);
-        Long longPrice = getLongAttributeValue(node, "IncomingPrice");
-        if(longPrice != null) setIncomingPrice(longPrice);
-        Long longNDS = getLongAttributeValue(node,"NDS");
-        if(longNDS != null) setNds(longNDS);
-        guidOfIID = getStringAttributeValue(node,"GuidOfInternalIncomingDocument",36);
-        guidOfTMG = getStringAttributeValue(node,"GuidOfTradeMaterialGoods",36);
-        guidOfG = getStringAttributeValue(node,"GuidOfGoods",36);
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        Date dateOfGoodsCreationDate = XMLUtils.getDateTimeAttributeValue(node, "GoodsCreationDate");
+        if (dateOfGoodsCreationDate != null)
+            setGoodsCreationDate(dateOfGoodsCreationDate);
+        Integer integerUnitsScale = XMLUtils.getIntegerAttributeValue(node, "UnitsScale");
+        if (integerUnitsScale != null)
+            setUnitsScale(UnitScale.fromInteger(integerUnitsScale));
+        Long longTotalCount = XMLUtils.getLongAttributeValue(node, "TotalCount");
+        if (longTotalCount != null)
+            setTotalCount(longTotalCount);
+        Long longNetWeight = XMLUtils.getLongAttributeValue(node, "NetWeight");
+        if (longTotalCount != null)
+            setNetWeight(longNetWeight);
+        Long longLifeTime = XMLUtils.getLongAttributeValue(node, "LifeTime");
+        if (longLifeTime != null)
+            setLifeTime(longLifeTime);
+        Long longPrice = XMLUtils.getLongAttributeValue(node, "IncomingPrice");
+        if (longPrice != null)
+            setIncomingPrice(longPrice);
+        Long longNDS = XMLUtils.getLongAttributeValue(node, "NDS");
+        if (longNDS != null)
+            setNds(longNDS);
+        guidOfIID = XMLUtils.getStringAttributeValue(node, "GuidOfInternalIncomingDocument", 36);
+        guidOfTMG = XMLUtils.getStringAttributeValue(node, "GuidOfTradeMaterialGoods", 36);
+        guidOfG = XMLUtils.getStringAttributeValue(node, "GuidOfGoods", 36);
         setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((InternalIncomingDocumentPosition) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setGoodsCreationDate(((InternalIncomingDocumentPosition) distributedObject).getGoodsCreationDate());
         setLifeTime(((InternalIncomingDocumentPosition) distributedObject).getLifeTime());
         setUnitsScale(((InternalIncomingDocumentPosition) distributedObject).getUnitsScale());

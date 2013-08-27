@@ -11,6 +11,8 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.I
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalIncomingDocumentPosition;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -59,43 +61,52 @@ public class TradeMaterialGood extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"GoodsCreationDate", getDateFormat().format(goodsCreationDate));
-        setAttribute(element,"LifeTime", lifeTime);
-        setAttribute(element,"UnitsScale", unitScale.ordinal());
-        setAttribute(element,"TotalCount", totalCount);
-        setAttribute(element,"NetWeight", netWeight);
-        setAttribute(element,"SelfPrice", selfPrice);
-        setAttribute(element,"NDS", nds);
-        setAttribute(element,"GuidOfGoods", good.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "GoodsCreationDate",
+                CalendarUtils.toStringFullDateTimeWithLocalTimeZone(goodsCreationDate));
+        XMLUtils.setAttributeIfNotNull(element, "LifeTime", lifeTime);
+        XMLUtils.setAttributeIfNotNull(element, "UnitsScale", unitScale.ordinal());
+        XMLUtils.setAttributeIfNotNull(element, "TotalCount", totalCount);
+        XMLUtils.setAttributeIfNotNull(element, "NetWeight", netWeight);
+        XMLUtils.setAttributeIfNotNull(element, "SelfPrice", selfPrice);
+        XMLUtils.setAttributeIfNotNull(element, "NDS", nds);
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfGoods", good.getGuid());
     }
 
     @Override
     protected TradeMaterialGood parseAttributes(Node node) throws Exception {
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        Date dateNameOfGood = getDateTimeAttributeValue(node, "GoodsCreationDate");
-        if(dateNameOfGood!=null) setGoodsCreationDate(dateNameOfGood);
-        Long longLifeTime = getLongAttributeValue(node, "LifeTime");
-        if(longLifeTime != null) setLifeTime(longLifeTime);
-        Integer integerUnitsScale = getIntegerAttributeValue(node,"UnitsScale");
-        if(integerUnitsScale != null) setUnitScale(UnitScale.fromInteger(integerUnitsScale));
-        Long longTotalCount = getLongAttributeValue(node, "TotalCount");
-        if(longTotalCount != null) setTotalCount(longTotalCount);
-        Long longNetWeight = getLongAttributeValue(node,"NetWeight");
-        if(longNetWeight != null) setNetWeight(longNetWeight);
-        Long longSelfPrice = getLongAttributeValue(node, "SelfPrice");
-        if(longSelfPrice != null) setSelfPrice(longSelfPrice);
-        Long longNDS = getLongAttributeValue(node,"NDS");
-        if(longNDS != null) setNds(longNDS);
-        guidOfG = getStringAttributeValue(node,"GuidOfGoods",36);
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        Date dateNameOfGood = XMLUtils.getDateTimeAttributeValue(node, "GoodsCreationDate");
+        if (dateNameOfGood != null)
+            setGoodsCreationDate(dateNameOfGood);
+        Long longLifeTime = XMLUtils.getLongAttributeValue(node, "LifeTime");
+        if (longLifeTime != null)
+            setLifeTime(longLifeTime);
+        Integer integerUnitsScale = XMLUtils.getIntegerAttributeValue(node, "UnitsScale");
+        if (integerUnitsScale != null)
+            setUnitScale(UnitScale.fromInteger(integerUnitsScale));
+        Long longTotalCount = XMLUtils.getLongAttributeValue(node, "TotalCount");
+        if (longTotalCount != null)
+            setTotalCount(longTotalCount);
+        Long longNetWeight = XMLUtils.getLongAttributeValue(node, "NetWeight");
+        if (longNetWeight != null)
+            setNetWeight(longNetWeight);
+        Long longSelfPrice = XMLUtils.getLongAttributeValue(node, "SelfPrice");
+        if (longSelfPrice != null)
+            setSelfPrice(longSelfPrice);
+        Long longNDS = XMLUtils.getLongAttributeValue(node, "NDS");
+        if (longNDS != null)
+            setNds(longNDS);
+        guidOfG = XMLUtils.getStringAttributeValue(node, "GuidOfGoods", 36);
         setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((TradeMaterialGood) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setGoodsCreationDate(((TradeMaterialGood) distributedObject).getGoodsCreationDate());
         setLifeTime(((TradeMaterialGood) distributedObject).getLifeTime());
         setUnitScale(((TradeMaterialGood) distributedObject).getUnitScale());

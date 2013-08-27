@@ -8,9 +8,9 @@ import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -29,7 +29,7 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((TechnologicalMap) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setNameOfTechnologicalMap(((TechnologicalMap) distributedObject).getNameOfTechnologicalMap());
         setNumberOfTechnologicalMap(((TechnologicalMap) distributedObject).getNumberOfTechnologicalMap());
         setTechnologyOfPreparation(((TechnologicalMap) distributedObject).getTechnologyOfPreparation());
@@ -56,136 +56,112 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element, "Name", nameOfTechnologicalMap);
-        setAttribute(element, "Number", numberOfTechnologicalMap);
-        setAttribute(element, "Technology", technologyOfPreparation);
-        setAttribute(element, "TempPreparation", tempOfPreparation);
-        setAttribute(element, "LifeTime", lifeTime);
-
-        setAttribute(element, "Energy", energyValue);
-
-        setAttribute(element, "Proteins", proteins);
-        setAttribute(element, "Carbohydrates", carbohydrates);
-        setAttribute(element, "Fats", fats);
-
-        setAttribute(element, "Ca", microElCa);
-        setAttribute(element, "Mg", microElMg);
-        setAttribute(element, "P", microElP);
-        setAttribute(element, "Fe", microElFe);
-
-        setAttribute(element, "VA", vitaminA);
-        setAttribute(element, "VB1", vitaminB1);
-        setAttribute(element, "VB2", vitaminB2);
-        setAttribute(element, "VPp", vitaminPp);
-        setAttribute(element, "VC", vitaminC);
-        setAttribute(element, "VE", vitaminE);
-
-        setAttribute(element, "GuidOfTMG", technologicalMapGroup.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "Name", nameOfTechnologicalMap);
+        XMLUtils.setAttributeIfNotNull(element, "Number", numberOfTechnologicalMap);
+        XMLUtils.setAttributeIfNotNull(element, "Technology", technologyOfPreparation);
+        XMLUtils.setAttributeIfNotNull(element, "TempPreparation", tempOfPreparation);
+        XMLUtils.setAttributeIfNotNull(element, "LifeTime", lifeTime);
+        XMLUtils.setAttributeIfNotNull(element, "Energy", energyValue);
+        XMLUtils.setAttributeIfNotNull(element, "Proteins", proteins);
+        XMLUtils.setAttributeIfNotNull(element, "Carbohydrates", carbohydrates);
+        XMLUtils.setAttributeIfNotNull(element, "Fats", fats);
+        XMLUtils.setAttributeIfNotNull(element, "Ca", microElCa);
+        XMLUtils.setAttributeIfNotNull(element, "Mg", microElMg);
+        XMLUtils.setAttributeIfNotNull(element, "P", microElP);
+        XMLUtils.setAttributeIfNotNull(element, "Fe", microElFe);
+        XMLUtils.setAttributeIfNotNull(element, "VA", vitaminA);
+        XMLUtils.setAttributeIfNotNull(element, "VB1", vitaminB1);
+        XMLUtils.setAttributeIfNotNull(element, "VB2", vitaminB2);
+        XMLUtils.setAttributeIfNotNull(element, "VPp", vitaminPp);
+        XMLUtils.setAttributeIfNotNull(element, "VC", vitaminC);
+        XMLUtils.setAttributeIfNotNull(element, "VE", vitaminE);
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfTMG", technologicalMapGroup.getGuid());
 
     }
 
     @Override
-    protected TechnologicalMap parseAttributes(Node node) throws Exception{
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        String stringNameOfTechnologicalMap = getStringAttributeValue(node, "Name", 128);
+    protected TechnologicalMap parseAttributes(Node node) throws Exception {
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        String stringNameOfTechnologicalMap = XMLUtils.getStringAttributeValue(node, "Name", 128);
         if (stringNameOfTechnologicalMap != null) {
             setNameOfTechnologicalMap(stringNameOfTechnologicalMap);
         }
-
-        String numberOfTechnologicalMap = getStringAttributeValue(node, "Number", 128);
+        String numberOfTechnologicalMap = XMLUtils.getStringAttributeValue(node, "Number", 128);
         if (numberOfTechnologicalMap != null) {
             setNumberOfTechnologicalMap(numberOfTechnologicalMap);
         }
-
-
-        String stringTechnologyOfPreparation = getStringAttributeValue(node, "Technology", 4096);
+        String stringTechnologyOfPreparation = XMLUtils.getStringAttributeValue(node, "Technology", 4096);
         if (stringTechnologyOfPreparation != null) {
             setTechnologyOfPreparation(stringTechnologyOfPreparation);
         }
-
-        String stringTempOfPreparation = getStringAttributeValue(node, "TempOfPreparation", 128);
+        String stringTempOfPreparation = XMLUtils.getStringAttributeValue(node, "TempOfPreparation", 128);
         if (stringTempOfPreparation != null) {
             setTempOfPreparation(stringTempOfPreparation);
         }
-
-        Integer integerLifeTime = getIntegerAttributeValue(node, "LifeTime");
+        Integer integerLifeTime = XMLUtils.getIntegerAttributeValue(node, "LifeTime");
         if (integerLifeTime != null) {
             setLifeTime(integerLifeTime);
         }
-
-        Float floatEnergyValue = getFloatAttributeValue(node, "Energy");
+        Float floatEnergyValue = XMLUtils.getFloatAttributeValue(node, "Energy");
         if (floatEnergyValue != null) {
             setEnergyValue(floatEnergyValue);
         }
-
-        Float floatProteins = getFloatAttributeValue(node, "Proteins");
+        Float floatProteins = XMLUtils.getFloatAttributeValue(node, "Proteins");
         if (floatProteins != null) {
             setProteins(floatProteins);
         }
-
-        Float floatCarbohydrates = getFloatAttributeValue(node, "Carbohydrates");
+        Float floatCarbohydrates = XMLUtils.getFloatAttributeValue(node, "Carbohydrates");
         if (floatCarbohydrates != null) {
             setCarbohydrates(floatCarbohydrates);
         }
-
-        Float floatFats = getFloatAttributeValue(node, "Fats");
+        Float floatFats = XMLUtils.getFloatAttributeValue(node, "Fats");
         if (floatFats != null) {
             setFats(floatFats);
         }
-
-        Float floatMicroElCa = getFloatAttributeValue(node, "Ca");
+        Float floatMicroElCa = XMLUtils.getFloatAttributeValue(node, "Ca");
         if (floatMicroElCa != null) {
             setMicroElCa(floatMicroElCa);
         }
-
-        Float floatMicroElMg = getFloatAttributeValue(node, "Mg");
+        Float floatMicroElMg = XMLUtils.getFloatAttributeValue(node, "Mg");
         if (floatMicroElMg != null) {
             setMicroElMg(floatMicroElMg);
         }
-
-        Float floatMicroElP = getFloatAttributeValue(node, "P");
+        Float floatMicroElP = XMLUtils.getFloatAttributeValue(node, "P");
         if (floatMicroElP != null) {
             setMicroElP(floatMicroElP);
         }
-
-        Float floatMicroElFe = getFloatAttributeValue(node, "Fe");
+        Float floatMicroElFe = XMLUtils.getFloatAttributeValue(node, "Fe");
         if (floatMicroElFe != null) {
             setMicroElFe(floatMicroElFe);
         }
-
-        Float floatVitaminA = getFloatAttributeValue(node, "VA");
+        Float floatVitaminA = XMLUtils.getFloatAttributeValue(node, "VA");
         if (floatVitaminA != null) {
             setVitaminA(floatVitaminA);
         }
-
-        Float floatVitaminB1 = getFloatAttributeValue(node, "VB1");
+        Float floatVitaminB1 = XMLUtils.getFloatAttributeValue(node, "VB1");
         if (floatVitaminB1 != null) {
             setVitaminB1(floatVitaminB1);
         }
-
-        Float floatVitaminB2 = getFloatAttributeValue(node, "VB2");
+        Float floatVitaminB2 = XMLUtils.getFloatAttributeValue(node, "VB2");
         if (floatVitaminB2 != null) {
             setVitaminB2(floatVitaminB2);
         }
-
-        Float floatVitaminPp = getFloatAttributeValue(node, "VPp");
+        Float floatVitaminPp = XMLUtils.getFloatAttributeValue(node, "VPp");
         if (floatVitaminPp != null) {
             setVitaminPp(floatVitaminPp);
         }
-
-        Float floatVitaminC = getFloatAttributeValue(node, "VC");
+        Float floatVitaminC = XMLUtils.getFloatAttributeValue(node, "VC");
         if (floatVitaminC != null) {
             setVitaminC(floatVitaminC);
         }
-
-        Float floatVitaminE = getFloatAttributeValue(node, "VE");
+        Float floatVitaminE = XMLUtils.getFloatAttributeValue(node, "VE");
         if (floatVitaminE != null) {
             setVitaminE(floatVitaminE);
         }
-
-        guidOfTMG = getStringAttributeValue(node, "GuidOfTMG", 36);
+        guidOfTMG = XMLUtils.getStringAttributeValue(node, "GuidOfTMG", 36);
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }

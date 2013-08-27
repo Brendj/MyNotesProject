@@ -7,10 +7,10 @@ package ru.axetta.ecafe.processor.web;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerProcessor;
 import ru.axetta.ecafe.processor.core.sync.manager.IntegroLogger;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
-import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.CharEncoding;
@@ -35,7 +35,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -130,22 +129,15 @@ public class IntegroServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }*/
-            Manager manager = new Manager(dateFormat, timeFormat);
+            /* Секция RO можент быть и пустой но идентификатор организации для подготовки ответа возмем */
+            Manager manager = new Manager(idOfOrg);
             try {
                 // Save requestDocument by means of SyncLogger as IdOfOrg-in.xml
 
                 Node roNode = dataNode.getFirstChild();
                 roNode=roNode.getNextSibling();
-                /* Секция RO можент быть и пустой но идентификатор организации для подготовки ответа возмем */
-                manager.setIdOfOrg(idOfOrg);
                 if (roNode != null) {
-                    Node itemNode = roNode.getFirstChild();
-                    while (null != itemNode) {
-                        if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
-                            manager.build(itemNode);
-                        }
-                        itemNode = itemNode.getNextSibling();
-                    }
+                    manager.buildRO(roNode);
                 }
                 //manager.build(roNode);
             } catch (Exception e) {

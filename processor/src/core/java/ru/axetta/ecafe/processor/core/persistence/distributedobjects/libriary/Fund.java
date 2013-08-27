@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -25,20 +26,14 @@ public class Fund extends DistributedObject {
     protected void appendAttributes(Element element) {}
 
     @Override
-    public Fund parseAttributes(Node node) throws Exception{
-
-        String fundName = getStringAttributeValue(node, "FundName", 128);
-        if (fundName != null) {
+    public Fund parseAttributes(Node node) throws Exception {
+        String fundName = XMLUtils.getStringAttributeValue(node, "FundName", 128);
+        if (fundName != null)
             setFundName(fundName);
-        }
-
-        Boolean bollStud =  getBollAttributeValue(node, "Stud");
-        if(bollStud != null){
+        Boolean bollStud = XMLUtils.getBooleanAttributeValue(node, "Stud");
+        if (bollStud != null)
             setStud(bollStud);
-        }
-
         setSendAll(SendToAssociatedOrgs.DontSend);
-
         return this;
     }
 

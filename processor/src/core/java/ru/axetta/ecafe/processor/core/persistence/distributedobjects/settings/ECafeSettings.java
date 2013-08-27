@@ -7,18 +7,15 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
-import org.hibernate.type.EnumType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
 
 /**
  * Created with IntelliJ IDEA.
@@ -34,28 +31,29 @@ public class ECafeSettings extends DistributedObject{
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"Value", settingValue);
-        setAttribute(element,"Id", settingsId.getId()+1);
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "Value", settingValue);
+        XMLUtils.setAttributeIfNotNull(element, "Id", settingsId.getId() + 1);
     }
 
     @Override
     protected ECafeSettings parseAttributes(Node node) throws Exception {
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        String stringValue = getStringAttributeValue(node, "Value", 128);
-        if(stringValue!=null) setSettingValue(stringValue);
-        Integer intId = getIntegerAttributeValue(node, "Id");
-        if(intId!=null){
-            setSettingsId(SettingsIds.fromInteger(intId-1));
-        }
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        String stringValue = XMLUtils.getStringAttributeValue(node, "Value", 128);
+        if (stringValue != null)
+            setSettingValue(stringValue);
+        Integer intId = XMLUtils.getIntegerAttributeValue(node, "Id");
+        if (intId != null)
+            setSettingsId(SettingsIds.fromInteger(intId - 1));
         setSendAll(SendToAssociatedOrgs.SendToSelf);
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((ECafeSettings) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setSettingValue(((ECafeSettings) distributedObject).getSettingValue());
         setSettingsId(((ECafeSettings) distributedObject).getSettingsId());
     }

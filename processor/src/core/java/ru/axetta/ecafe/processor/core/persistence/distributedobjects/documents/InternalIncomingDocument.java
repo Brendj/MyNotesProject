@@ -6,9 +6,10 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -43,34 +44,40 @@ public class InternalIncomingDocument extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element, "State", state);
-        setAttribute(element, "Date", getDateFormat().format(date));
-        if(wayBill!=null) setAttribute(element, "GuidOfWayBill", wayBill.getGuid());
-        if(internalDisposingDocument!=null) setAttribute(element, "GuidOfDisposingDoc", internalDisposingDocument.getGuid());
-        if(actOfInventarization!=null) setAttribute(element, "GuidOfInventorizationAct", actOfInventarization.getGuid());
-        setAttribute(element, "GuidOfStaff", staff.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "State", state);
+        XMLUtils.setAttributeIfNotNull(element, "Date", CalendarUtils.toStringFullDateTimeWithLocalTimeZone(date));
+        if (wayBill != null)
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfWayBill", wayBill.getGuid());
+        if (internalDisposingDocument != null)
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfDisposingDoc", internalDisposingDocument.getGuid());
+        if (actOfInventarization != null)
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfInventorizationAct", actOfInventarization.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfStaff", staff.getGuid());
     }
 
     @Override
     protected InternalIncomingDocument parseAttributes(Node node) throws Exception {
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        Integer integerState = getIntegerAttributeValue(node,"State");
-        if(integerState!=null) setState(integerState);
-        Date dateOfInternalIncomingDocument = getDateTimeAttributeValue(node, "Date");
-        if(dateOfInternalIncomingDocument != null) setDate(dateOfInternalIncomingDocument);
-        guidOfWB = getStringAttributeValue(node,"GuidOfWayBill",36);
-        guidOfIDD = getStringAttributeValue(node,"GuidOfDisposingDoc",36);
-        guidOfAI = getStringAttributeValue(node,"GuidOfInventorizationAct",36);
-        guidOfS = getStringAttributeValue(node,"GuidOfStaff",36);
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        Integer integerState = XMLUtils.getIntegerAttributeValue(node, "State");
+        if (integerState != null)
+            setState(integerState);
+        Date dateOfInternalIncomingDocument = XMLUtils.getDateTimeAttributeValue(node, "Date");
+        if (dateOfInternalIncomingDocument != null)
+            setDate(dateOfInternalIncomingDocument);
+        guidOfWB = XMLUtils.getStringAttributeValue(node, "GuidOfWayBill", 36);
+        guidOfIDD = XMLUtils.getStringAttributeValue(node, "GuidOfDisposingDoc", 36);
+        guidOfAI = XMLUtils.getStringAttributeValue(node, "GuidOfInventorizationAct", 36);
+        guidOfS = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);
         setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((InternalIncomingDocument) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setDate(((InternalIncomingDocument) distributedObject).getDate());
         setState(((InternalIncomingDocument) distributedObject).getState());
     }

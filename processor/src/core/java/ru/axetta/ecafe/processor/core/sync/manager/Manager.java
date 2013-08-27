@@ -4,11 +4,17 @@
 
 package ru.axetta.ecafe.processor.core.sync.manager;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.utils.*;
+import ru.axetta.ecafe.processor.core.sync.doGroups.DOGroupsFactory;
+import ru.axetta.ecafe.processor.core.sync.doGroups.DOSyncClass;
+import ru.axetta.ecafe.processor.core.sync.doGroups.IDOGroup;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.*;
 import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Criterion;
@@ -20,14 +26,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.StringWriter;
-import java.text.DateFormat;
 import java.util.*;
 
 /**
@@ -37,6 +36,7 @@ import java.util.*;
  * Time: 17:27
  * To change this template use File | Settings | File Templates.
  */
+
 public class Manager {
     /**
      * Логгер
@@ -47,22 +47,28 @@ public class Manager {
      * значения = текущие максимальые версии объектов(Пример версии: атрибут V тега <Pr V="20">)
      */
     private HashMap<String, Long> currentMaxVersions = new HashMap<String, Long>();
-    private Map<DistributedObjectsEnum, List<DistributedObject>> resultDistributedObjectsListMap = new HashMap<DistributedObjectsEnum, List<DistributedObject>>();
+    private SortedMap<DOSyncClass, List<DistributedObject>> resultDOMap = new TreeMap<DOSyncClass, List<DistributedObject>>();
     /**
      * Список глобальных объектов на базе процессинга
      */
     /* Пара ключ значение ключ имя класса значение список объектов этого класса */
-    private Map<DistributedObjectsEnum, List<DistributedObject>> distributedObjectsListMap = new HashMap<DistributedObjectsEnum, List<DistributedObject>>();
-    private List<DOConfirm> confirmDistributedObject = new ArrayList<DOConfirm>();
-    private Document document;
+    private SortedMap<DOSyncClass, List<DistributedObject>> incomeDOMap = new TreeMap<DOSyncClass, List<DistributedObject>>();
+    private List<DOConfirm> doConfirms = new ArrayList<DOConfirm>();
     private Long idOfOrg;
-    private final DateFormat dateOnlyFormat;
-    private final DateFormat timeFormat;
     private SyncHistory syncHistory;
+    private Document conflictDocument;
 
-    public Manager(DateFormat dateOnlyFormat, DateFormat timeFormat){
-        this.dateOnlyFormat = dateOnlyFormat;
-        this.timeFormat = timeFormat;
+    private DOSyncService doService;
+
+    public Manager(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
+        this.doService = (DOSyncService) RuntimeContext.getAppContext().getBean("doSyncService");
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        try {
+            this.conflictDocument = factory.newDocumentBuilder().newDocument();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
     }
 
     /**
@@ -70,291 +76,217 @@ public class Manager {
      * (create, update). При успехе выполнения действия формируется объект класса DistributedObjectItem и сохраняется
      * в список - поле distributedObjectItems.
      *
-     * @param node Элемент <RO>
+     * @param roNode Элемент <RO>
      * @throws Exception
      */
-    public void build(Node node) throws Exception {
-        if (Node.ELEMENT_NODE == node.getNodeType()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("RO parse XML section");
-            }
-            if(node.getNodeName().equals("Confirm")){
-                if (logger.isDebugEnabled()) {
-                    logger.debug("RO parse Confirm XML section");
-                }
-                Node childNode = node.getFirstChild();
-                while (childNode != null) {
-                    buildConfirm(childNode);
-                    childNode = childNode.getNextSibling();
-                }
-                if (logger.isDebugEnabled()) {
-                    logger.debug("RO end parse Confirm XML section");
-                }
-            } else {
-                DistributedObjectsEnum currentObject = null;
-                currentObject = DistributedObjectsEnum.parse(node.getNodeName());
-                if(currentObject != null){
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("RO parse '"+currentObject.name()+"' node XML section");
-                    }
-                    currentMaxVersions.put(currentObject.name(), Long.parseLong(getAttributeValue(node, "V")));
-                    node = node.getFirstChild();
-                    while (node != null) {
-                        if (Node.ELEMENT_NODE == node.getNodeType()) {
-                            DistributedObject distributedObject = createDistributedObject(currentObject);
-                            distributedObject.setIdOfSyncOrg(idOfOrg);
-                            distributedObject.setTimeFormat(timeFormat);
-                            distributedObject.setDateOnlyFormat(dateOnlyFormat);
-                            try{
-                                distributedObject = distributedObject.build(node);
-                            } catch (DistributedObjectException e){
-                                distributedObject.setDistributedObjectException(e);
-                                logger.error(distributedObject.toString(), e);
-                            } catch (Exception e){
-                                distributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
-                                logger.error(distributedObject.toString(), e);
-                            }
-                            if (!distributedObjectsListMap.containsKey(currentObject)) {
-                                distributedObjectsListMap.put(currentObject, new ArrayList<DistributedObject>());
-                            }
-                            distributedObjectsListMap.get(currentObject).add(distributedObject);
-                        }
-                        node = node.getNextSibling();
-                    }
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("RO end parse '"+currentObject.name()+"' node XML section");
-                    }
-                } else {
-                    logger.warn(String.format("Section '%s' processing is not known",node.getNodeName()));
-                }
-            }
-            if (logger.isDebugEnabled()) {
-                logger.debug("RO end parse XML section");
+    public void buildRO(Node roNode) throws Exception {
+        // Получаем имена групп РО, которые будем обрабатывать.
+        String[] doGroupNames = StringUtils.split(XMLUtils.getAttributeValue(roNode, "DO_GROUPS"), ';');
+        // Если группы явно не указаны, то пока берем все.
+        if (doGroupNames == null || doGroupNames.length == 0)
+            doGroupNames = new String[]{"ProductsGroup", "DocumentGroup", "SettingsGroup", "LibraryGroup"};
+        Node confirmNode = XMLUtils.findFirstChildElement(roNode, "Confirm");
+        if (confirmNode != null)
+            // Обработка секции <Confirm>
+            buildConfirmNode(confirmNode);
+        // Получаем секции РО, которые будем обрабатывать.
+        List<Node> doNodeList = XMLUtils.findNodesWithNameNotEqualsTo(roNode, "Confirm");
+        for (String groupName : doGroupNames) {
+            IDOGroup doGroup = DOGroupsFactory.getGroup(groupName);
+            buildOneGroup(doGroup, doNodeList);
+        }
+    }
+
+    private void buildOneGroup(IDOGroup doGroup, List<Node> doNodeList) {
+        Iterator<Node> iter = doNodeList.iterator();
+        while (iter.hasNext()) {
+            Node doNode = iter.next();
+            DOSyncClass doSyncClass = doGroup.getDOSyncClass(doNode.getNodeName().trim());
+            if (doSyncClass != null) {
+                // Обработка перечня экземпляров РО одного определенного класса.
+                buildDONode(doNode, doSyncClass);
+                iter.remove();
             }
         }
+    }
 
+    private void buildDONode(Node doNode, DOSyncClass doSyncClass) {
+        String name = doNode.getNodeName().trim();
+        // http://www.slf4j.org/faq.html#logging_performance
+        logger.debug("RO parse '{}' node XML section", name);
+        currentMaxVersions.put(doSyncClass.getDoClass().getSimpleName(), XMLUtils.getLongAttributeValue(doNode, "V"));
+        incomeDOMap.put(doSyncClass, new ArrayList<DistributedObject>());
+        doNode = doNode.getFirstChild();
+        while (doNode != null) {
+            if (Node.ELEMENT_NODE == doNode.getNodeType()) {
+                DistributedObject distributedObject = null;
+                try {
+                    distributedObject = doSyncClass.getDoClass().newInstance();
+                    distributedObject.setIdOfSyncOrg(idOfOrg);
+                    distributedObject = distributedObject.build(doNode);
+                } catch (Exception e) {
+                    if (distributedObject != null) {
+                        if (e instanceof DistributedObjectException)
+                            distributedObject.setDistributedObjectException((DistributedObjectException) e);
+                        else
+                            distributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
+                        logger.error(distributedObject.toString(), e);
+                    }
+                }
+                List<DistributedObject> doList = incomeDOMap.get(doSyncClass);
+                doList.add(distributedObject);
+            }
+            doNode = doNode.getNextSibling();
+        }
+        logger.debug("RO end parse '{}' node XML section", name);
     }
 
     public Element toElement(Document document) throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug("RO section begin generate XML node");
-        }
+        logger.debug("RO section begin generate XML node");
         Element elementRO = document.createElement("RO");
         Element confirmElement = document.createElement("Confirm");
-        HashMap<String, Element> elementMap = new HashMap<String, Element>();
-        String tagName;
-        List<DistributedObject> distributedObjects = null;
+        List<DistributedObject> distributedObjects;
         /* generate confirm element */
-        if (logger.isDebugEnabled()) {
-            logger.debug("Generate confirm element");
-        }
-        for (DistributedObjectsEnum key : distributedObjectsListMap.keySet()) {
-            distributedObjects = distributedObjectsListMap.get(key);
+        logger.debug("Generate confirm element");
+        for (SortedMap.Entry<DOSyncClass, List<DistributedObject>> entry : incomeDOMap.entrySet()) {
+            distributedObjects = entry.getValue();
+            String classTagName = entry.getKey().getDoClass().getSimpleName();
+            Element doClassElement = document.createElement(classTagName);
+            confirmElement.appendChild(doClassElement);
             for (DistributedObject distributedObject : distributedObjects) {
-                tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).name();
-                if (!elementMap.containsKey(tagName)) {
-                    Element distributedObjectElement = document.createElement(tagName);
-                    confirmElement.appendChild(distributedObjectElement);
-                    elementMap.put(tagName, distributedObjectElement);
-                }
                 Element element = document.createElement(distributedObject.getTagName());
-                distributedObject.setTimeFormat(timeFormat);
-                distributedObject.setDateOnlyFormat(dateOnlyFormat);
-                elementMap.get(tagName).appendChild(distributedObject.toConfirmElement(element));
+                doClassElement.appendChild(distributedObject.toConfirmElement(element));
             }
-            elementRO.appendChild(confirmElement);
-            elementMap.clear();
             distributedObjects.clear();
         }
+        elementRO.appendChild(confirmElement);
         /* generate result objects */
-        if (logger.isDebugEnabled()) {
-            logger.debug("Generate result objects.");
-        }
-        for (DistributedObjectsEnum key : resultDistributedObjectsListMap.keySet()) {
-            distributedObjects = resultDistributedObjectsListMap.get(key);
+        logger.debug("Generate result objects.");
+        for (Map.Entry<DOSyncClass, List<DistributedObject>> entry : resultDOMap.entrySet()) {
+            distributedObjects = entry.getValue();
+            String classTagName = entry.getKey().getDoClass().getSimpleName();
+            Element doClassElement = document.createElement(classTagName);
+            elementRO.appendChild(doClassElement);
             for (DistributedObject distributedObject : distributedObjects) {
-                tagName = DistributedObjectsEnum.parse(distributedObject.getClass()).name();
-                if (!elementMap.containsKey(tagName)) {
-                    Element distributedObjectElement = document.createElement(tagName);
-                    elementRO.appendChild(distributedObjectElement);
-                    elementMap.put(tagName, distributedObjectElement);
-                }
                 Element element = document.createElement("O");
-                distributedObject.setDateOnlyFormat(dateOnlyFormat);
-                distributedObject.setTimeFormat(timeFormat);
-                elementMap.get(tagName).appendChild(distributedObject.toElement(element));
+                doClassElement.appendChild(distributedObject.toElement(element));
             }
-            elementMap.clear();
             distributedObjects.clear();
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Complete manager generate XML node.");
-        }
+        logger.debug("Complete manager generate XML node.");
         return elementRO;
     }
 
-    private List<Long> getMenuExchangeRuleList(SessionFactory sessionFactory){
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        List<Long> menuExchangeRuleList = new ArrayList<Long>();
-        try {
-            persistenceSession = sessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            menuExchangeRuleList = DAOUtils.getListIdOfOrgList(persistenceSession, idOfOrg);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-        return menuExchangeRuleList;
-    }
-
     public void process(SessionFactory sessionFactory) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("RO begin process section");
-        }
-        DistributedObjectsEnumComparator distributedObjectsEnumComparator = new DistributedObjectsEnumComparator();
-        DistributedObjectsEnum[] array = DistributedObjectsEnum.values();
-        Arrays.sort(array, distributedObjectsEnumComparator);
-        clearConfirmTable(sessionFactory);
-        Map<DistributedObjectsEnum, List<DistributedObject>> currentDistributedObjectsListMap = new HashMap<DistributedObjectsEnum, List<DistributedObject>>();
+        logger.debug("RO begin process section");
+        doService.deleteDOConfirms(doConfirms);
+        SortedMap<DOSyncClass, List<DistributedObject>> currentDOListMap = new TreeMap<DOSyncClass, List<DistributedObject>>();
         ConfigurationProvider configurationProvider = getConfigurationProvider(sessionFactory);
-        List<Long> menuExchangeRuleList = getMenuExchangeRuleList(sessionFactory);
-        for (DistributedObjectsEnum anArray : array) {
-            List<DistributedObject> currentResultDistributedObjectsList = generateResponseResult(sessionFactory, anArray.getValue(), currentMaxVersions.get(anArray.getValue().getSimpleName()),configurationProvider, menuExchangeRuleList);
-            resultDistributedObjectsListMap.put(anArray, currentResultDistributedObjectsList);
-            if (!(distributedObjectsListMap.get(anArray) == null || distributedObjectsListMap.get(anArray).isEmpty())) {
-                List<DistributedObject> distributedObjectsList = processDistributedObjectsList(sessionFactory,
-                        distributedObjectsListMap.get(anArray), anArray, configurationProvider);
-                currentDistributedObjectsListMap.put(anArray, distributedObjectsList);
-            }
-            addConfirms(sessionFactory, currentResultDistributedObjectsList);
-            List<DistributedObject> currentConfirmDistributedObjectsList = generateConfirmResponseResult(sessionFactory, anArray.getValue());
-            if(!(currentConfirmDistributedObjectsList == null || currentConfirmDistributedObjectsList.isEmpty())){
-                for (DistributedObject distributedObject: currentConfirmDistributedObjectsList){
-                    if(!currentResultDistributedObjectsList.contains(distributedObject)){
-                        currentResultDistributedObjectsList.add(distributedObject);
+        Session session = sessionFactory.openSession();
+        List<Long> menuExchangeRuleList = DAOUtils.getListIdOfOrgList(session, idOfOrg);
+        HibernateUtils.close(session, logger);
+
+        for (DOSyncClass doSyncClass : incomeDOMap.keySet()) {
+            List<DistributedObject> currentResultDOList = generateResponseResult(sessionFactory, doSyncClass,
+                    configurationProvider, menuExchangeRuleList);
+            resultDOMap.put(doSyncClass, currentResultDOList);
+            List<DistributedObject> distributedObjectsList = processDistributedObjectsList(sessionFactory, doSyncClass, configurationProvider);
+            currentDOListMap.put(doSyncClass, distributedObjectsList);
+            addConfirms(currentResultDOList);
+            List<DistributedObject> currentConfirmDOList = doService.findConfirmedDO(doSyncClass.getDoClass(), idOfOrg);
+            if (!currentConfirmDOList.isEmpty()) {
+                for (DistributedObject distributedObject : currentConfirmDOList) {
+                    if (!currentResultDOList.contains(distributedObject)) {
+                        currentResultDOList.add(distributedObject);
                     }
                 }
             }
         }
-        distributedObjectsListMap = currentDistributedObjectsListMap;
-        if (logger.isDebugEnabled()) {
-            logger.debug("RO end process section");
+        incomeDOMap = currentDOListMap;
+        logger.debug("RO end process section");
+    }
+
+    private void buildConfirmNode(Node node) throws Exception {
+        logger.debug("RO parse Confirm XML section");
+        Node childNode = node.getFirstChild();
+        while (childNode != null) {
+            if (Node.ELEMENT_NODE == childNode.getNodeType()) {
+                DOConfirm confirm = new DOConfirm();
+                confirm.setDistributedObjectClassName(node.getNodeName().trim());
+                confirm.setGuid(childNode.getAttributes().getNamedItem("Guid").getTextContent());
+                confirm.setOrgOwner(idOfOrg);
+                doConfirms.add(confirm);
+            }
+            childNode = childNode.getNextSibling();
         }
+        logger.debug("RO end parse Confirm XML section");
     }
 
-    public void setIdOfOrg(Long idOfOrg) {
-        this.idOfOrg = idOfOrg;
-    }
-
-    private void buildConfirm(Node node) throws Exception {
-        if (Node.ELEMENT_NODE == node.getNodeType()) {
-            DistributedObjectsEnum currentObject = DistributedObjectsEnum.parse(node.getNodeName());
-            DOConfirm confirm = new DOConfirm();
-            confirm.setDistributedObjectClassName(currentObject.name());
-            confirm.setGuid(node.getAttributes().getNamedItem("Guid").getTextContent());
-            confirm.setOrgOwner(idOfOrg);
-            confirmDistributedObject.add(confirm);
-        }
-    }
-
-    private void addConfirms(SessionFactory sessionFactory, List<DistributedObject> confirmDistributedObjectList){
-        for (DistributedObject distributedObject: confirmDistributedObjectList){
+    private void addConfirms(List<DistributedObject> confirmDistributedObjectList) {
+        for (DistributedObject distributedObject : confirmDistributedObjectList) {
             DOConfirm doConfirm = new DOConfirm();
-            doConfirm.setDistributedObjectClassName(DistributedObjectsEnum.parse(distributedObject.getClass()).name());
+            doConfirm.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
             doConfirm.setGuid(distributedObject.getGuid());
             doConfirm.setOrgOwner(idOfOrg);
-            addConfirm(sessionFactory, doConfirm);
+            doService.addConfirm(doConfirm);
         }
     }
 
-    private void addConfirm(SessionFactory sessionFactory, DOConfirm doConfirm){
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = sessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            Query query = persistenceSession.createQuery("from DOConfirm where orgOwner=:orgOwner and distributedObjectClassName=:distributedObjectClassName and guid=:guid");
-            query.setParameter("orgOwner",doConfirm.getOrgOwner());
-            query.setParameter("distributedObjectClassName", doConfirm.getDistributedObjectClassName());
-            query.setParameter("guid",doConfirm.getGuid());
-            List list = query.list();
-            if(list==null || list.isEmpty()){
-                persistenceSession.save(doConfirm);
-            }
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-    }
-
-    private List<DistributedObject> processDistributedObjectsList(SessionFactory sessionFactory, List<DistributedObject> distributedObjects, DistributedObjectsEnum objectClass, ConfigurationProvider configurationProvider){
+    private List<DistributedObject> processDistributedObjectsList(SessionFactory sessionFactory, DOSyncClass doSyncClass,
+            ConfigurationProvider configurationProvider) {
+        List<DistributedObject> distributedObjects = incomeDOMap.get(doSyncClass);
         List<DistributedObject> distributedObjectList = new ArrayList<DistributedObject>();
-        if(!(distributedObjects==null || distributedObjects.isEmpty())){
+        if (!distributedObjects.isEmpty()) {
             // Все объекты одного типа получают одну (новую) версию и все их изменения пишуться с этой версией.
-            Long currentMaxVersion = updateVersionByDistributedObjects(sessionFactory, objectClass.name());
+            Long currentMaxVersion = doService.updateDOVersion(doSyncClass.getDoClass());
             for (DistributedObject distributedObject : distributedObjects) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Process: "+distributedObject.toString());
-                }
-                DistributedObject currentDistributedObject = processCurrentObject(sessionFactory, distributedObject, currentMaxVersion, configurationProvider);
+                logger.debug("Process: {}", distributedObject.toString());
+                DistributedObject currentDistributedObject = processCurrentObject(sessionFactory, distributedObject, currentMaxVersion,
+                        configurationProvider);
                 distributedObjectList.add(currentDistributedObject);
             }
             /* generate result list */
-            List<DistributedObject> currentResultDistributedObjectsList = resultDistributedObjectsListMap.get(objectClass);
+            List<DistributedObject> currentResultDOList = resultDOMap.get(doSyncClass);
             /* уберем все объекты которые есть в конфирме */
-            if(!(currentResultDistributedObjectsList == null || currentResultDistributedObjectsList.isEmpty())){
-                currentResultDistributedObjectsList.removeAll(distributedObjectList);
-            }
-            resultDistributedObjectsListMap.put(objectClass, currentResultDistributedObjectsList);
+            if (!(currentResultDOList == null || currentResultDOList.isEmpty()))
+                currentResultDOList.removeAll(distributedObjectList);
         }
         return distributedObjectList;
     }
 
-    private DistributedObject processCurrentObject(SessionFactory sessionFactory,DistributedObject distributedObject,Long currentMaxVersion, ConfigurationProvider configurationProvider){
+    private DistributedObject processCurrentObject(SessionFactory sessionFactory, DistributedObject distributedObject,
+            Long currentMaxVersion, ConfigurationProvider configurationProvider) {
         Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
         try {
-            if(distributedObject.getDistributedObjectException()==null){
+            if (distributedObject.getDistributedObjectException() == null) {
                 persistenceSession = sessionFactory.openSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                if (!(distributedObject.getDeletedState()==null || distributedObject.getDeletedState())) {
+                if (!(distributedObject.getDeletedState() == null || distributedObject.getDeletedState())) {
                     distributedObject.preProcess(persistenceSession);
-                    if(distributedObject instanceof IConfigProvider){
-                        if(configurationProvider == null) {
+                    if (distributedObject instanceof IConfigProvider) {
+                        if (configurationProvider == null) {
                             throw new DistributedObjectException("CONFIGURATION_PROVIDER_NOT_FOUND");
                         } else {
-                            ((IConfigProvider) distributedObject).setIdOfConfigurationProvider(configurationProvider.getIdOfConfigurationProvider());
+                            ((IConfigProvider) distributedObject)
+                                    .setIdOfConfigurationProvider(configurationProvider.getIdOfConfigurationProvider());
                         }
                     }
-                    distributedObject.setDateOnlyFormat(dateOnlyFormat);
-                    distributedObject.setTimeFormat(timeFormat);
-                    distributedObject = processDistributedObject(persistenceSession, distributedObject, currentMaxVersion);
+                    distributedObject = processDistributedObject(distributedObject, currentMaxVersion);
                 } else {
                     String tagName = distributedObject.getTagName();
-                    distributedObject = updateDeleteState(persistenceSession, distributedObject, currentMaxVersion);
+                    distributedObject = updateDeleteState(distributedObject, currentMaxVersion);
                     distributedObject.setTagName(tagName);
-                    distributedObject.setDateOnlyFormat(dateOnlyFormat);
-                    distributedObject.setTimeFormat(timeFormat);
                 }
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
             }
-        } catch (DistributedObjectException e){
+        } catch (DistributedObjectException e) {
             // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю
             // TODO: записать в журнал ошибок
             distributedObject.setDistributedObjectException(e);
             logger.error(distributedObject.toString(), e);
-        } catch (Exception e){
+        } catch (Exception e) {
             // TODO: записать в журнал ошибок
             distributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
             logger.error(distributedObject.toString(), e);
         } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
         return distributedObject;
@@ -392,8 +324,10 @@ public class Manager {
         return configurationProvider;
     }
 
-    private List<DistributedObject> generateResponseResult(SessionFactory sessionFactory, Class<? extends DistributedObject> clazz, Long currentMaxVersion, ConfigurationProvider configurationProvider, List<Long> menuExchangeRuleList){
+    private List<DistributedObject> generateResponseResult(SessionFactory sessionFactory, DOSyncClass doSyncClass, ConfigurationProvider configurationProvider, List<Long> menuExchangeRuleList){
         List<DistributedObject> result = new ArrayList<DistributedObject>();
+        Class<?> clazz = doSyncClass.getDoClass();
+        Long currentMaxVersion = currentMaxVersions.get(doSyncClass.getDoClass().getSimpleName());
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -421,7 +355,6 @@ public class Manager {
                     .add(Restrictions.eq("sendAll",SendToAssociatedOrgs.SendToAll));
 
             Criterion sendToMainRestriction = Restrictions.conjunction();
-            Set<Long>  mainOrg = new TreeSet<Long>();
             allOrg.addAll(menuExchangeRuleList);
             allOrg.add(idOfOrg);
             sendToMainRestriction = ((Conjunction)sendToMainRestriction)
@@ -490,240 +423,69 @@ public class Manager {
         return result;
     }
 
-    private List<DistributedObject> generateConfirmResponseResult(SessionFactory sessionFactory, Class<? extends DistributedObject> clazz){
-        List<DistributedObject> result = new ArrayList<DistributedObject>();
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = sessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            Query query = persistenceSession.createQuery("Select guid from DOConfirm where orgOwner=:orgOwner and distributedObjectClassName=:distributedObjectClassName");
-            query.setParameter("orgOwner",idOfOrg);
-            query.setParameter("distributedObjectClassName",DistributedObjectsEnum.parse(clazz).name());
-            List list = query.list();
-            List<String> stringList = new ArrayList<String>();
-            if(!(list==null || list.isEmpty())){
-                for (Object object: list){
-                    stringList.add((String) object);
-                }
-                Criteria criteria = persistenceSession.createCriteria(clazz);
-                criteria.add(Restrictions.in("guid",stringList));
-                List objects = criteria.list();
-                if(!(objects==null || objects.isEmpty())){
-                    for (Object object: objects){
-                        result.add((DistributedObject) object);
-                    }
-                }
-            }
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        }catch (Exception e){
-            // TODO: записать в журнал ошибок
-            logger.error("Error getDistributedObjects: ",e);
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
+    private DistributedObject updateDeleteState(DistributedObject distributedObject, Long currentMaxVersion) throws Exception {
+        DistributedObject currentDO = doService.findByGuid(distributedObject.getClass(), distributedObject.getGuid());
+        if (currentDO == null) {
+            throw new DistributedObjectException(
+                    distributedObject.getClass().getSimpleName() + " NOT_FOUND_VALUE : " + distributedObject.getGuid());
         }
-        return result;
+        currentDO.setGlobalVersion(currentMaxVersion);
+        currentDO.setDeletedState(true);
+        currentDO.setDeleteDate(new Date());
+        return doService.update(currentDO);
     }
 
-    private Long getDistributedObjectVersion(Session session, DistributedObject distributedObject) throws Exception{
-        String where = String.format("from %s where guid = '%s'",distributedObject.getClass().getSimpleName(),distributedObject.getGuid());
-        Query query = session.createQuery(where);
-        List list = query.list();
-        if(list==null || list.isEmpty()){
-            throw new DistributedObjectException(distributedObject.getClass().getSimpleName()+" NOT_FOUND_VALUE : "+distributedObject.getGuid());
-        }
-        return ((DistributedObject)list.get(0)).getGlobalVersion();
-    }
-
-    private DistributedObject updateDeleteState(Session session, DistributedObject distributedObject,Long currentMaxVersion) throws Exception{
-        Long id = getGlobalIDByGUID(session, distributedObject);
-        if (id < 0) {
-            throw new DistributedObjectException(distributedObject.getClass().getSimpleName()+" NOT_FOUND_VALUE : "+distributedObject.getGuid());
-        }
-        DistributedObject object = (DistributedObject) session.get(distributedObject.getClass(), id);
-        object.setGlobalVersion(currentMaxVersion);
-        object.setDeletedState(true);
-        object.setDeleteDate(new Date());
-        session.save(object);
-        return (DistributedObject) session.get(distributedObject.getClass(), id);
-    }
-
-    private DistributedObject processDistributedObject(Session session,DistributedObject distributedObject, long currentMaxVersion) throws Exception {
+    private DistributedObject processDistributedObject(DistributedObject distributedObject, Long currentMaxVersion) throws Exception {
+        DistributedObject currentDO = doService.findByGuid(distributedObject.getClass(), distributedObject.getGuid());
+        // Создание в БД нового экземпляра РО.
         if (distributedObject.getTagName().equals("C")) {
-            distributedObject = createDistributedObject(session, distributedObject, currentMaxVersion);
+            if (currentDO != null) {
+                throw new DistributedObjectException(
+                        distributedObject.getClass().getSimpleName() + " DUPLICATE_GUID : " + distributedObject.getGuid());
+            }
+            distributedObject.setGlobalVersion(currentMaxVersion);
+            distributedObject.setGlobalVersionOnCreate(currentMaxVersion);
+            distributedObject = doService.createDO(distributedObject);
             distributedObject.setTagName("C");
         }
+        // Изменение существующего в БД экземпляра РО.
         if (distributedObject.getTagName().equals("M")) {
-            Long currentVersion = getDistributedObjectVersion(session, distributedObject);
+            if (currentDO == null)
+                throw new DistributedObjectException(
+                        distributedObject.getClass().getSimpleName() + " NOT_FOUND_VALUE : " + distributedObject.getGuid());
+            Long currentVersion = currentDO.getGlobalVersion();
             Long objectVersion = distributedObject.getGlobalVersion();
-            if (objectVersion!=null && currentVersion!=null && !objectVersion.equals(currentVersion)) {
-                createConflict(session, distributedObject, currentMaxVersion);
+            DOConflict doConflict = null;
+            // Проверка на наличие конфликта версионности.
+            if (objectVersion != null && currentVersion != null && !objectVersion.equals(currentVersion)) {
+                doConflict = createConflict(distributedObject, currentDO);
             }
-            distributedObject = mergeDistributedObject(session, distributedObject, currentMaxVersion);
+            currentDO.fill(distributedObject);
+            currentDO.setDeletedState(distributedObject.getDeletedState());
+            currentDO.setLastUpdate(new Date());
+            currentDO.setGlobalVersion(currentVersion);
+            distributedObject = doService.mergeDO(currentDO, doConflict);
             distributedObject.setTagName("M");
         }
         return distributedObject;
     }
 
-    private void createConflict(Session session, DistributedObject distributedObject, Long currentVersion) throws Exception {
+    private DOConflict createConflict(DistributedObject distributedObject, DistributedObject currentDO) throws Exception {
         DOConflict conflict = new DOConflict();
-        conflict.setValueInc(createStringElement(getSimpleDocument(), distributedObject));
+        conflict.setValueInc(createStringElement(conflictDocument, distributedObject));
         conflict.setgVersionInc(distributedObject.getGlobalVersion());
         conflict.setIdOfOrg(idOfOrg);
         conflict.setDistributedObjectClassName(distributedObject.getClass().getSimpleName());
-        String where = String.format("from %s where guid='%s'",distributedObject.getClass().getSimpleName(),distributedObject.getGuid());
-        Query query = session.createQuery(where);
-        List list = query.list();
-        DistributedObject currDistributedObject = null;
-        if(!(list == null || list.isEmpty())){
-            currDistributedObject = (DistributedObject) list.get(0);
-            conflict.setgVersionCur(currDistributedObject.getGlobalVersion());
-            conflict.setgVersionResult(currentVersion);
-            conflict.setValueCur(createStringElement(getSimpleDocument(), currDistributedObject));
-            conflict.setCreateConflictDate(new Date());
-            session.persist(conflict);
-        }
-    }
-
-    private DistributedObject mergeDistributedObject(Session session, DistributedObject distributedObject, long currentVersion) throws Exception{
-        long id = getGlobalIDByGUID(session,distributedObject);
-        if (id < 0) {
-            throw new DistributedObjectException(distributedObject.getClass().getSimpleName()+" NOT_FOUND_VALUE : "+distributedObject.getGuid());
-            //throw new DistributedObjectException("NOT_FOUND_VALUE");
-        }
-        DistributedObject object = (DistributedObject) session.get(distributedObject.getClass(), id);
-        object.fill(distributedObject);
-        object.setDeletedState(distributedObject.getDeletedState());
-        object.setLastUpdate(new Date());
-        object.setGlobalVersion(currentVersion);
-        return (DistributedObject) session.merge(object);
-    }
-
-    private DistributedObject createDistributedObject(Session session, DistributedObject distributedObject, long currentVersion)
-            throws DistributedObjectException {
-        long id = getGlobalIDByGUID(session,distributedObject);
-        if (id > 0) {
-            throw new DistributedObjectException(distributedObject.getClass().getSimpleName()+" DUPLICATE_GUID : "+distributedObject.getGuid());
-            //throw new DistributedObjectException(DistributedObjectException.ErrorType.DUPLICATE_VALUE);
-        }
-        distributedObject.setCreatedDate(new Date());
-        distributedObject.setGlobalVersion(currentVersion);
-        distributedObject.setGlobalVersionOnCreate(currentVersion);
-        distributedObject.setDeletedState(distributedObject.getDeletedState());
-        return (DistributedObject) session.merge(distributedObject);
-    }
-
-    private DistributedObject createDistributedObject(DistributedObjectsEnum distributedObjectsEnum) throws Exception {
-        Class cl = distributedObjectsEnum.getValue();
-        return (DistributedObject) cl.newInstance();
-    }
-
-    private String getAttributeValue(Node node, String attributeName) {
-        return (node.getAttributes().getNamedItem(attributeName) != null ? node.getAttributes()
-                .getNamedItem(attributeName).getTextContent() : null);
-    }
-
-    private Long updateVersionByDistributedObjects(SessionFactory sessionFactory, String name) {
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        Long version = null;
-        try {
-            persistenceSession = sessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            Query query = persistenceSession.createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName");
-            query.setParameter("distributedObjectClassName",name.toUpperCase());
-            List list = query.list();
-            DOVersion doVersion = null;
-            if(list.isEmpty()) {
-                doVersion = new DOVersion();
-                doVersion.setCurrentVersion(0L);
-                doVersion.setDistributedObjectClassName(name);
-                version = 0L;
-            } else {
-                doVersion = (DOVersion) list.get(0);
-                doVersion = (DOVersion) persistenceSession.merge(doVersion);
-                version = doVersion.getCurrentVersion()+1;
-                doVersion.setCurrentVersion(version);
-            }
-            persistenceSession.save(doVersion);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-        return version;
-    }
-
-    private void clearConfirmTable(SessionFactory sessionFactory){
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        if (logger.isDebugEnabled()) {
-            logger.debug("Begin clear confirm elements");
-        }
-        try {
-            persistenceSession = sessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            for (DOConfirm confirm: confirmDistributedObject){
-                String where = String.format("from DOConfirm where orgOwner=%d and UPPER(distributedObjectClassName)='%s' and guid='%s'",confirm.getOrgOwner(),confirm.getDistributedObjectClassName().toUpperCase(),confirm.getGuid());
-                Query query = persistenceSession.createQuery(where);
-                List list = query.list();
-                for (Object object: list){
-                    DOConfirm doConfirm = (DOConfirm) object;
-                    persistenceSession.delete(doConfirm);
-                }
-            }
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("End clear confirm elements");
-        }
-    }
-
-    private long getGlobalIDByGUID(Session session, DistributedObject distributedObject) {
-
-        String where = String.format("select id from %s where guid='%s'",distributedObject.getClass().getSimpleName(), distributedObject.getGuid());
-        Query query = session.createQuery(where);
-        List list = query.list();
-
-        //Criteria criteria = session.createCriteria(distributedObject.getClass());
-        //criteria.add(Restrictions.eq("guid",distributedObject.getGuid()));
-        Long result = -1L;
-        //List list = criteria.list();
-        if(!(list == null || list.isEmpty())){
-            result = (Long) list.get(0);
-        }
-        return result;
+        conflict.setgVersionCur(currentDO.getGlobalVersion());
+        conflict.setgVersionResult(currentDO.getGlobalVersion());
+        conflict.setValueCur(createStringElement(conflictDocument, currentDO));
+        return conflict;
     }
 
     /* взять из XML Utills */
-    private String createStringElement(Document document, DistributedObject distributedObject)
-            throws TransformerException {
+    private String createStringElement(Document document, DistributedObject distributedObject) throws TransformerException {
         Element element = document.createElement("O");
-        distributedObject.setDateOnlyFormat(dateOnlyFormat);
-        distributedObject.setTimeFormat(timeFormat);
         element = distributedObject.toElement(element);
         return XMLUtils.nodeToString(element);
-        //TransformerFactory transFactory = TransformerFactory.newInstance();
-        //Transformer transformer = transFactory.newTransformer();
-        //StringWriter buffer = new StringWriter();
-        //transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-        //transformer.transform(new DOMSource(element), new StreamResult(buffer));
-        //return buffer.toString();
     }
-
-    private Document getSimpleDocument() throws Exception {
-        if (document == null) {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            document = factory.newDocumentBuilder().newDocument();
-        }
-        return document;
-    }
-
 }

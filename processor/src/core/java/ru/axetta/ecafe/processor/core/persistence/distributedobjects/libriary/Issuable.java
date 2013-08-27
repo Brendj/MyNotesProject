@@ -6,9 +6,9 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -30,17 +30,14 @@ public class Issuable extends DistributedObject {
 
     @Override
     protected Issuable parseAttributes(Node node) throws Exception {
-        Long longBarCode = getLongAttributeValue(node, "Barcode");
-        if (longBarCode != null) {
+        Long longBarCode = XMLUtils.getLongAttributeValue(node, "Barcode");
+        if (longBarCode != null)
             setBarcode(longBarCode);
-        }
-        Character charType = getCharacterAttributeValue(node, "Type");
-        if (charType != null) {
+        Character charType = XMLUtils.getCharacterAttributeValue(node, "Type");
+        if (charType != null)
             setType(charType);
-        }
-
-        guidInstance = getStringAttributeValue(node, "GuidInstance", 36);
-        guidJournalItem = getStringAttributeValue(node, "GuidJournalItem", 36);
+        guidInstance = XMLUtils.getStringAttributeValue(node, "GuidInstance", 36);
+        guidJournalItem = XMLUtils.getStringAttributeValue(node, "GuidJournalItem", 36);
         setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
@@ -56,7 +53,7 @@ public class Issuable extends DistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((Issuable) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setBarcode(((Issuable) distributedObject).getBarcode());
         setType(((Issuable) distributedObject).getType());
         setBarcode(((Issuable) distributedObject).getBarcode());

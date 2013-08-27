@@ -7,9 +7,9 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -26,7 +26,7 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((TechnologicalMapProduct) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setGrossWeight(((TechnologicalMapProduct) distributedObject).getGrossWeight());
         setNetWeight(((TechnologicalMapProduct) distributedObject).getNetWeight());
         setProduct(((TechnologicalMapProduct) distributedObject).getProduct());
@@ -34,37 +34,35 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
         setNumberGroupReplace(((TechnologicalMapProduct) distributedObject).getNumberGroupReplace());
     }
 
-
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element, "GWeight", grossWeight);
-        setAttribute(element, "NWeight", netWeight);
-        setAttribute(element, "NumberGroupReplace", numberGroupReplace);
-        setAttribute(element, "GuidOfP", product.getGuid());
-        setAttribute(element, "GuidOfTM", technologicalMap.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "GWeight", grossWeight);
+        XMLUtils.setAttributeIfNotNull(element, "NWeight", netWeight);
+        XMLUtils.setAttributeIfNotNull(element, "NumberGroupReplace", numberGroupReplace);
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfP", product.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfTM", technologicalMap.getGuid());
     }
 
     @Override
-    protected TechnologicalMapProduct parseAttributes(Node node) throws Exception{
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        Integer integerGrossMass = getIntegerAttributeValue(node, "GWeight");
+    protected TechnologicalMapProduct parseAttributes(Node node) throws Exception {
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        Integer integerGrossMass = XMLUtils.getIntegerAttributeValue(node, "GWeight");
         if (integerGrossMass != null) {
             setGrossWeight(integerGrossMass);
         }
-
-        Integer integerNetMass = getIntegerAttributeValue(node, "NWeight");
+        Integer integerNetMass = XMLUtils.getIntegerAttributeValue(node, "NWeight");
         if (integerNetMass != null) {
             setNetWeight(integerNetMass);
         }
-        Integer integerNumberGroupReplace = getIntegerAttributeValue(node, "NumberGroupReplace");
+        Integer integerNumberGroupReplace = XMLUtils.getIntegerAttributeValue(node, "NumberGroupReplace");
         if (integerNumberGroupReplace != null) {
             setNumberGroupReplace(integerNumberGroupReplace);
         }
-        guidOfP = getStringAttributeValue(node, "GuidOfP", 36);
-        guidOfTM = getStringAttributeValue(node, "GuidOfTM", 36);
-
+        guidOfP = XMLUtils.getStringAttributeValue(node, "GuidOfP", 36);
+        guidOfTM = XMLUtils.getStringAttributeValue(node, "GuidOfTM", 36);
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }

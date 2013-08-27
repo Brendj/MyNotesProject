@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -36,24 +37,19 @@ public class Source extends DistributedObject {
             throw  distributedObjectException;
         }
     }
-    
+
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "SourceName", sourceName);
+        XMLUtils.setAttributeIfNotNull(element, "SourceName", sourceName);
     }
 
     @Override
-    public Source parseAttributes(Node node) throws Exception{
-
-        String sourceName = getStringAttributeValue(node, "SourceName", 127);
-        if (sourceName != null) {
+    public Source parseAttributes(Node node) throws Exception {
+        String sourceName = XMLUtils.getStringAttributeValue(node, "SourceName", 127);
+        if (sourceName != null)
             setSourceName(sourceName);
-        }
-
         setHashCode(hashCode());
-
         setSendAll(SendToAssociatedOrgs.SendToAll);
-
         return this;
     }
 

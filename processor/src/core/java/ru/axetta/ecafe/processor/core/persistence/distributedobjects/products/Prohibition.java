@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Distributed
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -66,30 +67,35 @@ public class Prohibition extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element, "IdOfClient", client.getIdOfClient());
-        if(product != null) setAttribute(element,"GuidOfProduct", product.getGuid());
-        if(productGroup != null) setAttribute(element,"GuidOfProductGroup", productGroup.getGuid());
-        if(good != null) setAttribute(element,"GuidOfGoods", good.getGuid());
-        if(goodGroup != null) setAttribute(element,"GuidOfGoodsGroup", goodGroup.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "IdOfClient", client.getIdOfClient());
+        if (product != null)
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfProduct", product.getGuid());
+        if (productGroup != null)
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfProductGroup", productGroup.getGuid());
+        if (good != null)
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfGoods", good.getGuid());
+        if (goodGroup != null)
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfGoodsGroup", goodGroup.getGuid());
     }
 
     @Override
     protected Prohibition parseAttributes(Node node) throws Exception {
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        idOfClient = getLongAttributeValue(node, "IdOfClient");
-        guidOfProduct = getStringAttributeValue(node,"GuidOfProduct",36);
-        guidOfProductGroup = getStringAttributeValue(node,"GuidOfProductGroup",36);
-        guidOfGoods = getStringAttributeValue(node,"GuidOfGoods",36);
-        guidOfGoodsGroup = getStringAttributeValue(node,"GuidOfGoodsGroup",36);
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        idOfClient = XMLUtils.getLongAttributeValue(node, "IdOfClient");
+        guidOfProduct = XMLUtils.getStringAttributeValue(node, "GuidOfProduct", 36);
+        guidOfProductGroup = XMLUtils.getStringAttributeValue(node, "GuidOfProductGroup", 36);
+        guidOfGoods = XMLUtils.getStringAttributeValue(node, "GuidOfGoods", 36);
+        guidOfGoodsGroup = XMLUtils.getStringAttributeValue(node, "GuidOfGoodsGroup", 36);
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((Prohibition) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
     }
 
     private Client client;

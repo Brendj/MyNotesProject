@@ -6,9 +6,9 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -27,9 +27,9 @@ public class AccompanyingDocument extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "AccompanyingDocumentNumber", accompanyingDocumentNumber);
-        setAttribute(element, "GuidTypeOfAccompanyingDocument", guidTypeOfAccompanyingDocument);
-        setAttribute(element, "GuidSource", guidSource);
+        XMLUtils.setAttributeIfNotNull(element, "AccompanyingDocumentNumber", accompanyingDocumentNumber);
+        XMLUtils.setAttributeIfNotNull(element, "GuidTypeOfAccompanyingDocument", guidTypeOfAccompanyingDocument);
+        XMLUtils.setAttributeIfNotNull(element, "GuidSource", guidSource);
     }
 
     @Override
@@ -53,15 +53,13 @@ public class AccompanyingDocument extends DistributedObject {
     }
 
     @Override
-    public AccompanyingDocument parseAttributes(Node node) throws Exception{
-
-        String stringAccompanyingDocumentNumber = getStringAttributeValue(node,"AccompanyingDocumentNumber",32);
-        if(stringAccompanyingDocumentNumber!=null) {
+    public AccompanyingDocument parseAttributes(Node node) throws Exception {
+        String stringAccompanyingDocumentNumber = XMLUtils.getStringAttributeValue(node, "AccompanyingDocumentNumber", 32);
+        if (stringAccompanyingDocumentNumber != null) {
             setAccompanyingDocumentNumber(stringAccompanyingDocumentNumber);
         }
-
-        guidTypeOfAccompanyingDocument = getStringAttributeValue(node, "GuidTypeOfAccompanyingDocument", 36);
-        guidSource = getStringAttributeValue(node, "GuidSource", 36);
+        guidTypeOfAccompanyingDocument = XMLUtils.getStringAttributeValue(node, "GuidTypeOfAccompanyingDocument", 36);
+        guidSource = XMLUtils.getStringAttributeValue(node, "GuidSource", 36);
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }

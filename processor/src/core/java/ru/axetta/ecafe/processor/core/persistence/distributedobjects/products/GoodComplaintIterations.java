@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Distributed
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -35,23 +36,24 @@ public class GoodComplaintIterations extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element, "GuidOfComplaint", complaint.getGuid());
-        setAttribute(element, "IterationNumber", iterationNumber);
-        setAttribute(element, "Status", goodComplaintIterationStatus.getStatusNumber());
-        setAttribute(element, "ProblemDescription", problemDescription);
-        setAttribute(element, "Conclusion", conclusion);
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfComplaint", complaint.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "IterationNumber", iterationNumber);
+        XMLUtils.setAttributeIfNotNull(element, "Status", goodComplaintIterationStatus.getStatusNumber());
+        XMLUtils.setAttributeIfNotNull(element, "ProblemDescription", problemDescription);
+        XMLUtils.setAttributeIfNotNull(element, "Conclusion", conclusion);
     }
 
     @Override
     protected GoodComplaintIterations parseAttributes(Node node) throws Exception {
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null) setOrgOwner(longOrgOwner);
-        guidOfComplaint = getStringAttributeValue(node, "GuidOfComplaint", 36);
-        iterationNumber = getIntegerAttributeValue(node, "IterationNumber");
-        iterationStatusNumber = getIntegerAttributeValue(node, "Status");
-        problemDescription = getStringAttributeValue(node, "ProblemDescription", 512);
-        conclusion = getStringAttributeValue(node, "Conclusion", 512);
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        guidOfComplaint = XMLUtils.getStringAttributeValue(node, "GuidOfComplaint", 36);
+        iterationNumber = XMLUtils.getIntegerAttributeValue(node, "IterationNumber");
+        iterationStatusNumber = XMLUtils.getIntegerAttributeValue(node, "Status");
+        problemDescription = XMLUtils.getStringAttributeValue(node, "ProblemDescription", 512);
+        conclusion = XMLUtils.getStringAttributeValue(node, "Conclusion", 512);
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }

@@ -6,13 +6,12 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -39,36 +38,42 @@ public class InternalDisposingDocument extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"Type", type);
-        setAttribute(element,"Date", getDateFormat().format(date));
-        setAttribute(element,"State", state.ordinal());
-        setAttribute(element,"Comment", comments);
-        setAttribute(element, "GuidOfStaff", staff.getGuid());
-        if(actOfInventarization!=null) setAttribute(element, "GuidOfInventarizationAct", actOfInventarization.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "Type", type);
+        XMLUtils.setAttributeIfNotNull(element, "Date", CalendarUtils.toStringFullDateTimeWithLocalTimeZone(date));
+        XMLUtils.setAttributeIfNotNull(element, "State", state.ordinal());
+        XMLUtils.setAttributeIfNotNull(element, "Comment", comments);
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfStaff", staff.getGuid());
+        if (actOfInventarization != null)
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfInventarizationAct", actOfInventarization.getGuid());
     }
 
     @Override
     protected InternalDisposingDocument parseAttributes(Node node) throws Exception {
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        Integer integerType = getIntegerAttributeValue(node, "Type");
-        if(integerType != null) setType(integerType);
-        Date dateOfInternalDisposingDocument = getDateTimeAttributeValue(node, "Date");
-        if(dateOfInternalDisposingDocument!=null) setDate(dateOfInternalDisposingDocument);
-        Integer integerState = getIntegerAttributeValue(node, "State");
-        if(integerState != null) setState(DocumentState.values()[integerState]);
-        String stringComments = getStringAttributeValue(node,"Comment",1024);
-        if(stringComments != null) setComments(stringComments);
-        guidOfSt = getStringAttributeValue(node,"GuidOfStaff",36);
-        guidOfAI = getStringAttributeValue(node,"GuidOfInventarizationAct",36);
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        Integer integerType = XMLUtils.getIntegerAttributeValue(node, "Type");
+        if (integerType != null)
+            setType(integerType);
+        Date dateOfInternalDisposingDocument = XMLUtils.getDateTimeAttributeValue(node, "Date");
+        if (dateOfInternalDisposingDocument != null)
+            setDate(dateOfInternalDisposingDocument);
+        Integer integerState = XMLUtils.getIntegerAttributeValue(node, "State");
+        if (integerState != null)
+            setState(DocumentState.values()[integerState]);
+        String stringComments = XMLUtils.getStringAttributeValue(node, "Comment", 1024);
+        if (stringComments != null)
+            setComments(stringComments);
+        guidOfSt = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);
+        guidOfAI = XMLUtils.getStringAttributeValue(node, "GuidOfInventarizationAct", 36);
         setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((InternalDisposingDocument) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setType(((InternalDisposingDocument) distributedObject).getType());
         setDate(((InternalDisposingDocument) distributedObject).getDate());
         setState(((InternalDisposingDocument) distributedObject).getState());

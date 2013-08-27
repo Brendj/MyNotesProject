@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -44,41 +45,51 @@ public class Staff extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"IdOfClient", idOfClient);
-        setAttribute(element,"IdOfRole", idOfRole);
-        setAttribute(element,"ParentId", parentId);
-        setAttribute(element,"Flags", flags);
-        setAttribute(element,"SurName", surName);
-        setAttribute(element,"FirstName", firstName);
-        setAttribute(element,"SecondName", secondName);
-        setAttribute(element,"StaffPosition", staffPosition);
-        setAttribute(element,"PersonalCode", personalCode);
-        setAttribute(element,"Rights", rights);
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "IdOfClient", idOfClient);
+        XMLUtils.setAttributeIfNotNull(element, "IdOfRole", idOfRole);
+        XMLUtils.setAttributeIfNotNull(element, "ParentId", parentId);
+        XMLUtils.setAttributeIfNotNull(element, "Flags", flags);
+        XMLUtils.setAttributeIfNotNull(element, "SurName", surName);
+        XMLUtils.setAttributeIfNotNull(element, "FirstName", firstName);
+        XMLUtils.setAttributeIfNotNull(element, "SecondName", secondName);
+        XMLUtils.setAttributeIfNotNull(element, "StaffPosition", staffPosition);
+        XMLUtils.setAttributeIfNotNull(element, "PersonalCode", personalCode);
+        XMLUtils.setAttributeIfNotNull(element, "Rights", rights);
     }
 
     @Override
     protected Staff parseAttributes(Node node) throws Exception {
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        Long longIdOfClient = getLongAttributeValue(node,"IdOfClient");
-        if(longIdOfClient!=null) setIdOfClient(longIdOfClient);
-        Long longIdOfRole = getLongAttributeValue(node, "IdOfRole");
-        if(longIdOfRole != null) setIdOfRole(longIdOfRole);
-        Long longParentId = getLongAttributeValue(node, "ParentId");
-        if(longParentId != null) setParentId(longParentId);
-        Integer integerFlags = getIntegerAttributeValue(node, "Flags");
-        if(integerFlags != null) setFlags(integerFlags);
-        String stringSurName = getStringAttributeValue(node, "SurName",30);
-        if(stringSurName != null) setSurName(stringSurName);
-        String stringFirstName =getStringAttributeValue(node, "FirstName",30);
-        if(stringFirstName != null) setFirstName(stringFirstName);
-        String stringSecondName = getStringAttributeValue(node, "SecondName", 30);
-        if(stringSecondName != null) setSecondName(stringSecondName);
-        String stringPersonalCode = getStringAttributeValue(node, "PersonalCode", 128);
-        if(stringPersonalCode != null) setPersonalCode(stringPersonalCode);
-        String stringRights = getStringAttributeValue(node, "Rights", 256);
-        if(stringRights != null) setRights(stringRights);
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        Long longIdOfClient = XMLUtils.getLongAttributeValue(node, "IdOfClient");
+        if (longIdOfClient != null)
+            setIdOfClient(longIdOfClient);
+        Long longIdOfRole = XMLUtils.getLongAttributeValue(node, "IdOfRole");
+        if (longIdOfRole != null)
+            setIdOfRole(longIdOfRole);
+        Long longParentId = XMLUtils.getLongAttributeValue(node, "ParentId");
+        if (longParentId != null)
+            setParentId(longParentId);
+        Integer integerFlags = XMLUtils.getIntegerAttributeValue(node, "Flags");
+        if (integerFlags != null)
+            setFlags(integerFlags);
+        String stringSurName = XMLUtils.getStringAttributeValue(node, "SurName", 30);
+        if (stringSurName != null)
+            setSurName(stringSurName);
+        String stringFirstName = XMLUtils.getStringAttributeValue(node, "FirstName", 30);
+        if (stringFirstName != null)
+            setFirstName(stringFirstName);
+        String stringSecondName = XMLUtils.getStringAttributeValue(node, "SecondName", 30);
+        if (stringSecondName != null)
+            setSecondName(stringSecondName);
+        String stringPersonalCode = XMLUtils.getStringAttributeValue(node, "PersonalCode", 128);
+        if (stringPersonalCode != null)
+            setPersonalCode(stringPersonalCode);
+        String stringRights = XMLUtils.getStringAttributeValue(node, "Rights", 256);
+        if (stringRights != null)
+            setRights(stringRights);
         setHashCode(hashCode());
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
@@ -86,7 +97,7 @@ public class Staff extends DistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((Staff) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setIdOfClient(((Staff) distributedObject).getIdOfClient());
         setIdOfRole(((Staff) distributedObject).getIdOfRole());
         setParentId(((Staff) distributedObject).getParentId());
@@ -281,9 +292,6 @@ public class Staff extends DistributedObject {
         }
         return sb.toString().toLowerCase();
     }
-
-
-
 
     @Override
     public int hashCode() {

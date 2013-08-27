@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.utils;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -26,12 +25,12 @@ public class CalendarUtils {
     private static SimpleDateFormat dateShortFormat = new SimpleDateFormat("dd.MM.yy");
     private static SimpleDateFormat dayInWeekFormat = new SimpleDateFormat("EE", new Locale("ru"));
 
-    public static Date parseFullDateTimeWithLocalTimeZone(String stringDateTime) throws ParseException {
+    public static Date parseFullDateTimeWithLocalTimeZone(String s) throws ParseException {
         dateTimeFormat.setTimeZone(localTimeZone);
-        return dateTimeFormat.parse(stringDateTime);
+        return (s == null || s.isEmpty()) ? null : dateTimeFormat.parse(s);
     }
 
-    public static String toStringFullDateTimeWithLocalTimeZone(Date dateTime) throws ParseException {
+    public static String toStringFullDateTimeWithLocalTimeZone(Date dateTime) {
         dateTimeFormat.setTimeZone(localTimeZone);
         return dateTimeFormat.format(dateTime);
     }
@@ -69,8 +68,13 @@ public class CalendarUtils {
         truncateToDayOfMonth(c);
         return c.getTime();
     }
-    public static Date parseDate(String validTime) throws ParseException {
-        return dateFormat.parse(validTime);
+
+    public static Date parseDate(String s) throws ParseException {
+        dateFormat.setTimeZone(utcTimeZone);
+        if (s == null || s.isEmpty())
+            return null;
+        else
+            return dateFormat.parse(s);
     }
 
     public static String dateToString(Date date) {

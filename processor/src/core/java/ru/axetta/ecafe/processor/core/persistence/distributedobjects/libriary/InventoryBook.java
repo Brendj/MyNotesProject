@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -27,13 +28,10 @@ public class InventoryBook extends DistributedObject {
     }
 
     @Override
-    public InventoryBook parseAttributes(Node node) throws Exception{
-
-        String bookName = getStringAttributeValue(node, "BookName", 256);
-        if (bookName != null) {
+    public InventoryBook parseAttributes(Node node) throws Exception {
+        String bookName = XMLUtils.getStringAttributeValue(node, "BookName", 256);
+        if (bookName != null)
             setBookName(bookName);
-        }
-
         setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }

@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -25,8 +26,6 @@ import java.util.Set;
  */
 public class TypeOfAccompanyingDocument extends DistributedObject {
 
-
-
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
         Criteria criteria = session.createCriteria(TypeOfAccompanyingDocument.class);
@@ -41,30 +40,24 @@ public class TypeOfAccompanyingDocument extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "TypeOfAccompanyingDocumentName", typeOfAccompanyingDocumentName);
+        XMLUtils.setAttributeIfNotNull(element, "TypeOfAccompanyingDocumentName", typeOfAccompanyingDocumentName);
     }
 
     @Override
-    public TypeOfAccompanyingDocument parseAttributes(Node node) throws Exception{
-
-        String typeOfAccompanyingDocumentName = getStringAttributeValue(node, "TypeOfAccompanyingDocumentName", 36);
+    public TypeOfAccompanyingDocument parseAttributes(Node node) throws Exception {
+        String typeOfAccompanyingDocumentName = XMLUtils.getStringAttributeValue(node, "TypeOfAccompanyingDocumentName", 36);
         if (typeOfAccompanyingDocumentName != null) {
             setTypeOfAccompanyingDocumentName(typeOfAccompanyingDocumentName);
         }
-
         setHashCode(hashCode());
-
         setSendAll(SendToAssociatedOrgs.SendToAll);
-
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-
         setTypeOfAccompanyingDocumentName(
                 ((TypeOfAccompanyingDocument) distributedObject).getTypeOfAccompanyingDocumentName());
-
         setHashCode(((TypeOfAccompanyingDocument) distributedObject).getHashCode());
     }
 
@@ -127,7 +120,6 @@ public class TypeOfAccompanyingDocument extends DistributedObject {
         }
         return sb.toString().toLowerCase();
     }
-
 
     @Override
     public int hashCode() {

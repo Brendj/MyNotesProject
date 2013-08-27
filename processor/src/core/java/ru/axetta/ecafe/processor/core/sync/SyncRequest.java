@@ -2387,16 +2387,9 @@ public class SyncRequest {
 
             /*  Модуль распределенной синхронизации объектов */
             Node roNode = findFirstChildElement(envelopeNode, "RO");
-            if(roNode != null){
-                manager = new Manager(dateOnlyFormat, timeFormat);
-                manager.setIdOfOrg(org.getIdOfOrg());
-                Node itemNode = roNode.getFirstChild();
-                while (null != itemNode) {
-                    if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
-                        manager.build(itemNode);
-                    }
-                    itemNode = itemNode.getNextSibling();
-                }
+            if (roNode != null){
+                manager = new Manager(org.getIdOfOrg());
+                manager.buildRO(roNode);
             }
 
 

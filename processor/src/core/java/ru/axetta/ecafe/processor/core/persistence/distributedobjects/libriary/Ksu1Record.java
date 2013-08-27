@@ -6,9 +6,9 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -41,14 +41,10 @@ public class Ksu1Record extends DistributedObject {
 
     @Override
     public Ksu1Record parseAttributes(Node node) throws Exception {
-
-        //Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        //if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-
-        guidFund = getStringAttributeValue(node, "GuidFund", 36);
-        guidAccompanyingDocument = getStringAttributeValue(node, "GuidAccompanyingDocument", 36);
-        incomeDate = getDateOnlyAttributeValue(node, "IncomeDate");
-        recordNumber = getIntegerAttributeValue(node, "RecordNumber");
+        guidFund = XMLUtils.getStringAttributeValue(node, "GuidFund", 36);
+        guidAccompanyingDocument = XMLUtils.getStringAttributeValue(node, "GuidAccompanyingDocument", 36);
+        incomeDate = XMLUtils.getDateAttributeValue(node, "IncomeDate");
+        recordNumber = XMLUtils.getIntegerAttributeValue(node, "RecordNumber");
         setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }

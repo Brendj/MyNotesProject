@@ -9,9 +9,9 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Distributed
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequestPosition;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -94,50 +94,55 @@ public class Product extends DistributedObject implements IConfigProvider {
      */
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"FullName", fullName);
-        setAttribute(element,"ProductName", productName);
-        setAttribute(element,"Code", code);
-        setAttribute(element,"OkpCode", okpCode);
-        setAttribute(element,"OrgOwner", orgOwner);
-        setAttribute(element,"Density", density);
-        setAttribute(element,"ClassificationCode", classificationCode);
-        setAttribute(element,"GuidOfPG", productGroup.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "FullName", fullName);
+        XMLUtils.setAttributeIfNotNull(element, "ProductName", productName);
+        XMLUtils.setAttributeIfNotNull(element, "Code", code);
+        XMLUtils.setAttributeIfNotNull(element, "OkpCode", okpCode);
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "Density", density);
+        XMLUtils.setAttributeIfNotNull(element, "ClassificationCode", classificationCode);
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfPG", productGroup.getGuid());
         //setAttribute(element,"GuidOfPG", productGuid);
     }
 
     @Override
-    protected Product parseAttributes(Node node) throws Exception{
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        String stringCode = getStringAttributeValue(node,"Code",16);
-        if(stringCode!=null) {
+    protected Product parseAttributes(Node node) throws Exception {
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        String stringCode = XMLUtils.getStringAttributeValue(node, "Code", 16);
+        if (stringCode != null) {
             setCode(stringCode);
         } else {
             throw new DistributedObjectException("Code column is not null");
         }
-        String stringFullName= getStringAttributeValue(node,"FullName",1024);
-        if(stringFullName!=null) setFullName(stringFullName);
-        String stringOkpCode= getStringAttributeValue(node,"OkpCode",128);
-        if(stringOkpCode!=null) setOkpCode(stringOkpCode);
-        String stringProductName= getStringAttributeValue(node,"ProductName",512);
-        if(stringProductName!=null) {
+        String stringFullName = XMLUtils.getStringAttributeValue(node, "FullName", 1024);
+        if (stringFullName != null)
+            setFullName(stringFullName);
+        String stringOkpCode = XMLUtils.getStringAttributeValue(node, "OkpCode", 128);
+        if (stringOkpCode != null)
+            setOkpCode(stringOkpCode);
+        String stringProductName = XMLUtils.getStringAttributeValue(node, "ProductName", 512);
+        if (stringProductName != null) {
             setProductName(stringProductName);
         } else {
             throw new DistributedObjectException("ProductName column is not null");
         }
-        String stringClassificationCode = getStringAttributeValue(node,"ClassificationCode",32);
-        if(stringClassificationCode!=null) setClassificationCode(stringClassificationCode);
-        Float floatDensity = getFloatAttributeValue(node,"Density");
-        if(floatDensity!=null) setDensity(floatDensity);
-        guidOfPG = getStringAttributeValue(node,"GuidOfPG",36);
+        String stringClassificationCode = XMLUtils.getStringAttributeValue(node, "ClassificationCode", 32);
+        if (stringClassificationCode != null)
+            setClassificationCode(stringClassificationCode);
+        Float floatDensity = XMLUtils.getFloatAttributeValue(node, "Density");
+        if (floatDensity != null)
+            setDensity(floatDensity);
+        guidOfPG = XMLUtils.getStringAttributeValue(node, "GuidOfPG", 36);
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((Product) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setCode( ((Product) distributedObject).getCode());
         setFullName (((Product) distributedObject).getFullName());
         setProductName( ((Product) distributedObject).getProductName());

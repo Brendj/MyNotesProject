@@ -8,6 +8,8 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Distributed
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -36,41 +38,47 @@ public class WayBill extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"Number", number);
-        setAttribute(element,"Date", getDateFormat().format(dateOfWayBill));
-        setAttribute(element,"State", state.ordinal());
-        setAttribute(element, "Shipper", shipper);
-        setAttribute(element,"Receiver", receiver);
-        setAttribute(element, "GuidOfStaff", staff.getGuid());
-        if(actOfWayBillDifference !=null){
-            setAttribute(element, "GuidOfActOfDifference", actOfWayBillDifference.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "Number", number);
+        XMLUtils.setAttributeIfNotNull(element, "Date", CalendarUtils.toStringFullDateTimeWithLocalTimeZone(dateOfWayBill));
+        XMLUtils.setAttributeIfNotNull(element, "State", state.ordinal());
+        XMLUtils.setAttributeIfNotNull(element, "Shipper", shipper);
+        XMLUtils.setAttributeIfNotNull(element, "Receiver", receiver);
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfStaff", staff.getGuid());
+        if (actOfWayBillDifference != null) {
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfActOfDifference", actOfWayBillDifference.getGuid());
         }
     }
 
     @Override
     protected WayBill parseAttributes(Node node) throws Exception {
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        String stringNumber = getStringAttributeValue(node, "Number", 128);
-        if(stringNumber != null) setNumber(stringNumber);
-        Date dateWayBill = getDateTimeAttributeValue(node, "Date");
-        if(dateWayBill!=null) setDateOfWayBill(dateWayBill);
-        Integer integerState = getIntegerAttributeValue(node, "State");
-        if(integerState != null) setState(DocumentState.values()[integerState]);
-        String stringShipper = getStringAttributeValue(node, "Shipper", 128);
-        if(stringShipper != null) setShipper(stringShipper);
-        String stringReceiver = getStringAttributeValue(node, "Receiver", 128);
-        if(stringReceiver != null) setReceiver(stringReceiver);
-        guidOfSt = getStringAttributeValue(node,"GuidOfStaff",36);
-        guidOfAWD = getStringAttributeValue(node,"GuidOfActOfDifference",36);
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        String stringNumber = XMLUtils.getStringAttributeValue(node, "Number", 128);
+        if (stringNumber != null)
+            setNumber(stringNumber);
+        Date dateWayBill = XMLUtils.getDateTimeAttributeValue(node, "Date");
+        if (dateWayBill != null)
+            setDateOfWayBill(dateWayBill);
+        Integer integerState = XMLUtils.getIntegerAttributeValue(node, "State");
+        if (integerState != null)
+            setState(DocumentState.values()[integerState]);
+        String stringShipper = XMLUtils.getStringAttributeValue(node, "Shipper", 128);
+        if (stringShipper != null)
+            setShipper(stringShipper);
+        String stringReceiver = XMLUtils.getStringAttributeValue(node, "Receiver", 128);
+        if (stringReceiver != null)
+            setReceiver(stringReceiver);
+        guidOfSt = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);
+        guidOfAWD = XMLUtils.getStringAttributeValue(node, "GuidOfActOfDifference", 36);
         setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((WayBill) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setNumber(((WayBill) distributedObject).getNumber());
         setDateOfWayBill(((WayBill) distributedObject).getDateOfWayBill());
         setState(((WayBill) distributedObject).getState());

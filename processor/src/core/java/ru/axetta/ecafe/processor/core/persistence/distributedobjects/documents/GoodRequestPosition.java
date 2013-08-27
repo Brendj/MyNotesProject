@@ -7,11 +7,11 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -42,34 +42,41 @@ public class GoodRequestPosition extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"UnitsScale", unitsScale.ordinal());
-        setAttribute(element,"TotalCount", totalCount);
-        setAttribute(element,"NetWeight", netWeight);
-        setAttribute(element,"GuidOfGoodsRequest", goodRequest.getGuid());
-        if(good!=null) setAttribute(element,"GuidOfGoods", good.getGuid());
-        if(product!=null) setAttribute(element,"GuidOfBaseProduct", product.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "UnitsScale", unitsScale.ordinal());
+        XMLUtils.setAttributeIfNotNull(element, "TotalCount", totalCount);
+        XMLUtils.setAttributeIfNotNull(element, "NetWeight", netWeight);
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfGoodsRequest", goodRequest.getGuid());
+        if (good != null)
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfGoods", good.getGuid());
+        if (product != null)
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfBaseProduct", product.getGuid());
     }
 
     @Override
     protected GoodRequestPosition parseAttributes(Node node) throws Exception {
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        Integer integerUnitsScale = getIntegerAttributeValue(node, "UnitsScale");
-        if(integerUnitsScale!=null) setUnitsScale(UnitScale.fromInteger(integerUnitsScale));
-        Long longTotalCount = getLongAttributeValue(node, "TotalCount");
-        if(longTotalCount != null) setTotalCount(longTotalCount);
-        Long longNetWeight = getLongAttributeValue(node, "NetWeight");
-        if( longNetWeight != null) setNetWeight(longNetWeight);
-        guidOfGR = getStringAttributeValue(node,"GuidOfGoodsRequest",36);
-        guidOfG = getStringAttributeValue(node,"GuidOfGoods",36);
-        guidOfP = getStringAttributeValue(node,"GuidOfBaseProduct",36);
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        Integer integerUnitsScale = XMLUtils.getIntegerAttributeValue(node, "UnitsScale");
+        if (integerUnitsScale != null)
+            setUnitsScale(UnitScale.fromInteger(integerUnitsScale));
+        Long longTotalCount = XMLUtils.getLongAttributeValue(node, "TotalCount");
+        if (longTotalCount != null)
+            setTotalCount(longTotalCount);
+        Long longNetWeight = XMLUtils.getLongAttributeValue(node, "NetWeight");
+        if (longNetWeight != null)
+            setNetWeight(longNetWeight);
+        guidOfGR = XMLUtils.getStringAttributeValue(node, "GuidOfGoodsRequest", 36);
+        guidOfG = XMLUtils.getStringAttributeValue(node, "GuidOfGoods", 36);
+        guidOfP = XMLUtils.getStringAttributeValue(node, "GuidOfBaseProduct", 36);
         setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
     }
+
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((GoodRequestPosition) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setUnitsScale(((GoodRequestPosition) distributedObject).getUnitsScale());
         setNetWeight(((GoodRequestPosition) distributedObject).getNetWeight());
         setTotalCount(((GoodRequestPosition) distributedObject).getTotalCount());
@@ -154,11 +161,7 @@ public class GoodRequestPosition extends DistributedObject {
     }
 
     public Boolean getFloatScale(){
-        if(unitsScale.equals(UnitScale.UNITS) || unitsScale.equals(UnitScale.PORTIONS)){
-            return true;
-        } else {
-            return false;
-        }
+        return unitsScale.equals(UnitScale.UNITS) || unitsScale.equals(UnitScale.PORTIONS);
     }
 
     public void setUnitsScale(UnitScale unitsScale) {

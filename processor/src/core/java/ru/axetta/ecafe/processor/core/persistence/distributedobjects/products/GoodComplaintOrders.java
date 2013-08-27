@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Distributed
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -50,19 +51,20 @@ public class GoodComplaintOrders extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element, "GuidOfComplaintIteration", complaintIteration.getGuid());
-        setAttribute(element, "IdOfOrg", orderOrg.getIdOfOrg());
-        setAttribute(element, "IdOfOrderDetail", orderDetail.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfComplaintIteration", complaintIteration.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "IdOfOrg", orderOrg.getIdOfOrg());
+        XMLUtils.setAttributeIfNotNull(element, "IdOfOrderDetail", orderDetail.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
     }
 
     @Override
     protected GoodComplaintOrders parseAttributes(Node node) throws Exception {
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null) setOrgOwner(longOrgOwner);
-        guidOfComplaintIteration = getStringAttributeValue(node, "GuidOfComplaintIteration", 36);
-        idOfOrderDetail = getLongAttributeValue(node, "IdOfOrg");
-        idOfOrderDetail = getLongAttributeValue(node, "IdOfOrderDetail");
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        guidOfComplaintIteration = XMLUtils.getStringAttributeValue(node, "GuidOfComplaintIteration", 36);
+        idOfOrderDetail = XMLUtils.getLongAttributeValue(node, "IdOfOrg");
+        idOfOrderDetail = XMLUtils.getLongAttributeValue(node, "IdOfOrderDetail");
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }

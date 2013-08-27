@@ -7,9 +7,9 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -29,21 +29,18 @@ public class LibVisit extends DistributedObject {
     private Client client;
     private Date date;
     private int source;
-
     private Long idOfClient;
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "Guid", guid);
+        XMLUtils.setAttributeIfNotNull(element, "Guid", guid);
     }
 
     @Override
     public LibVisit parseAttributes(Node node) throws Exception {
-
-        idOfClient = getLongAttributeValue(node, "idOfClient");
-
-        date = getDateTimeAttributeValue(node, "date");
-        source = getIntegerAttributeValue(node, "source");
+        idOfClient = XMLUtils.getLongAttributeValue(node, "idOfClient");
+        date = XMLUtils.getDateTimeAttributeValue(node, "date");
+        source = XMLUtils.getIntegerAttributeValue(node, "source");
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }

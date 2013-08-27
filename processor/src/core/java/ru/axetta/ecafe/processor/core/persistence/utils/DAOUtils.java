@@ -1175,6 +1175,7 @@ public class DAOUtils {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static List<Long> getListIdOfOrgList(Session session, Long idOfOrg){
         //List<Long> resultList = new ArrayList<Long>();
         //Query query = session.createQuery("select idOfDestOrg from MenuExchangeRule where idOfSourceOrg=:idOfOrg");
@@ -1194,13 +1195,13 @@ public class DAOUtils {
         //    }
         //}
         List<Long> resultList = new ArrayList<Long>();
-        Query query = session.createQuery("select idOfDestOrg from MenuExchangeRule where idOfSourceOrg=:idOfOrg");
-        query.setParameter("idOfOrg",idOfOrg);
-        List<Long> list = (List<Long>)query.list();
+        Query query = session.createQuery("select idOfDestOrg from MenuExchangeRule where idOfSourceOrg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        List<Long> list = (List<Long>) query.list();
         resultList.addAll(list);
-        query = session.createQuery("select idOfSourceOrg from MenuExchangeRule where idOfDestOrg=:idOfOrg");
-        query.setParameter("idOfOrg",idOfOrg);
-        list = (List<Long>)query.list();
+        query = session.createQuery("select idOfSourceOrg from MenuExchangeRule where idOfDestOrg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        list = (List<Long>) query.list();
         resultList.addAll(list);
         return resultList;
     }

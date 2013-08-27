@@ -6,9 +6,10 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -36,28 +37,31 @@ public class ActOfWayBillDifference extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"Date", getDateFormat().format(date));
-        setAttribute(element, "Number", number);
-        setAttribute(element, "GuidOfStaff", staff.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "Date", CalendarUtils.toStringFullDateTimeWithLocalTimeZone(date));
+        XMLUtils.setAttributeIfNotNull(element, "Number", number);
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfStaff", staff.getGuid());
     }
 
     @Override
-    protected ActOfWayBillDifference parseAttributes(Node node) throws Exception{
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        Date dateOfActOfDifference = getDateTimeAttributeValue(node, "Date");
-        if(dateOfActOfDifference != null) setDate(dateOfActOfDifference);
-        String stringNumber = getStringAttributeValue(node, "Number",128);
-        if(stringNumber != null) setNumber(stringNumber);
-        guidOfStaff = getStringAttributeValue(node,"GuidOfStaff",36);
+    protected ActOfWayBillDifference parseAttributes(Node node) throws Exception {
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        Date dateOfActOfDifference = XMLUtils.getDateTimeAttributeValue(node, "Date");
+        if (dateOfActOfDifference != null)
+            setDate(dateOfActOfDifference);
+        String stringNumber = XMLUtils.getStringAttributeValue(node, "Number", 128);
+        if (stringNumber != null)
+            setNumber(stringNumber);
+        guidOfStaff = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((ActOfWayBillDifference) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setDate(((ActOfWayBillDifference) distributedObject).getDate());
         setNumber(((ActOfWayBillDifference) distributedObject).getNumber());
     }

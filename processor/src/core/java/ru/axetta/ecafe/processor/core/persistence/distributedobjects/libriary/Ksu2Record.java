@@ -6,9 +6,9 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -26,17 +26,15 @@ import java.util.Set;
  */
 public class Ksu2Record extends DistributedObject {
 
-
-
     @Override
     protected void appendAttributes(Element element) {}
 
     @Override
     public Ksu2Record parseAttributes(Node node) throws Exception {
-        guidFund = getStringAttributeValue(node, "GuidFund", 36);
-        guidRetirementReason = getStringAttributeValue(node, "GuidRetirementReason", 36);
-        retirementDate = getDateOnlyAttributeValue(node, "RetirementDate");
-        recordNumber = getIntegerAttributeValue(node, "RecordNumber");
+        guidFund = XMLUtils.getStringAttributeValue(node, "GuidFund", 36);
+        guidRetirementReason = XMLUtils.getStringAttributeValue(node, "GuidRetirementReason", 36);
+        retirementDate = XMLUtils.getDateAttributeValue(node, "RetirementDate");
+        recordNumber = XMLUtils.getIntegerAttributeValue(node, "RecordNumber");
         setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
@@ -62,7 +60,7 @@ public class Ksu2Record extends DistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((Ksu2Record) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setRecordNumber(((Ksu2Record) distributedObject).getRecordNumber());
         setFund(((Ksu2Record) distributedObject).getFund());
         setRetirementReason(((Ksu2Record) distributedObject).getRetirementReason());

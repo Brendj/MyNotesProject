@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.StateChange;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -40,23 +40,25 @@ public class TechnologicalMapGroup extends DistributedObject implements IConfigP
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"Name", nameOfGroup);
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "Name", nameOfGroup);
     }
 
     @Override
-    protected TechnologicalMapGroup parseAttributes(Node node) throws Exception{
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        String stringNameOfGroup = getStringAttributeValue(node,"Name",128);
-        if(stringNameOfGroup!=null) setNameOfGroup(stringNameOfGroup);
+    protected TechnologicalMapGroup parseAttributes(Node node) throws Exception {
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        String stringNameOfGroup = XMLUtils.getStringAttributeValue(node, "Name", 128);
+        if (stringNameOfGroup != null)
+            setNameOfGroup(stringNameOfGroup);
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((TechnologicalMapGroup) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setNameOfGroup(((TechnologicalMapGroup) distributedObject).getNameOfGroup());
     }
 

@@ -7,9 +7,9 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -35,16 +35,13 @@ public class Circulation extends DistributedObject {
 
     @Override
     protected Circulation parseAttributes(Node node) throws Exception {
-
-        guidClient = getStringAttributeValue(node, "GuidClient", 36);
-
-        guidParentCirculation = getStringAttributeValue(node, "GuidParentCirculation", 36);
-        guidIssuable = getStringAttributeValue(node, "GuidIssuable", 36);
-
-        issuanceDate = getDateTimeAttributeValue(node, "IssuanceDate");
-        refundDate = getDateOnlyAttributeValue(node, "RefundDate");
-        realRefundDate = getDateTimeAttributeValue(node, "RealRefundDate");
-        status = getIntegerAttributeValue(node, "Status");
+        guidClient = XMLUtils.getStringAttributeValue(node, "GuidClient", 36);
+        guidParentCirculation = XMLUtils.getStringAttributeValue(node, "GuidParentCirculation", 36);
+        guidIssuable = XMLUtils.getStringAttributeValue(node, "GuidIssuable", 36);
+        issuanceDate = XMLUtils.getDateTimeAttributeValue(node, "IssuanceDate");
+        refundDate = XMLUtils.getDateAttributeValue(node, "RefundDate");
+        realRefundDate = XMLUtils.getDateTimeAttributeValue(node, "RealRefundDate");
+        status = XMLUtils.getIntegerAttributeValue(node, "Status");
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }

@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Distributed
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -49,26 +50,31 @@ public class GoodBasicBasketPrice extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"Price", price);
-        if(good != null) setAttribute(element,"GuidOfGood", good.getGuid());
-        if(goodsBasicBasket != null) setAttribute(element,"GuidOfBasicGood", goodsBasicBasket.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "Price", price);
+        if (good != null)
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfGood", good.getGuid());
+        if (goodsBasicBasket != null)
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfBasicGood", goodsBasicBasket.getGuid());
     }
+
     @Override
     protected GoodBasicBasketPrice parseAttributes(Node node) throws Exception {
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        Long longPrice = getLongAttributeValue(node, "Price");
-        if(longPrice != null) setPrice(longPrice);
-        guidOfGood = getStringAttributeValue(node,"GuidOfGood",36);
-        guidOfGoodsBasicBasket = getStringAttributeValue(node,"GuidOfBasicGood",36);
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        Long longPrice = XMLUtils.getLongAttributeValue(node, "Price");
+        if (longPrice != null)
+            setPrice(longPrice);
+        guidOfGood = XMLUtils.getStringAttributeValue(node, "GuidOfGood", 36);
+        guidOfGoodsBasicBasket = XMLUtils.getStringAttributeValue(node, "GuidOfBasicGood", 36);
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((GoodBasicBasketPrice) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setPrice(((GoodBasicBasketPrice) distributedObject).getPrice());
         setGoodsBasicBasket(((GoodBasicBasketPrice) distributedObject).getGoodsBasicBasket());
         setGood(((GoodBasicBasketPrice) distributedObject).getGood());

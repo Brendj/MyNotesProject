@@ -12,9 +12,9 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
-import org.hibernate.type.EnumType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -48,53 +48,64 @@ public class Good extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"Name", nameOfGood);
-        setAttribute(element, "FullName", fullName);
-        setAttribute(element,"GoodsCode", goodsCode);
-        setAttribute(element,"UnitsScale", unitsScale.ordinal());
-        setAttribute(element,"NetWeight", netWeight);
-        setAttribute(element,"LifeTime", lifeTime);
-        setAttribute(element,"Margin", margin);
-        setAttribute(element,"GuidOfGroup", goodGroup.getGuid());
-        if(product != null) setAttribute(element,"GuidOfBaseProduct", product.getGuid());
-        if(technologicalMap != null) setAttribute(element,"GuidOfTechMap", technologicalMap.getGuid());
-        if(basicGood != null) setAttribute(element, "GuidOfBasicGood", basicGood.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "Name", nameOfGood);
+        XMLUtils.setAttributeIfNotNull(element, "FullName", fullName);
+        XMLUtils.setAttributeIfNotNull(element, "GoodsCode", goodsCode);
+        XMLUtils.setAttributeIfNotNull(element, "UnitsScale", unitsScale.ordinal());
+        XMLUtils.setAttributeIfNotNull(element, "NetWeight", netWeight);
+        XMLUtils.setAttributeIfNotNull(element, "LifeTime", lifeTime);
+        XMLUtils.setAttributeIfNotNull(element, "Margin", margin);
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfGroup", goodGroup.getGuid());
+        if (product != null)
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfBaseProduct", product.getGuid());
+        if (technologicalMap != null)
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfTechMap", technologicalMap.getGuid());
+        if (basicGood != null)
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfBasicGood", basicGood.getGuid());
     }
+
     @Override
     protected Good parseAttributes(Node node) throws Exception {
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        String stringNameOfGood = getStringAttributeValue(node,"Name",512);
-        if(stringNameOfGood!=null) setNameOfGood(stringNameOfGood);
-        String stringFullName = getStringAttributeValue(node,"FullName",1024);
-        if(stringFullName!=null) {
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        String stringNameOfGood = XMLUtils.getStringAttributeValue(node, "Name", 512);
+        if (stringNameOfGood != null)
+            setNameOfGood(stringNameOfGood);
+        String stringFullName = XMLUtils.getStringAttributeValue(node, "FullName", 1024);
+        if (stringFullName != null) {
             String[] tmp = stringFullName.split("/");
-            if(tmp.length>0){
+            if (tmp.length > 0) {
                 StringBuilder sb = new StringBuilder();
-                for (String s: tmp){
-                     sb.append(s.trim()).append("/");
+                for (String s : tmp) {
+                    sb.append(s.trim()).append("/");
                 }
                 String s = sb.toString();
-                setFullName(s.substring(0,s.length()-1));
+                setFullName(s.substring(0, s.length() - 1));
             } else {
                 setFullName(stringFullName);
             }
         }
-        String stringGoodsCode = getStringAttributeValue(node,"GoodsCode",32);
-        if(stringGoodsCode!=null) setGoodsCode(stringGoodsCode);
-        Integer integerUnitsScale = getIntegerAttributeValue(node,"UnitsScale");
-        if(integerUnitsScale!=null) setUnitsScale(UnitScale.fromInteger(integerUnitsScale));
-        Long longNetWeight = getLongAttributeValue(node, "NetWeight");
-        if( longNetWeight != null) setNetWeight(longNetWeight);
-        Long longLifeTime = getLongAttributeValue(node, "LifeTime");
-        if(longLifeTime != null) setLifeTime(longLifeTime);
-        Long longMargin = getLongAttributeValue(node, "Margin");
-        if(longMargin != null) setMargin(longMargin);
-        guidOfGG = getStringAttributeValue(node,"GuidOfGroup",36);
-        guidOfP = getStringAttributeValue(node,"GuidOfBaseProduct",36);
-        guidOfTM = getStringAttributeValue(node,"GuidOfTechMap",36);
-        guidOfBasicGood = getStringAttributeValue(node, "GuidOfBasicGood", 36);
+        String stringGoodsCode = XMLUtils.getStringAttributeValue(node, "GoodsCode", 32);
+        if (stringGoodsCode != null)
+            setGoodsCode(stringGoodsCode);
+        Integer integerUnitsScale = XMLUtils.getIntegerAttributeValue(node, "UnitsScale");
+        if (integerUnitsScale != null)
+            setUnitsScale(UnitScale.fromInteger(integerUnitsScale));
+        Long longNetWeight = XMLUtils.getLongAttributeValue(node, "NetWeight");
+        if (longNetWeight != null)
+            setNetWeight(longNetWeight);
+        Long longLifeTime = XMLUtils.getLongAttributeValue(node, "LifeTime");
+        if (longLifeTime != null)
+            setLifeTime(longLifeTime);
+        Long longMargin = XMLUtils.getLongAttributeValue(node, "Margin");
+        if (longMargin != null)
+            setMargin(longMargin);
+        guidOfGG = XMLUtils.getStringAttributeValue(node, "GuidOfGroup", 36);
+        guidOfP = XMLUtils.getStringAttributeValue(node, "GuidOfBaseProduct", 36);
+        guidOfTM = XMLUtils.getStringAttributeValue(node, "GuidOfTechMap", 36);
+        guidOfBasicGood = XMLUtils.getStringAttributeValue(node, "GuidOfBasicGood", 36);
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }

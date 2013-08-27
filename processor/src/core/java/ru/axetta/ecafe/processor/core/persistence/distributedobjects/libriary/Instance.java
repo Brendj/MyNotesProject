@@ -6,9 +6,9 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -30,19 +30,17 @@ public class Instance extends DistributedObject {
 
     @Override
     public Instance parseAttributes(Node node) throws Exception {
-
-        //Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        //if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-
-        guidFund = getStringAttributeValue(node, "GuidFund", 36);
-        guidPublication = getStringAttributeValue(node, "GuidPublication", 36);
-        guidInventaryBook = getStringAttributeValue(node, "GuidInventaryBook", 36);
-        guidKsu1Record = getStringAttributeValue(node, "GuidKsu1Record", 36);
-        guidKsu2Record = getStringAttributeValue(node, "GuidKsu2Record", 36);
-
-        inGroup = getBollAttributeValue(node, "InGroup");
-        invNumber = getStringAttributeValue(node, "InvNumber", 10);
-        cost = getIntegerAttributeValue(node, "Cost");
+        //Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        //if (longOrgOwner != null)
+        //    setOrgOwner(longOrgOwner);
+        guidFund = XMLUtils.getStringAttributeValue(node, "GuidFund", 36);
+        guidPublication = XMLUtils.getStringAttributeValue(node, "GuidPublication", 36);
+        guidInventaryBook = XMLUtils.getStringAttributeValue(node, "GuidInventaryBook", 36);
+        guidKsu1Record = XMLUtils.getStringAttributeValue(node, "GuidKsu1Record", 36);
+        guidKsu2Record = XMLUtils.getStringAttributeValue(node, "GuidKsu2Record", 36);
+        inGroup = XMLUtils.getBooleanAttributeValue(node, "InGroup");
+        invNumber = XMLUtils.getStringAttributeValue(node, "InvNumber", 10);
+        cost = XMLUtils.getIntegerAttributeValue(node, "Cost");
         setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
     }
@@ -81,7 +79,7 @@ public class Instance extends DistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((Instance) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setFund(((Instance) distributedObject).getFund());
         setPublication(((Instance) distributedObject).getPublication());
         setInventoryBook(((Instance) distributedObject).getInventoryBook());

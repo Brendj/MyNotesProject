@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -39,21 +40,16 @@ public class RetirementReason extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "RetirementReasonName", retirementReasonName);
+        XMLUtils.setAttributeIfNotNull(element, "RetirementReasonName", retirementReasonName);
     }
 
     @Override
-    public RetirementReason parseAttributes(Node node) throws Exception{
-
-        String retirementReasonName = getStringAttributeValue(node, "RetirementReasonName", 45);
-        if (retirementReasonName != null) {
+    public RetirementReason parseAttributes(Node node) throws Exception {
+        String retirementReasonName = XMLUtils.getStringAttributeValue(node, "RetirementReasonName", 45);
+        if (retirementReasonName != null)
             setRetirementReasonName(retirementReasonName);
-        }
-
         setHashCode(hashCode());
-
         setSendAll(SendToAssociatedOrgs.SendToAll);
-
         return this;
     }
 

@@ -9,9 +9,9 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssoc
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TradeMaterialGood;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -28,57 +28,67 @@ public class InternalDisposingDocumentPosition extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException {
-        InternalDisposingDocument idd  = DAOUtils.findDistributedObjectByRefGUID(InternalDisposingDocument.class, session, guidOfIDD);
-        if(idd==null) throw new DistributedObjectException("NOT_FOUND_InternalDisposingDocument");
+        InternalDisposingDocument idd = DAOUtils.findDistributedObjectByRefGUID(InternalDisposingDocument.class, session, guidOfIDD);
+        if (idd == null)
+            throw new DistributedObjectException("NOT_FOUND_InternalDisposingDocument");
         setInternalDisposingDocument(idd);
-        TradeMaterialGood tmg  = DAOUtils.findDistributedObjectByRefGUID(TradeMaterialGood.class, session, guidOfTMG);
-        if(tmg!=null) setTradeMaterialGood(tmg);
-
-        Good g  = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfGood);
-        if(g==null)  throw new DistributedObjectException("NOT_FOUND_Good");
+        TradeMaterialGood tmg = DAOUtils.findDistributedObjectByRefGUID(TradeMaterialGood.class, session, guidOfTMG);
+        if (tmg != null)
+            setTradeMaterialGood(tmg);
+        Good g = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfGood);
+        if (g == null)
+            throw new DistributedObjectException("NOT_FOUND_Good");
         setGood(g);
     }
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element, "UnitsScale", unitsScale.ordinal());
-        setAttribute(element, "TotalCount", totalCount);
-        setAttribute(element, "TotalCountMust", totalCountMust);
-        setAttribute(element, "NetWeight", netWeight);
-        setAttribute(element, "DisposePrice", disposePrice);
-        setAttribute(element, "NDS", nds);
-        setAttribute(element, "GuidOfInternalDisposingDocument", internalDisposingDocument.getGuid());
-        if(tradeMaterialGood!=null) setAttribute(element, "GuidOfTradeMaterialGoods", tradeMaterialGood.getGuid());
-        setAttribute(element, "GuidOfGoods", good.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "UnitsScale", unitsScale.ordinal());
+        XMLUtils.setAttributeIfNotNull(element, "TotalCount", totalCount);
+        XMLUtils.setAttributeIfNotNull(element, "TotalCountMust", totalCountMust);
+        XMLUtils.setAttributeIfNotNull(element, "NetWeight", netWeight);
+        XMLUtils.setAttributeIfNotNull(element, "DisposePrice", disposePrice);
+        XMLUtils.setAttributeIfNotNull(element, "NDS", nds);
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfInternalDisposingDocument", internalDisposingDocument.getGuid());
+        if (tradeMaterialGood != null)
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfTradeMaterialGoods", tradeMaterialGood.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfGoods", good.getGuid());
     }
 
     @Override
     protected InternalDisposingDocumentPosition parseAttributes(Node node) throws Exception {
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        Integer integerUnitsScale = getIntegerAttributeValue(node,"UnitsScale");
-        if(integerUnitsScale!=null) setUnitsScale(UnitScale.fromInteger(integerUnitsScale));
-        Long longTotalCount = getLongAttributeValue(node,"TotalCount");
-        if(longTotalCount!=null) setTotalCount(longTotalCount);
-        Long longTotalCountMust = getLongAttributeValue(node,"TotalCountMust");
-        if(longTotalCountMust!=null) setTotalCountMust(longTotalCountMust);
-        Long longNetWeight = getLongAttributeValue(node,"NetWeight");
-        if(longNetWeight!=null) setNetWeight(longNetWeight);
-        Long longDisposePrice = getLongAttributeValue(node,"DisposePrice");
-        if(longDisposePrice!=null) setDisposePrice(longDisposePrice);
-        Long longNDS = getLongAttributeValue(node,"NDS");
-        if(longNDS!=null) setNds(longNDS);
-        guidOfIDD = getStringAttributeValue(node,"GuidOfInternalDisposingDocument",36);
-        guidOfTMG = getStringAttributeValue(node,"GuidOfTradeMaterialGoods",36);
-        guidOfGood = getStringAttributeValue(node,"GuidOfGoods",36);
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        Integer integerUnitsScale = XMLUtils.getIntegerAttributeValue(node, "UnitsScale");
+        if (integerUnitsScale != null)
+            setUnitsScale(UnitScale.fromInteger(integerUnitsScale));
+        Long longTotalCount = XMLUtils.getLongAttributeValue(node, "TotalCount");
+        if (longTotalCount != null)
+            setTotalCount(longTotalCount);
+        Long longTotalCountMust = XMLUtils.getLongAttributeValue(node, "TotalCountMust");
+        if (longTotalCountMust != null)
+            setTotalCountMust(longTotalCountMust);
+        Long longNetWeight = XMLUtils.getLongAttributeValue(node, "NetWeight");
+        if (longNetWeight != null)
+            setNetWeight(longNetWeight);
+        Long longDisposePrice = XMLUtils.getLongAttributeValue(node, "DisposePrice");
+        if (longDisposePrice != null)
+            setDisposePrice(longDisposePrice);
+        Long longNDS = XMLUtils.getLongAttributeValue(node, "NDS");
+        if (longNDS != null)
+            setNds(longNDS);
+        guidOfIDD = XMLUtils.getStringAttributeValue(node, "GuidOfInternalDisposingDocument", 36);
+        guidOfTMG = XMLUtils.getStringAttributeValue(node, "GuidOfTradeMaterialGoods", 36);
+        guidOfGood = XMLUtils.getStringAttributeValue(node, "GuidOfGoods", 36);
         setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
     }
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((InternalDisposingDocumentPosition) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setUnitsScale(((InternalDisposingDocumentPosition) distributedObject).getUnitsScale());
         setTotalCount(((InternalDisposingDocumentPosition) distributedObject).getTotalCount());
         setTotalCountMust(((InternalDisposingDocumentPosition) distributedObject).getTotalCountMust());

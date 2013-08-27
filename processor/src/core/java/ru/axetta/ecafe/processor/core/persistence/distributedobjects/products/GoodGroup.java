@@ -6,9 +6,8 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import org.hibernate.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -47,22 +46,23 @@ public class GoodGroup extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element,"Name", NameOfGoodsGroup);
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "Name", NameOfGoodsGroup);
     }
 
     @Override
     protected GoodGroup parseAttributes(Node node) throws Exception {
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if(longOrgOwner != null) setOrgOwner(longOrgOwner);
-        String stringNameOfGoodsGroup = getStringAttributeValue(node,"Name",128);
+        String stringNameOfGoodsGroup = XMLUtils.getStringAttributeValue(node, "Name", 128);
         if(stringNameOfGoodsGroup!=null) setNameOfGoodsGroup(stringNameOfGoodsGroup);
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
+
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((GoodGroup) distributedObject).getOrgOwner());
+        setOrgOwner(distributedObject.getOrgOwner());
         setNameOfGoodsGroup(((GoodGroup) distributedObject).getNameOfGoodsGroup());
     }
 

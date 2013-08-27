@@ -13,15 +13,15 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
  */
 public class DOVersion {
 
-    private long idOfDOObject;
+    private Long idOfDOObject;
     private String distributedObjectClassName;
-    private long currentVersion;
+    private Long currentVersion;
 
-    public long getCurrentVersion() {
+    public Long getCurrentVersion() {
         return currentVersion;
     }
 
-    public void setCurrentVersion(long currentVersion) {
+    public void setCurrentVersion(Long currentVersion) {
         this.currentVersion = currentVersion;
     }
 
@@ -33,11 +33,11 @@ public class DOVersion {
         this.distributedObjectClassName = distributedObjectClassName;
     }
 
-    public long getIdOfDOObject() {
+    public Long getIdOfDOObject() {
         return idOfDOObject;
     }
 
-    public void setIdOfDOObject(long idOfDOObject) {
+    public void setIdOfDOObject(Long idOfDOObject) {
         this.idOfDOObject = idOfDOObject;
     }
 }

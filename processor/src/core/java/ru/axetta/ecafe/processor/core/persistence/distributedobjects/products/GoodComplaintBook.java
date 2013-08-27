@@ -5,6 +5,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.Distributed
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Element;
@@ -34,17 +35,18 @@ public class GoodComplaintBook extends DistributedObject {
 
     @Override
     protected void appendAttributes(Element element) {
-        setAttribute(element, "OrgOwner", orgOwner);
-        setAttribute(element, "IdOfClient", client.getIdOfClient());
-        setAttribute(element, "GuidOfGoods", good.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "IdOfClient", client.getIdOfClient());
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfGoods", good.getGuid());
     }
 
     @Override
     protected GoodComplaintBook parseAttributes(Node node) throws Exception {
-        Long longOrgOwner = getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null) setOrgOwner(longOrgOwner);
-        idOfClient = getLongAttributeValue(node, "IdOfClient");
-        guidOfGood = getStringAttributeValue(node, "GuidOfGoods", 36);
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
+        idOfClient = XMLUtils.getLongAttributeValue(node, "IdOfClient");
+        guidOfGood = XMLUtils.getStringAttributeValue(node, "GuidOfGoods", 36);
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
     }
