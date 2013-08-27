@@ -40,6 +40,8 @@ import java.util.regex.Pattern;
  * To change this template use File | Settings | File Templates.
  */
 public class RuleProcessor implements AutoReportProcessor, EventProcessor {
+    public static final String CONTRAGENT_EXPRESSION = "contragent:";
+    public static final String CONTRAGENT_PAYAGENT_EXPRESSION = "contragent-payagent:";
     public static final String COMBOBOX_EXPRESSION = "комбобокс:";
     public static final String INPUT_EXPRESSION = "значение:";
     public static final String CHECKBOX_EXPRESSION = "чекбокс:";

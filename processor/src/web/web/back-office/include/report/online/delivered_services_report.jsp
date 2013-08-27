@@ -75,7 +75,7 @@
 
         </c:if>
     </h:panelGrid>
-    <h:commandButton value="Выгрузить в CSV" actionListener="#{mainPage.deliveredServicesReportPage.showCSVList}" styleClass="command-button" />
+    <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.deliveredServicesReportPage.showCSVList}" styleClass="command-button" />
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>

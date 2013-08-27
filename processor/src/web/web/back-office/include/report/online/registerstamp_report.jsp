@@ -83,7 +83,7 @@
         </rich:columns>
     </rich:dataTable>
 
-    <h:commandButton value="Выгрузить в CSV" actionListener="#{registerStampPage.showCSVList}" styleClass="command-button" />
+    <h:commandButton value="Выгрузить в Excel" actionListener="#{registerStampPage.showCSVList}" styleClass="command-button" />
 
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />

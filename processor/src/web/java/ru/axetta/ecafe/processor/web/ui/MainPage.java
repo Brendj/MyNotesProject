@@ -299,6 +299,7 @@ public class MainPage {
     // Levadny (11.02.2012)
     private final BasicWorkspacePage discountGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage goodRequestsGroupMenu = new BasicWorkspacePage();
+    private final BasicWorkspacePage budgetFoodGroupMenu = new BasicWorkspacePage();
 
 
     // Levadny (11.02.2012)
@@ -5036,8 +5037,18 @@ public Long getSelectedIdOfReportRule() {
         return goodRequestsGroupMenu;
     }
 
+    public BasicWorkspacePage getBudgetFoodGroupMenu() {
+        return budgetFoodGroupMenu;
+    }
+
     public Object showGoodRequestsGroupMenu () {
         currentWorkspacePage = goodRequestsGroupMenu;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showBudgetFoodGroupMenu () {
+        currentWorkspacePage = budgetFoodGroupMenu;
         updateSelectedMainMenu();
         return null;
     }

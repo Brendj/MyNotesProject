@@ -96,6 +96,7 @@ public class ReportRuleConstants {
             this.hideOnSetup = hideOnSetup;
             return this;
         }
+
     }
 
     public static class ReportHint {
@@ -147,7 +148,8 @@ public class ReportRuleConstants {
             new ParamHint(DailySalesByGroupsReport.PARAM_INCLUDE_COMPLEX, "Включать комплексы"),
             new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD, "Количество дней в выборке").setHideOnSetup(true),     //  Период отображать не надо, он устанавливается автоматически
             new ParamHint(ReportPropertiesUtils.P_JOB_NAME, "Название задачи"),
-            new ParamHint(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID, "Идентификатор контрагента-получателя"), //30,
+            new ParamHint(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID, "Контрагент-получатель").setDefaultRule("= contragent:"), //30,
+            new ParamHint("idOfContragent", "Агент по приему платежей").setDefaultRule("= contragent-payagent:"),
 
             // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
             /*new ParamHint("idOfContract", "Контракт"),
@@ -188,11 +190,12 @@ public class ReportRuleConstants {
             new ReportHint(MenuDetailsGroupByMenuOriginReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(ClientOrderDetailsByAllOrgReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(OrderDetailsGroupByMenuOriginReport.class.getCanonicalName(), new int[]{}),
-            new ReportHint(ContragentPaymentReport.class.getCanonicalName(), new int[]{20, 21, 30}),
+            new ReportHint(ContragentPaymentReport.class.getCanonicalName(), new int[]{-31, 21, 30}),
             new ReportHint(ContragentCompletionReport.class.getCanonicalName(), new int[]{20, 21}),
             new ReportHint(HalfYearSummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(BeneficiarySummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(DeliveredServicesReport.class.getCanonicalName(), new int[]{3, -20/*, 31, 32, 33, 34, 35, 36, 37*/}),
+            // отрицательное значение - обязательное
     };
 
     private ReportRuleConstants() {

@@ -7,6 +7,8 @@ package ru.axetta.ecafe.processor.web.ui.report.online;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
 import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
+import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -98,15 +100,19 @@ public class DeliveredServicesReportPage extends OnlineReportPage
             ServletOutputStream servletOutputStream = response.getOutputStream();
 
             facesContext.responseComplete();
-            response.setContentType("application/csv");
-            response.setHeader("Content-disposition", "inline;filename=delivered.csv");
+            response.setContentType("application/xls");
+            response.setHeader("Content-disposition", "inline;filename=delivered.xls");
 
-            JRCsvExporter csvExporter = new JRCsvExporter();
-            csvExporter.setParameter(JRCsvExporterParameter.JASPER_PRINT, deliveredServicesReport.getPrint());
-            csvExporter.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
-            csvExporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ";");
-            csvExporter.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
-            csvExporter.exportReport();
+            JRXlsExporter xlsExport = new JRXlsExporter();
+            //JRCsvExporter csvExporter = new JRCsvExporter();
+            xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, deliveredServicesReport.getPrint());
+            xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+            xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+            xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+            xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+            //xlsExport.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ";");
+            xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+            xlsExport.exportReport();
 
             servletOutputStream.flush();
             servletOutputStream.close();

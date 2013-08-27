@@ -30,7 +30,7 @@
                 <h:panelGrid styleClass="borderless-grid" columnClasses="topAligned">
                     <h:outputText value="Выберите отчет:" styleClass="output-text"/>
                     <h:selectOneListbox id="subscriptions" valueChangeListener="#{manualReportRunnerPage.valueChangeListener}"
-                                         value="#{manualReportRunnerPage.ruleItem}" style="width:300px; height: 300px" >
+                                         value="#{manualReportRunnerPage.ruleItem}" style="width:300px;" size="10">
                         <f:selectItems value="#{manualReportRunnerPage.ruleItems}"/>
                         <%-- workspaceSubView:workspaceForm:workspacePageSubView:manualMainParams --%>
                         <a4j:support event="onselect" reRender="workspaceSubView:workspaceForm:workspacePageSubView:manualParamHints,workspaceSubView:workspaceForm:workspacePageSubView:manualMainParams" />
@@ -103,6 +103,20 @@
                                     <f:setPropertyActionListener value="0"
                                                                  target="#{mainPage.multiContrFlag}" />
                                     <f:setPropertyActionListener value="2"
+                                                                 target="#{mainPage.classTypes}" />
+                                </a4j:commandButton>
+                            </h:panelGroup>
+
+                            <h:panelGroup styleClass="borderless-div" rendered="#{item.type=='contragent-payagent'}" style="#{manualReportRunnerPage.displayElement(item)};">
+                                <h:inputText value="#{manualReportRunnerPage.contragentPayAgentFilter.contragent.contragentName}" readonly="true"
+                                             styleClass="input-text" style="margin-right: 2px;" />
+                                <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
+                                                   reRender="modalContragentSelectorPanel"
+                                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                                                   styleClass="command-link" style="width: 25px;">
+                                    <f:setPropertyActionListener value="0"
+                                                                 target="#{mainPage.multiContrFlag}" />
+                                    <f:setPropertyActionListener value="1"
                                                                  target="#{mainPage.classTypes}" />
                                 </a4j:commandButton>
                             </h:panelGroup>
