@@ -78,13 +78,8 @@ public class ClientMigration {
 
         ClientMigration that = (ClientMigration) o;
 
-        if (!client.equals(that.client)) {
-            return false;
-        }
-        if (!org.equals(that.org)) {
-            return false;
-        }
-        if (!registrationDate.equals(that.registrationDate)) {
+        if (idOfClientMigration != null ? !idOfClientMigration.equals(that.idOfClientMigration)
+                : that.idOfClientMigration != null) {
             return false;
         }
 
@@ -93,9 +88,10 @@ public class ClientMigration {
 
     @Override
     public int hashCode() {
-        int result = registrationDate.hashCode();
-        result = 31 * result + org.hashCode();
-        result = 31 * result + client.hashCode();
+        int result = idOfClientMigration != null ? idOfClientMigration.hashCode() : 0;
+        result = 31 * result + (registrationDate != null ? registrationDate.hashCode() : 0);
+        result = 31 * result + (org != null ? org.hashCode() : 0);
+        result = 31 * result + (client != null ? client.hashCode() : 0);
         return result;
     }
 }

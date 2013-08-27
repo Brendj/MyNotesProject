@@ -696,6 +696,8 @@
                             label="Поиск организаций" action="#{orgCatalogFindPage.show}" reRender="workspaceForm" />
         <rich:panelMenuItem id="nsiPupilCatalogFind" binding="#{pupilCatalogFindPage.mainMenuComponent}"
                             label="Поиск учащихся" action="#{pupilCatalogFindPage.show}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="nsiRegistrySync" binding="#{NSIRegistrySyncPage.mainMenuComponent}"
+                            label="Ручная синхронизация" action="#{NSIRegistrySyncPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
     <rich:panelMenuGroup id="uosGroup" binding="#{mainPage.uosGroupPage.mainMenuComponent}" label="УОС"
                          rendered="#{mainPage.eligibleToServiceAdmin}">

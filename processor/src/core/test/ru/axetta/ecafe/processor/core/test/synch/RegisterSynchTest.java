@@ -81,9 +81,9 @@ public class RegisterSynchTest extends TestCase {
 
             System.out.println("---               Синхронизация с массивом данных                   ---");
             RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).
-                                    parseClients("test", "test", new java.util.Date(), org, pupils);
+                                    parseClients("test", "test", org, pupils, true, null);
             RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).
-                    parseClients("test", "test", new java.util.Date(), org2, pupils2);
+                    parseClients("test", "test", org2, pupils2, true, null);
             System.out.println("---               Синхронизация окончена                            ---");
 
             printOrgClients(org);

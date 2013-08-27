@@ -459,13 +459,13 @@ public class DAOUtils {
                 "where (cf_clients.idoforg in (select cf_friendly_organization.friendlyorg from cf_friendly_organization where cf_friendly_organization.currentorg=:org)) and "+
                 predefinedGroups +
                 "(levenshtein(:fio, trim(lower(cf_persons.Surname))||trim(lower(cf_persons.FirstName))||trim(lower(cf_persons.SecondName)))<3 or "+
-                "(trim(lower(cf_persons.Surname))=:surname and trim(lower(cf_persons.FirstName))=:firstName and length(cf_persons.SecondName)=0)) "+
+                "(trim(lower(cf_persons.Surname))=:surname and trim(lower(cf_persons.FirstName))=:firstName and (length(cf_persons.SecondName)=0 or length(:secondName)=0))) "+
                 " order by levenshtein(:fio, trim(lower(cf_persons.Surname))||trim(lower(cf_persons.FirstName))||trim(lower(cf_persons.SecondName)))");
         q.setParameter("org", organization.getIdOfOrg());
         q.setParameter("surname", StringUtils.lowerCase(surname).trim());
         q.setParameter("firstName", StringUtils.lowerCase(firstName).trim());
         q.setParameter("fio", fio);
-        //q.setParameter("secondName", StringUtils.upperCase(secondName).trim());
+        q.setParameter("secondName", StringUtils.upperCase(secondName).trim());
         q.setMaxResults(1);
         List res = q.getResultList();
         if (res.isEmpty()) return null;

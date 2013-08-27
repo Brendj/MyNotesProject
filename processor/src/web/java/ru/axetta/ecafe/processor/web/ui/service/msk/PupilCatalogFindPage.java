@@ -179,8 +179,8 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
             List<ImportRegisterClientsService.PupilInfo> pis = nsiService
                     .getPupilsByOrgGUID(org.getGuid(), familyName, null);
             for (ImportRegisterClientsService.PupilInfo pi : pis) {
-                if (pi.getGroup().startsWith("Дошкол")) {
-                    continue; // исключаем дошкольников
+                if (ImportRegisterClientsService.isPupilIgnoredFromImport(pi.getGuid(), pi.getGroup())) {
+                    continue;
                 }
                 Item i = new Item(pi);
                 i.idOfClient = DAOUtils.getClientIdByGuid(em, i.guid);

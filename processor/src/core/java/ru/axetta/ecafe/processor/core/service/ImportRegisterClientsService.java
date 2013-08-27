@@ -43,6 +43,7 @@ import java.util.List;
 @Component
 @Scope("singleton")
 public class ImportRegisterClientsService {
+
     private static final int MAX_CLIENTS_PER_TRANSACTION = 500;
     @PersistenceContext
     EntityManager em;
@@ -78,9 +79,20 @@ public class ImportRegisterClientsService {
             }
             return dateFormat.parse(d);
         } catch (Exception e) {
-            logError("Failed to parse date from options", e);
+            logError("Failed to parse date from options", e, null);
         }
         return new Date(0);
+    }
+
+    public StringBuffer runSyncForOrg(long idOfOrg, boolean performChanges) throws Exception {
+        Org org = DAOService.getInstance().getOrg(idOfOrg);
+        if (org.getTag() == null || !org.getTag().toUpperCase().contains(ORG_SYNC_MARKER)) {
+            throw new Exception(
+                    "У организации " + idOfOrg + " не установлен тэг синхронизации с Реестрами: " + ORG_SYNC_MARKER);
+        }
+        StringBuffer logBuffer = new StringBuffer();
+        return RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
+                .loadClients(org, performChanges, logBuffer);
     }
 
 
@@ -93,7 +105,6 @@ public class ImportRegisterClientsService {
 
 
         int maxAttempts = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_MSK_NSI_MAX_ATTEMPTS);
-        boolean allOperationsAreFinished = true;
         for (Org org : orgs) {
             if (org.getTag() == null || !org.getTag().toUpperCase().contains(ORG_SYNC_MARKER)) {
                 continue;
@@ -101,47 +112,49 @@ public class ImportRegisterClientsService {
             int attempt = 0;
             while (attempt < maxAttempts) {
                 try {
-                    RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).loadClients(lastUpd, org);
+                    RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
+                            .loadClients(org, true, null);
                     break;
                 } catch (SocketTimeoutException ste) {
                 } catch (Exception e) {
-                    logError("Ошибка при синхронизации с Реестрами для организации: " + org.getIdOfOrg(), e);
+                    logError("Ошибка при синхронизации с Реестрами для организации: " + org.getIdOfOrg(), e, null);
                     break;
                 } finally {
                     attempt++;
                 }
             }
             if (attempt >= maxAttempts) {
-                allOperationsAreFinished = false;
-                logError("Неудалось подключиться к сервису, превышено максимальное количество попыток (" + maxAttempts +")");
+                logError("Неудалось подключиться к сервису, превышено максимальное количество попыток (" + maxAttempts
+                        + ")", null, null);
             }
         }
         //  Если была хотя бы одна неудачная загрузка данных с сервиса, время последный синхронизации не обновляем!
         //if (allOperationsAreFinished) {
-            setLastUpdateDate(new Date(System.currentTimeMillis()));
+        setLastUpdateDate(new Date(System.currentTimeMillis()));
         //}
     }
 
 
     @Transactional
-    public void loadClients(java.util.Date lastUpd, Org org) throws Exception {
+    public StringBuffer loadClients(Org org, boolean performChanges, StringBuffer logBuffer) throws Exception {
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
-        String synchDate = "[Синхронизация с Реестрами от " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis())) + " для " + org.getIdOfOrg() + "]: ";
-        log(synchDate + "Производится синхронизация для " + org.getOfficialName());
+        String synchDate = "[Синхронизация с Реестрами от " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                .format(new Date(System.currentTimeMillis())) + " для " + org.getIdOfOrg() + "]: ";
+        log(synchDate + "Производится синхронизация для " + org.getOfficialName(), logBuffer);
 
         Session session = (Session) em.getDelegate();
         org = em.find(Org.class, org.getIdOfOrg());
         //  Итеративно загружаем клиентов, используя ограничения
-        List<ExpandedPupilInfo> pupils = new ArrayList <ExpandedPupilInfo> ();
+        List<ExpandedPupilInfo> pupils = new ArrayList<ExpandedPupilInfo>();
         List<ExpandedPupilInfo> tempPupils = new ArrayList<ExpandedPupilInfo>();
         int importIteration = 1;
         while (true) {
             tempPupils.clear();
             try {
-                tempPupils = nsiService.getChangedClients(lastUpd, org, importIteration);
+                tempPupils = nsiService.getChangedClients(org, importIteration);
             } catch (Exception e) {
-                logError("Ошибка получения данных от Реестров для "+org.getOfficialName(), e);
-                return;
+                logError("Ошибка получения данных от Реестров для " + org.getOfficialName(), e, logBuffer);
+                return logBuffer;
             }
             //  Если клиенты найдены, значит добавляем их в общий список и выполняем следующую итерацию, иначе - завершаем импорт
             if (tempPupils.size() > 0) {
@@ -151,17 +164,24 @@ public class ImportRegisterClientsService {
             }
             importIteration++;
         }
-        log(synchDate + "Всего импортировано " + pupils.size() + " за " + (importIteration) + " итераций импорта");
-        parseClients (synchDate, date, lastUpd, org, pupils);
+        log(synchDate + "Всего импортировано " + pupils.size() + " за " + (importIteration) + " итераций импорта",
+                logBuffer);
+        parseClients(synchDate, date, org, pupils, performChanges, logBuffer);
+        return logBuffer;
     }
 
     @Transactional
-    public void parseClients (String synchDate, String date,
-            java.util.Date lastUpd, Org org, List<ExpandedPupilInfo> pupils) throws Exception {
+    public void parseClients(String synchDate, String date, Org org, List<ExpandedPupilInfo> pupils,
+            boolean performChanges, StringBuffer logBuffer) throws Exception {
+        log(synchDate + "Синхронизация списков начата для " + org.getOfficialName() + (performChanges ? ""
+                : " РЕЖИМ БЕЗ ПРИМЕНЕНИЯ ИЗМЕНЕНИЙ"), logBuffer);
         //  Проверяем количество поступивших изменений, если больще чем ограничение, то прекращаем обновление школы и
         //  отправляем уведомление на email
+        /*//TODO: неправильно!
         if (pupils.size() > MAX_CLIENTS_PER_TRANSACTION) {
-            String text = "Внимание! Из Реестров поступило обновление " + pupils.size() + " клиентов для " + org.getOfficialName() + " {" + org.getIdOfOrg() + "}. В целях безопасности автоматическое обновление прекращено.";
+            String text = "Внимание! Из Реестров поступило обновление " + pupils.size() + " клиентов для " + org
+                    .getOfficialName() + " {" + org.getIdOfOrg()
+                    + "}. В целях безопасности автоматическое обновление прекращено.";
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             if (runtimeContext != null) {
                 String address = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_SUPPORT_EMAIL);
@@ -169,125 +189,143 @@ public class ImportRegisterClientsService {
                 List<File> files = new ArrayList<File>();
                 runtimeContext.getPostman().postSupportEmail(address, subject, text, files);
             }
-            logError(text);
+            logError(text, null, logBuffer);
             return;
-        }
+        }*/
 
         Session session = (Session) em.getDelegate();
-        try {
-
-            //  Проходим по всем существующим клиентам ОУ
-            List<Client> currentClients = DAOUtils.findClientsForOrgAndFriendly (em, org);
-            List<Org> orgsList = DAOUtils.findFriendlyOrgs (em, org);   //  Текущая организация и дружественные ей
-            //orgsList.add(org);
-            for (Client dbClient : currentClients) {
-                boolean found = false;
-                for (ExpandedPupilInfo pupil : pupils) {
-                    if (pupil.getGuid().equals(dbClient.getClientGUID())) {
-                        found = true;
-                        break;
-                    }
+        //  Проходим по всем существующим клиентам ОУ
+        List<Client> currentClients = DAOUtils.findClientsForOrgAndFriendly(em, org);
+        List<Org> orgsList = DAOUtils.findFriendlyOrgs(em, org);   //  Текущая организация и дружественные ей
+        //orgsList.add(org);
+        for (Client dbClient : currentClients) {
+            boolean found = false;
+            for (ExpandedPupilInfo pupil : pupils) {
+                if (pupil.getGuid() != null && dbClient.getClientGUID() != null && pupil.getGuid()
+                        .equals(dbClient.getClientGUID())) {
+                    found = true;
+                    break;
                 }
-                ClientGroup currGroup = dbClient.getClientGroup();
-                //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные", то заносим его в эту группу
-                if (!found && !emptyIfNull(dbClient.getClientGUID()).equals("") && currGroup != null &&
-                    !currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) {
-                    ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session, dbClient.getOrg().getIdOfOrg(),
-                                                                                            ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
-                    if (clientGroup == null) {
-                        clientGroup = DAOUtils.createNewClientGroup(session, dbClient.getOrg().getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
-                    }
-                    log(synchDate + "Требует произвести удаление клиента " +
-                        emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(dbClient.getPerson().getSurname()) + " " +
-                        emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(dbClient.getPerson().getSecondName()) + ", " +
-                        emptyIfNull(dbClient.getClientGroup().getGroupName()));
+            }
+            ClientGroup currGroup = dbClient.getClientGroup();
+            //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные", то заносим его в эту группу
+            if (!found && !emptyIfNull(dbClient.getClientGUID()).equals("") && currGroup != null &&
+                    !currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup()
+                            .equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) {
+                ClientGroup clientGroup = DAOUtils
+                        .findClientGroupByGroupNameAndIdOfOrg(session, dbClient.getOrg().getIdOfOrg(),
+                                ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
+                if (clientGroup == null) {
+                    clientGroup = DAOUtils.createNewClientGroup(session, dbClient.getOrg().getIdOfOrg(),
+                            ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
+                }
+                log(synchDate + "Удаление " +
+                        emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(dbClient.getPerson().getSurname())
+                        + " " +
+                        emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(
+                        dbClient.getPerson().getSecondName()) + ", " +
+                        emptyIfNull(dbClient.getClientGroup().getGroupName()), logBuffer);
+                if (performChanges) {
                     dbClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                     session.save(dbClient);
                 }
             }
+        }
 
-            //  Проходим по ответу от Реестров и анализируем надо ли обновлять его или нет
-            for (ExpandedPupilInfo pupil : pupils) {
-                FieldProcessor.Config fieldConfig;
-                boolean updateClient = false;
-                Client cl = DAOUtils.findClientByGuid(em, emptyIfNull(pupil.getGuid()));
-                if (cl == null) {
-                    fieldConfig = new ClientManager.ClientFieldConfig();
-                } else {
-                    fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
-                }
-                updateClient = doClientUpdate (fieldConfig, ClientManager.FieldId.CLIENT_GUID,
-                                               pupil.getGuid(), cl == null ? null : cl.getClientGUID(), updateClient);// fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, pupil.getGuid());
-                updateClient = doClientUpdate (fieldConfig, ClientManager.FieldId.SURNAME,
-                                               pupil.getFamilyName(), cl == null ? null : cl.getPerson().getSurname(), updateClient);
-                updateClient = doClientUpdate (fieldConfig, ClientManager.FieldId.NAME,
-                                               pupil.getFirstName(), cl == null ? null : cl.getPerson().getFirstName(), updateClient);
-                updateClient = doClientUpdate (fieldConfig, ClientManager.FieldId.SECONDNAME,
-                                               pupil.getSecondName(), cl == null ? null : cl.getPerson().getSecondName(), updateClient);
-                if (pupil.getGroup() != null) {
-                    updateClient = doClientUpdate (fieldConfig, ClientManager.FieldId.GROUP,
-                                                   pupil.getGroup(), cl == null ? null : cl.getClientGroup().getGroupName(), updateClient);
-                }
-                //  Проверяем организацию и дружественные ей - если клиент был переведен из другого ОУ, то перемещаем его
-                boolean guidFound = false;
-                for (Org o : orgsList) {
-                    if (o.getGuid().equals(pupil.getGuidOfOrg())) {
-                        guidFound = true;
-                        break;
-                    }
-                }
-                if (cl != null && !cl.getOrg().getGuid().equals(pupil.getGuidOfOrg()) && !guidFound) {
-                    Org newOrg = DAOService.getInstance().getOrgByGuid (pupil.getGuidOfOrg());
-                    log(synchDate + "Клиент " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
-                        emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName()) + ", " +
-                        emptyIfNull(cl.getClientGroup().getGroupName()) + " был переведен из школы " + cl.getOrg().getIdOfOrg() + " в школу " + newOrg.getIdOfOrg());
-                    cl.setOrg(newOrg);
-                    updateClient = true;
-                }
-
-
-
-                if (!updateClient) {
-                    continue;
-                }
-                try {
-                    //  Если клиента по GUID найти не удалось, это значит что он новый - добавляем его
-                    if (cl == null) {
-                        try {
-                            log(synchDate + "Требуется добавление нового клинета " + pupil.getGuid() + ", " +
-                                pupil.getFamilyName() + " " + pupil.getFirstName() + " " +
-                                pupil.getSecondName() + ", " + pupil.getGroup());
-                            fieldConfig.setValue(ClientManager.FieldId.COMMENTS,
-                                    String.format(MskNSIService.COMMENT_AUTO_IMPORT, date));
-                            ClientManager
-                                    .registerClientTransactionFree(org.getIdOfOrg(), (ClientManager.ClientFieldConfig) fieldConfig,
-                                            true, session);
-                        } catch (Exception e) {
-                            // Не раскомментировать, очень много исключений будет из-за дублирования клиентов
-                            e.printStackTrace();
-                        }
-                    //  Иначе - обновляем клиента в БД
-                    } else {
-                        log(synchDate + "Требуется внести изменения в учетную запись существующего пользователя " +
-                            emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
-                            emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName()) + ", " +
-                            emptyIfNull(cl.getClientGroup().getGroupName()) + " на " +
-                            emptyIfNull(pupil.getGuid()) + ", " + emptyIfNull(pupil.getFamilyName()) + " " + emptyIfNull(pupil.getFirstName()) + " " +
-                            emptyIfNull(pupil.getSecondName()) + ", " + emptyIfNull(pupil.getGroup()));
-                        ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) fieldConfig, org,
-                                String.format(MskNSIService.COMMENT_AUTO_MODIFY, date), cl, session);
-                    }
-                } catch (Exception e) {
-                    logError("Failed to add client for " + org.getIdOfOrg() + " org", e);
+        //  Проходим по ответу от Реестров и анализируем надо ли обновлять его или нет
+        for (ExpandedPupilInfo pupil : pupils) {
+            if (isPupilIgnoredFromImport(pupil.getGuid(), pupil.getGroup())) {
+                continue;
+            }
+            FieldProcessor.Config fieldConfig;
+            boolean updateClient = false;
+            Client cl = DAOUtils.findClientByGuid(em, emptyIfNull(pupil.getGuid()));
+            if (cl == null) {
+                fieldConfig = new ClientManager.ClientFieldConfig();
+            } else {
+                fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
+            }
+            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.CLIENT_GUID, pupil.getGuid(),
+                    cl == null ? null : cl.getClientGUID(),
+                    updateClient);// fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, pupil.getGuid());
+            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SURNAME, pupil.getFamilyName(),
+                    cl == null ? null : cl.getPerson().getSurname(), updateClient);
+            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.NAME, pupil.getFirstName(),
+                    cl == null ? null : cl.getPerson().getFirstName(), updateClient);
+            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SECONDNAME, pupil.getSecondName(),
+                    cl == null ? null : cl.getPerson().getSecondName(), updateClient);
+            if (pupil.getGroup() != null) {
+                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP, pupil.getGroup(),
+                        cl == null ? null : cl.getClientGroup().getGroupName(), updateClient);
+            }
+            //  Проверяем организацию и дружественные ей - если клиент был переведен из другого ОУ, то перемещаем его
+            boolean guidFound = false;
+            for (Org o : orgsList) {
+                if (o.getGuid().equals(pupil.getGuidOfOrg())) {
+                    guidFound = true;
+                    break;
                 }
             }
-        } finally {
+            if (cl != null && !cl.getOrg().getGuid().equals(pupil.getGuidOfOrg()) && !guidFound) {
+                Org newOrg = DAOService.getInstance().getOrgByGuid(pupil.getGuidOfOrg());
+                log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(
+                        cl.getPerson().getSurname()) + " " +
+                        emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName())
+                        + ", " +
+                        emptyIfNull(cl.getClientGroup().getGroupName()) + " из школы " + cl.getOrg().getIdOfOrg()
+                        + " в школу " + newOrg.getIdOfOrg(), logBuffer);
+                if (performChanges) {
+                    cl.setOrg(newOrg);
+                }
+                updateClient = true;
+            }
+
+
+            if (!updateClient) {
+                continue;
+            }
+            try {
+                //  Если клиента по GUID найти не удалось, это значит что он новый - добавляем его
+                if (cl == null) {
+                    try {
+                        log(synchDate + "Добавление " + pupil.getGuid() + ", " +
+                                pupil.getFamilyName() + " " + pupil.getFirstName() + " " +
+                                pupil.getSecondName() + ", " + pupil.getGroup(), logBuffer);
+                        fieldConfig.setValue(ClientManager.FieldId.COMMENTS,
+                                String.format(MskNSIService.COMMENT_AUTO_IMPORT, date));
+                        if (performChanges) {
+                            ClientManager.registerClientTransactionFree(org.getIdOfOrg(),
+                                    (ClientManager.ClientFieldConfig) fieldConfig, true, session);
+                        }
+                    } catch (Exception e) {
+                        // Не раскомментировать, очень много исключений будет из-за дублирования клиентов
+                        logError("Ошибка добавления клиента", e, logBuffer);
+                    }
+                    //  Иначе - обновляем клиента в БД
+                } else {
+                    log(synchDate + "Изменение " +
+                            emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
+                            emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(
+                            cl.getPerson().getSecondName()) + ", " +
+                            emptyIfNull(cl.getClientGroup().getGroupName()) + " на " +
+                            emptyIfNull(pupil.getGuid()) + ", " + emptyIfNull(pupil.getFamilyName()) + " "
+                            + emptyIfNull(pupil.getFirstName()) + " " +
+                            emptyIfNull(pupil.getSecondName()) + ", " + emptyIfNull(pupil.getGroup()), logBuffer);
+                    if (performChanges) {
+                        ClientManager
+                                .modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) fieldConfig,
+                                        org, String.format(MskNSIService.COMMENT_AUTO_MODIFY, date), cl, session);
+                    }
+                }
+            } catch (Exception e) {
+                logError("Failed to add client for " + org.getIdOfOrg() + " org", e, logBuffer);
+            }
         }
-        log(synchDate + "Синхронизация завершена для " + org.getOfficialName());
+        log(synchDate + "Синхронизация завершена для " + org.getOfficialName(), logBuffer);
     }
 
-    public static boolean doClientUpdate (FieldProcessor.Config fieldConfig, Object fieldID,
-                                  String reesterValue, String currentValue, boolean doClientUpdate) throws Exception {
+    public static boolean doClientUpdate(FieldProcessor.Config fieldConfig, Object fieldID, String reesterValue,
+            String currentValue, boolean doClientUpdate) throws Exception {
         reesterValue = emptyIfNull(reesterValue);
         currentValue = emptyIfNull(currentValue);
         fieldConfig.setValue(fieldID, reesterValue);
@@ -334,22 +372,34 @@ public class ImportRegisterClientsService {
     } */
 
 
-    private static void log (String str) {
+    private static void log(String str, StringBuffer logBuffer) {
+        if (logBuffer != null) {
+            logBuffer.append(str).append('\n');
+        }
         if (RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_MSK_NSI_LOG)) {
             logger.info(str);
         }
     }
 
-    private static void logError (String str) {
-        logError(str);
-    }
-
-    private static void logError (String str, Exception e) {
+    private static void logError(String str, Exception e, StringBuffer logBuffer) {
+        if (logBuffer != null) {
+            logBuffer.append(str).append(": ").append(e.getMessage());
+        }
         if (e != null) {
             logger.error(str, e);
         } else {
             logger.error(str);
         }
+    }
+
+    public static boolean isPupilIgnoredFromImport(String guid, String group) {
+        if (group!=null && group.toLowerCase().startsWith("дошкол")) {
+            return true;
+        }
+        if (guid==null || guid.length()==0) {
+            return true;
+        }
+        return false;
     }
 
     public static class PupilInfo {

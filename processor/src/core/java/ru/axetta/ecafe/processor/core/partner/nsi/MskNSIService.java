@@ -277,7 +277,7 @@ public class MskNSIService {
     }
 
 
-    public List<ImportRegisterClientsService.ExpandedPupilInfo> getChangedClients(java.util.Date date, Org org, int importIteration) throws Exception {
+    public List<ImportRegisterClientsService.ExpandedPupilInfo> getChangedClients(Org org, int importIteration) throws Exception {
         /*
         От Козлова
         */
