@@ -355,10 +355,11 @@ public class Manager {
                     .add(Restrictions.eq("sendAll",SendToAssociatedOrgs.SendToAll));
 
             Criterion sendToMainRestriction = Restrictions.conjunction();
-            allOrg.addAll(menuExchangeRuleList);
-            allOrg.add(idOfOrg);
+            Set<Long> mainOrg = new TreeSet<Long>();
+            mainOrg.addAll(menuExchangeRuleList);
+            mainOrg.add(idOfOrg);
             sendToMainRestriction = ((Conjunction)sendToMainRestriction)
-                    .add(Restrictions.in("orgOwner",allOrg))
+                    .add(Restrictions.in("orgOwner",mainOrg))
                     .add(Restrictions.eq("sendAll",SendToAssociatedOrgs.SendToMain));
 
             Criterion sendToSelfRestriction = Restrictions.conjunction();
