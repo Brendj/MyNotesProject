@@ -375,7 +375,9 @@ public class ClientRegisterPage extends BasicWorkspacePage {
             }
             idOfCategoryList.add(idofcategorydiscount);
         }
-        ClientManager.setCategories(session, cl, idOfCategoryList);
+        if (idOfCategoryList.size() > 0) {
+            ClientManager.setCategories(session, cl, idOfCategoryList);
+        }
     }
 
     public static boolean doClientUpdate(FieldProcessor.Config fieldConfig, Object fieldID, String reesterValue,

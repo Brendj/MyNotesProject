@@ -32,12 +32,11 @@
         color: #000;
         white-space: nowrap;
         padding-right: 10px;
-
-        -moz-transform: rotate(90deg);  /* FF3.5+ */
-        -o-transform: rotate(90deg);  /* Opera 10.5 */
-        -webkit-transform: rotate(90deg);  /* Saf3.1+, Chrome */
-        filter:  progid:DXImageTransform.Microsoft.BasicImage(rotation=1.5);  /* IE6,IE7 */
-        -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=1.5)"; /* IE8 */
+        -moz-transform: rotate(-90.0deg);  /* FF3.5+ */
+        -o-transform: rotate(-90.0deg);  /* Opera 10.5 */
+        -webkit-transform: rotate(-90.0deg);  /* Saf3.1+, Chrome */
+        filter:  progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083);  /* IE6,IE7 */
+        -ms-filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=0.083)"; /* IE8 */
     }
 
     .thin-center-aligned-column {
@@ -83,64 +82,76 @@
 <a4j:form>
     <h:panelGrid id="setupDiscountGrid" binding="#{setupDiscountPage.pageComponent}" styleClass="borderless-grid" style="width: 100%;">
 
-        <a4j:region>
-            <rich:panel id="clients" style="height: 450px; overflow: auto;">
-                <rich:dataTable value="#{setupDiscountPage.clients}" var="cl" id="table" rowKeyVar="row"
-                                columnClasses="clientsgrid_col1,clientsgrid_col2,clientsgrid_col3,clientsgrid_col4,clientsgrid_col5,clientsgrid_col6,clientsgrid_col7,clientsgrid_col8,clientsgrid_col9,clientsgrid_col10">
-                    <rich:column headerClass="center-aligned-column">
-                        <f:facet name="header">
-                            <h:outputText value="№"></h:outputText>
-                        </f:facet>
-                        <h:outputText value="#{row+1}"></h:outputText>
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" style="width: 150px;">
-                        <f:facet name="header">
-                            <h:outputText value="Клиент"></h:outputText>
-                        </f:facet>
-                        <h:outputText value="#{cl.fullName}"></h:outputText>
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column">
-                        <f:facet name="header">
-                            <h:outputText value="Категория льготы"></h:outputText>
-                        </f:facet>
-                        <h:outputText value="Нет"></h:outputText>
-                    </rich:column>
-                    <rich:columns value="#{setupDiscountPage.columns}" var="col" styleClass="left-aligned-column"
-                                  index="ind" headerClass="thin-center-aligned-column" width="30px" >
-                        <f:facet name="header">
-                            <h:outputText escape="true" value="#{col.title}" styleClass="rotate_text" />
-                        </f:facet>
-                        <h:outputText value="#{cl.rules[col.id]}" styleClass="output-text" />
-                    </rich:columns>
-                </rich:dataTable>
-            </rich:panel>
-        </a4j:region>
+    <a4j:region>
+        <rich:panel id="clients" style="height: 550px; overflow: auto;">
+            <rich:dataTable value="#{setupDiscountPage.clients}" var="cl" id="table" rowKeyVar="row"
+                            columnClasses="clientsgrid_col1,clientsgrid_col2,clientsgrid_col3,clientsgrid_col4,clientsgrid_col5,clientsgrid_col6,clientsgrid_col7,clientsgrid_col8,clientsgrid_col9,clientsgrid_col10">
+                <rich:column headerClass="center-aligned-column">
+                    <f:facet name="header">
+                        <h:outputText value="№"></h:outputText>
+                    </f:facet>
+                    <h:outputText value="#{row+1}" styleClass="output-text"></h:outputText>
+                </rich:column>
+                <rich:column headerClass="center-aligned-column" style="width: 150px;">
+                    <f:facet name="header">
+                        <h:outputText value="Клиент"></h:outputText>
+                    </f:facet>
+                    <h:outputText value="#{cl.fullName}" styleClass="output-text-mod"></h:outputText>
+                </rich:column>
+                <rich:columns value="#{setupDiscountPage.columns}" var="col" styleClass="left-aligned-column"
+                              index="ind" headerClass="thin-center-aligned-column" width="30px" >
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="#{col.title}" />
+                    </f:facet>
+                    <h:selectBooleanCheckbox value="#{cl.rules[col.id]}" styleClass="output-text" rendered="#{cl.input}" />
+                    <h:outputText value="#{cl.values[col.id]}" styleClass="output-text-mod" rendered="#{!cl.input}" />
+                </rich:columns>
+            </rich:dataTable>
+        </rich:panel>
 
         <table cellpadding="0" cellspacing="0">
             <tr>
                 <td>
-                <a4j:region>
                     <h:panelGrid id="groups" styleClass="borderless-grid">
                         <h:selectOneMenu id="group" value="#{setupDiscountPage.group}" style="width:150px;">
                             <f:selectItems value="#{setupDiscountPage.groups}"/>
-                            <a4j:support event="onchange" actionListener="#{setupDiscountPage.doChangeGroup}" reRender="clients"/>
+                            <a4j:support status="loadingStatus" event="onchange" actionListener="#{setupDiscountPage.doChangeGroup}" reRender="clients"/>
                         </h:selectOneMenu>
                     </h:panelGrid>
-                </a4j:region>
                 </td>
-                <td style="text-align: right">
+                <td>
+                    <h:panelGrid id="categories" styleClass="borderless-grid">
+                        <h:selectOneMenu id="category" value="#{setupDiscountPage.category}" style="width:350px;">
+                            <f:selectItems value="#{setupDiscountPage.categories}"/>
+                            <a4j:support status="loadingStatus" event="onchange" actionListener="#{setupDiscountPage.doChangeCategory}" reRender="clients"/>
+                        </h:selectOneMenu>
+                    </h:panelGrid>
+                </td>
+                <td style="text-align: right; width: 99%">
                     <a4j:region>
-                    <a4j:commandButton value="Применить" reRender="" action="#{setupDiscountPage.doApply}">
+                    <a4j:status id="loadingStatus">
+                        <f:facet name="start">
+                            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+                        </f:facet>
+                    </a4j:status>
+
+                    <a4j:commandButton value="Применить" reRender="clients,messages" action="#{setupDiscountPage.doApply}" status="loadingStatus">
                     </a4j:commandButton>
 
-                    <a4j:commandButton value="Отменить" reRender="clients" action="#{setupDiscountPage.doCancel}">
-                    </a4j:commandButton>
-
-                    <a4j:commandButton value="Выгрузить в Excel" action="#{setupDiscountPage.doExportToExcel}">
+                    <a4j:commandButton style="padding-left: 10px" value="Отменить" reRender="clients,messages" action="#{setupDiscountPage.doCancel}" status="loadingStatus">
                     </a4j:commandButton>
                     </a4j:region>
                 </td>
             </tr>
+            <tr>
+                <td colspan="3">
+                    <h:panelGrid id="messages" styleClass="borderless-grid">
+                        <h:outputText escape="true" value="#{setupDiscountPage.errorMessages}" rendered="#{not empty setupDiscountPage.errorMessages}" styleClass="error-messages" />
+                        <h:outputText escape="true" value="#{setupDiscountPage.infoMessages}" rendered="#{not empty setupDiscountPage.infoMessages}" styleClass="info-messages" />
+                    </h:panelGrid>
+                </td>
+            </tr>
         </table>
+        </a4j:region>
     </h:panelGrid>
 </a4j:form>

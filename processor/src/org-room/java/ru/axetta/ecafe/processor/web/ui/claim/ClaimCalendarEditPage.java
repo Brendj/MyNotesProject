@@ -148,7 +148,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         Calendar dateFrom = new GregorianCalendar();
         dateFrom.setTimeInMillis(start.getTimeInMillis() - getCalendarPadding());
         Calendar dateTo = new GregorianCalendar();
-        dateTo.setTimeInMillis(end.getTimeInMillis() - getCalendarPadding());
+        dateTo.setTimeInMillis(end.getTimeInMillis() + getCalendarPadding());
 
         //  Загружаем все товары, которые есть
         List<Good> goods = DAOUtils.getAllGoods(session, goodGroup);

@@ -6,11 +6,14 @@ package ru.axetta.ecafe.processor.web.ui.discount;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.dao.DAOServices;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.ClientListEditPage;
 
 import org.hibernate.Session;
+import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -20,10 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -44,6 +44,8 @@ public class SetupDiscountPage extends BasicWorkspacePage {
     private String infoMessages;
     private List<String> groups;
     private String group;
+    private Map<Long, String> categories;
+    private Long category;
     private List<Client> clients;
     private List<DiscountColumn> columns;
 
@@ -96,8 +98,67 @@ public class SetupDiscountPage extends BasicWorkspacePage {
     }
 
     public void fill(Session session) throws Exception {
+        loadCategories(session);
         loadGroups(session);
+        loadClients(session);
         buildColumns(session);
+    }
+
+    public void loadClients (Session session) {
+        String groupJoin = "";
+        String groupRestr = "";
+        String discountRestr = "";
+        if (group != null && group.length() > 0) {
+            groupJoin = "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg ";
+            groupRestr = " and cf_clientgroups.groupname=:groupname ";
+        }
+        if (category != null && category > 0) {
+            discountRestr = " and cf_clients_categorydiscounts.idofcategorydiscount=:idofcategorydiscount ";
+        }
+
+        OverallClient overall = new OverallClient ("ИТОГО");
+        overall.fill(categories);
+        clients = new ArrayList<Client>();
+        Long prevIdoOfClient = null;
+        Client cl = null;
+        
+        String sql = "select cf_clients.idofclient, cf_persons.firstname, cf_persons.secondname, cf_persons.surname, cf_clients_categorydiscounts.idofcategorydiscount "
+                + "from cf_clients "
+                + "left join cf_persons on cf_persons.idofperson=cf_clients.idofperson "
+                + "left join cf_clients_categorydiscounts on cf_clients.idofclient=cf_clients_categorydiscounts.idofclient "
+                + groupJoin
+                + "where cf_clients.idoforg=:idoforg and surname<>'' " + groupRestr + discountRestr
+                + "order by surname, firstname, secondname, cf_clients_categorydiscounts.idofcategorydiscount";
+        org.hibernate.Query q = session.createSQLQuery(sql);
+        q.setLong("idoforg", getOrg(session).getIdOfOrg());
+        if (group != null && group.length() > 0) {
+            q.setString("groupname", group);
+        }
+        if (category != null && category > 0) {
+            q.setLong("idofcategorydiscount", category);
+        }
+        List resultList = q.list();
+        for (Object entry : resultList) {
+            Object o[] = (Object[]) entry;
+            Long idOfClient = HibernateUtils.getDbLong(o[0]);
+            String firstName = HibernateUtils.getDbString(o[1]);
+            String secondname = HibernateUtils.getDbString(o[2]);
+            String surname = HibernateUtils.getDbString(o[3]);
+            Long idofcategorydiscount = HibernateUtils.getDbLong(o[4]);
+            if (prevIdoOfClient == null || prevIdoOfClient.longValue() != idOfClient.longValue()) {
+                cl = new Client(idOfClient, firstName, secondname, surname);
+                prevIdoOfClient = idOfClient;
+                clients.add(cl);
+            }
+            if (idofcategorydiscount != null) {
+                //  Устанавливаем категорию для клиента 
+                cl.addRule(idofcategorydiscount, true);
+                
+                //  Обновляем итоговое значение
+                overall.addValue(idofcategorydiscount, 1);
+            }
+        }
+        clients.add(overall);
     }
 
     @Transactional
@@ -118,18 +179,80 @@ public class SetupDiscountPage extends BasicWorkspacePage {
         Collections.sort(groups, new ClientListEditPage.ClientComparator ());
     }
 
+    @Transactional
+    public void loadCategories () throws Exception {
+        Session session = null;
+        try {
+            session = (Session) entityManager.getDelegate();
+            loadCategories(session);
+        } catch (Exception e) {
+            logger.error("Failed to load catregories for org", e);
+        } finally {
+            //HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void loadCategories(Session session) {
+        if (categories != null) {
+            return;
+        }
+        categories = DAOServices.getInstance().loadDiscountCategories(session);
+    }
+
     public void buildColumns (Session session) {
         if (columns != null) {
             return;
         }
+        loadCategories(session);
 
         columns = new ArrayList<DiscountColumn>();
-        Map<Long, String> categories = DAOServices.getInstance().loadDiscountCategories(session);
         for (Long id : categories.keySet()) {
             String title = categories.get(id);
             columns.add(new DiscountColumn(id, title));
         }
     }
+
+    @Transactional
+    public void save () {
+        Session session = null;
+        try {
+            session = (Session) entityManager.getDelegate();
+            save(session);
+            sendInfo("Изменения успешно внесены");
+        } catch (Exception e) {
+            logger.error("Failed to load discounts data", e);
+            sendError("При внесении изменений произошла ошибка: " + e.getMessage());
+        } finally {
+            //HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void save(Session session) throws Exception {
+        for (Client client : clients) {
+            if (!client.getInput()) {
+                continue;
+            }
+            //  Составляем список тех льгот, которые отмечены у клиента
+            List<Long> idOfCategoryList = new ArrayList<Long>();
+            for (Long idofcategorydiscount : client.getRules().keySet()) {
+                if (client.getRules().get(idofcategorydiscount).equals(Boolean.FALSE)) {
+                    continue;
+                }
+                idOfCategoryList.add(idofcategorydiscount);
+            }
+            if (idOfCategoryList.size() < 1) {
+                continue;
+            }
+
+            //  Загружаем клиента из БД
+            ru.axetta.ecafe.processor.core.persistence.Client cl = (ru.axetta.ecafe.processor.core.persistence.Client) session
+                    .get(ru.axetta.ecafe.processor.core.persistence.Client.class, client.getIdofclient());
+            ClientManager.setCategories(session, cl, idOfCategoryList);
+        }
+    }
+
+
+
 
 
 
@@ -146,19 +269,20 @@ public class SetupDiscountPage extends BasicWorkspacePage {
     }
 
     public void doApply () {
-
+        RuntimeContext.getAppContext().getBean(SetupDiscountPage.class).save();
+        RuntimeContext.getAppContext().getBean(SetupDiscountPage.class).fill();
     }
 
     public void doCancel () {
-
+        RuntimeContext.getAppContext().getBean(SetupDiscountPage.class).fill();
     }
 
-    public void doExportToExcel () {
-
+    public void doChangeGroup (javax.faces.event.ActionEvent actionEvent) {
+        RuntimeContext.getAppContext().getBean(SetupDiscountPage.class).fill();
     }
 
-    public void doChangeGroup () {
-
+    public void doChangeCategory (javax.faces.event.ActionEvent actionEvent) {
+        RuntimeContext.getAppContext().getBean(SetupDiscountPage.class).fill();
     }
 
     public List<SelectItem> getGroups() throws Exception {
@@ -173,6 +297,16 @@ public class SetupDiscountPage extends BasicWorkspacePage {
         return res;
     }
 
+    public List<SelectItem> getCategories () throws  Exception {
+        RuntimeContext.getAppContext().getBean(SetupDiscountPage.class).loadCategories();
+        List<SelectItem> res = new ArrayList<SelectItem>();
+        res.add(new SelectItem("", ""));
+        for (Long idofcategory : categories.keySet()) {
+            res.add(new SelectItem(idofcategory, categories.get(idofcategory)));
+        }
+        return res;
+    }
+
     public void setGroups(List<String> groups) {
         this.groups = groups;
     }
@@ -183,6 +317,14 @@ public class SetupDiscountPage extends BasicWorkspacePage {
 
     public void setGroup(String group) {
         this.group = group;
+    }
+
+    public Long getCategory() {
+        return category;
+    }
+
+    public void setCategory(Long category) {
+        this.category = category;
     }
 
     public List<Client> getClients() {
@@ -238,17 +380,29 @@ public class SetupDiscountPage extends BasicWorkspacePage {
 
 
     public static class Client {
-        private String firstName;
-        private String secondName;
-        private String surname;
-        private Map<Long, Boolean> rules;
-        
-        public Client (String firstName, String secondName, String surname) {
+        protected long idofclient;
+        protected String firstName;
+        protected String secondName;
+        protected String surname;
+        protected Map<Long, Boolean> rules;
+        protected Map<Long, Integer> values;
+
+        public Client () {
+
+        }
+
+        public Client (long idofclient, String firstName, String secondName, String surname) {
+            this.idofclient = idofclient;
             this.firstName = firstName;
             this.secondName = secondName;
             this.surname = surname;
+            rules = new HashMap<Long, Boolean>();
         }
-        
+
+        public long getIdofclient () {
+            return idofclient;
+        }
+
         public String getFullName () {
             String n = surname;
             if (firstName != null && firstName.length() > 0) {
@@ -260,12 +414,59 @@ public class SetupDiscountPage extends BasicWorkspacePage {
             return n;
         }
 
+        public Map<Long, Integer> getValues() {
+            return values;
+        }
+
         public Map<Long, Boolean> getRules() {
             return rules;
         }
 
         public void setRules(Map<Long, Boolean> rules) {
             this.rules = rules;
+        }
+
+        public void addRule (long idofrule, boolean flag) {
+            rules.put(idofrule, flag);
+        }
+
+        public boolean getInput() {
+            return true;
+        }
+    }
+
+    public static class OverallClient extends Client{
+        protected String title;
+
+        public OverallClient (String title) {
+            this.idofclient = -1L;
+            this.title = title;
+            values = new HashMap<Long, Integer>();
+        }
+
+        public void addValue(Long idofcategorydiscount, int val) {
+            Integer v = values.get(idofcategorydiscount);
+            if (v == null) {
+                v = 0;
+            }
+            v += val;
+            values.put(idofcategorydiscount, v);
+        }
+
+        @Override
+        public String getFullName () {
+            return title;
+        }
+        
+        @Override
+        public boolean getInput () {
+            return false;
+        }
+
+        public void fill (Map<Long, String> categories) {
+            for (Long k : categories.keySet()) {
+                values.put(k, 0);
+            }
         }
     }
 
