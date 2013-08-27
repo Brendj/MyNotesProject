@@ -351,6 +351,7 @@ public class ClientManager {
             }
             if (registerCommentsAdds != null && registerCommentsAdds.length() > 0) {
                 String comments = client.getRemarks();
+                if (comments==null) comments="";
                 if (comments.indexOf("{%") > -1) {
                     comments = comments.substring(0, comments.indexOf("{%")) + comments
                             .substring(comments.indexOf("%}") + 1);
@@ -409,8 +410,8 @@ public class ClientManager {
 
             return client.getIdOfClient();
         } catch (Exception e) {
-            logger.info("Ошибка при обновлении данных клиента", e);
-            throw new Exception(e.getMessage());
+            logger.error("Ошибка при обновлении данных клиента", e);
+            throw new Exception(e);
         }
     }
 
@@ -494,8 +495,8 @@ public class ClientManager {
             persistenceTransaction = null;
             return idOfClient;
         } catch (Exception e) {
-            logger.info("Ошибка при обновлении данных клиента", e);
-            throw new Exception(e.getMessage());
+            logger.error("Ошибка при обновлении данных клиента", e);
+            throw new Exception(e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
