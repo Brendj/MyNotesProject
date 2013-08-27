@@ -20,6 +20,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.faces.event.ActionEvent;
+import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -113,11 +115,9 @@ public class SetupDiscountPage extends BasicWorkspacePage {
             groupRestr = " and cf_clientgroups.groupname=:groupname ";
         }
         if (category != null && category > 0) {
-            discountRestr = " and cf_clients_categorydiscounts.idofcategorydiscount=:idofcategorydiscount ";
+            discountRestr = " and cf_clients.idofclient in (select cl_cat_disc2.idofclient from cf_clients_categorydiscounts as cl_cat_disc2 where idofcategorydiscount=:idofcategorydiscount) ";
         }
 
-        OverallClient overall = new OverallClient ("ИТОГО");
-        overall.fill(categories);
         clients = new ArrayList<Client>();
         Long prevIdoOfClient = null;
         Client cl = null;
@@ -153,9 +153,27 @@ public class SetupDiscountPage extends BasicWorkspacePage {
             if (idofcategorydiscount != null) {
                 //  Устанавливаем категорию для клиента 
                 cl.addRule(idofcategorydiscount, true);
-                
-                //  Обновляем итоговое значение
-                overall.addValue(idofcategorydiscount, 1);
+            }
+        }
+        recalculateOverall ();
+    }
+
+    public void recalculateOverall() {
+        OverallClient overall = new OverallClient ("ИТОГО");
+        overall.fill(categories);
+        for (int i=0; i<clients.size(); i++) {
+            Client c = clients.get(i);
+            if (!c.getInput()) {
+                clients.remove(i);
+                i--;
+                continue;
+            }
+            for (Long idofrule : categories.keySet()) {
+                Boolean flag = c.getRules().get(idofrule);
+                if (flag != null && flag.equals(Boolean.TRUE)) {
+                    //  Обновляем итоговое значение
+                    overall.addValue(idofrule, 1);
+                }
             }
         }
         clients.add(overall);
@@ -213,11 +231,11 @@ public class SetupDiscountPage extends BasicWorkspacePage {
     }
 
     @Transactional
-    public void save () {
+    public void save(long idofclient) {
         Session session = null;
         try {
             session = (Session) entityManager.getDelegate();
-            save(session);
+            save(session, idofclient);
             sendInfo("Изменения успешно внесены");
         } catch (Exception e) {
             logger.error("Failed to load discounts data", e);
@@ -227,7 +245,48 @@ public class SetupDiscountPage extends BasicWorkspacePage {
         }
     }
 
-    public void save(Session session) throws Exception {
+    public void save(Session session, long idofclient) throws Exception {
+        //  Изменяем действующее значение
+        Client client = null;
+        for (Client c : clients) {
+            if (c.getIdofclient() == idofclient) {
+                //c.getRules().put(idofrule, !c.getRules().get(idofrule));
+                client = c;
+                break;
+            }
+        }
+
+        List<Long> idOfCategoryList = new ArrayList<Long>();
+        for (Long idofcategorydiscount : client.getRules().keySet()) {
+            if (client.getRules().get(idofcategorydiscount).equals(Boolean.FALSE)) {
+                continue;
+            }
+            idOfCategoryList.add(idofcategorydiscount);
+        }
+
+        //  Загружаем клиента из БД
+        ru.axetta.ecafe.processor.core.persistence.Client cl = (ru.axetta.ecafe.processor.core.persistence.Client) session
+                .get(ru.axetta.ecafe.processor.core.persistence.Client.class, client.getIdofclient());
+        ClientManager.setCategories(session, cl, idOfCategoryList);
+        recalculateOverall();
+    }
+
+    @Transactional
+    public void saveAll() {
+        Session session = null;
+        try {
+            session = (Session) entityManager.getDelegate();
+            saveAll(session);
+            sendInfo("Изменения успешно внесены");
+        } catch (Exception e) {
+            logger.error("Failed to load discounts data", e);
+            sendError("При внесении изменений произошла ошибка: " + e.getMessage());
+        } finally {
+            //HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void saveAll(Session session) throws Exception {
         for (Client client : clients) {
             if (!client.getInput()) {
                 continue;
@@ -269,8 +328,8 @@ public class SetupDiscountPage extends BasicWorkspacePage {
     }
 
     public void doApply () {
-        RuntimeContext.getAppContext().getBean(SetupDiscountPage.class).save();
-        RuntimeContext.getAppContext().getBean(SetupDiscountPage.class).fill();
+        /*RuntimeContext.getAppContext().getBean(SetupDiscountPage.class).saveAll();
+        RuntimeContext.getAppContext().getBean(SetupDiscountPage.class).fill();*/
     }
 
     public void doCancel () {
@@ -283,6 +342,15 @@ public class SetupDiscountPage extends BasicWorkspacePage {
 
     public void doChangeCategory (javax.faces.event.ActionEvent actionEvent) {
         RuntimeContext.getAppContext().getBean(SetupDiscountPage.class).fill();
+    }
+
+    public void doChangeDiscount(ActionEvent event) {
+        Long idofclient = (Long) event.getComponent().getAttributes().get("idofclient");
+        if (idofclient == -1L) {
+            return;
+        }
+
+        RuntimeContext.getAppContext().getBean(SetupDiscountPage.class).save(idofclient);
     }
 
     public List<SelectItem> getGroups() throws Exception {

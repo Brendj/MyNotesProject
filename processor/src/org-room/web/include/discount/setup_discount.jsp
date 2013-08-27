@@ -77,9 +77,24 @@
     }
 </style>
 
+<script type="text/javascript">
+function onstartloading(){
+    jQuery(".checkboxes").attr('disabled', 'disabled');
+    jQuery(".groupSelect").attr('disabled', 'disabled');
+    jQuery(".categorySelect").attr('disabled', 'disabled');
+}
+function onstoploading(){
+    jQuery(".checkboxes").attr('disabled', '');
+    jQuery(".groupSelect").attr('disabled', '');
+    jQuery(".categorySelect").attr('disabled', '');
+}
+</script>
+
+
+
 
 <%--@elvariable id="setupDiscountPage" type="ru.axetta.ecafe.processor.web.ui.discount.SetupDiscountPage"--%>
-<a4j:form>
+<a4j:form id="setupDiscountForm">
     <h:panelGrid id="setupDiscountGrid" binding="#{setupDiscountPage.pageComponent}" styleClass="borderless-grid" style="width: 100%;">
 
     <a4j:region>
@@ -103,7 +118,12 @@
                     <f:facet name="header">
                         <h:outputText escape="true" value="#{col.title}" />
                     </f:facet>
-                    <h:selectBooleanCheckbox value="#{cl.rules[col.id]}" styleClass="output-text" rendered="#{cl.input}" />
+                    <h:selectBooleanCheckbox value="#{cl.rules[col.id]}" styleClass="checkboxes" rendered="#{cl.input}" >
+                        <a4j:support event="onclick" status="loadingStatus" actionListener="#{setupDiscountPage.doChangeDiscount}" reRender="messages,clients">
+                            <!-- use property that uniquely identifies a row -->
+                            <f:attribute name="idofclient" value="#{cl.idofclient}"/>
+                        </a4j:support>
+                    </h:selectBooleanCheckbox>
                     <h:outputText value="#{cl.values[col.id]}" styleClass="output-text-mod" rendered="#{!cl.input}" />
                 </rich:columns>
             </rich:dataTable>
@@ -113,7 +133,7 @@
             <tr>
                 <td>
                     <h:panelGrid id="groups" styleClass="borderless-grid">
-                        <h:selectOneMenu id="group" value="#{setupDiscountPage.group}" style="width:150px;">
+                        <h:selectOneMenu id="group" value="#{setupDiscountPage.group}" style="width:150px;" styleClass="groupSelect">
                             <f:selectItems value="#{setupDiscountPage.groups}"/>
                             <a4j:support status="loadingStatus" event="onchange" actionListener="#{setupDiscountPage.doChangeGroup}" reRender="clients"/>
                         </h:selectOneMenu>
@@ -121,26 +141,18 @@
                 </td>
                 <td>
                     <h:panelGrid id="categories" styleClass="borderless-grid">
-                        <h:selectOneMenu id="category" value="#{setupDiscountPage.category}" style="width:350px;">
+                        <h:selectOneMenu id="category" value="#{setupDiscountPage.category}" style="width:350px;" styleClass="categorySelect">
                             <f:selectItems value="#{setupDiscountPage.categories}"/>
                             <a4j:support status="loadingStatus" event="onchange" actionListener="#{setupDiscountPage.doChangeCategory}" reRender="clients"/>
                         </h:selectOneMenu>
                     </h:panelGrid>
                 </td>
-                <td style="text-align: right; width: 99%">
-                    <a4j:region>
-                    <a4j:status id="loadingStatus">
+                <td style="">
+                    <a4j:status id="loadingStatus" onstart="onstartloading()" onstop="onstoploading()">
                         <f:facet name="start">
                             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
                         </f:facet>
                     </a4j:status>
-
-                    <a4j:commandButton value="Применить" reRender="clients,messages" action="#{setupDiscountPage.doApply}" status="loadingStatus">
-                    </a4j:commandButton>
-
-                    <a4j:commandButton style="padding-left: 10px" value="Отменить" reRender="clients,messages" action="#{setupDiscountPage.doCancel}" status="loadingStatus">
-                    </a4j:commandButton>
-                    </a4j:region>
                 </td>
             </tr>
             <tr>

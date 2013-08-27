@@ -417,11 +417,13 @@ public class ClientManager {
     public static boolean setCategories(Session session, Client cl, List<Long> idOfCategoryList) throws Exception {
         try {
             Set<CategoryDiscount> categories = new HashSet <CategoryDiscount>();
-            Criteria categoryCriteria = session.createCriteria(CategoryDiscount.class);
-            categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", idOfCategoryList));
-            for (Object object : categoryCriteria.list()) {
-                CategoryDiscount categoryDiscount = (CategoryDiscount) object;
-                categories.add(categoryDiscount);
+            if (idOfCategoryList != null && idOfCategoryList.size() > 0) {
+                Criteria categoryCriteria = session.createCriteria(CategoryDiscount.class);
+                categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", idOfCategoryList));
+                for (Object object : categoryCriteria.list()) {
+                    CategoryDiscount categoryDiscount = (CategoryDiscount) object;
+                    categories.add(categoryDiscount);
+                }
             }
             cl.setCategories(categories);
             session.save(cl);
