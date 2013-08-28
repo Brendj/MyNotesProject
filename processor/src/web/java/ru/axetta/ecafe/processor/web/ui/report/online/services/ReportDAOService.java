@@ -985,9 +985,9 @@ public class ReportDAOService {
         }
     }
 
-    
+
     public List<RuleCondition> getReportHandlerRules (Long ruleId) {
-        TypedQuery<RuleCondition> query = entityManager.createQuery("from RuleCondition where idOfRuleCondition=:handler", RuleCondition.class);
+        TypedQuery<RuleCondition> query = entityManager.createQuery("from RuleCondition where reportHandleRule.idOfReportHandleRule=:handler", RuleCondition.class);
         query.setParameter("handler",ruleId);
         List<RuleCondition> result = query.getResultList();
         return result;
