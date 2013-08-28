@@ -5,15 +5,10 @@
 package ru.axetta.ecafe.processor.web.ui.contragent;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.PaymentReconciliationManager;
-import ru.axetta.ecafe.processor.core.persistence.Contract;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.MainPage;
-import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractListPage;
-import ru.axetta.ecafe.processor.web.ui.org.contract.ContractItem;
 
 import org.hibernate.Session;
 import org.richfaces.event.UploadEvent;
@@ -21,10 +16,7 @@ import org.richfaces.model.UploadItem;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import java.io.*;
-import java.net.URLDecoder;
 import java.util.*;
 import java.util.regex.Pattern;
 

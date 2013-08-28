@@ -5,16 +5,9 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import ru.axetta.ecafe.processor.core.report.ClientsBenefitsReport;
-import ru.axetta.ecafe.processor.core.report.DeliveredServicesReport;
-import ru.axetta.ecafe.processor.web.ui.MainPage;
-import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
-import ru.axetta.ecafe.processor.web.ui.contract.ContractFilter;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.hibernate.Session;
-
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 /**
  * Created with IntelliJ IDEA.

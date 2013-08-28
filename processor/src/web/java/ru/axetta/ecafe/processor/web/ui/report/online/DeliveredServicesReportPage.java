@@ -21,6 +21,8 @@ import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
 import ru.axetta.ecafe.processor.web.ui.contract.ContractFilter;
 import ru.axetta.ecafe.processor.web.ui.contract.ContractSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
+import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractFilter;
+import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractSelectPage;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;

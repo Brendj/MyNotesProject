@@ -6,12 +6,10 @@ package ru.axetta.ecafe.processor.web.ui.report.repository;
 
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Contract;
 import ru.axetta.ecafe.processor.core.persistence.ReportInfo;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractListPage;
-import ru.axetta.ecafe.processor.web.ui.org.contract.ContractItem;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
