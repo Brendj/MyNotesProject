@@ -13,9 +13,9 @@ import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ReportFormatMenu;
 import ru.axetta.ecafe.processor.web.ui.RuleConditionItem;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
-import ru.axetta.ecafe.processor.web.ui.contract.ContractFilter;
-import ru.axetta.ecafe.processor.web.ui.contract.ContractSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
+import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractFilter;
+import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractSelectPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.apache.commons.lang.StringUtils;
