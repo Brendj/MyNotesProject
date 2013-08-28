@@ -45,8 +45,11 @@ public class ECafeSettings extends DistributedObject{
         if (stringValue != null)
             setSettingValue(stringValue);
         Integer intId = XMLUtils.getIntegerAttributeValue(node, "Id");
-        if (intId != null)
+        if (intId != null){
             setSettingsId(SettingsIds.fromInteger(intId - 1));
+        } else {
+            throw new DistributedObjectException("ECafeSettings Id not null");
+        }
         setSendAll(SendToAssociatedOrgs.SendToSelf);
         return this;
     }
