@@ -49,7 +49,9 @@ public abstract class AbstractEditPage<I extends AbstractEntityItem> extends Bas
     public void onShow() throws Exception {
         //getSelectedEntityGroupPage().show();
         currentItem = (I)getSelectedEntityGroupPage().getCurrentEntityItem();
-        reload();
+        if(currentItem!=null){
+            reload();
+        }
     }
 
     public Object reload() {

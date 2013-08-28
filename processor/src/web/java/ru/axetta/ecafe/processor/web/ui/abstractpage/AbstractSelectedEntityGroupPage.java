@@ -4,9 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.abstractpage;
 
-import ru.axetta.ecafe.processor.core.persistence.Contract;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.org.contract.ContractItem;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
