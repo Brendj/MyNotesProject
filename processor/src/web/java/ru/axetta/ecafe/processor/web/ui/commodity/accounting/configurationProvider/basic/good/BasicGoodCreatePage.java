@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good;
 
-import ru.axetta.ecafe.processor.web.ui.org.contract.ContractItem;
-
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
