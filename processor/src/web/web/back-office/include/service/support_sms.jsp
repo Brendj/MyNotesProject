@@ -28,6 +28,11 @@
                 reRender="supportSmsPanel" value="Отправить"
                 rendered="#{not supportSMSPage.sent}" />
 
+            <a4j:status id="sReportGenerateStatus">
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                </f:facet>
+            </a4j:status>
         </h:panelGrid>
     </h:panelGrid>
 </rich:panel>

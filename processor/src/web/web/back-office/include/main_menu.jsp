@@ -276,6 +276,11 @@
         <rich:panelMenuItem id="createContractMenuItem" binding="#{contractCreatePage.mainMenuComponent}"
                             label="Регистрация" action="#{contractCreatePage.show}" reRender="workspaceForm" />
 
+
+        <%--@elvariable id="orgOfContractsReportPage" type="ru.axetta.ecafe.processor.web.ui.contragent.contract.OrgOfContractsReportPage"--%>
+        <rich:panelMenuItem id="orgOfContractsReportPageMenuItem" binding="#{orgOfContractsReportPage.mainMenuComponent}"
+                            label="Отчет" action="#{orgOfContractsReportPage.show}" reRender="workspaceForm" />
+
     </rich:panelMenuGroup>
     <rich:panelMenuGroup id="caOpsGroupMenu" binding="#{mainPage.caOpsGroupPage.mainMenuComponent}" label="Операции">
         <a4j:support event="onclick" action="#{mainPage.showContragentOpsGroupPage}" reRender="workspaceForm" />

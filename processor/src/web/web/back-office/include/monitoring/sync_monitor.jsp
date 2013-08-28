@@ -19,8 +19,8 @@
 
 <%-- Панель просмотра списка организаций --%>
 <%--@elvariable id="syncMonitorPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.SyncMonitorPage"--%>
-<%--@elvariable id="contractViewPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractViewPage"--%>
-<%--@elvariable id="contractEditPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractEditPage"--%>
+<%--@elvariable id="contractViewPage" type="ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractViewPage"--%>
+<%--@elvariable id="contractEditPage" type="ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractEditPage"--%>
 <h:panelGrid id="contractListPanelGrid" binding="#{syncMonitorPage.pageComponent}" styleClass="borderless-grid">
 
 

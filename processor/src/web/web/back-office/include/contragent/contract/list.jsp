@@ -10,9 +10,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%-- Панель просмотра списка организаций --%>
-<%--@elvariable id="contractListPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractListPage"--%>
-<%--@elvariable id="contractViewPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractViewPage"--%>
-<%--@elvariable id="contractEditPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractEditPage"--%>
+<%--@elvariable id="contractListPage" type="ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractListPage"--%>
+<%--@elvariable id="contractViewPage" type="ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractViewPage"--%>
+<%--@elvariable id="contractEditPage" type="ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractEditPage"--%>
 <h:panelGrid id="contractListPanelGrid" binding="#{contractListPage.pageComponent}" styleClass="borderless-grid">
     <rich:simpleTogglePanel label="Фильтр (#{contractListPage.filter.status})" switchType="client"
                             opened="false" headerClass="filter-panel-header">

@@ -12,7 +12,7 @@
 { out.println("Недостаточно прав для просмотра страницы"); return; } %>
 
 <%-- Панель создания организации --%>
-<%--@elvariable id="contractEditPage" type="ru.axetta.ecafe.processor.web.ui.org.contract.ContractEditPage"--%>
+<%--@elvariable id="contractEditPage" type="ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractEditPage"--%>
 <h:panelGrid id="contractEditGrid" binding="#{contractEditPage.ap.pageComponent}" styleClass="borderless-grid" columns="2">
 
     <h:outputText escape="true" value="Контрагент" styleClass="output-text" />

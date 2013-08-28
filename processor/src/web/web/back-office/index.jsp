@@ -112,7 +112,7 @@
     </f:subview>
 
     <f:subview id="contractSelectSubView">
-        <c:import url="include/contract/select.jsp" />
+        <c:import url="include/contragent/contract/select.jsp" />
     </f:subview>
 
     <f:subview id="clientSelectSubView">
