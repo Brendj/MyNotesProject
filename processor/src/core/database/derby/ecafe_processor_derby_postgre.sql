@@ -1773,6 +1773,8 @@ CREATE TABLE cf_publications
   CONSTRAINT cf_publications_GUID_key UNIQUE (GUID )
 );
 
+CREATE INDEX cf_publications_idofpublication_idx ON cf_publications USING btree (idofpublication );
+
 --книговыдача
 --IdOfParentCirculation - родительская выдача (древовидная структура для продления выдач)
 --IdOfReader - читатель --можно выкинуть Readers, тогда связь будет сразу на client
@@ -1807,6 +1809,8 @@ CREATE TABLE cf_circulations
   CONSTRAINT cf_circulation_GUID_key UNIQUE (GUID )
 );
 
+CREATE INDEX cf_circulations_idofcirculation_idx ON cf_circulations USING btree (idofcirculation );
+
 --выдаваемая сущность
 --BarCode - штрихкод
 --Type - можешь просто смотреть, какое из след. двух полей не null
@@ -1833,6 +1837,8 @@ CREATE TABLE cf_issuable
   CONSTRAINT cf_issuable_pk PRIMARY KEY (IdOfIssuable ),
   CONSTRAINT cf_issuable_guid_key UNIQUE (guid )
 );
+
+CREATE INDEX cf_issuable_idofissuable_idx ON cf_issuable USING btree (idofissuable );
 
 --тип сопр.документа
 --TypeOfAccompanyingDocumentName - название (акт, накладная, т.п.)
@@ -1893,21 +1899,6 @@ CREATE TABLE cf_accompanyingdocuments (
   CONSTRAINT cf_accompanyingdocument_pk PRIMARY KEY (IdOfAccompanyingDocument ),
   CONSTRAINT cf_accompanyingdocuments_guid_key UNIQUE (guid )
 );
-
--- --читатель
--- CREATE TABLE cf_readers (
---   IdOfReader bigserial NOT NULL,
---   IdOfClient bigint NOT NULL REFERENCES cf_clients(idofclient),
---   GlobalVersion bigint,
---   OrgOwner bigint,
---   DeletedState boolean NOT NULL DEFAULT false,
---   GUID character varying(36) NOT NULL,
---   LastUpdate bigint,
---   DeleteDate bigint,
---   CreatedDate bigint NOT NULL,
---   SendAll integer DEFAULT 0,
---   CONSTRAINT cf_reader_pk PRIMARY KEY (IdOfReader )
--- );
 
 --фонд
 --FundName - название
@@ -2060,6 +2051,8 @@ CREATE TABLE cf_instances (
   CONSTRAINT cf_instances_guid_key UNIQUE (guid )
 );
 
+CREATE INDEX cf_instances_idofinstance_idx ON cf_instances USING btree (idofinstance );
+
 --журналы(тип)
 --IdOfFund - фонд
 --IsNewspaper - газета или журнал (газета не заносится в фонд)
@@ -2115,24 +2108,6 @@ CREATE TABLE cf_journalitems (
   PRIMARY KEY  (IdOfJournalItem),
   CONSTRAINT cf_journalitems_guid_key UNIQUE (guid )
 );
-
---регистрация читателя (перерег. после перехода в другой класс)
---IdOfClientGroupHist - ссылка на историю переходов по классам
--- CREATE TABLE cf_readerreg (
---   IdOfReg bigserial NOT NULL,
---   IdOfReader bigint NOT NULL REFERENCES cf_readers(IdOfReader),
---   IdOfClientGroupHist bigint default NULL,
---   Date date NOT NULL,
---   GlobalVersion bigint,
---   OrgOwner bigint,
---   DeletedState boolean NOT NULL DEFAULT false,
---   GUID character varying(36) NOT NULL,
---   LastUpdate bigint,
---   DeleteDate bigint,
---   CreatedDate bigint NOT NULL,
---   SendAll integer DEFAULT 0,
---   PRIMARY KEY  (IdOfReg)
--- );
 
 --посещение бибилотеки
 --IdOfClient bigint - читатель (тут сразу клиент)
@@ -2573,9 +2548,4 @@ create table CF_ComplexRoles(
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
   VALUES(2, 2, 42, 130809, 0, '');
-
-CREATE INDEX cf_publications_idofpublication_idx ON cf_publications USING btree (idofpublication );
-CREATE INDEX cf_issuable_idofissuable_idx ON cf_issuable USING btree (idofissuable );
-CREATE INDEX cf_instances_idofinstance_idx ON cf_instances USING btree (idofinstance );
-CREATE INDEX cf_circulations_idofcirculation_idx ON cf_circulations USING btree (idofcirculation );
 
