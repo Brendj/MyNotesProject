@@ -5,7 +5,10 @@
 package ru.axetta.ecafe.processor.core.daoservices.context;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.User;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -34,7 +37,7 @@ import java.util.*;
 @Transactional
 public class ContextDAOServices {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
 

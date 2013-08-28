@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.dashboard.data.DashboardResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -23,7 +24,9 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -62,13 +65,14 @@ public class DashboardServiceBean {
     private static final int NUM_OF_OPERATIONS_PARAM_INDEX = LAST_OPERATION_TIME_PARAM_INDEX + 1;
 
     @Autowired
-    PlatformTransactionManager txManager;
+    @Qualifier(value = "txManager")
+    private PlatformTransactionManager txManager;
 
     @Autowired
     DAOService daoService;
 
-    @PersistenceContext
-    EntityManager entityManager;
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager entityManager;
 
     private DashboardResponse prepareDashboardResponse() {
         DashboardResponse dashboardResponse = new DashboardResponse();

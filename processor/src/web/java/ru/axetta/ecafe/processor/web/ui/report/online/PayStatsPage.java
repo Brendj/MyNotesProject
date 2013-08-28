@@ -5,12 +5,11 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.partner.rbkmoney.CurrencyConverter;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.report.online.services.ReportDAOService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -27,10 +26,10 @@ import java.util.List;
 @Scope(value = "session")
 public class PayStatsPage extends BasicWorkspacePage {
 
-    Date fromDate, toDate;
+    private Date fromDate, toDate;
 
     @Autowired
-    DAOService daoService;
+    private ReportDAOService daoService;
     private Calendar localCalendar;
 
     @Override

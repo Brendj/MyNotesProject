@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -22,8 +21,8 @@ import java.util.Date;
 @Component
 @Scope("session")
 public class UosStopListPage extends BasicWorkspacePage {
-    @PersistenceContext
-    EntityManager em;
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager em;
 
     String lastUpdate;
     Long stopListSize;

@@ -27,7 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by IntelliJ IDEA.
@@ -48,8 +51,8 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
     private List<TechnologicalMapProduct> technologicalMapProducts = new LinkedList<TechnologicalMapProduct>();
     private TechnologicalMapGroup currentTechnologicalMapGroup;
 
-    @PersistenceContext
-    EntityManager em;
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager em;
     @Autowired
     private DAOService daoService;
     @Autowired

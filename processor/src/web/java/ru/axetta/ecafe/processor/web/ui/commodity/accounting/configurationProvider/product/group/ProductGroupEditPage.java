@@ -44,7 +44,7 @@ public class ProductGroupEditPage extends BasicWorkspacePage implements Configur
     private Org org;
     @Autowired
     private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
     @Autowired
     private DAOService daoService;

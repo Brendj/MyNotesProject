@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.List;
 
 /**
@@ -46,7 +45,7 @@ public class TechnologicalMapGroupViewPage extends BasicWorkspacePage {
     private SelectedTechnologicalMapGroupGroupPage selectedTechnologicalMapGroupGroupPage;
     @Autowired
     private TechnologicalMapListPage technologicalMapListPage;
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
     @Autowired
     private DAOService daoService;

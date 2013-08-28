@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
-import ru.axetta.ecafe.processor.core.mail.File;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
@@ -45,8 +44,8 @@ import java.util.List;
 public class ImportRegisterClientsService {
 
     private static final int MAX_CLIENTS_PER_TRANSACTION = 500;
-    @PersistenceContext
-    EntityManager em;
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager em;
 
     @Autowired
     MskNSIService nsiService;

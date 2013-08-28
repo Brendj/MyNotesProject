@@ -37,8 +37,8 @@ public class ClientGuardSanRebuildService {
     public static final String DELIMETER_1 = ",";
     public static final String DELIMETER_2 = ";";
 
-    @PersistenceContext
-    EntityManager em;
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager em;
 
 
 

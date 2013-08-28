@@ -6,12 +6,10 @@ package ru.axetta.ecafe.processor.web.ui.abstractpage;
 
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -22,10 +20,10 @@ import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpSession;
 
 public abstract class AbstractEditPage<I extends AbstractEntityItem> extends BasicWorkspacePage {
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     protected EntityManager entityManager;
-    @Resource
-    PlatformTransactionManager transactionManager;
+    @Resource(name = "txManager")
+    protected PlatformTransactionManager transactionManager;
 
     @Autowired
     protected DAOService daoService;

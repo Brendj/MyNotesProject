@@ -27,7 +27,7 @@ import java.util.*;
 @Transactional
 public class AggregateGoodRequestReportService {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
 
     public List<AggregateGoodRequestReportItem> fetchAggregateGoodRequestReportItems(List<Long> idOfSourceOrgList,List<Long> idOfEduList, Date startDate, Date endDate){

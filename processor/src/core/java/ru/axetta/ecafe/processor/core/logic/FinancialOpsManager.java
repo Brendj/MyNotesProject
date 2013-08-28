@@ -5,11 +5,9 @@
 package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.mail.File;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
-import ru.axetta.ecafe.processor.core.service.SMSService;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
@@ -23,16 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.io.StringReader;
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
 
 @Component
 @Scope("singleton")
 public class FinancialOpsManager {
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     EntityManager em;
     
     @Resource

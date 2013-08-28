@@ -4,19 +4,18 @@
 
 package ru.axetta.ecafe.processor.core.daoservices.questionary;
 
-import ru.axetta.ecafe.processor.core.daoservices.client.items.ClientMigrationHistoryReportItem;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.questionary.*;
+import ru.axetta.ecafe.processor.core.persistence.questionary.Answer;
+import ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary;
+import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
+import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryStatus;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +23,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,7 +39,7 @@ import java.util.*;
 @Transactional
 public class QuestionaryDAOService {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
     /* истена если клиент не ответил на данный вопрос или нет доступных для него анкет*/

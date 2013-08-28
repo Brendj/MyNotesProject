@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
@@ -21,8 +20,8 @@ import javax.persistence.PersistenceContext;
 @Component
 @Scope("session")
 public class ClientBalanceTransferPage extends BasicWorkspacePage implements ClientSelectPage.CompleteHandler {
-    @PersistenceContext
-    EntityManager em;
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager em;
 
 
     @Override

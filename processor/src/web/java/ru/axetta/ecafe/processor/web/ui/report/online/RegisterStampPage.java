@@ -1,8 +1,6 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperRunManager;
-import net.sf.jasperreports.engine.export.JRCsvExporter;
 import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
 import net.sf.jasperreports.engine.export.JRXlsExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
@@ -11,10 +9,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
-import ru.axetta.ecafe.processor.core.report.BasicJasperReport;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.RegisterStampReport;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -23,6 +18,7 @@ import ru.axetta.ecafe.processor.web.ui.org.OrgShortItem;
 import ru.axetta.ecafe.processor.web.ui.report.online.items.stamp.RegisterStampPageItem;
 import ru.axetta.ecafe.processor.web.ui.report.online.items.stamp.Tree;
 import ru.axetta.ecafe.processor.web.ui.report.online.items.stamp.Visitor;
+import ru.axetta.ecafe.processor.web.ui.report.online.services.ReportDAOService;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
@@ -91,12 +87,12 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
         this.lvlBottom = lvlBottom;
     }
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
     @Autowired
     private RuntimeContext runtimeContext;
     @Autowired
-    private DAOService daoService;
+    private ReportDAOService daoService;
 
     private OrgShortItem org;
     private Date start;

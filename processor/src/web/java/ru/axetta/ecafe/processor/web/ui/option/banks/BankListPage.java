@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.web.ui.option.banks;
 import ru.axetta.ecafe.processor.core.persistence.Bank;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractListPage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -29,7 +28,7 @@ import java.util.List;
 @Scope("session")
 public class BankListPage extends BasicWorkspacePage{
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
     @Autowired
     private DAOService daoService;

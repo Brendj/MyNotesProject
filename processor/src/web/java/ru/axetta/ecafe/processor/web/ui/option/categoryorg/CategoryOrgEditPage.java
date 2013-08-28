@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.categoryorg;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -18,8 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,8 +37,8 @@ public class CategoryOrgEditPage extends BasicWorkspacePage implements OrgListSe
     private String filter = "Не выбрано";
     private List<Long> idOfOrgList = new ArrayList<Long>(0);
 
-    @PersistenceContext
-    EntityManager entityManager;
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager entityManager;
 
 
     public String getPageFilename() {

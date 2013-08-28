@@ -1,13 +1,10 @@
 package ru.axetta.ecafe.processor.core.daoservices.discount.rules;
 
-import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
-
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,7 +17,7 @@ import javax.persistence.TypedQuery;
 @Transactional
 public class DiscountRuleService {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
 

@@ -525,7 +525,7 @@ public class MainPage {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             allOrgsDiscountsReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();
@@ -550,7 +550,7 @@ public class MainPage {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             orgDiscountsReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();
@@ -1336,7 +1336,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             orgBalanceReportPage.buildReport(persistenceSession, selectedIdOfOrg);
             persistenceTransaction.commit();
@@ -1396,7 +1396,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             orgOrderReportPage.buildReport(persistenceSession, selectedIdOfOrg);
             persistenceTransaction.commit();
@@ -2080,7 +2080,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             contragentClientPaymentReportPage.buildReport(persistenceSession, selectedIdOfContragent);
             persistenceTransaction.commit();
@@ -5083,7 +5083,7 @@ public Long getSelectedIdOfReportRule() {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             freeComplexReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();
@@ -5133,7 +5133,7 @@ public Long getSelectedIdOfReportRule() {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             payComplexReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();
@@ -5192,7 +5192,7 @@ public Long getSelectedIdOfReportRule() {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             clientsBenefitsReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();
@@ -5233,7 +5233,7 @@ public Long getSelectedIdOfReportRule() {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             deliveredServicesReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();
@@ -5283,7 +5283,7 @@ public Long getSelectedIdOfReportRule() {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             goodRequestsReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();
@@ -5324,7 +5324,7 @@ public Long getSelectedIdOfReportRule() {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             clientPaymentsReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();
@@ -5367,7 +5367,7 @@ public Long getSelectedIdOfReportRule() {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             salesReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();
@@ -5429,7 +5429,7 @@ public Long getSelectedIdOfReportRule() {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             syncReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();
@@ -5476,7 +5476,7 @@ public Long getSelectedIdOfReportRule() {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             statusSyncReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();
@@ -5524,7 +5524,7 @@ public Long getSelectedIdOfReportRule() {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             enterEventReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();
@@ -5577,7 +5577,7 @@ public Long getSelectedIdOfReportRule() {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             clientReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();
@@ -5749,7 +5749,7 @@ public Long getSelectedIdOfReportRule() {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             currentPositionsReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();
@@ -7375,7 +7375,7 @@ public User getCurrentUser() throws Exception {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             allComplexReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();

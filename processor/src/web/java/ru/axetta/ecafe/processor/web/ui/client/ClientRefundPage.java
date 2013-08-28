@@ -21,8 +21,8 @@ import javax.persistence.PersistenceContext;
 @Component
 @Scope("session")
 public class ClientRefundPage extends BasicWorkspacePage implements ClientSelectPage.CompleteHandler {
-    @PersistenceContext
-    EntityManager em;
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager em;
 
 
     @Override

@@ -9,15 +9,15 @@ import net.sf.jasperreports.engine.export.JRCsvExporter;
 import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.daoservices.contragent.*;
+import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentCompletionItem;
+import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentDAOService;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.ContragentCompletionReport;
-import ru.axetta.ecafe.processor.core.report.RegisterStampReport;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
+import ru.axetta.ecafe.processor.web.ui.report.online.services.ReportDAOService;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.persistence.EntityManager;
@@ -49,7 +48,7 @@ import java.util.List;
 @Scope("session")
 public class ContragentCompletionReportPage extends BasicWorkspacePage implements ContragentSelectPage.CompleteHandler {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
     protected Date startDate;
     protected Date endDate;
@@ -100,7 +99,7 @@ public class ContragentCompletionReportPage extends BasicWorkspacePage implement
     @Autowired
     private RuntimeContext runtimeContext;
     @Autowired
-    private DAOService daoService;
+    private ReportDAOService daoService;
 
     public void showCSVList(ActionEvent actionEvent){
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();

@@ -8,30 +8,26 @@ import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.option.discountrule.RuleListSelectPage;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.*;
+import java.util.Date;
 
 @Component
 @Scope("session")
 public class CategoryDiscountCreatePage extends BasicWorkspacePage {
 
 
-    @PersistenceContext
-    EntityManager entityManager;
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager entityManager;
 
     public String getPageFilename() {
         return "option/categorydiscount/create";
@@ -135,5 +131,6 @@ public class CategoryDiscountCreatePage extends BasicWorkspacePage {
     }
 
     @Autowired
+    @Qualifier(value = "txManager")
     private PlatformTransactionManager transactionManager;
 }

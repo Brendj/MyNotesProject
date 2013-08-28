@@ -41,8 +41,8 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
     Logger logger = LoggerFactory.getLogger(PupilCatalogFindPage.class);
     @Resource
     MskNSIService nsiService;
-    @PersistenceContext
-    EntityManager em;
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager em;
 
     Org org;
     String orgName;

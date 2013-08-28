@@ -65,8 +65,8 @@ public class BenefitsRecalculationService {
     private static final String DELETE_SQL = "DELETE FROM cf_clientscomplexdiscounts ";//WHERE createdate=:createdate";
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BenefitsRecalculationService.class);
     
-    @PersistenceContext
-    EntityManager em;
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager em;
 
 
     public static boolean isOn() {

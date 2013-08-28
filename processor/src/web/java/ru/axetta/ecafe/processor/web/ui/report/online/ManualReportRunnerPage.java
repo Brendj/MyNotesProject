@@ -24,6 +24,7 @@ import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractSelectPage;
+import ru.axetta.ecafe.processor.web.ui.report.online.services.ReportDAOService;
 import ru.axetta.ecafe.processor.web.ui.report.rule.ReportRuleConstants;
 import ru.axetta.ecafe.processor.web.ui.report.rule.ReportRuleEditPage;
 
@@ -87,10 +88,10 @@ public class ManualReportRunnerPage extends OnlineReportPage
     private List<ReportRuleEditPage.Hint> hints = new ArrayList<ReportRuleEditPage.Hint>();
 
     @Autowired
-    private DAOService proxy;
+    private ReportDAOService proxy;
 
-    @PersistenceContext
-    EntityManager em;
+    @PersistenceContext(unitName = "reportsPU")
+    private EntityManager em;
 
 
     @Override

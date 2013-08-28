@@ -43,7 +43,7 @@ public class TechnologicalMapGroupEditPage extends BasicWorkspacePage implements
     private Org org;
     @Autowired
     private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
     @Autowired
     private DAOService daoService;

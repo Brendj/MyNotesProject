@@ -11,29 +11,18 @@ package ru.axetta.ecafe.processor.web; /**
  */
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
-import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.metamodel.MetadataSources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.io.File;
-import java.io.StringReader;
-import java.util.*;
 
 public class RuntimeInitListener implements ServletContextListener {
     // Logger
@@ -43,11 +32,18 @@ public class RuntimeInitListener implements ServletContextListener {
     public RuntimeInitListener() {
     }
 
-    @PersistenceUnit
+    @PersistenceUnit(unitName = "processorPU")
     static SessionFactory sessionFactory;
+
+    @PersistenceUnit(unitName = "reportsPU")
+    static SessionFactory reportsSessionFactory;
 
     public static SessionFactory getSessionFactory() {
         return sessionFactory;
+    }
+
+    public static SessionFactory getReportsSessionFactory() {
+        return reportsSessionFactory;
     }
 
     public void contextInitialized(ServletContextEvent servletContextEvent) {
@@ -55,6 +51,7 @@ public class RuntimeInitListener implements ServletContextListener {
         // Retrieve application deploy path
         String contextPath = servletContext.getRealPath(File.separator);
         RuntimeContext.setSessionFactory(sessionFactory);
+        RuntimeContext.setReportsSessionFactory(reportsSessionFactory);
     }
 
     public void contextDestroyed(ServletContextEvent servletContextEvent) {

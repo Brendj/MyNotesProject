@@ -31,7 +31,7 @@ public class ProductViewPage extends BasicWorkspacePage {
     private static final Logger logger = LoggerFactory.getLogger(ProductViewPage.class);
     private Product currentProduct;
     private ConfigurationProvider configurationProvider;
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
     @Autowired
     private SelectedProductGroupPage selectedProductGroupPage;

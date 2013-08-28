@@ -30,7 +30,7 @@ public class MaintananceService {
     private Date srcOrgLastCleanDate;
     private Integer maintananceHour;
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
     @Autowired

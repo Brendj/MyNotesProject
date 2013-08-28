@@ -1,8 +1,6 @@
 package ru.axetta.ecafe.processor.core.daoservices.contract;
 
-import ru.axetta.ecafe.processor.core.daoservices.client.items.ClientMigrationHistoryReportItem;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -14,9 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -67,7 +62,7 @@ public class ContractDAOService {
         return (List<OrgContractReportItem>) criteria.list();
     }
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
 }

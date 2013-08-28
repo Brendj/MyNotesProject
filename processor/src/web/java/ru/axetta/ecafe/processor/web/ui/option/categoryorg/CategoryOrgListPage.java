@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.web.ui.option.categoryorg;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
-import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -14,11 +13,11 @@ import ru.axetta.ecafe.processor.web.ui.ConfirmDeletePage;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
 
 @Component
@@ -27,8 +26,8 @@ public class CategoryOrgListPage extends BasicWorkspacePage implements ConfirmDe
 
     private List<CategoryOrg> items;
     
-    @PersistenceContext
-    EntityManager entityManager;
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager entityManager;
 
     public String getPageFilename() {
         return "option/categoryorg/list";

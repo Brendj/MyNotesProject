@@ -16,9 +16,6 @@ import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSele
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -48,7 +45,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
     private String filter = "Не выбрано";
     private Set<CategoryDiscount> categoryDiscountSet;
     private Integer[] selectedComplexIds;
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
     @Autowired
     private DAOService daoService;

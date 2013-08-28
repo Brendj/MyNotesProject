@@ -23,7 +23,7 @@ public class GoodRequestPositionListPage extends BasicWorkspacePage {
     private List<GoodRequestPosition> goodRequestPositionList;
     private Long idOfGoodRequest;
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
     @Override

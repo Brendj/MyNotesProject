@@ -41,7 +41,7 @@ public class ProductGroupViewPage extends BasicWorkspacePage {
     private SelectedProductGroupGroupPage selectedProductGroupGroupPage;
     @Autowired
     private ProductListPage productListPage;
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
     @Override

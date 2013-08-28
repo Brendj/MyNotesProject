@@ -16,7 +16,7 @@ import javax.persistence.PersistenceContext;
 @Component
 @Scope("session")
 public class UvDeletePage extends AbstractModalPage {
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
     
     protected Object currentEntityItem;

@@ -11,15 +11,34 @@ import generated.opc.ru.msk.schemas.uec.identification.v1.HolderIdDescriptionTyp
 import generated.opc.ru.msk.schemas.uec.identification.v1.LegalIdDescriptionType;
 import generated.opc.ru.msk.schemas.uec.identification.v1.OrganizationType;
 import generated.opc.ru.msk.schemas.uec.transaction.v1.*;
-import generated.opc.ru.msk.schemas.uec.transactionservice.v1.*;
+import generated.opc.ru.msk.schemas.uec.transactionservice.v1.TransactionService;
+import generated.opc.ru.msk.schemas.uec.transactionservice.v1.TransactionServicePortType;
+
+import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.TransactionJournal;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.ws.BindingProvider;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 //import org.apache.cxf.annotations.Logging;
 //import org.apache.cxf.interceptor.InInterceptors;
@@ -27,25 +46,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 //import org.apache.cxf.interceptor.LoggingOutInterceptor;
 ////import org.apache.cxf.interceptor.OutInterceptors;
 //import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.ws.BindingProvider;
-import java.math.BigDecimal;
-import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -63,7 +63,7 @@ public class TransactionJournalService {
 
     private static final Logger logger = LoggerFactory.getLogger(TransactionJournalService.class);
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
     @Autowired

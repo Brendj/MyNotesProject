@@ -4,8 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.report.online.services.ReportDAOService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -18,7 +18,7 @@ import java.util.List;
 @Scope(value = "session")
 public class CommonStatsPage extends BasicWorkspacePage {
     @Autowired
-    DAOService daoService;
+    private ReportDAOService daoService;
 
     @Override
     public String getPageFilename() {

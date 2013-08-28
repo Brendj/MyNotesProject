@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2013. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence.utils;
+package ru.axetta.ecafe.processor.web.ui.report.online.services;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -22,7 +23,6 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,19 +33,18 @@ import java.security.SecureRandom;
 import java.util.*;
 
 @Component
-@Scope("singleton")
 @Transactional
-public class DAOService {
+public class ReportDAOService {
 
-    private final static Logger logger = LoggerFactory.getLogger(DAOService.class);
+    private final static Logger logger = LoggerFactory.getLogger(ReportDAOService.class);
 
     public final static int GROUP_TYPE_STUDENTS = 0, GROUP_TYPE_NON_STUDENTS = 1;
 
-    @PersistenceContext(unitName = "processorPU")
+    @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
 
-    public static DAOService getInstance() {
-        return RuntimeContext.getAppContext().getBean(DAOService.class);
+    public static ReportDAOService getInstance() {
+        return RuntimeContext.getAppContext().getBean(ReportDAOService.class);
     }
 
     public List<CategoryDiscount> getCategoryDiscountList() {
@@ -64,7 +63,7 @@ public class DAOService {
     }
 
     public User findUserByUserName(String userName) throws Exception {
-        javax.persistence.Query q = entityManager.createQuery("from User where userName=:userName");
+        Query q = entityManager.createQuery("from User where userName=:userName");
         q.setParameter("userName", userName);
         return (User) q.getSingleResult();
     }
@@ -751,7 +750,7 @@ public class DAOService {
     @SuppressWarnings("unchecked")
     public Map<Long, Integer> getProposalOrgDiscounsCountByGroupType(Date at, Date to, int groupType) {
         String sql = "";
-        if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
+        if (groupType == ReportDAOService.GROUP_TYPE_STUDENTS) {
             sql = "SELECT idoforg, COUNT(DISTINCT cf_clientscomplexdiscounts.idofclient) " +
                     "FROM cf_clients " +
                     "LEFT JOIN cf_clientscomplexdiscounts ON cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient "
@@ -776,7 +775,7 @@ public class DAOService {
             Query q = entityManager.createNativeQuery(sql);
             /*q.setParameter("dateAt", at.getTime());
             q.setParameter("dateTo", to.getTime());*/
-            if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
+            if (groupType == ReportDAOService.GROUP_TYPE_STUDENTS) {
                 q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
             } else {
                 q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
@@ -798,7 +797,7 @@ public class DAOService {
     @SuppressWarnings("unchecked")
     public Map<Long, Integer> getOrgUniqueOrdersCountByGroupType(Date at, Date to, int groupType) {
         String sql = "";
-        if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
+        if (groupType == ReportDAOService.GROUP_TYPE_STUDENTS) {
             sql = "SELECT cf_orders.idoforg, COUNT(DISTINCT cf_orders.idofclient) " +
                     "FROM cf_orders " +
                     "LEFT JOIN cf_clients ON cf_clients.idofclient=cf_orders.idofclient " +
@@ -820,7 +819,7 @@ public class DAOService {
             Query q = entityManager.createNativeQuery(sql);
             q.setParameter("dateAt", at.getTime());
             q.setParameter("dateTo", to.getTime());
-            if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
+            if (groupType == ReportDAOService.GROUP_TYPE_STUDENTS) {
                 q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
             } else {
                 q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
@@ -864,7 +863,7 @@ public class DAOService {
 
 
     @SuppressWarnings("unchecked")
-    
+
     public boolean bindClientToGroup(long idofclient, long idofclientgroup) {
         if (idofclient < 0) {
             return false;
@@ -882,7 +881,7 @@ public class DAOService {
         return false;
     }
 
-    
+
     public List<Contragent> getContragentsList() {
         TypedQuery<Contragent> query = entityManager.createQuery("from Contragent", Contragent.class);
         List<Contragent> result = query.getResultList();
@@ -908,7 +907,7 @@ public class DAOService {
     }
 
     @SuppressWarnings("unchecked")
-    
+
     public Contragent getContragentByBIC(String bic) {
         TypedQuery<Contragent> query = entityManager.createQuery("from Contragent where bic=:bic and classId=:classId", Contragent.class);
         query.setParameter("bic", bic);
@@ -935,7 +934,7 @@ public class DAOService {
 
 
     public Org getOrgByGuid (String guid) {
-        javax.persistence.Query q = entityManager.createQuery("from Org where guid=:guid");
+        Query q = entityManager.createQuery("from Org where guid=:guid");
         q.setParameter("guid", guid);
         List l = q.getResultList();
         if (l.size()==0) return null;

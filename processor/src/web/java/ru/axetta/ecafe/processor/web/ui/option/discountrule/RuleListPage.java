@@ -13,16 +13,12 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.ConfirmDeletePage;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.criterion.Order;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.applet.AppletContext;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -227,8 +223,8 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
         RuntimeContext.getAppContext().getBean(getClass()).reload();
     }
 
-    @PersistenceContext
-    EntityManager em;
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager em;
 
     @Transactional
     public void reload() {

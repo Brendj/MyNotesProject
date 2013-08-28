@@ -27,7 +27,7 @@ import java.util.List;
 @Repository("doDAO")
 public class DistributedObjectDAO {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
     public <T extends DistributedObject> T findByGuid(Class<T> doClass, String guid) {

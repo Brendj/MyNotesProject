@@ -19,10 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.Date;
@@ -42,7 +39,7 @@ public class ProductEditPage extends BasicWorkspacePage implements ProductGroupS
     private Product currentProduct;
     private ConfigurationProvider currentConfigurationProvider;
     private ProductGroup currentProductGroup;
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
     @Autowired
     private ProductGroupItemsPanel productGroupItemsPanel;

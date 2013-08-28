@@ -4,12 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.logic;
 
-import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
-import org.apache.commons.collections.ListUtils;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +19,7 @@ import java.util.*;
 @Component
 @Scope("singleton")
 public class PaymentReconciliationManager {
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
     
     public static class RegistryItem {

@@ -8,12 +8,13 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.DocumentState;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequestPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,21 +23,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequest;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequestPosition;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,7 +37,7 @@ import java.util.UUID;
 @Transactional
 public class GoodRequestService {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
     
     @SuppressWarnings("unchecked")

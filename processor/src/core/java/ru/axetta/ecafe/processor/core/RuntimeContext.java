@@ -32,8 +32,8 @@ import ru.axetta.ecafe.processor.core.report.AutoReportPostman;
 import ru.axetta.ecafe.processor.core.report.AutoReportProcessor;
 import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
 import ru.axetta.ecafe.processor.core.sms.ClientSmsDeliveryStatusUpdater;
-import ru.axetta.ecafe.processor.core.sms.MessageIdGenerator;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
+import ru.axetta.ecafe.processor.core.sms.MessageIdGenerator;
 import ru.axetta.ecafe.processor.core.sms.altarix.AltarixSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.atompark.AtomparkSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.smpp.SMPPClient;
@@ -51,8 +51,8 @@ import ru.axetta.ecafe.util.DigitalSignatureUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.hibernate.SessionFactory;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.quartz.Scheduler;
@@ -69,7 +69,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.mail.internet.InternetAddress;
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.security.PrivateKey;
@@ -231,6 +232,10 @@ public class RuntimeContext implements ApplicationContextAware {
         return sessionFactory.openSession();
     }
 
+    public Session createReportPersistenceSession() {
+        return reportsSessionFactory.openSession();
+    }
+
     public SyncProcessor getSyncProcessor() {
         return syncProcessor;
     }
@@ -354,10 +359,15 @@ public class RuntimeContext implements ApplicationContextAware {
 
     static SessionFactory sessionFactory;
 
+    private static SessionFactory reportsSessionFactory;
+
     public static void setSessionFactory(SessionFactory sessionFactory) {
         RuntimeContext.sessionFactory = sessionFactory;
     }
 
+    public static void setReportsSessionFactory(SessionFactory reportsSessionFactory) {
+        RuntimeContext.reportsSessionFactory = reportsSessionFactory;
+    }
 
     boolean criticalErrors;
 
@@ -476,7 +486,7 @@ public class RuntimeContext implements ApplicationContextAware {
             this.clientPasswordRecover = createClientPasswordRecover(sessionFactory);
 
             this.autoReportGenerator = createAutoReportGenerator(basePath, properties, executorService, scheduler,
-                    sessionFactory, ruleProcessor);
+                    reportsSessionFactory, ruleProcessor);
 
             this.clientSmsDeliveryStatusUpdater = createClientSmsDeliveryStatusUpdater(properties, executorService,
                     scheduler, sessionFactory, smsService);
@@ -536,7 +546,7 @@ public class RuntimeContext implements ApplicationContextAware {
         return currentSchemaVersionInfo;
     }
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
     @Autowired

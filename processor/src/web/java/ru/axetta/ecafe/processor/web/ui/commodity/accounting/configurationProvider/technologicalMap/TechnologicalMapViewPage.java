@@ -48,8 +48,8 @@ public class TechnologicalMapViewPage extends BasicWorkspacePage{
     private ConfigurationProvider currentConfigurationProvider;
     private TechnologicalMapGroup currentTechnologicalMapGroup;
 
-    @PersistenceContext
-    EntityManager em;
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager em;
     @Autowired
     private DAOService daoService;
     @Autowired

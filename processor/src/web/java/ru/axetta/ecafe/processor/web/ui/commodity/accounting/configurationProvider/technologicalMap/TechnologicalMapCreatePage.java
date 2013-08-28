@@ -23,7 +23,10 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by IntelliJ IDEA.
@@ -50,7 +53,7 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
     @Autowired
     private ProductListItemsPanel productItemsPanel;
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
     @Override

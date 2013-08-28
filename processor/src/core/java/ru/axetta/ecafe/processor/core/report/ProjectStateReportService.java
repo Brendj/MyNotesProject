@@ -4,18 +4,12 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
-import com.google.visualization.datasource.DataSourceRequest;
-import com.google.visualization.datasource.base.DataSourceException;
-import com.google.visualization.datasource.base.ResponseStatus;
-import com.google.visualization.datasource.base.StatusType;
 import com.google.visualization.datasource.base.TypeMismatchException;
 import com.google.visualization.datasource.datatable.ColumnDescription;
 import com.google.visualization.datasource.datatable.DataTable;
 import com.google.visualization.datasource.datatable.TableRow;
 import com.google.visualization.datasource.datatable.value.Value;
 import com.google.visualization.datasource.datatable.value.ValueType;
-import com.google.visualization.datasource.query.Query;
-import com.google.visualization.datasource.render.JsonRenderer;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
@@ -23,20 +17,11 @@ import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 
 import org.hibernate.Session;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.UnavailableException;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
@@ -519,7 +504,7 @@ public class ProjectStateReportService {
         Session session = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            session = runtimeContext.createPersistenceSession();
+            session = runtimeContext.createReportPersistenceSession();
 
             initDictionaries(session);
         } catch (Exception e) {
@@ -854,7 +839,7 @@ public class ProjectStateReportService {
         encoding = encoding == "" ? null : encoding;
 
         try {
-            Session session = runtimeContext.createPersistenceSession();
+            Session session = runtimeContext.createReportPersistenceSession();
 
             initDictionaries(session);
 

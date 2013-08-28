@@ -5,22 +5,20 @@
 package ru.axetta.ecafe.processor.web.ui.option.categoryorg;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
-import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -77,8 +75,8 @@ public class CategoryOrgCreatePage extends BasicWorkspacePage implements OrgList
         this.filter = "Не выбрано";
     }
 
-    @PersistenceContext
-    EntityManager entityManager;
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager entityManager;
 
     @Transactional
     public void createCategoryOrg(){
