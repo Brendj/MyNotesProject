@@ -230,6 +230,11 @@ public class ClientManager {
 
     public static long modifyClientTransactionFree(ClientFieldConfigForUpdate fieldConfig, Org org,
             String registerCommentsAdds, Client client, Session persistenceSession) throws Exception {
+        return modifyClientTransactionFree(fieldConfig, org, registerCommentsAdds, client, persistenceSession, false);
+    }
+
+    public static long modifyClientTransactionFree(ClientFieldConfigForUpdate fieldConfig, Org org,
+            String registerCommentsAdds, Client client, Session persistenceSession, boolean updateSecondNameAnyway) throws Exception {
         try {
             //tokens[2];
             if (fieldConfig.getValue(ClientManager.FieldId.CONTRACT_STATE) != null) {
@@ -289,7 +294,7 @@ public class ClientManager {
                 person.setFirstName(firstName);
                 changed = true;
             }
-            if (secondName != null && StringUtils.isNotEmpty(secondName)) {
+            if ((secondName != null && StringUtils.isNotEmpty(secondName)) || updateSecondNameAnyway) {
                 person.setSecondName(secondName);
                 changed = true;
             }

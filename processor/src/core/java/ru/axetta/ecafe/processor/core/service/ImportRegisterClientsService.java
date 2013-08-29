@@ -361,7 +361,7 @@ public class ImportRegisterClientsService {
                     if (performChanges) {
                         ClientManager
                                 .modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) fieldConfig,
-                                        org, String.format(MskNSIService.COMMENT_AUTO_MODIFY, date), cl, session);
+                                        org, String.format(MskNSIService.COMMENT_AUTO_MODIFY, date), cl, session, true);
                     }
                 }
             } catch (Exception e) {
