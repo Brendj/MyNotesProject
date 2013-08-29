@@ -92,7 +92,7 @@ public class ActOfWayBillDifferencePosition extends DistributedObject {
             setNds(longNDS);
         guidOfG = XMLUtils.getStringAttributeValue(node, "GuidOfGoods", 36);
         guidOfAWD = XMLUtils.getStringAttributeValue(node, "GuidOfActOfDifference", 36);
-        setSendAll(SendToAssociatedOrgs.SendToAll);
+        setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
     }
 

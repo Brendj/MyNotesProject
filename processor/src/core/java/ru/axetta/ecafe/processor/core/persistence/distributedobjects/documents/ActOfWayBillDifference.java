@@ -55,7 +55,7 @@ public class ActOfWayBillDifference extends DistributedObject {
         if (stringNumber != null)
             setNumber(stringNumber);
         guidOfStaff = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);
-        setSendAll(SendToAssociatedOrgs.SendToAll);
+        setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
     }
 
