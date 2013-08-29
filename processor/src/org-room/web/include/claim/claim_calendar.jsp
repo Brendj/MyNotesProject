@@ -68,8 +68,7 @@
         </h:panelGrid>
 
         <a4j:region>
-        <div style="width: 1350px; overflow: auto;">
-        <rich:panel id="claimsCalendar" style="height: 450px; overflow: auto;">
+        <rich:panel id="claimsCalendar" style="height: 450px; width: 1350px; overflow: auto;">
             <rich:dataTable value="#{claimCalendarEditPage.entries}" var="e"
                             width="350px" rows="15" id="table" rowKeyVar="row">
                 <rich:column>
@@ -112,38 +111,28 @@
                 </f:facet>
             </rich:dataTable>
         </rich:panel>
-        </div>
 
-        <rich:panel style="width: 100%; background: none" id="controls">
-            <table cellpadding="0" cellspacing="0">
-                <tr>
-                    <td>
-                    <h:panelGrid id="messages">
-                        <h:outputText escape="true" value="#{claimCalendarEditPage.errorMessages}" rendered="#{not empty claimCalendarEditPage.errorMessages}" styleClass="error-messages" />
-                        <h:outputText escape="true" value="#{claimCalendarEditPage.infoMessages}" rendered="#{not empty claimCalendarEditPage.infoMessages}" styleClass="info-messages" />
-                    </h:panelGrid>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <a4j:commandButton value="Применить" reRender="claimsCalendar,messages,months,group" disabled="#{!claimCalendarEditPage.changesMade}"
-                                           action="#{claimCalendarEditPage.doApply}">
-                        </a4j:commandButton>
+        <h:panelGrid style="width: 100%; background: none" id="controls">
+            <h:outputText escape="true" value="#{claimCalendarEditPage.errorMessages}" rendered="#{not empty claimCalendarEditPage.errorMessages}" styleClass="error-messages" />
+            <h:outputText escape="true" value="#{claimCalendarEditPage.infoMessages}" rendered="#{not empty claimCalendarEditPage.infoMessages}" styleClass="info-messages" />
+            <h:panelGrid columns="2">
+                <h:panelGrid columns="2">
+                    <a4j:commandButton value="Применить" reRender="claimsCalendar,messages,months,group" disabled="#{!claimCalendarEditPage.changesMade}"
+                                       action="#{claimCalendarEditPage.doApply}">
+                    </a4j:commandButton>
 
-                        <a4j:commandButton value="Отменить" reRender="claimsCalendar,messages,months,group" disabled="#{!claimCalendarEditPage.changesMade}"
-                                           action="#{claimCalendarEditPage.doCancel}">
-                        </a4j:commandButton>
-                    </td>
-                    <td>
-                        <a4j:status id="registerStatus">
-                            <f:facet name="start">
-                                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
-                            </f:facet>
-                        </a4j:status>
-                    </td>
-                </tr>
-            </table>
-        </rich:panel>
+                    <a4j:commandButton value="Отменить" reRender="claimsCalendar,messages,months,group" disabled="#{!claimCalendarEditPage.changesMade}"
+                                       action="#{claimCalendarEditPage.doCancel}">
+                    </a4j:commandButton>
+                </h:panelGrid>
+
+                <a4j:status id="registerStatus">
+                    <f:facet name="start">
+                        <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+                    </f:facet>
+                </a4j:status>
+            </h:panelGrid>
+        </h:panelGrid>
         </a4j:region>
 
 

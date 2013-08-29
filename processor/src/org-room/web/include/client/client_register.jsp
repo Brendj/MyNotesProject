@@ -31,6 +31,9 @@
     .datagrid_col2 {
         width: 20%;
     }
+    .submit_col1 {
+        width: 99%;
+    }
 </style>
 
 <%-- Событие для добавления строки по изменению поля
@@ -159,7 +162,7 @@
             </rich:dataTable>
         </rich:panel>
 
-        <rich:panel style="width: 100%; height: 300px">
+        <h:panelGrid style="width: 100%; height: 300px">
             <rich:simpleTogglePanel label="Отображаемые поля" switchType="client" style="width: 100%;"
                                     opened="true" headerClass="filter-panel-header">
                 <a4j:region>
@@ -191,31 +194,21 @@
                 </h:panelGrid>
                 </a4j:region>
             </rich:simpleTogglePanel>
-        </rich:panel>
+        </h:panelGrid>
     </h:panelGrid>
     </a4j:region>
 
-    <rich:panel style="width:100%; background: none">
-    <table cellpadding="0" cellspacing="0">
-        <tr>
-            <td style="width: 99%">
-                <h:panelGrid styleClass="borderless-grid" columns="2" style="width: 70%">
-                    <h:selectBooleanCheckbox value="#{clientRegisterPage.registerTwins}" styleClass="output-text" ></h:selectBooleanCheckbox>
-                    <h:outputText escape="true" value="Регистрировать клиентов с одинаковыми данными" styleClass="output-text-mod" />
-                </h:panelGrid>
-            </td>
-            <td>
-                <a4j:status id="registerStatus">
-                    <f:facet name="start">
-                        <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
-                    </f:facet>
-                </a4j:status>
-            </td>
-            <td>
-                <a4j:commandButton value="Зарегистрировать" action="#{clientRegisterPage.doApply}" reRender="clientRegisterGrid" />
-            </td>
-        </tr>
-    </table>
-    </rich:panel>
+    <h:panelGrid columns="3" columnClasses="submit_col1" style="width:100%;">
+        <h:panelGrid styleClass="borderless-grid" columns="2" style="width: 70%">
+            <h:selectBooleanCheckbox value="#{clientRegisterPage.registerTwins}" styleClass="output-text" ></h:selectBooleanCheckbox>
+            <h:outputText escape="true" value="Регистрировать клиентов с одинаковыми данными" styleClass="output-text-mod" />
+        </h:panelGrid>
+        <a4j:status id="registerStatus">
+            <f:facet name="start">
+                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+            </f:facet>
+        </a4j:status>
+        <a4j:commandButton value="Зарегистрировать" action="#{clientRegisterPage.doApply}" reRender="clientRegisterGrid" />
+    </h:panelGrid>
 </h:panelGrid>
 </a4j:form>

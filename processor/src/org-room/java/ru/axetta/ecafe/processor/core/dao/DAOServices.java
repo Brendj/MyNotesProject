@@ -31,7 +31,7 @@ import java.util.*;
 public class DAOServices {
     private final static Logger logger = LoggerFactory.getLogger(DAOServices.class);
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
 

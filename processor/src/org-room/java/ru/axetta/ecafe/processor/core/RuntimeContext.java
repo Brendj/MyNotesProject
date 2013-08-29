@@ -54,7 +54,7 @@ import java.util.concurrent.TimeUnit;
 @Scope("singleton")
 public class RuntimeContext implements ApplicationContextAware {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     EntityManager em;
     // Logger
     private static final Logger logger = LoggerFactory.getLogger(RuntimeContext.class);
@@ -137,7 +137,7 @@ public class RuntimeContext implements ApplicationContextAware {
      ******************************************************************************************************************/
     public void initiateEntityManager () {
         if (em == null) {
-            EntityManagerFactory emf = Persistence.createEntityManagerFactory("org_room");
+            EntityManagerFactory emf = Persistence.createEntityManagerFactory("processorPU");
             em = emf.createEntityManager();
             setSessionFactory (((Session) em.getDelegate()).getSessionFactory());
         }

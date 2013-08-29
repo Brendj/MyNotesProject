@@ -42,7 +42,7 @@ import java.util.*;
 @Scope("session")
 public class ClientRegisterPage extends BasicWorkspacePage {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
     private static final Logger logger = LoggerFactory.getLogger(ClientListEditPage.class);
     private String errorMessages;

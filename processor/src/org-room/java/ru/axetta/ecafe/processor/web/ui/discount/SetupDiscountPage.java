@@ -39,7 +39,7 @@ import java.util.*;
 public class SetupDiscountPage extends BasicWorkspacePage {
     private static final Logger logger = LoggerFactory.getLogger(SetupDiscountPage.class);
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
     private Org org;
     private String errorMessages;

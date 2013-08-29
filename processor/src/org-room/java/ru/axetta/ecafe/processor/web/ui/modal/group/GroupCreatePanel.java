@@ -38,7 +38,7 @@ import java.util.List;
 @Scope("session")
 public class GroupCreatePanel extends BasicWorkspacePage {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
     private static final Logger logger = LoggerFactory.getLogger(GroupCreatePanel.class);

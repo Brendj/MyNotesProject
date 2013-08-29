@@ -15,11 +15,12 @@
         http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
         http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 
-    <jee:jndi-lookup id="entityManagerFactory" jndi-name="java:/org_roomPUFactory"/>
+    <jee:jndi-lookup id="processorPU" jndi-name="java:/processorPUFactory"/>
+    <jee:jndi-lookup id="reportsPU" jndi-name="java:/reportsPUFactory"/>
 
     <!-- Let's access the JTA transaction manager of the application server -->
     <bean id="txManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+        <property name="entityManagerFactory" ref="processorPU"/>
     </bean>
 
     <task:annotation-driven/>

@@ -55,7 +55,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     public static final String OVERALL_TITLE = "ИТОГО";
     public static final long OVERALL_GLOBAL_ID = Long.MIN_VALUE;
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
     @Autowired
     private GoodRequestService goodRequestService;

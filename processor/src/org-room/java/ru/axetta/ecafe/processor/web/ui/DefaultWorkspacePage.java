@@ -31,7 +31,7 @@ import java.util.TreeMap;
 @Scope("session")
 public class DefaultWorkspacePage extends BasicWorkspacePage {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
     private String org;
     private Map<Long, String> orgs;

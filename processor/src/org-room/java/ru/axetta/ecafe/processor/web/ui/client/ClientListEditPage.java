@@ -57,7 +57,7 @@ import java.util.regex.Pattern;
 @Scope("session")
 public class ClientListEditPage extends BasicWorkspacePage implements GroupCreateListener {
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
     public static final String NO_GROUP = "- Без группы -";
