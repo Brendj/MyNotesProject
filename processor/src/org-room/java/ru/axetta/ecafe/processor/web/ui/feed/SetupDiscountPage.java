@@ -2,7 +2,7 @@
  * Copyright (c) 2013. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.discount;
+package ru.axetta.ecafe.processor.web.ui.feed;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.dao.DAOServices;
@@ -13,7 +13,6 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.ClientListEditPage;
 
 import org.hibernate.Session;
-import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.event.ActionEvent;
-import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -418,7 +416,7 @@ public class SetupDiscountPage extends BasicWorkspacePage {
      * ****************************************************************************************************************
      */
     public String getPageFilename() {
-        return "discount/setup_discount";
+        return "feed/setup_discount";
     }
 
     public String getPageTitle() {

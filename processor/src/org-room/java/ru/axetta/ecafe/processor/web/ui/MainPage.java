@@ -5,22 +5,14 @@
 package ru.axetta.ecafe.processor.web.ui;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.ui.client.ClientListEditPage;
-import ru.axetta.ecafe.processor.web.ui.discount.SetupDiscountPage;
 import ru.axetta.ecafe.processor.web.ui.modal.YesNoConfirmPanel;
 import ru.axetta.ecafe.processor.web.ui.modal.group.GroupCreatePanel;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.richfaces.component.UIModalPanel;
 import org.richfaces.component.html.HtmlPanelMenu;
-import org.richfaces.function.RichFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;

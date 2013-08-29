@@ -62,9 +62,7 @@ function onstoploading(){
 </script>
 
 
-
-
-<%--@elvariable id="setupDiscountPage" type="ru.axetta.ecafe.processor.web.ui.discount.SetupDiscountPage"--%>
+<%--@elvariable id="setupDiscountPage" type="ru.axetta.ecafe.processor.web.ui.feed.SetupDiscountPage"--%>
 <a4j:form id="setupDiscountForm">
     <h:panelGrid id="setupDiscountGrid" binding="#{setupDiscountPage.pageComponent}" styleClass="borderless-grid" style="width: 100%;">
 
