@@ -67,6 +67,9 @@
             <rich:menuItem submitMode="ajax" id="discountEditPageMenuItem"
                            binding="#{setupDiscountPage.mainMenuComponent}" value="Установка льгот"
                            action="#{setupDiscountPage.show}" reRender="workspaceForm" />
+            <rich:menuItem submitMode="ajax" id="feedPlanEditPageMenuItem"
+                           binding="#{feedPlanPage.mainMenuComponent}" value="План питания"
+                           action="#{feedPlanPage.show}" reRender="workspaceForm" />
         </rich:dropDownMenu>
 
         <%-- Отчеты --%>

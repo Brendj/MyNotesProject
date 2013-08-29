@@ -27,8 +27,8 @@ padding-right: 10px;
 }
 </style>
 
-<%--@elvariable id="setupDiscountPage" type="ru.axetta.ecafe.processor.web.ui.feed.FeedPlanPage"--%>
-<a4j:form id="setupDiscountForm">
-    <h:panelGrid id="setupDiscountGrid" binding="#{setupDiscountPage.pageComponent}" styleClass="borderless-grid" style="width: 100%;">
+<%--@elvariable id="feedPlanPage" type="ru.axetta.ecafe.processor.web.ui.feed.FeedPlanPage"--%>
+<a4j:form id="setupFeedPlanForm">
+    <h:panelGrid id="setupFeedPlanGrid" binding="#{feedPlanPage.pageComponent}" styleClass="borderless-grid" style="width: 100%;">
     </h:panelGrid>
 </a4j:form>
