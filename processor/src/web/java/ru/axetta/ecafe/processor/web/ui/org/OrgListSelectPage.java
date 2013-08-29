@@ -199,8 +199,13 @@ public class OrgListSelectPage extends BasicPage {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private List<OrgShortItem> retrieveOrgs(Session session) throws HibernateException {
+        deselectAllItems();
+        return retrieveOrgs(session, filter, tagFilter, supplierFilter);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<OrgShortItem> retrieveOrgs(Session session, String filter, String tagFilter, int supplierFilter) throws HibernateException {
         Criteria criteria = session.createCriteria(Org.class);
         criteria.addOrder(Order.asc("idOfOrg"));
         //  Ограничение оргов, которые позволено видеть пользователю
@@ -242,7 +247,6 @@ public class OrgListSelectPage extends BasicPage {
 
         criteria.setResultTransformer(Transformers.aliasToBean(OrgShortItem.class));
 
-        deselectAllItems();
         return (List<OrgShortItem>) criteria.list();
     }
 

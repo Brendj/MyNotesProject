@@ -40,8 +40,14 @@
         <rich:calendar value="#{mainPage.goodRequestReportPage.startDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
         <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
-        <rich:calendar value="#{mainPage.goodRequestReportPage.endDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+        <h:selectOneMenu value="#{mainPage.goodRequestReportPage.daysLimit}" converter="javax.faces.Integer"
+                         styleClass="output-text" >
+            <f:selectItem itemValue="0" itemLabel="1 месяц"/>
+            <f:selectItem itemValue="2" itemLabel="2 недели"/>
+            <f:selectItem itemValue="1" itemLabel="1 неделя"/>
+        </h:selectOneMenu>
+        <%--<rich:calendar value="#{mainPage.goodRequestReportPage.endDate}" datePattern="dd.MM.yyyy"
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />--%>
 
         <h:outputText escape="true" value="Скрывать даты с пустыми значениями"
                       styleClass="output-text" />

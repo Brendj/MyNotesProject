@@ -140,7 +140,7 @@ public class ContextDAOServices {
                            ПОИСКИ    ОБЪЕКТОВ
     */
     @Transactional
-    private Set<Contragent> getRestictedContragents (long idOfUser) {
+    public Set<Contragent> getRestictedContragents (long idOfUser) {
         Session persistenceSession = (Session) entityManager.getDelegate();
         Set<Contragent> contragents = null;
         try {

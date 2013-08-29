@@ -15,8 +15,14 @@
         <rich:calendar value="#{aggregateGoodRequestReportPage.startDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
         <h:outputText escape="true" value="Конечная дата" styleClass="output-text" />
-        <rich:calendar value="#{aggregateGoodRequestReportPage.endDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+        <h:selectOneMenu value="#{aggregateGoodRequestReportPage.daysLimit}" converter="javax.faces.Integer"
+                         styleClass="output-text" >
+            <f:selectItem itemValue="0" itemLabel="1 месяц"/>
+            <f:selectItem itemValue="2" itemLabel="2 недели"/>
+            <f:selectItem itemValue="1" itemLabel="1 неделя"/>
+        </h:selectOneMenu>
+        <%--<rich:calendar value="#{aggregateGoodRequestReportPage.endDate}" datePattern="dd.MM.yyyy"
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />--%>
 
         <h:outputText styleClass="output-text required-field" escape="true" value="Поставщик" />
         <h:panelGroup>

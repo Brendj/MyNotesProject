@@ -5265,6 +5265,7 @@ public Long getSelectedIdOfReportRule() {
     public Object showGoodRequestReportPage () {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
+            goodRequestsReportPage.fill();
             currentWorkspacePage = goodRequestsReportPage;
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);

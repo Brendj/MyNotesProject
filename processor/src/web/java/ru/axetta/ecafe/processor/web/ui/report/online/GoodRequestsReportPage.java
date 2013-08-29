@@ -4,10 +4,22 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.report.GoodRequestsReport;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.org.OrgShortItem;
 
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,14 +29,50 @@ import org.hibernate.Session;
  * To change this template use File | Settings | File Templates.
  */
 public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
+    public static final int MONTH_1_LIMIT = 0;
+    public static final int WEEK_1_LIMIT = 1;
+    public static final int WEEKS_2_LIMIT = 2;
+    public static final long WEEK_1_LIMIT_TS = 604800000;
+    public static final long WEEKS_2_LIMIT_TS = 1209600000L;
+
+    private static final Logger logger = LoggerFactory.getLogger(GoodRequestsReportPage.class);
     private GoodRequestsReport goodRequests;
     private Boolean hideMissedColumns;
     private boolean showAll = true;
-    private int requestsFilter = 1;
+    private int requestsFilter = 3;
     private String goodName;
+    private int daysLimit;
+
+    @PersistenceContext(unitName = "reportsPU")
+    private EntityManager entityManager;
 
     public String getPageFilename() {
         return "report/online/good_requests_report";
+    }
+
+    public void fill() {
+        RuntimeContext.getAppContext().getBean(GoodRequestsReportPage.class).loadPredefinedContragents();
+    }
+
+    @Transactional
+    public void loadPredefinedContragents () {
+        /*if (idOfContragentOrgList.size() > 0) {
+            return;
+        }
+        Session session = null;
+        try {
+            session = (Session) entityManager.getDelegate();
+            List<OrgShortItem> orgs = OrgListSelectPage.retrieveOrgs(session, "", "", 2);
+            Map<Long, String> contragentsMap = new HashMap<Long, String>();
+            selectIdOfOrgList = false;
+            for (OrgShortItem i : orgs) {
+                contragentsMap.put(i.getIdOfOrg(), i.getOfficialName());
+            }
+            completeOrgListSelection(contragentsMap);
+            selectIdOfOrgList = true;
+        } catch (Exception e) {
+            logger.error("Failed to predefine allowed contragents list", e);
+        }*/
     }
 
     public String getGoodName() {
@@ -37,6 +85,14 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
 
     public int getRequestsFilter() {
         return requestsFilter;
+    }
+
+    public int getDaysLimit() {
+        return daysLimit;
+    }
+
+    public void setDaysLimit(int daysLimit) {
+        this.daysLimit = daysLimit;
     }
 
     public void setRequestsFilter(int requestsFilter) {
@@ -82,8 +138,29 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
     }
 
     public void buildReport(Session session) throws Exception {
+        //  пределяем на какой лимит дней необходимо увеличить дату
+        endDate = new Date(getDaysLimitTS(daysLimit, startDate));
+
+        //  Запускаем отчет
         GoodRequestsReport.Builder reportBuilder = new GoodRequestsReport.Builder();
         this.goodRequests = reportBuilder.build(session, hideMissedColumns, startDate, endDate,
                                                 idOfOrgList, idOfContragentOrgList, requestsFilter, goodName);
+    }
+
+    public static long getDaysLimitTS(int daysLimit, Date startDate) {
+        long tsIncrement = 0L;
+        if (daysLimit == MONTH_1_LIMIT) {
+            Calendar cal = new GregorianCalendar();
+            cal.setTimeInMillis(startDate.getTime());
+            cal.set(Calendar.MONTH, cal.get(Calendar.MONTH) + 1);
+            tsIncrement = cal.getTimeInMillis() - startDate.getTime();
+        }
+        if (daysLimit == WEEK_1_LIMIT) {
+            tsIncrement = WEEK_1_LIMIT_TS;
+        }
+        if (daysLimit == WEEKS_2_LIMIT) {
+            tsIncrement = WEEKS_2_LIMIT_TS;
+        }
+        return startDate.getTime() + tsIncrement;
     }
 }
