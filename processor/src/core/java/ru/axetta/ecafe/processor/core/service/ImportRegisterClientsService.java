@@ -92,7 +92,7 @@ public class ImportRegisterClientsService {
         }
         StringBuffer logBuffer = new StringBuffer();
         return RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
-                .loadClients(org, performChanges, logBuffer);
+                .loadClients(org, performChanges, logBuffer, true);
     }
 
 
@@ -113,7 +113,7 @@ public class ImportRegisterClientsService {
             while (attempt < maxAttempts) {
                 try {
                     RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
-                            .loadClients(org, true, null);
+                            .loadClients(org, true, null, false);
                     break;
                 } catch (SocketTimeoutException ste) {
                 } catch (Exception e) {
@@ -136,43 +136,8 @@ public class ImportRegisterClientsService {
 
 
     @Transactional
-    public StringBuffer loadClients(Org org, boolean performChanges, StringBuffer logBuffer) throws Exception {
-        String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
-        String synchDate = "[Синхронизация с Реестрами от " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                .format(new Date(System.currentTimeMillis())) + " для " + org.getIdOfOrg() + "]: ";
-        log(synchDate + "Производится синхронизация для " + org.getOfficialName(), logBuffer);
-
-        Session session = (Session) em.getDelegate();
-        org = em.find(Org.class, org.getIdOfOrg());
-        //  Итеративно загружаем клиентов, используя ограничения
-        List<ExpandedPupilInfo> pupils = new ArrayList<ExpandedPupilInfo>();
-        List<ExpandedPupilInfo> tempPupils = new ArrayList<ExpandedPupilInfo>();
-        int importIteration = 1;
-        while (true) {
-            tempPupils.clear();
-            try {
-                tempPupils = nsiService.getChangedClients(org, importIteration);
-            } catch (Exception e) {
-                logError("Ошибка получения данных от Реестров для " + org.getOfficialName(), e, logBuffer);
-                return logBuffer;
-            }
-            //  Если клиенты найдены, значит добавляем их в общий список и выполняем следующую итерацию, иначе - завершаем импорт
-            if (tempPupils.size() > 0) {
-                pupils.addAll(tempPupils);
-            } else {
-                break;
-            }
-            importIteration++;
-        }
-        log(synchDate + "Всего импортировано " + pupils.size() + " за " + (importIteration) + " итераций импорта",
-                logBuffer);
-        parseClients(synchDate, date, org, pupils, performChanges, logBuffer);
-        return logBuffer;
-    }
-
-    @Transactional
     public void parseClients(String synchDate, String date, Org org, List<ExpandedPupilInfo> pupils,
-            boolean performChanges, StringBuffer logBuffer) throws Exception {
+            boolean performChanges, StringBuffer logBuffer, boolean manualCheckout) throws Exception {
         log(synchDate + "Синхронизация списков начата для " + org.getOfficialName() + (performChanges ? ""
                 : " РЕЖИМ БЕЗ ПРИМЕНЕНИЯ ИЗМЕНЕНИЙ"), logBuffer);
 
@@ -206,7 +171,7 @@ public class ImportRegisterClientsService {
             }
         }
         //log(synchDate + "Найдено " + (removedClientsCount) + " клиентов, подлженщих удалению");
-        if (clientsToRemove.size() > MAX_CLIENTS_PER_TRANSACTION) {
+        if (clientsToRemove.size() > MAX_CLIENTS_PER_TRANSACTION && !manualCheckout) {
             String text = "Внимание! Из Реестров поступило обновление " + pupils.size() + " клиентов для " + org
                     .getOfficialName() + " {" + org.getIdOfOrg()
                     + "}. В целях безопасности автоматическое обновление прекращено.";
@@ -222,7 +187,6 @@ public class ImportRegisterClientsService {
         }
 
 
-        
         //  Удаляем найденных клиентов
         for (Client dbClient: clientsToRemove) {
             ClientGroup clientGroup = DAOUtils
@@ -369,6 +333,41 @@ public class ImportRegisterClientsService {
             }
         }
         log(synchDate + "Синхронизация завершена для " + org.getOfficialName(), logBuffer);
+    }
+
+    @Transactional
+    public StringBuffer loadClients(Org org, boolean performChanges, StringBuffer logBuffer, boolean manualCheckout) throws Exception {
+        String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
+        String synchDate = "[Синхронизация с Реестрами от " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                .format(new Date(System.currentTimeMillis())) + " для " + org.getIdOfOrg() + "]: ";
+        log(synchDate + "Производится синхронизация для " + org.getOfficialName(), logBuffer);
+
+        Session session = (Session) em.getDelegate();
+        org = em.find(Org.class, org.getIdOfOrg());
+        //  Итеративно загружаем клиентов, используя ограничения
+        List<ExpandedPupilInfo> pupils = new ArrayList<ExpandedPupilInfo>();
+        List<ExpandedPupilInfo> tempPupils = new ArrayList<ExpandedPupilInfo>();
+        int importIteration = 1;
+        while (true) {
+            tempPupils.clear();
+            try {
+                tempPupils = nsiService.getChangedClients(org, importIteration);
+            } catch (Exception e) {
+                logError("Ошибка получения данных от Реестров для " + org.getOfficialName(), e, logBuffer);
+                return logBuffer;
+            }
+            //  Если клиенты найдены, значит добавляем их в общий список и выполняем следующую итерацию, иначе - завершаем импорт
+            if (tempPupils.size() > 0) {
+                pupils.addAll(tempPupils);
+            } else {
+                break;
+            }
+            importIteration++;
+        }
+        log(synchDate + "Всего импортировано " + pupils.size() + " за " + (importIteration) + " итераций импорта",
+                logBuffer);
+        parseClients(synchDate, date, org, pupils, performChanges, logBuffer, manualCheckout);
+        return logBuffer;
     }
 
     public static boolean doClientUpdate(FieldProcessor.Config fieldConfig, Object fieldID, String reesterValue,
