@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.mail.File;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
@@ -43,7 +44,7 @@ import java.util.List;
 @Scope("singleton")
 public class ImportRegisterClientsService {
 
-    private static final int MAX_CLIENTS_PER_TRANSACTION = 500;
+    private static final int MAX_CLIENTS_PER_TRANSACTION = 50;
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
 
@@ -174,10 +175,38 @@ public class ImportRegisterClientsService {
             boolean performChanges, StringBuffer logBuffer) throws Exception {
         log(synchDate + "Синхронизация списков начата для " + org.getOfficialName() + (performChanges ? ""
                 : " РЕЖИМ БЕЗ ПРИМЕНЕНИЯ ИЗМЕНЕНИЙ"), logBuffer);
-        //  Проверяем количество поступивших изменений, если больще чем ограничение, то прекращаем обновление школы и
+
+
+        //  Открываем сессию и загружаем клиентов, которые сейчас находятся в БД
+        Session session = (Session) em.getDelegate();
+        List<Client> currentClients = DAOUtils.findClientsForOrgAndFriendly(em, org);
+        List<Org> orgsList = DAOUtils.findFriendlyOrgs(em, org);   //  Текущая организация и дружественные ей
+        //orgsList.add(org);
+
+
+        //  Находим только удаления и подсчитываем их, если их количество больще чем ограничение, то прекращаем обновление школы и
         //  отправляем уведомление на email
-        /*//TODO: неправильно!
-        if (pupils.size() > MAX_CLIENTS_PER_TRANSACTION) {
+        List<Client> clientsToRemove = new ArrayList<Client>();
+        for (Client dbClient : currentClients) {
+            boolean found = false;
+            for (ExpandedPupilInfo pupil : pupils) {
+                if (pupil.getGuid() != null && dbClient.getClientGUID() != null && pupil.getGuid()
+                        .equals(dbClient.getClientGUID())) {
+                    found = true;
+                    break;
+                }
+            }
+            ClientGroup currGroup = dbClient.getClientGroup();
+            //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные",
+            //  увеличиваем количество клиентов, подлежих удалению
+            if (!found && !emptyIfNull(dbClient.getClientGUID()).equals("") && currGroup != null &&
+                    !currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup()
+                            .equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) {
+                clientsToRemove.add(dbClient);
+            }
+        }
+        //log(synchDate + "Найдено " + (removedClientsCount) + " клиентов, подлженщих удалению");
+        if (clientsToRemove.size() > MAX_CLIENTS_PER_TRANSACTION) {
             String text = "Внимание! Из Реестров поступило обновление " + pupils.size() + " клиентов для " + org
                     .getOfficialName() + " {" + org.getIdOfOrg()
                     + "}. В целях безопасности автоматическое обновление прекращено.";
@@ -190,14 +219,33 @@ public class ImportRegisterClientsService {
             }
             logError(text, null, logBuffer);
             return;
-        }*/
+        }
 
-        Session session = (Session) em.getDelegate();
-        //  Проходим по всем существующим клиентам ОУ
-        List<Client> currentClients = DAOUtils.findClientsForOrgAndFriendly(em, org);
-        List<Org> orgsList = DAOUtils.findFriendlyOrgs(em, org);   //  Текущая организация и дружественные ей
-        //orgsList.add(org);
-        for (Client dbClient : currentClients) {
+
+        
+        //  Удаляем найденных клиентов
+        for (Client dbClient: clientsToRemove) {
+            ClientGroup clientGroup = DAOUtils
+                    .findClientGroupByGroupNameAndIdOfOrg(session, dbClient.getOrg().getIdOfOrg(),
+                            ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
+            if (clientGroup == null) {
+                clientGroup = DAOUtils.createNewClientGroup(session, dbClient.getOrg().getIdOfOrg(),
+                        ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
+            }
+            log(synchDate + "Удаление " +
+                    emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(dbClient.getPerson().getSurname())
+                    + " " +
+                    emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(
+                    dbClient.getPerson().getSecondName()) + ", " +
+                    emptyIfNull(dbClient.getClientGroup().getGroupName()), logBuffer);
+            if (performChanges) {
+                dbClient.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                session.save(dbClient);
+            }
+        }
+
+        //  Начинаем работать с поступившем списком клиентов - для начала, УДАЛЯЕМ
+        /*for (Client dbClient : currentClients) {
             boolean found = false;
             for (ExpandedPupilInfo pupil : pupils) {
                 if (pupil.getGuid() != null && dbClient.getClientGUID() != null && pupil.getGuid()
@@ -229,7 +277,7 @@ public class ImportRegisterClientsService {
                     session.save(dbClient);
                 }
             }
-        }
+        }*/
 
         //  Проходим по ответу от Реестров и анализируем надо ли обновлять его или нет
         for (ExpandedPupilInfo pupil : pupils) {
