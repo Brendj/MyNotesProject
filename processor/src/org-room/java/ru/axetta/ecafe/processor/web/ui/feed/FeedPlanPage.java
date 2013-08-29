@@ -83,7 +83,7 @@ public class FeedPlanPage extends BasicWorkspacePage {
         if (org != null) {
             return org;
         }
-        org = (Org) session.get(Org.class, 0L);
+        org = (Org) session.get(Org.class, 6L);
         return org;
     }
 
@@ -104,10 +104,11 @@ public class FeedPlanPage extends BasicWorkspacePage {
     public void fill(Session session) throws Exception {
         clients = new HashMap<Long, Client>();
         complexes = new ArrayList<Complex>();
+        List<Complex> allComplexes = new ArrayList<Complex>();
 
         long prevIdofclient = -1L;
         Client prevClient = null;
-        Integer prevGroupNum = null;
+        Complex prevSuperComplex = null;
 
         String sql = "select cf_clientgroups.idofclientgroup, cf_clientgroups.groupname, cf_clients.idofclient, cf_persons.firstname, "
                 + "       cf_persons.secondname, cf_persons.surname, cf_clientscomplexdiscounts.idofrule, description, idofcomplex, cf_discountrules.priority, "
@@ -162,35 +163,42 @@ public class FeedPlanPage extends BasicWorkspacePage {
                 idofsuperclientgroup = HIGH_CLASSES_TYPE;
                 superclientgroupname = HIGH_CLASSES_TYPE_NAME;
             }
+            //  Поиск супер-группы клиента только в том случае, если она новая
+            Complex c = getComplexByComplexIdAndGroup(idofcomplex, idofsuperclientgroup);
+            if (c != null) {
+                c.increase();
+                prevSuperComplex = c;
+            } else {
+                c = new Complex(idofcomplex, idofsuperclientgroup, superclientgroupname);
+                //  Если у супер-групп различаются id, значит, они поменялись - старую добавляем в список комплексов
+                if (prevSuperComplex != null && prevSuperComplex.getIdofclientgroup() != c.getIdofclientgroup()) {
+                    complexes.add(prevSuperComplex);
+                }
+                prevSuperComplex = c;
+            }
             //  Поиск группы клиента
-            Complex c = getComplexByComplexIdAndGroup(idofcomplex, idofclientgroup);
+            c = getComplexByComplexIdAndGroup(idofcomplex, idofclientgroup);
             if (c != null) {
                 c.increase();
             } else {
                 c = new Complex(idofcomplex, idofclientgroup, clientgroupname);
                 complexes.add(c);
             }
-            //  Поиск супер-группы клиента только в том случае, если школановая
-            c = getComplexByComplexIdAndGroup(idofcomplex, idofsuperclientgroup);
-            if (c != null) {
-                c.increase();
-            } else {
-                c = new Complex(idofcomplex, idofsuperclientgroup, superclientgroupname);
-                complexes.add(c);
-            }
             //  Поиск иговой группы клиента
-            c = getComplexByComplexIdAndGroup(idofcomplex, ALL_TYPE);
+            c = getComplexByComplexIdAndGroup(idofcomplex, ALL_TYPE, allComplexes);
             if (c != null) {
                 c.increase();
             } else {
                 c = new Complex(idofcomplex, ALL_TYPE, ALL_TYPE_NAME);
-                complexes.add(c);
+                allComplexes.add(c);
             }
-
-            //  Устанавливаем предыдущий класс от клиента
-            prevGroupNum = groupNum;
         }
-    int few =2;
+        //  Последний комплекс не попадет в список автоматически, добавляем его вручную
+        if (prevSuperComplex != null) {
+            complexes.add(prevSuperComplex);
+        }
+        complexes.addAll(allComplexes);
+        int few =2;
     }
 
 
@@ -221,6 +229,10 @@ public class FeedPlanPage extends BasicWorkspacePage {
      * ****************************************************************************************************************
      */
     private Complex getComplexByComplexIdAndGroup (int idofcomplex, long idofclientgroup) {
+        return getComplexByComplexIdAndGroup (idofcomplex, idofclientgroup, complexes);
+    }
+    
+    private Complex getComplexByComplexIdAndGroup (int idofcomplex, long idofclientgroup, List<Complex> complexes) {
         for (Complex complex : complexes) {
             if (complex.getComplex() == idofcomplex &&
                 complex.getIdofclientgroup() == idofclientgroup) {
@@ -267,6 +279,10 @@ public class FeedPlanPage extends BasicWorkspacePage {
         private int complex;
         private int count;
 
+        public Complex () {
+
+        }
+
         public Complex(int complex, long idofclientgroup, String clientgroupname) {
             this.complex = complex;
             this.idofclientgroup = idofclientgroup;
@@ -293,7 +309,18 @@ public class FeedPlanPage extends BasicWorkspacePage {
         public void increase () {
             count++;
         }
+
+        @Override
+        public String toString() {
+            return "Complex{" +
+                    "idofclientgroup=" + idofclientgroup +
+                    ", clientgroupname='" + clientgroupname + '\'' +
+                    ", complex=" + complex +
+                    ", count=" + count +
+                    '}';
+        }
     }
+
 
     public static class Client {
         private long idoclientgroup;
@@ -394,6 +421,17 @@ public class FeedPlanPage extends BasicWorkspacePage {
         public void addComplex (Integer complex) {
             complexes.remove(complex);
             complexes.add(complex);
+        }
+
+        @Override
+        public String toString() {
+            return "Client{" +
+                    "user='" + firstname + '\'' +
+                    " '" + secondname + '\'' +
+                    " '" + surname + '\'' +
+                    " '" + ruleDescription + '\'' +
+                    ", idofclient=" + idofclient +
+                    '}';
         }
     }
 }
