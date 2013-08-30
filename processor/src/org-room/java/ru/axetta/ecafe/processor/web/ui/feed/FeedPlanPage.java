@@ -16,12 +16,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.faces.event.ValueChangeEvent;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -50,8 +48,10 @@ public class FeedPlanPage extends BasicWorkspacePage {
     private Org org;
     private String errorMessages;
     private String infoMessages;
-    private Map<Long, Client> clients;
+    private List<Client> clients;
     private List<Complex> complexes;
+    private Calendar planDate;
+    private Long selectedIdOfClientGroup;
 
 
 
@@ -102,13 +102,35 @@ public class FeedPlanPage extends BasicWorkspacePage {
     }
 
     public void fill(Session session) throws Exception {
-        clients = new HashMap<Long, Client>();
+        if (planDate == null) {
+            planDate = new GregorianCalendar();
+            planDate.setTimeInMillis(System.currentTimeMillis());
+            clearDate(planDate);
+        }
+        if (selectedIdOfClientGroup == null) {
+            selectedIdOfClientGroup = ALL_TYPE;
+        }
+        clients = new ArrayList<Client>();
         complexes = new ArrayList<Complex>();
         List<Complex> allComplexes = new ArrayList<Complex>();
+        List<Complex> superComlexGroups = new ArrayList<Complex>();
 
-        long prevIdofclient = -1L;
-        Client prevClient = null;
-        Complex prevSuperComplex = null;
+
+        //  Обработка фильтра классов
+        /*String groupFilter = "";
+        if(selectedIdOfClientGroup == ELEMENTARY_CLASSES_TYPE) {
+             groupFilter = " and CAST(substring(cf_clientgroups.groupname FROM '[0-9]+') AS INTEGER)<4 ";
+        } else if(selectedIdOfClientGroup == MIDDLE_CLASSES_TYPE) {
+            groupFilter = " and CAST(substring(cf_clientgroups.groupname FROM '[0-9]+') AS INTEGER)>3 and "
+                        + " and CAST(substring(cf_clientgroups.groupname FROM '[0-9]+') AS INTEGER)<10 ";
+        } else if(selectedIdOfClientGroup == HIGH_CLASSES_TYPE) {
+            groupFilter = " and CAST(substring(cf_clientgroups.groupname FROM '[0-9]+') AS INTEGER)>9 ";
+        } else if(selectedIdOfClientGroup == ALL_TYPE) {
+            groupFilter = " ";
+        } else {
+            groupFilter = " and cf_clients.idofclientgroup=" + selectedIdOfClientGroup + " ";
+        }*/
+
 
         String sql = "select cf_clientgroups.idofclientgroup, cf_clientgroups.groupname, cf_clients.idofclient, cf_persons.firstname, "
                 + "       cf_persons.secondname, cf_persons.surname, cf_clientscomplexdiscounts.idofrule, description, idofcomplex, cf_discountrules.priority, "
@@ -118,8 +140,8 @@ public class FeedPlanPage extends BasicWorkspacePage {
                 + "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "
                 + "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
                 + "left join cf_discountrules on cf_discountrules.idofrule=cf_clientscomplexdiscounts.idofrule "
-                + "where cf_clients.idoforg=:idoforg "
-                + "order by groupNum, groupname, cf_clients.idofclient, cf_discountrules.priority, idofcomplex";
+                + "where cf_clients.idoforg=:idoforg " //+ groupFilter
+                + "order by groupNum, groupname, cf_clients.idofclient, idofcomplex, cf_discountrules.priority";
         org.hibernate.Query q = session.createSQLQuery(sql);
         q.setLong("idoforg", getOrg(session).getIdOfOrg());
         List resultList = q.list();
@@ -139,14 +161,10 @@ public class FeedPlanPage extends BasicWorkspacePage {
 
 
             //  Добавляем клиента
-            if (prevIdofclient != idofclient.longValue()) {
-                Client cl = new Client(idofclientgroup, idofclient,
-                        firstName, secondname, surname,
-                        idofrule, ruleDescription, idofcomplex, priority);
-                clients.put(idofclient, cl);
-                prevClient = cl;
-            }
-            prevClient.addComplex(idofcomplex);
+            Client cl = new Client(idofclientgroup, idofclient,
+                    firstName, secondname, surname,
+                    idofrule, ruleDescription, idofcomplex, priority);
+            clients.add(cl);
 
 
             //  Обновляем комплексы
@@ -163,19 +181,20 @@ public class FeedPlanPage extends BasicWorkspacePage {
                 idofsuperclientgroup = HIGH_CLASSES_TYPE;
                 superclientgroupname = HIGH_CLASSES_TYPE_NAME;
             }
-            //  Поиск супер-группы клиента только в том случае, если она новая
-            Complex c = getComplexByComplexIdAndGroup(idofcomplex, idofsuperclientgroup);
+            //  Поиск супер-группы в отдельном массиве
+            Complex c = getComplexByComplexIdAndGroup(idofcomplex, idofsuperclientgroup, superComlexGroups);
             if (c != null) {
                 c.increase();
-                prevSuperComplex = c;
             } else {
-                c = new Complex(idofcomplex, idofsuperclientgroup, superclientgroupname);
-                //  Если у супер-групп различаются id, значит, они поменялись - старую добавляем в список комплексов
-                if (prevSuperComplex != null && prevSuperComplex.getIdofclientgroup() != c.getIdofclientgroup()) {
-                    complexes.add(prevSuperComplex);
+                //  Если существуют ранее установленные групп и идентификатор у них иной, то значит началась другая супер-группа
+                if (superComlexGroups.size() > 0 && idofsuperclientgroup != superComlexGroups.get(0).getIdofclientgroup()) {
+                    complexes.addAll(superComlexGroups);
+                    superComlexGroups.clear();
                 }
-                prevSuperComplex = c;
+                c = new Complex(idofcomplex, idofsuperclientgroup, superclientgroupname);
+                superComlexGroups.add(c);
             }
+            c.addClient(cl);
             //  Поиск группы клиента
             c = getComplexByComplexIdAndGroup(idofcomplex, idofclientgroup);
             if (c != null) {
@@ -184,6 +203,7 @@ public class FeedPlanPage extends BasicWorkspacePage {
                 c = new Complex(idofcomplex, idofclientgroup, clientgroupname);
                 complexes.add(c);
             }
+            c.addClient(cl);
             //  Поиск иговой группы клиента
             c = getComplexByComplexIdAndGroup(idofcomplex, ALL_TYPE, allComplexes);
             if (c != null) {
@@ -192,13 +212,14 @@ public class FeedPlanPage extends BasicWorkspacePage {
                 c = new Complex(idofcomplex, ALL_TYPE, ALL_TYPE_NAME);
                 allComplexes.add(c);
             }
+            c.addClient(cl);
         }
         //  Последний комплекс не попадет в список автоматически, добавляем его вручную
-        if (prevSuperComplex != null) {
-            complexes.add(prevSuperComplex);
+        if (superComlexGroups.size() > 0) {
+            complexes.addAll(superComlexGroups);
         }
         complexes.addAll(allComplexes);
-        int few =2;
+        int frew =2;
     }
 
 
@@ -218,6 +239,84 @@ public class FeedPlanPage extends BasicWorkspacePage {
         RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
     }
 
+    public void doChangePlanDate(ValueChangeEvent event) {
+        planDate.setTimeInMillis(((Date) event.getNewValue()).getTime());
+        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
+    }
+
+    public void doChangeGroup (long idofclientgroup) {
+        selectedIdOfClientGroup = idofclientgroup;
+        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
+    }
+
+    public void doApply () {
+
+    }
+
+    public Date getPlanDate() {
+        return planDate.getTime();
+    }
+
+    public void setPlanDate(Date planDate) {
+        this.planDate.setTimeInMillis(planDate.getTime());
+    }
+
+    public List<Client> getClients() {
+        //  Если тип "Все", то отображаем всех клиентов
+        if(selectedIdOfClientGroup == ALL_TYPE) {
+            return clients;
+        }
+
+        //  Иначе, производим поиск по комплексам и  загружаем их
+        List<Client> foundClients = new ArrayList<Client>();
+        for (Complex c : complexes) {
+            if (c.getIdofclientgroup() == selectedIdOfClientGroup.longValue()) {
+                foundClients.addAll(c.getClients());
+            }
+        }
+        return foundClients;
+    }
+    
+    public List<Long> getGroups() {
+        List<Long> res = new ArrayList<Long>();
+        for (Complex c : complexes) {
+            if (res.contains(c.getIdofclientgroup())) {
+                continue;
+            }
+            res.add(c.getIdofclientgroup());
+        }
+        return res;
+    }
+
+    public List<Integer> getComplexes() {
+        List<Integer> res = new ArrayList<Integer>();
+        for (Complex c : complexes) {
+            if (res.contains(c.getComplex())) {
+                continue;
+            }
+            res.add(c.getComplex());
+        }
+        return res;
+    }
+    
+    public int getComplexCount(long idoclientgroup, int complex) {
+        for (Complex c : complexes) {
+            if (c.getIdofclientgroup() == idoclientgroup && c.getComplex() == complex) {
+                return c.getCount();
+            }
+        }
+        return 0;
+    }
+
+    public String getGroupName(long idofclientgroup) {
+        for (Complex c : complexes) {
+            if (c.getIdofclientgroup() == idofclientgroup) {
+                return c.getClientgroupname();
+            }
+        }
+        return "";
+    }
+
 
 
 
@@ -234,8 +333,7 @@ public class FeedPlanPage extends BasicWorkspacePage {
     
     private Complex getComplexByComplexIdAndGroup (int idofcomplex, long idofclientgroup, List<Complex> complexes) {
         for (Complex complex : complexes) {
-            if (complex.getComplex() == idofcomplex &&
-                complex.getIdofclientgroup() == idofclientgroup) {
+            if (complex.getComplex() == idofcomplex && complex.getIdofclientgroup() == idofclientgroup) {
                 return complex;
             }
         }
@@ -270,6 +368,13 @@ public class FeedPlanPage extends BasicWorkspacePage {
     public String getErrorMessages() {
         return errorMessages;
     }
+    
+    public static void clearDate(Calendar calendar) {
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+    }
 
 
 
@@ -278,6 +383,7 @@ public class FeedPlanPage extends BasicWorkspacePage {
         private String clientgroupname;
         private int complex;
         private int count;
+        private List<Client> clients;
 
         public Complex () {
 
@@ -288,6 +394,7 @@ public class FeedPlanPage extends BasicWorkspacePage {
             this.idofclientgroup = idofclientgroup;
             this.clientgroupname = clientgroupname;
             this.count = 1;
+            clients = new ArrayList<Client>();
         }
 
         public int getComplex() {
@@ -310,6 +417,14 @@ public class FeedPlanPage extends BasicWorkspacePage {
             count++;
         }
 
+        public void addClient(Client cl) {
+            clients.add(cl);
+        }
+        
+        public List<Client> getClients() {
+            return clients;
+        }
+
         @Override
         public String toString() {
             return "Complex{" +
@@ -323,35 +438,35 @@ public class FeedPlanPage extends BasicWorkspacePage {
 
 
     public static class Client {
-        private long idoclientgroup;
+        private long idofclientgroup;
         private long idofclient;
         private String firstname;
         private String secondname;
         private String surname;
         private long idofrule;
         private String ruleDescription;
-        private List<Integer> complexes;
+        private int complex;
         private int priority;
 
-        public Client(long idoclientgroup, long idofclient, String firstname, String secondname,
+        public Client(long idofclientgroup, long idofclient, String firstname, String secondname,
                 String surname, long idofrule, String ruleDescription, int complex, int priority) {
-            this.idoclientgroup = idoclientgroup;
+            this.idofclientgroup = idofclientgroup;
             this.idofclient = idofclient;
             this.firstname = firstname;
             this.secondname = secondname;
             this.surname = surname;
             this.idofrule = idofrule;
             this.ruleDescription = ruleDescription;
-            this.complexes = new ArrayList<Integer>();
+            this.complex = complex;
             this.priority = priority;
         }
 
-        public long getIdoclientgroup() {
-            return idoclientgroup;
+        public long getIdofclientgroup() {
+            return idofclientgroup;
         }
 
-        public void setIdoclientgroup(long idoclientgroup) {
-            this.idoclientgroup = idoclientgroup;
+        public void setIdofclientgroup(long idofclientgroup) {
+            this.idofclientgroup = idofclientgroup;
         }
 
         public long getIdofclient() {
@@ -402,12 +517,12 @@ public class FeedPlanPage extends BasicWorkspacePage {
             this.ruleDescription = ruleDescription;
         }
 
-        public List<Integer> getComplexes() {
-            return complexes;
+        public int getComplex() {
+            return complex;
         }
 
-        public void setComplexes(List<Integer> complexes) {
-            this.complexes = complexes;
+        public void setComplex(int complex) {
+            this.complex = complex;
         }
 
         public int getPriority() {
@@ -417,10 +532,9 @@ public class FeedPlanPage extends BasicWorkspacePage {
         public void setPriority(int priority) {
             this.priority = priority;
         }
-
-        public void addComplex (Integer complex) {
-            complexes.remove(complex);
-            complexes.add(complex);
+        
+        public String getFullName () {
+            return firstname + "<br/>" + secondname + "<br/>" + surname;
         }
 
         @Override
