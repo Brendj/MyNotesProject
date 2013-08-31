@@ -390,8 +390,6 @@ public class FrontController extends HttpServlet {
                 if (cd.cardExpiry!=null) fc.setValue(ClientManager.FieldId.CARD_EXPIRY, cd.cardExpiry);
                 if (cd.cardIssued!=null) fc.setValue(ClientManager.FieldId.CARD_ISSUED, cd.cardIssued);
                 if (cd.snils!=null) fc.setValue(ClientManager.FieldId.SAN, cd.snils);
-                /* Генерируем GUID клиента при регистрации  */
-                fc.setValue(ClientManager.FieldId.CLIENT_GUID, UUID.randomUUID().toString());
                 long idOfClient = ClientManager.registerClient(orgId, fc, checkFullNameUniqueness);
                 results.add(new RegisterClientResult(idOfClient, cd.recId, true, null));
             } catch (Exception e) {

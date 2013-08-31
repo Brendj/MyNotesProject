@@ -8,7 +8,7 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting" table="CF_ClientsNotificationSettings">
         <id name="IdOfSetting" column="idOfSetting"  type="long">
-            <generator class="increment"/>
+            <generator class="identity"/>
         </id>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
                          not-null="true" update="false"/>

@@ -15,10 +15,7 @@ import ru.axetta.ecafe.processor.web.ui.org.OrgShortItem;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.*;
 
 /**
@@ -43,18 +40,12 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
     private String goodName;
     private int daysLimit;
 
-    @PersistenceContext(unitName = "reportsPU")
-    private EntityManager entityManager;
-
     public String getPageFilename() {
         return "report/online/good_requests_report";
     }
 
-    public void fill() {
-        RuntimeContext.getAppContext().getBean(GoodRequestsReportPage.class).loadPredefinedContragents();
-    }
+    public void fill() {}
 
-    @Transactional
     public void loadPredefinedContragents () {
         /*if (idOfContragentOrgList.size() > 0) {
             return;
