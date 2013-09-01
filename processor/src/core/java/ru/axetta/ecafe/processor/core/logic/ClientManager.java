@@ -409,6 +409,7 @@ public class ClientManager {
                     client.setClientGUID(clientGUID);
                 }
             }
+            client.setUpdateTime(new Date(System.currentTimeMillis()));
 
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
             client.setClientRegistryVersion(clientRegistryVersion);
