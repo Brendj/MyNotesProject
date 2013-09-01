@@ -1468,4 +1468,9 @@ public class DAOService {
         }
         return cl;
     }
+
+    public Set<Org> getFriendlyOrgs(Long idOfOrg) {
+        Org org = entityManager.find(Org.class, idOfOrg);
+        return org.getFriendlyOrg();
+    }
 }

@@ -27,8 +27,21 @@
                                    styleClass="command-link" style="width: 25px;" />
             </h:panelGroup>
 
-            <h:outputText escape="true" value="Фамилия учащегося" styleClass="output-text" />
-            <h:inputText value="#{pupilCatalogFindPage.familyName}" maxlength="20" size="20" styleClass="input-text" />
+        </h:panelGrid>
+        <h:panelGrid columns="6" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Фамилия" styleClass="output-text" />
+            <h:inputText value="#{pupilCatalogFindPage.familyName}" maxlength="30" size="20"
+                         styleClass="input-text" />
+            <h:outputText escape="true" value="Имя" styleClass="output-text" />
+            <h:inputText value="#{pupilCatalogFindPage.firstName}" maxlength="30" size="20"
+                         styleClass="input-text" />
+            <h:outputText escape="true" value="Отчество" styleClass="output-text" />
+            <h:inputText value="#{pupilCatalogFindPage.secondName}" maxlength="30" size="20"
+                         styleClass="input-text" />
+        </h:panelGrid>
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:outputText value="Показывать дополнительные поля:" styleClass="output-text"/>
+            <h:selectBooleanCheckbox value="#{pupilCatalogFindPage.showExtendedInfo}"/>
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
 
@@ -45,15 +58,15 @@
                            styleClass="command-button" />
     </h:panelGroup>
     <h:panelGroup style="text-align: right">
-        <h:outputText value="Всего в списке: #{pupilCatalogFindPage.clientTotalCount}" styleClass="output-text"/>
-        <rich:spacer width="20px"/>
+        <h:outputText value="Всего в списке: #{pupilCatalogFindPage.clientTotalCount}" styleClass="output-text" />
+        <rich:spacer width="20px" />
         <a4j:commandLink value="Отметить все записи к регистрации"
-                           action="#{pupilCatalogFindPage.markAllForRegistration}" reRender="workspaceTogglePanel"
-                           styleClass="command-button" />
-        <rich:spacer width="20px"/>
+                         action="#{pupilCatalogFindPage.markAllForRegistration}" reRender="workspaceTogglePanel"
+                         styleClass="command-button" />
+        <rich:spacer width="20px" />
         <a4j:commandLink value="Снять все записи c регистрации"
-                           action="#{pupilCatalogFindPage.unmarkAllForRegistration}" reRender="workspaceTogglePanel"
-                           styleClass="command-button" />
+                         action="#{pupilCatalogFindPage.unmarkAllForRegistration}" reRender="workspaceTogglePanel"
+                         styleClass="command-button" />
     </h:panelGroup>
 
 
@@ -103,11 +116,41 @@
             </f:facet>
             <h:outputText value="#{item.group}" />
         </rich:column>
+        <rich:column headerClass="column-header" rendered="#{pupilCatalogFindPage.showExtendedInfo}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Класс зачисления" />
+            </f:facet>
+            <h:outputText value="#{item.enterGroup}" />
+        </rich:column>
+        <rich:column headerClass="column-header" rendered="#{pupilCatalogFindPage.showExtendedInfo}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Дата зачисления" />
+            </f:facet>
+            <h:outputText value="#{item.enterDate}" />
+        </rich:column>
+        <rich:column headerClass="column-header" rendered="#{pupilCatalogFindPage.showExtendedInfo}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Дата отчисления" />
+            </f:facet>
+            <h:outputText value="#{item.leaveDate}" />
+        </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="GUID" />
             </f:facet>
             <h:outputText value="#{item.guid}" />
+        </rich:column>
+        <rich:column headerClass="column-header" rendered="#{pupilCatalogFindPage.showExtendedInfo}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="GUID организации" />
+            </f:facet>
+            <h:outputText value="#{item.guidOfOrg}" />
+        </rich:column>
+        <rich:column headerClass="column-header" rendered="#{pupilCatalogFindPage.showExtendedInfo}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Статус" />
+            </f:facet>
+            <h:outputText value="#{item.recordState}" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -140,7 +183,8 @@
                 </rich:datascroller>
                 <a4j:commandButton value="Найти по Ф.И.О." action="#{pupilCatalogFindPage.checkFullNameDuplicates}"
                                    reRender="workspaceTogglePanel" styleClass="command-button" />
-                <a4j:commandButton value="Найти по Ф.И.О. (с допуском)" action="#{pupilCatalogFindPage.checkFullNameDuplicatesFuzzy}"
+                <a4j:commandButton value="Найти по Ф.И.О. (с допуском)"
+                                   action="#{pupilCatalogFindPage.checkFullNameDuplicatesFuzzy}"
                                    reRender="workspaceTogglePanel" styleClass="command-button" />
                 <a4j:commandButton value="Связать" action="#{pupilCatalogFindPage.bindClients}"
                                    reRender="workspaceTogglePanel" styleClass="command-button" />
@@ -149,8 +193,8 @@
                                    reRender="workspaceTogglePanel" styleClass="command-button" />
                 <rich:spacer width="20px" />
 
-                <h:commandLink value="Сравнение в файл CSV" style="color: #0000ff;" action="#{pupilCatalogFindPage.buildComparisonCSVFile}"
-                               styleClass="command-button"/>
+                <h:commandLink value="Сравнение в файл CSV" style="color: #0000ff;"
+                               action="#{pupilCatalogFindPage.buildComparisonCSVFile}" styleClass="command-button" />
             </h:panelGroup>
         </f:facet>
 

@@ -13,7 +13,7 @@
     </persistence-unit>
     <persistence-unit name="reportsPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <jta-data-source>java:jboss/PostgresDS</jta-data-source>
+        <jta-data-source>java:jboss/PostgresReportDS</jta-data-source>
         <properties>
             <property name="hibernate.dialect"
                       value="org.hibernate.dialect.PostgreSQLDialect"/>

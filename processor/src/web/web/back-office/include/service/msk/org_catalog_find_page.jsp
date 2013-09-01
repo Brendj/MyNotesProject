@@ -18,6 +18,8 @@
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText escape="true" value="Наименование/номер организации" styleClass="output-text" />
             <h:inputText value="#{orgCatalogFindPage.orgName}" maxlength="20" size="20" styleClass="input-text" />
+            <h:outputText escape="true" value="GUID организации" styleClass="output-text" />
+            <h:inputText value="#{orgCatalogFindPage.guid}" maxlength="36" size="40" styleClass="input-text" />
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
 

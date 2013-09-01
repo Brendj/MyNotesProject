@@ -29,9 +29,7 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -90,9 +88,10 @@ public class ImportRegisterClientsService {
             throw new Exception(
                     "У организации " + idOfOrg + " не установлен тэг синхронизации с Реестрами: " + ORG_SYNC_MARKER);
         }
+        
         StringBuffer logBuffer = new StringBuffer();
         return RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
-                .loadClients(org, performChanges, logBuffer, true);
+                .syncClientsWithRegistry(org, performChanges, logBuffer, true);
     }
 
 
@@ -100,9 +99,7 @@ public class ImportRegisterClientsService {
         if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
             return;
         }
-        Date lastUpd = getLastUpdateDate();
         List<Org> orgs = DAOService.getInstance().getOrderedSynchOrgsList();
-
 
         int maxAttempts = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_MSK_NSI_MAX_ATTEMPTS);
         for (Org org : orgs) {
@@ -113,7 +110,7 @@ public class ImportRegisterClientsService {
             while (attempt < maxAttempts) {
                 try {
                     RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
-                            .loadClients(org, true, null, false);
+                            .syncClientsWithRegistry(org, true, null, false);
                     break;
                 } catch (SocketTimeoutException ste) {
                 } catch (Exception e) {
@@ -162,11 +159,12 @@ public class ImportRegisterClientsService {
                 }
             }
             ClientGroup currGroup = dbClient.getClientGroup();
-            //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные",
+            //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные", "Удаленные"
             //  увеличиваем количество клиентов, подлежих удалению
-            if (!found && !emptyIfNull(dbClient.getClientGUID()).equals("") && currGroup != null &&
-                    !currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup()
-                            .equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) {
+            Long currGroupId = currGroup==null?null:currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
+            if (!found && !emptyIfNull(dbClient.getClientGUID()).equals("") && currGroupId != null &&
+                    !currGroupId.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) &&
+                    !currGroupId.equals(ClientGroup.Predefined.CLIENT_DELETED.getValue())) {
                 clientsToRemove.add(dbClient);
             }
         }
@@ -177,10 +175,14 @@ public class ImportRegisterClientsService {
                     + "}. В целях безопасности автоматическое обновление прекращено.";
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             if (runtimeContext != null) {
-                String address = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_SUPPORT_EMAIL);
-                String subject = "Синхронизация с Реестрами";
-                List<File> files = new ArrayList<File>();
-                runtimeContext.getPostman().postSupportEmail(address, subject, text, files);
+                try {
+                    String address = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_SUPPORT_EMAIL);
+                    String subject = "Синхронизация с Реестрами";
+                    List<File> files = new ArrayList<File>();
+                    runtimeContext.getPostman().postSupportEmail(address, subject, text, files);
+                } catch (Exception e) {
+                    logError("Ошибка при отправке уведомления", e, logBuffer);
+                }
             }
             logError(text, null, logBuffer);
             return;
@@ -245,9 +247,6 @@ public class ImportRegisterClientsService {
 
         //  Проходим по ответу от Реестров и анализируем надо ли обновлять его или нет
         for (ExpandedPupilInfo pupil : pupils) {
-            if (isPupilIgnoredFromImport(pupil.getGuid(), pupil.getGroup())) {
-                continue;
-            }
             FieldProcessor.Config fieldConfig;
             boolean updateClient = false;
             Client cl = DAOUtils.findClientByGuid(em, emptyIfNull(pupil.getGuid()));
@@ -334,38 +333,44 @@ public class ImportRegisterClientsService {
         }
         log(synchDate + "Синхронизация завершена для " + org.getOfficialName(), logBuffer);
     }
+    
+    public static class OrgRegistryGUIDInfo {
+        Set<String> orgGuids;
+        String guidInfo;
+        
+        public OrgRegistryGUIDInfo(Org org) {
+            Set<Org> orgs = DAOService.getInstance().getFriendlyOrgs(org.getIdOfOrg());
+            orgGuids = new HashSet<String>();
+            guidInfo="";
+            for (Org o : orgs) {
+                if (o.getGuid()==null) continue;
+                if (guidInfo.length()>0) guidInfo+=", ";
+                guidInfo+=o.getOrgNumberInName()+": "+o.getGuid();
+                orgGuids.add(o.getGuid());
+            }
+        }
 
+        public Set<String> getOrgGuids() {
+            return orgGuids;
+        }
+
+        public String getGuidInfo() {
+            return guidInfo;
+        }
+    }
+    
     @Transactional
-    public StringBuffer loadClients(Org org, boolean performChanges, StringBuffer logBuffer, boolean manualCheckout) throws Exception {
+    public StringBuffer syncClientsWithRegistry(Org org, boolean performChanges, StringBuffer logBuffer, boolean manualCheckout) throws Exception {
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
         String synchDate = "[Синхронизация с Реестрами от " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                 .format(new Date(System.currentTimeMillis())) + " для " + org.getIdOfOrg() + "]: ";
-        log(synchDate + "Производится синхронизация для " + org.getOfficialName(), logBuffer);
-
-        Session session = (Session) em.getDelegate();
         org = em.find(Org.class, org.getIdOfOrg());
+        OrgRegistryGUIDInfo orgGuids = new OrgRegistryGUIDInfo(org);
+        log(synchDate + "Производится синхронизация для " + org.getOfficialName()+" GUID ["+orgGuids.getGuidInfo()+"]", logBuffer);
+
         //  Итеративно загружаем клиентов, используя ограничения
-        List<ExpandedPupilInfo> pupils = new ArrayList<ExpandedPupilInfo>();
-        List<ExpandedPupilInfo> tempPupils = new ArrayList<ExpandedPupilInfo>();
-        int importIteration = 1;
-        while (true) {
-            tempPupils.clear();
-            try {
-                tempPupils = nsiService.getChangedClients(org, importIteration);
-            } catch (Exception e) {
-                logError("Ошибка получения данных от Реестров для " + org.getOfficialName(), e, logBuffer);
-                return logBuffer;
-            }
-            //  Если клиенты найдены, значит добавляем их в общий список и выполняем следующую итерацию, иначе - завершаем импорт
-            if (tempPupils.size() > 0) {
-                pupils.addAll(tempPupils);
-            } else {
-                break;
-            }
-            importIteration++;
-        }
-        log(synchDate + "Всего импортировано " + pupils.size() + " за " + (importIteration) + " итераций импорта",
-                logBuffer);
+        List<ExpandedPupilInfo> pupils = nsiService.getPupilsByOrgGUID(orgGuids.orgGuids, null, null, null);
+        log(synchDate + "Получено " + pupils.size() +" записей", logBuffer);
         parseClients(synchDate, date, org, pupils, performChanges, logBuffer, manualCheckout);
         return logBuffer;
     }
@@ -448,10 +453,30 @@ public class ImportRegisterClientsService {
         return false;
     }
 
-    public static class PupilInfo {
-
-        public String familyName, firstName, secondName, guid, group;
+    public static class ExpandedPupilInfo {
+        public String familyName, firstName, secondName, guid, group, enterGroup, enterDate, leaveDate;
         public String birthDate;
+
+        public boolean deleted;
+        public boolean created;
+        public String guidOfOrg;
+        public String recordState;
+
+        public boolean isDeleted() {
+            return deleted;
+        }
+
+        public boolean isCreated() {
+            return created;
+        }
+
+        public String getGuidOfOrg() {
+            return guidOfOrg;
+        }
+
+        public void setGuidOfOrg(String guidOfOrg) {
+            this.guidOfOrg = guidOfOrg;
+        }
 
         public String getFamilyName() {
             return familyName;
@@ -481,36 +506,52 @@ public class ImportRegisterClientsService {
             this.birthDate = birthDate;
         }
 
-        public void copyFrom(PupilInfo pi) {
-            this.birthDate = pi.birthDate;
+        public String getRecordState() {
+            return recordState;
+        }
+
+        public void setRecordState(String recordState) {
+            this.recordState = recordState;
+        }
+
+        public String getEnterGroup() {
+            return enterGroup;
+        }
+
+        public void setEnterGroup(String enterGroup) {
+            this.enterGroup = enterGroup;
+        }
+
+        public String getEnterDate() {
+            return enterDate;
+        }
+
+        public void setEnterDate(String enterDate) {
+            this.enterDate = enterDate;
+        }
+
+        public String getLeaveDate() {
+            return leaveDate;
+        }
+
+        public void setLeaveDate(String leaveDate) {
+            this.leaveDate = leaveDate;
+        }
+
+        public void copyFrom(ExpandedPupilInfo pi) {
+            this.familyName = pi.familyName;
             this.firstName = pi.firstName;
             this.secondName = pi.secondName;
-            this.familyName = pi.familyName;
             this.guid = pi.guid;
             this.group = pi.group;
-        }
-    }
-
-    public static class ExpandedPupilInfo extends PupilInfo {
-
-        public boolean deleted;
-        public boolean created;
-        public String guidOfOrg;
-
-        public boolean isDeleted() {
-            return deleted;
-        }
-
-        public boolean isCreated() {
-            return created;
-        }
-
-        public String getGuidOfOrg() {
-            return guidOfOrg;
-        }
-
-        public void setGuidOfOrg(String guidOfOrg) {
-            this.guidOfOrg = guidOfOrg;
+            this.birthDate = pi.birthDate;
+            this.deleted = pi.deleted;
+            this.created = pi.created;
+            this.guidOfOrg = pi.guidOfOrg;
+            this.recordState = pi.recordState;
+            this.enterGroup = pi.enterGroup;
+            this.enterDate = pi.enterDate;
+            this.leaveDate = pi.leaveDate;
         }
     }
 }

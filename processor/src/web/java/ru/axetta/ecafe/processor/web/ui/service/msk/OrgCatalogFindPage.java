@@ -21,6 +21,7 @@ public class OrgCatalogFindPage extends BasicWorkspacePage {
     MskNSIService nsiService;
     
     String orgName;
+    String guid;
     
     public void setOrgName(String orgName) {
         this.orgName = orgName;
@@ -30,11 +31,19 @@ public class OrgCatalogFindPage extends BasicWorkspacePage {
         return orgName;
     }
 
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
+    }
+
     List<MskNSIService.OrgInfo> orgInfos = new LinkedList<MskNSIService.OrgInfo>();
 
     public void updateList() {
         try {
-            orgInfos = nsiService.getOrgByName(orgName);
+            orgInfos = nsiService.getOrgByNameAndGuid(orgName, guid);
         } catch (Exception e) {
             super.logAndPrintMessage("Ошибка получения данных", e);
         }

@@ -111,7 +111,7 @@ public class MskNSIService {
     }
 
     public List<QueryResult> executeQuery(String queryText) throws Exception {
-        return executeQuery (queryText, -1);
+        return executeQuery(queryText, -1);
     }
 
     public List<QueryResult> executeQuery(String queryText, int importIteration) throws Exception {
@@ -126,7 +126,7 @@ public class MskNSIService {
         setTimeouts (provider, new Long (60000), new Long (180000));*/
         //provider.getRequestContext().put("jaxb-validation-event-handle", null);
         Client client = ClientProxy.getClient(nsiService);
-        HTTPConduit conduit = (HTTPConduit)client.getConduit();
+        HTTPConduit conduit = (HTTPConduit) client.getConduit();
         HTTPClientPolicy policy = conduit.getClient();
         policy.setReceiveTimeout(10 * 60 * 1000);
         policy.setConnectionTimeout(10 * 60 * 1000);
@@ -153,7 +153,7 @@ public class MskNSIService {
         request.getMessageData().getAppData().getContext().setCompany(Config.getCompany());
         if (importIteration >= 0) {
             request.getMessageData().getAppData().setFrom(new Long(1 + SERVICE_ROWS_LIMIT * (importIteration - 1)));
-            request.getMessageData().getAppData().setLimit(SERVICE_ROWS_LIMIT );
+            request.getMessageData().getAppData().setLimit(SERVICE_ROWS_LIMIT);
         }
         request.getMessageData().getAppData().setQuery(queryText);
 
@@ -172,7 +172,8 @@ public class MskNSIService {
         }
     }
 
-    public List<OrgInfo> getOrgByName(String orgName) throws Exception {
+    public List<OrgInfo> getOrgByNameAndGuid(String orgName, String orgGuid) throws Exception {
+        if (orgName==null && orgGuid==null) throw new Exception("Не указано название организации и GUID");
         /*
        От Козлова
        "select item['РОУ XML/GUID Образовательного учреждения'], "+
@@ -185,14 +186,14 @@ public class MskNSIService {
        "item['РОУ XML/Статус записи']!='Удаленный' and "+
        "item['РОУ XML/Краткое наименование учреждения'] like '"+orgGuid+"'
         */
-        List<QueryResult> queryResults = executeQuery(
-                "select \n" + "item['РОУ XML/GUID Образовательного учреждения'],\n"
-                        + "item['РОУ XML/Краткое наименование учреждения'],\n"
-                        + "item['РОУ XML/Официальный адрес'],\n"
-                        + "item['РОУ XML/Дата изменения (число)']\n"
-                        + "from catalog('Реестр образовательных учреждений') where \n"
-                        + "item['РОУ XML/Статус записи'] not like 'Удален%' and "
-                        + "item['РОУ XML/Краткое наименование учреждения'] like '%" + orgName + "%'");
+        String query = "select \n" + "item['РОУ XML/GUID Образовательного учреждения'],\n"
+                                + "item['РОУ XML/Краткое наименование учреждения'],\n" + "item['РОУ XML/Официальный адрес'],\n"
+                                + "item['РОУ XML/Дата изменения (число)']\n"
+                                + "from catalog('Реестр образовательных учреждений') where \n"
+                                + "item['РОУ XML/Статус записи'] not like 'Удален%'";
+        if (orgName!=null) query+= " and item['РОУ XML/Краткое наименование учреждения'] like '%" + orgName + "%'";
+        if (orgGuid!=null) query+= " and item['РОУ XML/GUID Образовательного учреждения']='" + orgGuid + "'";
+        List<QueryResult> queryResults = executeQuery(query);
         LinkedList<OrgInfo> list = new LinkedList<OrgInfo>();
         for (QueryResult qr : queryResults) {
             OrgInfo orgInfo = new OrgInfo();
@@ -213,32 +214,40 @@ public class MskNSIService {
 
     private String getGroup(String currentGroup, String initialGroup) {
         String group = currentGroup;
-        if (group==null || group.trim().length()==0) group=initialGroup;
-        if (group!=null) group = group.replaceAll("[ -]", "");
+        if (group == null || group.trim().length() == 0) {
+            group = initialGroup;
+        }
+        if (group != null) {
+            group = group.replaceAll("[ -]", "");
+        }
         return group;
     }
-
-    public List<ImportRegisterClientsService.PupilInfo> getPupilsByOrgGUID(String orgGuid, String familyName, Long updateTime) throws Exception {
-        List<ImportRegisterClientsService.PupilInfo> pupils = new ArrayList<ImportRegisterClientsService.PupilInfo>();
+    
+    public List<ImportRegisterClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(Set<String> orgGuids,
+            String familyName, String firstName, String secondName) throws Exception {
+        List<ImportRegisterClientsService.ExpandedPupilInfo> pupils = new ArrayList<ImportRegisterClientsService.ExpandedPupilInfo>();
         int importIteration = 1;
         while (true) {
-            List<ImportRegisterClientsService.PupilInfo> iterationPupils = null;
-            try {
-                iterationPupils = getPupilsByOrgGUID(orgGuid, familyName, updateTime, importIteration);
-            } catch (Exception e) {
-                throw e;
-            }
+            List<ImportRegisterClientsService.ExpandedPupilInfo> iterationPupils = null;
+            iterationPupils = getClientsForOrgs(orgGuids, familyName, firstName, secondName, importIteration);
             if (iterationPupils.size() > 0) {
                 pupils.addAll(iterationPupils);
             } else {
                 break;
             }
-        importIteration++;
+            importIteration++;
+        }
+        /// удалить неимпортируемые группы
+        for (Iterator<ImportRegisterClientsService.ExpandedPupilInfo> i = pupils.iterator(); i.hasNext(); ) {
+            ImportRegisterClientsService.ExpandedPupilInfo p = i.next();
+            if (ImportRegisterClientsService.isPupilIgnoredFromImport(p.getGuid(), p.getGroup())) {
+                i.remove();
+            }
         }
         return pupils;
     }
 
-    public List<ImportRegisterClientsService.PupilInfo> getPupilsByOrgGUID(String orgGuid, String familyName, Long updateTime, int iteration) throws Exception {
+    /*    public List<ImportRegisterClientsService.PupilInfo> getPupilsByOrgGUID(String orgGuid, String familyName, int iteration) throws Exception {
         String tbl = getNSIWorkTable ();
         String select = "select item['" + tbl + "/Фамилия'], "
         + "item['" + tbl + "/Имя'], item['" + tbl + "/Отчество'], "
@@ -251,9 +260,9 @@ public class MskNSIService {
         if (familyName != null && familyName.length() > 0) {
             select += " and item['" + tbl + "/Фамилия'] like '%" + familyName + "%'";
         }
-        if (updateTime != null) {
-            select += " and  item['" + tbl + "/Дата изменения (число)']  &gt; " + (updateTime / 1000);
-        }
+        //if (updateTime != null) {
+        //    select += " and  item['" + tbl + "/Дата изменения (число)']  &gt; " + (updateTime / 1000);
+        //}
         List<QueryResult> queryResults = executeQuery(select, iteration);
         LinkedList<ImportRegisterClientsService.PupilInfo> list = new LinkedList<ImportRegisterClientsService.PupilInfo>();
         for (QueryResult qr : queryResults) {
@@ -274,29 +283,63 @@ public class MskNSIService {
             list.add(pupilInfo);
         }
         return list;
-    }
+    }*/
 
 
-    public List<ImportRegisterClientsService.ExpandedPupilInfo> getChangedClients(Org org, int importIteration) throws Exception {
+    public List<ImportRegisterClientsService.ExpandedPupilInfo> getClientsForOrgs(Set<String> guids, String familyName,
+            String firstName, String secondName, int importIteration) throws Exception {
         /*
         От Козлова
         */
-        String tbl = getNSIWorkTable ();
-        String query = "select "+
-        "item['" + tbl + "/Фамилия'], "+
-        "item['" + tbl + "/Имя'], "+
-        "item['" + tbl + "/Отчество'], "+
-        "item['" + tbl + "/GUID'], "+
-        "item['" + tbl + "/Дата рождения'], "+
-        "item['" + tbl + "/Класс или группа зачисления'], "+
-        "item['" + tbl + "/Дата зачисления'], "+
-        "item['" + tbl + "/Дата отчисления'], "+
-        "item['" + tbl + "/Текущий класс или группа'], "+
-        "item['" + tbl + "/GUID образовательного учреждения'] "+
-        "from catalog('Реестр обучаемых') "+
-        "where "+
-        "item['" + tbl + "/Статус записи'] not like 'Удален%' and "+
-        "item['" + tbl + "/GUID образовательного учреждения'] like '" + org.getGuid() + "'";
+        String tbl = getNSIWorkTable();
+        String orgFilter = "";
+        if (guids!=null && guids.size()>0) {
+            for (String guid : guids) {
+                if (orgFilter.length() > 0) {
+                    orgFilter += " or ";
+                }
+                orgFilter += "item['" + tbl + "/GUID образовательного учреждения']='" + guid + "'";
+            }
+        }
+
+        String query = "select " +
+                "item['" + tbl + "/Фамилия'], " +
+                "item['" + tbl + "/Имя'], " +
+                "item['" + tbl + "/Отчество'], " +
+                "item['" + tbl + "/GUID'], " +
+                "item['" + tbl + "/Дата рождения'], " +
+                "item['" + tbl + "/Класс или группа зачисления'], " +
+                "item['" + tbl + "/Дата зачисления'], " +
+                "item['" + tbl + "/Дата отчисления'], " +
+                "item['" + tbl + "/Текущий класс или группа'], " +
+                "item['" + tbl + "/GUID образовательного учреждения'], " +
+                "item['" + tbl + "/Статус записи'] " +
+                "from catalog('Реестр обучаемых') " +
+                "where ";
+        if (orgFilter.length()>0) {
+            query+= " item['" + tbl + "/Статус записи'] not like 'Удален%'";
+            query+= " and (" + orgFilter + ")";
+            if (familyName != null && familyName.length() > 0) {
+                query += " and item['" + tbl + "/Фамилия'] like '%" + familyName + "%'";
+            }
+            if (firstName != null && firstName.length() > 0) {
+                query += " and item['" + tbl + "/Имя'] like '%" + firstName + "%'";
+            }
+            if (secondName != null && secondName.length() > 0) {
+                query += " and item['" + tbl + "/Отчество'] like '%" + secondName + "%'";
+            }
+        } else { // при поиске по ФИО используем для быстроты только полное совпадение
+            if (familyName != null && familyName.length() > 0) {
+                query += " item['" + tbl + "/Фамилия'] = '" + familyName + "'";
+            }
+            if (firstName != null && firstName.length() > 0) {
+                query += " and item['" + tbl + "/Имя'] = '" + firstName + "'";
+            }
+            if (secondName != null && secondName.length() > 0) {
+                query += " and item['" + tbl + "/Отчество'] = '" + secondName + "'";
+            }
+        }
+
 
         List<QueryResult> queryResults = executeQuery(query, importIteration);
         LinkedList<ImportRegisterClientsService.ExpandedPupilInfo> list = new LinkedList<ImportRegisterClientsService.ExpandedPupilInfo>();
@@ -311,6 +354,7 @@ public class MskNSIService {
             pupilInfo.created = qr.getQrValue().get(6) != null && !qr.getQrValue().get(6).equals("");
             pupilInfo.deleted = qr.getQrValue().get(7) != null && !qr.getQrValue().get(7).equals("");
             pupilInfo.guidOfOrg = qr.getQrValue().get(9);
+            pupilInfo.recordState = qr.getQrValue().get(10);
 
             pupilInfo.familyName = pupilInfo.familyName == null ? null : pupilInfo.familyName.trim();
             pupilInfo.firstName = pupilInfo.firstName == null ? null : pupilInfo.firstName.trim();
@@ -324,11 +368,11 @@ public class MskNSIService {
     }
 
 
-    public static String getNSIWorkTable () {
-        boolean isTestingService = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_MSK_NSI_USE_TESTING_SERVICE);
+    public static String getNSIWorkTable() {
+        boolean isTestingService = RuntimeContext.getInstance()
+                .getOptionValueBool(Option.OPTION_MSK_NSI_USE_TESTING_SERVICE);
         return !isTestingService ? "Реестр обучаемых линейный" : "Реестр обучаемых спецификация";
     }
-
 
 
     public static void setTimeouts(BindingProvider bindingProvider, Long connectTimeout, Long requestTimeout) {
@@ -343,12 +387,12 @@ public class MskNSIService {
         if (connectTimeout != null) {
             requestContext.put(keyInternalConnectTimeout, connectTimeout);
             requestContext.put(keyConnectTimeout, (int) connectTimeout.longValue());
-            requestContext.put(BindingProviderProperties.CONNECT_TIMEOUT, (int)connectTimeout.longValue());
+            requestContext.put(BindingProviderProperties.CONNECT_TIMEOUT, (int) connectTimeout.longValue());
         }
         if (requestTimeout != null) {
             requestContext.put(keyInternalRequestTimeout, requestTimeout);
             requestContext.put(keyRequestTimeout, (int) requestTimeout.longValue());
-            requestContext.put(BindingProviderProperties.REQUEST_TIMEOUT, (int)requestTimeout.longValue());
+            requestContext.put(BindingProviderProperties.REQUEST_TIMEOUT, (int) requestTimeout.longValue());
         }
     }
 }

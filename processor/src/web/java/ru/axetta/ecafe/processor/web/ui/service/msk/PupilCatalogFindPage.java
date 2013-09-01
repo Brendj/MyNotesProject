@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,10 +30,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Component
 @Scope("session")
@@ -47,6 +45,18 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
     Org org;
     String orgName;
     String familyName;
+    String firstName;
+    String secondName;
+    
+    boolean showExtendedInfo;
+
+    public boolean isShowExtendedInfo() {
+        return showExtendedInfo;
+    }
+
+    public void setShowExtendedInfo(boolean showExtendedInfo) {
+        this.showExtendedInfo = showExtendedInfo;
+    }
 
     public void setOrgName(String orgName) {
         this.orgName = orgName;
@@ -62,6 +72,22 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
 
     public void setFamilyName(String familyName) {
         this.familyName = familyName;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getSecondName() {
+        return secondName;
+    }
+
+    public void setSecondName(String secondName) {
+        this.secondName = secondName;
     }
 
     public Object removeFoundClientsByGUID() {
@@ -106,13 +132,13 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
         }
     }
 
-    public static class Item extends ImportRegisterClientsService.PupilInfo {
+    public static class Item extends ImportRegisterClientsService.ExpandedPupilInfo {
 
         boolean toAdd, toBind;
         Long idOfClient, idOfClientForBind;
         String findByFIOResult, fullNameOfClientForBind;
 
-        public Item(ImportRegisterClientsService.PupilInfo pi) {
+        public Item(ImportRegisterClientsService.ExpandedPupilInfo pi) {
             this.copyFrom(pi);
         }
 
@@ -166,22 +192,25 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
     @Transactional
     public void updateList() {
         try {
-            if (org == null) {
-                printError("Необходимо выбрать организацию");
-                return;
+            ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids=null;
+            if (org!= null) {
+                orgGuids = new ImportRegisterClientsService.OrgRegistryGUIDInfo(org);
+                if (orgGuids.getOrgGuids().size()==0) {
+                    printError("У выбранной организации не указан GUID");
+                    return;
+                }
             }
-            if (org.getGuid() == null) {
-                printError("У выбранной организации не указан GUID");
-                return;
+            if (org==null) {
+                if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(secondName) || StringUtils.isEmpty(familyName)) {
+                    printError("При поиске без организации необходимо указать фамилию, имя, отчество");
+                    return;
+                }
             }
             pupilInfos = new LinkedList<Item>();
             int nItemsNotFound = 0;
-            List<ImportRegisterClientsService.PupilInfo> pis = nsiService
-                    .getPupilsByOrgGUID(org.getGuid(), familyName, null);
-            for (ImportRegisterClientsService.PupilInfo pi : pis) {
-                if (ImportRegisterClientsService.isPupilIgnoredFromImport(pi.getGuid(), pi.getGroup())) {
-                    continue;
-                }
+            List<ImportRegisterClientsService.ExpandedPupilInfo> pis = nsiService
+                    .getPupilsByOrgGUID(orgGuids==null?null:orgGuids.getOrgGuids(), familyName, firstName, secondName);
+            for (ImportRegisterClientsService.ExpandedPupilInfo pi : pis) {
                 Item i = new Item(pi);
                 i.idOfClient = DAOUtils.getClientIdByGuid(em, i.guid);
                 if (i.idOfClient == null) {
@@ -190,6 +219,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
                 i.toAdd = i.idOfClient == null;
                 pupilInfos.add(i);
             }
+            if (orgGuids!=null) printMessage("Выполнен запрос по GUID: " + orgGuids.getGuidInfo());
             printMessage("Получено записей: " + pupilInfos.size() + ", не найдено по GUID: " + nItemsNotFound);
         } catch (Exception e) {
             super.logAndPrintMessage("Ошибка получения данных", e);

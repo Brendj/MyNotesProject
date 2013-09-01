@@ -226,6 +226,9 @@ public class ClientFilter {
             Org org = (Org) session.load(Org.class, idOfOrg);
             this.org = new OrgItem(org);
         }
+        else {
+            this.org = new OrgItem();
+        }
     }
 
     public List retrieveClients(Session session) throws Exception {

@@ -57,15 +57,14 @@
 
 
     <rich:dataTable id="orgListTable" value="#{mainPage.orgListPage.items}"
-                    var="item" rows="20" footerClass="data-table-footer"
-                    columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
-        <rich:column headerClass="column-header">
+                    var="item" rows="20" footerClass="data-table-footer">
+        <rich:column headerClass="column-header" styleClass="right-aligned-column">
             <f:facet name="header">
                 <h:outputText escape="true" value="Идентификатор" />
             </f:facet>
             <h:outputText escape="true" value="#{item.idOfOrg}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" styleClass="left-aligned-column">
             <f:facet name="header">
                 <h:outputText escape="true" value="Организация" />
             </f:facet>
@@ -73,50 +72,50 @@
                 <f:setPropertyActionListener value="#{item.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" styleClass="left-aligned-column">
             <f:facet name="header">
                 <h:outputText escape="true" value="Статус" />
             </f:facet>
             <h:outputText escape="true" value="#{item.state}" converter="orgStateConverter" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" styleClass="right-aligned-column">
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер договора" />
             </f:facet>
             <h:outputText escape="true" value="#{item.contractId}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" styleClass="left-aligned-column">
             <f:facet name="header">
                 <h:outputText escape="true" value="Тэги" />
             </f:facet>
             <h:outputText escape="true" value="#{item.tag}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" styleClass="left-aligned-column">
             <f:facet name="header">
                 <h:outputText escape="true" value="Город" />
             </f:facet>
             <h:outputText escape="true" value="#{item.city}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" styleClass="left-aligned-column">
             <f:facet name="header">
                 <h:outputText escape="true" value="Район" />
             </f:facet>
             <h:outputText escape="true" value="#{item.district}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" styleClass="left-aligned-column">
             <f:facet name="header">
                 <h:outputText escape="true" value="Локация" />
             </f:facet>
             <h:outputText escape="true" value="#{item.location}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" styleClass="left-aligned-column">
             <f:facet name="header">
                 <h:outputText escape="true" value="Контактный телефон" />
             </f:facet>
             <h:outputText escape="true" value="#{item.phone}" converter="phoneConverter" styleClass="output-text" />
         </rich:column>
 
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" styleClass="center-aligned-column">
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />
             </f:facet>

@@ -411,7 +411,8 @@ public class DAOUtils {
             //  Проверяем не попадает ли в CLIENT_EMPLOYEES, а так же в ВЫБЫВШИЕ за предыдущие года
             predefinedGroups = " (cf_clients.idofclientgroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() +
                     " or (cf_clients.idofclientgroup=" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() +
-                    " and EXTRACT(year from date (to_timestamp(cf_clients.lastupdate / 1000))) = EXTRACT(year from date (current_timestamp))) ) and ";
+                    " ) ) and ";
+            // and EXTRACT(year from date (to_timestamp(cf_clients.lastupdate / 1000))) = EXTRACT(year from date (current_timestamp))
             //predefinedGroups = " cf_clients.idofclientgroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and ";
         }
 
@@ -457,7 +458,8 @@ public class DAOUtils {
             //  Проверяем не попадает ли в CLIENT_EMPLOYEES, а так же в ВЫБЫВШИЕ за предыдущие года
             predefinedGroups = " (cf_clients.idofclientgroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() +
                     " or (cf_clients.idofclientgroup=" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() +
-                    " and EXTRACT(year from date (to_timestamp(cf_clients.lastupdate / 1000))) = EXTRACT(year from date (current_timestamp))) ) and ";
+                    " ) ) and ";
+            // and EXTRACT(year from date (to_timestamp(cf_clients.lastupdate / 1000))) = EXTRACT(year from date (current_timestamp))
             //predefinedGroups = " cf_clients.idofclientgroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and ";
         }
         String fio=((surname==null?"":surname)+(firstName==null?"":firstName)+(secondName==null?"":secondName)).toLowerCase().replaceAll(" ", "");
