@@ -84,7 +84,10 @@ padding-right: 10px;
                         <f:facet name="header">
                             <h:outputText styleClass="output-text-mod" value="Оператор"/>
                         </f:facet>
-                        <h:outputText styleClass="output-text" value="..."/>
+                        <a4j:commandLink styleClass="output-text-mod" value="..." >
+                            <a4j:support event="onclick" reRender="clientFeedActionPanel" action="#{feedPlanPage.doShowClientFeedActionPanel(client.idofclient,client.complex)}"
+                                         oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.show();"/>
+                        </a4j:commandLink>
                     </rich:column>
 
                     <rich:column style="text-align: center;">

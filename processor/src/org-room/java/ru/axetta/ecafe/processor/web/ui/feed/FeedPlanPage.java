@@ -8,6 +8,9 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.modal.feed_plan.ClientFeedActionEvent;
+import ru.axetta.ecafe.processor.web.ui.modal.feed_plan.ClientFeedActionListener;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -30,7 +33,7 @@ import java.util.*;
  */
 @Component
 @Scope("session")
-public class FeedPlanPage extends BasicWorkspacePage {
+public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedActionListener {
     private static final long ELEMENTARY_CLASSES_TYPE = Long.MIN_VALUE;
     private static final long MIDDLE_CLASSES_TYPE     = Long.MIN_VALUE + 1;
     private static final long HIGH_CLASSES_TYPE       = Long.MIN_VALUE + 2;
@@ -52,6 +55,7 @@ public class FeedPlanPage extends BasicWorkspacePage {
     private List<Complex> complexes;
     private Calendar planDate;
     private Long selectedIdOfClientGroup;
+    private Client selectedClient;
 
 
 
@@ -251,6 +255,20 @@ public class FeedPlanPage extends BasicWorkspacePage {
 
     public void doApply () {
 
+    }
+    
+    public void doShowClientFeedActionPanel(long idofclient, long idofcomplex) {
+        for (Client cl : clients) {
+            if (cl.getIdofclient() == idofclient || cl.getComplex() == idofcomplex) {
+                selectedClient = cl;
+                break;
+            }
+        }
+        MainPage.getSessionInstance().doShowClientFeedActionPanel();
+    }
+
+    public void onClientFeedActionEvent (ClientFeedActionEvent event) {
+        selectedClient.setFirstname(selectedClient.getFirstname() + " " + event.getActionType());
     }
 
     public Date getPlanDate() {
