@@ -33,6 +33,9 @@
     <f:subview id="clientFeedActionView">
         <c:import url="include/modal/feed_plan/client_action.jsp" />
     </f:subview>
+    <f:subview id="disableComplexView">
+        <c:import url="include/modal/feed_plan/disable_complex.jsp" />
+    </f:subview>
 
     <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">
             <%-- Заголовок страницы --%>

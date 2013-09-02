@@ -23,7 +23,6 @@ font-family: Tahoma, Arial, Sans-Serif;
 font-size: 10pt;
 color: #000;
 white-space: nowrap;
-padding-right: 10px;
 }
 
 .thin-center-aligned-column {
@@ -41,51 +40,74 @@ padding-right: 10px;
 .groupsPanel {
     width: 30%;
 }
+
+.numbersTableCol1 {
+    width: 100%;
+}
+.numbersTableCol2 {
+    text-align: right;
+
+}
+
+.setupFeedPlanGridControlImg1 {
+    padding-right: 5px;
+    vertical-align: middle;
+}
+.setupFeedPlanGridControlTxt1 {
+    padding-right: 20px;
+    vertical-align: middle;
+}
+.setupFeedPlanGridControlImg2 {
+    padding-right: 5px;
+    vertical-align: middle;
+}
+.setupFeedPlanGridControlTxt2 {
+    padding-right: 20px;
+    vertical-align: middle;
+}
+.setupFeedPlanGridControlImg3 {
+    padding-right: 5px;
+    vertical-align: middle;
+}
+.setupFeedPlanGridControlTxt3 {
+    padding-right: 20px;
+    vertical-align: middle;
+
+}
 </style>
 
 <%--@elvariable id="feedPlanPage" type="ru.axetta.ecafe.processor.web.ui.feed.FeedPlanPage"--%>
 <a4j:form id="setupFeedPlanForm">
     <h:panelGrid id="setupFeedPlanGrid" binding="#{feedPlanPage.pageComponent}" styleClass="borderless-grid" style="width: 100%;">
         <h:panelGrid columns="2">
+            <a4j:region>
             <h:outputText styleClass="output-text-mod" value="План питания:"/>
             <rich:calendar value="#{feedPlanPage.planDate}" datePattern="dd.MM.yyyy"
                            converter="dateConverter" inputClass="input-text" showWeeksBar="false"
                            valueChangeListener="#{feedPlanPage.doChangePlanDate}">
-                <a4j:support event="onchanged" reRender="planGrid" bypassUpdates="true" />
+                <a4j:support event="onchanged" reRender="planGrid,groupsGrid" bypassUpdates="true" />
             </rich:calendar>
+            </a4j:region>
         </h:panelGrid>
 
         <h:panelGrid id="planGrid" columns="2" style="width: 100%" columnClasses="clientsPanel,groupsPanel">
             <%-- КЛИЕНТЫ --%>
             <rich:panel id="claimsCalendar" style="height: 450px; width: 100%; overflow: auto;">
+                <a4j:region>
                 <rich:dataTable id="planTable" value="#{feedPlanPage.clients}" var="client" style="width: 100%">
                     <rich:column style="text-align: center;">
                         <f:facet name="header">
                             <h:outputText styleClass="output-text-mod" value="Оплата"/>
                         </f:facet>
-                        <a4j:commandButton image="/images/icon/stop.png" styleClass="command-button" />
-                    </rich:column>
-
-                    <rich:column style="text-align: center;">
-                        <f:facet name="header">
-                            <h:outputText styleClass="output-text-mod" value="Вход"/>
-                        </f:facet>
-                        <a4j:commandButton image="/images/icon/exit_off.png" styleClass="command-button" />
-                    </rich:column>
-
-                    <rich:column style="text-align: center;">
-                        <f:facet name="header">
-                            <h:outputText styleClass="output-text-mod" value="Карта"/>
-                        </f:facet>
-                        <a4j:commandButton image="/images/icon/id_card_off.png" styleClass="command-button" />
+                        <a4j:commandButton image="/images/icon/#{client.actionIcon}.png" styleClass="command-button" />
                     </rich:column>
 
                     <rich:column style="text-align: center;">
                         <f:facet name="header">
                             <h:outputText styleClass="output-text-mod" value="Оператор"/>
                         </f:facet>
-                        <a4j:commandLink styleClass="output-text-mod" value="..." >
-                            <a4j:support event="onclick" reRender="clientFeedActionPanel" action="#{feedPlanPage.doShowClientFeedActionPanel(client.idofclient,client.complex)}"
+                        <a4j:commandLink styleClass="output-text-mod" value="#{client.action}" >
+                            <a4j:support event="onclick" reRender="clientFeedActionPanel" action="#{feedPlanPage.doShowClientFeedActionPanel(client)}"
                                          oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.show();"/>
                         </a4j:commandLink>
                     </rich:column>
@@ -108,7 +130,8 @@ padding-right: 10px;
                         <f:facet name="header">
                             <h:outputText styleClass="output-text-mod" value="Замена"/>
                         </f:facet>
-                        <h:outputText styleClass="output-text" escape="false" value="-"/>
+                        <a4j:commandLink styleClass="output-text" value="[Нажмите для выбора замены]" >
+                        </a4j:commandLink>
                     </rich:column>
 
                     <rich:column>
@@ -129,7 +152,7 @@ padding-right: 10px;
                         <f:facet name="header">
                             <h:outputText styleClass="output-text-mod" value="Цена"/>
                         </f:facet>
-                        <h:outputText styleClass="output-text" value="0 р."/>
+                        <h:outputText styleClass="output-text" value="#{client.price} р."/>
                     </rich:column>
 
                     <rich:column>
@@ -139,6 +162,7 @@ padding-right: 10px;
                         <h:outputText styleClass="output-text" value="нет"/>
                     </rich:column>
                 </rich:dataTable>
+                </a4j:region>
             </rich:panel>
 
             <%-- КЛАССЫ --%>
@@ -150,7 +174,7 @@ padding-right: 10px;
                             <h:outputText escape="false" styleClass="output-text" value="К<br/>л<br/>а<br/>с<br/>с"/>
                         </f:facet>
                         <a4j:commandLink styleClass="output-text-mod" value="#{feedPlanPage.getGroupName(idoclientgroup)}" >
-                            <a4j:support reRender="planGrid" event="onclick" action="#{feedPlanPage.doChangeGroup(idoclientgroup)}" />
+                            <a4j:support reRender="planTable" event="onclick" action="#{feedPlanPage.doChangeGroup(idoclientgroup)}" />
                         </a4j:commandLink>
                     </rich:column>
 
@@ -159,26 +183,35 @@ padding-right: 10px;
                         <f:facet name="header">
                             <h:outputText styleClass="output-text-mod" escape="false" value="К<br/>о<br/>м<br/>п<br/>л<br/>е<br/>к<br/>с<br/><br/>№#{complex}" />
                         </f:facet>
-                        <h:outputText styleClass="output-text-mod" value="#{feedPlanPage.getComplexCount(idoclientgroup, complex)}" />
+                        <h:panelGrid style="background: no-repeat url('/orgroom/images/split.jpg'); width: 40px; height: 40px" columnClasses="numbersTableCol1,numbersTableCol2" columns="2">
+                            <h:outputText styleClass="output-text-mod" value="0"/>
+                            <h:outputText value=""/>
+                            <h:outputText value=""/>
+                            <h:outputText styleClass="output-text-mod" value="#{feedPlanPage.getComplexCount(idoclientgroup, complex)}" />
+                        </h:panelGrid>
                     </rich:columns>
                 </rich:dataTable>
                 </a4j:region>
             </rich:panel>
         </h:panelGrid>
 
-        <h:panelGrid columns="4">
-            <a4j:commandButton value="Оплатить" style="height: 30px; width: 150px;">
-                <a4j:support event="onclick" action="#{feedPlanPage.doApply}" />
-            </a4j:commandButton>
-            <a4j:commandButton value="Очистить план" style="height: 30px; width: 150px;">
-                <a4j:support event="onclick" action="#{feedPlanPage.doApply}" />
-            </a4j:commandButton>
-            <a4j:commandButton value="Автозамена" style="height: 30px; width: 150px;">
-                <a4j:support event="onclick" action="#{feedPlanPage.doApply}" />
-            </a4j:commandButton>
-            <a4j:commandButton value="Исключить комплекс" style="height: 30px; width: 150px;">
-                <a4j:support event="onclick" action="#{feedPlanPage.doApply}" />
-            </a4j:commandButton>
+        <h:panelGrid columns="6" columnClasses="setupFeedPlanGridControlImg1,setupFeedPlanGridControlTxt1,setupFeedPlanGridControlImg2,setupFeedPlanGridControlTxt2,setupFeedPlanGridControlImg3,setupFeedPlanGridControlTxt3">
+            <a4j:region>
+                <a4j:commandButton image="/images/icon/money.png" action="#{feedPlanPage.doApply}" style="padding-right: 5px"/>
+                <a4j:commandLink value="Оплатить" styleClass="output-text" action="#{feedPlanPage.doApply}" style="vertical-align: middle; padding-right: 20px;"/>
+
+                <a4j:commandButton image="/images/icon/blank.png" reRender="planGrid,groupsGrid" action="#{feedPlanPage.doClearPlan}" style="padding-right: 5px"/>
+                <a4j:commandLink value="Очистить план" reRender="" styleClass="output-text" action="#{feedPlanPage.doClearPlan}" style="vertical-align: middle; padding-right: 20px;"/>
+
+                <a4j:commandButton image="/images/icon/cancel.png" style="padding-right: 5px">
+                    <a4j:support event="onclick" reRender="disableComplexPanel" action="#{feedPlanPage.doShowDisableComplexPanel}"
+                                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('disableComplexPanel')}.show();"/>
+                </a4j:commandButton>
+                <a4j:commandLink value="Исключить комплекс" styleClass="output-text" style="vertical-align: middle;">
+                    <a4j:support event="onclick" reRender="disableComplexPanel" action="#{feedPlanPage.doShowDisableComplexPanel}"
+                                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('disableComplexPanel')}.show();"/>
+                </a4j:commandLink>
+            </a4j:region>
         </h:panelGrid>
     </h:panelGrid>
 </a4j:form>

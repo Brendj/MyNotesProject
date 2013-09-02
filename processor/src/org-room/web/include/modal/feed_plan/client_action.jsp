@@ -9,37 +9,87 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 
+<style>
+.clientFeedModalCol1 {
+    width: 1px;
+    padding-bottom: 20px;
+}
+.clientFeedModalCol2 {
+    width: 33%;
+    padding-bottom: 20px;
+}
+.clientFeedModalCol3 {
+    width: 1px;
+    padding-bottom: 20px;
+}
+.clientFeedModalCol4 {
+    width: 33%;
+    padding-bottom: 20px;
+}
+.clientFeedModalCol5 {
+    width: 1px;
+    padding-bottom: 20px;
+}
+.clientFeedModalCol6 {
+    width: 33%;
+    padding-bottom: 20px;
+}
+</style>
+
+
 <%--@elvariable id="clientFeedActionPanel" type="ru.axetta.ecafe.processor.web.ui.modal.feed_plan.ClientFeedActionPanel"--%>
-<rich:modalPanel id="clientFeedActionPanel" width="400" height="150" resizeable="false" moveable="false" binding="#{clientFeedActionPanel.pageComponent}">
+<rich:modalPanel id="clientFeedActionPanel" width="300" height="100" resizeable="false" moveable="false" binding="#{clientFeedActionPanel.pageComponent}">
     <a4j:form>
         <a4j:region>
-            <h:panelGrid columns="3">
-                <a4j:commandButton value="БЛОК" action="#{clientFeedActionPanel.doBlock}"
-                                   reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
-                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.hide();"
-                                   styleClass="command-button" />
-                <a4j:commandButton value="ОПЛАТА" action="#{clientFeedActionPanel.doPay}"
-                                   reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
-                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.hide();"
-                                   styleClass="command-button" />
-                <a4j:commandButton value="СБРОС" action="#{clientFeedActionPanel.doRelease}"
-                                   reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
-                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.hide();"
-                                   styleClass="command-button" />
-            </h:panelGrid>
-            <h:panelGrid columns="3">
-                <a4j:commandButton value="БЛОК" action="#{clientFeedActionPanel.doBlock}"
-                                   reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
-                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.hide();"
-                                   styleClass="command-button" />
-                <a4j:commandButton value="ОПЛАТА" action="#{clientFeedActionPanel.doPay}"
-                                   reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
-                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.hide();"
-                                   styleClass="command-button" />
-                <a4j:commandButton value="СБРОС" action="#{clientFeedActionPanel.doRelease}"
-                                   reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
-                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.hide();"
-                                   styleClass="command-button" />
+            <h:panelGrid columns="6" columnClasses="clientFeedModalCol1,clientFeedModalCol2,clientFeedModalCol3,clientFeedModalCol4,clientFeedModalCol5,clientFeedModalCol6">
+                <a4j:commandButton image="/images/icon/stop.png"
+                                   action="#{clientFeedActionPanel.doBlock}" reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.hide();"/>
+                <a4j:commandLink value="БЛОК" styleClass="output-text"
+                                 action="#{clientFeedActionPanel.doBlock}" reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
+                                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.hide();"/>
+
+
+                <a4j:commandButton image="/images/icon/play.png"
+                                   action="#{clientFeedActionPanel.doPay}" reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.hide();"/>
+                <a4j:commandLink value="ОПЛАТА" styleClass="output-text"
+                                 action="#{clientFeedActionPanel.doPay}" reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
+                                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.hide();"/>
+
+
+                <a4j:commandButton image="/images/icon/release.png"
+                                   action="#{clientFeedActionPanel.doRelease}" reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.hide();"/>
+                <a4j:commandLink value="СБРОС" styleClass="output-text"
+                                 action="#{clientFeedActionPanel.doRelease}" reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
+                                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.hide();"/>
+
+
+
+
+                <a4j:commandButton image="/images/icon/stop.png"
+                                   action="#{clientFeedActionPanel.doBlock}" reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.hide();"/>
+                <a4j:commandLink value="БЛОК КЛАСС" styleClass="output-text"
+                                 action="#{clientFeedActionPanel.doBlock}" reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
+                                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.hide();"/>
+
+
+                <a4j:commandButton image="/images/icon/play.png"
+                                   action="#{clientFeedActionPanel.doPay}" reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.hide();"/>
+                <a4j:commandLink value="ОПЛАТА КЛАСС" styleClass="output-text"
+                                 action="#{clientFeedActionPanel.doPay}" reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
+                                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.hide();"/>
+
+
+                <a4j:commandButton image="/images/icon/release.png"
+                                   action="#{clientFeedActionPanel.doRelease}" reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.hide();"/>
+                <a4j:commandLink value="СБРОС КЛАСС" styleClass="output-text"
+                                 action="#{clientFeedActionPanel.doRelease}" reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
+                                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.hide();"/>
             </h:panelGrid>
         </a4j:region>
     </a4j:form>

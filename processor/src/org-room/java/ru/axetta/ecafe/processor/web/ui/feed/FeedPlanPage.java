@@ -9,8 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
-import ru.axetta.ecafe.processor.web.ui.modal.feed_plan.ClientFeedActionEvent;
-import ru.axetta.ecafe.processor.web.ui.modal.feed_plan.ClientFeedActionListener;
+import ru.axetta.ecafe.processor.web.ui.modal.feed_plan.*;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -22,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.faces.event.ValueChangeEvent;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -33,7 +33,8 @@ import java.util.*;
  */
 @Component
 @Scope("session")
-public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedActionListener {
+public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedActionListener, DisableComplexListener {
+    private static final long MILLIS_IN_DAY           = 86400000L;
     private static final long ELEMENTARY_CLASSES_TYPE = Long.MIN_VALUE;
     private static final long MIDDLE_CLASSES_TYPE     = Long.MIN_VALUE + 1;
     private static final long HIGH_CLASSES_TYPE       = Long.MIN_VALUE + 2;
@@ -56,6 +57,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
     private Calendar planDate;
     private Long selectedIdOfClientGroup;
     private Client selectedClient;
+    private Map<Integer, Boolean> disabledComplexes;
 
 
 
@@ -114,40 +116,30 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         if (selectedIdOfClientGroup == null) {
             selectedIdOfClientGroup = ALL_TYPE;
         }
+        selectedClient = null;
         clients = new ArrayList<Client>();
         complexes = new ArrayList<Complex>();
         List<Complex> allComplexes = new ArrayList<Complex>();
         List<Complex> superComlexGroups = new ArrayList<Complex>();
 
 
-        //  Обработка фильтра классов
-        /*String groupFilter = "";
-        if(selectedIdOfClientGroup == ELEMENTARY_CLASSES_TYPE) {
-             groupFilter = " and CAST(substring(cf_clientgroups.groupname FROM '[0-9]+') AS INTEGER)<4 ";
-        } else if(selectedIdOfClientGroup == MIDDLE_CLASSES_TYPE) {
-            groupFilter = " and CAST(substring(cf_clientgroups.groupname FROM '[0-9]+') AS INTEGER)>3 and "
-                        + " and CAST(substring(cf_clientgroups.groupname FROM '[0-9]+') AS INTEGER)<10 ";
-        } else if(selectedIdOfClientGroup == HIGH_CLASSES_TYPE) {
-            groupFilter = " and CAST(substring(cf_clientgroups.groupname FROM '[0-9]+') AS INTEGER)>9 ";
-        } else if(selectedIdOfClientGroup == ALL_TYPE) {
-            groupFilter = " ";
-        } else {
-            groupFilter = " and cf_clients.idofclientgroup=" + selectedIdOfClientGroup + " ";
-        }*/
-
-
         String sql = "select cf_clientgroups.idofclientgroup, cf_clientgroups.groupname, cf_clients.idofclient, cf_persons.firstname, "
-                + "       cf_persons.secondname, cf_persons.surname, cf_clientscomplexdiscounts.idofrule, description, idofcomplex, cf_discountrules.priority, "
-                + "       CAST(substring(groupname FROM '[0-9]+') AS INTEGER) as groupNum "
+                + "       cf_persons.secondname, cf_persons.surname, cf_clientscomplexdiscounts.idofrule, description, "
+                + "       cf_clientscomplexdiscounts.idofcomplex, cf_discountrules.priority, "
+                + "       CAST(substring(groupname FROM '[0-9]+') AS INTEGER) as groupNum, cf_complexinfo.currentprice "
                 + "from cf_clients "
                 + "join cf_clientscomplexdiscounts on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient "
                 + "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "
                 + "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
                 + "left join cf_discountrules on cf_discountrules.idofrule=cf_clientscomplexdiscounts.idofrule "
+                + "left join cf_complexinfo on cf_clients.idoforg=cf_complexinfo.idoforg and cf_complexinfo.idofcomplex=cf_clientscomplexdiscounts.idofcomplex "
+                + "                            and menudate between :startMenudate and :endMenudate "
                 + "where cf_clients.idoforg=:idoforg " //+ groupFilter
                 + "order by groupNum, groupname, cf_clients.idofclient, idofcomplex, cf_discountrules.priority";
         org.hibernate.Query q = session.createSQLQuery(sql);
         q.setLong("idoforg", getOrg(session).getIdOfOrg());
+        q.setLong("startMenudate", planDate.getTimeInMillis());
+        q.setLong("endMenudate", planDate.getTimeInMillis() + MILLIS_IN_DAY);
         List resultList = q.list();
         for (Object entry : resultList) {
             Object o[] = (Object[]) entry;
@@ -162,12 +154,16 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
             Integer idofcomplex = HibernateUtils.getDbInt(o[8]);
             Integer priority = HibernateUtils.getDbInt(o[9]);
             Integer groupNum = HibernateUtils.getDbInt(o[10]);
+            Long price = HibernateUtils.getDbLong(o[11]);
+            if (price == null) {
+                price = 0L;
+            }
 
 
             //  Добавляем клиента
             Client cl = new Client(idofclientgroup, idofclient,
                     firstName, secondname, surname,
-                    idofrule, ruleDescription, idofcomplex, priority);
+                    idofrule, ruleDescription, idofcomplex, priority, price);
             clients.add(cl);
 
 
@@ -223,7 +219,16 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
             complexes.addAll(superComlexGroups);
         }
         complexes.addAll(allComplexes);
-        int frew =2;
+
+
+        // Заполняем выключенные комплексы так, что все остаются
+        if (disabledComplexes == null) {
+            disabledComplexes = new HashMap<Integer, Boolean>();
+        }
+        disabledComplexes.clear();
+        for (Complex c : complexes) {
+            disabledComplexes.put(c.getComplex(), false);
+        }
     }
 
 
@@ -250,25 +255,34 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
 
     public void doChangeGroup (long idofclientgroup) {
         selectedIdOfClientGroup = idofclientgroup;
-        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
+        //RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
     }
 
     public void doApply () {
 
     }
+
+    public void doClearPlan () {
+        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
+    }
     
-    public void doShowClientFeedActionPanel(long idofclient, long idofcomplex) {
-        for (Client cl : clients) {
-            if (cl.getIdofclient() == idofclient || cl.getComplex() == idofcomplex) {
-                selectedClient = cl;
-                break;
-            }
-        }
+    public void doShowClientFeedActionPanel(Client cl) {
+        selectedClient = cl;
         MainPage.getSessionInstance().doShowClientFeedActionPanel();
     }
 
+    public void doShowDisableComplexPanel() {
+        DisableComplexPanel panel = RuntimeContext.getAppContext().getBean(DisableComplexPanel.class);
+        panel.setComplexes(disabledComplexes);
+        MainPage.getSessionInstance().doShowDisableComplexPanel();
+    }
+
     public void onClientFeedActionEvent (ClientFeedActionEvent event) {
-        selectedClient.setFirstname(selectedClient.getFirstname() + " " + event.getActionType());
+        selectedClient.setActionType(event.getActionType());
+    }
+
+    public void onDisableComplexEvent (DisableComplexEvent event) {
+        disabledComplexes = event.getComplexes();
     }
 
     public Date getPlanDate() {
@@ -280,14 +294,15 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
     }
 
     public List<Client> getClients() {
-        //  Если тип "Все", то отображаем всех клиентов
-        if(selectedIdOfClientGroup == ALL_TYPE) {
-            return clients;
-        }
-
         //  Иначе, производим поиск по комплексам и  загружаем их
         List<Client> foundClients = new ArrayList<Client>();
         for (Complex c : complexes) {
+            //  Производим поиск по отключенным комплексам
+            if (disabledComplexes.get(c.getComplex())) {
+                continue;
+            }
+
+            //  Если тип "Все", то отображаем всех клиентов; иначе, отображаем только выбранных
             if (c.getIdofclientgroup() == selectedIdOfClientGroup.longValue()) {
                 foundClients.addAll(c.getClients());
             }
@@ -310,6 +325,10 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         List<Integer> res = new ArrayList<Integer>();
         for (Complex c : complexes) {
             if (res.contains(c.getComplex())) {
+                continue;
+            }
+            //  Если комплекс отключен, то не отображаем его
+            if (disabledComplexes.get(c.getComplex())) {
                 continue;
             }
             res.add(c.getComplex());
@@ -465,9 +484,11 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         private String ruleDescription;
         private int complex;
         private int priority;
+        private int actionType;
+        private long price;
 
         public Client(long idofclientgroup, long idofclient, String firstname, String secondname,
-                String surname, long idofrule, String ruleDescription, int complex, int priority) {
+                String surname, long idofrule, String ruleDescription, int complex, int priority, long price) {
             this.idofclientgroup = idofclientgroup;
             this.idofclient = idofclient;
             this.firstname = firstname;
@@ -477,6 +498,8 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
             this.ruleDescription = ruleDescription;
             this.complex = complex;
             this.priority = priority;
+            actionType = ClientFeedActionEvent.RELEASE_CLIENT;
+            this.price = price;
         }
 
         public long getIdofclientgroup() {
@@ -553,6 +576,52 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         
         public String getFullName () {
             return firstname + "<br/>" + secondname + "<br/>" + surname;
+        }
+
+        public int getActionType() {
+            return actionType;
+        }
+
+        public void setActionType(int actionType) {
+            this.actionType = actionType;
+        }
+        
+        public String getPrice () {
+            if (price == 0L) {
+                return "0";
+            }
+            BigDecimal bd = new BigDecimal(price / 100).setScale(1, BigDecimal.ROUND_HALF_DOWN);
+            return bd.toString();
+        }
+
+        public void setPrice(long price) {
+            this.price = price;
+        }
+
+        public String getAction() {
+            switch (actionType) {
+                case ClientFeedActionEvent.BLOCK_CLIENT:
+                    return "БЛОК";
+                case ClientFeedActionEvent.PAY_CLIENT:
+                    return "ОПЛАТА";
+                case ClientFeedActionEvent.RELEASE_CLIENT:
+                    return "...";
+                default:
+                    return "...";
+            }
+        }
+        
+        public String getActionIcon() {
+            switch (actionType) {
+                case ClientFeedActionEvent.BLOCK_CLIENT:
+                    return "stop";
+                case ClientFeedActionEvent.PAY_CLIENT:
+                    return "play";
+                case ClientFeedActionEvent.RELEASE_CLIENT:
+                    return "stop";
+                default:
+                    return "stop";
+            }
         }
 
         @Override

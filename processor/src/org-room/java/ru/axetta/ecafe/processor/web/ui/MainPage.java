@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.web.ui.modal.YesNoConfirmPanel;
 import ru.axetta.ecafe.processor.web.ui.modal.feed_plan.ClientFeedActionPanel;
+import ru.axetta.ecafe.processor.web.ui.modal.feed_plan.DisableComplexPanel;
 import ru.axetta.ecafe.processor.web.ui.modal.group.GroupCreatePanel;
 
 import org.apache.commons.lang.StringUtils;
@@ -105,6 +106,12 @@ public class MainPage {
 
     public void doShowClientFeedActionPanel() {
         ClientFeedActionPanel panel = RuntimeContext.getAppContext().getBean(ClientFeedActionPanel.class);
+        panel.fill();
+        panel.addCallbackListener(currentWorkspacePage);
+    }
+
+    public void doShowDisableComplexPanel() {
+        DisableComplexPanel panel = RuntimeContext.getAppContext().getBean(DisableComplexPanel.class);
         panel.fill();
         panel.addCallbackListener(currentWorkspacePage);
     }
