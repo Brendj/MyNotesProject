@@ -248,6 +248,7 @@ public class Org {
         this.mailingListReportsOnVisits = mailingListReportsOnVisits;
         this.mailingListReports1 = mailingListReports1;
         this.mailingListReports2 = mailingListReports2;
+        this.fullSyncParam=false;
     }
 
     public Long getIdOfOrg() {

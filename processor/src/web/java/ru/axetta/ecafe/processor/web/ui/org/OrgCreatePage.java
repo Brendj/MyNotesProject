@@ -215,7 +215,6 @@ public class OrgCreatePage extends BasicWorkspacePage
         this.longitude = longitude;
     }
 
-
     public Integer getRefectoryType() {
         return refectoryType;
     }
