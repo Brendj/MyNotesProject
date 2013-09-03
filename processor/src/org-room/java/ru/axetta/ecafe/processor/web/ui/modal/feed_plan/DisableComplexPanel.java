@@ -110,6 +110,7 @@ public class DisableComplexPanel extends BasicWorkspacePage {
         if (listeners == null) {
             listeners = new ArrayList<DisableComplexListener>();
         }
+        listeners.clear();
         listeners.add((DisableComplexListener) page);
     }
 

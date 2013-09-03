@@ -101,6 +101,7 @@ public class ClientFeedActionPanel extends BasicWorkspacePage {
         if (listeners == null) {
             listeners = new ArrayList<ClientFeedActionListener>();
         }
+        listeners.clear();
         listeners.add((ClientFeedActionListener) page);
     }
 }

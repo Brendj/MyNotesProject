@@ -211,6 +211,7 @@ public class GroupCreatePanel extends BasicWorkspacePage {
             logger.error("Trying to add not listener for GroupCreatePanel");
             return;
         }
+        listeners.clear();
         listeners.add((GroupCreateListener) page);
     }
 }

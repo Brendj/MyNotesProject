@@ -72,7 +72,10 @@ white-space: nowrap;
 .setupFeedPlanGridControlTxt3 {
     padding-right: 20px;
     vertical-align: middle;
+}
 
+.payed {
+    background-color: #CCFFCC;
 }
 </style>
 
@@ -92,74 +95,68 @@ white-space: nowrap;
 
         <h:panelGrid id="planGrid" columns="2" style="width: 100%" columnClasses="clientsPanel,groupsPanel">
             <%-- КЛИЕНТЫ --%>
-            <rich:panel id="claimsCalendar" style="height: 450px; width: 100%; overflow: auto;">
+            <rich:panel style="height: 450px; width: 100%; overflow: auto;">
                 <a4j:region>
                 <rich:dataTable id="planTable" value="#{feedPlanPage.clients}" var="client" style="width: 100%">
-                    <rich:column style="text-align: center;">
+                    <rich:column style="text-align: center;" styleClass="#{client.lineStyleClass}">
                         <f:facet name="header">
                             <h:outputText styleClass="output-text-mod" value="Оплата"/>
                         </f:facet>
-                        <a4j:commandButton image="/images/icon/#{client.actionIcon}.png" styleClass="command-button" />
+                        <h:graphicImage url="/images/icon/#{client.actionIcon}.png"/>
                     </rich:column>
 
-                    <rich:column style="text-align: center;">
+                    <rich:column style="text-align: center;" styleClass="#{client.lineStyleClass}">
                         <f:facet name="header">
                             <h:outputText styleClass="output-text-mod" value="Оператор"/>
                         </f:facet>
-                        <a4j:commandLink styleClass="output-text-mod" value="#{client.action}" >
+                        <a4j:commandLink styleClass="output-text-mod" value="#{client.action}" rendered="#{!client.saved}">
                             <a4j:support event="onclick" reRender="clientFeedActionPanel" action="#{feedPlanPage.doShowClientFeedActionPanel(client)}"
                                          oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.show();"/>
                         </a4j:commandLink>
+                        <h:outputText styleClass="output-text-mod" value="#{client.action}" rendered="#{client.saved}"/>
                     </rich:column>
 
-                    <rich:column style="text-align: center;">
+                    <rich:column style="text-align: center;" styleClass="#{client.lineStyleClass}">
                         <f:facet name="header">
                             <h:outputText styleClass="output-text-mod" value="Класс"/>
                         </f:facet>
                         <h:outputText styleClass="output-text" value="#{feedPlanPage.getGroupName(client.idofclientgroup)}"/>
                     </rich:column>
 
-                    <rich:column>
+                    <rich:column styleClass="#{client.lineStyleClass}">
                         <f:facet name="header">
                             <h:outputText styleClass="output-text-mod" value="ФИО"/>
                         </f:facet>
                         <h:outputText styleClass="output-text" escape="false" value="#{client.fullName}"/>
                     </rich:column>
 
-                    <rich:column>
+                    <rich:column styleClass="#{client.lineStyleClass}">
                         <f:facet name="header">
                             <h:outputText styleClass="output-text-mod" value="Замена"/>
                         </f:facet>
-                        <a4j:commandLink styleClass="output-text" value="[Нажмите для выбора замены]" >
-                        </a4j:commandLink>
+                        <a4j:commandLink styleClass="output-text" value="[Нажмите для выбора замены]" rendered="#{!client.saved}"></a4j:commandLink>
+                        <h:outputText styleClass="output-text" value="[Замен нет]" rendered="#{client.saved}"></h:outputText>
                     </rich:column>
 
-                    <rich:column>
+                    <rich:column styleClass="#{client.lineStyleClass}">
                         <f:facet name="header">
                             <h:outputText styleClass="output-text-mod" value="Правило"/>
                         </f:facet>
                         <h:outputText styleClass="output-text" value="#{client.ruleDescription}"/>
                     </rich:column>
 
-                    <rich:column>
+                    <rich:column styleClass="#{client.lineStyleClass}">
                         <f:facet name="header">
                             <h:outputText styleClass="output-text-mod" value="Комплекс"/>
                         </f:facet>
                         <h:outputText styleClass="output-text" value="Комплекс №#{client.complex}"/>
                     </rich:column>
 
-                    <rich:column>
+                    <rich:column styleClass="#{client.lineStyleClass}">
                         <f:facet name="header">
                             <h:outputText styleClass="output-text-mod" value="Цена"/>
                         </f:facet>
                         <h:outputText styleClass="output-text" value="#{client.price} р."/>
-                    </rich:column>
-
-                    <rich:column>
-                        <f:facet name="header">
-                            <h:outputText styleClass="output-text-mod" value="Заказ"/>
-                        </f:facet>
-                        <h:outputText styleClass="output-text" value="нет"/>
                     </rich:column>
                 </rich:dataTable>
                 </a4j:region>
@@ -184,7 +181,7 @@ white-space: nowrap;
                             <h:outputText styleClass="output-text-mod" escape="false" value="К<br/>о<br/>м<br/>п<br/>л<br/>е<br/>к<br/>с<br/><br/>№#{complex}" />
                         </f:facet>
                         <h:panelGrid style="background: no-repeat url('/orgroom/images/split.jpg'); width: 40px; height: 40px" columnClasses="numbersTableCol1,numbersTableCol2" columns="2">
-                            <h:outputText styleClass="output-text-mod" value="0"/>
+                            <h:outputText styleClass="output-text-mod" value="#{feedPlanPage.getPayedComplexCount(idoclientgroup, complex)}"/>
                             <h:outputText value=""/>
                             <h:outputText value=""/>
                             <h:outputText styleClass="output-text-mod" value="#{feedPlanPage.getComplexCount(idoclientgroup, complex)}" />
@@ -197,11 +194,17 @@ white-space: nowrap;
 
         <h:panelGrid columns="6" columnClasses="setupFeedPlanGridControlImg1,setupFeedPlanGridControlTxt1,setupFeedPlanGridControlImg2,setupFeedPlanGridControlTxt2,setupFeedPlanGridControlImg3,setupFeedPlanGridControlTxt3">
             <a4j:region>
-                <a4j:commandButton image="/images/icon/money.png" action="#{feedPlanPage.doApply}" style="padding-right: 5px"/>
-                <a4j:commandLink value="Оплатить" styleClass="output-text" action="#{feedPlanPage.doApply}" style="vertical-align: middle; padding-right: 20px;"/>
+                <a4j:commandButton image="/images/icon/money.png" style="padding-right: 5px">
+                    <a4j:support event="onclick" reRender="orderRegistrationResultPanel" action="#{feedPlanPage.doShowOrderRegistrationResultPanel}"
+                                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('orderRegistrationResultPanel')}.show();"/>
+                </a4j:commandButton>
+                <a4j:commandLink value="Оплатить" styleClass="output-text" style="vertical-align: middle; padding-right: 20px;">
+                    <a4j:support event="onclick" reRender="orderRegistrationResultPanel" action="#{feedPlanPage.doShowOrderRegistrationResultPanel}"
+                                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('orderRegistrationResultPanel')}.show();"/>
+                </a4j:commandLink>
 
                 <a4j:commandButton image="/images/icon/blank.png" reRender="planGrid,groupsGrid" action="#{feedPlanPage.doClearPlan}" style="padding-right: 5px"/>
-                <a4j:commandLink value="Очистить план" reRender="" styleClass="output-text" action="#{feedPlanPage.doClearPlan}" style="vertical-align: middle; padding-right: 20px;"/>
+                <a4j:commandLink value="Очистить план" reRender="planGrid,groupsGrid" styleClass="output-text" action="#{feedPlanPage.doClearPlan}" style="vertical-align: middle; padding-right: 20px;"/>
 
                 <a4j:commandButton image="/images/icon/cancel.png" style="padding-right: 5px">
                     <a4j:support event="onclick" reRender="disableComplexPanel" action="#{feedPlanPage.doShowDisableComplexPanel}"

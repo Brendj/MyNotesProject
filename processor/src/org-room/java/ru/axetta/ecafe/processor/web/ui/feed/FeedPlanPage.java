@@ -22,6 +22,7 @@ import javax.faces.event.ValueChangeEvent;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.math.BigDecimal;
+import java.sql.PreparedStatement;
 import java.util.*;
 
 /**
@@ -125,8 +126,8 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
 
         String sql = "select cf_clientgroups.idofclientgroup, cf_clientgroups.groupname, cf_clients.idofclient, cf_persons.firstname, "
                 + "       cf_persons.secondname, cf_persons.surname, cf_clientscomplexdiscounts.idofrule, description, "
-                + "       cf_clientscomplexdiscounts.idofcomplex, cf_discountrules.priority, "
-                + "       CAST(substring(groupname FROM '[0-9]+') AS INTEGER) as groupNum, cf_complexinfo.currentprice "
+                + "       cf_clientscomplexdiscounts.idofcomplex, cf_discountrules.priority, CAST(substring(groupname FROM '[0-9]+') AS INTEGER) as groupNum, "
+                + "       cf_complexinfo.currentprice, cf_temporary_orders.action, cf_temporary_orders.IdOfOrder "
                 + "from cf_clients "
                 + "join cf_clientscomplexdiscounts on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient "
                 + "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "
@@ -134,12 +135,16 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
                 + "left join cf_discountrules on cf_discountrules.idofrule=cf_clientscomplexdiscounts.idofrule "
                 + "left join cf_complexinfo on cf_clients.idoforg=cf_complexinfo.idoforg and cf_complexinfo.idofcomplex=cf_clientscomplexdiscounts.idofcomplex "
                 + "                            and menudate between :startMenudate and :endMenudate "
+                + "left join cf_temporary_orders on cf_temporary_orders.idofclient=cf_clients.idofclient and "
+                + "          cf_temporary_orders.idofcomplex=cf_clientscomplexdiscounts.idofcomplex and "
+                + "          cf_temporary_orders.plandate=:plandate "
                 + "where cf_clients.idoforg=:idoforg " //+ groupFilter
-                + "order by groupNum, groupname, cf_clients.idofclient, idofcomplex, cf_discountrules.priority";
+                + "order by groupNum, groupname, cf_persons.firstname, cf_persons.secondname, cf_persons.surname, cf_clients.idofclient, idofcomplex";
         org.hibernate.Query q = session.createSQLQuery(sql);
         q.setLong("idoforg", getOrg(session).getIdOfOrg());
         q.setLong("startMenudate", planDate.getTimeInMillis());
         q.setLong("endMenudate", planDate.getTimeInMillis() + MILLIS_IN_DAY);
+        q.setLong("plandate", planDate.getTimeInMillis());
         List resultList = q.list();
         for (Object entry : resultList) {
             Object o[] = (Object[]) entry;
@@ -155,15 +160,20 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
             Integer priority = HibernateUtils.getDbInt(o[9]);
             Integer groupNum = HibernateUtils.getDbInt(o[10]);
             Long price = HibernateUtils.getDbLong(o[11]);
+            Integer action = HibernateUtils.getDbInt(o[12]);
+            Long idoforder = HibernateUtils.getDbLong(o[13]);
             if (price == null) {
                 price = 0L;
             }
 
 
             //  Добавляем клиента
-            Client cl = new Client(idofclientgroup, idofclient,
-                    firstName, secondname, surname,
-                    idofrule, ruleDescription, idofcomplex, priority, price);
+            Client cl = new Client(idofclientgroup, idofclient, firstName, secondname, surname,
+                    idofrule, ruleDescription, idofcomplex, priority, price, action);
+            if (action != null) {
+                cl.setTemporarySaved(true);
+            }
+            cl.setIdoforder(idoforder);
             clients.add(cl);
 
 
@@ -231,6 +241,127 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         }
     }
 
+    @Transactional
+    public void saveClientFeedAction (Client client, int actionType) {
+        if (client.getActionType() == actionType) {
+            return;
+        }
+        Session session = null;
+        try {
+            session = (Session) entityManager.getDelegate();
+            saveClientFeedAction(session, client, actionType);
+            client.setActionType(actionType);
+        } catch (Exception e) {
+            logger.error("Failed to save client's into temporary table", e);
+            sendError("Не удалось изменить статус питания клиента " + client.getFullName() + ": " + e.getMessage());
+        } finally {
+            //HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void saveClientFeedAction(Session session, Client client, int actionType) {
+        //  Если уже имеется заказ, значит сохранение во временную таблицу запрещено
+        if (client.getSaved()) {
+            return;
+        }
+
+
+       String sql = "";
+        //  Проверяем, сохранен ли клиент во временную таблицу в БД
+        if (client.getTemporarySaved()) {
+            sql = "update cf_temporary_orders set action=:action, modificationdate=:date, idofuser=:idofuser "
+                + "where idofclient=:idofclient and idofcomplex=:idofcomplex and plandate=:plandate";
+        } else {
+            sql = "insert into cf_temporary_orders (idoforg, idofclient, idofcomplex, plandate, action, creationdate, idofuser) "
+                + "values (:idoforg, :idofclient, :idofcomplex, :plandate, :action, :date, :idofuser)";
+        }
+
+        clearDate(planDate);
+        long currentTS = System.currentTimeMillis();
+        org.hibernate.Query query = session.createSQLQuery(sql);
+        query.setLong("idofclient", client.getIdofclient());
+        query.setInteger("idofcomplex", client.getComplex());
+        query.setLong("plandate", planDate.getTimeInMillis());
+        query.setInteger("action", actionType);
+        query.setLong("date", currentTS);
+        query.setLong("idofuser", -1L);
+        if (!client.getTemporarySaved()) {
+            query.setLong("idoforg", getOrg().getIdOfOrg());
+        }
+        query.executeUpdate();
+        client.setTemporarySaved(true);
+    }
+
+    @Transactional
+    public Map<Client, String> saveOrders () {
+        Session session = null;
+        try {
+            session = (Session) entityManager.getDelegate();
+            return saveOrders(session);
+        } catch (Exception e) {
+            logger.error("Failed to save orders", e);
+            //sendError("Не создать заказ для " + client.getFullName() + ": " + e.getMessage());
+        } finally {
+            //HibernateUtils.close(session, logger);
+        }
+        return Collections.emptyMap();
+    }
+
+    public Map<Client, String> saveOrders(Session session) {
+        Map <Client, String> result = new HashMap<Client, String>();
+        boolean hasError = false;
+        for (Client client : clients) {
+            if (client.getActionType() != ClientFeedActionEvent.PAY_CLIENT || client.getSaved()) {
+                continue;
+            }
+            //  Ошибка, для теста
+            if(!hasError) {
+                result.put(client, "Не удалось добавить заказ, здесь указывается причина ошибки");
+                hasError = true;
+                continue;
+            }
+
+
+            Random rand = new Random();
+            long idoforder = rand.nextLong();
+            org.hibernate.Query query = session.createSQLQuery(
+                    "update cf_temporary_orders set idoforder=:idoforder, modificationdate=:date "
+                            + "where idofclient=:idofclient and idofcomplex=:idofcomplex and plandate=:plandate");
+            query.setLong("idofclient", client.getIdofclient());
+            query.setInteger("idofcomplex", client.getComplex());
+            query.setLong("plandate", planDate.getTimeInMillis());
+            query.setLong("date", System.currentTimeMillis());
+            query.setLong("idoforder", idoforder);
+            query.executeUpdate();
+            client.setIdoforder(idoforder);
+            result.put(client, "Заказ успешно составлен");
+        }
+        return result;
+    }
+
+    @Transactional
+    public void clear () {
+        Session session = null;
+        try {
+            session = (Session) entityManager.getDelegate();
+            clear(session);
+        } catch (Exception e) {
+            logger.error("Failed to save orders", e);
+            //sendError("Не создать заказ для " + client.getFullName() + ": " + e.getMessage());
+        } finally {
+            //HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void clear(Session session) {
+        //  Удаляем все заказы, имеющиеся за выбранную дату
+        org.hibernate.Query query = session.createSQLQuery(
+                "delete from cf_temporary_orders where idoforg=:idoforg and plandate=:plandate");
+        query.setLong("idoforg", getOrg().getIdOfOrg());
+        query.setLong("plandate", planDate.getTimeInMillis());
+        query.executeUpdate();
+    }
+
 
 
 
@@ -258,11 +389,18 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         //RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
     }
 
-    public void doApply () {
-
+    public void doShowOrderRegistrationResultPanel () {
+        //  Созраняем заказы
+        Map <Client, String> result = RuntimeContext.getAppContext().getBean(FeedPlanPage.class).saveOrders();
+        //  Передаем полученный массив в модальное окно,
+        //  чтобы отобразить ошибки или успехи сохранения заказов
+        OrderRegistrationResultPanel panel = RuntimeContext.getAppContext().getBean(OrderRegistrationResultPanel.class);
+        panel.setClientSaveMessages(result);
+        MainPage.getSessionInstance().doShowOrderRegistrationResultPanel();
     }
 
     public void doClearPlan () {
+        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).clear();
         RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
     }
     
@@ -278,7 +416,8 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
     }
 
     public void onClientFeedActionEvent (ClientFeedActionEvent event) {
-        selectedClient.setActionType(event.getActionType());
+        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).saveClientFeedAction(selectedClient,
+                event.getActionType());
     }
 
     public void onDisableComplexEvent (DisableComplexEvent event) {
@@ -334,6 +473,22 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
             res.add(c.getComplex());
         }
         return res;
+    }
+    
+    public int getPayedComplexCount(long idoclientgroup, int complex) {
+        for (Complex c : complexes) {
+            if (c.getIdofclientgroup() == idoclientgroup && c.getComplex() == complex) {
+                //  Найдя нужный комплекс, приступаем к подсчету оплаченных комплексов
+                int count = 0;
+                for (Client cl : c.getClients()) {
+                    if (cl.getActionType() == ClientFeedActionEvent.PAY_CLIENT) {
+                        count++;
+                    }
+                }
+                return count;
+            }
+        }
+        return 0;
     }
     
     public int getComplexCount(long idoclientgroup, int complex) {
@@ -486,9 +641,12 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         private int priority;
         private int actionType;
         private long price;
+        private boolean temporarySaved;
+        private Long idoforder;
 
         public Client(long idofclientgroup, long idofclient, String firstname, String secondname,
-                String surname, long idofrule, String ruleDescription, int complex, int priority, long price) {
+                String surname, long idofrule, String ruleDescription, int complex, int priority,
+                long price, Integer action) {
             this.idofclientgroup = idofclientgroup;
             this.idofclient = idofclient;
             this.firstname = firstname;
@@ -498,7 +656,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
             this.ruleDescription = ruleDescription;
             this.complex = complex;
             this.priority = priority;
-            actionType = ClientFeedActionEvent.RELEASE_CLIENT;
+            actionType = action == null ? ClientFeedActionEvent.RELEASE_CLIENT : action;
             this.price = price;
         }
 
@@ -622,6 +780,33 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
                 default:
                     return "stop";
             }
+        }
+
+        public Long getIdoforder() {
+            return idoforder;
+        }
+
+        public void setIdoforder(Long idoforder) {
+            this.idoforder = idoforder;
+        }
+
+        public boolean getTemporarySaved() {
+            return temporarySaved;
+        }
+
+        public void setTemporarySaved(boolean temporarySaved) {
+            this.temporarySaved = temporarySaved;
+        }
+
+        public boolean getSaved() {
+            return idoforder != null;
+        }
+        
+        public String getLineStyleClass (){
+            if (idoforder != null) {
+                return "payed";
+            }
+            return "";
         }
 
         @Override
