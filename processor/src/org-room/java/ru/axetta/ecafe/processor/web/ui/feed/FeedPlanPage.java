@@ -109,6 +109,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
     }
 
     public void fill(Session session) throws Exception {
+        resetMessages();
         if (planDate == null) {
             planDate = new GregorianCalendar();
             planDate.setTimeInMillis(System.currentTimeMillis());
@@ -385,11 +386,13 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
     }
 
     public void doChangeGroup (long idofclientgroup) {
+        resetMessages();
         selectedIdOfClientGroup = idofclientgroup;
         //RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
     }
 
     public void doShowOrderRegistrationResultPanel () {
+        resetMessages();
         //  Созраняем заказы
         Map <Client, String> result = RuntimeContext.getAppContext().getBean(FeedPlanPage.class).saveOrders();
         //  Передаем полученный массив в модальное окно,
@@ -400,16 +403,26 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
     }
 
     public void doClearPlan () {
+        resetMessages();
+        for (Client cl : clients) {
+            if (cl.getIdoforder() != null) {
+                sendError("Присутствуют уже оплаченные заказы, план очистить невозможно");
+                return;
+            }
+        }
+
         RuntimeContext.getAppContext().getBean(FeedPlanPage.class).clear();
         RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
     }
     
     public void doShowClientFeedActionPanel(Client cl) {
+        resetMessages();
         selectedClient = cl;
         MainPage.getSessionInstance().doShowClientFeedActionPanel();
     }
 
     public void doShowDisableComplexPanel() {
+        resetMessages();
         DisableComplexPanel panel = RuntimeContext.getAppContext().getBean(DisableComplexPanel.class);
         panel.setComplexes(disabledComplexes);
         MainPage.getSessionInstance().doShowDisableComplexPanel();

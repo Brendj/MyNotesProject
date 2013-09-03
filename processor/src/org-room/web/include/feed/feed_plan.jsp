@@ -88,7 +88,7 @@ white-space: nowrap;
             <rich:calendar value="#{feedPlanPage.planDate}" datePattern="dd.MM.yyyy"
                            converter="dateConverter" inputClass="input-text" showWeeksBar="false"
                            valueChangeListener="#{feedPlanPage.doChangePlanDate}">
-                <a4j:support event="onchanged" reRender="planGrid,groupsGrid" bypassUpdates="true" />
+                <a4j:support event="onchanged" reRender="planGrid,groupsGrid,messages" bypassUpdates="true" />
             </rich:calendar>
             </a4j:region>
         </h:panelGrid>
@@ -171,7 +171,7 @@ white-space: nowrap;
                             <h:outputText escape="false" styleClass="output-text" value="К<br/>л<br/>а<br/>с<br/>с"/>
                         </f:facet>
                         <a4j:commandLink styleClass="output-text-mod" value="#{feedPlanPage.getGroupName(idoclientgroup)}" >
-                            <a4j:support reRender="planTable" event="onclick" action="#{feedPlanPage.doChangeGroup(idoclientgroup)}" />
+                            <a4j:support reRender="planTable,messages" event="onclick" action="#{feedPlanPage.doChangeGroup(idoclientgroup)}" />
                         </a4j:commandLink>
                     </rich:column>
 
@@ -192,6 +192,11 @@ white-space: nowrap;
             </rich:panel>
         </h:panelGrid>
 
+        <h:panelGrid id="messages">
+            <h:outputText escape="true" value="#{feedPlanPage.errorMessages}" rendered="#{not empty feedPlanPage.errorMessages}" styleClass="error-messages" />
+            <h:outputText escape="true" value="#{feedPlanPage.infoMessages}" rendered="#{not empty feedPlanPage.infoMessages}" styleClass="info-messages" />
+        </h:panelGrid>
+
         <h:panelGrid columns="6" columnClasses="setupFeedPlanGridControlImg1,setupFeedPlanGridControlTxt1,setupFeedPlanGridControlImg2,setupFeedPlanGridControlTxt2,setupFeedPlanGridControlImg3,setupFeedPlanGridControlTxt3">
             <a4j:region>
                 <a4j:commandButton image="/images/icon/money.png" style="padding-right: 5px">
@@ -203,8 +208,8 @@ white-space: nowrap;
                                  oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('orderRegistrationResultPanel')}.show();"/>
                 </a4j:commandLink>
 
-                <a4j:commandButton image="/images/icon/blank.png" reRender="planGrid,groupsGrid" action="#{feedPlanPage.doClearPlan}" style="padding-right: 5px"/>
-                <a4j:commandLink value="Очистить план" reRender="planGrid,groupsGrid" styleClass="output-text" action="#{feedPlanPage.doClearPlan}" style="vertical-align: middle; padding-right: 20px;"/>
+                <a4j:commandButton image="/images/icon/blank.png" reRender="planGrid,groupsGrid,messages" action="#{feedPlanPage.doClearPlan}" style="padding-right: 5px"/>
+                <a4j:commandLink value="Очистить план" reRender="planGrid,groupsGrid,messages" styleClass="output-text" action="#{feedPlanPage.doClearPlan}" style="vertical-align: middle; padding-right: 20px;"/>
 
                 <a4j:commandButton image="/images/icon/cancel.png" style="padding-right: 5px">
                     <a4j:support event="onclick" reRender="disableComplexPanel" action="#{feedPlanPage.doShowDisableComplexPanel}"
