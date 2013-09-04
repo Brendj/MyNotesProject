@@ -243,20 +243,26 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
     }
 
     @Transactional
-    public void saveClientFeedAction (Client client, int actionType) {
-        if (client.getActionType() == actionType) {
-            return;
-        }
+    public void saveClientFeedAction (List<Client> clients, int actionType) {
         Session session = null;
         try {
             session = (Session) entityManager.getDelegate();
-            saveClientFeedAction(session, client, actionType);
-            client.setActionType(actionType);
+            saveClientFeedAction(session, clients, actionType);
         } catch (Exception e) {
             logger.error("Failed to save client's into temporary table", e);
-            sendError("Не удалось изменить статус питания клиента " + client.getFullName() + ": " + e.getMessage());
+            //sendError("Не удалось изменить статус питания клиента " + client.getFullName() + ": " + e.getMessage());
         } finally {
             //HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void saveClientFeedAction(Session session, List<Client> clients, int actionType) {
+        for (Client client : clients) {
+            if (client.getActionType() == actionType) {
+                continue;
+            }
+
+            saveClientFeedAction(session, client, actionType);
         }
     }
 
@@ -290,6 +296,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
             query.setLong("idoforg", getOrg().getIdOfOrg());
         }
         query.executeUpdate();
+        client.setActionType(actionType);
         client.setTemporarySaved(true);
     }
 
@@ -428,9 +435,28 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         MainPage.getSessionInstance().doShowDisableComplexPanel();
     }
 
+    public void doDecreaseDay() {
+        planDate.setTimeInMillis(planDate.getTimeInMillis() - MILLIS_IN_DAY);
+        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
+    }
+
+    public void doIncreaseDay() {
+        planDate.setTimeInMillis(planDate.getTimeInMillis() + MILLIS_IN_DAY);
+        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
+    }
+
     public void onClientFeedActionEvent (ClientFeedActionEvent event) {
-        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).saveClientFeedAction(selectedClient,
-                event.getActionType());
+        //  Если значение было установлено для всех, то выполняем выбранную операцию для всех отображаемых клиентов
+        int actionType = event.getActionType();
+        List<Client> clients = null;
+        if (event.getActionType() > ClientFeedActionEvent.ALL_CLIENTS) {
+            clients = getClients();
+            actionType = actionType - ClientFeedActionEvent.ALL_CLIENTS;
+        } else {
+            clients = new ArrayList<Client>();
+            clients.add(selectedClient);
+        }
+        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).saveClientFeedAction(clients,actionType);
     }
 
     public void onDisableComplexEvent (DisableComplexEvent event) {
@@ -439,6 +465,98 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
 
     public Date getPlanDate() {
         return planDate.getTime();
+    }
+
+    public String getSelectedClientGroupName() {
+        if (selectedIdOfClientGroup == null) {
+            return "";
+        }
+        for (Complex complex : complexes) {
+            if (complex.getIdofclientgroup() == selectedIdOfClientGroup) {
+                return complex.getClientgroupname();
+            }
+        }
+        return "";
+    }
+
+    public String getComplexesTotalString() {
+        Map<Integer, Integer> [] arr = getClientsStatistic(clients);
+        Map<Integer, Integer> payed = arr [0];
+        Map<Integer, Integer> toPay = arr [1];
+        Map<Integer, Integer> total = arr [2];
+
+
+        //  Составляем строку комплексов
+        StringBuilder builder = new StringBuilder();
+        for (Integer complex : getComplexes()) {
+            Integer p = payed.get(complex);
+            Integer n = toPay.get(complex);
+            Integer t = total.get(complex);
+            if (builder.length() > 0) {
+                builder.append(", ");
+            }
+            builder.append("Комплекс №").append(complex).append(" (").
+                    append(p == null ? 0 : p).append("/").
+                    append(n == null ? 0 : n).append("/").
+                    append(t == null ? 0 : t).append(")");
+        }
+        return builder.toString();
+    }
+
+    public String getCurrentTotalString () {
+        Map<Integer, Integer> [] arr = getClientsStatistic(getClients());
+        Map<Integer, Integer> payed = arr [0];
+        Map<Integer, Integer> toPay = arr [1];
+        Map<Integer, Integer> total = arr [2];
+
+
+        //  Суммируем все значения от комплексов
+        int payedTotal = 0;
+        for (Integer complex : payed.keySet()) {
+            payedTotal += payed.get(complex);
+        }
+        int toPayTotal = 0;
+        for (Integer complex : toPay.keySet()) {
+            toPayTotal += toPay.get(complex);
+        }
+
+        //  Составляем строку
+        return "К оплате: " + toPayTotal + ", Оплачено: " + payedTotal;
+    }
+    
+    private Map<Integer, Integer> [] getClientsStatistic(List<Client> clients) {
+        Map<Integer, Integer> payed = new HashMap<Integer, Integer>();
+        Map<Integer, Integer> toPay = new HashMap<Integer, Integer>();
+        Map<Integer, Integer> total = new HashMap<Integer, Integer>();
+        for (Client cl : clients) {
+            //  Оплаченные
+            if (cl.getIdoforder() != null) {
+                Integer now = payed.get(cl.getComplex());
+                if (now == null) {
+                    now = 0;
+                }
+                now++;
+                payed.put(cl.getComplex(), now);
+            }
+            //  К оплате
+            else if (cl.getActionType() == ClientFeedActionEvent.PAY_CLIENT) {
+                Integer now = toPay.get(cl.getComplex());
+                if (now == null) {
+                    now = 0;
+                }
+                now++;
+                toPay.put(cl.getComplex(), now);
+            }
+
+            //  Всего
+            Integer now = total.get(cl.getComplex());
+            if (now == null) {
+                now = 0;
+            }
+            now++;
+            total.put(cl.getComplex(), now);
+        }
+        return new Map[] { payed, toPay, total };
     }
 
     public void setPlanDate(Date planDate) {
@@ -518,6 +636,21 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
             if (c.getIdofclientgroup() == idofclientgroup) {
                 return c.getClientgroupname();
             }
+        }
+        return "";
+    }
+    
+    public String getClientGroupStyleClass(long idofclientgroup) {
+        if (selectedIdOfClientGroup != null &&
+            selectedIdOfClientGroup == idofclientgroup) {
+            return "selectClientGroup";
+        }
+        if (idofclientgroup == ELEMENTARY_CLASSES_TYPE ||
+            idofclientgroup == MIDDLE_CLASSES_TYPE ||
+            idofclientgroup == HIGH_CLASSES_TYPE ||
+            idofclientgroup == ORDER_TYPE ||
+            idofclientgroup == ALL_TYPE) {
+            return "subcategoryClientGroup";
         }
         return "";
     }

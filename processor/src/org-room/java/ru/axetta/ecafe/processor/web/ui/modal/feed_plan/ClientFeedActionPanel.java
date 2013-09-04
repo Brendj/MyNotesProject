@@ -84,6 +84,27 @@ public class ClientFeedActionPanel extends BasicWorkspacePage {
         }
     }
 
+    public void doPayAllClients() {
+        ClientFeedActionEvent event = new ClientFeedActionEvent(ClientFeedActionEvent.PAY_CLIENT + ClientFeedActionEvent.ALL_CLIENTS);
+        for (ClientFeedActionListener l : listeners) {
+            l.onClientFeedActionEvent(event);
+        }
+    }
+
+    public void doBlockAllClients() {
+        ClientFeedActionEvent event = new ClientFeedActionEvent(ClientFeedActionEvent.BLOCK_CLIENT + ClientFeedActionEvent.ALL_CLIENTS);
+        for (ClientFeedActionListener l : listeners) {
+            l.onClientFeedActionEvent(event);
+        }
+    }
+
+    public void doReleaseAllClients() {
+        ClientFeedActionEvent event = new ClientFeedActionEvent(ClientFeedActionEvent.RELEASE_CLIENT + ClientFeedActionEvent.ALL_CLIENTS);
+        for (ClientFeedActionListener l : listeners) {
+            l.onClientFeedActionEvent(event);
+        }
+    }
+
 
 
 

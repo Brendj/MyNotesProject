@@ -77,21 +77,48 @@ white-space: nowrap;
 .payed {
     background-color: #CCFFCC;
 }
+.selectClientGroup {
+    background-color: #CCDBFF;
+}
+.subcategoryClientGroup {
+    background-color: #FFDD57;
+}
+.totalMessages_col1 {
+    width: 1%;
+}
+.totalMessages_col2 {
+    width: 99%;
+    text-align: right;
+}
+.calendar {
+    width: 50%;
+}
+.calendarText {
+    width: 50%;
+    text-align: right;
+}
 </style>
 
 <%--@elvariable id="feedPlanPage" type="ru.axetta.ecafe.processor.web.ui.feed.FeedPlanPage"--%>
 <a4j:form id="setupFeedPlanForm">
     <h:panelGrid id="setupFeedPlanGrid" binding="#{feedPlanPage.pageComponent}" styleClass="borderless-grid" style="width: 100%;">
-        <h:panelGrid columns="2">
-            <a4j:region>
-            <h:outputText styleClass="output-text-mod" value="План питания:"/>
-            <rich:calendar value="#{feedPlanPage.planDate}" datePattern="dd.MM.yyyy"
-                           converter="dateConverter" inputClass="input-text" showWeeksBar="false"
-                           valueChangeListener="#{feedPlanPage.doChangePlanDate}">
-                <a4j:support event="onchanged" reRender="planGrid,groupsGrid,messages" bypassUpdates="true" />
-            </rich:calendar>
-            </a4j:region>
+        <a4j:region>
+        <h:panelGrid id="planDateCalendar" columns="2" columnClasses="calendar,calendarText">
+            <h:panelGrid columns="4">
+                <h:outputText styleClass="output-text-mod" value="План питания:"/>
+                <a4j:commandButton value="<" action="#{feedPlanPage.doDecreaseDay}" reRender="planDateCalendar,planGrid,groupsGrid,messages,totalMessage"/>
+                <rich:calendar value="#{feedPlanPage.planDate}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false"
+                               valueChangeListener="#{feedPlanPage.doChangePlanDate}">
+                    <a4j:support event="onchanged" reRender="planGrid,groupsGrid,messages,totalMessage" bypassUpdates="true" />
+                </rich:calendar>
+                <a4j:commandButton value=">" action="#{feedPlanPage.doIncreaseDay}" reRender="planDateCalendar,planGrid,groupsGrid,messages,totalMessage"/>
+            </h:panelGrid>
+            <h:panelGrid id="currentTotalString">
+                <h:outputText styleClass="output-text-mod" style="font-weight: bold" value="#{feedPlanPage.currentTotalString}"/>
+            </h:panelGrid>
         </h:panelGrid>
+        </a4j:region>
 
         <h:panelGrid id="planGrid" columns="2" style="width: 100%" columnClasses="clientsPanel,groupsPanel">
             <%-- КЛИЕНТЫ --%>
@@ -166,17 +193,18 @@ white-space: nowrap;
             <rich:panel id="groupsGrid" style="height: 450px; width: 100%; overflow: auto;">
                 <a4j:region>
                 <rich:dataTable id="groupsTable" value="#{feedPlanPage.groups}" var="idoclientgroup" style="width: 100%">
-                    <rich:column style="text-align: center; line-height: 0.9;">
+                    <rich:column style="text-align: center; line-height: 0.9;" styleClass="#{feedPlanPage.getClientGroupStyleClass(idoclientgroup)}">
                         <f:facet name="header">
                             <h:outputText escape="false" styleClass="output-text" value="К<br/>л<br/>а<br/>с<br/>с"/>
                         </f:facet>
                         <a4j:commandLink styleClass="output-text-mod" value="#{feedPlanPage.getGroupName(idoclientgroup)}" >
-                            <a4j:support reRender="planTable,messages" event="onclick" action="#{feedPlanPage.doChangeGroup(idoclientgroup)}" />
+                            <a4j:support reRender="planTable,messages,groupsGrid,currentTotalString" event="onclick" action="#{feedPlanPage.doChangeGroup(idoclientgroup)}" />
                         </a4j:commandLink>
                     </rich:column>
 
-                    <rich:columns value="#{feedPlanPage.complexes}" var="complex" styleClass="left-aligned-column"
-                                  index="ind" headerClass="thin-center-aligned-column"  width="1%" style="width: 1%;">
+                    <rich:columns value="#{feedPlanPage.complexes}" var="complex"
+                                  index="ind" headerClass="thin-center-aligned-column"  width="1%" style="width: 1%;"
+                                  styleClass="#{feedPlanPage.getClientGroupStyleClass(idoclientgroup)}">
                         <f:facet name="header">
                             <h:outputText styleClass="output-text-mod" escape="false" value="К<br/>о<br/>м<br/>п<br/>л<br/>е<br/>к<br/>с<br/><br/>№#{complex}" />
                         </f:facet>
@@ -195,6 +223,14 @@ white-space: nowrap;
         <h:panelGrid id="messages">
             <h:outputText escape="true" value="#{feedPlanPage.errorMessages}" rendered="#{not empty feedPlanPage.errorMessages}" styleClass="error-messages" />
             <h:outputText escape="true" value="#{feedPlanPage.infoMessages}" rendered="#{not empty feedPlanPage.infoMessages}" styleClass="info-messages" />
+        </h:panelGrid>
+
+        <h:panelGrid id="totalMessage" columns="2" columnClasses="totalMessage_col1,totalMessage_col2">
+            <h:outputText value=""/>
+            <h:panelGrid columns="2">
+                <h:outputText value="Итого по #{feedPlanPage.selectedClientGroupName} (оплачено/к оплате/всего):" styleClass="output-text" style="font-weight: bold"/>
+                <h:outputText value="#{feedPlanPage.complexesTotalString}" styleClass="output-text"/>
+            </h:panelGrid>
         </h:panelGrid>
 
         <h:panelGrid columns="6" columnClasses="setupFeedPlanGridControlImg1,setupFeedPlanGridControlTxt1,setupFeedPlanGridControlImg2,setupFeedPlanGridControlTxt2,setupFeedPlanGridControlImg3,setupFeedPlanGridControlTxt3">
