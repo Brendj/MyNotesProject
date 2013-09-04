@@ -900,7 +900,7 @@ class Session {
                     ed.appendByte((byte) (message.num + 1)); //Sequence number
                     switch (message.type) {
                         case Message.GSM7BIT:
-                            ed.appendString(message.getMessage(), Data.ENC_GSM7BIT);
+                            ed.appendString(message.getMessage(), Data.ENC_ASCII);
                             break;
                         case Message.UCS2:
                             request.setDataCoding((byte)0x08);
@@ -922,7 +922,7 @@ class Session {
                     switch (message.type) {
                         case Message.GSM7BIT:
                             //System.out.println("sending gsm7bit");
-                            request.setShortMessage(message.getMessage(), Data.ENC_GSM7BIT);
+                            request.setShortMessage(message.getMessage(), Data.ENC_ASCII);
                             break;
                         case Message.UCS2:
                             //System.out.println("sending ucs2");
