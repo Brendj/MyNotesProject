@@ -106,7 +106,7 @@ public class ProjectStateReportService {
 
     static {
         TYPES = new HashMap<String, Type>();
-        TYPES.put("ActiveChart", new ComplexType(new Type[]{
+        /*TYPES.put("ActiveChart", new ComplexType(new Type[]{
                 new SimpleType("select '' || EXTRACT(EPOCH FROM d) * 1000, count(v) " +
                         "from (select distinct regOrgSrc.idoforg as v, date_trunc('day', to_timestamp(regOrgSrc.evtdatetime / 1000)) as d "
                         +
@@ -254,7 +254,7 @@ public class ProjectStateReportService {
                         "group by cf_contragents.contragentname " +
                         "order by 1", new Object[][]{
                         {ValueType.TEXT, "Способ пополнения"}, {ValueType.NUMBER, "Количество пополнений", REFILL_CHART_DATA}},
-                        REFILL_CHART_DATA).setPostReportMethod("parseRefillChart"));
+                        REFILL_CHART_DATA).setPostReportMethod("parseRefillChart"));*/
         TYPES.put("RefillAvgChart", new ComplexType(new Type[]{
                 new SimpleType("select 'Средняя сумма пополнения' as title, avg(cf_clientpayments.paysum) / 100 " +
                         "from cf_contragents " +
@@ -299,7 +299,7 @@ public class ProjectStateReportService {
                 new Object[][]{
                 {ValueType.DATE, "Дата"}, {ValueType.NUMBER, PAY_AGENTS_COLUMNS, REFILL_PROGRESS_CHART}},
                 REFILL_PROGRESS_CHART));
-        TYPES.put("InformingChart",
+        /*TYPES.put("InformingChart",
                 new SimpleType("select 'Не предоставлены данные для информирования', count(regOrgSrc.idofclient) " +
                         "from cf_clients as regOrgSrc " +
                         "left join cf_cards on regOrgSrc.idofclient=cf_cards.idofclient " +
@@ -470,7 +470,7 @@ public class ProjectStateReportService {
                         .setPeriodDaysInc(-7).setIncremental(true)}, new Object[][]{
                 {ValueType.TEXT, "ОУ"}, {ValueType.NUMBER, "Проход (%)", RATING_CHART_1_DATA}, {ValueType.NUMBER, "Платное питание (%)", RATING_CHART_2_DATA},
                 {ValueType.TEXT, "Льготное питание", RATING_CHART_3_DATA}, {ValueType.NUMBER, "Рейтинг (%)", RATING_CHART_4_DATA}, {ValueType.TEXT, "Округ", RATING_CHART_5_DATA},},
-                RATING_CHART_DATA));
+                RATING_CHART_DATA));*/
     }
 
     private static final String INSERT_SQL = "INSERT INTO cf_projectstate_data (GenerationDate, Period, Region, Type, StringKey, StringValue, Comments) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -504,7 +504,7 @@ public class ProjectStateReportService {
         Session session = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            session = runtimeContext.createReportPersistenceSession();
+            session = runtimeContext.createPersistenceSession();
 
             initDictionaries(session);
         } catch (Exception e) {
@@ -665,6 +665,7 @@ public class ProjectStateReportService {
             }
             String finalSQL = applyMacroReplace(t.getSQL(), t.getReportType(), lastUpload, today, 0, regionName,
                     idOfContragent);
+            logger.error("PROJECT_STATE SQL COMMAND: " + finalSQL);
 
             org.hibernate.Query q = session.createSQLQuery(finalSQL);
             //logger.info(t.getReportType() + " :: " + regionName + " :: SQL:__ " + finalSQL);
