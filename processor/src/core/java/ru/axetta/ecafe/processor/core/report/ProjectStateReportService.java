@@ -266,7 +266,7 @@ public class ProjectStateReportService {
                         "group by cf_contragents.contragentname " +
                         "order by 1", REFILL_CHART_02_DATA).setValueType(Double.class), },
                         new Object[][]{
-                        {ValueType.TEXT, "Способ пополнения"}, {ValueType.NUMBER, PAY_AGENTS_COLUMNS, REFILL_CHART_01_DATA}}, REFILL_CHART_01_DATA));
+                        {ValueType.TEXT, "Способ пополнения"}, {ValueType.NUMBER, PAY_AGENTS_COLUMNS, REFILL_CHART_02_DATA}}, REFILL_CHART_02_DATA));
         TYPES.put("RefillProgressChart", new ComplexType(new Type[]{
                 new SimpleType("select bycontr.dat, bycontr.cnt / byall.cnt * 100 "
                         + "from (select '' || EXTRACT(EPOCH FROM ooo.dat) * 1000 as dat, sum(ooo.cnt) as cnt "
@@ -297,8 +297,8 @@ public class ProjectStateReportService {
                         + "where bycontr.dat = byall.dat "
                         + "order by bycontr.dat", REFILL_PROGRESS_0_CHART).setIncremental(true).setValueType (Double.class)},
                 new Object[][]{
-                {ValueType.DATE, "Дата"}, {ValueType.NUMBER, PAY_AGENTS_COLUMNS, REFILL_PROGRESS_CHART}},
-                REFILL_PROGRESS_CHART));
+                {ValueType.DATE, "Дата"}, {ValueType.NUMBER, PAY_AGENTS_COLUMNS, REFILL_PROGRESS_0_CHART}},
+                REFILL_PROGRESS_0_CHART));
         TYPES.put("InformingChart",
                 new SimpleType("select 'Не предоставлены данные для информирования', count(regOrgSrc.idofclient) " +
                         "from cf_clients as regOrgSrc " +
@@ -945,9 +945,15 @@ public class ProjectStateReportService {
             }
             q.setInteger(0, type);
 
+
+            //  Временный фикс для 402
+            int insertType = t.getReportType ();
+            if (t.getReportType() == REFILL_CHART_02_DATA || t.getReportType() == REFILL_PROGRESS_0_CHART) {
+                insertType = type;
+            }
             for (Object entry : q.list()) {
                 Object e[] = (Object[]) entry;
-                result.put(((String) e[0]).trim(), new Item (t.getReportType (), ((String) e[1]).trim()));
+                result.put(((String) e[0]).trim(), new Item (insertType, ((String) e[1]).trim()));
             }
             return result;
         } catch (Exception e) {
@@ -1004,46 +1010,65 @@ public class ProjectStateReportService {
             if (t.getColumns().length > 0 && ((String) t.getColumns()[1][1]).equals(PAY_AGENTS_COLUMNS)) {
                 agentInc = PAY_AGENTS_LIST.size() - 1;
             }
-            for (int i = 1; i < t.getColumns().length + agentInc; i++) {
-                Object col[] = t.getColumns()[agentInc != 0 ? 1 : i];       // Подсчет переделать
-                Integer type = null;
-                if (col [2] != null) {
-                    type = (Integer) col [2];
+            //  Обрабаытваем агентов - для каждого из них, выбираем данные того типа, который ему соответствует
+            int agentCount = 0;
+            if ((t.getReportType() == REFILL_CHART_02_DATA || t.getReportType() == REFILL_PROGRESS_0_CHART) &&
+                t.getColumns().length > 0 && ((String) t.getColumns()[1][1]).equals(PAY_AGENTS_COLUMNS)) {
+                agentCount = PAY_AGENTS_LIST.size();
+            }
+            int agentI = 0;
+            do {
+                Integer idOfContragent = agentCount == 0 ? 0 : (Integer) PAY_AGENTS_LIST.get(agentI)[0];
+                int colsLimit = t.getColumns().length + agentInc;
+                if (idOfContragent != 0) {
+                    colsLimit = 2;
                 }
-                String val = getValue (vals, type);
-
-
-                if ((ValueType) col[0] == ValueType.TEXT) {
-                    if (i - 1 >= vals.size()) {
-                        r.addCell("");
-                    } else {
-                        r.addCell(encode (val, encoding));
+                for (int i = 1; i < colsLimit; i++) {
+                    Object col[] = t.getColumns()[agentInc != 0 ? 1 : i];       // Подсчет переделать
+                    Integer type = null;
+                    if (col != null && col [2] != null) {
+                        type = (Integer) col [2];
                     }
-                } else if ((ValueType) col[0] == ValueType.NUMBER) {
-                    //  Проверка, если выполняем за выходной и выполняются конкретные типы,
-                    //  то добавляем null вместо значений, чтобы линия прервалась и потом продолжилась
-                    if (val == null) {
-                        r.addCell(Value.getNullValueFromValueType(ValueType.NUMBER));
-                        continue;
+                    if (idOfContragent != 0) {
+                        type = t.getReportType() + buildPayAgentTypeInc(idOfContragent);
+                        col = t.getColumns()[1];
                     }
+                    String val = getValue (vals, type);
 
-                    if (i - 1 >= vals.size()) {
-                        r.addCell(0);
-                    } else {
-                        try {
-                            r.addCell(Integer.parseInt(val));
-                        } catch (NumberFormatException nfe) {
-                            if (val != null && val.length() > 0) {
-                                r.addCell(new BigDecimal(Double.parseDouble(val))
-                                        .setScale(1, BigDecimal.ROUND_HALF_DOWN).doubleValue());
-                            } else {
-                                r.addCell(new BigDecimal(0D)
-                                        .setScale(1, BigDecimal.ROUND_HALF_DOWN).doubleValue());
+
+                    if ((ValueType) col[0] == ValueType.TEXT) {
+                        if (i - 1 >= vals.size()) {
+                            r.addCell("");
+                        } else {
+                            r.addCell(encode (val, encoding));
+                        }
+                    } else if ((ValueType) col[0] == ValueType.NUMBER) {
+                        //  Проверка, если выполняем за выходной и выполняются конкретные типы,
+                        //  то добавляем null вместо значений, чтобы линия прервалась и потом продолжилась
+                        if (val == null) {
+                            r.addCell(Value.getNullValueFromValueType(ValueType.NUMBER));
+                            continue;
+                        }
+
+                        if (i - 1 >= vals.size()) {
+                            r.addCell(0);
+                        } else {
+                            try {
+                                r.addCell(Integer.parseInt(val));
+                            } catch (NumberFormatException nfe) {
+                                if (val != null && val.length() > 0) {
+                                    r.addCell(new BigDecimal(Double.parseDouble(val))
+                                            .setScale(1, BigDecimal.ROUND_HALF_DOWN).doubleValue());
+                                } else {
+                                    r.addCell(new BigDecimal(0D)
+                                            .setScale(1, BigDecimal.ROUND_HALF_DOWN).doubleValue());
+                                }
                             }
                         }
                     }
                 }
-            }
+                agentI++;
+            } while (agentI < agentCount);
             dt.addRow(r);
         }
 
