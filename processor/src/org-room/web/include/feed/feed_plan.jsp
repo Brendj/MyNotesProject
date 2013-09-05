@@ -161,8 +161,11 @@ white-space: nowrap;
                         <f:facet name="header">
                             <h:outputText styleClass="output-text-mod" value="Замена"/>
                         </f:facet>
-                        <a4j:commandLink styleClass="output-text" value="[Нажмите для выбора замены]" rendered="#{!client.saved}"></a4j:commandLink>
-                        <h:outputText styleClass="output-text" value="[Замен нет]" rendered="#{client.saved}"></h:outputText>
+                        <a4j:commandLink styleClass="output-text" value="#{feedPlanPage.getReplaceClient(client)}" rendered="#{!client.saved}">
+                            <a4j:support event="onclick" reRender="replaceClientPanel" action="#{feedPlanPage.doShowReplaceClientPanel(client)}"
+                                         oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('replaceClientPanel')}.show();"/>
+                        </a4j:commandLink>
+                        <h:outputText styleClass="output-text" value="#{feedPlanPage.getReplaceClient(client)}" rendered="#{client.saved}"></h:outputText>
                     </rich:column>
 
                     <rich:column styleClass="#{client.lineStyleClass}">
@@ -209,10 +212,10 @@ white-space: nowrap;
                             <h:outputText styleClass="output-text-mod" escape="false" value="К<br/>о<br/>м<br/>п<br/>л<br/>е<br/>к<br/>с<br/><br/>№#{complex}" />
                         </f:facet>
                         <h:panelGrid style="background: no-repeat url('/orgroom/images/split.jpg'); width: 40px; height: 40px" columnClasses="numbersTableCol1,numbersTableCol2" columns="2">
-                            <h:outputText styleClass="output-text-mod" value="#{feedPlanPage.getPayedComplexCount(idoclientgroup, complex)}"/>
+                            <h:outputText styleClass="output-text-mod" style="font-weight: bold; color: red" value="#{feedPlanPage.getPayedComplexCount(idoclientgroup, complex)}"/>
                             <h:outputText value=""/>
                             <h:outputText value=""/>
-                            <h:outputText styleClass="output-text-mod" value="#{feedPlanPage.getComplexCount(idoclientgroup, complex)}" />
+                            <h:outputText styleClass="output-text-mod" style="font-weight: bold; color: blue" value="#{feedPlanPage.getComplexCount(idoclientgroup, complex)}" />
                         </h:panelGrid>
                     </rich:columns>
                 </rich:dataTable>

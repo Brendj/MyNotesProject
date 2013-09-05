@@ -4,6 +4,7 @@ CREATE TABLE cf_temporary_orders (
   IdOfComplex int not null,
   PlanDate bigint not null,
   Action int not null,
+  IdOfReplaceClient bigInt,
   CreationDate bigint not null,
   ModificationDate bigint,
   IdOfOrder bigint default null,

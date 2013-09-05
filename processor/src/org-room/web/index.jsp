@@ -39,6 +39,10 @@
     <f:subview id="orderRegistrationResultView">
         <c:import url="include/modal/feed_plan/order_registration_result.jsp" />
     </f:subview>
+    <f:subview id="replaceClientView">
+        <c:import url="include/modal/feed_plan/replace_client.jsp" />
+    </f:subview>
+
 
     <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">
             <%-- Заголовок страницы --%>
