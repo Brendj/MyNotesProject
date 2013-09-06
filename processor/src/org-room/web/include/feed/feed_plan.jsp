@@ -254,6 +254,8 @@ white-space: nowrap;
             </h:panelGrid>
         </h:panelGrid>
 
+
+
         <h:panelGrid columns="6" columnClasses="setupFeedPlanGridControlImg1,setupFeedPlanGridControlTxt1,setupFeedPlanGridControlImg2,setupFeedPlanGridControlTxt2,setupFeedPlanGridControlImg3,setupFeedPlanGridControlTxt3">
             <a4j:region>
                 <%--<a4j:commandButton image="/images/icon/money.png" style="padding-right: 5px">
@@ -269,6 +271,7 @@ white-space: nowrap;
                                  oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.show();">
                         <f:setPropertyActionListener value="Вы уверены что хотите произвести оплату?" target="#{yesNoConfirmPanel.message}" />
                         <f:setPropertyActionListener value="orderRegistrationResultPanel" target="#{yesNoConfirmPanel.nodePanel}" />
+                        <f:setPropertyActionListener value="#{feedPlanPage}" target="#{yesNoConfirmPanel.yesActionListener}" />
                     </a4j:support>
                 </a4j:commandButton>
                 <a4j:commandLink value="Оплатить" styleClass="output-text" style="vertical-align: middle; padding-right: 20px;">
@@ -276,11 +279,28 @@ white-space: nowrap;
                                  oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.show();">
                         <f:setPropertyActionListener value="Вы уверены что хотите произвести оплату?" target="#{yesNoConfirmPanel.message}" />
                         <f:setPropertyActionListener value="orderRegistrationResultPanel" target="#{yesNoConfirmPanel.nodePanel}" />
+                        <f:setPropertyActionListener value="#{feedPlanPage}" target="#{yesNoConfirmPanel.yesActionListener}" />
                     </a4j:support>
                 </a4j:commandLink>
 
-                <a4j:commandButton image="/images/icon/blank.png" reRender="planGrid,groupsGrid,messages" action="#{feedPlanPage.doClearPlan}" style="padding-right: 5px"/>
-                <a4j:commandLink value="Очистить план" reRender="planGrid,groupsGrid,messages" styleClass="output-text" action="#{feedPlanPage.doClearPlan}" style="vertical-align: middle; padding-right: 20px;"/>
+
+                <a4j:commandButton image="/images/icon/blank.png" reRender="planGrid,groupsGrid,messages" action="#{feedPlanPage.doClearPlan}" style="padding-right: 5px">
+                    <a4j:support event="onclick" reRender="yesNoConfirmPanel" action="#{mainPage.doShowYesNoConfirmModal}"
+                                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.show();">
+                        <f:setPropertyActionListener value="Все изменения будут утеряны, Вы хотите продолжить?" target="#{yesNoConfirmPanel.message}" />
+                        <f:setPropertyActionListener value="#{null}" target="#{yesNoConfirmPanel.nodePanel}" />
+                        <f:setPropertyActionListener value="#{null}" target="#{yesNoConfirmPanel.yesActionListener}" />
+                    </a4j:support>
+                </a4j:commandButton>
+                <a4j:commandLink value="Очистить план" reRender="planGrid,groupsGrid,messages" styleClass="output-text" action="#{feedPlanPage.doClearPlan}" style="vertical-align: middle; padding-right: 20px;">
+                    <a4j:support event="onclick" reRender="yesNoConfirmPanel" action="#{mainPage.doShowYesNoConfirmModal}"
+                                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.show();">
+                        <f:setPropertyActionListener value="Все изменения будут утеряны, Вы хотите продолжить?" target="#{yesNoConfirmPanel.message}" />
+                        <f:setPropertyActionListener value="#{null}" target="#{yesNoConfirmPanel.nodePanel}" />
+                        <f:setPropertyActionListener value="#{null}" target="#{yesNoConfirmPanel.yesActionListener}" />
+                    </a4j:support>
+                </a4j:commandLink>
+
 
                 <a4j:commandButton image="/images/icon/cancel.png" style="padding-right: 5px">
                     <a4j:support event="onclick" reRender="disableComplexPanel" action="#{feedPlanPage.doShowDisableComplexPanel}"

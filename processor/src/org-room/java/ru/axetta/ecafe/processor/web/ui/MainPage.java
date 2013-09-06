@@ -125,8 +125,12 @@ public class MainPage {
     }
 
     public void doShowOrderRegistrationResultPanel () {
+        doShowOrderRegistrationResultPanel(currentWorkspacePage);
+    }
+
+    public void doShowOrderRegistrationResultPanel (BasicWorkspacePage page) {
         OrderRegistrationResultPanel panel = RuntimeContext.getAppContext().getBean(OrderRegistrationResultPanel.class);
         panel.fill();
-        panel.addCallbackListener(currentWorkspacePage);
+        panel.addCallbackListener(page);
     }
 }

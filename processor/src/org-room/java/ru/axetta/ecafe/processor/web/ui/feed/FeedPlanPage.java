@@ -13,6 +13,8 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.modal.YesNoConfirmPanel;
+import ru.axetta.ecafe.processor.web.ui.modal.YesNoEvent;
+import ru.axetta.ecafe.processor.web.ui.modal.YesNoListener;
 import ru.axetta.ecafe.processor.web.ui.modal.feed_plan.*;
 
 import org.hibernate.Session;
@@ -39,7 +41,8 @@ import java.util.*;
  */
 @Component
 @Scope("session")
-public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedActionListener, DisableComplexListener, ReplaceClientListener {
+public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedActionListener, DisableComplexListener, ReplaceClientListener,
+        YesNoListener {
     private static final long MILLIS_IN_DAY           = 86400000L;
     private static final long ELEMENTARY_CLASSES_TYPE = Long.MIN_VALUE;
     private static final long MIDDLE_CLASSES_TYPE     = Long.MIN_VALUE + 1;
@@ -68,6 +71,8 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
     private Client selectedClient;
     private List<Complex> orderedComplexes;
     private Map<Integer, Boolean> disabledComplexes;
+    private boolean clearPlan;
+    private boolean orderRegistrationResult;
 
 
 
@@ -516,27 +521,41 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
     }
 
     public void doShowOrderRegistrationResultPanel () {
-        resetMessages();
-        //  Созраняем заказы
-        Map <Client, String> result = RuntimeContext.getAppContext().getBean(FeedPlanPage.class).saveOrders();
-        //  Передаем полученный массив в модальное окно,
-        //  чтобы отобразить ошибки или успехи сохранения заказов
-        OrderRegistrationResultPanel panel = RuntimeContext.getAppContext().getBean(OrderRegistrationResultPanel.class);
-        panel.setClientSaveMessages(result);
-        MainPage.getSessionInstance().doShowOrderRegistrationResultPanel();
+        orderRegistrationResult = true;
+        clearPlan = false;
+    }
+    
+    public void onYesNoEvent (YesNoEvent event) {
+        if (!event.isYes()) {
+            return;
+        }
+
+        if (orderRegistrationResult) {
+            resetMessages();
+            //  Созраняем заказы
+            Map <Client, String> result = RuntimeContext.getAppContext().getBean(FeedPlanPage.class).saveOrders();
+            //  Передаем полученный массив в модальное окно,
+            //  чтобы отобразить ошибки или успехи сохранения заказов
+            OrderRegistrationResultPanel panel = RuntimeContext.getAppContext().getBean(OrderRegistrationResultPanel.class);
+            panel.setClientSaveMessages(result);
+            MainPage.getSessionInstance().doShowOrderRegistrationResultPanel(this);
+        } else if (clearPlan) {
+            resetMessages();
+            for (Client cl : clients) {
+                if (cl.getIdoforder() != null) {
+                    sendError("Присутствуют уже оплаченные заказы, план очистить невозможно");
+                    return;
+                }
+            }
+
+            RuntimeContext.getAppContext().getBean(FeedPlanPage.class).clear();
+            RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
+        }
     }
 
     public void doClearPlan () {
-        resetMessages();
-        for (Client cl : clients) {
-            if (cl.getIdoforder() != null) {
-                sendError("Присутствуют уже оплаченные заказы, план очистить невозможно");
-                return;
-            }
-        }
-
-        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).clear();
-        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
+        clearPlan = true;
+        orderRegistrationResult = false;
     }
     
     public void doShowClientFeedActionPanel(Client cl) {

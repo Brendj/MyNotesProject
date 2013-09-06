@@ -22,6 +22,7 @@ public class YesNoConfirmPanel extends BasicWorkspacePage {
     private static final Logger logger = LoggerFactory.getLogger(YesNoConfirmPanel.class);
     private String message;
     private String nodePanel;
+    private YesNoListener yesActionListener;
 
 
     public void fill () {
@@ -35,6 +36,16 @@ public class YesNoConfirmPanel extends BasicWorkspacePage {
      * ****************************************************************************************************************
      */
     public void doYes () {
+        //  Если указан метод, который необходимо выполнить до
+        if (yesActionListener != null) {
+            if (!(yesActionListener instanceof YesNoListener)) {
+                logger.error("Trying to add not listener for YesNoConfirmPanel");
+            } else {
+                yesActionListener.onYesNoEvent(new YesNoEvent(true));
+            }
+        }
+
+
         if (listeners == null) {
             return;
         }
@@ -50,6 +61,14 @@ public class YesNoConfirmPanel extends BasicWorkspacePage {
         for (YesNoListener listener : listeners) {
             listener.onYesNoEvent(new YesNoEvent(false));
         }
+    }
+
+    public YesNoListener getYesActionListener() {
+        return yesActionListener;
+    }
+
+    public void setYesActionListener(YesNoListener yesActionListener) {
+        this.yesActionListener = yesActionListener;
     }
 
     public String getNodePanel() {
