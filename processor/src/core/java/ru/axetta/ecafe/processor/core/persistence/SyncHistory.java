@@ -47,7 +47,7 @@ public class SyncHistory {
         // For Hibernate only
     }
 
-    public SyncHistory(Org org, Date syncStartTime, long idOfPacket, String clientVersion, String remoteAddress) throws Exception {
+    public SyncHistory(Org org, Date syncStartTime, long idOfPacket, String clientVersion, String remoteAddress) {
         this.org = org;
         this.syncStartTime = syncStartTime;
         this.idOfPacket = idOfPacket;
