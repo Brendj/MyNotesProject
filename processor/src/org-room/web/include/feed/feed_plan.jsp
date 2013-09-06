@@ -200,9 +200,12 @@ white-space: nowrap;
                         <f:facet name="header">
                             <h:outputText escape="false" styleClass="output-text" value="К<br/>л<br/>а<br/>с<br/>с"/>
                         </f:facet>
-                        <a4j:commandLink styleClass="output-text-mod" value="#{feedPlanPage.getGroupName(idoclientgroup)}" >
+                        <a4j:commandLink styleClass="output-text-mod" value="#{feedPlanPage.getGroupName(idoclientgroup)}"
+                                         rendered="#{!feedPlanPage.isOrderedComplex(idoclientgroup)}" >
                             <a4j:support reRender="planTable,messages,groupsGrid,currentTotalString" event="onclick" action="#{feedPlanPage.doChangeGroup(idoclientgroup)}" />
                         </a4j:commandLink>
+                        <h:outputText styleClass="output-text-mod" value="#{feedPlanPage.getGroupName(idoclientgroup)}"
+                                      rendered="#{feedPlanPage.isOrderedComplex(idoclientgroup)}"/>
                     </rich:column>
 
                     <rich:columns value="#{feedPlanPage.complexes}" var="complex"
@@ -212,7 +215,10 @@ white-space: nowrap;
                             <h:outputText styleClass="output-text-mod" escape="false" value="К<br/>о<br/>м<br/>п<br/>л<br/>е<br/>к<br/>с<br/><br/>№#{complex}" />
                         </f:facet>
                         <h:panelGrid style="background: no-repeat url('/orgroom/images/split.jpg'); width: 40px; height: 40px" columnClasses="numbersTableCol1,numbersTableCol2" columns="2">
-                            <h:outputText styleClass="output-text-mod" style="font-weight: bold; color: red" value="#{feedPlanPage.getPayedComplexCount(idoclientgroup, complex)}"/>
+                            <h:outputText styleClass="output-text-mod" style="font-weight: bold; color: red" value="#{feedPlanPage.getPayedComplexCount(idoclientgroup, complex)}"
+                                          rendered="#{!feedPlanPage.isOrderedComplex(idoclientgroup)}"/>
+                            <h:outputText styleClass="output-text-mod" style="font-weight: bold; color: red" escape="false" value="&nbsp;"
+                                          rendered="#{feedPlanPage.isOrderedComplex(idoclientgroup)}"/>
                             <h:outputText value=""/>
                             <h:outputText value=""/>
                             <h:outputText styleClass="output-text-mod" style="font-weight: bold; color: blue" value="#{feedPlanPage.getComplexCount(idoclientgroup, complex)}" />

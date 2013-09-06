@@ -80,7 +80,7 @@ public class GroupCreatePanel extends BasicWorkspacePage {
         if (org != null) {
             return org;
         }
-        org = (Org) session.get(Org.class, 0L);
+        org = (Org) session.get(Org.class, 6L);
         return org;
     }
     

@@ -65,6 +65,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
     private Calendar planDate;
     private Long selectedIdOfClientGroup;
     private Client selectedClient;
+    private List<Complex> orderedComplexes;
     private Map<Integer, Boolean> disabledComplexes;
 
 
@@ -129,24 +130,42 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         selectedClient = null;
 
         //  Загружаем клиентов и комплексы одним запросом
-        //loadClaims(session);
+        loadClaims(session);
         loadReplaceClients(session);
         loadClientsAndComplexes(session);
     }
 
     public void loadClaims (Session session) {
-        //  Загружаем заявки
-        Integer deletedState = 2;
-        List<DocumentState> stateList = new ArrayList<DocumentState>();
-        for (DocumentState i: DocumentState.values()){
-            stateList.add(i);
+        if (orderedComplexes == null) {
+            orderedComplexes = new ArrayList<Complex>();
         }
-        List<GoodRequest> goodRequestList = goodRequestService.findByFilter(getOrg().getIdOfOrg(),stateList,
-                planDate.getTime(),planDate.getTime(),
-                deletedState, Long.MIN_VALUE);
+        orderedComplexes.clear();
+        org.hibernate.Query q = session.createSQLQuery(
+                "select cf_complexinfo.idofcomplex, count(cf_complexinfo.idofcomplex), cf_goods_requests_positions.totalcount / 1000 "
+                        + "from cf_goods_requests "
+                        + "left join cf_goods_requests_positions on cf_goods_requests.idofgoodsrequest=cf_goods_requests_positions.idofgoodsrequest "
+                        + "left join cf_complexinfo on cf_complexinfo.idofcomplex=cf_goods_requests_positions.idofgood and "
+                        + "                            cf_complexinfo.idoforg=cf_goods_requests.orgowner and "
+                        + "                            cf_complexinfo.menudate between :startMenudate and :endMenudate "
+                        + "where donedate between :startMenudate and :endMenudate and cf_goods_requests.orgowner=:idoforg "
+                        + "group by idofcomplex, cf_goods_requests_positions.totalcount "
+                        + "order by idofcomplex");
+        q.setLong("idoforg", getOrg(session).getIdOfOrg());
+        q.setLong("startMenudate", planDate.getTimeInMillis());
+        q.setLong("endMenudate", planDate.getTimeInMillis() + MILLIS_IN_DAY);
+        List resultList = q.list();
+        for (Object entry : resultList) {
+            Object o[] = (Object[]) entry;
+            Integer idofcomplex = HibernateUtils.getDbInt(o[0]);
+            Long complesCount = HibernateUtils.getDbLong(o[1]);
+            Long goodsCount = HibernateUtils.getDbLong(o[2]);
+            complesCount = complesCount == null ? 0L : complesCount;
+            goodsCount = goodsCount == null ? 0L : goodsCount;
 
-
-        //  Проходим по всем заявкам и сортируем их по комплексам
+            OrderedComplex c = new OrderedComplex(idofcomplex, ORDER_TYPE, ORDER_TYPE_NAME);
+            c.setCount(complesCount.intValue() * goodsCount.intValue());
+            orderedComplexes.add(c);
+        }
     }
 
     public void loadReplaceClients(Session session) {
@@ -294,6 +313,10 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         if (superComlexGroups.size() > 0) {
             complexes.addAll(superComlexGroups);
         }
+
+
+        //  Вставляем заказанные комплексы из ранее загруженного массива, а так же составленные все комплексы
+        complexes.addAll(orderedComplexes);
         complexes.addAll(allComplexes);
 
 
@@ -734,6 +757,14 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         return res;
     }
 
+    public boolean isOrderedComplex (long idoclientgroup) {
+        if (idoclientgroup == ORDER_TYPE) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public List<Integer> getComplexes() {
         List<Integer> res = new ArrayList<Integer>();
         for (Complex c : complexes) {
@@ -750,6 +781,9 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
     }
     
     public int getPayedComplexCount(long idoclientgroup, int complex) {
+        if (isOrderedComplex(idoclientgroup)) {
+            return 0;
+        }
         for (Complex c : complexes) {
             if (c.getIdofclientgroup() == idoclientgroup && c.getComplex() == complex) {
                 //  Найдя нужный комплекс, приступаем к подсчету оплаченных комплексов
@@ -865,11 +899,11 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
 
 
     public static class Complex {
-        private long idofclientgroup;
-        private String clientgroupname;
-        private int complex;
-        private int count;
-        private List<Client> clients;
+        protected long idofclientgroup;
+        protected String clientgroupname;
+        protected int complex;
+        protected int count;
+        protected List<Client> clients;
 
         public Complex () {
 
@@ -919,6 +953,28 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
                     ", complex=" + complex +
                     ", count=" + count +
                     '}';
+        }
+    }
+
+
+    public static class OrderedComplex extends Complex{
+        protected int count;
+
+        public OrderedComplex () {
+
+        }
+
+        public OrderedComplex(int complex, long idofclientgroup, String clientgroupname) {
+            super(complex, idofclientgroup, clientgroupname);
+        }
+
+        @Override
+        public int getCount() {
+            return count;
+        }
+
+        public void setCount(int count) {
+            this.count = count;
         }
     }
 
