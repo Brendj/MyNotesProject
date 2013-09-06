@@ -32,13 +32,11 @@ public class LibVisit extends DistributedObject {
     private Long idOfClient;
 
     @Override
-    protected void appendAttributes(Element element) {
-        XMLUtils.setAttributeIfNotNull(element, "Guid", guid);
-    }
+    protected void appendAttributes(Element element) {}
 
     @Override
     public LibVisit parseAttributes(Node node) throws Exception {
-        idOfClient = XMLUtils.getLongAttributeValue(node, "idOfClient");
+        idOfClient = XMLUtils.getLongAttributeValue(node, "IdOfClient");
         date = XMLUtils.getDateTimeAttributeValue(node, "date");
         source = XMLUtils.getIntegerAttributeValue(node, "source");
         setSendAll(SendToAssociatedOrgs.SendToAll);
@@ -47,13 +45,13 @@ public class LibVisit extends DistributedObject {
 
     @Override
     public void preProcess(Session session) throws DistributedObjectException{
-        if (idOfClient != null) {
-            try{
-                setClient(DAOUtils.findClient(session, idOfClient));
-            } catch (Exception e){
-                throw new DistributedObjectException("NOT_FOUND_VALUE");
-            }
+        Client cl = null;
+        try {
+            cl = DAOUtils.findClient(session, idOfClient);
+        } catch (Exception e) {
+            throw new DistributedObjectException(e.getMessage());
         }
+        if(cl==null) throw new DistributedObjectException("Client NOT_FOUND_VALUE");
     }
 
     @Override

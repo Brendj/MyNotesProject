@@ -35,7 +35,8 @@ public class Circulation extends DistributedObject {
 
     @Override
     protected Circulation parseAttributes(Node node) throws Exception {
-        guidClient = XMLUtils.getStringAttributeValue(node, "GuidClient", 36);
+        //guidClient = XMLUtils.getStringAttributeValue(node, "GuidClient", 36);
+        idOfClient = XMLUtils.getLongAttributeValue(node, "IdOfClient");
         guidParentCirculation = XMLUtils.getStringAttributeValue(node, "GuidParentCirculation", 36);
         guidIssuable = XMLUtils.getStringAttributeValue(node, "GuidIssuable", 36);
         issuanceDate = XMLUtils.getDateTimeAttributeValue(node, "IssuanceDate");
@@ -55,7 +56,13 @@ public class Circulation extends DistributedObject {
         Circulation parentCirculation = DAOUtils.findDistributedObjectByRefGUID(Circulation.class, session, guidParentCirculation);
         if(parentCirculation!=null) setParentCirculation(parentCirculation);
 
-        Client cl = DAOUtils.findClientByRefGUID(session, guidClient);
+        //Client cl = DAOUtils.findClientByRefGUID(session, guidClient);
+        Client cl = null;
+        try {
+            cl = DAOUtils.findClient(session, idOfClient);
+        } catch (Exception e) {
+            throw new DistributedObjectException(e.getMessage());
+        }
         if(cl==null) throw new DistributedObjectException("Client NOT_FOUND_VALUE");
         setClient(cl);
 
@@ -70,6 +77,29 @@ public class Circulation extends DistributedObject {
         setParentCirculation(((Circulation) distributedObject).getParentCirculation());
         setIssuable(((Circulation) distributedObject).getIssuable());
         setClient(((Circulation) distributedObject).getClient());
+    }
+
+    private Circulation parentCirculation;
+    private Issuable issuable;
+    private Date issuanceDate;
+    private Date refundDate;
+    private Date realRefundDate;
+    private int status;
+
+    //private String guidClient;
+    private Long idOfClient;
+
+    private String guidParentCirculation;
+    private String guidIssuable;
+    private Client client;
+    private Set<Circulation> circulationInternal;
+
+    public Set<Circulation> getCirculationInternal() {
+        return circulationInternal;
+    }
+
+    public void setCirculationInternal(Set<Circulation> circulationInternal) {
+        this.circulationInternal = circulationInternal;
     }
 
     public Circulation getParentCirculation() {
@@ -126,27 +156,5 @@ public class Circulation extends DistributedObject {
 
     public void setClient(Client client) {
         this.client = client;
-    }
-
-    private Circulation parentCirculation;
-    private Issuable issuable;
-    private Date issuanceDate;
-    private Date refundDate;
-    private Date realRefundDate;
-    private int status;
-
-    private String guidClient;
-
-    private String guidParentCirculation;
-    private String guidIssuable;
-    private Client client;
-    private Set<Circulation> circulationInternal;
-
-    public Set<Circulation> getCirculationInternal() {
-        return circulationInternal;
-    }
-
-    public void setCirculationInternal(Set<Circulation> circulationInternal) {
-        this.circulationInternal = circulationInternal;
     }
 }

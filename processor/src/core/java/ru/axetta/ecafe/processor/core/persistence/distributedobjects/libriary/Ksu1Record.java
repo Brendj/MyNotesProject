@@ -62,7 +62,6 @@ public class Ksu1Record extends DistributedObject {
     private Fund fund;
     private Date incomeDate;
     private AccompanyingDocument accompanyingDocument;
-
     private String guidFund;
     private String guidAccompanyingDocument;
     private Set<JournalItem> journalItemInternal;

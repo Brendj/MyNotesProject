@@ -90,6 +90,28 @@ public class Instance extends DistributedObject {
         setCost(((Instance) distributedObject).getCost());
     }
 
+    private Publication publication;
+    private boolean inGroup;
+    private Fund fund;
+    private String invNumber;
+    private InventoryBook inventoryBook;
+    private Ksu1Record ksu1Record;
+    private Ksu2Record ksu2Record;
+    private int cost;
+    private String guidPublication;
+    private String guidFund;
+    private String guidInventaryBook;
+    private String guidKsu1Record;
+    private String guidKsu2Record;
+    private Set<Issuable> issuableInternal;
+    public Set<Issuable> getIssuableInternal() {
+        return issuableInternal;
+    }
+
+    public void setIssuableInternal(Set<Issuable> issuableInternal) {
+        this.issuableInternal = issuableInternal;
+    }
+
     public Publication getPublication() {
         return publication;
     }
@@ -152,30 +174,6 @@ public class Instance extends DistributedObject {
 
     public void setCost(int cost) {
         this.cost = cost;
-    }
-
-    private Publication publication;
-    private boolean inGroup;
-    private Fund fund;
-    private String invNumber;
-    private InventoryBook inventoryBook;
-    private Ksu1Record ksu1Record;
-    private Ksu2Record ksu2Record;
-    private int cost;
-
-    private String guidPublication;
-    private String guidFund;
-    private String guidInventaryBook;
-    private String guidKsu1Record;
-    private String guidKsu2Record;
-    private Set<Issuable> issuableInternal;
-
-    public Set<Issuable> getIssuableInternal() {
-        return issuableInternal;
-    }
-
-    public void setIssuableInternal(Set<Issuable> issuableInternal) {
-        this.issuableInternal = issuableInternal;
     }
 
 

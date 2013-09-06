@@ -42,14 +42,6 @@ public class Fund extends DistributedObject {
         setFundName(((Fund) distributedObject).getFundName());
     }
 
-    public String getFundName() {
-        return fundName;
-    }
-
-    public void setFundName(String fundName) {
-        this.fundName = fundName;
-    }
-
     @Override
     public String toString() {
         return String.format("Fund{fundName='%s'}", fundName);
@@ -109,5 +101,13 @@ public class Fund extends DistributedObject {
 
     public void setStud(Boolean stud) {
         this.stud = stud;
+    }
+
+    public String getFundName() {
+        return fundName;
+    }
+
+    public void setFundName(String fundName) {
+        this.fundName = fundName;
     }
 }

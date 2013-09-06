@@ -75,46 +75,6 @@ public class Publication extends DistributedObject {
     private Set<Journal> journalInternal;
     private Set<Instance> instanceInternal;
 
-    public Set<Instance> getInstanceInternal() {
-        return instanceInternal;
-    }
-
-    public void setInstanceInternal(Set<Instance> instanceInternal) {
-        this.instanceInternal = instanceInternal;
-    }
-
-    public Set<Journal> getJournalInternal() {
-        return journalInternal;
-    }
-
-    public void setJournalInternal(Set<Journal> journalInternal) {
-        this.journalInternal = journalInternal;
-    }
-
-    public Boolean getValidISBN() {
-        return validISBN;
-    }
-
-    public void setValidISBN(Boolean validISBN) {
-        this.validISBN = validISBN;
-    }
-
-    public String getPublicationdate() {
-        return publicationdate;
-    }
-
-    public void setPublicationdate(String publicationdate) {
-        this.publicationdate = publicationdate;
-    }
-
-    public String getTitle2() {
-        return title2;
-    }
-
-    public void setTitle2(String title2) {
-        this.title2 = title2;
-    }
-
     @Override
     protected void appendAttributes(Element element) {
         String decodedString = Base64AndZip.enCode(data);
@@ -227,7 +187,45 @@ public class Publication extends DistributedObject {
         this.hash = hash;
     }
 
+    public Set<Instance> getInstanceInternal() {
+        return instanceInternal;
+    }
 
+    public void setInstanceInternal(Set<Instance> instanceInternal) {
+        this.instanceInternal = instanceInternal;
+    }
+
+    public Set<Journal> getJournalInternal() {
+        return journalInternal;
+    }
+
+    public void setJournalInternal(Set<Journal> journalInternal) {
+        this.journalInternal = journalInternal;
+    }
+
+    public Boolean getValidISBN() {
+        return validISBN;
+    }
+
+    public void setValidISBN(Boolean validISBN) {
+        this.validISBN = validISBN;
+    }
+
+    public String getPublicationdate() {
+        return publicationdate;
+    }
+
+    public void setPublicationdate(String publicationdate) {
+        this.publicationdate = publicationdate;
+    }
+
+    public String getTitle2() {
+        return title2;
+    }
+
+    public void setTitle2(String title2) {
+        this.title2 = title2;
+    }
 
     @Override
     public String toString() {

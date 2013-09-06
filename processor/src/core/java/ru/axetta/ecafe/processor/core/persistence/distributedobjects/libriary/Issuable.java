@@ -60,6 +60,20 @@ public class Issuable extends DistributedObject {
         setType((((Issuable) distributedObject).getType()));
     }
 
+    @Override
+    public String toString() {
+        return String.format("Issuable{barcode=%d, type=%s, instance=%s, journalItem=%s}", barcode, type, instance,
+                journalItem);
+    }
+
+    private Long barcode;
+    private char type;
+    private Instance instance;
+    private JournalItem journalItem;
+    private String guidInstance;
+    private String guidJournalItem;
+    private Set<Circulation> circulationInternal;
+
     public Long getBarcode() {
         return barcode;
     }
@@ -91,21 +105,6 @@ public class Issuable extends DistributedObject {
     public void setJournalItem(JournalItem journalItem) {
         this.journalItem = journalItem;
     }
-
-    @Override
-    public String toString() {
-        return String.format("Issuable{barcode=%d, type=%s, instance=%s, journalItem=%s}", barcode, type, instance,
-                journalItem);
-    }
-
-    private Long barcode;
-    private char type;
-    private Instance instance;
-    private JournalItem journalItem;
-
-    private String guidInstance;
-    private String guidJournalItem;
-    private Set<Circulation> circulationInternal;
 
     public Set<Circulation> getCirculationInternal() {
         return circulationInternal;

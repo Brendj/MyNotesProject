@@ -23,9 +23,7 @@ import java.util.Set;
 public class InventoryBook extends DistributedObject {
 
     @Override
-    protected void appendAttributes(Element element) {
-        //setAttribute(element, "BookName", bookName);
-    }
+    protected void appendAttributes(Element element) {}
 
     @Override
     public InventoryBook parseAttributes(Node node) throws Exception {
@@ -41,14 +39,6 @@ public class InventoryBook extends DistributedObject {
         setBookName(((InventoryBook) distributedObject).getBookName());
     }
 
-    public String getBookName() {
-        return bookName;
-    }
-
-    public void setBookName(String bookName) {
-        this.bookName = bookName;
-    }
-
     @Override
     public String toString() {
         return String.format("InventoryBook{bookName='%s'}", bookName);
@@ -56,6 +46,14 @@ public class InventoryBook extends DistributedObject {
 
     private String bookName;
     private Set<Instance> instanceInternal;
+
+    public String getBookName() {
+        return bookName;
+    }
+
+    public void setBookName(String bookName) {
+        this.bookName = bookName;
+    }
 
     public Set<Instance> getInstanceInternal() {
         return instanceInternal;

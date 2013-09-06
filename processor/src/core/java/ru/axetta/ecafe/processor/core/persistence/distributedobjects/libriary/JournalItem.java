@@ -75,11 +75,9 @@ public class JournalItem extends DistributedObject {
     private Fund fund;
     private Ksu1Record ksu1Record;
     private Ksu2Record ksu2Record;
-
     private Date date;
     private String number;
     private int cost;
-
     private String guidJournal;
     private String guidFund;
     private String guidKsu1Record;

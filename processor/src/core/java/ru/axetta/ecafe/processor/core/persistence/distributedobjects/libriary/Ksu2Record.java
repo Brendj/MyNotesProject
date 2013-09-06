@@ -71,7 +71,6 @@ public class Ksu2Record extends DistributedObject {
     private Fund fund;
     private Date retirementDate;
     private RetirementReason retirementReason;
-
     private String guidFund;
     private String guidRetirementReason;
     private Set<JournalItem> journalItemInternal;

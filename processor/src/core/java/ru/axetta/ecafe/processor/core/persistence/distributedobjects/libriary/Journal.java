@@ -63,6 +63,21 @@ public class Journal extends DistributedObject {
         setCount(((Journal) distributedObject).getCount());
     }
 
+    @Override
+    public String toString() {
+        return String.format("Journal{fund=%s, publication=%s, isNewspaper=%s, monthCount=%d, count=%d}", fund, publication, isNewspaper,
+                monthCount, count);
+    }
+
+    private Fund fund;
+    private Publication publication;
+    private boolean isNewspaper;
+    private int monthCount;
+    private int count;
+    private String guidFund;
+    private String guidPublication;
+    private Set<JournalItem> journalItemInternal;
+
     public Fund getFund() {
         return fund;
     }
@@ -103,21 +118,6 @@ public class Journal extends DistributedObject {
         this.count = count;
     }
 
-    @Override
-    public String toString() {
-        return String.format("Journal{fund=%s, publication=%s, isNewspaper=%s, monthCount=%d, count=%d}", fund, publication, isNewspaper,
-                monthCount, count);
-    }
-
-    private Fund fund;
-    private Publication publication;
-    private boolean isNewspaper;
-    private int monthCount;
-    private int count;
-
-    private String guidFund;
-    private String guidPublication;
-    private Set<JournalItem> journalItemInternal;
 
     public Set<JournalItem> getJournalItemInternal() {
         return journalItemInternal;
