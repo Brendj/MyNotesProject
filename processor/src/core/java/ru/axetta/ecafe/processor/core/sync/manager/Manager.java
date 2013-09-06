@@ -281,7 +281,7 @@ public class Manager {
             // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю
             // TODO: записать в журнал ошибок
             distributedObject.setDistributedObjectException(e);
-            logger.error(distributedObject.toString(), e);
+            logger.error(distributedObject.toString());
         } catch (Exception e) {
             // TODO: записать в журнал ошибок
             distributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
