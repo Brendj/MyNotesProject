@@ -938,8 +938,9 @@ public class Processor implements SyncProcessor,
                     if (request.getPaymentRegistry().getPayments().hasMoreElements()) {
                         if (!RuntimeContext.getInstance()
                                 .isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
-                            SyncHistory syncHistory = addSyncHistory(request.getIdOfOrg(), idOfPacket, new Date(), request.getClientVersion(),
-                                    request.getRemoteAddr());
+                            String clientVersion = (request.getClientVersion()==null?"":request.getClientVersion());
+                            Long packet = (idOfPacket==null?-1L:idOfPacket);
+                            SyncHistory syncHistory = addSyncHistory(request.getIdOfOrg(), packet, new Date(), clientVersion, request.getRemoteAddr());
                             final String s = String.format("Failed to process PaymentRegistry, IdOfOrg == %s, no license slots available", request.getIdOfOrg());
                             createSyncHistory(request.getIdOfOrg(),syncHistory, s);
                             throw new Exception("no license slots available");
@@ -1890,8 +1891,7 @@ public class Processor implements SyncProcessor,
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
-            SyncHistory syncHistory = new SyncHistory(organization, startTime, idOfPacket, clientVersion,
-                    remoteAddress);
+            SyncHistory syncHistory = new SyncHistory(organization, startTime, idOfPacket, clientVersion,remoteAddress);
             persistenceSession.save(syncHistory);
             //Long idOfSync = syncHistory.getIdOfSync();
 

@@ -55,7 +55,7 @@ public class ClientOrderDetailsByAllOrgReport extends BasicReportForAllOrgJob {
             parameterMap.put("monthName", new DateFormatSymbols().getMonths()[month]);
             parameterMap.put("year", calendar.get(Calendar.YEAR));
             parameterMap.put("startDate", startTime);
-            parameterMap.put("endDate", endTime);
+            parameterMap.put("endDate", new Date(endTime.getTime()+1000));
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, startTime, endTime, (Calendar) calendar.clone(), parameterMap));

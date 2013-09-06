@@ -112,28 +112,29 @@ public class OrderDetailsDAOService extends AbstractDAOService {
 
     public List<ClientReportItem> fetchClientReportItem(Date startDate, Date endDate){
 
-        String sql = "select client.contractid, "
-                + " peroson.firstname || ' ' || peroson.secondname || ' ' || peroson.surname, "
-                + " detail.menuorigin, detail.menudetailname, "
-                + " (ord.sumbycard - detail.discount) * detail.qty as subsum, ord.sumbycard, "
-                + " detail.discount, detail.qty  FROM  cf_orderdetails as detail"
-                + " left join cf_orders as ord on ord.idoforg=detail.idoforg AND ord.idoforder = detail.idoforder"
-                + " left join cf_clients as client on ord.idofclient = client.idofclient   "
-                + " left join cf_persons as peroson on peroson.idofperson = client.idofperson WHERE "
-                + " ord.createddate>=:startTime AND ord.createddate<=:endTime AND "
-                + " ord.sumbycard>0 and detail.menutype>=:mintype and detail.menutype<=:maxtype "
-                + " and (ord.sumbycard - detail.discount) * detail.qty>0";
-        Query query = getSession().createSQLQuery(sql);
-        //Query query = getSession().createSQLQuery("SELECT cf_orderdetails.idoforderdetail, cf_clients.contractid, cf_persons.firstname || ' ' || cf_persons.secondname || ' ' || cf_persons.surname, "
-        //        + " cf_orderdetails.menuorigin, cf_orderdetails.menudetailname, cf_orders.sumbycard, cf_orderdetails.discount, cf_orderdetails.qty "
-        //        + " FROM  public.cf_clients, public.cf_persons, public.cf_orders, public.cf_orderdetails "
-        //        + " WHERE (cf_orders.createddate>=:startTime AND cf_orders.createddate<=:endTime AND cf_orders.idoforg=cf_orderdetails.idoforg  AND "
-        //        + " cf_orders.idoforder = cf_orderdetails.idoforder AND cf_orders.idofclient = cf_clients.idofclient AND cf_persons.idofperson = cf_clients.idofperson "
-        //        + "and cf_orders.sumbycard>0 and orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype);");
+        //String sql = "select detail.idoforderdetail, client.contractid, "
+        //        + " peroson.firstname || ' ' || peroson.secondname || ' ' || peroson.surname, "
+        //        + " detail.menuorigin, detail.menudetailname, "
+        //        + " (ord.sumbycard - detail.discount) * detail.qty as subsum, ord.sumbycard, "
+        //        + " detail.discount, detail.qty  FROM  cf_orderdetails as detail"
+        //        + " left join cf_orders as ord on ord.idoforg=detail.idoforg AND ord.idoforder = detail.idoforder"
+        //        + " left join cf_clients as client on ord.idofclient = client.idofclient   "
+        //        + " left join cf_persons as peroson on peroson.idofperson = client.idofperson WHERE "
+        //        + " ord.createddate>=:startTime AND ord.createddate<=:endTime AND "
+        //        + " ord.sumbycard>0 and detail.menutype>=:mintype and detail.menutype<=:maxtype "
+        //        + " and (ord.sumbycard - detail.discount) * detail.qty>0";
+        //Query query = getSession().createSQLQuery(sql);
+        Query query = getSession().createSQLQuery("SELECT cf_orderdetails.idoforderdetail, cf_clients.contractid, cf_persons.firstname || ' ' || cf_persons.secondname || ' ' || cf_persons.surname, "
+                + " cf_orderdetails.menuorigin, cf_orderdetails.menudetailname, cf_orders.sumbycard, cf_orderdetails.discount, cf_orderdetails.qty "
+                + " FROM  public.cf_clients, public.cf_persons, public.cf_orders, public.cf_orderdetails "
+                + " WHERE (cf_orders.createddate>=:startTime AND cf_orders.createddate<=:endTime AND cf_orders.idoforg=cf_orderdetails.idoforg  AND "
+                + " cf_orders.idoforder = cf_orderdetails.idoforder AND cf_orders.idofclient = cf_clients.idofclient AND cf_persons.idofperson = cf_clients.idofperson "
+            //    + "and cf_orders.sumbycard>0 and cf_orderdetails.menutype>=:mintype and cf_orderdetails.menutype<=:maxtype);");
+                + "and cf_orders.sumbycard>0) order by cf_orderdetails.idoforderdetail;");
         query.setParameter("startTime", startDate.getTime());
         query.setParameter("endTime", endDate.getTime());
-        query.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
-        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        //query.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
+        //query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
         List list = query.list();
         List<ClientReportItem> clientReportItems = new LinkedList<ClientReportItem>();
         for (Object row : list) {
