@@ -28,7 +28,7 @@
         <a4j:region>
         <h:panelGrid>
             <h:panelGrid>
-                <h:outputText styleClass="output-text" value="Внесенные изменения будут утеряны, вы согласны продолжить?" />
+                <h:outputText styleClass="output-text" value="#{yesNoConfirmPanel.message}" />
             </h:panelGrid>
             <h:panelGrid columns="2">
                 <a4j:commandButton value="Да" action="#{yesNoConfirmPanel.doYes}"

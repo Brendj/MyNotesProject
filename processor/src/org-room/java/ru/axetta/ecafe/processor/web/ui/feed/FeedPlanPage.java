@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.G
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.modal.YesNoConfirmPanel;
 import ru.axetta.ecafe.processor.web.ui.modal.feed_plan.*;
 
 import org.hibernate.Session;
@@ -315,6 +316,14 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         }
 
 
+        //  Перед добавлением строки с Заказом, необходимо проверить ниличие в нем всех комплексов
+        for (Integer idofcomplex : getComplexes()) {
+            if (!orderedComplexes.contains(idofcomplex)) {
+                OrderedComplex c = new OrderedComplex(idofcomplex, ORDER_TYPE, ORDER_TYPE_NAME);
+                c.setCount(0);
+                orderedComplexes.add(c);
+            }
+        }
         //  Вставляем заказанные комплексы из ранее загруженного массива, а так же составленные все комплексы
         complexes.addAll(orderedComplexes);
         complexes.addAll(allComplexes);
@@ -327,7 +336,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         disabledComplexes.clear();
         for (Complex c : complexes) {
             disabledComplexes.put(c.getComplex(), false);
-        }/**/
+        }
     }
 
     @Transactional
@@ -734,9 +743,9 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         List<Client> foundClients = new ArrayList<Client>();
         for (Complex c : complexes) {
             //  Производим поиск по отключенным комплексам
-            if (disabledComplexes.get(c.getComplex())) {
+            /*if (disabledComplexes.get(c.getComplex())) {
                 continue;
-            }
+            }*/
 
             //  Если тип "Все", то отображаем всех клиентов; иначе, отображаем только выбранных
             if (c.getIdofclientgroup() == selectedIdOfClientGroup.longValue()) {
@@ -772,9 +781,9 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
                 continue;
             }
             //  Если комплекс отключен, то не отображаем его
-            if (disabledComplexes.get(c.getComplex())) {
+            /*if (disabledComplexes.get(c.getComplex())) {
                 continue;
-            }
+            }*/
             res.add(c.getComplex());
         }
         return res;

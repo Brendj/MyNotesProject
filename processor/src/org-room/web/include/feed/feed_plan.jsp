@@ -94,8 +94,11 @@ white-space: nowrap;
     width: 50%;
 }
 .calendarText {
-    width: 50%;
+    width: 1%;
     text-align: right;
+}
+.status {
+    width: 49%
 }
 </style>
 
@@ -103,17 +106,25 @@ white-space: nowrap;
 <a4j:form id="setupFeedPlanForm">
     <h:panelGrid id="setupFeedPlanGrid" binding="#{feedPlanPage.pageComponent}" styleClass="borderless-grid" style="width: 100%;">
         <a4j:region>
-        <h:panelGrid id="planDateCalendar" columns="2" columnClasses="calendar,calendarText">
+        <h:panelGrid id="planDateCalendar" columns="3" columnClasses="calendar,status,calendarText">
             <h:panelGrid columns="4">
                 <h:outputText styleClass="output-text-mod" value="План питания:"/>
-                <a4j:commandButton value="<" action="#{feedPlanPage.doDecreaseDay}" reRender="planDateCalendar,planGrid,groupsGrid,messages,totalMessage"/>
+                <a4j:commandButton value="<" action="#{feedPlanPage.doDecreaseDay}" reRender="planDateCalendar,planGrid,groupsGrid,messages,totalMessage" status="feedPlanStatus"/>
                 <rich:calendar value="#{feedPlanPage.planDate}" datePattern="dd.MM.yyyy"
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false"
-                               valueChangeListener="#{feedPlanPage.doChangePlanDate}">
+                               valueChangeListener="#{feedPlanPage.doChangePlanDate}" status="feedPlanStatus">
                     <a4j:support event="onchanged" reRender="planGrid,groupsGrid,messages,totalMessage" bypassUpdates="true" />
                 </rich:calendar>
-                <a4j:commandButton value=">" action="#{feedPlanPage.doIncreaseDay}" reRender="planDateCalendar,planGrid,groupsGrid,messages,totalMessage"/>
+                <a4j:commandButton value=">" action="#{feedPlanPage.doIncreaseDay}" reRender="planDateCalendar,planGrid,groupsGrid,messages,totalMessage" status="feedPlanStatus"/>
             </h:panelGrid>
+            <a4j:status id="feedPlanStatus">
+                <f:facet name="start">
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Загрузка... " styleClass="output-text-mod"/>
+                        <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+                    </h:panelGrid>
+                </f:facet>
+            </a4j:status>
             <h:panelGrid id="currentTotalString">
                 <h:outputText styleClass="output-text-mod" style="font-weight: bold" value="#{feedPlanPage.currentTotalString}"/>
             </h:panelGrid>
@@ -138,7 +149,7 @@ white-space: nowrap;
                         </f:facet>
                         <a4j:commandLink styleClass="output-text-mod" value="#{client.action}" rendered="#{!client.saved}">
                             <a4j:support event="onclick" reRender="clientFeedActionPanel" action="#{feedPlanPage.doShowClientFeedActionPanel(client)}"
-                                         oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.show();"/>
+                                         oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.show();" status="feedPlanStatus"/>
                         </a4j:commandLink>
                         <h:outputText styleClass="output-text-mod" value="#{client.action}" rendered="#{client.saved}"/>
                     </rich:column>
@@ -163,7 +174,7 @@ white-space: nowrap;
                         </f:facet>
                         <a4j:commandLink styleClass="output-text" value="#{feedPlanPage.getReplaceClient(client)}" rendered="#{!client.saved}">
                             <a4j:support event="onclick" reRender="replaceClientPanel" action="#{feedPlanPage.doShowReplaceClientPanel(client)}"
-                                         oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('replaceClientPanel')}.show();"/>
+                                         oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('replaceClientPanel')}.show();" status="feedPlanStatus"/>
                         </a4j:commandLink>
                         <h:outputText styleClass="output-text" value="#{feedPlanPage.getReplaceClient(client)}" rendered="#{client.saved}"></h:outputText>
                     </rich:column>
@@ -202,7 +213,7 @@ white-space: nowrap;
                         </f:facet>
                         <a4j:commandLink styleClass="output-text-mod" value="#{feedPlanPage.getGroupName(idoclientgroup)}"
                                          rendered="#{!feedPlanPage.isOrderedComplex(idoclientgroup)}" >
-                            <a4j:support reRender="planTable,messages,groupsGrid,currentTotalString" event="onclick" action="#{feedPlanPage.doChangeGroup(idoclientgroup)}" />
+                            <a4j:support reRender="planTable,messages,groupsGrid,currentTotalString" event="onclick" action="#{feedPlanPage.doChangeGroup(idoclientgroup)}" status="feedPlanStatus" />
                         </a4j:commandLink>
                         <h:outputText styleClass="output-text-mod" value="#{feedPlanPage.getGroupName(idoclientgroup)}"
                                       rendered="#{feedPlanPage.isOrderedComplex(idoclientgroup)}"/>

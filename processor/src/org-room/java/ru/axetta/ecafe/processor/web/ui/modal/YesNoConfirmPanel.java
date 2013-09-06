@@ -20,6 +20,7 @@ import java.util.List;
 public class YesNoConfirmPanel extends BasicWorkspacePage {
     private List<YesNoListener> listeners;
     private static final Logger logger = LoggerFactory.getLogger(YesNoConfirmPanel.class);
+    private String message;
 
 
     public void fill () {
@@ -48,6 +49,14 @@ public class YesNoConfirmPanel extends BasicWorkspacePage {
         for (YesNoListener listener : listeners) {
             listener.onYesNoEvent(new YesNoEvent(false));
         }
+    }
+    
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
 

@@ -30,6 +30,7 @@
 
 
 <%--@elvariable id="claimCalendarEditPage" type="ru.axetta.ecafe.processor.web.ui.claim.ClaimCalendarEditPage"--%>
+<%--@elvariable id="yesNoConfirmPanel" type="ru.axetta.ecafe.processor.web.ui.modal.YesNoConfirmPanel"--%>
 <a4j:form id="claimCalendarForm">
     <h:panelGrid id="claimCalendarEditPage" binding="#{claimCalendarEditPage.pageComponent}" styleClass="borderless-grid" style="width: 100%">
 
@@ -46,7 +47,9 @@
                     <h:selectOneMenu id="monthWithConfirm" value="#{claimCalendarEditPage.month}" style="width:150px;" rendered="#{claimCalendarEditPage.changesMade}" >
                         <f:selectItems value="#{claimCalendarEditPage.months}"/>
                         <a4j:support event="onchange" reRender="yesNoConfirmPanel" action="#{mainPage.doShowYesNoConfirmModal}"
-                                     oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.show();"/>
+                                     oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.show();">
+                            <f:setPropertyActionListener value="Все изменения будут утеряны, Вы хотите продолжить?" target="#{yesNoConfirmPanel.message}" />
+                        </a4j:support>
                     </h:selectOneMenu>
                 </h:panelGrid>
             </a4j:region>
@@ -61,7 +64,9 @@
                     <h:selectOneMenu id="goodsGroupWithConfirm" value="#{claimCalendarEditPage.goodGroup}" style="width:150px;" rendered="#{claimCalendarEditPage.changesMade}" >
                         <f:selectItems value="#{claimCalendarEditPage.goodsGroups}"/>
                         <a4j:support event="onchange" reRender="yesNoConfirmPanel" action="#{mainPage.doShowYesNoConfirmModal}"
-                                     oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.show();"/>
+                                     oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.show();">
+                            <f:setPropertyActionListener value="Все изменения будут утеряны, Вы хотите продолжить?" target="#{yesNoConfirmPanel.message}" />
+                        </a4j:support>
                     </h:selectOneMenu>
                 </h:panelGrid>
             </a4j:region>

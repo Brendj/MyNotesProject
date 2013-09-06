@@ -39,6 +39,9 @@
             <rich:menuItem submitMode="ajax" id="clientRegisterPageMenuItem"
                            binding="#{clientRegisterPage.mainMenuComponent}" value="Регистрация"
                            action="#{clientRegisterPage.show}" reRender="workspaceForm" />
+            <rich:menuItem submitMode="ajax" id="discountEditPageMenuItem"
+                           binding="#{setupDiscountPage.mainMenuComponent}" value="Установка льгот"
+                           action="#{setupDiscountPage.show}" reRender="workspaceForm" />
         </rich:dropDownMenu>
 
         <%-- Управление заявками на питание --%>
@@ -64,9 +67,6 @@
                     <h:outputText value="Групповое питание"/>
                 </h:panelGroup>
             </f:facet>
-            <rich:menuItem submitMode="ajax" id="discountEditPageMenuItem"
-                           binding="#{setupDiscountPage.mainMenuComponent}" value="Установка льгот"
-                           action="#{setupDiscountPage.show}" reRender="workspaceForm" />
             <rich:menuItem submitMode="ajax" id="feedPlanEditPageMenuItem"
                            binding="#{feedPlanPage.mainMenuComponent}" value="План питания"
                            action="#{feedPlanPage.show}" reRender="workspaceForm" />
