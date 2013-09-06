@@ -264,6 +264,13 @@ white-space: nowrap;
                     <a4j:support event="onclick" reRender="orderRegistrationResultPanel" action="#{feedPlanPage.doShowOrderRegistrationResultPanel}"
                                  oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('orderRegistrationResultPanel')}.show();"/>
                 </a4j:commandLink>--%>
+                <a4j:commandButton image="/images/icon/money.png" style="padding-right: 5px">
+                    <a4j:support event="onclick" reRender="yesNoConfirmPanel" action="#{feedPlanPage.doShowOrderRegistrationResultPanel}"
+                                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.show();">
+                        <f:setPropertyActionListener value="Вы уверены что хотите произвести оплату?" target="#{yesNoConfirmPanel.message}" />
+                        <f:setPropertyActionListener value="orderRegistrationResultPanel" target="#{yesNoConfirmPanel.nodePanel}" />
+                    </a4j:support>
+                </a4j:commandButton>
                 <a4j:commandLink value="Оплатить" styleClass="output-text" style="vertical-align: middle; padding-right: 20px;">
                     <a4j:support event="onclick" reRender="yesNoConfirmPanel" action="#{feedPlanPage.doShowOrderRegistrationResultPanel}"
                                  oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.show();">
