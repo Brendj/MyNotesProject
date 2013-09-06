@@ -21,6 +21,7 @@ public class YesNoConfirmPanel extends BasicWorkspacePage {
     private List<YesNoListener> listeners;
     private static final Logger logger = LoggerFactory.getLogger(YesNoConfirmPanel.class);
     private String message;
+    private String nodePanel;
 
 
     public void fill () {
@@ -50,7 +51,15 @@ public class YesNoConfirmPanel extends BasicWorkspacePage {
             listener.onYesNoEvent(new YesNoEvent(false));
         }
     }
-    
+
+    public String getNodePanel() {
+        return nodePanel;
+    }
+
+    public void setNodePanel(String nodePanel) {
+        this.nodePanel = nodePanel;
+    }
+
     public String getMessage() {
         return message;
     }

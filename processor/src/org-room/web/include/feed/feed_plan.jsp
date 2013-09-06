@@ -103,6 +103,7 @@ white-space: nowrap;
 </style>
 
 <%--@elvariable id="feedPlanPage" type="ru.axetta.ecafe.processor.web.ui.feed.FeedPlanPage"--%>
+<%--@elvariable id="yesNoConfirmPanel" type="ru.axetta.ecafe.processor.web.ui.modal.YesNoConfirmPanel"--%>
 <a4j:form id="setupFeedPlanForm">
     <h:panelGrid id="setupFeedPlanGrid" binding="#{feedPlanPage.pageComponent}" styleClass="borderless-grid" style="width: 100%;">
         <a4j:region>
@@ -255,13 +256,20 @@ white-space: nowrap;
 
         <h:panelGrid columns="6" columnClasses="setupFeedPlanGridControlImg1,setupFeedPlanGridControlTxt1,setupFeedPlanGridControlImg2,setupFeedPlanGridControlTxt2,setupFeedPlanGridControlImg3,setupFeedPlanGridControlTxt3">
             <a4j:region>
-                <a4j:commandButton image="/images/icon/money.png" style="padding-right: 5px">
+                <%--<a4j:commandButton image="/images/icon/money.png" style="padding-right: 5px">
                     <a4j:support event="onclick" reRender="orderRegistrationResultPanel" action="#{feedPlanPage.doShowOrderRegistrationResultPanel}"
                                  oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('orderRegistrationResultPanel')}.show();"/>
                 </a4j:commandButton>
                 <a4j:commandLink value="Оплатить" styleClass="output-text" style="vertical-align: middle; padding-right: 20px;">
                     <a4j:support event="onclick" reRender="orderRegistrationResultPanel" action="#{feedPlanPage.doShowOrderRegistrationResultPanel}"
                                  oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('orderRegistrationResultPanel')}.show();"/>
+                </a4j:commandLink>--%>
+                <a4j:commandLink value="Оплатить" styleClass="output-text" style="vertical-align: middle; padding-right: 20px;">
+                    <a4j:support event="onclick" reRender="yesNoConfirmPanel" action="#{feedPlanPage.doShowOrderRegistrationResultPanel}"
+                                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.show();">
+                        <f:setPropertyActionListener value="Вы уверены что хотите произвести оплату?" target="#{yesNoConfirmPanel.message}" />
+                        <f:setPropertyActionListener value="orderRegistrationResultPanel" target="#{yesNoConfirmPanel.nodePanel}" />
+                    </a4j:support>
                 </a4j:commandLink>
 
                 <a4j:commandButton image="/images/icon/blank.png" reRender="planGrid,groupsGrid,messages" action="#{feedPlanPage.doClearPlan}" style="padding-right: 5px"/>

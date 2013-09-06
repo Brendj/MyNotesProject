@@ -32,10 +32,13 @@
             </h:panelGrid>
             <h:panelGrid columns="2">
                 <a4j:commandButton value="Да" action="#{yesNoConfirmPanel.doYes}"
-                                   status="groupCreateStatus"
                                    reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.hide();"
-                                   styleClass="command-button" style="width: 80px;"/>
+                                   styleClass="command-button" style="width: 80px;" rendered="#{empty yesNoConfirmPanel.nodePanel}"/>
+                <a4j:commandButton value="Да" action="#{yesNoConfirmPanel.doYes}"
+                                   reRender="#{yesNoConfirmPanel.nodePanel}"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) { #{rich:component('yesNoConfirmPanel')}.hide(); #{rich:component(yesNoConfirmPanel.nodePanel)}.show(); }"
+                                   styleClass="command-button" style="width: 80px;" rendered="#{not empty yesNoConfirmPanel.nodePanel}"/>
                 <a4j:commandButton value="Нет" action="#{yesNoConfirmPanel.doNo}"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.hide();"
                                    styleClass="command-button" style="width: 80px;"/>
