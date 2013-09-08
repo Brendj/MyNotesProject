@@ -123,7 +123,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
             Order order = (Order) o;
             Client client = order.getClient();
             if(order.getSumByCash()>0){
-                Long sumByCash = order.getSumByCash();
+                float sumByCash = order.getSumByCash() / 100.0f;
                 Set<OrderDetail> details = order.getOrderDetails();
                 for (OrderDetail detail: details){
                     Long idOfOrderDetail = detail.getCompositeIdOfOrderDetail().getIdOfOrderDetail();
@@ -131,17 +131,28 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                     String fullName = client.getPerson().getFullName();
                     Integer menuOrigin = detail.getMenuOrigin();
                     String menuName = detail.getMenuDetailName();
-                    final Long rPrice = detail.getRPrice();
-                    if(rPrice-sumByCash<=0){
-                        sumByCash=sumByCash-rPrice;
+                    Float price = detail.getRPrice() / 100f;
+                    Float discount = detail.getDiscount() / 100f;
+                    Long quantity = detail.getQty();
+                    Float totalDetailSum = (price - discount) * quantity;
+                    if(totalDetailSum - sumByCash <= 0){
+                        sumByCash=sumByCash-totalDetailSum;
                     } else {
-                        Float price = (rPrice - sumByCash) / 100f;
+                        totalDetailSum = totalDetailSum - sumByCash;
                         sumByCash=0L;
-                        Float discount = detail.getDiscount() / 100f;
-                        Long quantity = detail.getQty();
-                        Float totalDetailSum = (price - discount) * quantity;
                         clientReportItems.add(new ClientReportItem(idOfOrderDetail, contractId, fullName, menuName, OrderDetail.getMenuOriginAsString(menuOrigin), totalDetailSum));
                     }
+                    //final Long rPrice = detail.getRPrice();
+                    //if(rPrice-sumByCash<=0){
+                    //    sumByCash=sumByCash-rPrice;
+                    //} else {
+                    //    Float price = (rPrice - sumByCash) / 100f;
+                    //    sumByCash=0L;
+                    //    Float discount = detail.getDiscount() / 100f;
+                    //    Long quantity = detail.getQty();
+                    //    Float totalDetailSum = (price - discount) * quantity;
+                    //    clientReportItems.add(new ClientReportItem(idOfOrderDetail, contractId, fullName, menuName, OrderDetail.getMenuOriginAsString(menuOrigin), totalDetailSum));
+                    //}
                 }
             } else {
                 Set<OrderDetail> details = order.getOrderDetails();
