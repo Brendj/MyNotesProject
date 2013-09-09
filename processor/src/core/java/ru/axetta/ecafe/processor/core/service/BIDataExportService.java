@@ -69,8 +69,8 @@ public class BIDataExportService {
                 "select cf_orgs.idoforg, cf_orgs.officialname, cf_orgs.address, cf_orgs.district, array_to_string(array_agg(cf_categoryorg_orgs.idofcategoryorg), ',') as orgCategory, cf_orgs.state as isInProm "
                         + "from cf_orgs "
                         + "left join cf_categoryorg_orgs on cf_categoryorg_orgs.idoforg=cf_orgs.idoforg "
-                        + "group by cf_orgs.idoforg, cf_orgs.officialname, cf_orgs.address, cf_orgs.district "
                         + "where cf_orgs.state<>0 "
+                        + "group by cf_orgs.idoforg, cf_orgs.officialname, cf_orgs.address, cf_orgs.district "
                         + "order by cf_orgs.officialname",
                 new String[]{"idoforg", "officialname", "address", "district", "orgCategory", "isInProm"}));
 
