@@ -22,3 +22,4 @@ CREATE TABLE cf_thin_client_users (
   CONSTRAINT cf_thin_client_users_org FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg),
   CONSTRAINT cf_thin_client_users_user FOREIGN KEY (IdOfUser) REFERENCES cf_users (IdOfUser)
 );
+insert into cf_thin_client_users values (6, 1, 1);
