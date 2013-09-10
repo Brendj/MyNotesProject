@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.G
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.auth.LoginBean;
 import ru.axetta.ecafe.processor.web.ui.modal.YesNoConfirmPanel;
 import ru.axetta.ecafe.processor.web.ui.modal.YesNoEvent;
 import ru.axetta.ecafe.processor.web.ui.modal.YesNoListener;
@@ -83,32 +84,6 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
      * ****************************************************************************************************************
      */
     @Transactional
-    public Org getOrg() {
-        if (org != null) {
-            return org;
-        }
-        Session session = null;
-        try {
-            session = (Session) entityManager.getDelegate();
-            return getOrg(session);
-        } catch (Exception e) {
-            logger.error("Failed to load client by name", e);
-            sendError("Произошел критический сбой, пожалуйста, повторите попытку позже");
-        } finally {
-            //HibernateUtils.close(session, logger);
-        }
-        return null;
-    }
-
-    public Org getOrg(Session session) {
-        if (org != null) {
-            return org;
-        }
-        org = (Org) session.get(Org.class, 6L);
-        return org;
-    }
-
-    @Transactional
     public void fill() {
         Session session = null;
         try {
@@ -146,6 +121,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
             orderedComplexes = new ArrayList<Complex>();
         }
         orderedComplexes.clear();
+        Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
         org.hibernate.Query q = session.createSQLQuery(
                 "select cf_complexinfo.idofcomplex, count(cf_complexinfo.idofcomplex), cf_goods_requests_positions.totalcount / 1000 "
                         + "from cf_goods_requests "
@@ -156,7 +132,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
                         + "where donedate between :startMenudate and :endMenudate and cf_goods_requests.orgowner=:idoforg "
                         + "group by idofcomplex, cf_goods_requests_positions.totalcount "
                         + "order by idofcomplex");
-        q.setLong("idoforg", getOrg(session).getIdOfOrg());
+        q.setLong("idoforg", org.getIdOfOrg());
         q.setLong("startMenudate", planDate.getTimeInMillis());
         q.setLong("endMenudate", planDate.getTimeInMillis() + MILLIS_IN_DAY);
         List resultList = q.list();
@@ -176,6 +152,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
 
     public void loadReplaceClients(Session session) {
         replaceClients = new ArrayList<ReplaceClient>();
+        Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
         String sql = "";
         org.hibernate.Query q = session.createSQLQuery(
                 "select cf_clients.idofclient, cf_persons.firstname, cf_persons.secondname, cf_persons.surname "
@@ -183,7 +160,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
                         + "left join cf_clients_categorydiscounts on cf_clients.idofclient=cf_clients_categorydiscounts.idofclient "
                         + "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "
                         + "where cf_clients_categorydiscounts.idofcategorydiscount=50 and cf_clients.idoforg=:idoforg");
-        q.setLong("idoforg", getOrg(session).getIdOfOrg());
+        q.setLong("idoforg", org.getIdOfOrg());
         List resultList = q.list();
         for (Object entry : resultList) {
             Object o[] = (Object[]) entry;
@@ -200,6 +177,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         complexes = new ArrayList<Complex>();
         List<Complex> allComplexes = new ArrayList<Complex>();
         List<Complex> superComlexGroups = new ArrayList<Complex>();
+        Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
 
 
         String sql = "select cf_clientgroups.idofclientgroup, cf_clientgroups.groupname, cf_clients.idofclient, cf_persons.firstname, "
@@ -219,7 +197,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
                 + "where cf_clients.idoforg=:idoforg and CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 " //+ groupFilter
                 + "order by groupNum, groupname, cf_persons.firstname, cf_persons.secondname, cf_persons.surname, cf_clients.idofclient, idofcomplex";
         org.hibernate.Query q = session.createSQLQuery(sql);
-        q.setLong("idoforg", getOrg(session).getIdOfOrg());
+        q.setLong("idoforg", org.getIdOfOrg());
         q.setLong("startMenudate", planDate.getTimeInMillis());
         q.setLong("endMenudate", planDate.getTimeInMillis() + MILLIS_IN_DAY);
         q.setLong("plandate", planDate.getTimeInMillis());
@@ -374,8 +352,8 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
             return;
         }
 
-
-       String sql = "";
+        Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
+        String sql = "";
         //  Проверяем, сохранен ли клиент во временную таблицу в БД
         if (client.getTemporarySaved()) {
             sql = "update cf_temporary_orders set action=:action, "
@@ -398,7 +376,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         query.setLong("date", currentTS);
         query.setLong("idofuser", -1L);
         if (!client.getTemporarySaved()) {
-            query.setLong("idoforg", getOrg().getIdOfOrg());
+            query.setLong("idoforg", org.getIdOfOrg());
         }
         if (client.getIdofReplaceClient() != null) {
             query.setLong("idofreplaceclient", client.getIdofReplaceClient());
@@ -484,10 +462,11 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         if (complexRestrict.length() > 0) {
             complexRestrict = " and (" + complexRestrict + ") ";
         }
+        Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
         //  Удаляем все заказы, имеющиеся за выбранную дату
         org.hibernate.Query query = session.createSQLQuery(
                 "delete from cf_temporary_orders where idoforg=:idoforg and plandate=:plandate " + complexRestrict);
-        query.setLong("idoforg", getOrg().getIdOfOrg());
+        query.setLong("idoforg", org.getIdOfOrg());
         query.setLong("plandate", planDate.getTimeInMillis());
         query.executeUpdate();
     }

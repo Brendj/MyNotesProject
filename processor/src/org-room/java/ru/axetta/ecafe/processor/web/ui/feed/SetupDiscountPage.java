@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.auth.LoginBean;
 import ru.axetta.ecafe.processor.web.ui.client.ClientListEditPage;
 
 import org.hibernate.Session;
@@ -58,32 +59,6 @@ public class SetupDiscountPage extends BasicWorkspacePage {
      * ****************************************************************************************************************
      */
     @Transactional
-    public Org getOrg() {
-        if (org != null) {
-            return org;
-        }
-        Session session = null;
-        try {
-            session = (Session) entityManager.getDelegate();
-            return getOrg(session);
-        } catch (Exception e) {
-            logger.error("Failed to load client by name", e);
-            sendError("Произошел критический сбой, пожалуйста, повторите попытку позже");
-        } finally {
-            //HibernateUtils.close(session, logger);
-        }
-        return null;
-    }
-
-    public Org getOrg(Session session) {
-        if (org != null) {
-            return org;
-        }
-        org = (Org) session.get(Org.class, 6L);
-        return org;
-    }
-
-    @Transactional
     public void fill() {
         Session session = null;
         try {
@@ -105,6 +80,7 @@ public class SetupDiscountPage extends BasicWorkspacePage {
     }
 
     public void loadClients (Session session) {
+        Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
         String groupJoin = "";
         String groupRestr = "";
         String discountRestr = "";
@@ -128,7 +104,7 @@ public class SetupDiscountPage extends BasicWorkspacePage {
                 + "where cf_clients.idoforg=:idoforg and surname<>'' " + groupRestr + discountRestr
                 + "order by surname, firstname, secondname, cf_clients_categorydiscounts.idofcategorydiscount";
         org.hibernate.Query q = session.createSQLQuery(sql);
-        q.setLong("idoforg", getOrg(session).getIdOfOrg());
+        q.setLong("idoforg", org.getIdOfOrg());
         if (group != null && group.length() > 0) {
             q.setString("groupname", group);
         }
@@ -191,7 +167,8 @@ public class SetupDiscountPage extends BasicWorkspacePage {
     }
 
     public void loadGroups(Session session) {
-        groups = DAOServices.getInstance().loadGroups(session, getOrg().getIdOfOrg(), true);
+        Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
+        groups = DAOServices.getInstance().loadGroups(session, org.getIdOfOrg(), true);
         Collections.sort(groups, new ClientListEditPage.ClientComparator ());
     }
 

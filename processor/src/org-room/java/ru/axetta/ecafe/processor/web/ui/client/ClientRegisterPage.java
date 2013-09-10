@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.auth.LoginBean;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -68,32 +69,6 @@ public class ClientRegisterPage extends BasicWorkspacePage {
      * ****************************************************************************************************************
      */
     @Transactional
-    public Org getOrg() {
-        if (org != null) {
-            return org;
-        }
-        Session session = null;
-        try {
-            session = (Session) entityManager.getDelegate();
-            return getOrg(session);
-        } catch (Exception e) {
-            logger.error("Failed to load client by name", e);
-            sendError("Произошел критический сбой, пожалуйста, повторите попытку позже");
-        } finally {
-            //HibernateUtils.close(session, logger);
-        }
-        return null;
-    }
-
-    public Org getOrg(Session session) {
-        if (org != null && org.getIdOfOrg().longValue() == MainPage.getSessionInstance().getIdoforg().longValue()) {
-            return org;
-        }
-        org = (Org) session.get(Org.class, MainPage.getSessionInstance().getIdoforg());
-        return org;
-    }
-
-    @Transactional
     public void fill(boolean reset) {
         Session session = null;
         try {
@@ -127,7 +102,8 @@ public class ClientRegisterPage extends BasicWorkspacePage {
     }
 
     public void loadGroups(Session session) {
-        groups = DAOServices.getInstance().loadGroups(session, getOrg().getIdOfOrg());
+        Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
+        groups = DAOServices.getInstance().loadGroups(session, org.getIdOfOrg());
         Collections.sort(groups, new ClientListEditPage.ClientComparator ());
     }
 
@@ -136,13 +112,14 @@ public class ClientRegisterPage extends BasicWorkspacePage {
         Session session = null;
         try {
             session = (Session) entityManager.getDelegate();
+            Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
             for (RegisterClient client : clientsForRegister) {
                 if (!isClientModified(client) || client.isAdded()) {
                     continue;
                 }
                 client.removeMessages();
                 try {
-                    registerClient(session, client, getOrg(), registerTwins);
+                    registerClient(session, client, org, registerTwins);
                     client.setAdded(true);
                     client.setInfo("Клиент успешно зарегистрирован");
                     //session.flush();

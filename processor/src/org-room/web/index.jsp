@@ -11,7 +11,7 @@
 
 <f:view>
 <head>
-    <title><h:outputText value="Новая школа: Юзер"/></title>
+    <title><h:outputText value="Управление школой: #{loginBean.org.officialName}"/></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="Content-Language" content="ru">
     <link rel="icon" href="<c:url value="/images/icon/ecafe-favicon.png"/>" type="image/x-icon">
@@ -22,6 +22,7 @@
 
 <a4j:loadScript src="/scripts/jquery.maskedinput.min.js"/>
 
+<%--@elvariable id="loginBean" type="ru.axetta.ecafe.processor.web.ui.auth.LoginBean"--%>
 <body style="margin: 4px; padding: 0;">
 
     <f:subview id="groupCreateSubView">
@@ -47,13 +48,13 @@
     <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">
             <%-- Заголовок страницы --%>
         <tr>
-            <td>
+            <td colspan="2">
                 <a4j:form id="headerForm" styleClass="borderless-form" eventsQueue="mainFormEventsQueue">
                     <rich:panel styleClass="header-panel" bodyClass="header-panel-body">
                         <h:panelGroup style="text-align: left;">
                             <h:graphicImage value="/images/icon/ecafe-favicon.png"
                                             style="border: 0; margin: 0 8px 0 0; vertical-align: middle; " />
-                            <h:outputText escape="true" id="headerText" value="Управление школой: ГОУ СОШ № 1547"
+                            <h:outputText escape="true" id="headerText" value="Управление школой: #{loginBean.org.officialName}"
                                           styleClass="page-header-text" />
                         </h:panelGroup>
                     </rich:panel>
@@ -62,16 +63,26 @@
         </tr>
             <%-- Верхнее (основное) меню --%>
         <tr>
-            <td style="min-width: 210px; vertical-align: top;" width="215px">
-                    <%-- Главное меню --%>
-                    <f:subview id="mainMenuSubView">
-                        <c:import url="/include/main_menu.jsp" />
-                    </f:subview>
+            <td style="min-width: 210px; vertical-align: top;" width="99%">
+                <%-- Главное меню --%>
+                <f:subview id="mainMenuSubView">
+                    <c:import url="/include/main_menu.jsp" />
+                </f:subview>
+            </td>
+            <td width="1%">
+                <a4j:form id="logoutForm" styleClass="borderless-form" eventsQueue="mainFormEventsQueue">
+                    <a4j:commandLink action="#{loginBean.doLogout}" oncomplete="window.location=('logout.jsf')" style="white-space: nowrap;">
+                        <h:graphicImage value="/images/icon/logout.png"
+                                        style="border: 0; margin: 0 8px 0 0; vertical-align: middle; " />
+                        <h:outputText escape="true" value="Выйти"
+                                      styleClass="output-text" style="white-space: nowrap;"/>
+                    </a4j:commandLink>
+                </a4j:form>
             </td>
         </tr>
             <%-- Рабочая область --%>
         <tr>
-            <td style="vertical-align: top;" width="*">
+            <td style="vertical-align: top;" width="*" colspan="2">
                     <f:subview id="workspaceSubView">
                         <c:import url="/include/workspace.jsp" />
                     </f:subview>

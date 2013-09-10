@@ -13,3 +13,12 @@ CREATE TABLE cf_temporary_orders (
   CONSTRAINT cf_temporary_orders_org FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg),
   CONSTRAINT cf_temporary_orders_client FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
 );
+
+CREATE TABLE cf_thin_client_users (
+  IdOfOrg bigint not null,
+  IdOfUser bigInt not null,
+  Role int not null default 1,
+  CONSTRAINT cf_thin_client_users_pk PRIMARY KEY (IdOfUser),
+  CONSTRAINT cf_thin_client_users_org FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg),
+  CONSTRAINT cf_thin_client_users_user FOREIGN KEY (IdOfUser) REFERENCES cf_users (IdOfUser)
+);

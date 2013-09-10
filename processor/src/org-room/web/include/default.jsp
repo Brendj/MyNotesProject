@@ -9,14 +9,9 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <%--@elvariable id="defaultWorkspacePage" type="ru.axetta.ecafe.processor.web.ui.DefaultWorkspacePage"--%>
+<%--@elvariable id="loginBean" type="ru.axetta.ecafe.processor.web.ui.auth.LoginBean"--%>
 <a4j:form>
     <a4j:region>
-    <h:panelGrid columns="2">
-        <h:outputText value="ОУ" styleClass="output-text" />
-        <h:selectOneMenu id="org" value="#{defaultWorkspacePage.org}" style="width:150px;"  >
-            <f:selectItems value="#{defaultWorkspacePage.orgs}"/>
-        </h:selectOneMenu>
-    </h:panelGrid>
-    <a4j:commandButton value="Выбрать" action="#{defaultWorkspacePage.doApply}" />
+        <h:outputText value="Добро пожаловать в Панель управление школой #{loginBean.org.officialName}" styleClass="output-text"/>
     </a4j:region>
 </a4j:form>

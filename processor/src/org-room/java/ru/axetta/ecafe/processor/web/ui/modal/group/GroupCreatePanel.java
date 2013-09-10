@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.auth.LoginBean;
 
 import org.hibernate.Session;
 import org.richfaces.component.UIModalPanel;
@@ -58,33 +59,6 @@ public class GroupCreatePanel extends BasicWorkspacePage {
      * Загрузка данных из БД
      * ****************************************************************************************************************
      */
-    @Transactional
-    public Org getOrg() {
-        if (org != null) {
-            return org;
-        }
-        Session session = null;
-        try {
-            session = (Session) entityManager.getDelegate();
-            return getOrg(session);
-        } catch (Exception e) {
-            logger.error("Failed to load client by name", e);
-            sendError("Произошел критический сбой, пожалуйста, повторите попытку позже");
-        } finally {
-            //HibernateUtils.close(session, logger);
-        }
-        return null;
-    }
-
-    public Org getOrg(Session session) {
-        if (org != null) {
-            return org;
-        }
-        org = (Org) session.get(Org.class, 6L);
-        return org;
-    }
-    
-    
     public void fill () {
         event = null;
         listeners = new ArrayList<GroupCreateListener>();
@@ -126,7 +100,8 @@ public class GroupCreatePanel extends BasicWorkspacePage {
         groupName = groupName.toUpperCase();
         groupName = groupName.replaceAll("-", "");
 
-        ClientGroup grp = DAOUtils.createClientGroup(session, getOrg(session).getIdOfOrg(), groupName);
+        Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
+        ClientGroup grp = DAOUtils.createClientGroup(session, org.getIdOfOrg(), groupName);
         if (grp == null) {
             throw new Exception("Неудалось создать группу '" + groupName + "', попробуйте повторить попытку позже");
         }

@@ -36,6 +36,7 @@ import javax.persistence.PersistenceContext;
 
 import ru.axetta.ecafe.processor.web.ui.Constants;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.auth.LoginBean;
 import ru.axetta.ecafe.processor.web.ui.modal.group.GroupCreateEvent;
 import ru.axetta.ecafe.processor.web.ui.modal.group.GroupCreateListener;
 
@@ -92,32 +93,6 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
      * ****************************************************************************************************************
      */
     @Transactional
-    public Org getOrg() {
-        if (org != null) {
-            return org;
-        }
-        Session session = null;
-        try {
-            session = (Session) entityManager.getDelegate();
-            return getOrg(session);
-        } catch (Exception e) {
-            logger.error("Failed to load client by name", e);
-            sendError("Произошел критический сбой, пожалуйста, повторите попытку позже");
-        } finally {
-            //HibernateUtils.close(session, logger);
-        }
-        return null;
-    }
-
-    public Org getOrg(Session session) {
-        if (org != null && org.getIdOfOrg().longValue() == MainPage.getSessionInstance().getIdoforg().longValue()) {
-            return org;
-        }
-        org = (Org) session.get(Org.class, MainPage.getSessionInstance().getIdoforg());
-        return org;
-    }
-
-    @Transactional
     public void fill(boolean reset) {
         Session session = null;
         try {
@@ -153,6 +128,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         //  Загружаем данные и записываем их в map
         dbTree = new TreeMap<String, List<Client>>();
         teachers = new ArrayList<Client>();
+        Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
         String sql =
                 "select idofclient, firstname, secondname, surname, groupname, cf_persons.idofperson, cf_clients.idofclientgroup "
                         + "from cf_clients " + "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "
@@ -161,7 +137,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
                         //+ "  and cf_clientgroups.idofclientgroup=1000000004 "
                         + "order by groupname, surname, firstname, secondname";
         org.hibernate.Query q = session.createSQLQuery(sql);
-        q.setLong("idoforg", getOrg(session).getIdOfOrg());
+        q.setLong("idoforg", org.getIdOfOrg());
         List resultList = q.list();
         List<Client> clients = new ArrayList<Client>();
         String prevGroupName = "";
@@ -447,7 +423,8 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
     }
 
     public void loadGroups(Session session) {
-        groups = DAOServices.getInstance().loadGroups(session, getOrg(session).getIdOfOrg());
+        Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
+        groups = DAOServices.getInstance().loadGroups(session, org.getIdOfOrg());
         Collections.sort(groups, new ClientComparator ());
     }
 

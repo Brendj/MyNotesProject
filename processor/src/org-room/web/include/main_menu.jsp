@@ -81,22 +81,5 @@
                 </h:panelGroup>
             </f:facet>
         </rich:dropDownMenu>
-
-
-
-
-
-        <%-- Выбор организаци --%>
-        <rich:dropDownMenu>
-            <f:facet name="label">
-                <h:panelGroup>
-                    <h:graphicImage value="/images/icon/user-group-icon.png" styleClass="pic"/>
-                    <h:outputText value="Выбрать ОУ"/>
-                </h:panelGroup>
-            </f:facet>
-            <rich:menuItem submitMode="ajax" id="defaultPageEditPageMenuItem"
-                           binding="#{defaultWorkspacePage.mainMenuComponent}" value="Выбрать ОУ"
-                           action="#{defaultWorkspacePage.show}" reRender="workspaceForm" />
-        </rich:dropDownMenu>
     </rich:toolBar>
 </h:form>
