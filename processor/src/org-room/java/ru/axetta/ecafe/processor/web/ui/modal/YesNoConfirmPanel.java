@@ -42,6 +42,7 @@ public class YesNoConfirmPanel extends BasicWorkspacePage {
                 logger.error("Trying to add not listener for YesNoConfirmPanel");
             } else {
                 yesActionListener.onYesNoEvent(new YesNoEvent(true));
+                return;
             }
         }
 
