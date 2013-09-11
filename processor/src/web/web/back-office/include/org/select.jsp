@@ -90,13 +90,9 @@
                                            reRender="#{mainPage.topMostPage.pageComponent.id}"
                                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.hide();"
                                            styleClass="command-button" style="width: 80px; margin-right: 4px;" />
-                        <a4j:commandButton value="Отмена" action="#{mainPage.completeOrgSelection}"
-                                           reRender="#{mainPage.topMostPage.pageComponent.id}"
-                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.hide();"
-                                           styleClass="command-button" style="width: 80px;">
-                            <f:setPropertyActionListener value="#{null}"
-                                                         target="#{mainPage.orgSelectPage.selectedItem}" />
-                        </a4j:commandButton>
+                        <a4j:commandButton value="Отмена"
+                                           onclick="#{rich:component('modalOrgSelectorPanel')}.hide();return false;"
+                                           styleClass="command-button" style="width: 80px;" />
                     </h:panelGroup>
                 </td>
             </tr>

@@ -8,8 +8,10 @@ import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -19,8 +21,10 @@ import org.hibernate.criterion.Example;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -128,6 +132,11 @@ public class ClientFilter {
     private final ClientBalanceFilter clientBalanceMenu = new ClientBalanceFilter();
     private Integer clientBalanceCondition =  ClientBalanceFilter.NO_CONDITION;
     private String filterClientId;
+    private String filterClientGUID;
+    private Map<String, Long> clientGroupItems = ClientGroupMenu.getItems();
+    private Long clientGroupId = ClientGroupMenu.CLIENT_ALL;
+    private boolean showDeleted;
+    private boolean includeFriendlyOrg = true;
     private String mobileNumber;
 
     public ClientBalanceFilter getClientBalanceMenu() {
@@ -198,6 +207,42 @@ public class ClientFilter {
         this.contractPerson = contractPerson;
     }
 
+    public String getFilterClientGUID() {
+        return filterClientGUID;
+    }
+
+    public void setFilterClientGUID(String filterClientGUID) {
+        this.filterClientGUID = filterClientGUID;
+    }
+
+    public boolean isIncludeFriendlyOrg() {
+        return includeFriendlyOrg;
+    }
+
+    public void setIncludeFriendlyOrg(boolean includeFriendlyOrg) {
+        this.includeFriendlyOrg = includeFriendlyOrg;
+    }
+
+    public boolean isShowDeleted() {
+        return showDeleted;
+    }
+
+    public void setShowDeleted(boolean showDeleted) {
+        this.showDeleted = showDeleted;
+    }
+
+    public Long getClientGroupId() {
+        return clientGroupId;
+    }
+
+    public void setClientGroupId(Long clientGroupId) {
+        this.clientGroupId = clientGroupId;
+    }
+
+    public Map<String, Long> getClientGroupItems() {
+        return clientGroupItems;
+    }
+
     public boolean isEmpty() {
         return ClientCardOwnMenu.NO_CONDITION == clientCardOwnCondition && StringUtils.isEmpty(contractId)
                 && StringUtils.isEmpty(filterClientId) && org.isEmpty() && person.isEmpty() && contractPerson.isEmpty();
@@ -245,8 +290,14 @@ public class ClientFilter {
         } catch (Exception e) {
         }
         if (!this.org.isEmpty()) {
-            Org org = (Org) session.load(Org.class, this.org.getIdOfOrg());
-            criteria.add(Restrictions.eq("org", org));
+            criteria.createAlias("org", "o");
+            if (includeFriendlyOrg) {
+                List<Long> orgIds = DAOUtils.findFriendlyOrgIds(session, org.getIdOfOrg());
+                criteria.add(orgIds.isEmpty() ? Restrictions.eq("o.idOfOrg", org.getIdOfOrg())
+                        : Restrictions.in("o.idOfOrg", orgIds));
+            } else {
+                criteria.add(Restrictions.eq("o.idOfOrg", org.getIdOfOrg()));
+            }
         }
         if (ClientCardOwnMenu.NO_CONDITION != clientCardOwnCondition) {
             switch (clientCardOwnCondition) {
@@ -293,6 +344,23 @@ public class ClientFilter {
         }
         if (StringUtils.isNotEmpty(this.mobileNumber)) {
             criteria.add(Restrictions.ilike("mobile", PhoneNumberCanonicalizator.canonicalize(mobileNumber), MatchMode.ANYWHERE));
+        }
+        if (StringUtils.isNotEmpty(filterClientGUID)) {
+            criteria.add(Restrictions.eq("clientGUID", filterClientGUID));
+        }
+        criteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
+        String cgFieldName = "cg.compositeIdOfClientGroup.idOfClientGroup";
+        if (!clientGroupId.equals(ClientGroupMenu.CLIENT_ALL)) {
+            if (clientGroupId.equals(ClientGroupMenu.CLIENT_STUDENTS)) {
+                criteria.add(Restrictions.not(Restrictions.in(cgFieldName, ClientGroupMenu.getNotStudent())));
+            } else {
+                criteria.add(Restrictions.eq(cgFieldName, clientGroupId));
+            }
+        }
+        if (!showDeleted && clientGroupId.equals(ClientGroupMenu.CLIENT_ALL)) {
+            criteria.add(Restrictions.or(Restrictions.not(Restrictions
+                    .in(cgFieldName, new Long[]{ClientGroupMenu.CLIENT_DELETED, ClientGroupMenu.CLIENT_LEAVING})),
+                    Restrictions.isNull(cgFieldName)));
         }
        criteria.addOrder(Order.asc("contractId"));
     }
