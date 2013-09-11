@@ -41,20 +41,20 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
                 "   and orderdetail.idoforder = cforder.idoforder" +
                 " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
-                " where cforder.createddate>=:start and cforder.createddate<:end and orderdetail.socdiscount>0 and" +
+                " where cforder.createddate>=:startDate and cforder.createddate<:endDate and orderdetail.socdiscount>0 and" +
                 " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"' and " +
                 " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
-                " cforder.ordertype in (0,1,4) " +
+                " cforder.ordertype in (0,1,4,6) " +
                 " group by orderdetail.qty ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idoforg",idOfOrg);
         query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
-        query.setParameter("start",start.getTime());
+        query.setParameter("startDate",start.getTime());
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(start);
         calendar.add(Calendar.DATE, 1);
-        query.setParameter("end",calendar.getTimeInMillis()-1);
+        query.setParameter("endDate",calendar.getTimeInMillis()-1);
         List list = query.list();
         if(list==null || list.isEmpty()){
             return  0L;
@@ -69,7 +69,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
                 "   and orderdetail.idoforder = cforder.idoforder" +
                 " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
-                " where cforder.createddate between :start and :end and orderdetail.socdiscount>0 and" +
+                " where cforder.createddate between :startDate and :endDate and orderdetail.socdiscount>0 and" +
                 //" cforder.idoforg=:idoforg and split_part(good.fullname, '/', 4) like '"+part4+"'" +
                 " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
                 " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"' and" +
@@ -77,8 +77,8 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 " group by orderdetail.qty ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idoforg",idOfOrg);
-        query.setParameter("start",start.getTime());
-        query.setParameter("end",end.getTime());
+        query.setParameter("startDate",start.getTime());
+        query.setParameter("endDate",end.getTime());
         query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
         List list = query.list();
@@ -92,11 +92,12 @@ public class OrderDetailsDAOService extends AbstractDAOService {
     /* получаем список всех  */
     @SuppressWarnings("unchecked")
     public List<GoodItem> findAllGoods(Long idOfOrg){
-        Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>(3);
+        Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>();
         orderTypeEnumTypeSet.add(OrderTypeEnumType.DEFAULT);
         orderTypeEnumTypeSet.add(OrderTypeEnumType.UNKNOWN);
         orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN);
         orderTypeEnumTypeSet.add(OrderTypeEnumType.DAILY_SAMPLE);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE);
         String sql = "select distinct good.globalId as globalId, good.pathPart3 as pathPart3, "
                 + "good.pathPart4 as pathPart4,good.pathPart2 as pathPart2, good.fullName as fullName "
                 + " from OrderDetail details "
@@ -142,17 +143,6 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                         sumByCash=0L;
                         clientReportItems.add(new ClientReportItem(idOfOrderDetail, contractId, fullName, menuName, OrderDetail.getMenuOriginAsString(menuOrigin), totalDetailSum));
                     }
-                    //final Long rPrice = detail.getRPrice();
-                    //if(rPrice-sumByCash<=0){
-                    //    sumByCash=sumByCash-rPrice;
-                    //} else {
-                    //    Float price = (rPrice - sumByCash) / 100f;
-                    //    sumByCash=0L;
-                    //    Float discount = detail.getDiscount() / 100f;
-                    //    Long quantity = detail.getQty();
-                    //    Float totalDetailSum = (price - discount) * quantity;
-                    //    clientReportItems.add(new ClientReportItem(idOfOrderDetail, contractId, fullName, menuName, OrderDetail.getMenuOriginAsString(menuOrigin), totalDetailSum));
-                    //}
                 }
             } else {
                 Set<OrderDetail> details = order.getOrderDetails();
