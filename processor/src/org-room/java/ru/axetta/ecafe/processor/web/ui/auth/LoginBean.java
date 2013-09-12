@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.auth;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -38,13 +39,13 @@ public class LoginBean extends BasicWorkspacePage {
     private EntityManager entityManager;
 
     private boolean loggedIn = false;
-    private Long idofuser;
+    private Long idofclient;
     private Long idoforg;
     private Integer role;
     private String username = "";
     private String password = "";
     private String errorMessage;
-    private User user;
+    private Client client;
     private Org org;
 
 
@@ -56,14 +57,14 @@ public class LoginBean extends BasicWorkspacePage {
      * ****************************************************************************************************************
      */
     public void doLogout () {
-        loggedIn = false;
-        idofuser = null;
-        idoforg  = null;
-        role     = null;
-        username = null;
-        password = null;
-        user     = null;
-        org      = null;
+        loggedIn   = false;
+        idofclient = null;
+        idoforg    = null;
+        role       = null;
+        username   = null;
+        password   = null;
+        client     = null;
+        org        = null;
     }
 
     @Transactional
@@ -99,10 +100,12 @@ public class LoginBean extends BasicWorkspacePage {
 
         }
         org.hibernate.Query q = session.createSQLQuery(
-                          "select cf_thin_client_users.idofuser, idoforg, role "
-                        + "from cf_thin_client_users "
-                        + "left join cf_users on cf_thin_client_users.idofuser=cf_users.idofuser "
-                        + "where cf_users.username=:username and cf_users.password=:password");
+                          "select cf_clients.idofclient, cf_clients.idoforg, cf_thin_client_users.role "
+                          //+ "     , cf_persons.surname, cf_persons.firstname, cf_persons.secondname "
+                          + "from cf_thin_client_users "
+                          + "left join cf_clients on cf_clients.idofclient=cf_thin_client_users.idofclient "
+                          //+ "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "
+                          + "where cf_thin_client_users.username=:username and cf_thin_client_users.password=:password");
         q.setString("username", username);
         q.setString("password", encPassword);
         List resultList = q.list();
@@ -115,7 +118,7 @@ public class LoginBean extends BasicWorkspacePage {
             return;
         } else {
             Object o[] = (Object[]) resultList.get(0);
-            idofuser   = HibernateUtils.getDbLong(o[0]);
+            idofclient = HibernateUtils.getDbLong(o[0]);
             idoforg    = HibernateUtils.getDbLong(o[1]);
             role       = HibernateUtils.getDbInt(o[2]);
             loggedIn = true;
@@ -134,7 +137,7 @@ public class LoginBean extends BasicWorkspacePage {
             session = (Session) entityManager.getDelegate();
             return loadOrg(session);
         } catch (Exception e) {
-            logger.error("Failed to load binded for user {" + idofuser + "} org {" + idoforg + "}");
+            logger.error("Failed to load binded for user {" + idofclient + "} org {" + idoforg + "}");
         } finally {
             //HibernateUtils.close(session, logger);
         }
@@ -144,7 +147,7 @@ public class LoginBean extends BasicWorkspacePage {
 
     public Org loadOrg (Session session) {
         try {
-            return (Org) session.get(Org.class, 6L);
+            return (Org) session.get(Org.class, idoforg.longValue());
         } catch (Exception e) {
             logger.error("failed to load", e);
         }
@@ -152,17 +155,17 @@ public class LoginBean extends BasicWorkspacePage {
     }
 
     @Transactional
-    public User loadUser () {
+    public Client loadClient () {
         Session session = null;
         try {
             session = (Session) entityManager.getDelegate();
-            return (User) session.get(User.class, idofuser.longValue());
+            return (Client) session.get(Client.class, idofclient.longValue());
         } catch (Exception e) {
-            logger.error("Failed to load user {" + idofuser + "}");
+            logger.error("Failed to load user {" + idofclient + "}");
         } finally {
             //HibernateUtils.close(session, logger);
         }
-        logger.error("User with id {" + idofuser + "} was no found");
+        logger.error("User with id {" + idofclient + "} was no found");
         return null;
     }
 
@@ -232,10 +235,10 @@ public class LoginBean extends BasicWorkspacePage {
         return org;
     }
 
-    public User getUser() {
-        if (user == null) {
-            user = RuntimeContext.getAppContext().getBean(LoginBean.class).loadUser();
+    public Client getUser() {
+        if (client == null) {
+            client = RuntimeContext.getAppContext().getBean(LoginBean.class).loadClient();
         }
-        return user;
+        return client;
     }
 }
