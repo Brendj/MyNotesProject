@@ -15,11 +15,13 @@ CREATE TABLE cf_temporary_orders (
 );
 
 CREATE TABLE cf_thin_client_users (
-  IdOfOrg bigint not null,
-  IdOfUser bigInt not null,
+  IdOfClient bigint not null,
+  UserName varchar(64) not null,
+  Password varchar(128) not null,
   Role int not null default 1,
-  CONSTRAINT cf_thin_client_users_pk PRIMARY KEY (IdOfUser),
-  CONSTRAINT cf_thin_client_users_org FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg),
-  CONSTRAINT cf_thin_client_users_user FOREIGN KEY (IdOfUser) REFERENCES cf_users (IdOfUser)
+  CreationDate bigint not null,
+  ModificationDate bigint,
+  CONSTRAINT cf_thin_client_users_pk PRIMARY KEY (UserName),
+  CONSTRAINT cf_thin_client_users_client FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
 );
-insert into cf_thin_client_users values (6, 1, 1);
+insert into cf_thin_client_users values (1032, 'testerov', 'R2hiZHRuMDA=', 1, 1378976400000, null) values (IdOfOrg, IdOfClient, UserName, Password, Role, CreationDate, ModificationDate);
