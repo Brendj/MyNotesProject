@@ -336,7 +336,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
                     continue;
                 }
                 defRule = new RuleConditionItem(
-                        hint.getHint().getParamHint().getName() + hint.getHint().getParamHint().getDefaultRule());
+                       hint.getHint().getParamHint().getName() + hint.getHint().getParamHint().getDefaultRule());
             } catch (Exception e) {
                 try {
                     defRule = new RuleConditionItem(
@@ -544,7 +544,13 @@ public class ManualReportRunnerPage extends OnlineReportPage
             List<String> idOfOrgList = values.get("idOfOrg");
             for (String idOfOrg : idOfOrgList) {
                 Org org = DAOService.getInstance().getOrg(Long.parseLong(idOfOrg));
-                buildReport(values, org);
+                try {
+                    buildReport(values, org);
+                } catch (Exception e) {
+                    errorMessage = String.format("Во время выполнения отчета, возникла ошибка: %s",
+                            e.getMessage());
+                    return;
+                }
                 //  .. но прерываем выполнение, если тип отчета не "В репозиторий" - для всех оргов выполнение только
                 //  если требуется экспорт в репозитории
                 if (documentFormat != ReportHandleRule.REPOSITORY_FORMAT) {
@@ -553,7 +559,13 @@ public class ManualReportRunnerPage extends OnlineReportPage
             }
         } else {
             //  Если орги вообще не присутствывали, то просто единаждый выполняем отчет
-            buildReport(values, null);
+            try {
+                buildReport(values, null);
+            } catch (Exception e) {
+                errorMessage = String.format("Во время выполнения отчета, возникла ошибка: %s",
+                                             e.getMessage());
+                return;
+            }
         }
     }
 
