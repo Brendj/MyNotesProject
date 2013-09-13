@@ -39,9 +39,9 @@ public class RuleExpressionUtil {
         "contragentName",
         "category",
         "idOfMenuSourceOrg",
-        "enterEventType",
         "orgTag",
         null, // далее идут параметры для передачи значений
+        "enterEventType", // используется в AutoEnterEventByDaysReport и AutoEnterEventReport
         DailySalesByGroupsReport.PARAM_GROUP_BY_MENU_GROUP,
         DailySalesByGroupsReport.PARAM_INCLUDE_COMPLEX,
         DailySalesByGroupsReport.PARAM_MENU_GROUPS,

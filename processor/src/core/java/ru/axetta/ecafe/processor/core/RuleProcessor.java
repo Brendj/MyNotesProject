@@ -20,14 +20,13 @@ import ru.axetta.ecafe.processor.core.utils.RuleExpressionUtil;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.text.DateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,19 +48,19 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
     public static final String METHOD_EXPRESSION = "метод:";
 
 
-    public static final Map<String, String> getParametersFromString (String parameters) {
-        if (parameters.indexOf(COMBOBOX_EXPRESSION) < 0 &&
-            parameters.indexOf(CHECKBOX_EXPRESSION) < 0 &&
-            parameters.indexOf(RADIO_EXPRESSION) < 0 &&
-            parameters.indexOf(METHOD_EXPRESSION) < 0) {
-            return Collections.EMPTY_MAP;
+    public static Map<String, String> getParametersFromString (String parameters) {
+        if (!parameters.contains(COMBOBOX_EXPRESSION) &&
+            !parameters.contains(CHECKBOX_EXPRESSION) &&
+            !parameters.contains(RADIO_EXPRESSION) &&
+            !parameters.contains(METHOD_EXPRESSION)) {
+            return Collections.emptyMap();
         }
-        if (parameters.indexOf(METHOD_EXPRESSION) > -1) {
+        if (parameters.contains(METHOD_EXPRESSION)) {
             try {
                 String method = parameters.substring(parameters.indexOf(METHOD_EXPRESSION) + METHOD_EXPRESSION.length());
                 parameters = getMethodExecutionResult(method);
             } catch (Exception e) {
-                return Collections.EMPTY_MAP;
+                return Collections.emptyMap();
             }
         }
 
@@ -72,14 +71,14 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         parameters = parameters.replaceAll(METHOD_EXPRESSION, "");
 
         String parts [] = parameters.split(DELIMETER);
-        Pattern pattern = Pattern.compile("(\\{([а-яА-Яa-zA-Z0-9]*)\\})?([а-яА-Яa-zA-Z0-9]*)");
+        Pattern pattern = Pattern.compile("(\\{([а-яА-Яa-zA-Z0-9\\u005F]*)\\})?([а-яА-Яa-zA-Z0-9\\s]+)");
         for (String p : parts) {
             Matcher matcher = pattern.matcher(p);
             while (matcher.find()) {
                 String group1 = matcher.group(2);
                 String group2 = matcher.group(3);
                 if (group1 == null || group1.length() < 1) {
-                    group1 = new String(group2);
+                    group1 = group2;
                 }
                 if (group1 != null && group1.length() > 0) {
                     result.put(group1, group2);
@@ -89,7 +88,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         return result;
     }
 
-    public static final String getMethodExecutionResult (String method) throws Exception {
+    public static String getMethodExecutionResult (String method) throws Exception {
         //  Данный метод возвращает унифицированную строку для результата от выполнения метода в виде {ключ}значение, {ключ}значение
         if (method == null || method.length() < 1) {
             return "";
