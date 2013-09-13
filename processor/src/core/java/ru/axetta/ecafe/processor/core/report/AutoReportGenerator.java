@@ -4,9 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.SchedulerJob;
+import ru.axetta.ecafe.processor.core.report.complianceWithOrderAndConsumption.CWOACReport;
 import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
@@ -18,9 +17,9 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.io.FilenameUtils;
 import org.hibernate.Criteria;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -789,6 +788,26 @@ public class AutoReportGenerator {
             }
         })
         );
+
+        REPORT_DEFS
+                .add(new ReportDef(CWOACReport.class, CWOACReport.AutoReportBuildJob.class, new JobDetailCreator() {
+                    public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId,
+                            String jobName) throws Exception {
+                        Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+                        String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + "CWOACReport.jasper";
+                        BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                                jobName, new CWOACReport(), autoReportGenerator.getExecutorService(),
+                                autoReportGenerator.getSessionFactory(), autoReportGenerator.getAutoReportProcessor(),
+                                autoReportGenerator.getReportPath(), reportTemplate,
+                                (Calendar) autoReportGenerator.getCalendar().clone(),
+                                (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                                (DateFormat) autoReportGenerator.getTimeFormat().clone());
+                        JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                        jobDetail.getJobDataMap()
+                                .put(CWOACReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                        return jobDetail;
+                    }
+                }));
     } // static
 
 

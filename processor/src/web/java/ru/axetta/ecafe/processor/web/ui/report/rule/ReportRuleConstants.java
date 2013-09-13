@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.report.*;
+import ru.axetta.ecafe.processor.core.report.complianceWithOrderAndConsumption.CWOACReport;
 import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
@@ -195,6 +196,7 @@ public class ReportRuleConstants {
             new ReportHint(HalfYearSummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(BeneficiarySummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(DeliveredServicesReport.class.getCanonicalName(), new int[]{3, -20/*, 31, 32, 33, 34, 35, 36, 37*/}),
+            new ReportHint(CWOACReport.class.getCanonicalName(), new int[]{})
             // отрицательное значение - обязательное
     };
 
