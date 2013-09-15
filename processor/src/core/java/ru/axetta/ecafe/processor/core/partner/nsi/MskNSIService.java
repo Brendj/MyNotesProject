@@ -19,6 +19,7 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.transport.http.HTTPConduit;
@@ -103,7 +104,7 @@ public class MskNSIService {
         }
         String url = Config.getUrl();
         logger.info("Trying NSI service: " + url);
-        nsiServicePort = new NSIServiceService(new URL(url + "?wsdl"),
+        nsiServicePort = new NSIServiceService(new URL(url.toLowerCase().contains("wsdl")?url:(url + "?wsdl")),
                 new QName("http://rstyle.com/nsi/services", "NSIServiceService"));
         nsiService = nsiServicePort.getNSIService();
 
@@ -173,7 +174,9 @@ public class MskNSIService {
     }
 
     public List<OrgInfo> getOrgByNameAndGuid(String orgName, String orgGuid) throws Exception {
-        if (orgName==null && orgGuid==null) throw new Exception("Не указано название организации и GUID");
+        if (StringUtils.isEmpty(orgName) && StringUtils.isEmpty(orgGuid)) {
+            throw new Exception("Не указано название организации и GUID");
+        }
         /*
        От Козлова
        "select item['РОУ XML/GUID Образовательного учреждения'], "+
@@ -187,12 +190,16 @@ public class MskNSIService {
        "item['РОУ XML/Краткое наименование учреждения'] like '"+orgGuid+"'
         */
         String query = "select \n" + "item['РОУ XML/GUID Образовательного учреждения'],\n"
-                                + "item['РОУ XML/Краткое наименование учреждения'],\n" + "item['РОУ XML/Официальный адрес'],\n"
-                                + "item['РОУ XML/Дата изменения (число)']\n"
-                                + "from catalog('Реестр образовательных учреждений') where \n"
-                                + "item['РОУ XML/Статус записи'] not like 'Удален%'";
-        if (orgName!=null) query+= " and item['РОУ XML/Краткое наименование учреждения'] like '%" + orgName + "%'";
-        if (orgGuid!=null) query+= " and item['РОУ XML/GUID Образовательного учреждения']='" + orgGuid + "'";
+                + "item['РОУ XML/Краткое наименование учреждения'],\n" + "item['РОУ XML/Официальный адрес'],\n"
+                + "item['РОУ XML/Дата изменения (число)']\n"
+                + "from catalog('Реестр образовательных учреждений') where \n"
+                + "item['РОУ XML/Статус записи'] not like 'Удален%'";
+        if (StringUtils.isNotEmpty(orgName)) {
+            query += " and item['РОУ XML/Краткое наименование учреждения'] like '%" + orgName + "%'";
+        }
+        if (StringUtils.isNotEmpty(orgGuid)) {
+            query += " and item['РОУ XML/GUID Образовательного учреждения']='" + orgGuid + "'";
+        }
         List<QueryResult> queryResults = executeQuery(query);
         LinkedList<OrgInfo> list = new LinkedList<OrgInfo>();
         for (QueryResult qr : queryResults) {
@@ -222,7 +229,7 @@ public class MskNSIService {
         }
         return group;
     }
-    
+
     public List<ImportRegisterClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(Set<String> orgGuids,
             String familyName, String firstName, String secondName) throws Exception {
         List<ImportRegisterClientsService.ExpandedPupilInfo> pupils = new ArrayList<ImportRegisterClientsService.ExpandedPupilInfo>();
@@ -293,7 +300,7 @@ public class MskNSIService {
         */
         String tbl = getNSIWorkTable();
         String orgFilter = "";
-        if (guids!=null && guids.size()>0) {
+        if (guids != null && guids.size() > 0) {
             for (String guid : guids) {
                 if (orgFilter.length() > 0) {
                     orgFilter += " or ";
@@ -316,9 +323,9 @@ public class MskNSIService {
                 "item['" + tbl + "/Статус записи'] " +
                 "from catalog('Реестр обучаемых') " +
                 "where ";
-        if (orgFilter.length()>0) {
-            query+= " item['" + tbl + "/Статус записи'] not like 'Удален%'";
-            query+= " and (" + orgFilter + ")";
+        if (orgFilter.length() > 0) {
+            query += " item['" + tbl + "/Статус записи'] not like 'Удален%'";
+            query += " and (" + orgFilter + ")";
             if (familyName != null && familyName.length() > 0) {
                 query += " and item['" + tbl + "/Фамилия'] like '%" + familyName + "%'";
             }

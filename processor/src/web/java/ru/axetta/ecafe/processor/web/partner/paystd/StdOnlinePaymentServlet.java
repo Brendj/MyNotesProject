@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 public class StdOnlinePaymentServlet extends OnlinePaymentServlet {
@@ -38,8 +39,25 @@ public class StdOnlinePaymentServlet extends OnlinePaymentServlet {
     @Override
     protected String getAuthenticatedRemoteAddressMasks(RuntimeContext runtimeContext, HttpServletRequest httpRequest, OnlinePaymentRequestParser requestParser)  throws Exception {
         String partnerName = requestParser.getRequestParams().getParam("PID");
-        if (partnerName==null) throw new Exception("Parameter missing: PID");
-        StdPayConfig.LinkConfig linkConfig =  runtimeContext.getPartnerStdPayConfig().getLinkConfig(partnerName);
+        StdPayConfig.LinkConfig linkConfig = null;
+        if (partnerName==null) {
+            // try auth by ssl cert
+            String DNs="";
+            X509Certificate[] certificates = (X509Certificate[]) httpRequest.getAttribute("javax.servlet.request.X509Certificate");
+            if (certificates==null || certificates.length==0) {
+                throw new Exception("Parameter missing: PID");
+            }
+            for (int n=0;n<certificates.length;++n) {
+                String dn = certificates[0].getSubjectDN().getName();
+                linkConfig = runtimeContext.getPartnerStdPayConfig().getLinkConfigByCertDN(dn);
+                if (linkConfig!=null) break;
+                DNs+=dn+";";
+            }
+            if (linkConfig==null) throw new Exception("PID parameter missing and invalid client certificatew: DNs: "+DNs);
+
+        } else {
+            linkConfig = runtimeContext.getPartnerStdPayConfig().getLinkConfig(partnerName);
+        }
         if (linkConfig==null) throw new Exception("Invalid PID");
         ((StdOnlinePaymentRequestParser)requestParser).setLinkConfig(linkConfig);
         ///
