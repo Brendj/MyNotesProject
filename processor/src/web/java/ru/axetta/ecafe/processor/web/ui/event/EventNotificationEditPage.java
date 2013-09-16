@@ -6,10 +6,10 @@ package ru.axetta.ecafe.processor.web.ui.event;
 
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
+import ru.axetta.ecafe.processor.core.report.RuleConditionItem;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.ReportConditionItem;
 import ru.axetta.ecafe.processor.web.ui.ReportFormatMenu;
-import ru.axetta.ecafe.processor.web.ui.RuleConditionItem;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;

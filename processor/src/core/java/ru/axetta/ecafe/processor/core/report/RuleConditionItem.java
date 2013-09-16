@@ -2,7 +2,7 @@
  * Copyright (c) 2009. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui;
+package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 

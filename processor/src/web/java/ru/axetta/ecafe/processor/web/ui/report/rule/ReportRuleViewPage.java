@@ -10,8 +10,8 @@ import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.ReportRuleConstants;
+import ru.axetta.ecafe.processor.core.report.RuleConditionItem;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.RuleConditionItem;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;

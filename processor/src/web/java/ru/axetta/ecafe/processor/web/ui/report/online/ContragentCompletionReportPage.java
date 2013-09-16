@@ -15,9 +15,9 @@ import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.ContragentCompletionReport;
+import ru.axetta.ecafe.processor.core.report.ReportDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
-import ru.axetta.ecafe.processor.web.ui.report.online.services.ReportDAOService;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
