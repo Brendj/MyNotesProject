@@ -128,21 +128,23 @@ public class DAOUtils {
     }
 
     /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
-    public static List findNewerClients(Session persistenceSession, Collection<Org> organizations, long clientRegistryVersion)
+    @SuppressWarnings("unchecked")
+    public static List<Client> findNewerClients(Session persistenceSession, Collection<Org> organizations, long clientRegistryVersion)
             throws Exception {
         Query query = persistenceSession.createQuery("from Client cl where (cl.idOfClientGroup is null or cl.idOfClientGroup !=1100000060 or cl.idOfClientGroup !=1100000070)  and cl.org in :orgs and clientRegistryVersion>:version");
         query.setParameter("version", clientRegistryVersion);
         query.setParameterList("orgs", organizations);
-        return query.list();
+        return (List<Client>) query.list();
     }
 
     /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
-    public static List findNewerClients(Session persistenceSession, Org organization, long clientRegistryVersion)
+    @SuppressWarnings("unchecked")
+    public static List<Client> findNewerClients(Session persistenceSession, Org organization, long clientRegistryVersion)
             throws Exception {
         Query query = persistenceSession.createQuery("from Client cl where (cl.idOfClientGroup is null or cl.idOfClientGroup !=1100000060 or cl.idOfClientGroup !=1100000070)  and cl.org in :orgs and clientRegistryVersion>:version");
         query.setParameter("version", clientRegistryVersion);
         query.setParameter("orgs", organization);
-        return query.list();
+        return (List<Client>) query.list();
     }
 
     public static Org findOrg(Session persistenceSession, long idOfOrg) throws Exception {
@@ -348,17 +350,21 @@ public class DAOUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Org> findFriendlyOrgs (EntityManager em, Org organization) throws Exception {
-        javax.persistence.Query query = em.createQuery("select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg");
-        query.setParameter("idOfOrg", organization.getIdOfOrg());
-        if (query.getResultList().isEmpty()) return new ArrayList<Org> ();
-        List <Long> orgs = (List <Long>)query.getResultList();
-        List <Org> res = new ArrayList <Org> ();
-        for (Long idoforg : orgs) {
-            if (idoforg.longValue() == organization.getIdOfOrg().longValue()) {
+    public static List<Long> findFriendlyOrgIds(Session session, Long orgId) {
+        Query query = session
+                .createQuery("select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg")
+                .setParameter("idOfOrg", orgId);
+        return (List<Long>) query.list();
+    }
+
+    public static List<Org> findFriendlyOrgs(EntityManager em, Org organization) throws Exception {
+        List<Long> orgIds = findFriendlyOrgIds((Session) em.getDelegate(), organization.getIdOfOrg());
+        List<Org> res = new ArrayList<Org>();
+        for (Long idoforg : orgIds) {
+            if (idoforg.equals(organization.getIdOfOrg())) {
                 continue;
             }
-            res.add(DAOService.getInstance().getOrg((Long) idoforg));
+            res.add(DAOService.getInstance().getOrg(idoforg));
         }
         return res;
     }
