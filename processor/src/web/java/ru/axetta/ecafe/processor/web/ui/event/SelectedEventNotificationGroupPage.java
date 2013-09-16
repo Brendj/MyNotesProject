@@ -5,8 +5,8 @@
 package ru.axetta.ecafe.processor.web.ui.event;
 
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
+import ru.axetta.ecafe.processor.core.report.ReportRuleConstants;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.report.rule.ReportRuleConstants;
 
 import org.hibernate.Session;
 

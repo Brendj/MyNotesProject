@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.rule;
 
+import ru.axetta.ecafe.processor.core.report.ReportRuleConstants;
+
 import javax.faces.model.SelectItem;
 
 /**
