@@ -259,6 +259,8 @@ public class BIDataExportService {
         now.setTimeInMillis(System.currentTimeMillis());
         clearCalendar(now);
 
+        last.setTimeInMillis(1377993600000L);
+
 
         try {
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -306,15 +308,15 @@ public class BIDataExportService {
             boolean dataExists = false;
             File rootDir = null;
             try {
+                //  Создаем директорию
                 rootDir = new File (exportType.getRootDirectory (LOCAL_DIRECTORY));
                 rootDir.mkdirs();
             } catch (Exception e) {
-                logger.error("Failed to create directory " + exportType.getRootDirectory (LOCAL_DIRECTORY), e);
+                logger.error("Failed to create ашду " + exportType.getRootDirectory (LOCAL_DIRECTORY), e);
                 return false;
             }
-            //  Составляем таблицу с данными в CSV
-            for (Object entry : resultList) {
-
+            try {
+                //  Создаем файл
                 dataExists = true;
                 if (!fileCreated) {
                     tempFile = new File(rootDir, parseFileName(last, t));
@@ -339,8 +341,14 @@ public class BIDataExportService {
 
                     fileCreated = true;
                 }
+            } catch (Exception e) {
+                logger.error("Failed to create file " + rootDir + "/" + parseFileName(last, t), e);
+                return false;
+            }
 
 
+            //  Составляем таблицу с данными в CSV
+            for (Object entry : resultList) {
                 //  Обрабатываем данные
                 Object e[] = (Object[]) entry;
                 for (Object o : e) {
