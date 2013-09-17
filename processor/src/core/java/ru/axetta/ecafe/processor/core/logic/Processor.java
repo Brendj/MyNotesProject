@@ -2015,7 +2015,8 @@ public class Processor implements SyncProcessor,
                 clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client));
             }
             // Добавляем временных клиентов.
-            List<Client> tempClients = ClientManager.findTemporaryClients(persistenceSession, organization);
+            List<Client> tempClients = ClientManager
+                    .findTemporaryClients(persistenceSession, organization, clientRegistryRequest.getCurrentVersion());
             for (Client tempClient : tempClients) {
                 clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(tempClient, true));
             }
