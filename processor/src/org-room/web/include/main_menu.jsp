@@ -80,6 +80,9 @@
                     <h:outputText value="Отчеты"/>
                 </h:panelGroup>
             </f:facet>
+            <rich:menuItem submitMode="ajax" id="reportMenuItem"
+                           binding="#{reportPage.mainMenuComponent}" value="Выполнить отчет"
+                           action="#{reportPage.show}" reRender="workspaceForm" />
         </rich:dropDownMenu>
     </rich:toolBar>
 </h:form>

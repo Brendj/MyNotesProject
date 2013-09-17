@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
  * To change this template use File | Settings | File Templates.
  */
 public class RuleProcessor implements AutoReportProcessor, EventProcessor {
+    public static final String ORG_EXPRESSION = "org:";
     public static final String CONTRAGENT_EXPRESSION = "contragent:";
     public static final String CONTRAGENT_PAYAGENT_EXPRESSION = "contragent-payagent:";
     public static final String COMBOBOX_EXPRESSION = "комбобокс:";

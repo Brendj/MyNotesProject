@@ -122,7 +122,7 @@ public class ReportRuleConstants {
             new ParamHint("generateDate", "Дата генерации отчета"),
             new ParamHint("generateTime", "Дата и время генерации отчета"),
             new ParamHint("generateDurationMillis", "Продолжительность генерации отчета в миллисекундах"),
-            new ParamHint("idOfOrg", "Идентификатор организации"),
+            new ParamHint("idOfOrg", "Идентификатор организации").setDefaultRule("= org: "),
             new ParamHint("shortName", "Краткое название организации"),
             new ParamHint("officialName", "Официальное название организации"),
             new ParamHint("groupName", "Название класса"),
@@ -138,7 +138,7 @@ public class ReportRuleConstants {
             new ParamHint("person.abbreviation", "Фамилия И.О. обслуживаемого физического лица"),
             new ParamHint("phone", "Телефонный номер клиента"),
             new ParamHint("mobile", "Номер мобильного телефона клиента"), new ParamHint("address", "Адрес клиента"),
-            new ParamHint("idOfContragent", "Идентификатор контрагента"),    //20
+            new ParamHint("idOfContragent", "Идентификатор контрагента").setDefaultRule("= contragent: "),    //20
             new ParamHint("contragentName", "Название контрагента"),
             new ParamHint("category", "Категория организации"),
             new ParamHint("idOfMenuSourceOrg", "Идентификатор организации - источника меню"),

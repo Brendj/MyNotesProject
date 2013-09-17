@@ -5,8 +5,12 @@
 package ru.axetta.ecafe.processor.core;
 
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
+import ru.axetta.ecafe.processor.core.mail.Postman;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.report.AutoReportPostman;
+import ru.axetta.ecafe.processor.core.report.AutoReportProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.io.FilenameUtils;
@@ -17,6 +21,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
+import org.quartz.Scheduler;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -27,6 +33,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.mail.internet.InternetAddress;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -54,6 +61,14 @@ import java.util.concurrent.TimeUnit;
 @Scope("singleton")
 public class RuntimeContext implements ApplicationContextAware {
 
+    private static final String PROCESSOR_PARAM_BASE = "ecafe.processor";
+    private static final String REPORT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".report";
+    private static final String REPORT_PARAM_BASE_KEY = REPORT_PARAM_BASE + ".";
+    private static final String AUTO_REPORT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".autoreport";
+    private static final String AUTO_REPORT_MAIL_PARAM_BASE = AUTO_REPORT_PARAM_BASE + ".mail";
+    private static final String SUPPORT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".support";
+    private static final String SUPPORT_MAIL_PARAM_BASE = SUPPORT_PARAM_BASE + ".mail";
+
     @PersistenceContext(unitName = "processorPU")
     EntityManager em;
     // Logger
@@ -62,6 +77,11 @@ public class RuntimeContext implements ApplicationContextAware {
     static SessionFactory sessionFactory;
     private static ApplicationContext applicationContext;
     private ContractIdGenerator clientContractIdGenerator;
+    private AutoReportGenerator autoReportGenerator;
+    private ExecutorService executorService;
+    private Scheduler scheduler;
+    private RuleProcessor autoReportProcessor;
+    private Postman postman;
 
 
 
@@ -96,6 +116,109 @@ public class RuntimeContext implements ApplicationContextAware {
         RuntimeContext.applicationContext = applicationContext;
     }
 
+    private static Scheduler createScheduler(Properties properties) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating application-wide job scheduler.");
+        }
+        Object threadPoolClass = properties.get("org.quartz.threadPool.class");
+        if (threadPoolClass == null || ((String) threadPoolClass).length() < 1) {
+            properties.put("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
+            properties.put("org.quartz.threadPool.threadCount", "4");
+            properties.put("org.quartz.jobStore.class", "org.quartz.simpl.RAMJobStore");
+        }
+        StdSchedulerFactory schedulerFactory = new StdSchedulerFactory(properties);
+        Scheduler scheduler = schedulerFactory.getScheduler();
+        scheduler.start();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Application-wide job scheduler created.");
+        }
+        return scheduler;
+    }
+
+    private static ExecutorService createExecutorService(Properties properties) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating application-wide executor service.");
+        }
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Application-wide executor service created.");
+        }
+        return executorService;
+    }
+
+    private static AutoReportGenerator createAutoReportGenerator(String basePath, Properties properties,
+            ExecutorService executorService, Scheduler scheduler,
+            AutoReportProcessor autoReportProcessor) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating auto report generator.");
+        }
+        TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
+        Calendar calendar = Calendar.getInstance(localTimeZone);
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        dateFormat.setTimeZone(localTimeZone);
+        timeFormat.setTimeZone(localTimeZone);
+
+        Properties reportProperties = new Properties();
+        Enumeration<?> propertyNames = properties.propertyNames();
+        while (propertyNames.hasMoreElements()) {
+            String key = (String) propertyNames.nextElement();
+            if (StringUtils.startsWith(key, REPORT_PARAM_BASE_KEY)) {
+                String value = properties.getProperty(key);
+                reportProperties.setProperty(StringUtils.substringAfter(key, REPORT_PARAM_BASE_KEY), value);
+            }
+        }
+
+        AutoReportGenerator generator = new AutoReportGenerator(basePath, executorService, scheduler, sessionFactory,
+                autoReportProcessor, calendar, properties.getProperty(AUTO_REPORT_PARAM_BASE + ".path"), dateFormat,
+                timeFormat, reportProperties);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Auto report generator created.");
+        }
+        return generator;
+    }
+
+    private static RuleProcessor createRuleHandler(Properties properties, SessionFactory sessionFactory,
+            AutoReportPostman autoReportPostman, Postman eventNotificationPostman) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating discountrule processor.");
+        }
+        RuleProcessor ruleProcessor = new RuleProcessor(sessionFactory, autoReportPostman, eventNotificationPostman);
+        ruleProcessor.loadAutoReportRules();
+        ruleProcessor.loadEventNotificationRules();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Rule processor created.");
+        }
+        return ruleProcessor;
+    }
+
+    private static Postman.MailSettings readMailSettings(Properties properties, String baseParam) throws Exception {
+        String smtpBaseParam = baseParam + ".smtp";
+        String startTLS = properties.getProperty(smtpBaseParam + ".starttls");
+        Postman.SmtpSettings smtpSettings = new Postman.SmtpSettings(properties.getProperty(smtpBaseParam + ".host"),
+                Integer.parseInt(properties.getProperty(smtpBaseParam + ".port", "25")),
+                StringUtils.equals(startTLS, "true"), properties.getProperty(smtpBaseParam + ".user"),
+                properties.getProperty(smtpBaseParam + ".password"));
+        String copyAddress = properties.getProperty(baseParam + ".copy");
+        return new Postman.MailSettings(smtpSettings, new InternetAddress(properties.getProperty(baseParam + ".from")),
+                null == copyAddress ? null : new InternetAddress(copyAddress));
+    }
+
+    private static Postman createPostman(Properties properties, SessionFactory sessionFactory) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating postman.");
+        }
+        Postman.MailSettings reportMailSettings = readMailSettings(properties, AUTO_REPORT_MAIL_PARAM_BASE);
+        Postman.MailSettings supportMailSettings = readMailSettings(properties, SUPPORT_MAIL_PARAM_BASE);
+        Postman postman = new Postman(reportMailSettings, supportMailSettings);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Postman created.");
+        }
+        return postman;
+    }
+
 
 
 
@@ -108,12 +231,28 @@ public class RuntimeContext implements ApplicationContextAware {
     public void init() throws Exception {
         applicationContext.getBean(this.getClass()).initDB();
 
+        String basePath = "/";
+
         Properties properties = new Properties();
+
+
+        /*executorService = createExecutorService(properties);
+        scheduler = createScheduler(properties);
+        postman = createPostman(properties, sessionFactory);
+        autoReportProcessor = createRuleHandler(properties, sessionFactory, postman, postman);*/
+
+
         this.clientContractIdGenerator = createClientContractIdGenerator(properties, sessionFactory);
+        /*this.autoReportGenerator = createAutoReportGenerator(basePath, properties, executorService, scheduler,
+                autoReportProcessor);*/
     }
 
     public ContractIdGenerator getClientContractIdGenerator() {
         return clientContractIdGenerator;
+    }
+
+    public AutoReportGenerator getAutoReportGenerator() {
+        return autoReportGenerator;
     }
 
     private static ContractIdGenerator createClientContractIdGenerator(Properties properties,
@@ -152,6 +291,10 @@ public class RuntimeContext implements ApplicationContextAware {
 
     public static void setSessionFactory(SessionFactory sessionFactory) {
         RuntimeContext.sessionFactory = sessionFactory;
+    }
+
+    public RuleProcessor getAutoReportProcessor() {
+        return autoReportProcessor;
     }
 
     @Transactional
