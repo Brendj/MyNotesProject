@@ -21,10 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ClientManager {
 
@@ -721,4 +718,65 @@ public class ClientManager {
         }
 
     }
+
+    /**
+     * Метод возвращает список клиентов, ко/ые для данной школы являются чужими.
+     * Этими клиентами могут быть ученики, администрация и т.д. из чужой школы.
+     * @param session - экземпляр Session.
+     * @param destinationOrg - организация (школа), в ко/ой ищем чужих клиентов.
+     * @return - список клиентов.
+     */
+
+    @SuppressWarnings("unchecked")
+    public static List<Client> findTemporaryClients(Session session, Org destinationOrg) {
+        List<Client> res = new ArrayList<Client>();
+        Criteria cr = session.createCriteria(ClientAllocationRule.class);
+        cr.add(Restrictions.eq("destinationOrg", destinationOrg));
+        List<ClientAllocationRule> list = cr.list();
+        for (ClientAllocationRule rule : list) {
+            if (rule.isTempClient()) {
+                Org clientOrg = rule.getSourceOrg();
+                if (clientOrg.getFriendlyOrg().isEmpty()) {
+                    findMatchedClients(clientOrg, rule.getGroupFilter(), res);
+                } else {
+                    for (Org friendlyOrg : clientOrg.getFriendlyOrg()) {
+                        findMatchedClients(friendlyOrg, rule.getGroupFilter(), res);
+                    }
+                }
+            }
+        }
+        return res;
+    }
+
+    public static void findMatchedClients(Org clientOrg, String regExp, List<Client> clientList) {
+        for (Client client : clientOrg.getClients()) {
+            boolean addClient =
+                    client.getClientGroup() != null && client.getClientGroup().getGroupName().matches(regExp);
+            if (addClient) {
+                clientList.add(client);
+            }
+        }
+    }
+
+    public static void updateClientVersionTransactional(Session session, Collection<Client> clients) {
+        Transaction tr = null;
+        try {
+            tr = session.beginTransaction();
+            updateClientVersion(session, clients);
+            tr.commit();
+        } catch (Exception ex) {
+            HibernateUtils.rollback(tr, logger);
+            logger.error(ex.getMessage());
+            throw new RuntimeException(ex.getMessage());
+        }
+    }
+
+    public static void updateClientVersion(Session session, Collection<Client> clients) throws Exception {
+        for (Client client : clients) {
+            Long version = DAOUtils.updateClientRegistryVersion(session);
+            client.setClientRegistryVersion(version);
+            session.update(client);
+        }
+    }
+
 }

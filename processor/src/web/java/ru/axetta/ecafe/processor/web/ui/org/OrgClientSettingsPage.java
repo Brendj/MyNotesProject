@@ -3,6 +3,7 @@ package ru.axetta.ecafe.processor.web.ui.org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,19 +23,22 @@ import java.util.Map;
  */
 @Component
 @Scope("session")
-public class OrgClientSettingsPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList{
+public class OrgClientSettingsPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList, OrgSelectPage.CompleteHandler {
 
     private static Logger logger = LoggerFactory.getLogger(OrgClientSettingsPage.class);
     private List<Long> idOfOrgList = new ArrayList<Long>(0);
 
     @Autowired
     private DAOService daoService;
+    @Autowired
+    private ClientAllocationRulesPage rulesPage;
     private String filter = "Не выбрано";
 
     @Override
     public void onShow() throws Exception {
         filter = "Не выбрано";
         idOfOrgList.clear();
+        rulesPage.onShow();
     }
 
     public Object applyFullSyncOperation(){
@@ -64,6 +67,11 @@ public class OrgClientSettingsPage extends BasicWorkspacePage implements OrgList
                 filter = filter.substring(0, filter.length() - 2);
             }
         }
+    }
+
+    @Override
+    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
+        rulesPage.completeOrgSelection(session, idOfOrg);
     }
 
     @Override

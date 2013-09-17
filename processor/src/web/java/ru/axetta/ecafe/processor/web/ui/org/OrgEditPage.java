@@ -5,13 +5,14 @@
 package ru.axetta.ecafe.processor.web.ui.org;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
-import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderSelect;
+import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
+import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
 
 import org.hibernate.Session;
 
@@ -171,12 +172,8 @@ public class OrgEditPage extends BasicWorkspacePage
                 for (Org o: friendlyOrg){
                     int count = DAOUtils.clearFriendlyOrgByOrg(session, o.getIdOfOrg());
                 }
-                for (Org o: selectOrg){
-                    for (Client client: o.getClients()){
-                        long version = DAOUtils.updateClientRegistryVersion(session);
-                        client.setClientRegistryVersion(version);
-                        session.update(client);
-                    }
+                for (Org o : selectOrg) {
+                    ClientManager.updateClientVersion(session, o.getClients());
                     o.setFriendlyOrg(selectOrg);
                 }
             }

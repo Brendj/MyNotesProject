@@ -13,6 +13,7 @@ import java.io.Serializable;
  * Time: 12:55
  * To change this template use File | Settings | File Templates.
  */
+@Deprecated
 public class CompositeIdOfPublication implements Serializable {
     private long idOfPublication;
     private long idOfOrg;

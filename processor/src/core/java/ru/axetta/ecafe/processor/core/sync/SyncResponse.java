@@ -7,11 +7,11 @@ package ru.axetta.ecafe.processor.core.sync;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
+import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.response.DirectiveElement;
 import ru.axetta.ecafe.processor.core.sync.response.GoodsBasicBasketData;
-import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.response.QuestionaryData;
 
 import org.apache.commons.lang.StringUtils;
@@ -322,6 +322,7 @@ public class SyncResponse {
             private final boolean canConfirmGroupPayment;
             private final int discountMode;
             private final String guid;
+            private boolean tempClient;
 
             public Item(Client client) {
                 this.idOfClient = client.getIdOfClient();
@@ -347,6 +348,11 @@ public class SyncResponse {
                 this.discountMode = client.getDiscountMode();
                 this.guid = client.getClientGUID();
                 if (this.clientGroup!=null) this.clientGroup.getGroupName(); // lazy load
+            }
+
+            public Item(Client client, boolean tempClient) {
+                this(client);
+                this.tempClient = tempClient;
             }
 
             public ClientGroup getClientGroup(){
@@ -409,6 +415,10 @@ public class SyncResponse {
                 return canConfirmGroupPayment;
             }
 
+            public boolean isTempClient() {
+                return tempClient;
+            }
+
             public Element toElement(Document document) throws Exception {
                 Element element = document.createElement("CC");
                 element.setAttribute("IdOfClient", Long.toString(this.idOfClient));
@@ -438,7 +448,9 @@ public class SyncResponse {
                 }
                 element.setAttribute("DiscountMode", Integer.toString(this.discountMode));
                 element.setAttribute("CategoriesDiscounts", this.categoriesDiscounts);
-
+                if (this.tempClient) {
+                    element.setAttribute("IsTempClient", "1");
+                }
                 if (this.clientGroup != null) {
 			        element.setAttribute("GroupName", this.clientGroup.getGroupName());
                 }
@@ -458,6 +470,11 @@ public class SyncResponse {
         }
 
         private final List<Item> items = new ArrayList<Item>();
+        private final List<Long> activeClientsId = new ArrayList<Long>();
+
+        public void addActiveClientId(Long id) {
+            activeClientsId.add(id);
+        }
 
         public void addItem(Item item) throws Exception {
             this.items.add(item);
@@ -471,6 +488,15 @@ public class SyncResponse {
             Element element = document.createElement("ClientRegistry");
             for (Item item : this.items) {
                 element.appendChild(item.toElement(document));
+            }
+            if (activeClientsId.size() != 0) {
+                Element actClElem = document.createElement("ActiveClients");
+                for (Long id : activeClientsId) {
+                    Element idElem = document.createElement("Client");
+                    idElem.setAttribute("IdOfClient", id.toString());
+                    actClElem.appendChild(idElem);
+                }
+                element.appendChild(actClElem);
             }
             return element;
         }

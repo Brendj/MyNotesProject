@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.client.request.ClientRequest
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperationBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
@@ -1741,18 +1742,25 @@ public class SyncRequest {
             public ClientRegistryRequest build(Node clientRegistryRequestNode) throws Exception {
                 long currentVersion = Long.parseLong(
                         clientRegistryRequestNode.getAttributes().getNamedItem("CurrentVersion").getTextContent());
-                return new ClientRegistryRequest(currentVersion);
+                Long currentCount = XMLUtils.getLongAttributeValue(clientRegistryRequestNode, "CurrentCount");
+                return new ClientRegistryRequest(currentVersion, currentCount);
             }
         }
 
         private final long currentVersion;
+        private final Long currentCount;
 
-        public ClientRegistryRequest(long currentVersion) {
+        public ClientRegistryRequest(long currentVersion, Long currentCount) {
             this.currentVersion = currentVersion;
+            this.currentCount = currentCount;
         }
 
         public long getCurrentVersion() {
             return currentVersion;
+        }
+
+        public Long getCurrentCount() {
+            return currentCount;
         }
 
         @Override

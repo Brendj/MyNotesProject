@@ -28,6 +28,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOpera
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardRequestProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoleProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
+import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardOperationProcessor;
@@ -35,7 +36,6 @@ import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCa
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.response.DirectiveElement;
 import ru.axetta.ecafe.processor.core.sync.response.GoodsBasicBasketData;
-import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.response.QuestionaryData;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
@@ -2003,7 +2003,7 @@ public class Processor implements SyncProcessor,
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
-            List clients;
+            List<Client> clients;
             if (organization.getFriendlyOrg() == null || organization.getFriendlyOrg().isEmpty()) {
                 clients = DAOUtils.findNewerClients(persistenceSession, organization, clientRegistryRequest.getCurrentVersion());
             } else {
@@ -2011,12 +2011,25 @@ public class Processor implements SyncProcessor,
                 orgList.add(organization);
                 clients = DAOUtils.findNewerClients(persistenceSession, orgList, clientRegistryRequest.getCurrentVersion());
             }
-
-            for (Object object : clients) {
-                Client client = (Client) object;
+            for (Client client : clients) {
                 clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client));
             }
-
+            // Добавляем временных клиентов.
+            List<Client> tempClients = ClientManager.findTemporaryClients(persistenceSession, organization);
+            for (Client tempClient : tempClients) {
+                clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(tempClient, true));
+            }
+            // "при отличии количества активных клиентов в базе админки от клиентов, которые должны быть у данной организации
+            // с учетом дружественных и правил - выдаем список идентификаторов всех клиентов в отдельном теге"
+            if (clientRegistryRequest.getCurrentCount() != null
+                    && (clients.size() + tempClients.size()) != clientRegistryRequest.getCurrentCount()) {
+                for (Client cl : clients) {
+                    clientRegistry.addActiveClientId(cl.getIdOfClient());
+                }
+                for (Client cl : tempClients) {
+                    clientRegistry.addActiveClientId(cl.getIdOfClient());
+                }
+            }
             if(!errorClientIds.isEmpty()){
                 List errorClients = DAOUtils.fetchErrorClientsWithOutFriendlyOrg(persistenceSession, organization.getFriendlyOrg(), errorClientIds);
                 ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistenceSession, organization.getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
