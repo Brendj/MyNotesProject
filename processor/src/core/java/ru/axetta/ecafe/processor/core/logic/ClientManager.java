@@ -724,12 +724,11 @@ public class ClientManager {
      * Этими клиентами могут быть ученики, администрация и т.д. из чужой школы.
      * @param session - экземпляр Session.
      * @param destinationOrg - организация (школа), в ко/ой ищем чужих клиентов.
-     * @param registryVersion - фильтр по полю clientRegistryVersion
      * @return - список клиентов.
      */
 
     @SuppressWarnings("unchecked")
-    public static List<Client> findTemporaryClients(Session session, Org destinationOrg, long registryVersion) {
+    public static List<Client> findTemporaryClients(Session session, Org destinationOrg) {
         List<Client> res = new ArrayList<Client>();
         Criteria cr = session.createCriteria(ClientAllocationRule.class);
         cr.add(Restrictions.eq("destinationOrg", destinationOrg));
@@ -744,13 +743,6 @@ public class ClientManager {
                         findMatchedClients(friendlyOrg, rule.getGroupFilter(), res);
                     }
                 }
-            }
-        }
-        Iterator<Client> iter = res.iterator();
-        while (iter.hasNext()) {
-            Client cl = iter.next();
-            if (cl.getClientRegistryVersion() <= registryVersion) {
-                iter.remove();
             }
         }
         return res;

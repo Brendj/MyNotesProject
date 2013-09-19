@@ -129,22 +129,24 @@ public class DAOUtils {
 
     /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
     @SuppressWarnings("unchecked")
-    public static List<Client> findNewerClients(Session persistenceSession, Collection<Org> organizations, long clientRegistryVersion)
-            throws Exception {
-        Query query = persistenceSession.createQuery("from Client cl where (cl.idOfClientGroup is null or cl.idOfClientGroup !=1100000060 or cl.idOfClientGroup !=1100000070)  and cl.org in :orgs and clientRegistryVersion>:version");
-        query.setParameter("version", clientRegistryVersion);
-        query.setParameterList("orgs", organizations);
+    public static List<Client> findNewerClients(Session session, Collection<Org> orgs, long clientRegistryVersion) {
+        Query query = session.createQuery(
+                "from Client cl where (cl.idOfClientGroup not in (:cg) or cl.idOfClientGroup is null) and cl.org in (:orgs) and clientRegistryVersion > :version")
+                .setParameterList("cg", new Long[]{
+                        ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
+                        ClientGroup.Predefined.CLIENT_DELETED.getValue()})
+                .setParameter("version", clientRegistryVersion).setParameterList("orgs", orgs);
         return (List<Client>) query.list();
     }
 
-    /* TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
     @SuppressWarnings("unchecked")
-    public static List<Client> findNewerClients(Session persistenceSession, Org organization, long clientRegistryVersion)
-            throws Exception {
-        Query query = persistenceSession.createQuery("from Client cl where (cl.idOfClientGroup is null or cl.idOfClientGroup !=1100000060 or cl.idOfClientGroup !=1100000070)  and cl.org in :orgs and clientRegistryVersion>:version");
-        query.setParameter("version", clientRegistryVersion);
-        query.setParameter("orgs", organization);
-        return (List<Client>) query.list();
+    public static List<Long> findActiveClientsId(Session session, List<Org> orgList) {
+        Query query = session.createQuery(
+                "select cl.idOfClient from Client cl where cl.org in (:orgList) and (cl.idOfClientGroup not in (:cg) or cl.idOfClientGroup is null)")
+                .setParameterList("orgList", orgList)
+                .setParameterList("cg", Arrays.asList(ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
+                        ClientGroup.Predefined.CLIENT_DELETED.getValue()));
+        return (List<Long>) query.list();
     }
 
     public static Org findOrg(Session persistenceSession, long idOfOrg) throws Exception {

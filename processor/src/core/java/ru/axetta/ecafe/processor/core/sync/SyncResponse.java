@@ -490,13 +490,13 @@ public class SyncResponse {
                 element.appendChild(item.toElement(document));
             }
             if (activeClientsId.size() != 0) {
-                Element actClElem = document.createElement("ActiveClients");
+                Element activeClientsElem = document.createElement("ActiveClients");
                 for (Long id : activeClientsId) {
-                    Element idElem = document.createElement("Client");
-                    idElem.setAttribute("IdOfClient", id.toString());
-                    actClElem.appendChild(idElem);
+                    Element elem = document.createElement("Client");
+                    elem.setAttribute("IdOfClient", id.toString());
+                    activeClientsElem.appendChild(elem);
                 }
-                element.appendChild(actClElem);
+                element.appendChild(activeClientsElem);
             }
             return element;
         }

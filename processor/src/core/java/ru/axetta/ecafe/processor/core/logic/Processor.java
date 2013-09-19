@@ -2003,32 +2003,27 @@ public class Processor implements SyncProcessor,
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
-            List<Client> clients;
-            if (organization.getFriendlyOrg() == null || organization.getFriendlyOrg().isEmpty()) {
-                clients = DAOUtils.findNewerClients(persistenceSession, organization, clientRegistryRequest.getCurrentVersion());
-            } else {
-                List<Org> orgList = new ArrayList<Org>(organization.getFriendlyOrg());
-                orgList.add(organization);
-                clients = DAOUtils.findNewerClients(persistenceSession, orgList, clientRegistryRequest.getCurrentVersion());
-            }
+            List<Org> orgList = new ArrayList<Org>(organization.getFriendlyOrg());
+            orgList.add(organization);
+            List<Client> clients = DAOUtils.findNewerClients(persistenceSession, orgList, clientRegistryRequest.getCurrentVersion());
             for (Client client : clients) {
                 clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client));
             }
-            // Добавляем временных клиентов.
-            List<Client> tempClients = ClientManager
-                    .findTemporaryClients(persistenceSession, organization, clientRegistryRequest.getCurrentVersion());
-            for (Client tempClient : tempClients) {
-                clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(tempClient, true));
+            List<Long> activeClientsId = DAOUtils.findActiveClientsId(persistenceSession, orgList);
+            // Получаем временных клиентов.
+            List<Client> tempClients = ClientManager.findTemporaryClients(persistenceSession, organization);
+            for (Client cl : tempClients) {
+                if (cl.getClientRegistryVersion() > clientRegistryRequest.getCurrentVersion()) {
+                    clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(cl, true));
+                }
+                activeClientsId.add(cl.getIdOfClient());
             }
             // "при отличии количества активных клиентов в базе админки от клиентов, которые должны быть у данной организации
             // с учетом дружественных и правил - выдаем список идентификаторов всех клиентов в отдельном теге"
-            if (clientRegistryRequest.getCurrentCount() != null
-                    && (clients.size() + tempClients.size()) != clientRegistryRequest.getCurrentCount()) {
-                for (Client cl : clients) {
-                    clientRegistry.addActiveClientId(cl.getIdOfClient());
-                }
-                for (Client cl : tempClients) {
-                    clientRegistry.addActiveClientId(cl.getIdOfClient());
+            if (clientRegistryRequest.getCurrentCount() != null && activeClientsId.size() != clientRegistryRequest
+                    .getCurrentCount()) {
+                for (Long id : activeClientsId) {
+                    clientRegistry.addActiveClientId(id);
                 }
             }
             if(!errorClientIds.isEmpty()){
