@@ -50,7 +50,8 @@ function checkReporitoryDate () {
                 <rich:calendar value="#{reportRepositoryListPage.filter.createdDate}" datePattern="dd.MM.yyyy"
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
                 <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
-                <rich:calendar id="startDate" onchanged="if(#{rich:component('startDate')}.getSelectedDate().getTime() > #{rich:component('endDate')}.getSelectedDate().getTime()) { #{rich:component('startDate')}.selectDate(#{rich:component('endDate')}.getSelectedDate()) }"
+                <rich:calendar id="startDate" value="#{reportRepositoryListPage.filter.startDate}"
+                               onchanged="if(#{rich:component('startDate')}.getSelectedDate().getTime() > #{rich:component('endDate')}.getSelectedDate().getTime()) { #{rich:component('startDate')}.selectDate(#{rich:component('endDate')}.getSelectedDate()) }"
                                datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
                 <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
                 <rich:calendar id="endDate" onchanged="if(#{rich:component('startDate')}.getSelectedDate().getTime() > #{rich:component('endDate')}.getSelectedDate().getTime()) { #{rich:component('startDate')}.selectDate(#{rich:component('endDate')}.getSelectedDate()) }"

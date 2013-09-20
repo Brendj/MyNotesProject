@@ -19,6 +19,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
 
 import javax.persistence.EntityManager;
+import java.util.Calendar;
 import java.util.Date;
 
 public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
@@ -56,7 +57,12 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
                 crit.add(Restrictions.ge("startDate", CalendarUtils.truncateToDayOfMonth(startDate)));
                 if (endDate==null) endDate = CalendarUtils.addOneDay(startDate);
             }
-            if (endDate!=null) crit.add(Restrictions.le("endDate", CalendarUtils.truncateToDayOfMonth(endDate)));
+            if (endDate!=null) {
+                Calendar localCalendar = Calendar.getInstance();
+                localCalendar.setTime(endDate);
+                localCalendar.add(Calendar.DAY_OF_MONTH,1);
+                crit.add(Restrictions.le("endDate", CalendarUtils.truncateToDayOfMonth(localCalendar.getTime())));
+            }
         }
 
         public String getRuleName() {
