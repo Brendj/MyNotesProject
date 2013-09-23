@@ -60,8 +60,7 @@ public abstract class BasicReportForOrgJob extends BasicReportJob {
                     for (Object object : allOrgs) {
                         Org org = (Org) object;
                         if (getLogger().isDebugEnabled()) {
-                            getLogger().debug(String.format("Building report \"%s\" for org: %s", classPropertyValue,
-                                    org.getIdOfOrg()));
+                            getLogger().debug(String.format("Building report \"%s\" for org: %s", classPropertyValue, org));
                         }
                         Properties properties = new Properties();
                         ReportPropertiesUtils.addProperties(properties, getMyClass(), autoReportBuildTask);

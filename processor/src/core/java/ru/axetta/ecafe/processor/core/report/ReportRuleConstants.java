@@ -150,7 +150,7 @@ public class ReportRuleConstants {
             new ParamHint(ReportPropertiesUtils.P_JOB_NAME, "Название задачи"),
             new ParamHint(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID, "Контрагент-получатель").setDefaultRule("= contragent:"), //30,
             new ParamHint("idOfContragent", "Агент по приему платежей").setDefaultRule("= contragent-payagent:"),
-            new ParamHint("reportPeriodType", "Период"),
+            new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE, "Период"),
             // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
             /*new ParamHint("idOfContract", "Контракт"),
             new ParamHint("listValue", "Какое-то значение из списка").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION + "{111}один,{222}два,{333}три"),
@@ -177,7 +177,7 @@ public class ReportRuleConstants {
             new ReportHint(OrgOrderByDaysReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23}),
             new ReportHint(AutoEnterEventReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23, 24}),
             new ReportHint(AutoEnterEventByDaysReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23, 24}),
-            new ReportHint(DailySalesByGroupsReport.class.getCanonicalName(), new int[]{28, -29, -3, 22, -23, 25, 26, 27, 32}),
+            new ReportHint(DailySalesByGroupsReport.class.getCanonicalName(), new int[]{28, -29, 3, 22, 23, 25, 26, 27, 32}),
             new ReportHint(ClientOrderDetailsByOneOrgReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(RegisterStampReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(ComplaintCountByGoodReport.class.getCanonicalName(), new int[]{3, 4, 5}),

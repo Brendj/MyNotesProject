@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
 import ru.axetta.ecafe.processor.core.report.msc.BeneficiarySummaryReport;
 import ru.axetta.ecafe.processor.core.report.msc.HalfYearSummaryReport;
 import ru.axetta.ecafe.processor.core.report.msc.MscSalesReport;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -119,7 +120,7 @@ public class ReportJobConstants {
             new ParamHint("idOfMenuSourceOrg", "Идентификатор организации - источника меню"),
             new ParamHint("enterEventType", "Тип отчета по посещаемости: все/учащиеся/все_без_учащихся"),
             new ParamHint("groupByMenuGroup", "Группировка отчета по товарным группам"),//25
-            new ParamHint("reportPeriodType", "Тип периода"),
+            new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE, "Тип периода"),
             // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
             /*new ParamHint("idOfContract", "Контракт"),
             new ParamHint("listValue", "Какое-то значение из списка").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION + "{111}один,{222}два,{333}три"),
