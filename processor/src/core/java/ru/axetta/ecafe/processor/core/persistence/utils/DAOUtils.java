@@ -15,6 +15,7 @@ import ru.axetta.ecafe.util.DigitalSignatureUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.*;
+import org.hibernate.Query;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
@@ -23,8 +24,7 @@ import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.*;
@@ -1459,4 +1459,13 @@ public class DAOUtils {
         return new HashSet<Org>(query.list());
     }
 
+    @SuppressWarnings("unchecked")
+    public static List<Object[]> getClientInOrgTimes(EntityManager em, long idOfClient, Date from, Date to) {
+        javax.persistence.Query q = em.createNativeQuery(
+                "select date_trunc('day', to_timestamp(evtdatetime/1000)), (max(evtdatetime)-min(evtdatetime))/1000  from cf_enterevents where idofclient=:idOfClient and evtdatetime>=:fromTime and evtdatetime<=:toTime group by date_trunc('day', to_timestamp(evtdatetime/1000)) order by 1");
+        q.setParameter("idOfClient", idOfClient);
+        q.setParameter("fromTime", from.getTime());
+        q.setParameter("toTime", to.getTime());
+        return (List<Object[]>)q.getResultList();
+    }
 }

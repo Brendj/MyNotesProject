@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
+import ru.axetta.ecafe.processor.core.client.ClientStatsReporter;
 import ru.axetta.ecafe.processor.core.client.RequestWebParam;
 import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService;
 import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
@@ -97,7 +98,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_CAN_NOT_CONFIRM_PAYMENT_DESC = "Лицевой счет не может подтвердить оплату";
 
 
-
     @Resource
     private WebServiceContext context;
 
@@ -182,12 +182,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (!bookEntries.isEmpty()) {
                 for (Object entry : bookEntries) {
                     GoodComplaintBook goodComplaintBook = (GoodComplaintBook) entry;
-                    ListOfComplaintBookEntriesExt listOfComplaintBookEntriesExt = objectFactory.createListOfComplaintBookEntriesExt();
+                    ListOfComplaintBookEntriesExt listOfComplaintBookEntriesExt = objectFactory
+                            .createListOfComplaintBookEntriesExt();
 
                     listOfComplaintBookEntriesExt.setContractId(goodComplaintBook.getClient().getContractId());
                     listOfComplaintBookEntriesExt.setGuid(goodComplaintBook.getGuid());
                     listOfComplaintBookEntriesExt.setDeletedState(goodComplaintBook.getDeletedState());
-                    listOfComplaintBookEntriesExt.setCreatedDate(getXMLGregorianCalendarByDate(goodComplaintBook.getCreatedDate()));
+                    listOfComplaintBookEntriesExt
+                            .setCreatedDate(getXMLGregorianCalendarByDate(goodComplaintBook.getCreatedDate()));
                     listOfComplaintBookEntriesExt.setOrgOwner(goodComplaintBook.getOrgOwner());
                     listOfComplaintBookEntriesExt.setGuidOfGood(goodComplaintBook.getGood().getGuid());
                     listOfComplaintBookEntriesExt.setNameOfGood(goodComplaintBook.getGood().getNameOfGood());
@@ -201,17 +203,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     if (!iterations.isEmpty()) {
                         for (Object iterObject : iterations) {
                             GoodComplaintIterations iteration = (GoodComplaintIterations) iterObject;
-                            ListOfComplaintIterationsExt listOfComplaintIterationsExt = objectFactory.createListOfComplaintIterationsExt();
+                            ListOfComplaintIterationsExt listOfComplaintIterationsExt = objectFactory
+                                    .createListOfComplaintIterationsExt();
 
                             listOfComplaintIterationsExt.setIterationNumber(iteration.getIterationNumber());
-                            listOfComplaintIterationsExt.setIterationStatus(
-                                    iteration.getGoodComplaintIterationStatus().getStatusNumber());
+                            listOfComplaintIterationsExt
+                                    .setIterationStatus(iteration.getGoodComplaintIterationStatus().getStatusNumber());
                             listOfComplaintIterationsExt.setProblemDescription(iteration.getProblemDescription());
                             listOfComplaintIterationsExt.setConclusion(iteration.getConclusion());
                             listOfComplaintIterationsExt.setGuid(iteration.getGuid());
                             listOfComplaintIterationsExt.setDeletedState(iteration.getDeletedState());
-                            listOfComplaintIterationsExt.setCreatedDate(getXMLGregorianCalendarByDate(
-                                    iteration.getCreatedDate()));
+                            listOfComplaintIterationsExt
+                                    .setCreatedDate(getXMLGregorianCalendarByDate(iteration.getCreatedDate()));
                             listOfComplaintIterationsExt.setOrgOwner(iteration.getOrgOwner());
 
                             ListOfComplaintOrders listOfComplaintOrders = new ListOfComplaintOrders();
@@ -222,14 +225,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             List orders = orderCriteria.list();
                             for (Object orderObject : orders) {
                                 GoodComplaintOrders order = (GoodComplaintOrders) orderObject;
-                                ListOfComplaintOrdersExt listOfComplaintOrdersExt = objectFactory.createListOfComplaintOrdersExt();
+                                ListOfComplaintOrdersExt listOfComplaintOrdersExt = objectFactory
+                                        .createListOfComplaintOrdersExt();
 
                                 OrderDetail orderDetail = order.getOrderDetail();
-                                listOfComplaintOrdersExt.setIdOfOrderDetail(orderDetail.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
+                                listOfComplaintOrdersExt.setIdOfOrderDetail(
+                                        orderDetail.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
                                 listOfComplaintOrdersExt.setMenuDetailName(orderDetail.getMenuDetailName());
-                                listOfComplaintOrdersExt.setDateOfOrder(getXMLGregorianCalendarByDate(order.getOrderDetail().getOrder().getCreateTime()));
+                                listOfComplaintOrdersExt.setDateOfOrder(getXMLGregorianCalendarByDate(
+                                        order.getOrderDetail().getOrder().getCreateTime()));
                                 listOfComplaintOrdersExt.setGuid(order.getGuid());
-                                listOfComplaintOrdersExt.setCreatedDate(getXMLGregorianCalendarByDate(order.getCreatedDate()));
+                                listOfComplaintOrdersExt
+                                        .setCreatedDate(getXMLGregorianCalendarByDate(order.getCreatedDate()));
                                 listOfComplaintOrdersExt.setDeletedState(order.getDeletedState());
                                 listOfComplaintOrdersExt.setOrgOwner(order.getOrgOwner());
 
@@ -244,12 +251,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             List causes = causeCriteria.list();
                             for (Object causeObject : causes) {
                                 GoodComplaintCauses cause = (GoodComplaintCauses) causeObject;
-                                ListOfComplaintCausesExt listOfComplaintCausesExt = objectFactory.createListOfComplaintCausesExt();
+                                ListOfComplaintCausesExt listOfComplaintCausesExt = objectFactory
+                                        .createListOfComplaintCausesExt();
 
                                 listOfComplaintCausesExt.setCause(cause.getCause().getCauseNumber());
                                 listOfComplaintCausesExt.setCauseDescription(cause.getTitle());
                                 listOfComplaintCausesExt.setGuid(cause.getGuid());
-                                listOfComplaintCausesExt.setCreatedDate(getXMLGregorianCalendarByDate(cause.getCreatedDate()));
+                                listOfComplaintCausesExt
+                                        .setCreatedDate(getXMLGregorianCalendarByDate(cause.getCreatedDate()));
                                 listOfComplaintCausesExt.setDeletedState(cause.getDeletedState());
                                 listOfComplaintCausesExt.setOrgOwner(cause.getOrgOwner());
 
@@ -281,7 +290,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public IdResult openComplaint(Long contractId, Long orderOrgId, List<Long> orderDetailIdList, List<Integer> causeNumberList, String description) {
+    public IdResult openComplaint(Long contractId, Long orderOrgId, List<Long> orderDetailIdList,
+            List<Integer> causeNumberList, String description) {
         authenticateRequest(null);
 
         IdResult result = new IdResult();
@@ -321,9 +331,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
             Good problematicGood = null;
-            List<GoodComplaintOrders> goodComplaintOrdersList = new ArrayList<GoodComplaintOrders>(orderDetailIdList.size());
+            List<GoodComplaintOrders> goodComplaintOrdersList = new ArrayList<GoodComplaintOrders>(
+                    orderDetailIdList.size());
             for (Long idOfOrderDetail : orderDetailIdList) {
-                CompositeIdOfOrderDetail compositeIdOfOrderDetail = new CompositeIdOfOrderDetail(orderOrg.getIdOfOrg(), idOfOrderDetail);
+                CompositeIdOfOrderDetail compositeIdOfOrderDetail = new CompositeIdOfOrderDetail(orderOrg.getIdOfOrg(),
+                        idOfOrderDetail);
                 OrderDetail orderDetail = DAOUtils.findOrderDetail(persistenceSession, compositeIdOfOrderDetail);
                 if (orderDetail == null) {
                     result.resultCode = RC_INTERNAL_ERROR;
@@ -332,7 +344,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
 
                 // Проверка, существует ли Заказ, совершенный указанным клиентом и содержащий данную деталь заказа
-                CompositeIdOfOrder compositeIdOfOrder = new CompositeIdOfOrder(client.getOrg().getIdOfOrg(), orderDetail.getIdOfOrder());
+                CompositeIdOfOrder compositeIdOfOrder = new CompositeIdOfOrder(client.getOrg().getIdOfOrg(),
+                        orderDetail.getIdOfOrder());
                 Criteria orderCriteria = persistenceSession.createCriteria(Order.class);
                 orderCriteria.add(Restrictions.eq("compositeIdOfOrder", compositeIdOfOrder));
                 Order order = (Order) orderCriteria.uniqueResult();
@@ -346,7 +359,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 if (goodFromOrder == null) {
                     result.resultCode = RC_INTERNAL_ERROR;
                     result.description = "У переданного элемента списка деталей заказов с идентификатором " +
-                            + orderDetail.getIdOfOrder() + " не указана ссылка на товар";
+                            +orderDetail.getIdOfOrder() + " не указана ссылка на товар";
                     return result;
                 }
 
@@ -392,7 +405,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 GoodComplaintIterations lastIteration = null;
                 for (Object iterationObject : iterationObjects) {
                     GoodComplaintIterations currentIteration = (GoodComplaintIterations) iterationObject;
-                    if ((null == lastIteration) || (currentIteration.getIterationNumber() > lastIteration.getIterationNumber())) {
+                    if ((null == lastIteration) || (currentIteration.getIterationNumber() > lastIteration
+                            .getIterationNumber())) {
                         lastIteration = currentIteration;
                     }
                 }
@@ -401,8 +415,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     result.description = RC_INTERNAL_ERROR_DESC;
                     return result;
                 }
-                if (!GoodComplaintIterationStatus
-                        .conclusion.equals(lastIteration.getGoodComplaintIterationStatus())) {
+                if (!GoodComplaintIterationStatus.conclusion.equals(lastIteration.getGoodComplaintIterationStatus())) {
                     result.resultCode = RC_INTERNAL_ERROR;
                     result.description = "По жалобе с указанным идентификатором еще не было вынесено заключения";
                     return result;
@@ -441,11 +454,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 } else {
                     parsedCauseNumberList.add(causeNumber);
                 }
-                GoodComplaintPossibleCauses cause = GoodComplaintPossibleCauses
-                        .getCauseByNumberNullSafe(causeNumber);
+                GoodComplaintPossibleCauses cause = GoodComplaintPossibleCauses.getCauseByNumberNullSafe(causeNumber);
                 if (cause == null) {
                     result.resultCode = RC_INTERNAL_ERROR;
-                    result.description = "Номер причины подачи жалобы " + causeNumber + " не определен в списке возможных причин";
+                    result.description =
+                            "Номер причины подачи жалобы " + causeNumber + " не определен в списке возможных причин";
                     return result;
                 }
                 GoodComplaintCauses goodComplaintCauses = new GoodComplaintCauses();
@@ -455,7 +468,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 persistenceSession.save(goodComplaintCauses);
             }
 
-            result.id =  goodComplaintBook.getGlobalId();
+            result.id = goodComplaintBook.getGlobalId();
 
             persistenceSession.flush();
             persistenceTransaction.commit();
@@ -478,8 +491,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         distributedObject.setCreatedDate(new Date());
         distributedObject.setDeletedState(false);
         distributedObject.setSendAll(SendToAssociatedOrgs.SendToMain);
-        distributedObject.setGlobalVersion(DAOService.getInstance().updateVersionByDistributedObjects(
-                distributedObject.getClass().getSimpleName()));
+        distributedObject.setGlobalVersion(DAOService.getInstance()
+                .updateVersionByDistributedObjects(distributedObject.getClass().getSimpleName()));
     }
 
     @Override
@@ -526,7 +539,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             GoodComplaintIterations iteration = null;
             for (Object iterationObject : iterationObjects) {
                 GoodComplaintIterations goodComplaintIterations = (GoodComplaintIterations) iterationObject;
-                if ((null == iteration) || (goodComplaintIterations.getIterationNumber() > iteration.getIterationNumber())) {
+                if ((null == iteration) || (goodComplaintIterations.getIterationNumber() > iteration
+                        .getIterationNumber())) {
                     iteration = goodComplaintIterations;
                 }
             }
@@ -538,8 +552,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             if (status.getStatusNumber() - iteration.getGoodComplaintIterationStatus().getStatusNumber() != 1) {
                 result.resultCode = RC_INTERNAL_ERROR;
-                result.description = "Нельзя назначать итерации со статусом " + iteration.getGoodComplaintIterationStatus().getTitle()
-                        + " статус " + status.getTitle();
+                result.description =
+                        "Нельзя назначать итерации со статусом " + iteration.getGoodComplaintIterationStatus()
+                                .getTitle() + " статус " + status.getTitle();
                 return result;
             }
             iteration.setGoodComplaintIterationStatus(status);
@@ -596,7 +611,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ObjectFactory objectFactory = new ObjectFactory();
 
             Criteria productGroupCriteria = persistenceSession.createCriteria(ProductGroup.class);
-            productGroupCriteria.add(Restrictions.in("orgOwner",setIdOfOrgs));
+            productGroupCriteria.add(Restrictions.in("orgOwner", setIdOfOrgs));
             List groupObjects = productGroupCriteria.list();
             if (!groupObjects.isEmpty()) {
                 for (Object groupObject : groupObjects) {
@@ -612,7 +627,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     listOfProductGroupsExt.getProducts().add(listOfProducts);
                     Criteria productCriteria = persistenceSession.createCriteria(Product.class);
                     productCriteria.add(Restrictions.eq("productGroup", productGroup));
-                    productCriteria.add(Restrictions.in("orgOwner",setIdOfOrgs));
+                    productCriteria.add(Restrictions.in("orgOwner", setIdOfOrgs));
                     List objects = productCriteria.list();
                     if (!objects.isEmpty()) {
                         for (Object object : objects) {
@@ -702,7 +717,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     Criteria goodCriteria = persistenceSession.createCriteria(Good.class);
                     goodCriteria.add(Restrictions.eq("goodGroup", goodGroup));
                     if (org != null) {
-                        List<Long> menuExchangeRuleList = DAOUtils.getListIdOfOrgList(persistenceSession, org.getIdOfOrg());
+                        List<Long> menuExchangeRuleList = DAOUtils
+                                .getListIdOfOrgList(persistenceSession, org.getIdOfOrg());
                         StringBuffer sqlRestriction = new StringBuffer();
                         for (Long idOfProvider : menuExchangeRuleList) {
                             sqlRestriction.append("orgOwner=");
@@ -865,9 +881,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public IdResult setProhibitionOnProduct(Long orgId, Long contractId, Long idOfProduct, Boolean isDeleted) {
-        if (isDeleted!=null && isDeleted) {
+        if (isDeleted != null && isDeleted) {
             return deteteProhibitionOnObject(orgId, contractId, Product.class, idOfProduct);
-        } else{
+        } else {
             return setProhibitionOnObject(orgId, contractId, Product.class, idOfProduct);
         }
     }
@@ -875,27 +891,27 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public IdResult setProhibitionOnProductGroup(Long orgId, Long contractId, Long idOfProductGroup,
             Boolean isDeleted) {
-        if (isDeleted!=null && isDeleted) {
+        if (isDeleted != null && isDeleted) {
             return deteteProhibitionOnObject(orgId, contractId, ProductGroup.class, idOfProductGroup);
-        } else{
+        } else {
             return setProhibitionOnObject(orgId, contractId, ProductGroup.class, idOfProductGroup);
         }
     }
 
     @Override
     public IdResult setProhibitionOnGood(Long orgId, Long contractId, Long idOfGood, Boolean isDeleted) {
-        if (isDeleted!=null && isDeleted) {
+        if (isDeleted != null && isDeleted) {
             return deteteProhibitionOnObject(orgId, contractId, Good.class, idOfGood);
-        } else{
+        } else {
             return setProhibitionOnObject(orgId, contractId, Good.class, idOfGood);
         }
     }
 
     @Override
     public IdResult setProhibitionOnGoodGroup(Long orgId, Long contractId, Long idOfGoodGroup, Boolean isDeleted) {
-        if (isDeleted!=null && isDeleted) {
+        if (isDeleted != null && isDeleted) {
             return deteteProhibitionOnObject(orgId, contractId, GoodGroup.class, idOfGoodGroup);
-        } else{
+        } else {
             return setProhibitionOnObject(orgId, contractId, GoodGroup.class, idOfGoodGroup);
         }
     }
@@ -946,7 +962,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             Prohibition prohibition = (Prohibition) prohibitionCriteria.uniqueResult();
             prohibition.setDeletedState(true);
-            prohibition.setGlobalVersion(DAOService.getInstance().updateVersionByDistributedObjects(Prohibition.class.getSimpleName()));
+            prohibition.setGlobalVersion(
+                    DAOService.getInstance().updateVersionByDistributedObjects(Prohibition.class.getSimpleName()));
             persistenceSession.save(prohibition);
             idResult.id = prohibition.getGlobalId();
             persistenceSession.flush();
@@ -1008,7 +1025,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (objectClass.equals(Product.class)) {
                 prohibitionCriteria.add(Restrictions.eq("product.globalId", idOfObject));
                 Prohibition p = (Prohibition) prohibitionCriteria.uniqueResult();
-                if(p == null){
+                if (p == null) {
                     Product product = (Product) objectCriteria.uniqueResult();
                     if (product == null) {
                         idResult.resultCode = RC_INTERNAL_ERROR;
@@ -1024,7 +1041,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             } else if (objectClass.equals(ProductGroup.class)) {
                 prohibitionCriteria.add(Restrictions.eq("productGroup.globalId", idOfObject));
                 Prohibition p = (Prohibition) prohibitionCriteria.uniqueResult();
-                if(p==null){
+                if (p == null) {
                     ProductGroup productGroup = (ProductGroup) objectCriteria.uniqueResult();
                     if (productGroup == null) {
                         idResult.resultCode = RC_INTERNAL_ERROR;
@@ -1040,7 +1057,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             } else if (objectClass.equals(Good.class)) {
                 prohibitionCriteria.add(Restrictions.eq("good.globalId", idOfObject));
                 Prohibition p = (Prohibition) prohibitionCriteria.uniqueResult();
-                if(p==null){
+                if (p == null) {
                     Good good = (Good) objectCriteria.uniqueResult();
                     if (good == null) {
                         idResult.resultCode = RC_INTERNAL_ERROR;
@@ -1057,7 +1074,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             } else if (objectClass.equals(GoodGroup.class)) {
                 prohibitionCriteria.add(Restrictions.eq("goodGroup.globalId", idOfObject));
                 Prohibition p = (Prohibition) prohibitionCriteria.uniqueResult();
-                if(p==null){
+                if (p == null) {
                     GoodGroup goodGroup = (GoodGroup) objectCriteria.uniqueResult();
                     if (goodGroup == null) {
                         idResult.resultCode = RC_INTERNAL_ERROR;
@@ -2068,13 +2085,21 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     private Integer translateDayOfWeek(int i) {
-        if (i==Calendar.MONDAY) return 0;
-        else if (i==Calendar.TUESDAY) return 1;
-        else if (i==Calendar.WEDNESDAY) return 2;
-        else if (i==Calendar.THURSDAY) return 3;
-        else if (i==Calendar.FRIDAY) return 4;
-        else if (i==Calendar.SATURDAY) return 5;
-        else if (i==Calendar.SUNDAY) return 6;
+        if (i == Calendar.MONDAY) {
+            return 0;
+        } else if (i == Calendar.TUESDAY) {
+            return 1;
+        } else if (i == Calendar.WEDNESDAY) {
+            return 2;
+        } else if (i == Calendar.THURSDAY) {
+            return 3;
+        } else if (i == Calendar.FRIDAY) {
+            return 4;
+        } else if (i == Calendar.SATURDAY) {
+            return 5;
+        } else if (i == Calendar.SUNDAY) {
+            return 6;
+        }
         return -1;
     }
 
@@ -2292,7 +2317,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         try {
-            parseWorkClientSan (persistenceSession, guardSan, data, clientList);
+            parseWorkClientSan(persistenceSession, guardSan, data, clientList);
         } catch (Exception e) {
             data.resultCode = RC_INVALID_DATA;
             data.description = RC_INTERNAL_ERROR_DESC;
@@ -2301,7 +2326,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
 
-    public void parseWorkClientSan (Session persistenceSession, String guardSan, Result data, List clientList) {
+    public void parseWorkClientSan(Session persistenceSession, String guardSan, Result data, List clientList) {
         if (clientList.size() == 0) {
             data.resultCode = RC_CLIENT_NOT_FOUND;
             data.description = RC_CLIENT_NOT_FOUND_DESC;
@@ -2311,7 +2336,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }*/ else {
             Long idOfClient = ((BigInteger) clientList.get(0)).longValue();
             Client cl = null;
-            Set <GuardSan> guardSans = Collections.EMPTY_SET;
+            Set<GuardSan> guardSans = Collections.EMPTY_SET;
             //String clientGuardSan = (String) clientObject[1];
             try {
                 cl = DAOUtils.findClient(persistenceSession, idOfClient);
@@ -2494,7 +2519,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Long contractId = null;
         try {
             contractId = DAOService.getInstance().getContractIdByCardNo(lCardId);
-            if(contractId==null){
+            if (contractId == null) {
                 contractId = DAOService.getInstance().getContractIdByTempCardNoAndCheckValidDate(lCardId);
             }
         } catch (Exception e) {
@@ -3171,6 +3196,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public ClientSmsListResult getClientSmsList(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
+        authenticateRequest(contractId);
+
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         org.hibernate.Transaction persistenceTransaction = null;
@@ -3379,7 +3406,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
 
     @Override
-    public QuestionaryResultList getActiveMenuQuestions(@WebParam(name = "contractId") Long contractId, @WebParam(name = "currentDate") final Date currentDate) {
+    public QuestionaryResultList getActiveMenuQuestions(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "currentDate") final Date currentDate) {
         authenticateRequest(contractId);
 
         Data data = new ClientRequest().process(contractId, new Processor() {
@@ -3397,7 +3425,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result setAnswerFromQuestion(@WebParam(name = "contractId") Long contractId, @WebParam(name="IdOfAnswer") Long idOfAnswer) {
+    public Result setAnswerFromQuestion(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "IdOfAnswer") Long idOfAnswer) {
         authenticateRequest(contractId);
         Result r = new Result();
         r.resultCode = RC_OK;
@@ -3410,7 +3439,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             persistenceTransaction = persistenceSession.beginTransaction();
 
             QuestionaryService questionaryService = new QuestionaryService();
-            questionaryService.registrationAnswerByClient(persistenceSession ,contractId, idOfAnswer);
+            questionaryService.registrationAnswerByClient(persistenceSession, contractId, idOfAnswer);
 
             persistenceSession.flush();
             persistenceTransaction.commit();
@@ -3426,30 +3455,30 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return r;
     }
 
-    private void processQuestionaryList(Client client, Data data, ObjectFactory objectFactory, Session session, Date currentDate, QuestionaryType type){
-        DetachedCriteria orgCriteria = DetachedCriteria.forClass(Client.class)
-                .createAlias("org","o", JoinType.NONE)
-                .setProjection( Property.forName("org.idOfOrg"))
-                .add(Restrictions.eq("contractId",client.getContractId()));
+    private void processQuestionaryList(Client client, Data data, ObjectFactory objectFactory, Session session,
+            Date currentDate, QuestionaryType type) {
+        DetachedCriteria orgCriteria = DetachedCriteria.forClass(Client.class).createAlias("org", "o", JoinType.NONE)
+                .setProjection(Property.forName("org.idOfOrg"))
+                .add(Restrictions.eq("contractId", client.getContractId()));
         Criteria questionaryCriteria = session.createCriteria(Questionary.class);
         questionaryCriteria.add(Restrictions.eq("status", QuestionaryStatus.START));
         questionaryCriteria.add(Restrictions.eq("questionaryType", type));
         questionaryCriteria.createAlias("orgs", "org", JoinType.INNER_JOIN);
         questionaryCriteria.add(Property.forName("org.idOfOrg").eq(orgCriteria));
-        questionaryCriteria.add(Restrictions.ge("viewDate",currentDate));
+        questionaryCriteria.add(Restrictions.ge("viewDate", currentDate));
         questionaryCriteria.addOrder(org.hibernate.criterion.Order.asc("viewDate"));
         questionaryCriteria.setMaxResults(24);
 
         List<Questionary> questionaries = questionaryCriteria.list();
         QuestionaryList questionaryList = objectFactory.createQuestionaryList();
 
-        for (Questionary questionary: questionaries){
+        for (Questionary questionary : questionaries) {
             Criteria criteria = session.createCriteria(ClientAnswerByQuestionary.class);
-            criteria.add(Restrictions.in("answer",questionary.getAnswers()));
-            criteria.add(Restrictions.eq("client",client));
+            criteria.add(Restrictions.in("answer", questionary.getAnswers()));
+            criteria.add(Restrictions.eq("client", client));
             List<ClientAnswerByQuestionary> list = (List<ClientAnswerByQuestionary>) criteria.list();
             QuestionaryItem questionaryItem = new QuestionaryItem(questionary);
-            if(!list.isEmpty()){
+            if (!list.isEmpty()) {
                 questionaryItem.setCheckedAnswer(list.get(0).getAnswer().getIdOfAnswer());
             }
             questionaryItem.addAnswers(questionary.getAnswers());
@@ -3487,9 +3516,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     @SuppressWarnings("unchecked")
-    public ClientNotificationSettingsResult getClientNotificationSettings(@WebParam(name = "contractId") Long contractId) {
+    public ClientNotificationSettingsResult getClientNotificationSettings(
+            @WebParam(name = "contractId") Long contractId) {
 
-        //authenticateRequest(contractId);
+        authenticateRequest(contractId);
 
         ClientNotificationSettingsResult res = new ClientNotificationSettingsResult(RC_OK, RC_OK_DESC);
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -3506,7 +3536,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             for (ClientNotificationSetting setting : client.getNotificationSettings()) {
-                if (setting.getNotifyType().equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
+                if (setting.getNotifyType()
+                        .equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
                     continue;
                 }
                 ClientNotificationSettingsItem it = new ClientNotificationSettingsItem();
@@ -3527,9 +3558,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
 
     @Override
-    public ClientNotificationChangeResult setClientNotificationSettings (@WebParam(name = "contractId") Long contractId,
+    public ClientNotificationChangeResult setClientNotificationSettings(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "notificationType") List<Long> notificationTypes) {
-        //authenticateRequest(contractId);
+        authenticateRequest(contractId);
 
         ClientNotificationChangeResult res = new ClientNotificationChangeResult(RC_OK, RC_OK_DESC);
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -3573,7 +3604,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public StudentsConfirmPaymentData getStudentsByCanNotConfirmPayment(@WebParam(name = "contractId") Long contractId) {
+    public StudentsConfirmPaymentData getStudentsByCanNotConfirmPayment(
+            @WebParam(name = "contractId") Long contractId) {
         // authenticateRequest(contractId);
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -3584,13 +3616,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Client teacher = DAOUtils.findClientByContractId(persistenceSession, contractId);
-            if (teacher==null) {
-                studentsConfirmPaymentData.resultCode=RC_CLIENT_NOT_FOUND;
-                studentsConfirmPaymentData.description=RC_CLIENT_NOT_FOUND_DESC;
+            if (teacher == null) {
+                studentsConfirmPaymentData.resultCode = RC_CLIENT_NOT_FOUND;
+                studentsConfirmPaymentData.description = RC_CLIENT_NOT_FOUND_DESC;
                 studentsConfirmPaymentData.studentsConfirmPaymentList = new StudentsConfirmPaymentList();
             } else {
-                if(teacher.getCanConfirmGroupPayment()){
-                    List students = DAOUtils.fetchStudentsByCanNotConfirmPayment(persistenceSession, teacher.getIdOfClient());
+                if (teacher.getCanConfirmGroupPayment()) {
+                    List students = DAOUtils
+                            .fetchStudentsByCanNotConfirmPayment(persistenceSession, teacher.getIdOfClient());
                     Long idOfClient = null;
                     Long sum = 0L;
                     List<StudentMustPayItem> studentMustPayItemList = new ArrayList<StudentMustPayItem>();
@@ -3610,17 +3643,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             mustPayItem.setSurname(String.valueOf(student[1]));
                             mustPayItem.setSecondName(String.valueOf(student[2]));
                             mustPayItem.setBalance(balance);
-                            mustPayItem.setCreateTime((Date)student[5]);
+                            mustPayItem.setCreateTime((Date) student[5]);
                             mustPayItem.setPaySum(paySum);
                             studentMustPayItemList.add(mustPayItem);
                         }
                     }
-                    studentsConfirmPaymentData.resultCode=RC_OK;
-                    studentsConfirmPaymentData.description=RC_OK_DESC;
-                    studentsConfirmPaymentData.studentsConfirmPaymentList = new StudentsConfirmPaymentList(studentMustPayItemList);
+                    studentsConfirmPaymentData.resultCode = RC_OK;
+                    studentsConfirmPaymentData.description = RC_OK_DESC;
+                    studentsConfirmPaymentData.studentsConfirmPaymentList = new StudentsConfirmPaymentList(
+                            studentMustPayItemList);
                 } else {
-                    studentsConfirmPaymentData.resultCode=RC_CAN_NOT_CONFIRM_PAYMENT;
-                    studentsConfirmPaymentData.description=RC_CAN_NOT_CONFIRM_PAYMENT_DESC;
+                    studentsConfirmPaymentData.resultCode = RC_CAN_NOT_CONFIRM_PAYMENT;
+                    studentsConfirmPaymentData.description = RC_CAN_NOT_CONFIRM_PAYMENT_DESC;
                     studentsConfirmPaymentData.studentsConfirmPaymentList = new StudentsConfirmPaymentList();
                 }
             }
@@ -3628,8 +3662,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed to Students By Can Not Confirm Payment settings", e);
-            studentsConfirmPaymentData.resultCode=RC_INTERNAL_ERROR;
-            studentsConfirmPaymentData.description=RC_INTERNAL_ERROR_DESC;
+            studentsConfirmPaymentData.resultCode = RC_INTERNAL_ERROR;
+            studentsConfirmPaymentData.description = RC_INTERNAL_ERROR_DESC;
             studentsConfirmPaymentData.studentsConfirmPaymentList = new StudentsConfirmPaymentList();
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -3638,4 +3672,54 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         return studentsConfirmPaymentData;
     }
+
+    public static class ClientStatsResult {
+
+        public long resultCode;
+        public String description;
+        public String stats;
+    }
+
+    @Override
+    public ClientStatsResult getClientStats(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate,
+            @WebParam(name = "type") int type) {
+        authenticateRequest(contractId);
+
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        org.hibernate.Transaction persistenceTransaction = null;
+
+        ClientStatsResult r = new ClientStatsResult();
+        r.resultCode = RC_OK;
+        r.description = RC_OK_DESC;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
+            if (client == null) {
+                r.resultCode = RC_CLIENT_NOT_FOUND;
+                r.description = RC_CLIENT_NOT_FOUND_DESC;
+                return r;
+            }
+            
+            r.stats = RuntimeContext.getAppContext().getBean(ClientStatsReporter.class).getStatsForClient(client, startDate, endDate);
+
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            r.resultCode = RC_INTERNAL_ERROR;
+            r.description = RC_INTERNAL_ERROR_DESC;
+
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+
+        return r;
+    }
+
+
 }

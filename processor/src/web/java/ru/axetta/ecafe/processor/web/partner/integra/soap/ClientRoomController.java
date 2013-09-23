@@ -197,4 +197,8 @@ public interface ClientRoomController {
     @WebMethod(operationName="getStudentsByCanNotConfirmPayment")
     public StudentsConfirmPaymentData getStudentsByCanNotConfirmPayment(@WebParam(name = "contractId") Long contractId);
 
+    @WebMethod(operationName="getClientStats")
+    ClientRoomControllerWS.ClientStatsResult getClientStats(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate,
+            @WebParam(name = "type") int type);
 }

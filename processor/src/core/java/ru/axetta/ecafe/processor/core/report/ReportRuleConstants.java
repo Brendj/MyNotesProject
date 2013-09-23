@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2013. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.core.report;
