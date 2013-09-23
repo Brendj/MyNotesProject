@@ -9,6 +9,22 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <h:panelGrid styleClass="borderless-grid">
+    <a4j:outputPanel ajaxRendered="true">
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText escape="true" value="Поставщик" styleClass="output-text required-field" />
+        <h:panelGroup styleClass="borderless-div">
+            <h:inputText value="#{mainPage.clientReportPage.contragent.contragentName}" readonly="true"
+                         styleClass="input-text" style="margin-right: 2px;" />
+            <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
+                               reRender="modalContragentSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+                <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
+            </a4j:commandButton>
+        </h:panelGroup>
+    </h:panelGrid>
+    </a4j:outputPanel>
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildClientReport}"
                            reRender="mainMenu, workspaceTogglePanel, clientReportTable" styleClass="command-button"
@@ -33,13 +49,13 @@
                         <h:outputText escape="true" value="Номер учреждения" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Название учреждения" styleClass="column-header"/>
+                        <h:outputText escape="true" value="Название учреждения" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" colspan="4">
-                        <h:outputText escape="true" value="Количество учащихся" styleClass="column-header"/>
+                        <h:outputText escape="true" value="Количество учащихся" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" colspan="3">
-                        <h:outputText escape="true" value="Сумма балансов" styleClass="column-header"/>
+                        <h:outputText escape="true" value="Сумма балансов" styleClass="column-header" />
                     </rich:column>
                     <rich:column breakBefore="true" headerClass="center-aligned-column">
                         <h:outputText escape="true" value="Общее" styleClass="column-header" />
@@ -54,7 +70,7 @@
                         <h:outputText escape="true" value="Баланс < 0" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
-                        <h:outputText escape="true" value="Общая" styleClass="column-header"/>
+                        <h:outputText escape="true" value="Общая" styleClass="column-header" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" rowspan="2">
                         <h:outputText escape="true" value="Баланс > 0" styleClass="column-header" />

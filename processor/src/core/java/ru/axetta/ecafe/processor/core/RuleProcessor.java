@@ -72,7 +72,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         parameters = parameters.replaceAll(METHOD_EXPRESSION, "");
 
         String parts [] = parameters.split(DELIMETER);
-        Pattern pattern = Pattern.compile("(\\{([а-яА-Яa-zA-Z0-9\\u005F]*)\\})?([а-яА-Яa-zA-Z0-9\\s]+)");
+        Pattern pattern = Pattern.compile("(\\{([а-яА-Яa-zA-Z0-9\\u005F]*)\\})?([-а-яА-Яa-zA-Z0-9\\s]+)");
         for (String p : parts) {
             Matcher matcher = pattern.matcher(p);
             while (matcher.find()) {

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2013. Axetta LLC. All Rights Reserved.
+ */
+
 package ru.axetta.ecafe.processor.core.persistence;
 
 /**

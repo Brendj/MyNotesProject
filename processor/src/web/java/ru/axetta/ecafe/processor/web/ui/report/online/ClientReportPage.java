@@ -4,7 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.report.ClientReport;
+import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
 import org.hibernate.Session;
 
@@ -15,11 +17,21 @@ import org.hibernate.Session;
  * Time: 12:01
  * To change this template use File | Settings | File Templates.
  */
-public class ClientReportPage extends OnlineReportPage {
+public class ClientReportPage extends OnlineReportPage  implements ContragentSelectPage.CompleteHandler{
     private ClientReport clientReport;
 
     public String getPageFilename() {
         return "report/online/client_report";
+    }
+    
+    private Contragent contragent;
+
+    public Contragent getContragent() {
+        return contragent;
+    }
+
+    public void setContragent(Contragent contragent) {
+        this.contragent = contragent;
     }
 
     public ClientReport getClientReport() {
@@ -29,6 +41,14 @@ public class ClientReportPage extends OnlineReportPage {
     public void buildReport(Session session) throws Exception {
         this.clientReport = new ClientReport();
         ClientReport.Builder reportBuilder = new ClientReport.Builder();
-        this.clientReport = reportBuilder.build(session);
+        this.clientReport = reportBuilder.build(contragent, session);
+    }
+
+    @Override
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes)
+            throws Exception {
+        if (null != idOfContragent) {
+            this.contragent = (Contragent) session.get(Contragent.class, idOfContragent);
+        }
     }
 }

@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -24,7 +26,7 @@ public class ClientReport extends BasicReport {
 
     public static class Builder {
 
-        public ClientReport build(Session session) throws Exception {
+        public ClientReport build(Contragent supplier, Session session) throws Exception {
             Date generateTime = new Date();
 
             /*Criteria clientCriteria = session.createCriteria(Client.class);
@@ -50,6 +52,7 @@ public class ClientReport extends BasicReport {
                                  + "       sum(case when balance > 0 then balance else 0 end) as posbalsum, "
                                  + "       sum(case when balance < 0 then balance else 0 end) as negbalsum "
                                  + "  from Client "
+                                 + (supplier==null?"":"where org.defaultSupplier.idOfContragent="+supplier.getIdOfContragent())
                                  + " group by org.idOfOrg, org.officialName "
                                  + " order by org.idOfOrg";
             List resultList = null;

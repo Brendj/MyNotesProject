@@ -151,7 +151,11 @@ public class ReportRuleConstants {
             new ParamHint(ReportPropertiesUtils.P_JOB_NAME, "Название задачи"),
             new ParamHint(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID, "Контрагент-получатель").setDefaultRule("= contragent:"), //30,
             new ParamHint("idOfContragent", "Агент по приему платежей").setDefaultRule("= contragent-payagent:"),
-            new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE, "Период"),
+            new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE, "Период").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION +
+                    "{"+BasicReportJob.REPORT_PERIOD_PREV_MONTH+"}месяц,"+
+                    "{"+BasicReportJob.REPORT_PERIOD_LAST_WEEK+"}неделя,"+
+                    "{"+BasicReportJob.REPORT_PERIOD_PREV_PREV_PREV_DAY+"}-3 дня,"+
+                    "{"+BasicReportJob.REPORT_PERIOD_PREV_PREV_DAY+"}-2 дня,{"+BasicReportJob.REPORT_PERIOD_PREV_DAY+"}-1 день,{"+BasicReportJob.REPORT_PERIOD_TODAY+"}сегодня"),
             // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
             /*new ParamHint("idOfContract", "Контракт"),
             new ParamHint("listValue", "Какое-то значение из списка").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION + "{111}один,{222}два,{333}три"),
