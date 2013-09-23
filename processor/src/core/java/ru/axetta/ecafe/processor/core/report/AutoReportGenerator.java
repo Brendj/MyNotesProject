@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
 import ru.axetta.ecafe.processor.core.report.msc.BeneficiarySummaryReport;
 import ru.axetta.ecafe.processor.core.report.msc.HalfYearSummaryReport;
 import ru.axetta.ecafe.processor.core.report.msc.MscSalesReport;
+import ru.axetta.ecafe.processor.core.report.summarySalesToSchools.SSTSReport;
 import ru.axetta.ecafe.processor.core.utils.ExecutorServiceWrappedJob;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -802,12 +803,31 @@ public class AutoReportGenerator {
                                 (Calendar) autoReportGenerator.getCalendar().clone(),
                                 (DateFormat) autoReportGenerator.getDateFormat().clone(),
                                 (DateFormat) autoReportGenerator.getTimeFormat().clone());
-                        JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                        JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                         jobDetail.getJobDataMap()
                                 .put(CWOACReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                         return jobDetail;
                     }
                 }));
+
+        REPORT_DEFS.add(new ReportDef(SSTSReport.class, SSTSReport.AutoReportBuildJob.class, new JobDetailCreator() {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName)
+                    throws Exception {
+                Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + "SSTSReport.jasper";
+                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName, new SSTSReport(), autoReportGenerator.getExecutorService(),
+                        autoReportGenerator.getSessionFactory(), autoReportGenerator.getAutoReportProcessor(),
+                        autoReportGenerator.getReportPath(), reportTemplate,
+                        (Calendar) autoReportGenerator.getCalendar().clone(),
+                        (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                        (DateFormat) autoReportGenerator.getTimeFormat().clone());
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
+                jobDetail.getJobDataMap().put(SSTSReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                return jobDetail;
+            }
+        }));
+
     } // static
 
 

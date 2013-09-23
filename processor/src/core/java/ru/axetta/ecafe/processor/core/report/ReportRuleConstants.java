@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
 import ru.axetta.ecafe.processor.core.report.msc.BeneficiarySummaryReport;
 import ru.axetta.ecafe.processor.core.report.msc.HalfYearSummaryReport;
 import ru.axetta.ecafe.processor.core.report.msc.MscSalesReport;
+import ru.axetta.ecafe.processor.core.report.summarySalesToSchools.SSTSReport;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -195,7 +196,8 @@ public class ReportRuleConstants {
             new ReportHint(HalfYearSummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(BeneficiarySummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(DeliveredServicesReport.class.getCanonicalName(), new int[]{3, -20/*, 31, 32, 33, 34, 35, 36, 37*/}),
-            new ReportHint(CWOACReport.class.getCanonicalName(), new int[]{})
+            new ReportHint(CWOACReport.class.getCanonicalName(), new int[]{}),
+            new ReportHint(SSTSReport.class.getCanonicalName(), new int[]{20})
             // отрицательное значение - обязательное
     };
 
