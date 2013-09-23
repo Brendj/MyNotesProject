@@ -61,7 +61,7 @@ public class ReportTradeMaterialGood extends BasicReportForOrgJob {
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
             Date generateEndTime = new Date();
-            return new DailySalesByGroupsReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
+            return new ReportTradeMaterialGood(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 

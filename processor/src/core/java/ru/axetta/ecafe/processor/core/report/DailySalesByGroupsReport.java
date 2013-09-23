@@ -30,6 +30,8 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
     }
 
+
+
     public static class Builder extends BasicReportJob.Builder {
 
 

@@ -46,6 +46,7 @@ public class ReportPropertiesUtils {
         properties.setProperty(P_REPORT_CLASS, reportClass.getCanonicalName());
         properties.setProperty(P_JOB_NAME, autoReportBuildTask==null?"null":autoReportBuildTask.jobName);
         properties.setProperty(P_DATES_SPECIFIED_BY_USER, autoReportBuildTask==null?"false":(autoReportBuildTask.datesSpecifiedByUser?"true":"false"));
+        //properties.setProperty(P_REPORT_PERIOD_TYPE, );
     }
 
     public static void addProperties(Session session, Properties properties, Org org, String prefix) throws Exception {

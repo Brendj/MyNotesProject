@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
@@ -53,13 +54,14 @@ public abstract class BasicReportForOrgJob extends BasicReportJob {
                     transaction = BasicReport.createTransaction(session);
                     transaction.begin();
                     Criteria allOrgCriteria = session.createCriteria(Org.class);
+                    allOrgCriteria.addOrder(Order.asc("idOfOrg"));
                     List allOrgs = allOrgCriteria.list();
 
                     for (Object object : allOrgs) {
                         Org org = (Org) object;
                         if (getLogger().isDebugEnabled()) {
                             getLogger().debug(String.format("Building report \"%s\" for org: %s", classPropertyValue,
-                                    org));
+                                    org.getIdOfOrg()));
                         }
                         Properties properties = new Properties();
                         ReportPropertiesUtils.addProperties(properties, getMyClass(), autoReportBuildTask);

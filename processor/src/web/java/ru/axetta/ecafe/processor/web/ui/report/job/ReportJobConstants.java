@@ -93,33 +93,33 @@ public class ReportJobConstants {
     }
 
     public static final ParamHint[] PARAM_HINTS = {
-            new ParamHint("generateDate", "Дата генерации отчета"),
+            new ParamHint("generateDate", "Дата генерации отчета"),  //0
             new ParamHint("generateTime", "Дата и время генерации отчета"),
             new ParamHint("generateDurationMillis", "Продолжительность генерации отчета в миллисекундах"),
             new ParamHint("idOfOrg", "Идентификатор организации"),
             new ParamHint("shortName", "Краткое название организации"),
-            new ParamHint("officialName", "Официальное название организации"),
+            new ParamHint("officialName", "Официальное название организации"),//5
             new ParamHint("groupName", "Название класса"),
             new ParamHint("idOfClient", "Идентификатор клиента"),
             new ParamHint("email", "Адрес электронной почты клиента"),
             new ParamHint("contractPerson.surname", "Фамилия физического лица, заключившего контракт"),
-            new ParamHint("contractPerson.firstName", "Имя физического лица, заключившего контракт"),
+            new ParamHint("contractPerson.firstName", "Имя физического лица, заключившего контракт"),//10
             new ParamHint("contractPerson.secondName", "Отчество физического лица, заключившего контракт"),
             new ParamHint("contractPerson.abbreviation", "Фамилия И.О. физического лица, заключившего контракт"),
             new ParamHint("person.surname", "Фамилия обслуживаемого физического лица"),
             new ParamHint("person.firstName", "Имя обслуживаемого физического лица"),
-            new ParamHint("person.secondName", "Отчество обслуживаемого физического лица"),
+            new ParamHint("person.secondName", "Отчество обслуживаемого физического лица"),              //15
             new ParamHint("person.abbreviation", "Фамилия И.О. обслуживаемого физического лица"),
             new ParamHint("phone", "Телефонный номер клиента"),
             new ParamHint("mobile", "Номер мобильного телефона клиента"),
             new ParamHint("address", "Адрес клиента"),
-            new ParamHint("idOfContragent", "Идентификатор контрагента"),
+            new ParamHint("idOfContragent", "Идентификатор контрагента"),//20
             new ParamHint("contragentName", "Название контрагента"),
             new ParamHint("category", "Категория организации"),
             new ParamHint("idOfMenuSourceOrg", "Идентификатор организации - источника меню"),
             new ParamHint("enterEventType", "Тип отчета по посещаемости: все/учащиеся/все_без_учащихся"),
-            new ParamHint("groupByMenuGroup", "Группировка отчета по товарным группам"),
-
+            new ParamHint("groupByMenuGroup", "Группировка отчета по товарным группам"),//25
+            new ParamHint("reportPeriodType", "Тип периода"),
             // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
             /*new ParamHint("idOfContract", "Контракт"),
             new ParamHint("listValue", "Какое-то значение из списка").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION + "{111}один,{222}два,{333}три"),
@@ -145,7 +145,7 @@ public class ReportJobConstants {
             new ReportHint(OrgOrderByDaysReport.class.getCanonicalName(), new int[]{3, 22, 23}),
             new ReportHint(AutoEnterEventReport.class.getCanonicalName(), new int[]{3, 22, 23, 24}),
             new ReportHint(AutoEnterEventByDaysReport.class.getCanonicalName(), new int[]{3, 22, 23, 24}),
-            new ReportHint(DailySalesByGroupsReport.class.getCanonicalName(), new int[]{3, 22, 23, 25}),
+            new ReportHint(DailySalesByGroupsReport.class.getCanonicalName(), new int[]{3, 22, 23, 25, 26}),
             new ReportHint(ClientOrderDetailsByOneOrgReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(RegisterStampReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(ComplaintCountByGoodReport.class.getCanonicalName(), new int[]{3, 4, 5}),
