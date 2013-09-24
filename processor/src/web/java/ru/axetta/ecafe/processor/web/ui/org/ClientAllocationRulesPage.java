@@ -83,8 +83,13 @@ public class ClientAllocationRulesPage extends BasicWorkspacePage implements Org
                 if (validateItem(item)) {
                     try {
                         session = RuntimeContext.getInstance().createPersistenceSession();
-                        ClientAllocationRule rule =
-                                item.getId() == null ? new ClientAllocationRule() : dao.find(item.getId());
+                        boolean isNewRule = item.getId() == null;
+                        ClientAllocationRule rule = isNewRule ? new ClientAllocationRule() : dao.find(item.getId());
+                        if (!isNewRule) {
+                            if (!checkIsReallyEdited(item, rule)) {
+                                continue;
+                            }
+                        }
                         rule.setSourceOrg(DAOUtils.getOrgReference(session, item.getIdOfSourceOrg()));
                         rule.setDestinationOrg(DAOUtils.getOrgReference(session, item.getIdOfDestOrg()));
                         rule.setGroupFilter(item.getGroupFilter());
@@ -102,9 +107,9 @@ public class ClientAllocationRulesPage extends BasicWorkspacePage implements Org
                         getLogger().error(ex.getMessage());
                         return null;
                     } finally {
+                        item.setEditable(false);
                         HibernateUtils.close(session, getLogger());
                     }
-                    item.setEditable(false);
                 } else {
                     this.printError(String.format("У строки №%s не все обязательные поля заполнены!", i + 1));
                     return null;
@@ -113,6 +118,15 @@ public class ClientAllocationRulesPage extends BasicWorkspacePage implements Org
         }
         this.printMessage("Правила успешно сохранены.");
         return null;
+    }
+
+    // Проверка того, действительно ли правило было изменено.
+    // Т.о., снижаем нагрузку, чтобы лишний раз не обновлять версии клиентов.
+    private boolean checkIsReallyEdited(ClientAllocationRuleItem item, ClientAllocationRule rule) {
+        return !(item.getIdOfDestOrg().equals(rule.getDestinationOrg().getIdOfOrg()) &&
+                item.getIdOfSourceOrg().equals(rule.getSourceOrg().getIdOfOrg()) &&
+                item.getGroupFilter().equals(rule.getGroupFilter()) &&
+                item.isTempClient() == rule.isTempClient());
     }
 
     // Обновляет версии клиентов. Нужно для синхронизации.
@@ -129,10 +143,10 @@ public class ClientAllocationRulesPage extends BasicWorkspacePage implements Org
         }
         org = DAOUtils.findOrg(session, rule.getSourceOrg().getIdOfOrg());
         if (org.getFriendlyOrg().isEmpty()) {
-            ClientManager.findMatchedClients(org, rule.getGroupFilter(), clients);
+            clients.addAll(ClientManager.findMatchedAllocatedClients(org, rule.getGroupFilter()));
         } else {
             for (Org frOrg : org.getFriendlyOrg()) {
-                ClientManager.findMatchedClients(frOrg, rule.getGroupFilter(), clients);
+                clients.addAll(ClientManager.findMatchedAllocatedClients(frOrg, rule.getGroupFilter()));
             }
         }
         ClientManager.updateClientVersionTransactional(session, clients);
@@ -179,5 +193,10 @@ public class ClientAllocationRulesPage extends BasicWorkspacePage implements Org
     private boolean validateItem(ClientAllocationRuleItem item) {
         return item.getIdOfSourceOrg() != null && item.getIdOfDestOrg() != null && StringUtils
                 .isNotEmpty(item.getGroupFilter());
+    }
+
+    @Override
+    public String getPageFilename() {
+        return "org/client_allocation_rules";
     }
 }

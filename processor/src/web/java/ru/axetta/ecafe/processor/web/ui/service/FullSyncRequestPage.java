@@ -1,9 +1,13 @@
-package ru.axetta.ecafe.processor.web.ui.org;
+/*
+ * Copyright (c) 2013. Axetta LLC. All Rights Reserved.
+ */
+
+package ru.axetta.ecafe.processor.web.ui.service;
 
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,29 +20,27 @@ import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
- * User: damir
- * Date: 19.07.13
- * Time: 12:29
- * To change this template use File | Settings | File Templates.
+ * User: r.kalimullin
+ * Date: 24.09.13
+ * Time: 13:38
  */
+
 @Component
 @Scope("session")
-public class OrgClientSettingsPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList, OrgSelectPage.CompleteHandler {
+public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList {
 
-    private static Logger logger = LoggerFactory.getLogger(OrgClientSettingsPage.class);
+    private static Logger logger = LoggerFactory.getLogger(FullSyncRequestPage.class);
     private List<Long> idOfOrgList = new ArrayList<Long>(0);
 
     @Autowired
     private DAOService daoService;
-    @Autowired
-    private ClientAllocationRulesPage rulesPage;
+
     private String filter = "Не выбрано";
 
     @Override
     public void onShow() throws Exception {
         filter = "Не выбрано";
         idOfOrgList.clear();
-        rulesPage.onShow();
     }
 
     public Object applyFullSyncOperation(){
@@ -70,13 +72,8 @@ public class OrgClientSettingsPage extends BasicWorkspacePage implements OrgList
     }
 
     @Override
-    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
-        rulesPage.completeOrgSelection(session, idOfOrg);
-    }
-
-    @Override
     public String getPageFilename() {
-        return "org/settings";
+        return "service/full_sync_request";
     }
 
     public List<Long> getIdOfOrgList() {
@@ -94,4 +91,5 @@ public class OrgClientSettingsPage extends BasicWorkspacePage implements OrgList
     public void setFilter(String filter) {
         this.filter = filter;
     }
+
 }

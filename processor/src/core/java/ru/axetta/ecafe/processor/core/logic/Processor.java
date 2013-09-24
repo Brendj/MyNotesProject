@@ -2010,13 +2010,16 @@ public class Processor implements SyncProcessor,
                 clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client));
             }
             List<Long> activeClientsId = DAOUtils.findActiveClientsId(persistenceSession, orgList);
-            // Получаем временных клиентов.
-            List<Client> tempClients = ClientManager.findTemporaryClients(persistenceSession, organization);
-            for (Client cl : tempClients) {
-                if (cl.getClientRegistryVersion() > clientRegistryRequest.getCurrentVersion()) {
-                    clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(cl, true));
+            // Получаем чужих клиентов.
+            Map<String, Set<Client>> alienClients = ClientManager.findAllocatedClients(persistenceSession, organization);
+            for (Map.Entry<String, Set<Client>> entry : alienClients.entrySet()) {
+                boolean isTempClient = entry.getKey().equals("TemporaryClients");
+                for (Client cl : entry.getValue()) {
+                    if (cl.getClientRegistryVersion() > clientRegistryRequest.getCurrentVersion()) {
+                        clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(cl, isTempClient));
+                    }
+                    activeClientsId.add(cl.getIdOfClient());
                 }
-                activeClientsId.add(cl.getIdOfClient());
             }
             // "при отличии количества активных клиентов в базе админки от клиентов, которые должны быть у данной организации
             // с учетом дружественных и правил - выдаем список идентификаторов всех клиентов в отдельном теге"

@@ -127,9 +127,10 @@
                             label="Загрузить с файла" action="#{questionaryLoadPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
-    <%--@elvariable id="orgClientSettingsPage" type="ru.axetta.ecafe.processor.web.ui.org.OrgClientSettingsPage"--%>
-    <rich:panelMenuItem id="orgClientSettingsMenuItem" binding="#{orgClientSettingsPage.mainMenuComponent}"
-                        label="Параметры" action="#{orgClientSettingsPage.show}" reRender="workspaceForm" />
+    <%--@elvariable id="clientAllocationRulesPage" type="ru.axetta.ecafe.processor.web.ui.org.ClientAllocationRulesPage"--%>
+    <rich:panelMenuItem id="clientAllocationRulesItem" binding="#{clientAllocationRulesPage.mainMenuComponent}"
+                        label="Настройки распределения клиентов" action="#{clientAllocationRulesPage.show}"
+                        reRender="workspaceForm" rendered="#{mainPage.eligibleToEditOrgs}" />
 
     <%--@elvariable id="distributionRulesPage" type="ru.axetta.ecafe.processor.web.ui.org.DistributionRulesPage"--%>
     <rich:panelMenuItem id="distributionRulesMenuItem" binding="#{distributionRulesPage.mainMenuComponent}"
@@ -689,6 +690,10 @@
     <rich:panelMenuItem id="showJournal" label="Очередь выгрузки транзакций"
                         binding="#{journalViewPage.mainMenuComponent}" action="#{journalViewPage.show}"
                         rendered="#{mainPage.eligibleToServiceAdmin}" reRender="workspaceForm" />
+    <%--@elvariable id="fullSyncRequestPage" type="ru.axetta.ecafe.processor.web.ui.service.FullSyncRequestPage"--%>
+    <rich:panelMenuItem id="fullSyncRequestItem" label="Запрос полной синхронизации"
+                        binding="#{fullSyncRequestPage.mainMenuComponent}" action="#{fullSyncRequestPage.show}"
+                        reRender="workspaceForm" />
     <%--@elvariable id="otherActionsPage" type="ru.axetta.ecafe.processor.web.ui.service.OtherActionsPage"--%>
     <rich:panelMenuItem id="otherActionsMenuItem" binding="#{otherActionsPage.mainMenuComponent}" label="Другое"
                         action="#{otherActionsPage.show}" reRender="workspaceForm"

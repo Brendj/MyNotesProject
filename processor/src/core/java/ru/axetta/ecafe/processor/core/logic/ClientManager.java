@@ -724,38 +724,42 @@ public class ClientManager {
      * Этими клиентами могут быть ученики, администрация и т.д. из чужой школы.
      * @param session - экземпляр Session.
      * @param destinationOrg - организация (школа), в ко/ой ищем чужих клиентов.
-     * @return - список клиентов.
+     * @return - хэш-мап клиентов. "RegularClients" - ключ для постоянных клиентов.
+     *                            "TemporaryClients" - ключ для временных клиентов.
      */
 
     @SuppressWarnings("unchecked")
-    public static List<Client> findTemporaryClients(Session session, Org destinationOrg) {
-        List<Client> res = new ArrayList<Client>();
+    public static Map<String, Set<Client>> findAllocatedClients(Session session, Org destinationOrg) {
+        Map<String, Set<Client>> res = new HashMap<String, Set<Client>>();
+        res.put("RegularClients", new HashSet<Client>());
+        res.put("TemporaryClients", new HashSet<Client>());
         Criteria cr = session.createCriteria(ClientAllocationRule.class);
         cr.add(Restrictions.eq("destinationOrg", destinationOrg));
         List<ClientAllocationRule> list = cr.list();
         for (ClientAllocationRule rule : list) {
-            if (rule.isTempClient()) {
-                Org clientOrg = rule.getSourceOrg();
-                if (clientOrg.getFriendlyOrg().isEmpty()) {
-                    findMatchedClients(clientOrg, rule.getGroupFilter(), res);
-                } else {
-                    for (Org friendlyOrg : clientOrg.getFriendlyOrg()) {
-                        findMatchedClients(friendlyOrg, rule.getGroupFilter(), res);
-                    }
+            Set<Client> clientSet = rule.isTempClient() ? res.get("TemporaryClients") : res.get("RegularClients");
+            Org clientOrg = rule.getSourceOrg();
+            if (clientOrg.getFriendlyOrg().isEmpty()) {
+                clientSet.addAll(findMatchedAllocatedClients(clientOrg, rule.getGroupFilter()));
+            } else {
+                for (Org friendlyOrg : clientOrg.getFriendlyOrg()) {
+                    clientSet.addAll(findMatchedAllocatedClients(friendlyOrg, rule.getGroupFilter()));
                 }
             }
         }
         return res;
     }
 
-    public static void findMatchedClients(Org clientOrg, String regExp, List<Client> clientList) {
+    public static List<Client> findMatchedAllocatedClients(Org clientOrg, String regExp) {
+        List<Client> res = new ArrayList<Client>();
         for (Client client : clientOrg.getClients()) {
             boolean addClient =
                     client.getClientGroup() != null && client.getClientGroup().getGroupName().matches(regExp);
             if (addClient) {
-                clientList.add(client);
+                res.add(client);
             }
         }
+        return res;
     }
 
     public static void updateClientVersionTransactional(Session session, Collection<Client> clients) {
