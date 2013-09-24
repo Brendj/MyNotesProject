@@ -95,12 +95,11 @@ public class SSTSReport extends BasicReportForContragentJob {
                 try {
                     validId = Long.parseLong(idOfContragent);
                 } catch (NumberFormatException e) {
-                    throw new Exception(
-                            "Ошибка парсинга идентификатора контрагента-получателя: " + idOfContragent, e);
+                    throw new Exception("Ошибка парсинга идентификатора контрагента: " + idOfContragent, e);
                 }
                 contragent = (Contragent) session.get(Contragent.class, validId);
                 if (contragent == null) {
-                    throw new Exception("Контрагент-получатель не найден: " + idOfContragent);
+                    throw new Exception("Контрагент не найден: " + idOfContragent);
                 }
             }
             Map<String, Object> parameterMap = new HashMap<String, Object>();
