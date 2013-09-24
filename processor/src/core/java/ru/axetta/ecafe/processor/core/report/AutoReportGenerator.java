@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.SchedulerJob;
 import ru.axetta.ecafe.processor.core.report.complianceWithOrderAndConsumption.CWOACReport;
 import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
@@ -951,7 +952,7 @@ public class AutoReportGenerator {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            persistenceSession = sessionFactory.openSession();
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = BasicReport.createTransaction(persistenceSession);
             persistenceTransaction.begin();
             persistenceSession.save(schedulerJob);
@@ -970,7 +971,7 @@ public class AutoReportGenerator {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            persistenceSession = sessionFactory.openSession();
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = BasicReport.createTransaction(persistenceSession);
             persistenceTransaction.begin();
             SchedulerJob schedulerJob = (SchedulerJob) persistenceSession.load(SchedulerJob.class, idOfSchedulerJob);
@@ -1008,7 +1009,7 @@ public class AutoReportGenerator {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            persistenceSession = sessionFactory.openSession();
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
             persistenceTransaction = BasicReport.createTransaction(persistenceSession);
             persistenceTransaction.begin();
             SchedulerJob schedulerJob = (SchedulerJob) persistenceSession.load(SchedulerJob.class, idOfSchedulerJob);
