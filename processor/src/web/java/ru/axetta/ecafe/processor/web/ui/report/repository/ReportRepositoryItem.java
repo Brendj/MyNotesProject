@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.ui.report.repository;
 
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
-import ru.axetta.ecafe.processor.core.persistence.Contract;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.ReportInfo;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -215,5 +214,10 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
 
     public String getTag() {
         return tag;
+    }
+
+    @Override
+    public String toString() {
+        return reportFile;
     }
 }
