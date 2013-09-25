@@ -1293,7 +1293,7 @@ public class DAOUtils {
 
     public static List<Client> fetchErrorClientsWithOutFriendlyOrg(final Session persistenceSession,final Set<Org> friendlyOrg,
             final List<Long> errorClientIds) {
-        final Query query = persistenceSession.createQuery("from Client cl where not(cl.org in :friendlyOrg) and cl.idOfClient in :errorClientIds");
+        final Query query = persistenceSession.createQuery("from Client cl where not(cl.org in (:friendlyOrg)) and cl.idOfClient in (:errorClientIds)");
         query.setParameterList("friendlyOrg", friendlyOrg);
         query.setParameterList("errorClientIds", errorClientIds);
         return query.list();
