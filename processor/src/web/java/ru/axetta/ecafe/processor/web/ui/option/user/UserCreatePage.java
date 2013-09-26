@@ -4,12 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.user;
 
-import ru.axetta.ecafe.processor.core.persistence.Contract;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
-import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
 import org.hibernate.Session;
 
@@ -145,6 +143,7 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
         user.setEmail(email);
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         user.setIdOfRole(idOfRole);
+        user.setBlocked(false);
         if(User.DefaultRole.DEFAULT.equals(role)){
             if(this.roleName==null || this.roleName.isEmpty()){
                 throw new Exception("Role name fields is null");
