@@ -5,13 +5,12 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.sync.SyncRequest;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting;
+import ru.axetta.ecafe.processor.core.persistence.ClientSms;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -20,11 +19,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.io.StringReader;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.List;
+import java.util.Properties;
 
 @Component
 @Scope("singleton")
@@ -33,6 +31,9 @@ public class EventNotificationService {
     Logger logger = LoggerFactory.getLogger(EventNotificationService.class);
 
     public static String NOTIFICATION_ENTER_EVENT = "enterEvent", NOTIFICATION_BALANCE_TOPUP = "balanceTopup", MESSAGE_LINKING_TOKEN_GENERATED = "linkingToken", MESSAGE_RESTORE_PASSWORD = "restorePassword", MESSAGE_PAYMENT = "payment";
+    public static String NOTIFICATION_SMS_SUBSCRIPTION_FEE = "smsSubscriptionFee";
+    public static String NOTIFICATION_SMS_SUB_FEE_WITHDRAW_SUCCESS = "smsSubFeeWithdrawSuccessful";
+    public static String NOTIFICATION_SMS_SUB_FEE_WITHDRAW_NOT_SUCCESS = "smsSubFeeWithdrawNotSuccessful";
     public static String TYPE_SMS = "sms", TYPE_EMAIL_TEXT = "email.text", TYPE_EMAIL_SUBJECT = "email.subject";
     Properties notificationText;
     Boolean notifyBySMSAboutEnterEvent;
@@ -79,6 +80,12 @@ public class EventNotificationService {
             + "Буфет: [others]. <br/>\n"
             + "Комплекс: [complexes]. <br/>\n"+ "<br/>\n"
             + "С уважением,<br/>\n" + "Служба поддержки клиентов\n" + "</body>\n" + "</html>",
+            NOTIFICATION_SMS_SUBSCRIPTION_FEE + "." + TYPE_SMS,
+            "Л/с: [contractId] Сервис SMS: не забудьте пополнить баланс до [withdrawDate]",
+            NOTIFICATION_SMS_SUB_FEE_WITHDRAW_SUCCESS + "." + TYPE_SMS,
+            "Списание [date] Л/с: [contractId] Сервис SMS: [smsSubscriptionFee] р.",
+            NOTIFICATION_SMS_SUB_FEE_WITHDRAW_NOT_SUCCESS + "." + TYPE_SMS,
+            "Л/с: [contractId] Сервис SMS отключен. Причина: недостаточный баланс."
     };
 
     String getDefaultText(String name) {
@@ -216,6 +223,10 @@ public class EventNotificationService {
     }
 
     public boolean sendSMS(Client client, String type, String[] values) {
+        return sendSMS(client, type, values, true);
+    }
+
+    public boolean sendSMS(Client client, String type, String[] values, boolean sendAsync) {
         if (client.getMobile() == null || client.getMobile().length() == 0) {
             return false;
         }
@@ -239,12 +250,22 @@ public class EventNotificationService {
                 clientSMSType = ClientSms.TYPE_LINKING_TOKEN;
             } else if (type.equals(MESSAGE_PAYMENT)) {
                 clientSMSType = ClientSms.TYPE_PAYMENT_NOTIFY;
+            } else if (type.equals(NOTIFICATION_SMS_SUBSCRIPTION_FEE)) {
+                clientSMSType = ClientSms.TYPE_SMS_SUBSCRIPTION_FEE;
+            } else if (type.equals(NOTIFICATION_SMS_SUB_FEE_WITHDRAW_SUCCESS) || type
+                    .equals(NOTIFICATION_SMS_SUB_FEE_WITHDRAW_NOT_SUCCESS)) {
+                clientSMSType = ClientSms.TYPE_SMS_SUB_FEE_WITHDRAW;
             } else {
                 throw new Exception("No client SMS type defined for notification " + type);
             }
-            smsService.sendSMSAsync(client.getIdOfClient(), clientSMSType, text);
+            if (sendAsync) {
+                smsService.sendSMSAsync(client, clientSMSType, text);
+            } else {
+                smsService.sendSMS(client, clientSMSType, text);
+            }
         } catch (Exception e) {
-            logger.error("Failed to send SMS notification", e);
+            String message = String.format("Failed to send SMS notification to client with contract_id = %s.", client.getContractId());
+            logger.error(message, e);
             return false;
         }
         return true;

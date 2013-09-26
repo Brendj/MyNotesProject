@@ -774,12 +774,14 @@ CREATE TABLE CF_Generators (
 );
 
 CREATE TABLE CF_SubscriptionFee (
+  IdOfSubscriptionFee  BIGSERIAL,
   SubscriptionYear     INTEGER            NOT NULL,
   PeriodNo             INTEGER            NOT NULL,
   IdOfTransaction      BIGINT             NOT NULL,
   SubscriptionSum      BIGINT             NOT NULL,
   CreateTime           BIGINT             NOT NULL,
-  CONSTRAINT CF_SubscriptionFee_pk PRIMARY KEY (SubscriptionYear, PeriodNo),
+  SubscriptionType     INTEGER            NOT NULL DEFAULT 0,
+  CONSTRAINT CF_SubscriptionFee_pk PRIMARY KEY (IdOfSubscriptionFee),
   CONSTRAINT CF_SubscriptionFee_IdOfTransaction_fk FOREIGN KEY (IdOfTransaction) REFERENCES CF_Transactions (IdOfTransaction)
 );
 

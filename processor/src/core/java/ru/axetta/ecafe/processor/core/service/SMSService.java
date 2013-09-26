@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientSms;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.sms.SendResponse;
@@ -14,62 +15,48 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.Date;
 
 @Component
 @Scope("singleton")
 public class SMSService {
-    Logger logger = LoggerFactory.getLogger(MaintananceService.class);
-    @PersistenceContext(unitName = "processorPU")
-    private EntityManager em;
+
+    private static Logger logger = LoggerFactory.getLogger(SMSService.class);
+    private static final ThreadLocal<ClientSms> createdClientSms = new ThreadLocal<ClientSms>();
 
     @Autowired
-    @Qualifier(value = "txManager")
-    private PlatformTransactionManager transactionManager;
-
-    @Autowired
-    RuntimeContext runtimeContext;
+    private RuntimeContext runtimeContext;
 
     public SMSService() {
     }
 
 
     @Async
-    public void sendSMSAsync(long idOfClient, int messageType, String text) throws Exception {
-        RuntimeContext.getAppContext().getBean(SMSService.class).sendSMS(idOfClient, messageType, text);
+    public void sendSMSAsync(Client client, int messageType, String text) throws Exception {
+        sendSMS(client, messageType, text);
     }
 
-    public boolean sendSMS(long idOfClient, int messageType, String text) throws Exception {
-        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        TransactionStatus status = transactionManager.getTransaction(def);
-        Client client = null; String phoneNumber, sender;
-        try {
-            client = em.find(Client.class, idOfClient);
-            if (client == null) {
-                throw new Exception ("Client doesn't exist");
-            }
-            if(!client.isNotifyViaSMS()) return false;
-            phoneNumber = client.getMobile();
-            if (!StringUtils.isNotEmpty(phoneNumber)) return false;
-            phoneNumber = PhoneNumberCanonicalizator.canonicalize(phoneNumber);
-            if (StringUtils.length(phoneNumber) != 11) return false;
-            sender = StringUtils.substring(StringUtils.defaultString(client.getOrg().getSmsSender()), 0, 11);
-            transactionManager.commit(status);
-            status = null;
+    public synchronized boolean sendSMS(Client client, int messageType, String text) throws Exception {
+        String phoneNumber, sender;
+        if (client == null) {
+            throw new Exception("Client doesn't exist");
         }
-        finally {
-            if (status!=null) transactionManager.rollback(status);
+        if (!client.isNotifyViaSMS()) {
+            return false;
         }
+        phoneNumber = client.getMobile();
+        if (StringUtils.isEmpty(phoneNumber)) {
+            return false;
+        }
+        phoneNumber = PhoneNumberCanonicalizator.canonicalize(phoneNumber);
+        if (StringUtils.length(phoneNumber) != 11) {
+            return false;
+        }
+        sender = StringUtils.substring(StringUtils.defaultString(client.getOrg().getSmsSender()), 0, 11);
 
         SendResponse sendResponse = null;
         ISmsService smsService = runtimeContext.getSmsService();
@@ -87,12 +74,16 @@ public class SMSService {
             }
         }
         if (null != sendResponse && sendResponse.isSuccess()) {
-            RuntimeContext.getFinancialOpsManager().createClientSmsCharge(client, sendResponse.getMessageId(), phoneNumber,
-                                messageType, text, new Date());
+            ClientSms clientSms = RuntimeContext.getFinancialOpsManager()
+                    .createClientSmsCharge(client, sendResponse.getMessageId(), phoneNumber, messageType, text,
+                            new Date());
+            createdClientSms.set(clientSms);
             return true;
         }
         return false;
     }
 
-
+    public static ClientSms getCreatedClientSms() {
+        return createdClientSms.get();
+    }
 }

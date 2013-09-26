@@ -15,30 +15,53 @@ import java.util.Date;
  */
 public class SubscriptionFee {
 
-    private CompositeIdOfSubscriptionFee compositeIdOfSubscriptionFee;
+    public static final String[] TYPE_DESCRIPTIONS = {"Неизвестно", "Абонентская плата за сервис SMS"};
+
+    public static final int TYPE_SMS_SERVICE = 1;
+
+    private Long idOfSubscriptionFee;
+    private Integer subscriptionYear;
+    private Integer periodNo;
     private AccountTransaction transaction;
     private Long subscriptionSum;
     private Date createTime;
+    private int subscriptionType;
 
     protected SubscriptionFee() {
-        // For Hibernate only
     }
 
-    public SubscriptionFee(CompositeIdOfSubscriptionFee compositeIdOfSubscriptionFee, AccountTransaction transaction,
-            Long subscriptionSum, Date createTime) {
-        this.compositeIdOfSubscriptionFee = compositeIdOfSubscriptionFee;
+    public SubscriptionFee(Integer subscriptionYear, Integer periodNo, AccountTransaction transaction,
+            Long subscriptionSum, Date createTime, int type) {
+        this.subscriptionYear = subscriptionYear;
+        this.periodNo = periodNo;
         this.transaction = transaction;
         this.subscriptionSum = subscriptionSum;
         this.createTime = createTime;
+        this.subscriptionType = type;
     }
 
-    public CompositeIdOfSubscriptionFee getCompositeIdOfSubscriptionFee() {
-        return compositeIdOfSubscriptionFee;
+    public Long getIdOfSubscriptionFee() {
+        return idOfSubscriptionFee;
     }
 
-    private void setCompositeIdOfSubscriptionFee(CompositeIdOfSubscriptionFee compositeIdOfSubscriptionFee) {
-        // For Hibernate only
-        this.compositeIdOfSubscriptionFee = compositeIdOfSubscriptionFee;
+    public void setIdOfSubscriptionFee(Long idOfSubscriptionFee) {
+        this.idOfSubscriptionFee = idOfSubscriptionFee;
+    }
+
+    public Integer getSubscriptionYear() {
+        return subscriptionYear;
+    }
+
+    public void setSubscriptionYear(Integer subscriptionYear) {
+        this.subscriptionYear = subscriptionYear;
+    }
+
+    public Integer getPeriodNo() {
+        return periodNo;
+    }
+
+    public void setPeriodNo(Integer periodNo) {
+        this.periodNo = periodNo;
     }
 
     public AccountTransaction getTransaction() {
@@ -68,6 +91,14 @@ public class SubscriptionFee {
         this.createTime = createTime;
     }
 
+    public int getSubscriptionType() {
+        return subscriptionType;
+    }
+
+    public void setSubscriptionType(int subscriptionType) {
+        this.subscriptionType = subscriptionType;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -77,17 +108,17 @@ public class SubscriptionFee {
             return false;
         }
         final SubscriptionFee that = (SubscriptionFee) o;
-        return compositeIdOfSubscriptionFee.equals(that.getCompositeIdOfSubscriptionFee());
+        return idOfSubscriptionFee.equals(that.idOfSubscriptionFee);
     }
 
     @Override
     public int hashCode() {
-        return compositeIdOfSubscriptionFee.hashCode();
+        return idOfSubscriptionFee.hashCode();
     }
 
     @Override
     public String toString() {
-        return "SubscriptionFee{" + "compositeIdOfSubscriptionFee=" + compositeIdOfSubscriptionFee + ", transaction="
+        return "SubscriptionFee{" + "idOfSubscriptionFee=" + idOfSubscriptionFee + ", transaction="
                 + transaction + ", subscriptionSum=" + subscriptionSum + ", createTime=" + createTime + '}';
     }
 }

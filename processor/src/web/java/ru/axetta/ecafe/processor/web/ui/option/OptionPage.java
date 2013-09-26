@@ -79,6 +79,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Integer retryAfter;
     private String syncRegisterSupportEmail;
     private Integer thinClientMinClaimsEditableDays;
+    private int smsPaymentType;
 
 
     private List<BankOptionItem> banks;
@@ -444,6 +445,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.thinClientMinClaimsEditableDays = thinClientMinClaimsEditableDays;
     }
 
+    public int getSmsPaymentType() {
+        return smsPaymentType;
+    }
+
+    public void setSmsPaymentType(int smsPaymentType) {
+        this.smsPaymentType = smsPaymentType;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -461,6 +470,7 @@ public class OptionPage extends BasicWorkspacePage {
         cleanMenu = runtimeContext.getOptionValueBool(Option.OPTION_CLEAN_MENU);
         menuDaysForDeletion = runtimeContext.getOptionValueInt(Option.OPTION_MENU_DAYS_FOR_DELETION);
         srcOrgMenuDaysForDeletion = runtimeContext.getOptionValueInt(Option.OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION);
+        smsPaymentType = runtimeContext.getOptionValueInt(Option.OPTION_SMS_PAYMENT_TYPE);
         journalTransactions = runtimeContext.getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS);
         sendJournalTransactionsToNFP = runtimeContext.getOptionValueBool(Option.OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP);
         nfpServiceAddress = runtimeContext.getOptionValueString(Option.OPTION_NFP_SERVICE_ADDRESS);
@@ -547,6 +557,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_CLEAN_MENU, cleanMenu);
             runtimeContext.setOptionValue(Option.OPTION_MENU_DAYS_FOR_DELETION, menuDaysForDeletion);
             runtimeContext.setOptionValue(Option.OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION, srcOrgMenuDaysForDeletion);
+            runtimeContext.setOptionValue(Option.OPTION_SMS_PAYMENT_TYPE, smsPaymentType);
             runtimeContext.setOptionValue(Option.OPTION_JOURNAL_TRANSACTIONS, journalTransactions);
             runtimeContext.setOptionValue(Option.OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP, sendJournalTransactionsToNFP);
             runtimeContext.setOptionValue(Option.OPTION_NFP_SERVICE_ADDRESS, nfpServiceAddress);

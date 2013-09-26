@@ -50,6 +50,14 @@
                           styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{optionPage.sendSMSPaymentNotification}" styleClass="output-text" />
         </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Модель оплаты СМС оповещений:" styleClass="output-text" />
+            <h:selectOneRadio value="#{optionPage.smsPaymentType}" styleClass="input-text">
+                <f:selectItem itemValue="1" itemLabel="по абонентской плате" />
+                <f:selectItem itemValue="2" itemLabel="поштучно" />
+            </h:selectOneRadio>
+        </h:panelGrid>
     </rich:tab>
     <rich:tab label="Платежные системы">
         <h:outputText escape="true" value="Выводить в личный кабинет" styleClass="output-text" />

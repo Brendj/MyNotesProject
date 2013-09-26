@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui.option;
 
-import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -12,8 +11,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Properties;
-import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -44,6 +41,10 @@ public class MessageConfigurePage extends BasicWorkspacePage {
     private String paymentEmailSubject;
     private String paymentEmailMessageText;
     private String paymentSMSMessageText;
+
+    private String smsSubscriptionFeeSMSText;
+    private String smsSubFeeWithdrawSuccessfulSMSText;
+    private String smsSubFeeWithdrawNotSuccessfulSMSText;
 
     @Resource
     EventNotificationService eventNotificationService;
@@ -81,6 +82,15 @@ public class MessageConfigurePage extends BasicWorkspacePage {
                 EventNotificationService.MESSAGE_PAYMENT, EventNotificationService.TYPE_EMAIL_TEXT);
         paymentSMSMessageText = eventNotificationService.getNotificationText(
                 EventNotificationService.MESSAGE_PAYMENT, EventNotificationService.TYPE_SMS);
+        smsSubscriptionFeeSMSText = eventNotificationService
+                .getNotificationText(EventNotificationService.NOTIFICATION_SMS_SUBSCRIPTION_FEE,
+                        EventNotificationService.TYPE_SMS);
+        smsSubFeeWithdrawSuccessfulSMSText = eventNotificationService
+                .getNotificationText(EventNotificationService.NOTIFICATION_SMS_SUB_FEE_WITHDRAW_SUCCESS,
+                        EventNotificationService.TYPE_SMS);
+        smsSubFeeWithdrawNotSuccessfulSMSText = eventNotificationService
+                .getNotificationText(EventNotificationService.NOTIFICATION_SMS_SUB_FEE_WITHDRAW_NOT_SUCCESS,
+                        EventNotificationService.TYPE_SMS);
     }
 
     public Object save() throws Exception {
@@ -117,7 +127,14 @@ public class MessageConfigurePage extends BasicWorkspacePage {
                     EventNotificationService.MESSAGE_PAYMENT, EventNotificationService.TYPE_EMAIL_TEXT,
                     paymentEmailMessageText,
                     EventNotificationService.MESSAGE_PAYMENT, EventNotificationService.TYPE_SMS,
-                    paymentSMSMessageText});
+                    paymentSMSMessageText,
+                    EventNotificationService.NOTIFICATION_SMS_SUBSCRIPTION_FEE, EventNotificationService.TYPE_SMS,
+                    smsSubscriptionFeeSMSText,
+                    EventNotificationService.NOTIFICATION_SMS_SUB_FEE_WITHDRAW_SUCCESS,
+                    EventNotificationService.TYPE_SMS, smsSubFeeWithdrawSuccessfulSMSText,
+                    EventNotificationService.NOTIFICATION_SMS_SUB_FEE_WITHDRAW_NOT_SUCCESS,
+                    EventNotificationService.TYPE_SMS, smsSubFeeWithdrawNotSuccessfulSMSText
+            });
 
             printMessage("Настройки сохранены.");
         } catch (Exception e) {
@@ -243,5 +260,29 @@ public class MessageConfigurePage extends BasicWorkspacePage {
 
     public void setPaymentSMSMessageText(String paymentSMSMessageText) {
         this.paymentSMSMessageText = paymentSMSMessageText;
+    }
+
+    public String getSmsSubscriptionFeeSMSText() {
+        return smsSubscriptionFeeSMSText;
+    }
+
+    public void setSmsSubscriptionFeeSMSText(String smsSubscriptionFeeSMSText) {
+        this.smsSubscriptionFeeSMSText = smsSubscriptionFeeSMSText;
+    }
+
+    public String getSmsSubFeeWithdrawSuccessfulSMSText() {
+        return smsSubFeeWithdrawSuccessfulSMSText;
+    }
+
+    public void setSmsSubFeeWithdrawSuccessfulSMSText(String smsSubFeeWithdrawSuccessfulSMSText) {
+        this.smsSubFeeWithdrawSuccessfulSMSText = smsSubFeeWithdrawSuccessfulSMSText;
+    }
+
+    public String getSmsSubFeeWithdrawNotSuccessfulSMSText() {
+        return smsSubFeeWithdrawNotSuccessfulSMSText;
+    }
+
+    public void setSmsSubFeeWithdrawNotSuccessfulSMSText(String smsSubFeeWithdrawNotSuccessfulSMSText) {
+        this.smsSubFeeWithdrawNotSuccessfulSMSText = smsSubFeeWithdrawNotSuccessfulSMSText;
     }
 }

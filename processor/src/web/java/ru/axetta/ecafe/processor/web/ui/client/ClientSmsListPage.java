@@ -6,7 +6,10 @@ package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientSms;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.service.SMSService;
 import ru.axetta.ecafe.processor.core.utils.AbbreviationUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
@@ -19,7 +22,10 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -286,7 +292,7 @@ public class ClientSmsListPage extends BasicWorkspacePage
             String text = String.format("Просьба пополнить счет карты. Баланс: %s р",
                     CurrencyStringUtils.copecksToRubles(currClient.getBalance()));
             try {
-                smsService.sendSMS(currClient.getIdOfClient(), ClientSms.TYPE_NEGATIVE_BALANCE, text);
+                smsService.sendSMS(currClient, ClientSms.TYPE_NEGATIVE_BALANCE, text);
             } catch (Exception e) {
                 logger.error(String.format("Failed to send SMS to client: %s", currClient), e);
             }

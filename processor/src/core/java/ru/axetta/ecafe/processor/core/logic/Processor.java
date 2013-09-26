@@ -21,7 +21,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
-import ru.axetta.ecafe.processor.core.subscription.SubscriptionFeeManager;
 import ru.axetta.ecafe.processor.core.sync.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.ClientRequests;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
@@ -68,8 +67,7 @@ public class Processor implements SyncProcessor,
         PaymentProcessor,
         ClientPaymentOrderProcessor,
         CardManager,
-        OrderCancelProcessor,
-        SubscriptionFeeManager {
+        OrderCancelProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(Processor.class);
     private static final int RESPONSE_MENU_PERIOD_IN_DAYS = 7;
@@ -509,32 +507,6 @@ public class Processor implements SyncProcessor,
                 if (null != client && 0 != order.getSumByCard()) {
                     RuntimeContext.getFinancialOpsManager().cancelOrder(persistenceSession, order);
                 }
-            }
-
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-    }
-
-    @Override
-    public void addSubcriptionFee(Long idOfClient, CompositeIdOfSubscriptionFee idOfSubscriptionFee) throws Exception {
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = persistenceSessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-
-            Client client = DAOUtils.getClientReference(persistenceSession, idOfClient);
-            Org organization = client.getOrg();
-            long subscriptionPrice = organization.getSubscriptionPrice();
-            if (subscriptionPrice != 0L) {
-                RuntimeContext.getFinancialOpsManager()
-                        .createSubscriptionFeeCharge(persistenceSession, idOfSubscriptionFee, client,
-                                subscriptionPrice);
             }
 
             persistenceSession.flush();

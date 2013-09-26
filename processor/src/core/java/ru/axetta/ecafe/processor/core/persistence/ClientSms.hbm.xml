@@ -22,7 +22,7 @@
         <property name="deliveryTime" column="DeliveryDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="price" column="Price" type="long" not-null="true" update="false"/>
         <many-to-one name="transaction" class="ru.axetta.ecafe.processor.core.persistence.AccountTransaction"
-                     column="IdOfTransaction" update="false" fetch="join"/>
+                     column="IdOfTransaction" fetch="join"/>
     </class>
 </hibernate-mapping>
 

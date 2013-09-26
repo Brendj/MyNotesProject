@@ -65,6 +65,28 @@
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>
+        <rich:tab label="SMS уведомление о списании абон. платы за SMS-сервис" id="smsSubFeeWithdraw-SMS">
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Текст уведомляющего сообщения:" styleClass="output-text" />
+                <h:inputTextarea rows="10" cols="40" value="#{messageConfigurePage.smsSubscriptionFeeSMSText}"
+                                 styleClass="input-text" />
+                <h:outputText escape="true" value="Текст (успешное списание):" styleClass="output-text" />
+                <h:inputTextarea rows="10" cols="40" value="#{messageConfigurePage.smsSubFeeWithdrawSuccessfulSMSText}"
+                                 styleClass="input-text" />
+                <h:outputText escape="true" value="Текст (неудачное списание):" styleClass="output-text" />
+                <h:inputTextarea rows="10" cols="40"
+                                 value="#{messageConfigurePage.smsSubFeeWithdrawNotSuccessfulSMSText}"
+                                 styleClass="input-text" />
+                <h:outputText escape="true" value="Ключевые слова:" styleClass="output-text" />
+                <h:panelGrid>
+                    <h:outputText value="[contractId] - номер лицевого счета" styleClass="output-text" />
+                    <h:outputText value="[date] - дата оповещения" styleClass="output-text" />
+                    <h:outputText value="[smsSubscriptionFee] - размер абонентской платы за SMS-сервис"
+                                  styleClass="output-text" />
+                    <h:outputText value="[withdrawDate] - дата списания абон. платы" styleClass="output-text" />
+                </h:panelGrid>
+            </h:panelGrid>
+        </rich:tab>
         <rich:tab label="E-mail уведомления о пополнении баланса" id="balance-Email">
             <h:panelGrid styleClass="borderless-grid" columns="2">
                 <h:outputText escape="true" value="Тема:" styleClass="output-text" />

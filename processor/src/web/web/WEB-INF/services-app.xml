@@ -98,8 +98,11 @@
         <task:scheduled ref="benefitsRecalculationService" method="run" cron="0 15 0 ? * *" />
     </task:scheduled-tasks>
 
-
-
-
+    <task:scheduler id="clientsSMSSubscriptionFeeSchedule"/>
+    <task:scheduled-tasks scheduler="clientsSMSSubscriptionFeeSchedule">
+        <task:scheduled ref="smsSubscriptionFeeService" method="notifyClientsAboutSMSSubscriptionFee"
+                        cron="0 0 16 26 * ?"/>
+        <task:scheduled ref="smsSubscriptionFeeService" method="smsSubscriptionFeeWithdraw" cron="0 0 16-20 1-3 * ?"/>
+    </task:scheduled-tasks>
 
 </beans>

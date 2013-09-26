@@ -8,12 +8,14 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
+import ru.axetta.ecafe.processor.core.service.SMSSubscriptionFeeService;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +30,10 @@ import java.util.Date;
 public class FinancialOpsManager {
     @PersistenceContext(unitName = "processorPU")
     EntityManager em;
-    
+
+    @Autowired
+    private RuntimeContext runtimeContext;
+
     @Resource
     EventNotificationService eventNotificationService;
 
@@ -37,17 +42,18 @@ public class FinancialOpsManager {
     }
 
     @Transactional
-    public void createClientSmsCharge(Client client, String idOfSms, String phone, Integer contentsType,
+    public ClientSms createClientSmsCharge(Client client, String idOfSms, String phone, Integer contentsType,
             String textContents, Date serviceSendTime) throws Exception {
 
         Session session = (Session)em.getDelegate();
         
         long priceOfSms = client.getOrg().getPriceOfSms();
+        int paymentType = runtimeContext.getOptionValueInt(Option.OPTION_SMS_PAYMENT_TYPE);
         //Card card = DAOUtils.findActiveCard(em, client);
         Date currTime = new Date();
 
         AccountTransaction accountTransaction = null;
-        if (priceOfSms != 0) {
+        if (priceOfSms != 0 && paymentType == SMSSubscriptionFeeService.SMS_PAYMENT_BY_THE_PIECE) {
             // Register transaction
             //accountTransaction = new AccountTransaction(client, null, -priceOfSms, "",
             //        AccountTransaction.INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE, currTime);
@@ -64,23 +70,26 @@ public class FinancialOpsManager {
         ClientSms clientSms = new ClientSms(idOfSms, client, accountTransaction, phone, contentsType, textContents,
                 serviceSendTime, priceOfSms);
         session.save(clientSms);
+        return clientSms;
     }
 
-    public void createSubscriptionFeeCharge(Session session, CompositeIdOfSubscriptionFee idOfSubscriptionFee,
-            Client client, long subscriptionPrice)
-            throws Exception {
+    public SubscriptionFee createSubscriptionFeeCharge(Session session, Client client, long subscriptionPrice,
+            int subscriptionYear, int periodNo, int type) throws Exception {
         Date currentTime = new Date();
-        AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
-                null, -subscriptionPrice, "", AccountTransaction.SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE, currentTime);
+        AccountTransaction accountTransaction = ClientAccountManager
+                .processAccountTransaction(session, client, null, -subscriptionPrice, "",
+                        AccountTransaction.SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE, currentTime);
 
-        SubscriptionFee subscriptionFee = new SubscriptionFee(idOfSubscriptionFee, accountTransaction,
-                subscriptionPrice, currentTime);
+        SubscriptionFee subscriptionFee = new SubscriptionFee(subscriptionYear, periodNo, accountTransaction,
+                subscriptionPrice, currentTime, type);
         session.save(subscriptionFee);
 
         Contragent operatorContragent = DAOUtils.findContragentByClass(session, Contragent.OPERATOR);
         Contragent clientContragent = DAOUtils.findContragentByClass(session, Contragent.CLIENT);
         // уменьшаем позицию Оператор - Клиент
-        getCurrentPositionsManager(session).changeCurrentPosition(-subscriptionPrice, operatorContragent, clientContragent);
+        getCurrentPositionsManager(session)
+                .changeCurrentPosition(-subscriptionPrice, operatorContragent, clientContragent);
+        return subscriptionFee;
     }
 
     public void createOrderCharge(Session session, SyncRequest.PaymentRegistry.Payment payment, Long idOfOrg,

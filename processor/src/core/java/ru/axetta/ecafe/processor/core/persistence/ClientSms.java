@@ -19,12 +19,16 @@ public class ClientSms {
 
     public static final String UNKNOWN_CONTENTS_TYPE_DESCRIPTION = "Неизвестен";
     public static final String CONTENTS_TYPE_DESCRIPTION[] = {UNKNOWN_CONTENTS_TYPE_DESCRIPTION, "Баланс меньше нуля",
-                                                              "Уведомление о проходе", "Зачисление средств", "Код активации","Уведомление о покупке"};
+                                                              "Уведомление о проходе", "Зачисление средств", "Код активации","Уведомление о покупке",
+                                                              "Уведомление о скором списании абон. платы за SMS-сервис",
+                                                              "Уведомление о списании абон. платы за SMS-сервис"};
     public static final int TYPE_NEGATIVE_BALANCE = 1;
     public static final int TYPE_ENTER_EVENT_NOTIFY = 2;
     public static final int TYPE_PAYMENT_REGISTERED = 3;
     public static final int TYPE_LINKING_TOKEN = 4;
     public static final int TYPE_PAYMENT_NOTIFY= 5;
+    public static final int TYPE_SMS_SUBSCRIPTION_FEE = 6;
+    public static final int TYPE_SMS_SUB_FEE_WITHDRAW = 7;
 
     public static final int SENT_TO_SERVICE = 0;
     public static final int SEND_TO_RECIPENT = 1;
@@ -167,7 +171,7 @@ public class ClientSms {
         return transaction;
     }
 
-    private void setTransaction(AccountTransaction accountTransaction) {
+    public void setTransaction(AccountTransaction accountTransaction) {
         // For Hibernate only
         this.transaction = accountTransaction;
     }
