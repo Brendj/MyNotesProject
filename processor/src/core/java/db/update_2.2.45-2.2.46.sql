@@ -25,3 +25,6 @@ CREATE TABLE cf_thin_client_users (
   CONSTRAINT cf_thin_client_users_client FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
 );
 insert into cf_thin_client_users values (1032, 'testerov', 'R2hiZHRuMDA=', 1, 1378976400000, null) values (IdOfOrg, IdOfClient, UserName, Password, Role, CreationDate, ModificationDate);
+
+-- Поправка бага ECAFE-1179
+ALTER TABLE cf_reportinfo ALTER COLUMN reportname TYPE character varying(512);
