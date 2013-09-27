@@ -13,11 +13,13 @@ import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -83,26 +85,61 @@ public class CWOACReport extends BasicReportForAllOrgJob {
 
         @SuppressWarnings("unchecked")
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime) {
-            List<CWOACItem> items = new ArrayList<CWOACItem>();
-            Query query = session.createSQLQuery(
-                    "SELECT \n" +
+            Map<Long, CWOACItem> itemsByOrg = new HashMap<Long, CWOACItem>();
+            Query query = session.createSQLQuery("SELECT \n" +
                     "o.idoforg, \n" +
                     "o.shortname, \n" +
-                    "sum(CASE WHEN ord.ordertype = 4 THEN 1 ELSE 0 END) AS consumedCount, \n" +
-                    "sum(CASE WHEN ord.ordertype = 6 THEN 1 ELSE 0 END) AS writtenOffCount \n" +
-                    "FROM cf_orgs o JOIN cf_orders ord ON (o.idoforg = ord.idoforg) \n" +
-                    "WHERE ord.createddate >= :beginDate AND ord.createddate <= :endDate \n" +
-                    "GROUP BY o.idoforg, o.shortname \n" +
-                    "ORDER BY o.shortname")
-                    .setParameter("beginDate", startTime.getTime())
+                    "o.district, \n" +
+                    "sum(grp.totalcount / 1000) AS requestCount \n" +
+                    "FROM cf_goods_requests gr JOIN cf_goods_requests_positions grp ON (gr.IdOfGoodsRequest = grp.IdOfGoodsRequest) \n" +
+                    "JOIN cf_orgs o ON (gr.orgOwner = o.idoforg) \n" +
+                    "JOIN cf_goods g ON (g.IdOfGood = grp.IdOfGood) \n" +
+                    "WHERE gr.doneDate BETWEEN :startDate AND :endDate \n" +
+                    "GROUP BY o.idoforg, o.shortname, o.district")
+                    .setParameter("startDate", startTime.getTime())
                     .setParameter("endDate", endTime.getTime());
             List<Object[]> res = (List<Object[]>) query.list();
             for (Object[] record : res) {
-                CWOACItem item = new CWOACItem(record[1].toString(), 0L, ((BigInteger) record[2]).longValue(),
-                        ((BigInteger) record[3]).longValue());
-                items.add(item);
+                CWOACItem item = new CWOACItem(record[1].toString(), StringUtils.defaultString((String) record[2]),
+                        ((BigDecimal) record[3]).longValue());
+                itemsByOrg.put(((BigInteger) record[0]).longValue(), item);
             }
-            return new JRBeanCollectionDataSource(items);
+            query = session.createSQLQuery("SELECT \n" +
+                    "ord.idoforg, \n" +
+                    "sum(CASE WHEN ord.ordertype = 4 THEN det.qty ELSE 0 END) AS consumedCount, \n" +
+                    "sum(CASE WHEN ord.ordertype = 6 THEN det.qty ELSE 0 END) AS writtenOffCount \n" +
+                    "FROM cf_orders ord JOIN CF_OrderDetails det ON (ord.idoforder = det.idoforder AND ord.idoforg = det.idoforg) \n" +
+                    "JOIN cf_goods g ON (g.IdOfGood = det.IdOfGood) \n" +
+                    "WHERE ord.createddate >= :beginDate AND ord.createddate <= :endDate \n" +
+                    "AND g.IdOfGood IN (SELECT g2.idofgood \n" +
+                    "                   FROM cf_goods_requests gr JOIN cf_goods_requests_positions grp ON (gr.IdOfGoodsRequest = grp.IdOfGoodsRequest) \n" +
+                    "                                             JOIN cf_goods g2 ON (g2.IdOfGood = grp.IdOfGood) \n" +
+                    "                   WHERE gr.doneDate BETWEEN :startDate AND :endDate2 AND gr.orgOwner = ord.idoforg)" +
+                    "GROUP BY ord.idoforg \n" +
+                    "ORDER BY ord.idoforg")
+                    .setParameter("beginDate", startTime.getTime())
+                    .setParameter("endDate", endTime.getTime())
+                    .setParameter("startDate", startTime.getTime())
+                    .setParameter("endDate2", endTime.getTime());
+            res = (List<Object[]>) query.list();
+            for (Object[] record : res) {
+                CWOACItem item = itemsByOrg.get(((BigInteger) record[0]).longValue());
+                if (item != null) {
+                    item.setConsumedCount(((BigInteger) record[1]).longValue());
+                    item.setWrittenOffCount(((BigInteger) record[2]).longValue());
+                }
+            }
+            SortedSet<CWOACItem> beanColl = new TreeSet<CWOACItem>(new Comparator<CWOACItem>() {
+                @Override
+                public int compare(CWOACItem o1, CWOACItem o2) {
+                    int res = o1.getDistrict().compareTo(o2.getDistrict());
+                    if (res != 0)
+                        return res;
+                    return o1.getOrgName().compareTo(o2.getOrgName());
+                }
+            });
+            beanColl.addAll(itemsByOrg.values());
+            return new JRBeanCollectionDataSource(beanColl);
         }
     }
 }

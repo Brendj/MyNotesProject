@@ -4,9 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.report.complianceWithOrderAndConsumption;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
 /**
  * Created with IntelliJ IDEA.
  * User: r.kalimullin
@@ -17,24 +14,15 @@ import java.math.RoundingMode;
 public class CWOACItem {
 
     private String orgName;
-    private Long ordersCount;
-    private Long consumedCount;
-    private Long difference;
-    private BigDecimal diffPercent;
-    private Long writtenOffCount;
-    private BigDecimal writtenOffPercent;
+    private String district;
+    private Long requestCount = 0L;
+    private Long consumedCount = 0L;
+    private Long writtenOffCount = 0L;
 
-    public CWOACItem(String orgName, Long ordersCount, Long consumedCount, Long writtenOffCount) {
+    public CWOACItem(String orgName, String district, Long requestCount) {
         this.orgName = orgName;
-        this.ordersCount = ordersCount;
-        this.consumedCount = consumedCount;
-        this.difference = ordersCount - consumedCount;
-        this.diffPercent = consumedCount == 0 ? BigDecimal.ZERO.setScale(2, RoundingMode.HALF_EVEN)
-                : BigDecimal.valueOf(100 * difference / (double) consumedCount).setScale(2, RoundingMode.HALF_EVEN);
-        this.writtenOffCount = writtenOffCount;
-        this.writtenOffPercent = consumedCount == 0 ? BigDecimal.ZERO.setScale(2, RoundingMode.HALF_EVEN)
-                : BigDecimal.valueOf(100 * writtenOffCount / (double) consumedCount)
-                        .setScale(2, RoundingMode.HALF_EVEN);
+        this.district = district;
+        this.requestCount = requestCount;
     }
 
     public String getOrgName() {
@@ -45,12 +33,20 @@ public class CWOACItem {
         this.orgName = orgName;
     }
 
-    public Long getOrdersCount() {
-        return ordersCount;
+    public String getDistrict() {
+        return district;
     }
 
-    public void setOrdersCount(Long ordersCount) {
-        this.ordersCount = ordersCount;
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public Long getRequestCount() {
+        return requestCount;
+    }
+
+    public void setRequestCount(Long requestCount) {
+         this.requestCount = requestCount;
     }
 
     public Long getConsumedCount() {
@@ -61,35 +57,11 @@ public class CWOACItem {
         this.consumedCount = consumedCount;
     }
 
-    public Long getDifference() {
-        return difference;
-    }
-
-    public void setDifference(Long difference) {
-        this.difference = difference;
-    }
-
-    public BigDecimal getDiffPercent() {
-        return diffPercent;
-    }
-
-    public void setDiffPercent(BigDecimal diffPercent) {
-        this.diffPercent = diffPercent;
-    }
-
     public Long getWrittenOffCount() {
         return writtenOffCount;
     }
 
     public void setWrittenOffCount(Long writtenOffCount) {
         this.writtenOffCount = writtenOffCount;
-    }
-
-    public BigDecimal getWrittenOffPercent() {
-        return writtenOffPercent;
-    }
-
-    public void setWrittenOffPercent(BigDecimal writtenOffPercent) {
-        this.writtenOffPercent = writtenOffPercent;
     }
 }
