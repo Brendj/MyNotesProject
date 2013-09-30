@@ -199,12 +199,11 @@ public class Person {
     }
 
     public String getFullName() {
-        String fullName="";
-        if (getSurname()!=null && getSurname().length()>0) fullName+=getSurname();
-        if (getFirstName()!=null && getFirstName().length()>0) fullName+=" "+getFirstName();
-        if (getSecondName()!=null && getSecondName().length()>0) fullName+=" "+getSecondName();
-        if (fullName.startsWith(" ")) fullName=fullName.substring(1);
-        return fullName;
+        StringBuilder sb = new StringBuilder();
+        if (getSurname()!=null && getSurname().length()>0) sb.append(getSurname());
+        if (getFirstName()!=null && getFirstName().length()>0) sb.append(" ").append(getFirstName());
+        if (getSecondName()!=null && getSecondName().length()>0) sb.append(" ").append(getSecondName());
+        return sb.toString().trim();
     }
 
     public String getSurnameAndFirstLetters() {

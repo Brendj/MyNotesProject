@@ -7,15 +7,16 @@ package ru.axetta.ecafe.processor.web.ui.client;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.client.items.ClientPassItem;
 
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -36,6 +37,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
     private List<AccountTransfer> accountTransferList = new ArrayList<AccountTransfer>();
     private List<AccountRefund> accountRefundList = new ArrayList<AccountRefund>();
     private List<AccountTransaction> accountTransactionList = new ArrayList<AccountTransaction>();
+    private List<ClientPassItem> clientPasses = new ArrayList<ClientPassItem>();
 
     public String getPageFilename() {
         return "client/operation_list";
@@ -95,6 +97,11 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         return accountRefundList;
     }
 
+    public List<ClientPassItem> getClientPasses() {
+        return clientPasses;
+    }
+
+    @SuppressWarnings("unchecked")
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
         this.idOfClient = client.getIdOfClient();
@@ -120,7 +127,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         criteria.add(Restrictions.ge("transactionTime", startTime));
         criteria.add(Restrictions.le("transactionTime", endTime));
         criteria.add(Restrictions.eq("client", client));
-        criteria.addOrder(org.hibernate.criterion.Order.asc("transactionTime"));
+        criteria.addOrder(Order.asc("transactionTime"));
         this.accountTransactionList = new ArrayList<AccountTransaction>();
         for (Object o : criteria.list()) {
             AccountTransaction accTrans = (AccountTransaction)o;
@@ -128,6 +135,15 @@ public class ClientOperationListPage extends BasicWorkspacePage {
             accountTransactionList.add(accTrans);
         }
 
+        criteria = session.createCriteria(EnterEvent.class);
+        criteria.add(Restrictions.ge("evtDateTime", startTime));
+        criteria.add(Restrictions.le("evtDateTime", endTime));
+        criteria.add(Restrictions.eq("client", client));
+        criteria.addOrder(Order.asc("evtDateTime"));
+        List<EnterEvent> res = (List<EnterEvent>) criteria.list();
+        for (EnterEvent event : res) {
+            clientPasses.add(new ClientPassItem(event));
+        }
     }
 
 }

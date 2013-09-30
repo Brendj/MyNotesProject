@@ -467,6 +467,42 @@
     </f:facet>
 </rich:dataTable>
 
+<h:outputText value="Проходы:" />
+<rich:dataTable id="clientPassesTable" var="pass" value="#{mainPage.clientOperationListPage.clientPasses}"
+                rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer" rows="8">
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="№" />
+        </f:facet>
+        <h:outputText escape="true" value="#{row+1}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Организация" />
+        </f:facet>
+        <h:outputText escape="true" value="#{pass.orgName}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Наименование входа" />
+        </f:facet>
+        <h:outputText escape="true" value="#{pass.enterName}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Дата и время" />
+        </f:facet>
+        <h:outputText escape="true" value="#{pass.enterTime}" styleClass="output-text"
+                      converter="timeMinuteConverter" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Направление" />
+        </f:facet>
+        <h:outputText escape="true" value="#{pass.direction}" styleClass="output-text" />
+    </rich:column>
+</rich:dataTable>
+
 </h:panelGrid>
 <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages" warnClass="warn-messages" />
 </h:panelGrid>
