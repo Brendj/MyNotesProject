@@ -58,6 +58,11 @@
                 <f:selectItem itemValue="2" itemLabel="поштучно" />
             </h:selectOneRadio>
         </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Размер абонентской платы по умолчанию" styleClass="output-text" />
+            <h:inputText value="#{optionPage.smsDefaultSubscriptionFee}" styleClass="input-text"
+                         converter="copeckSumConverter" size="5" />
+        </h:panelGrid>
     </rich:tab>
     <rich:tab label="Платежные системы">
         <h:outputText escape="true" value="Выводить в личный кабинет" styleClass="output-text" />

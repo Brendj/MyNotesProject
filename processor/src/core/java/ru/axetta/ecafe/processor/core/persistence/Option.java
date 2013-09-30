@@ -31,7 +31,8 @@ public class Option {
         RBK_SECTION(1002),
         RBK_RATE(1003),
         SRC_ORG_MENU_DAYS_FOR_DELETION(1004),
-        SMS_PAYMENT_TYPE(1005);
+        SMS_PAYMENT_TYPE(1005),
+        SMS_DEFAULT_SUBSCRIPTION_FEE(1006);
         private int value;
 
         private Options(int value) {
@@ -62,6 +63,7 @@ public class Option {
             OPTION_RBK_RATE=1003,
             OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION=1004,
             OPTION_SMS_PAYMENT_TYPE=1005,
+            OPTION_SMS_DEFAULT_SUBSCRIPTION_FEE=1006,
             OPTION_NSI_LAST_SYNC_TIME=10001,
             OPTION_STOP_LIST_LAST_UPDATE=10010,
             OPTION_MSR_STOPLIST_UPD_TIME=10011,
@@ -117,6 +119,7 @@ public class Option {
             OPTION_RBK_RATE, "3",
             OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION, "365",
             OPTION_SMS_PAYMENT_TYPE, "1",
+            OPTION_SMS_DEFAULT_SUBSCRIPTION_FEE, "0",
             OPTION_NSI_LAST_SYNC_TIME, null,
             OPTION_STOP_LIST_LAST_UPDATE, null,
             OPTION_MSR_STOPLIST_ON, "0",

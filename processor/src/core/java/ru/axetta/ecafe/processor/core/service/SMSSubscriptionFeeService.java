@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -52,9 +53,17 @@ public class SMSSubscriptionFeeService {
     @Autowired
     private EventNotificationService enService;
 
+    private Long defaultSubFee;
+    private int paymentType;
+
+    @PostConstruct
+    protected void init() {
+        defaultSubFee = runtimeContext.getOptionValueLong(Option.OPTION_SMS_DEFAULT_SUBSCRIPTION_FEE);
+        paymentType = runtimeContext.getOptionValueInt(Option.OPTION_SMS_PAYMENT_TYPE);
+    }
+
     @Transactional
     public void notifyClientsAboutSMSSubscriptionFee() throws Exception {
-        int paymentType = runtimeContext.getOptionValueInt(Option.OPTION_SMS_PAYMENT_TYPE);
         if (paymentType != SMS_PAYMENT_BY_SUBSCRIPTION_FEE) {
             return;
         }
@@ -62,7 +71,8 @@ public class SMSSubscriptionFeeService {
         String currentDate = CalendarUtils.dateToString(new Date());
         List<Client> clients = findClientsWithNotificationViaSMS();
         for (Client client : clients) {
-            Long smsFee = client.getOrg().getSubscriptionPrice();
+            Long smsFee = client.getOrg().getSubscriptionPrice() == 0 ? defaultSubFee
+                    : client.getOrg().getSubscriptionPrice();
             if (client.getBalance() - smsFee < 0) {
                 String[] values = {
                         "contractId", client.getContractId().toString(), "withdrawDate", withdrawDate,
@@ -74,7 +84,6 @@ public class SMSSubscriptionFeeService {
 
     @Transactional
     public void smsSubscriptionFeeWithdraw() {
-        int paymentType = runtimeContext.getOptionValueInt(Option.OPTION_SMS_PAYMENT_TYPE);
         if (paymentType != SMS_PAYMENT_BY_SUBSCRIPTION_FEE) {
             return;
         }
@@ -92,7 +101,8 @@ public class SMSSubscriptionFeeService {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     private void processOneClient(Client client, String withdrawDate) throws Exception {
-        Long smsSubFee = client.getOrg().getSubscriptionPrice();
+        Long smsSubFee =
+                client.getOrg().getSubscriptionPrice() == 0 ? defaultSubFee : client.getOrg().getSubscriptionPrice();
         String[] values = {
                 "contractId", client.getContractId().toString(), "date", withdrawDate, "smsSubscriptionFee",
                 CurrencyStringUtils.copecksToRubles(smsSubFee), "withdrawDate", withdrawDate};
