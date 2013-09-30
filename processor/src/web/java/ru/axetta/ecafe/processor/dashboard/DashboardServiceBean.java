@@ -571,7 +571,7 @@ public class DashboardServiceBean {
     public DashboardResponse.OrgSyncStats getOrgSyncInfo() {
         DashboardResponse.OrgSyncStats orgSyncStats = new DashboardResponse.OrgSyncStats();
         ///// получение данных по сихронизации
-        List<Org> orgs = daoService.getOrderedSynchOrgsList();
+        List<Org> orgs = daoService.getOrderedSynchOrgsList(true);
         LinkedList<DashboardResponse.OrgSyncStatItem> items = new LinkedList<DashboardResponse.OrgSyncStatItem>();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         for (Org org : orgs) {

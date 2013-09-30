@@ -558,7 +558,16 @@ public class DAOService {
 
 
     public List<Org> getOrderedSynchOrgsList() {
-        TypedQuery<Org> query = entityManager.createQuery("from Org order by lastSuccessfulBalanceSync", Org.class);
+        return getOrderedSynchOrgsList(false);
+    }
+
+
+    public List<Org> getOrderedSynchOrgsList(boolean excludeDisabled) {
+        String disabledClause = "";
+        if (excludeDisabled) {
+            disabledClause = " where state<>0 ";
+        }
+        TypedQuery<Org> query = entityManager.createQuery("from Org " + disabledClause + " order by lastSuccessfulBalanceSync", Org.class);
         return query.getResultList();
     }
 
