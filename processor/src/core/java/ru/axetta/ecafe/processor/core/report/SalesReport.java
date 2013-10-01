@@ -10,9 +10,9 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 public class SalesReport extends BasicReport {
@@ -24,35 +24,28 @@ public class SalesReport extends BasicReport {
         public SalesReport build(Session session, Date startDate, Date endDate, List<Long> idOfOrgList)
                 throws Exception {
             Date generateTime = new Date();
-            List<SalesItem> salesItems = new LinkedList<SalesItem>();
+            List<SalesItem> salesItems = new ArrayList<SalesItem>();
             if (!idOfOrgList.isEmpty()) {
-                // Обработать лист с организациями
-                String orgCondition = "";
-                orgCondition = "and (";
-                for (Long idOfOrg : idOfOrgList) {
-                    orgCondition = orgCondition.concat("o.idOfOrg = " + idOfOrg + " or ");
-                }
-                orgCondition = orgCondition.substring(0, orgCondition.length() - 4) + ") ";
-
-                String preparedQuery = "select org.officialName, od.MenuDetailName, od.MenuOutput, od.MenuOrigin, "
-                        + "       od.rPrice, od.discount, sum(od.qty) as quantity, "
-                        + "       min(o.createdDate), max(o.createdDate) "
-                        + "  from CF_Orders o, CF_OrderDetails od, CF_Orgs org " + " where o.idOfOrder = od.idOfOrder "
-                        + "   and o.idOfOrg = od.idOfOrg" + "   and org.idOfOrg = od.idOfOrg "
-                        + "   and o.createdDate >= :fromCreatedDate " + "   and o.createdDate <= :toCreatedDate"
-                        + "   and od.menuType = :menuType " + orgCondition
-                        + " group by org.officialName, od.menuDetailName, od.MenuOrigin, od.rPrice,"
-                        + "          od.MenuOutput, od.discount "
-                        + " order by org.officialName, od.MenuOrigin, od.menuDetailName";
-                List resultList = null;
+                String preparedQuery =
+                          "select org.officialName, od.MenuDetailName, od.MenuOutput, od.MenuOrigin, od.rPrice, "
+                        + " od.discount, sum(od.qty) as quantity, min(o.createdDate), max(o.createdDate) \n"
+                        + "from CF_Orders o join CF_OrderDetails od on (o.idOfOrder = od.idOfOrder and o.idOfOrg = od.idOfOrg) \n"
+                        + "                 join CF_Orgs org on (org.idOfOrg = od.idOfOrg) \n"
+                        + "where o.createdDate >= :fromCreatedDate and o.createdDate <= :toCreatedDate and od.menuType = :menuType \n"
+                        + " and (org.idOfOrg in (:orgs) or org.idOfOrg in "
+                        + "  (select me.IdOfDestOrg from CF_MenuExchangeRules me where me.IdOfSourceOrg in (:destOrgs))) \n"
+                        + "group by org.officialName, od.menuDetailName, od.MenuOrigin, od.rPrice, od.MenuOutput, od.discount \n"
+                        + "order by org.officialName, od.MenuOrigin, od.menuDetailName";
                 Query query = session.createSQLQuery(preparedQuery);
                 long startDateLong = startDate.getTime();
                 long endDateLong = endDate.getTime();
                 query.setLong("fromCreatedDate", startDateLong);
                 query.setLong("toCreatedDate", endDateLong);
                 query.setInteger("menuType", OrderDetail.TYPE_DISH_ITEM);
+                query.setParameterList("orgs", idOfOrgList);
+                query.setParameterList("destOrgs", idOfOrgList);
 
-                resultList = query.list();
+                List resultList = query.list();
 
                 for (Object result : resultList) {
                     Object[] sale = (Object[]) result;
