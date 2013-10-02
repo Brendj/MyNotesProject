@@ -17,7 +17,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <%--@elvariable id="contragentCompletionReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ContragentCompletionReportPage"--%>
-<h:panelGrid binding="#{contragentCompletionReportPage.pageComponent}" id="enterEventReportPanelGrid" styleClass="borderless-grid">
+<h:panelGrid binding="#{contragentCompletionReportPage.pageComponent}" id="contragentCompletionReportPanelGrid" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Поставщик" styleClass="output-text required-field" />
         <h:panelGroup styleClass="borderless-div">
@@ -40,7 +40,7 @@
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
         <a4j:commandButton value="Генерировать отчет" action="#{contragentCompletionReportPage.generate}"
-                           reRender="mainMenu, workspaceTogglePanel, contragentCompletionReportTable"
+                           reRender="contragentCompletionReportTable"
                            styleClass="command-button" status="reportGenerateStatus" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
@@ -48,7 +48,7 @@
             </f:facet>
         </a4j:status>
     </h:panelGrid>
-    <rich:dataTable id="contragentCompletionReportTableTemp" value="#{contragentCompletionReportPage.contragentCompletionItems}"
+    <rich:dataTable id="contragentCompletionReportTable" value="#{contragentCompletionReportPage.contragentCompletionItems}"
                     var="contragentCompletionItem" rowKeyVar="row">
         <f:facet name="header">
             <rich:columnGroup>
