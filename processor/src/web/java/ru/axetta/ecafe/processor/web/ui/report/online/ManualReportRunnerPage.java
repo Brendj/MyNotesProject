@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.faces.component.UIComponent;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
@@ -44,6 +45,7 @@ import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -70,6 +72,8 @@ public class ManualReportRunnerPage extends OnlineReportPage
     private CCAccountFilter contragentPayAgentFilter = new CCAccountFilter();
     private Date generateStartDate = getDefaultStartDate();
     private Date generateEndDate = getDefaultEndDate();
+    private int reportPeriod;
+    public final static int REPORT_PERIOD_DAY = 0, REPORT_PERIOD_WEEK = 1, REPORT_PERIOD_2WEEKS = 2, REPORT_PERIOD_MONTH = 3, REPORT_PERIOD_DATE = 4;
 
     private List<RuleItem> items = Collections.emptyList();
     private String ruleItem;
@@ -103,6 +107,31 @@ public class ManualReportRunnerPage extends OnlineReportPage
 
     public void setDocumentFormat(int documentFormat) {
         this.documentFormat = documentFormat;
+    }
+
+    public int getReportPeriod() {
+        return reportPeriod;
+    }
+
+    public void setReportPeriod(int reportPeriod) {
+        this.reportPeriod = reportPeriod;
+    }
+
+    public void onReportPeriodChanged(ActionEvent event) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTimeInMillis(generateStartDate.getTime());
+        if (reportPeriod == REPORT_PERIOD_WEEK) {
+            cal.add(Calendar.DAY_OF_MONTH, 7);
+        } else if (reportPeriod == REPORT_PERIOD_2WEEKS) {
+            cal.add(Calendar.DAY_OF_MONTH, 14);
+        } else if (reportPeriod == REPORT_PERIOD_MONTH) {
+            cal.add(Calendar.MONTH, 1);
+        }
+        this.generateEndDate = cal.getTime();
+    }
+
+    public void onEndDateSpecified(ActionEvent event) {
+        reportPeriod = REPORT_PERIOD_DATE;
     }
 
     public ReportFormatMenu getReportFormatMenu() {
@@ -333,7 +362,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
                     continue;
                 }
                 defRule = new RuleConditionItem(
-                       hint.getHint().getParamHint().getName() + hint.getHint().getParamHint().getDefaultRule());
+                        hint.getHint().getParamHint().getName() + hint.getHint().getParamHint().getDefaultRule());
             } catch (Exception e) {
                 try {
                     defRule = new RuleConditionItem(
@@ -385,7 +414,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
         }
     }
 
-    public void fillContragentPayAgentHint (RuleCondition hint) {
+    public void fillContragentPayAgentHint(RuleCondition hint) {
         if (hint == null || hint.getConditionConstant() == null || hint.getConditionConstant().length() < 1) {
             return;
         }
@@ -544,8 +573,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
                 try {
                     buildReport(values, org);
                 } catch (Exception e) {
-                    errorMessage = String.format("Во время выполнения отчета, возникла ошибка: %s",
-                            e.getMessage());
+                    errorMessage = String.format("Во время выполнения отчета, возникла ошибка: %s", e.getMessage());
                     return;
                 }
                 //  .. но прерываем выполнение, если тип отчета не "В репозиторий" - для всех оргов выполнение только
@@ -559,8 +587,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
             try {
                 buildReport(values, null);
             } catch (Exception e) {
-                errorMessage = String.format("Во время выполнения отчета, возникла ошибка: %s",
-                                             e.getMessage());
+                errorMessage = String.format("Во время выполнения отчета, возникла ошибка: %s", e.getMessage());
                 return;
             }
         }
@@ -693,7 +720,9 @@ public class ManualReportRunnerPage extends OnlineReportPage
                 ext = "pdf";
                 contentType = "application/pdf";
             }
-            response.setHeader("Content-disposition", String.format("attachment; filename=%s.%s", ruleName, ext));
+            String fileName=ruleName+"."+ext;
+            fileName = URLEncoder.encode(fileName, "UTF-8").replace('+', ' ');
+            response.setHeader("Content-disposition", "attachment; filename*=\"utf8'ru-ru'"+fileName+"\"");
             response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
             response.setCharacterEncoding("UTF-8");
             response.setContentType(contentType);
@@ -759,10 +788,10 @@ public class ManualReportRunnerPage extends OnlineReportPage
     public static Date getDefaultStartDate() {
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(System.currentTimeMillis());
-        cal.set(Calendar.YEAR, 2012);
-        cal.set(Calendar.MONTH, Calendar.SEPTEMBER);
-        cal.set(Calendar.DAY_OF_MONTH, 1);
-        cal.set(Calendar.MILLISECOND, 0);
+        //cal.set(Calendar.YEAR, 2012);
+        //cal.set(Calendar.MONTH, Calendar.SEPTEMBER);
+        //cal.set(Calendar.DAY_OF_MONTH, 1);
+        //cal.set(Calendar.MILLISECOND, 0);
         cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.HOUR, 0);

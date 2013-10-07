@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -36,7 +37,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
 
         public static class MealRow implements Comparable<MealRow> {
-            private int menuOrigin = 0;
+            //private int menuOrigin = 0;
             private final String name;
             private final long count;
             private final long price, sum;
@@ -47,7 +48,6 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 this.count = count;
                 this.price = price;
                 this.sum = sum;
-                this.menuOrigin = menuOrigin;
             }
 
             public MealRow(String originName, String name, long count, long price, long sum) {
@@ -58,14 +58,8 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 this.originName = originName;
             }
 
-            public int getMenuOrigin() {
-                return menuOrigin;
-            }
-
             public String getOriginName() {
-                if (originName!=null)
-                    return originName;
-                return OrderDetail.getMenuOriginAsString(menuOrigin);
+                return originName;
             }
 
             public String getName() {
@@ -131,8 +125,11 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 includeComplex = includeComplexParam.trim().equalsIgnoreCase("true");
             }
 
+            LinkedList<TotalDataRow> totalDataRows = new LinkedList<TotalDataRow>();
+
             List mealsList = null;
             MealRow mealRow;
+            long totalCount=0, totalSum=0;
             if (includeComplex) {
                 Query complexQuery_1 = session.createSQLQuery("SELECT od.MenuType, SUM(od.Qty) as qtySum, od.RPrice, SUM(od.Qty*od.RPrice), od.menuDetailName, od.discount, od.socdiscount, o.grantsum" +
                         " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
@@ -154,10 +151,10 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 mealsList = complexQuery_1.list();
 
                 List<MealRow> payMealRows = new LinkedList<MealRow>();
+                String menuGroup = "Платное комплексное питание";
                 for (Object o : mealsList) {
                     vals=(Object[])o;
                     //int menuOrigin = Integer.parseInt(vals[0].toString());
-                    String menuGroup = "Платное комплексное питание";
                     String menuName = vals[4].toString(); // od.MenuType
                     long count = Long.parseLong(vals[1].toString());
                     long rPrice = vals[2]==null?0:Long.parseLong(vals[2].toString());
@@ -169,18 +166,22 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                     if (tradeDiscount > 0)
                         menuName = String.format("%s (скидка %d%%)", menuName, tradeDiscount);
                     //MealRow mealRow = new MealRow(menuGroup, menuName, count, rPrice, sum);
+                    totalCount+=count;
+                    totalSum+=sum;
                     mealRow = new MealRow(menuGroup, menuName, count, rPrice, sum);
                     payMealRows.add(mealRow);
                 }
+                totalDataRows.add(new TotalDataRow(menuGroup, totalCount, totalSum));
+                
                 Collections.sort(payMealRows);
                 mealRows.addAll(payMealRows);
 
                 //// бесплатное питание
-                Query freeComplexQuery1 = session.createSQLQuery("SELECT od.MenuType, SUM(od.Qty) as qtySum, od.RPrice, SUM(od.Qty*od.RPrice), od.menuDetailName " +
+                Query freeComplexQuery1 = session.createSQLQuery("SELECT od.MenuType, SUM(od.Qty) as qtySum, od.RPrice, SUM(od.Qty*(od.RPrice+od.socdiscount)), od.menuDetailName, od.socdiscount " +
                         " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND " +
                         " (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.RPrice=0 AND od.Discount>0) AND " +
                         " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) "
-                        + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName");
+                        + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.socdiscount");
 
                 freeComplexQuery1.setParameter("idOfOrg", org.getIdOfOrg());
                 freeComplexQuery1.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
@@ -190,17 +191,22 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
                 mealsList = freeComplexQuery1.list();
 
+                totalCount=0; totalSum=0;
+                menuGroup = "Бесплатное комплексное питание";
                 for (Object o : mealsList) {
                     vals=(Object[])o;
                     //int menuOrigin = Integer.parseInt(vals[0].toString());
-                    String menuGroup = "Бесплатное комплексное питание";
                     String menuName = vals[4].toString(); // od.MenuType
                     long count = Long.parseLong(vals[1].toString());
                     long rPrice = vals[2]==null?0:Long.parseLong(vals[2].toString());
                     long sum = vals[3]==null?0:Long.parseLong(vals[3].toString());
-                    mealRow = new MealRow(menuGroup, menuName, count, rPrice, sum);
+                    long socdiscount = vals[5]==null?0:Long.parseLong(vals[5].toString());
+                    totalCount+=count;
+                    totalSum+=sum;
+                    mealRow = new MealRow(menuGroup, menuName, count, rPrice+socdiscount, sum);
                     mealRows.add(mealRow);
                 }
+                totalDataRows.add(new TotalDataRow(menuGroup, totalCount, totalSum));
             }
 
             String groupByField = "MenuOrigin";
@@ -240,6 +246,11 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             int menuOrigin = 0;
             String menuGroup = null;
             String menuName;
+            String currentTotalGroup="";
+            
+            long totalBuffetCount=0, totalBuffetSum=0;
+            int nTotalBufferDataRowPosition=totalDataRows.size();
+            
             for (Object o : mealsList) {
                 vals=(Object[])o;
                 if (groupByMenuOrigin)
@@ -251,15 +262,72 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 long rPrice = vals[3]==null?0:Long.parseLong(vals[3].toString());
                 long sum = vals[4]==null?0:Long.parseLong(vals[4].toString());
                 if (groupByMenuOrigin)
-                    mealRow = new MealRow(menuOrigin, menuName, count, rPrice, sum);
+                    mealRow = new MealRow(OrderDetail.getMenuOriginAsString(menuOrigin), menuName, count, rPrice, sum);
                 else
                     mealRow = new MealRow(menuGroup , menuName, count, rPrice, sum);
                 mealRows.add(mealRow);
+                ////
+                if (!currentTotalGroup.equals(mealRow.getOriginName())) {
+                    if (!currentTotalGroup.equals("")) {
+                        totalDataRows.add(new TotalDataRow("   Буфет: "+currentTotalGroup, totalCount, totalSum));
+                    }
+                    totalCount=0; totalSum=0;
+                    currentTotalGroup = mealRow.getOriginName();
+                }
+                totalBuffetCount+=count;
+                totalCount+=count;
+                totalBuffetSum+=sum;
+                totalSum+=sum;
             }
+            if (!currentTotalGroup.equals("")) {
+                totalDataRows.add(new TotalDataRow("   Буфет: "+currentTotalGroup, totalCount, totalSum));
+            }
+
+            totalDataRows.add(nTotalBufferDataRowPosition, new TotalDataRow("Буфет", totalBuffetCount, totalBuffetSum));
+            
+            ///
+            parameterMap.put("totalsData", new JRBeanCollectionDataSource(totalDataRows));
+            parameterMap.put("SUBREPORT_DIR", RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath());
 
             return new JRBeanCollectionDataSource(mealRows);
         }
 
+    }
+    
+    public static class TotalDataRow {
+        String totalOriginName;
+        long totalCount;
+        long totalSum;
+
+        public TotalDataRow(String totalOriginName, long totalCount, long totalSum) {
+            this.totalOriginName = totalOriginName;
+            this.totalCount = totalCount;
+            this.totalSum = totalSum;
+        }
+
+        public String getTotalOriginName() {
+            return totalOriginName;
+        }
+
+        public void setTotalOriginName(String totalOriginName) {
+            this.totalOriginName = totalOriginName;
+        }
+
+        public long getTotalCount() {
+            return totalCount;
+        }
+
+        public void setTotalCount(long totalCount) {
+            this.totalCount = totalCount;
+        }
+
+        public long getTotalSum() {
+            return totalSum;
+        }
+
+        public void setTotalSum(long totalSum) {
+            this.totalSum = totalSum;
+        }
     }
 
 

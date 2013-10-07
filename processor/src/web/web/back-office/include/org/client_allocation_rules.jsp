@@ -1,6 +1,7 @@
 <%--
   ~ Copyright (c) 2013. Axetta LLC. All Rights Reserved.
   --%>
+
 <%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>

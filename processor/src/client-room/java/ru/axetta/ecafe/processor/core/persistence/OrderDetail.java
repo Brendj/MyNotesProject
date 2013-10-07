@@ -12,7 +12,21 @@ package ru.axetta.ecafe.processor.core.persistence;
  * To change this template use File | Settings | File Templates.
  */
 public class OrderDetail {
-
+    public static final int TYPE_DISH_ITEM = 0;
+    public static final int TYPE_COMPLEX_MIN = 50;
+    public static final int TYPE_COMPLEX_MAX = 99;
+    public static final int TYPE_COMPLEX_0 = 50;
+    public static final int TYPE_COMPLEX_1 = 51;
+    public static final int TYPE_COMPLEX_2 = 52;
+    public static final int TYPE_COMPLEX_3 = 53;
+    public static final int TYPE_COMPLEX_4 = 54;
+    public static final int TYPE_COMPLEX_5 = 55;
+    public static final int TYPE_COMPLEX_6 = 56;
+    public static final int TYPE_COMPLEX_7 = 57;
+    public static final int TYPE_COMPLEX_8 = 58;
+    public static final int TYPE_COMPLEX_9 = 59;
+    public static final int TYPE_COMPLEX_ITEM_MIN = 150;
+    public static final int TYPE_COMPLEX_ITEM_MAX = 199;
 
     //private CompositeIdOfOrderDetail compositeIdOfOrderDetail;
     private Long idOfOrderDetail;

@@ -123,7 +123,7 @@ public class ReportRuleConstants {
             new ParamHint("generateDate", "Дата генерации отчета"),
             new ParamHint("generateTime", "Дата и время генерации отчета"),
             new ParamHint("generateDurationMillis", "Продолжительность генерации отчета в миллисекундах"),
-            new ParamHint("idOfOrg", "Идентификатор организации").setDefaultRule("= org: "),
+            new ParamHint("idOfOrg", "Организации").setDefaultRule("= org: "),
             new ParamHint("shortName", "Краткое название организации"),
             new ParamHint("officialName", "Официальное название организации"),
             new ParamHint("groupName", "Название класса"),
@@ -142,16 +142,16 @@ public class ReportRuleConstants {
             new ParamHint("idOfContragent", "Идентификатор контрагента").setDefaultRule("= contragent: "),    //20
             new ParamHint("contragentName", "Название контрагента"),
             new ParamHint("category", "Категория организации"),
-            new ParamHint("idOfMenuSourceOrg", "Идентификатор организации - источника меню"),
+            new ParamHint("idOfMenuSourceOrg", "Организация - источник меню"),
             new ParamHint("enterEventType", "Тип отчета по посещаемости: ").setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{все}Все,{учащиеся}Учащиеся,{все_без_учащихся}Все без учащихся"),
-            new ParamHint("groupByMenuGroup", "Группировка отчета по товарным группам"),
-            new ParamHint(DailySalesByGroupsReport.PARAM_MENU_GROUPS, "Группы меню"), //25
+            new ParamHint("groupByMenuGroup", "Группировка отчета").setDefaultRule("= "+RuleProcessor.COMBOBOX_EXPRESSION+"{false}По типам производства,{true}По товарным группам"),
+            new ParamHint(DailySalesByGroupsReport.PARAM_MENU_GROUPS, "Группы меню"), //26
             new ParamHint(DailySalesByGroupsReport.PARAM_INCLUDE_COMPLEX, "Включать комплексы"),
             new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD, "Количество дней в выборке").setHideOnSetup(true),     //  Период отображать не надо, он устанавливается автоматически
             new ParamHint(ReportPropertiesUtils.P_JOB_NAME, "Название задачи"),
             new ParamHint(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID, "Контрагент-получатель").setDefaultRule("= contragent:"), //30,
             new ParamHint("idOfContragent", "Агент по приему платежей").setDefaultRule("= contragent-payagent:"),
-            new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE, "Период").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION +
+            new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE, "Период").setHideOnSetup(true).setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION +
                     "{"+BasicReportJob.REPORT_PERIOD_PREV_MONTH+"}месяц,"+
                     "{"+BasicReportJob.REPORT_PERIOD_LAST_WEEK+"}неделя,"+
                     "{"+BasicReportJob.REPORT_PERIOD_PREV_PREV_PREV_DAY+"}-3 дня,"+
@@ -182,7 +182,7 @@ public class ReportRuleConstants {
             new ReportHint(OrgOrderByDaysReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23}),
             new ReportHint(AutoEnterEventReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23, 24}),
             new ReportHint(AutoEnterEventByDaysReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23, 24}),
-            new ReportHint(DailySalesByGroupsReport.class.getCanonicalName(), new int[]{28, -29, 3, 22, 23, 25, 26, 27, 32}),
+            new ReportHint(DailySalesByGroupsReport.class.getCanonicalName(), new int[]{3, 23, 25, 26, 27, 32}),
             new ReportHint(ClientOrderDetailsByOneOrgReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(RegisterStampReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(ComplaintCountByGoodReport.class.getCanonicalName(), new int[]{3, 4, 5}),

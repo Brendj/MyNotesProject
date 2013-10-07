@@ -51,9 +51,23 @@
             <h:panelGrid styleClass="borderless-grid">
                 <h:panelGrid id="manualMainParams" styleClass="borderless-grid" columns="2">
                     <h:outputText value="Дата выборки от:" styleClass="output-text"/>
-                    <rich:calendar value="#{manualReportRunnerPage.generateStartDate}" popup="true"/>
+                    <rich:calendar value="#{manualReportRunnerPage.generateStartDate}" popup="true">
+                        <a4j:support event="onchanged" reRender="endDateCalendar" actionListener="#{manualReportRunnerPage.onReportPeriodChanged}" />
+                    </rich:calendar>
+                    <h:outputText value="Интервал выборки: " styleClass="output-text"/>
+                    <h:selectOneMenu id="endDatePeriodSelect" value="#{manualReportRunnerPage.reportPeriod}" converter="javax.faces.Integer"
+                                     styleClass="output-text" >
+                        <f:selectItem itemValue="0" itemLabel="1 день"/>
+                        <f:selectItem itemValue="1" itemLabel="1 неделя"/>
+                        <f:selectItem itemValue="2" itemLabel="2 недели"/>
+                        <f:selectItem itemValue="3" itemLabel="1 месяц"/>
+                        <f:selectItem itemValue="4" itemLabel="Точная дата"/>
+                        <a4j:support event="onchange" reRender="endDateCalendar" actionListener="#{manualReportRunnerPage.onReportPeriodChanged}"/>
+                    </h:selectOneMenu>
                     <h:outputText value="Дата выборки до:" styleClass="output-text"/>
-                    <rich:calendar value="#{manualReportRunnerPage.generateEndDate}" popup="true"/>
+                    <rich:calendar id="endDateCalendar" value="#{manualReportRunnerPage.generateEndDate}" popup="true">
+                        <a4j:support event="onchanged" reRender="endDatePeriodSelect" actionListener="#{manualReportRunnerPage.onEndDateSpecified}"/>
+                    </rich:calendar>
 
                     <h:outputText escape="true" value="Формат отчета" styleClass="output-text" />
                     <h:selectOneMenu value="#{manualReportRunnerPage.documentFormat}" styleClass="input-text">

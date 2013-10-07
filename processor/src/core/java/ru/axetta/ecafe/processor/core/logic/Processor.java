@@ -389,6 +389,7 @@ public class Processor implements SyncProcessor,
     public Long createCard(Session persistenceSession, Transaction persistenceTransaction, Long idOfClient, long cardNo,
             int cardType, int state, Date validTime, int lifeState, String lockReason, Date issueTime,
             Long cardPrintedNo) throws Exception {
+
         Client client = DAOUtils.getClientReference(persistenceSession, idOfClient);
         if (client == null) {
             throw new Exception("Клиент не найден: " + idOfClient);
