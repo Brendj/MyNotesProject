@@ -28,7 +28,7 @@
         <h:outputLabel escape="true" value="Последний день действия" styleClass="output-text" />
         <h:inputText value="#{employeeCardViewPage.card.validDate}" styleClass="input-text" converter="dateConverter" readonly="true"/>
 
-        <h:outputLabel escape="true" value="Статус расположения карты" styleClass="output-text" />
+        <h:outputLabel escape="true" value="Статус карты" styleClass="output-text" />
         <h:inputText value="#{employeeCardViewPage.card.cardStation}" styleClass="input-text" readonly="true"/>
 
     </h:panelGrid>

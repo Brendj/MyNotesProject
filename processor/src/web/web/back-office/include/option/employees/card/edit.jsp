@@ -34,7 +34,7 @@
         <rich:calendar value="#{employeeCardEditPage.card.validDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                        inputClass="input-text" showWeeksBar="false" />
 
-        <h:outputLabel escape="true" value="Статус расположения карты" styleClass="output-text" />
+        <h:outputLabel escape="true" value="Статус карты" styleClass="output-text" />
         <h:selectOneMenu value="#{employeeCardEditPage.card.cardStation}" styleClass="input-text">
             <f:converter converterId="cardStationConverter"/>
             <f:selectItems value="#{employeeCardEditPage.cardOperationStationMenu.items}" />

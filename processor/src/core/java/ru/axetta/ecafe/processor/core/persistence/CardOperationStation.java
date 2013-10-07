@@ -9,7 +9,7 @@ package ru.axetta.ecafe.processor.core.persistence;
  */
 public enum CardOperationStation {
 
-    REGISTRATION("Зарегестрирована"),
+    REGISTRATION("Зарегистрирована"),
     ISSUE("Выдана"),
     RETURN_OF("Возвращена"),
     BLOCKING("Заблокирована");
