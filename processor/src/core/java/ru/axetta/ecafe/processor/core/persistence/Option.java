@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.CryptoPro.JCP.JCP;
 
+import ru.axetta.ecafe.processor.core.service.SMSSubscriptionFeeService;
+
 /**
  * Created by IntelliJ IDEA.
  * User: rumil
@@ -118,7 +120,7 @@ public class Option {
             OPTION_CHRONOPAY_RATE, "3.3", 
             OPTION_RBK_RATE, "3",
             OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION, "365",
-            OPTION_SMS_PAYMENT_TYPE, "1",
+            OPTION_SMS_PAYMENT_TYPE, String.valueOf(SMSSubscriptionFeeService.SMS_PAYMENT_BY_THE_PIECE),
             OPTION_SMS_DEFAULT_SUBSCRIPTION_FEE, "0",
             OPTION_NSI_LAST_SYNC_TIME, null,
             OPTION_STOP_LIST_LAST_UPDATE, null,
