@@ -112,18 +112,18 @@ public class ProjectStateReportService {
                         +
                         "from cf_enterevents as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " +
+                        "                                    EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 " +
                         REGION_SENSITIVE_CLAUSE + " " +
                         "union " +
                         "select distinct regOrgSrc.idoforg as v, date_trunc('day', to_timestamp(regOrgSrc.createddate / 1000)) as d "
                         +
                         "from cf_orders as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " +
+                        "                                    EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 " +
                         REGION_SENSITIVE_CLAUSE + ") as oo "+
                         "group by d " +
                         "order by 1", ACTIVE_CHART_1_DATA).setIncremental(true),
@@ -133,9 +133,9 @@ public class ProjectStateReportService {
                         +
                         "from cf_enterevents as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " +
+                        "                                    EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 " +
                         REGION_SENSITIVE_CLAUSE + ") as oo "+
                         "group by d " +
                         "order by 1", ACTIVE_CHART_2_DATA).setIncremental(true),
@@ -145,9 +145,9 @@ public class ProjectStateReportService {
                         +
                         "from cf_orders as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 AND "
+                        "                                    EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 AND "
                         +
                         "      regOrgSrc.socdiscount=0 " + REGION_SENSITIVE_CLAUSE + ") as oo " +
                         "group by d " +
@@ -175,18 +175,18 @@ public class ProjectStateReportService {
                         +
                         "from cf_enterevents as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
+                        "                                    EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
                         + REGION_SENSITIVE_CLAUSE + " "+
                         "union " +
                         "select distinct regOrgSrc.idofclient as v, date_trunc('day', to_timestamp(regOrgSrc.createddate / 1000)) as d "
                         +
                         "from cf_orders as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " + REGION_SENSITIVE_CLAUSE + ") as oo "
+                        "                                    EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 " + REGION_SENSITIVE_CLAUSE + ") as oo "
                         +
                         "group by d " +
                         "order by 1", UNIQUE_CHART_1_DATA).setIncremental(true),
@@ -196,9 +196,9 @@ public class ProjectStateReportService {
                         +
                         "from cf_enterevents as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 " +
+                        "                                    EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 " +
                         REGION_SENSITIVE_CLAUSE + ") as oo " +
                         "group by d " +
                         "order by 1", UNIQUE_CHART_2_DATA).setIncremental(true),
@@ -208,9 +208,9 @@ public class ProjectStateReportService {
                         +
                         "from cf_orders as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 AND "
+                        "                                    EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 AND "
                         +
                         "      regOrgSrc.socdiscount=0 " + REGION_SENSITIVE_CLAUSE + ") as oo " +
                         "group by d " +
@@ -235,9 +235,9 @@ public class ProjectStateReportService {
                         "from cf_orders as regOrgSrc " +
                         "left join cf_orderdetails on regOrgSrc.idoforg=cf_orderdetails.idoforg and regOrgSrc.idoforder=cf_orderdetails.idoforder "
                         +
-                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 AND "
+                        "                                    EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 AND "
                         +
                         "      cf_orderdetails.menugroup<>'' " +
                         "group by cf_orderdetails.menugroup", new Object[][]{
@@ -277,8 +277,8 @@ public class ProjectStateReportService {
                         + "left join cf_clients as regOrgSrc on cf_transactions.idofclient=regOrgSrc.idofclient "
                         + REGION_SENSITIVE_JOIN + " "
                         + "where cf_clientpayments.idofcontragent=" + PAY_AGENTS_CLAUSE + " and "
-                        + "      cf_clientpayments.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
-                        + "                                            EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
+                        + "      cf_clientpayments.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
+                        + "                                            EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
                         + REGION_SENSITIVE_CLAUSE + " "
                         + "group by cf_clientpayments.createddate) as ooo "
                         + "group by ooo.dat) as bycontr, "
@@ -289,8 +289,8 @@ public class ProjectStateReportService {
                         + "left join cf_transactions on cf_clientpayments.idoftransaction=cf_transactions.idoftransaction "
                         + "left join cf_clients as regOrgSrc on cf_transactions.idofclient=regOrgSrc.idofclient "
                         + REGION_SENSITIVE_JOIN + " "
-                        + "where cf_clientpayments.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
-                        + "                                            EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
+                        + "where cf_clientpayments.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
+                        + "                                            EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
                         + REGION_SENSITIVE_CLAUSE + " "
                         + "group by cf_clientpayments.createddate) as kkk "
                         + "group by kkk.dat) as byall "
@@ -420,7 +420,7 @@ public class ProjectStateReportService {
                         REGION_SENSITIVE_JOIN + " " +
                         "where CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 and CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<=4 "
                         + REGION_SENSITIVE_CLAUSE + " " +
-                        "      and cf_enterevents.evtdatetime BETWEEN EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
+                        "      and cf_enterevents.evtdatetime BETWEEN EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
                         +
                         "group by cf_enterevents.idofclient, cf_enterevents.idoforg, cf_enterevents.evtdatetime) events on events.o = overall.o "
                         +
@@ -448,7 +448,7 @@ public class ProjectStateReportService {
                         + REGION_SENSITIVE_JOIN + " " +
                         "where CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 and CAST(substring(groupname FROM '[0-9]+') AS INTEGER)>=5 "
                         +
-                        "      and cf_enterevents.evtdatetime BETWEEN EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 "
+                        "      and cf_enterevents.evtdatetime BETWEEN EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
                         + REGION_SENSITIVE_CLAUSE + " " +
                         "group by cf_enterevents.idofclient, cf_enterevents.idoforg, cf_enterevents.evtdatetime) events on events.o = overall.o "
                         +
@@ -477,12 +477,12 @@ public class ProjectStateReportService {
     private static final String DELETE_SQL = "DELETE FROM cf_projectstate_data WHERE Period=? AND Type=? and Region=?";
     //private static final String SELECT_SQL = "SELECT StringKey, StringValue FROM cf_projectstate_data WHERE Type=? and Period<=? and Region=? order by Period DESC, StringKey";
     private static final String SELECT_SQL = "SELECT StringKey, StringValue FROM cf_projectstate_data WHERE Type=? and Period=(select max(period) from cf_projectstate_data where type=? and region=?) and Region=? order by Period DESC, StringKey";
-    private static final String PERIODIC_SELECT_SQL = "SELECT distinct StringKey, StringValue FROM cf_projectstate_data WHERE INT8(StringKey) <= EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and INT8(StringKey) >= EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND Type=? AND Region=? order by StringKey";
+    private static final String PERIODIC_SELECT_SQL = "SELECT distinct StringKey, StringValue FROM cf_projectstate_data WHERE INT8(StringKey) <= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 and INT8(StringKey) >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND Type=? AND Region=? order by StringKey";
     private static final String PERIODIC_AVG_SELECT_SQL =
             "SELECT distinct substring(StringKey from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), " + PERIODIC_AVG_COL + " "
                     + "FROM cf_projectstate_data "
-                    + "WHERE period <= EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and "
-                    + "      period >= EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                    + "WHERE period <= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 and "
+                    + "      period >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                     + "      Type=? and Region=? and substring(StringKey from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') <> '' "
                     + PERIODIC_AVG_GROUP + " order by 2 desc, 1";
     private static final String CHECK_SQL = "SELECT Period FROM cf_projectstate_data WHERE Type=? and Region=? order by Period DESC";

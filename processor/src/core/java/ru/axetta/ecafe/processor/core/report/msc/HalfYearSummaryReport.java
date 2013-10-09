@@ -57,8 +57,8 @@ public class HalfYearSummaryReport extends BasicReportJob
                         "from cf_orderdetails " +
                         "left join cf_orders on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg " +
                         "where (cf_orderdetails.menutype BETWEEN 50 AND 60) and " +
-                        "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_PERIOD_START%') * 1000 AND " +
-                        "EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_PERIOD_END%') * 1000 and " +
+                        "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_START%') * 1000 AND " +
+                        "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_END%') * 1000 and " +
                         "cf_orders.socdiscount <> 0 and " +
                         "menudetailname LIKE 'Завтрак%' " +
                         "group by cf_orderdetails.idoforg ", Integer.class));
@@ -67,8 +67,8 @@ public class HalfYearSummaryReport extends BasicReportJob
                         "from cf_orderdetails "+
                         "left join cf_orders on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "+
                         "where (cf_orderdetails.menutype BETWEEN 50 AND 60) and "+
-                        "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_PERIOD_START%') * 1000 AND "+
-                        "EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_PERIOD_END%') * 1000 and "+
+                        "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_START%') * 1000 AND "+
+                        "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_END%') * 1000 and "+
                         "cf_orders.socdiscount <> 0 "+
                         //"and menudetailname LIKE 'Завтрак%' "+
                         "group by cf_orderdetails.idoforg ", Currency.class));
@@ -81,8 +81,8 @@ public class HalfYearSummaryReport extends BasicReportJob
                         "from cf_orderdetails " +
                         "left join cf_orders on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg " +
                         "where (cf_orderdetails.menutype BETWEEN 50 AND 60) and " +
-                        "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_PERIOD_START%') * 1000 AND " +
-                        "EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_PERIOD_END%') * 1000 and " +
+                        "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_START%') * 1000 AND " +
+                        "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_END%') * 1000 and " +
                         "cf_orders.socdiscount <> 0 " +
                         "group by cf_orderdetails.idoforg, cf_orders.createddate) AS o1 " +
                         "group by o1.idoforg, mon) AS o2 " +
@@ -100,8 +100,8 @@ public class HalfYearSummaryReport extends BasicReportJob
                         "from cf_orderdetails " +
                         "left join cf_orders on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg " +
                         "where (cf_orderdetails.menutype BETWEEN 50 AND 60) and " +
-                        "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_PERIOD_START%') * 1000 AND " +
-                        "EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_PERIOD_END%') * 1000 and " +
+                        "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_START%') * 1000 AND " +
+                        "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_END%') * 1000 and " +
                         "cf_orders.socdiscount = 0 and menudetailname LIKE 'Обед%' " +
                         "group by cf_orderdetails.idoforg, cf_orders.createddate) AS o1 " +
                         "group by o1.idoforg, mon) AS o2 " +
@@ -114,8 +114,8 @@ public class HalfYearSummaryReport extends BasicReportJob
                         "select cf_orderdetails.idoforg, date_part('month', to_timestamp(cf_orders.createddate / 1000)) as mon, sum(rprice*qty) AS cnt " +
                         "from cf_orderdetails " +
                         "left join cf_orders on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg " +
-                        "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_PERIOD_START%') * 1000 AND " +
-                        "EXTRACT(EPOCH FROM TIMESTAMP '%REPORT_PERIOD_END%') * 1000 and " +
+                        "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_START%') * 1000 AND " +
+                        "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_END%') * 1000 and " +
                         "cf_orderdetails.rootmenu <> '' and rprice <> 0 " +
                         "group by cf_orderdetails.idoforg, cf_orders.createddate) AS o1 " +
                         "group by o1.idoforg, mon) AS o2 " +
@@ -134,8 +134,8 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "from cf_orders " +
                             "left join cf_orderdetails on cf_orderdetails.idoforg=cf_orders.idoforg and cf_orderdetails.idoforder=cf_orders.idoforder " +
                             "where cf_orderdetails.menutype BETWEEN 50 AND 60 and " +
-                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_START%') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_END%') * 1000 and " +
+                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
                             "cf_orderdetails.socdiscount <> 0 and menudetailname LIKE '%1-4%' and qty <> 0 " +
                             "group by cf_orders.idoforg " +
                             "order by cf_orders.idoforg", Integer.class));
@@ -144,8 +144,8 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "from cf_orders " +
                             "left join cf_orderdetails on cf_orderdetails.idoforg=cf_orders.idoforg and cf_orderdetails.idoforder=cf_orders.idoforder " +
                             "where cf_orderdetails.menutype BETWEEN 50 AND 60 and " +
-                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_START%') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_END%') * 1000 and " +
+                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
                             "cf_orderdetails.socdiscount <> 0 and menudetailname LIKE '%1-4%' and qty <> 0 " +
                             "group by cf_orders.idoforg " +
                             "order by cf_orders.idoforg", Currency.class));
@@ -154,8 +154,8 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "from cf_orders " +
                             "left join cf_orderdetails on cf_orderdetails.idoforg=cf_orders.idoforg and cf_orderdetails.idoforder=cf_orders.idoforder " +
                             "where cf_orderdetails.menutype BETWEEN 50 AND 60 and " +
-                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_START%') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_END%') * 1000 and " +
+                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
                             "cf_orderdetails.socdiscount <> 0 and menudetailname LIKE '%1-4%' and qty <> 0 " +
                             "group by cf_orders.idoforg " +
                             "order by cf_orders.idoforg", Currency.class));
@@ -165,8 +165,8 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "from cf_orders " +
                             "left join cf_orderdetails on cf_orderdetails.idoforg=cf_orders.idoforg and cf_orderdetails.idoforder=cf_orders.idoforder " +
                             "where cf_orderdetails.menutype BETWEEN 50 AND 60 and " +
-                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_START%') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_END%') * 1000 and " +
+                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
                             "cf_orderdetails.socdiscount <> 0 and menudetailname LIKE '5-11%' and qty <> 0 " +
                             "group by cf_orders.idoforg " +
                             "order by cf_orders.idoforg", Integer.class));
@@ -175,8 +175,8 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "from cf_orders " +
                             "left join cf_orderdetails on cf_orderdetails.idoforg=cf_orders.idoforg and cf_orderdetails.idoforder=cf_orders.idoforder " +
                             "where cf_orderdetails.menutype BETWEEN 50 AND 60 and " +
-                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_START%') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_END%') * 1000 and " +
+                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
                             "cf_orderdetails.socdiscount <> 0 and menudetailname LIKE '%5-11%' and qty <> 0 " +
                             "group by cf_orders.idoforg " +
                             "order by cf_orders.idoforg", Currency.class));
@@ -185,23 +185,23 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "from cf_orders " +
                             "left join cf_orderdetails on cf_orderdetails.idoforg=cf_orders.idoforg and cf_orderdetails.idoforder=cf_orders.idoforder " +
                             "where cf_orderdetails.menutype BETWEEN 50 AND 60 and " +
-                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_START%') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_END%') * 1000 and " +
+                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
                             "cf_orderdetails.socdiscount <> 0 and menudetailname LIKE '%5-11%' and qty <> 0 " +
                             "group by cf_orders.idoforg " +
                             "order by cf_orders.idoforg", Currency.class));
             JASPER_FIELDS.put ("m" + i + "_payerCountMonthly",
                     new JasperField ("select cf_orders.idoforg, int8(count(distinct cf_orders.idofclient)) " +
                             "from cf_orders " +
-                            "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_START%') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_END%') * 1000 and " +
+                            "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
                             "socdiscount=0 " +
                             "group by cf_orders.idoforg", Integer.class));
             JASPER_FIELDS.put ("m" + i + "_payerSummMonthly",
                     new JasperField ("select cf_orders.idoforg, int8(sum(SumByCard+SumByCash)), count(distinct cf_orders.idofclient) " +
                             "from cf_orders " +
-                            "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_START%') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_END%') * 1000 and " +
+                            "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
                             "socdiscount=0 " +
                             "group by cf_orders.idoforg", Currency.class));
             JASPER_FIELDS.put ("m" + i + "_canteenSummMonthly",  ////////////////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -211,8 +211,8 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "from (select o1.idoforg, int8(sum(o1.cnt)) as cnt, d " +
                             "from (select cf_orders.idoforg, count(distinct cf_orders.idofclient) as cnt, date_part('day', to_timestamp(cf_orders.createddate / 1000)) as d " +
                             "from cf_orders " +
-                            "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_START%') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_END%') * 1000 and " +
+                            "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
                             "socdiscount<>0 " +
                             "group by cf_orders.idoforg, cf_orders.createddate) AS o1 " +
                             "group by o1.idoforg, d) AS o2 " +
@@ -223,8 +223,8 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "from (select cf_orders.idoforg, sum(cf_orderdetails.socdiscount*qty) as cnt, date_part('day', to_timestamp(cf_orders.createddate / 1000)) as d " +
                             "from cf_orders " +
                             "left join cf_orderdetails on cf_orders.idoforg=cf_orderdetails.idoforg and cf_orders.idoforder=cf_orderdetails.idoforder " +
-                            "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_START%') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_END%') * 1000 and " +
+                            "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
                             "cf_orderdetails.socdiscount<>0 " +
                             "group by cf_orders.idoforg, cf_orders.createddate) AS o1 " +
                             "group by o1.idoforg, d) AS o2 " +
@@ -234,8 +234,8 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "from (select o1.idoforg, int8(sum(o1.cnt)) as cnt, d " +
                             "from (select cf_orders.idoforg, count(distinct cf_orders.idofclient) as cnt, date_part('day', to_timestamp(cf_orders.createddate / 1000)) as d " +
                             "from cf_orders " +
-                            "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_START%') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_END%') * 1000 and " +
+                            "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
                             "socdiscount=0 "+
                             "group by cf_orders.idoforg, cf_orders.createddate) AS o1 " +
                             "group by o1.idoforg, d) AS o2 " +
@@ -245,8 +245,8 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "from (select o1.idoforg, int8(sum(o1.cnt)) as cnt, d " +
                             "from (select cf_orders.idoforg, count(distinct cf_orders.idofclient) as cnt, date_part('day', to_timestamp(cf_orders.createddate / 1000)) as d " +
                             "from cf_orders " +
-                            "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_START%') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_END%') * 1000 and " +
+                            "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
                             "socdiscount=0 " +
                             "group by cf_orders.idoforg, cf_orders.createddate) AS o1 " +
                             "group by o1.idoforg, d) AS o2 " +
@@ -257,8 +257,8 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "from (select cf_orders.idoforg, sum(cf_orderdetails.socdiscount*qty) as cnt, date_part('day', to_timestamp(cf_orders.createddate / 1000)) as d " +
                             "from cf_orders " +
                             "left join cf_orderdetails on cf_orders.idoforg=cf_orderdetails.idoforg and cf_orders.idoforder=cf_orderdetails.idoforder " +
-                            "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_START%') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_END%') * 1000 and " +
+                            "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
                             "cf_orderdetails.socdiscount=0 " +
                             "group by cf_orders.idoforg, cf_orders.createddate) AS o1 " +
                             "group by o1.idoforg, d) AS o2 " +
@@ -271,8 +271,8 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "from (select CF_Orders.IdOfOrg, count(distinct(CF_Orders.idofclient)) AS cnt, date_part('day', to_timestamp(cf_orders.createddate / 1000)) as d " +
                             "from CF_Orders " +
                             "left outer join CF_Clients  on CF_Clients.IdOfClient=CF_Orders.IdOfClient " +
-                            "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_START%') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '%MONTH_END%') * 1000 " +
+                            "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 " +
                             "group by CF_Orders.IdOfOrg, cf_orders.createddate) AS o1 " +
                             "group by o1.idoforg, d) AS o2 " + "group by idoforg", Integer.class));
         }

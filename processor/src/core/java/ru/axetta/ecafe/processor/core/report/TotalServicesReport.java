@@ -81,9 +81,9 @@ public class TotalServicesReport extends BasicReport {
                             "left join cf_orgs on cf_clients.idoforg=cf_orgs.idoforg " +
                             "where cf_orgs.state=1 and cf_clients.idOfClientGroup<" + ClientGroup.Predefined
                             .CLIENT_EMPLOYEES.getValue() + " and " +
-                            " cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '" + df.format(startDate)
+                            " cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(startDate)
                             + "') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '" + df.format(endDate) + "') * 1000 " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(endDate) + "') * 1000 " +
                             "group by cf_enterevents.idoforg");
             loadValue(entries, "realBenefitClientsCount", session,
                     "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
@@ -93,9 +93,9 @@ public class TotalServicesReport extends BasicReport {
                             "where cf_orgs.state=1 and cf_orders.socdiscount<>0 and " +
                             "cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and "
                             +
-                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + df.format(startDate)
+                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(startDate)
                             + "') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '" + df.format(endDate) + "') * 1000 " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(endDate) + "') * 1000 " +
                             "group by cf_orgs.idoforg");
             loadValue(entries, "realPayedClientsCount", session,
                     "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
@@ -105,9 +105,9 @@ public class TotalServicesReport extends BasicReport {
                             "where cf_orgs.state=1 and cf_orders.socdiscount<>0 and " +
                             "cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and "
                             +
-                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + df.format(startDate)
+                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(startDate)
                             + "') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '" + df.format(endDate) + "') * 1000 " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(endDate) + "') * 1000 " +
                             "group by cf_orgs.idoforg");
             loadValue(entries, "uniqueClientsCount", session,
                     "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +

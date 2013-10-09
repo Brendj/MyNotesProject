@@ -318,8 +318,8 @@ public class BeneficiarySummaryReport extends BasicReportJob
                             "left join cf_orgs on cf_orgs.idoforg=cf_orders.idoforg " +
                             "left join cf_orderdetails on cf_orderdetails.idoforg=cf_orders.idoforg and cf_orderdetails.idoforder=cf_orders.idoforder " +
                             "where cf_orderdetails.menutype BETWEEN " + OrderDetail.TYPE_COMPLEX_MIN + " AND " + OrderDetail.TYPE_COMPLEX_MAX + " and " +
-                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '2012-09-01') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP '2012-11-01') * 1000 and " +
+                            "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '2012-09-01') * 1000 AND " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '2012-11-01') * 1000 and " +
                             "cf_orderdetails.socdiscount > 0 " +
                             "group by cf_orders.idoforg, cf_orgs.shortname, menudetailname " +
                             "order by cf_orders.idoforg, menudetailname");
