@@ -1920,7 +1920,13 @@ public class Processor implements SyncProcessor,
             for (Object[] v : DAOUtils.getClientsAndCardsForOrgs(persistenceSession, idOfOrgSet)) {
                 accRegistry.addItem(new SyncResponse.AccRegistry.Item((Client) v[0], (Card) v[1]));
             }
-
+            // Добавляем карты перемещенных клиентов.
+            List<Client> allocClients = ClientManager.findAllAllocatedClients(persistenceSession, org);
+            for (Client client : allocClients) {
+                for (Card card : client.getCards()) {
+                    accRegistry.addItem(new SyncResponse.AccRegistry.Item(client, card));
+                }
+            }
             /*Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
             for (Client client : organization.getClients()) {
                 for (Card card : client.getCards()) {

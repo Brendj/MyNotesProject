@@ -783,4 +783,13 @@ public class ClientManager {
         }
     }
 
+    public static List<Client> findAllAllocatedClients(Session session, Org destinationOrg) {
+        Map<String, Set<Client>> map = findAllocatedClients(session, destinationOrg);
+        List<Client> res = new ArrayList<Client>();
+        for (Set<Client> set : map.values()) {
+            res.addAll(set);
+        }
+        return res;
+    }
+
 }
