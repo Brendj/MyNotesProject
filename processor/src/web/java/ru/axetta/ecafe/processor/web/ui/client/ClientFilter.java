@@ -245,7 +245,8 @@ public class ClientFilter {
 
     public boolean isEmpty() {
         return ClientCardOwnMenu.NO_CONDITION == clientCardOwnCondition && StringUtils.isEmpty(contractId)
-                && StringUtils.isEmpty(filterClientId) && org.isEmpty() && person.isEmpty() && contractPerson.isEmpty();
+                && StringUtils.isEmpty(filterClientId) && org.isEmpty() && person.isEmpty() && contractPerson.isEmpty()
+                && StringUtils.isEmpty(mobileNumber) && StringUtils.isEmpty(filterClientGUID);
     }
 
     public String getStatus() {
