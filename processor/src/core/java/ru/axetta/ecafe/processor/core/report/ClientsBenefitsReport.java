@@ -27,6 +27,7 @@ public class ClientsBenefitsReport extends BasicReport {
     public static final String COLUMN_TITLE = "Комплекс ";
     public static final String TOTAL_CAPTION = "Итого:";
     private boolean hideMissedColumns;
+    private Map<Integer, String> complexNames;
 
 
     public static class Builder {
@@ -72,7 +73,9 @@ public class ClientsBenefitsReport extends BasicReport {
             entries.add(total);
 
 
-            return new ClientsBenefitsReport(generateTime, new Date().getTime() - generateTime.getTime(), entries, hideMissedColumns);
+            ClientsBenefitsReport report = new ClientsBenefitsReport(generateTime, new Date().getTime() - generateTime.getTime(), entries, hideMissedColumns);
+            report.loadComplexRoleNames(session);
+            return report;
         }
     }
 
@@ -100,7 +103,7 @@ public class ClientsBenefitsReport extends BasicReport {
             boolean dataFound = false;
             if (hideMissedColumns) {
                 for (Entry it : items) {
-                    if (it.get(COLUMN_TITLE + i) != 0L) {
+                    if (it.get(/*COLUMN_TITLE + i*/complexNames.get(i)) != 0L) {
                         dataFound = true;
                         break;
                     }
@@ -110,10 +113,36 @@ public class ClientsBenefitsReport extends BasicReport {
             }
 
             if (dataFound) {
-                columnNames.add(COLUMN_TITLE + i);
+                columnNames.add(/*COLUMN_TITLE + i*/complexNames.get(i));
             }
         }
         return columnNames;
+    }
+    
+    private void loadComplexRoleNames(Session session) {
+        if (complexNames != null && complexNames.size() > 0) {
+            return;
+        }
+
+        if (complexNames == null) {
+            complexNames = new HashMap<Integer, String>();
+        }
+        complexNames.clear();
+
+        //  Загружаем наименования
+        Query q = session.createSQLQuery("select idofrole, rolename from cf_complexroles");
+        List resultList = q.list();
+        for (Object result : resultList) {
+            Object e[]  = (Object[]) result;
+            int complex = ((BigInteger) e[0]).intValue();
+            String name = ((String) e[1]).trim();
+            complexNames.put(complex, name);
+        }
+
+        //  Для каждого элемента делаем ссылку на массив загруженных данных
+        for (Entry e : items) {
+            e.setComplexNames(complexNames);
+        }
     }
 
 
@@ -138,6 +167,7 @@ public class ClientsBenefitsReport extends BasicReport {
 
         protected String rule;
         protected Map <Integer, Long> data;
+        protected Map<Integer, String> complexNames;
 
 
         public Map <Integer, Long> getData() {
@@ -156,10 +186,20 @@ public class ClientsBenefitsReport extends BasicReport {
 
             int complex = -1;
             try {
-                complex = Integer.parseInt(col.replaceAll(COLUMN_TITLE, ""));
+                for (Integer c : complexNames.keySet()) {
+                    if (col.equals(complexNames.get(c))) {
+                        complex = c;
+                        break;
+                    }
+                }
             } catch (Exception e) {
                 return 0L;
             }
+            /*try {
+                complex = Integer.parseInt(col.replaceAll(COLUMN_TITLE, ""));
+            } catch (Exception e) {
+                return 0L;
+            }*/
 
 
             if (data != null) {
@@ -176,6 +216,10 @@ public class ClientsBenefitsReport extends BasicReport {
         public Entry(String rule) {
             this.rule = rule;
             data = new HashMap <Integer, Long>();
+        }
+        
+        public void setComplexNames(Map<Integer, String> complexNames) {
+            this.complexNames = complexNames;
         }
     }
 
