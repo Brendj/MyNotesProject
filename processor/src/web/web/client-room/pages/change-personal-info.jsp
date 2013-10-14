@@ -341,8 +341,6 @@
                     }
                     %>
                 </table>
-                <input type="text" name="<%=EMAIL_PARAM%>" size="16" maxlength="64" class="input-text"
-                       value="<%=StringEscapeUtils.escapeHtml(StringUtils.defaultString(client.getEmail()))%>" />
             </td>
         </tr>
         <!--
