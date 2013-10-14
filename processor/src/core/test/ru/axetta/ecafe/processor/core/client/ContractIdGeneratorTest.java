@@ -29,17 +29,17 @@ public class ContractIdGeneratorTest {
             int count=0;
             while (line != null) {
                 totalCount++;
-                if(!ContractIdGenerator.luhnTest(line)){
-                    System.out.println(count +": " +line);
-                    count++;
-                } else {
-                    for (int i=1;i<10; i++){
-                        if(ContractIdGenerator.luhnTest(line+"0"+i)){
-                            System.out.println(count +": " +line + " subscribe: "+line+"0"+i);
-                            count++;
-                        }
-                    }
-                }
+                //if(!ContractIdGenerator.luhnTest(line)){
+                //    System.out.println(count +": " +line);
+                //    count++;
+                //} else {
+                //    for (int i=1;i<10; i++){
+                //        if(ContractIdGenerator.luhnTest(line+"0"+i)){
+                //            System.out.println(count +": " +line + " subscribe: "+line+"0"+i);
+                //            count++;
+                //        }
+                //    }
+                //}
                 line = br.readLine();
             }
             double percent = (count * 100.0) / totalCount;

@@ -259,9 +259,9 @@ public class EventNotificationService {
                 throw new Exception("No client SMS type defined for notification " + type);
             }
             if (sendAsync) {
-                smsService.sendSMSAsync(client, clientSMSType, text);
+                smsService.sendSMSAsync(client.getIdOfClient(), clientSMSType, text);
             } else {
-                smsService.sendSMS(client, clientSMSType, text);
+                smsService.sendSMS(client.getIdOfClient(), clientSMSType, text);
             }
         } catch (Exception e) {
             String message = String.format("Failed to send SMS notification to client with contract_id = %s.", client.getContractId());
