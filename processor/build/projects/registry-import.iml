@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="web" name="Web">
+      <configuration>
+        <descriptors>
+          <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/../../src/registry-import/web/WEB-INF/web.xml" />
+        </descriptors>
+        <webroots>
+          <root url="file://$MODULE_DIR$/../../src/registry-import/web" relative="/" />
+        </webroots>
+        <sourceRoots>
+          <root url="file://$MODULE_DIR$/../../src/registry-import/src" />
+        </sourceRoots>
+      </configuration>
+      <facet type="jsf" name="JSF">
+        <configuration />
+      </facet>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../src/registry-import">
+      <sourceFolder url="file://$MODULE_DIR$/../../src/registry-import/java" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="core" scope="PROVIDED" />
+    <orderEntry type="module" module-name="web" scope="PROVIDED" />
+    <orderEntry type="library" scope="PROVIDED" name="hibernate-4.0.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="richfaces-api-3.3.1.GA" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="spring305" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="commons" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="jsf-impl-1.2_15-jbossorg-2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="junit" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="jboss_J2EE" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="cxf" level="project" />
+  </component>
+</module>
+

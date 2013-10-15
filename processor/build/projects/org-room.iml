@@ -21,6 +21,8 @@
         <setting name="provider-name" value="" />
         <datasource-mapping>
           <factory-entry name="org_room" value="cedfba61-0f44-4ced-9708-18045311d229" />
+          <factory-entry name="processorPU" />
+          <factory-entry name="reportsPU" />
         </datasource-mapping>
         <deploymentDescriptor name="persistence.xml" url="file://$MODULE_DIR$/../../src/org-room/web/WEB-INF/classes/META-INF/persistence.xml" />
       </configuration>
@@ -41,6 +43,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="core" exported="" scope="PROVIDED" />
+    <orderEntry type="module" module-name="registry-import" exported="" scope="PROVIDED" />
     <orderEntry type="library" scope="PROVIDED" name="hibernate-4.0.1" level="project" />
     <orderEntry type="library" name="richfaces-api-3.3.1.GA" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="spring305" level="project" />
@@ -57,9 +61,9 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="core" />
     <orderEntry type="library" scope="PROVIDED" name="axetta_smpp" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="axetta_charset" level="project" />
+    <orderEntry type="library" name="jasperlib" level="project" />
   </component>
 </module>
 

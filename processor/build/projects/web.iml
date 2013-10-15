@@ -60,6 +60,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="core" exported="" scope="PROVIDED" />
+    <orderEntry type="module" module-name="registry-import" exported="" scope="PROVIDED" />
     <orderEntry type="module-library" exported="" scope="PROVIDED">
       <library>
         <CLASSES>
@@ -101,6 +102,7 @@
     <orderEntry type="library" scope="PROVIDED" name="hibernate-4.0.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="jsf-impl-1.2_15-jbossorg-2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="jboss_J2EE" level="project" />
+    <orderEntry type="library" name="client-room" level="project" />
   </component>
 </module>
 

@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="AntConfiguration">
-    <buildFile url="file://$PROJECT_DIR$/processor.xml" />
+    <defaultAnt bundledAnt="true" />
+    <buildFile url="file://$PROJECT_DIR$/processor.xml">
+      <additionalClassPath />
+      <antReference projectDefault="true" />
+      <customJdkName value="" />
+      <maximumHeapSize value="128" />
+      <maximumStackSize value="2" />
+      <properties />
+    </buildFile>
   </component>
   <component name="ArtifactManager">
     <artifact build-on-make="true" name="payconv:jar">
@@ -88,6 +96,7 @@
         </element>
         <element id="dir-copy" path="$PROJECT_DIR$/../../src/web/web" />
         <element id="javaee-facet-resources" facet="web/web/web" />
+        <element id="artifact" artifact-name="registry-import:war exploded" />
       </root>
     </artifact>
     <artifact type="ear" name="j2ee:j2ee ecafe-processor.ear">
@@ -171,29 +180,37 @@
       <root id="root">
         <element id="directory" name="WEB-INF">
           <element id="directory" name="classes">
-            <element id="module-output" name="org-room" />
             <element id="module-output" name="core" />
             <element id="module-output" name="util" />
+            <element id="module-output" name="org-room" />
           </element>
           <element id="directory" name="lib">
             <element id="library" level="project" name="richfaces-api-3.3.1.GA" />
             <element id="library" level="project" name="junit" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/xmlsec.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/xmldsig.jar" />
             <element id="library" level="project" name="axetta_charset" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/icu4j-4_0_1.jar" />
-            <element id="file-copy" path="$PROJECT_DIR$/../lib/visualization-datasource-1.1.1.jar" />
             <element id="library" level="project" name="axetta_smpp" />
-            <element id="library" level="project" name="jasperlib" />
           </element>
         </element>
         <element id="javaee-facet-resources" facet="org-room/web/Web" />
+        <element id="artifact" artifact-name="registry-import:war exploded" />
       </root>
     </artifact>
     <artifact type="war" name="org-room:war">
       <output-path>$PROJECT_DIR$/../../target/out/artifacts/org_room_war</output-path>
       <root id="archive" name="org-room_war.war">
         <element id="artifact" artifact-name="org-room:war exploded" />
+      </root>
+    </artifact>
+    <artifact type="exploded-war" name="registry-import:war exploded">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/registry_import_war_exploded</output-path>
+      <root id="root">
+        <element id="javaee-facet-resources" facet="registry-import/web/Web" />
+        <element id="directory" name="WEB-INF">
+          <element id="directory" name="classes">
+            <element id="module-output" name="registry-import" />
+          </element>
+          <element id="directory" name="lib" />
+        </element>
       </root>
     </artifact>
   </component>
@@ -483,11 +500,7 @@
       <entry name="*.sql" />
       <entry name="*.CharsetProvider" />
     </wildcardResourcePatterns>
-    <annotationProcessing>
-      <profile default="true" name="Default" enabled="false">
-        <processorPath useClasspath="true" />
-      </profile>
-    </annotationProcessing>
+    <annotationProcessing enabled="false" useClasspath="true" />
   </component>
   <component name="CopyrightManager" default="ecafe">
     <copyright>
@@ -499,53 +512,7 @@
     </copyright>
     <module2copyright />
   </component>
-  <component name="DataSourceManagerImpl" format="xml" hash="2420295322">
-    <data-source source="LOCAL" name="Moscow Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
-      <identifier-quote-string>&quot;</identifier-quote-string>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://172.18.16.14:5432/amoscow</jdbc-url>
-      <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>amoscow.public</schema-pattern>
-      <default-schemas>amoscow.public</default-schemas>
-      <libraries>
-        <library>
-          <url>jar://D:/home/java/testing/report/lib/postgresql-9.1-901.jdbc4.jar!/</url>
-        </library>
-      </libraries>
-    </data-source>
-    <data-source source="LOCAL" name="Kazan Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="f29aa7e6-4670-495a-8741-1713d2cee403">
-      <identifier-quote-string>&quot;</identifier-quote-string>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://192.168.15.158:5432/akazan</jdbc-url>
-      <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>akazan.public</schema-pattern>
-      <default-schemas>akazan.public</default-schemas>
-      <libraries>
-        <library>
-          <url>jar://D:/home/java/testing/report/lib/postgresql-9.1-901.jdbc4.jar!/</url>
-        </library>
-      </libraries>
-    </data-source>
-    <data-source source="LOCAL" name="Local MoscowDB" product="PostgreSQL" version="9.1.1" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="cedfba61-0f44-4ced-9708-18045311d229">
-      <identifier-quote-string>&quot;</identifier-quote-string>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/moscow</jdbc-url>
-      <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>moscow.public</schema-pattern>
-      <default-schemas>moscow.public</default-schemas>
-      <libraries>
-        <library>
-          <url>jar://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar!/</url>
-        </library>
-      </libraries>
-    </data-source>
-  </component>
+  <component name="DataSourceManagerImpl" compressed="false" hash="2420295322" />
   <component name="DependencyValidationManager">
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
@@ -1247,6 +1214,7 @@
       <module fileurl="file://$PROJECT_DIR$/org-room.iml" filepath="$PROJECT_DIR$/org-room.iml" />
       <module fileurl="file://$PROJECT_DIR$/payconv.iml" filepath="$PROJECT_DIR$/payconv.iml" />
       <module fileurl="file://$PROJECT_DIR$/pubkey.iml" filepath="$PROJECT_DIR$/pubkey.iml" />
+      <module fileurl="file://$PROJECT_DIR$/registry-import.iml" filepath="$PROJECT_DIR$/registry-import.iml" />
       <module fileurl="file://$PROJECT_DIR$/smpp/smpp.iml" filepath="$PROJECT_DIR$/smpp/smpp.iml" />
       <module fileurl="file://$PROJECT_DIR$/synctest.iml" filepath="$PROJECT_DIR$/synctest.iml" />
       <module fileurl="file://$PROJECT_DIR$/testmodule/testmodule.iml" filepath="$PROJECT_DIR$/testmodule/testmodule.iml" />

@@ -64,4 +64,16 @@
         перед     protected GeneralResponse generalResponse;
     -->
 
+
+
+    <target name="gen_registry_import" description="">
+        <wsimport
+                package="generated.registry.manual_synch"
+                keep="true"
+                destdir="../../src/registry-import/java"
+                extension="true"
+                wsdl="http://localhost:8080/processor/soap/front?wsdl">
+        </wsimport>
+
+    </target>
 </project>
