@@ -62,7 +62,6 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
     private String errorComment;
     private List<SelectItem> displayModes;
     private int displayMode;
-    private boolean selectAll;
 
     public String getPageFilename() {
         return "service/msk/nsi_org_registry_sync_page";
@@ -227,20 +226,25 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         errorComment = "";
     }
 
-    public void doChangeSelectAll(javax.faces.event.ActionEvent event) {
-        if (isPermittedRevision()) {
-            return;
-        }
+    public void doMarkAll() {
         for (WebRegistryChangeItem i : items) {
             if (i.isApplied()) {
                 continue;
             }
-            i.setSelected(selectAll);
+            i.setSelected(true);
+        }
+    }
+
+    public void doUnmarkAll() {
+        for (WebRegistryChangeItem i : items) {
+            if (i.isApplied()) {
+                continue;
+            }
+            i.setSelected(false);
         }
     }
 
     private void load (boolean refresh) {
-            selectAll = false;
         resetMessages();
         long idOfOrg = getIdOfOrg();
         if (idOfOrg < 1L) {
@@ -352,6 +356,10 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
 
     public boolean getDisplayOrgSelection() {
         return false;
+    }
+    
+    public int getTotalCount() {
+        return items.size();
     }
 
     public int getCreationsCount() {
@@ -592,14 +600,6 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
 
     public void setDisplayMode(int displayMode) {
         this.displayMode = displayMode;
-    }
-
-    public boolean isSelectAll() {
-        return selectAll;
-    }
-
-    public void setSelectAll(boolean selectAll) {
-        this.selectAll = selectAll;
     }
 
     public String getResultTitle() {

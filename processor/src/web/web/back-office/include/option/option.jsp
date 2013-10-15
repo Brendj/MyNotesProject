@@ -230,7 +230,7 @@
                 <f:facet name="header"><h:outputText styleClass="column-header"
                                                      value="Импорт данных из АИС Реестры" /></f:facet>
                 <h:panelGrid styleClass="borderless-grid" columns="2">
-                    <h:outputText escape="true" value="Производить автоматическую синхронизацию клиентов"
+                    <h:outputText escape="true" value="Производить автоматическую сверку клиентов"
                                   styleClass="output-text" />
                     <h:selectBooleanCheckbox value="#{optionPage.syncRegisterClients}" styleClass="output-text" />
                     <h:outputText escape="true" value="URL сервиса" styleClass="output-text" />
@@ -250,7 +250,7 @@
                     <h:inputText value="#{optionPage.syncRegisterMaxAttempts}" styleClass="input-text" size="5" />
                     <h:outputText escape="true" value="Емайл для оповещений" styleClass="output-text" />
                     <h:inputText value="#{optionPage.syncRegisterSupportEmail}" styleClass="input-text" size="100" />
-                    <h:outputText escape="true" value="Хранить историю синхронизации не более (дней)" styleClass="output-text" />
+                    <h:outputText escape="true" value="Хранить историю сверки не более (дней)" styleClass="output-text" />
                     <h:inputText value="#{optionPage.syncRegisterDaysTimeout}" styleClass="input-text" size="5" />
                 </h:panelGrid>
             </rich:panel>

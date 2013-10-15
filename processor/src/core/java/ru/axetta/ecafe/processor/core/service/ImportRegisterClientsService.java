@@ -149,6 +149,9 @@ public class ImportRegisterClientsService {
         Query q = session.createSQLQuery("delete from cf_registrychange where createDate<:minCreateDate");
         q.setLong("minCreateDate", cal.getTimeInMillis());
         q.executeUpdate();
+        q = session.createSQLQuery("delete from cf_registrychange_errors where createDate<:minCreateDate");
+        q.setLong("minCreateDate", cal.getTimeInMillis());
+        q.executeUpdate();
     }
 
     @Transactional

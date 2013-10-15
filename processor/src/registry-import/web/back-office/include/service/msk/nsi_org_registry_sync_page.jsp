@@ -78,12 +78,14 @@
                 <h:panelGroup id="synchTable">
                     <h:outputText id="resultTitle" value="Результаты #{NSIOrgRegistrySynchPage.resultTitle}"
                                   styleClass="page-header-text"/>
-                    <h:panelGrid style="text-align: right" columns="2" columnClasses="selectAll_text,selectAll_button">
-                        <h:outputText styleClass="output-text" value="Выбрать все" />
-                        <h:selectBooleanCheckbox value="#{NSIOrgRegistrySynchPage.selectAll}" styleClass="checkboxes">
-                            <a4j:support ajaxSingle="true" reRender="synchTable"
-                                         actionListener="#{NSIOrgRegistrySynchPage.doChangeSelectAll}" event="onchange"/>
-                        </h:selectBooleanCheckbox>
+                    <h:panelGrid style="text-align: right" columns="5" columnClasses="selectAll_text,selectAll_button">
+                        <h:outputText value="Всего в списке: #{NSIOrgRegistrySynchPage.totalCount}" styleClass="output-text" />
+                        <rich:spacer width="20px" />
+                        <a4j:commandLink value="Отметить все записи к применению" action="#{NSIOrgRegistrySynchPage.doMarkAll}"
+                                         reRender="workspaceTogglePanel" styleClass="command-button" />
+                        <rich:spacer width="20px" />
+                        <a4j:commandLink value="Снять все записи c применения" action="#{NSIOrgRegistrySynchPage.doUnmarkAll}"
+                                         reRender="workspaceTogglePanel" styleClass="command-button" />
                     </h:panelGrid>
                     <rich:dataTable value="#{NSIOrgRegistrySynchPage.items}" var="e" footerClass="data-table-footer"
                                     width="350px" rows="20" id="table" rowKeyVar="row">

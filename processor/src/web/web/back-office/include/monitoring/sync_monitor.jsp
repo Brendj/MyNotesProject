@@ -85,7 +85,7 @@
 
         <h:panelGrid>
             <rich:dataTable id="paramsTable" value="#{syncMonitorPage.namedParams}" var="item"
-                            footerClass="data-table-footer" columnClasses="center-aligned-column">
+                            footerClass="data-table-footer" columnClasses="left-aligned-column">
                 <rich:column headerClass="column-header">
                     <f:facet name="header">
                         <h:outputText escape="true" value="Наименование параметра" />

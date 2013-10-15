@@ -707,11 +707,14 @@
                             label="Поиск организаций" action="#{orgCatalogFindPage.show}" reRender="workspaceForm" />
         <rich:panelMenuItem id="nsiPupilCatalogFind" binding="#{pupilCatalogFindPage.mainMenuComponent}"
                             label="Поиск учащихся" action="#{pupilCatalogFindPage.show}" reRender="workspaceForm" />
-        <rich:panelMenuItem id="nsiRegistrySync" binding="#{NSIRegistrySyncPage.mainMenuComponent}"
+        <%--<rich:panelMenuItem id="nsiRegistrySync" binding="#{NSIRegistrySyncPage.mainMenuComponent}"
                             label="Ручная синхронизация" action="#{NSIRegistrySyncPage.show}"
-                            reRender="workspaceForm" />
+                            reRender="workspaceForm" />--%>
         <rich:panelMenuItem id="nsiOrgRegistrySync" binding="#{NSIOrgRegistrySynchPage.mainMenuComponent}"
                             label="Интерактивная сверка" action="#{NSIOrgRegistrySynchPage.show}"
+                            reRender="workspaceForm" />
+        <rich:panelMenuItem id="nsiOrgRegistrySyncOverview" binding="#{NSIOrgRegistrySynchOverviewPage.mainMenuComponent}"
+                            label="Статистика сверки" action="#{NSIOrgRegistrySynchOverviewPage.show}"
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
     <rich:panelMenuGroup id="uosGroup" binding="#{mainPage.uosGroupPage.mainMenuComponent}" label="УОС"

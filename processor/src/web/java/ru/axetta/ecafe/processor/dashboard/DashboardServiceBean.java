@@ -83,24 +83,31 @@ public class DashboardServiceBean {
     public List<DashboardResponse.NamedParams> getNamedParams() {
         //Session session = null;
         try {
+            Calendar now = new GregorianCalendar();
+            now.setTimeInMillis(System.currentTimeMillis());
+            now.set(Calendar.HOUR_OF_DAY, 0);
+            now.set(Calendar.MINUTE, 0);
+            now.set(Calendar.SECOND, 0);
+            now.set(Calendar.MILLISECOND, 0);
             List<DashboardResponse.NamedParams> params = new ArrayList<DashboardResponse.NamedParams>();
             Query q = entityManager.createNativeQuery(
-                    "select 'Количество доставленных SMS' as name, count(cf_clientsms.idofsms) as value, 'long' as type "
+                    "select 'Доставлено SMS' as name, count(cf_clientsms.idofsms) as value, 'long' as type "
                     + "from cf_clientsms "
-                    + "where deliverystatus=:deliveredSMSStatus "
+                    + "where deliverystatus=:deliveredSMSStatus and servicesenddate>:maxDate "
                     + "union all "
-                    + "select 'Количество не доставленных SMS' as name, count(cf_clientsms.idofsms) as value, 'long' as type "
+                    /*+ "select 'Количество не доставленных SMS' as name, count(cf_clientsms.idofsms) as value, 'long' as type "
                     + "from cf_clientsms "
                     + "where deliverystatus=:notDeliveredSMSStatus "
-                    + "union all "
-                    + "select 'Дата последнего отправленного SMS' as name, max(cf_clientsms.senddate) as value, 'date' as type "
+                    + "union all "*/
+                    + "select 'Последнее SMS' as name, max(cf_clientsms.servicesenddate) as value, 'date' as type "
                     + "from cf_clientsms "
                     + "union all "
-                    + "select '{href=NSIOrgRegistrySynchPage}Количество ошибок при сверки с Реестрами' as name, count(cf_registrychange_errors.idofregistrychangeerror) as value, 'long' as type "
+                    + "select '{href=NSIOrgRegistrySynchPage}Ошибок при сверке с Реестрами' as name, count(cf_registrychange_errors.idofregistrychangeerror) as value, 'long' as type "
                     + "from cf_registrychange_errors "
                     + "where comment is null or comment=''");
             q.setParameter("deliveredSMSStatus", ClientSms.DELIVERED_TO_RECIPENT);
-            q.setParameter("notDeliveredSMSStatus", ClientSms.NOT_DELIVERED_TO_RECIPENT);
+            q.setParameter("maxDate", now.getTimeInMillis());
+            //q.setParameter("notDeliveredSMSStatus", ClientSms.NOT_DELIVERED_TO_RECIPENT);
             List queryResult = q.getResultList();
             for (Object object : queryResult) {
                 Object[] result = (Object[]) object;
