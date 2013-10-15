@@ -70,6 +70,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.mail.internet.InternetAddress;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpSession;
 import java.io.*;
@@ -94,6 +96,10 @@ public class RuntimeContext implements ApplicationContextAware {
 
     public static boolean isTestRunning() {
         return getAppContext().containsBean("testDBInit");
+    }
+
+    public static boolean isOrgRoomRunning() {
+        return getAppContext().containsBean("orgRoomCommonBean");
     }
 
     public static class NotInitializedException extends RuntimeException {
@@ -229,7 +235,19 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     public Session createPersistenceSession() throws Exception {
+        if (isOrgRoomRunning()) {
+            initiateOrgRoomEntityManager();
+            return sessionFactory.openSession();
+        }
         return sessionFactory.openSession();
+    }
+
+    public void initiateOrgRoomEntityManager () {
+        if (entityManager == null) {
+            EntityManagerFactory emf = Persistence.createEntityManagerFactory("processorPU");
+            entityManager = emf.createEntityManager();
+            setSessionFactory (((Session) entityManager.getDelegate()).getSessionFactory());
+        }
     }
 
     public Session createReportPersistenceSession() {
@@ -379,6 +397,11 @@ public class RuntimeContext implements ApplicationContextAware {
         applicationContext.getBean(this.getClass()).initDB();
 
         String basePath = "/";
+        if (isOrgRoomRunning()) {
+            Properties properties = new Properties();//loadConfig();
+            this.clientContractIdGenerator = createClientContractIdGenerator(properties, sessionFactory);
+            return;
+        }
         Properties properties = loadConfig();
         if (properties == null) {
             properties = new Properties();
@@ -559,6 +582,17 @@ public class RuntimeContext implements ApplicationContextAware {
 
     @Transactional
     public void initDB() throws Exception {
+        if (isOrgRoomRunning()) {
+            try {
+                //getAppContext().getBean(RuntimeContext.class).initiateEntityManager();
+                getAppContext().getBean(RuntimeContext.class).loadOptionValues();
+            } catch (Exception e) {
+                logger.error("Failed to init application.", e);
+                throw e;
+            }
+            return;
+        }
+
         // Configure runtime context
         try {
             // check DB version
@@ -729,6 +763,14 @@ public class RuntimeContext implements ApplicationContextAware {
     private static Scheduler createScheduler(Properties properties) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating application-wide job scheduler.");
+        }
+        if (isOrgRoomRunning()){
+            Object threadPoolClass = properties.get("org.quartz.threadPool.class");
+            if (threadPoolClass == null || ((String) threadPoolClass).length() < 1) {
+                properties.put("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
+                properties.put("org.quartz.threadPool.threadCount", "4");
+                properties.put("org.quartz.jobStore.class", "org.quartz.simpl.RAMJobStore");
+            }
         }
         StdSchedulerFactory schedulerFactory = new StdSchedulerFactory(properties);
         Scheduler scheduler = schedulerFactory.getScheduler();
