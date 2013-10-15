@@ -11,6 +11,7 @@ import org.hibernate.criterion.Order;
 import org.slf4j.Logger;
 
 import javax.persistence.EntityTransaction;
+import java.math.BigInteger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -58,4 +59,50 @@ public class HibernateUtils {
         return criteria.addOrder(Order.asc(orderField));
     }
 
+    public static String getDbString(Object obj) {
+        if (obj == null) {
+            return "";
+        }
+        try {
+            return ((String) obj).trim();
+        } catch (Exception e) {
+            return obj.toString();
+        }
+    }
+
+    public static Long getDbLong(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+        try {
+            return ((BigInteger) obj).longValue();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static Integer getDbInt(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+        try {
+            return ((Integer) obj).intValue();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static Boolean getDbBoolean(Object obj) {
+        if (obj == null) {
+            return null;
+        }
+        if (obj == null) {
+            return null;
+        }
+        try {
+            return ((Integer) obj).intValue() == 1 ? true : false;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

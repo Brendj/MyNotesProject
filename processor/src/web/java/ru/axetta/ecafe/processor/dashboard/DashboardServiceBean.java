@@ -5,14 +5,13 @@
 package ru.axetta.ecafe.processor.dashboard;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.SyncHistory;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.dashboard.data.DashboardResponse;
 
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +27,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -78,6 +78,50 @@ public class DashboardServiceBean {
         DashboardResponse dashboardResponse = new DashboardResponse();
         dashboardResponse.setEduInstItemInfoList(new LinkedList<DashboardResponse.EduInstItemInfo>());
         return dashboardResponse;
+    }
+
+    public List<DashboardResponse.NamedParams> getNamedParams() {
+        //Session session = null;
+        try {
+            List<DashboardResponse.NamedParams> params = new ArrayList<DashboardResponse.NamedParams>();
+            Query q = entityManager.createNativeQuery(
+                    "select 'Количество доставленных SMS' as name, count(cf_clientsms.idofsms) as value, 'long' as type "
+                    + "from cf_clientsms "
+                    + "where deliverystatus=:deliveredSMSStatus "
+                    + "union all "
+                    + "select 'Количество не доставленных SMS' as name, count(cf_clientsms.idofsms) as value, 'long' as type "
+                    + "from cf_clientsms "
+                    + "where deliverystatus=:notDeliveredSMSStatus "
+                    + "union all "
+                    + "select 'Дата последнего отправленного SMS' as name, max(cf_clientsms.senddate) as value, 'date' as type "
+                    + "from cf_clientsms "
+                    + "union all "
+                    + "select '{href=NSIOrgRegistrySynchPage}Количество ошибок при сверки с Реестрами' as name, count(cf_registrychange_errors.idofregistrychangeerror) as value, 'long' as type "
+                    + "from cf_registrychange_errors "
+                    + "where comment is null or comment=''");
+            q.setParameter("deliveredSMSStatus", ClientSms.DELIVERED_TO_RECIPENT);
+            q.setParameter("notDeliveredSMSStatus", ClientSms.NOT_DELIVERED_TO_RECIPENT);
+            List queryResult = q.getResultList();
+            for (Object object : queryResult) {
+                Object[] result = (Object[]) object;
+                String name = ((String) result[0]).trim();
+                long value  = ((BigInteger) result[1]).longValue();
+                String type = ((String) result[2]).trim();
+                if (type.equals("long")) {
+                    params.add(new DashboardResponse.NamedParams(name, value));
+                } else if (type.equals("date")) {
+                    params.add(new DashboardResponse.NamedParams(name, new Date(value)));
+                }
+            }
+            return params;
+        } catch (Exception e) {
+            logger.error("Failed to load named params from database", e);
+            return Collections.EMPTY_LIST;
+        } finally {
+            /*try {
+                if (session != null) { HibernateUtils.close(session, logger); }
+            } catch (Exception e) { }*/
+        }
     }
 
     public DashboardResponse.OrgBasicStats getOrgBasicStats(Date dt, Long idOfOrg) throws Exception {

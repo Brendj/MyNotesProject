@@ -16,15 +16,19 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.ListType;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
     public static class Filter extends AbstractFilter {
         String ruleName, reportName, orgNum, tag;
         Date createdDate, startDate, endDate;
+        List<Long> idOfOrgList;
 
         @Override
         public boolean isEmpty() {
@@ -44,6 +48,9 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
                 Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
                 ContextDAOServices.getInstance().buildOrgRestriction(idOfUser, "idOfOrg", crit);
             } catch (Exception e) {
+            }
+            if (idOfOrgList != null && idOfOrgList.size() > 0) {
+                crit.add(Restrictions.in("idOfOrg", idOfOrgList));
             }
             if (!StringUtils.isEmpty(ruleName)) crit.add(Restrictions.like("ruleName", ruleName, MatchMode.ANYWHERE).ignoreCase());
             if (!StringUtils.isEmpty(tag)) crit.add(Restrictions.like("tag", tag, MatchMode.ANYWHERE).ignoreCase());
@@ -119,6 +126,14 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
         public void setOrgNum(String orgNum) {
             this.orgNum = orgNum;
         }
+
+        public List<Long> getIdOfOrgList() {
+            return idOfOrgList;
+        }
+
+        public void setIdOfOrgList(List<Long> idOfOrgList) {
+            this.idOfOrgList = idOfOrgList;
+        }
     }
 
 
@@ -133,6 +148,7 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
     private String reportFile;
     private String orgNum;
     private String tag;
+    private List<Long> idOfOrgList;
 
     @Override
     public void fillForList(EntityManager entityManager, ReportInfo entity) {

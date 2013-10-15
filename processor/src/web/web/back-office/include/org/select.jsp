@@ -18,9 +18,14 @@
         <table class="borderless-grid" width="100%">
             <tr>
                 <td style="text-align: left;">
-                    <h:panelGrid styleClass="borderless-grid">
+                    <h:panelGrid styleClass="borderless-grid" columns="2">
                         <h:inputText value="#{mainPage.orgSelectPage.selectedItem.shortName}" readonly="true" size="64"
                                      styleClass="input-text" />
+                        <a4j:commandLink styleClass="command-link">
+                            <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                            <%--<f:setPropertyActionListener value="" target="#{mainPage.orgSelectPage.filter}" />--%>
+                            <a4j:support event="onclick" action="#{mainPage.orgSelectPage.cancelFilter}" reRender="modalOrgSelectorForm"/>
+                        </a4j:commandLink>
                     </h:panelGrid>
                     <h:panelGrid columns="3" styleClass="borderless-grid">
                         <h:panelGrid columns="2" styleClass="borderless-grid">
@@ -34,11 +39,6 @@
                         <a4j:commandLink action="#{mainPage.updateOrgSelectPage}" reRender="modalOrgSelectorForm"
                                          styleClass="command-link">
                             <h:graphicImage value="/images/16x16/search.png" style="border: 0;" />
-                        </a4j:commandLink>
-                        <a4j:commandLink action="#{mainPage.updateOrgSelectPage}" reRender="modalOrgSelectorForm"
-                                         styleClass="command-link">
-                            <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
-                            <f:setPropertyActionListener value="" target="#{mainPage.orgSelectPage.filter}" />
                         </a4j:commandLink>
                     </h:panelGrid>
                     <h:selectOneRadio value="#{mainPage.orgListSelectPage.supplierFilter}" converter="javax.faces.Integer"

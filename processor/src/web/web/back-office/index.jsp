@@ -187,6 +187,10 @@
         <c:import url="include/monitoring/sync_errors_window.jsp" />
     </f:subview>
 
+    <f:subview id="NSIOrgRegistrySynchErrorView">
+        <c:import url="include/service/msk/nsi_org_registry_sync_error.jsp" />
+    </f:subview>
+
     <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">
         <tr>
             <td colspan="2">

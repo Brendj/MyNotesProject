@@ -17,7 +17,7 @@
         </f:facet>
         <f:subview id="workspacePageSubView">
             <a4j:outputPanel keepTransient="true">
-                <c:import url="/include/${mainPage.currentWorkspacePage.pageFilename}.jsp" />
+                <c:import url="${mainPage.currentWorkspacePage.pageDirectoryRoot}/${mainPage.currentWorkspacePage.pageFilename}.jsp" />
             </a4j:outputPanel>
         </f:subview>
     </rich:panel>

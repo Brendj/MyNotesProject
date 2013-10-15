@@ -83,30 +83,49 @@
             </rich:column>
         </rich:dataTable>
 
-        <rich:dataTable id="payMonitorTable" value="#{syncMonitorPage.payStatItems}" var="item"
-                        footerClass="data-table-footer" columnClasses="center-aligned-column">
-            <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:outputText escape="true" value="Контрагент" />
-                </f:facet>
-                <h:outputText escape="true" value="#{item.contragentName}" styleClass="output-text"/>
-            </rich:column>
+        <h:panelGrid>
+            <rich:dataTable id="paramsTable" value="#{syncMonitorPage.namedParams}" var="item"
+                            footerClass="data-table-footer" columnClasses="center-aligned-column">
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Наименование параметра" />
+                    </f:facet>
+                    <h:outputLink value="#" id="createGroupCommandLink" styleClass="command-button" rendered="#{not empty item.href}">
+                        <h:outputText value="#{item.paramName}" styleClass="output-text"/>
+                        <a4j:support event="onclick" action="#{item.hrefBean.show}" reRender="workspaceForm"/>
+                    </h:outputLink>
+                    <h:outputText escape="true" value="#{item.paramName}" styleClass="output-text" rendered="#{empty item.href}"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Значение" />
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.stringValue}" styleClass="output-text" />
+                </rich:column>
+            </rich:dataTable>
 
-            <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:outputText escape="true" value="Посл. транзакция" />
-                </f:facet>
-                <h:outputText escape="true" value="#{item.lastOperationTime}" styleClass="output-text" converter="timeConverter" />
-            </rich:column>
-
-            <rich:column headerClass="column-header">
-                <f:facet name="header">
-                    <h:outputText escape="true" value="Транзакций сегодня" />
-                </f:facet>
-                <h:outputText escape="true" value="#{item.numOfOperations}" styleClass="output-text"/>
-            </rich:column>
-
-        </rich:dataTable>
+            <rich:dataTable id="payMonitorTable" value="#{syncMonitorPage.payStatItems}" var="item"
+                            footerClass="data-table-footer" columnClasses="center-aligned-column">
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Контрагент" />
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.contragentName}" styleClass="output-text"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Посл. транзакция" />
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.lastOperationTime}" styleClass="output-text" converter="timeConverter" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Транзакций сегодня" />
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.numOfOperations}" styleClass="output-text"/>
+                </rich:column>
+            </rich:dataTable>
+        </h:panelGrid>
 
     </h:panelGrid>
 

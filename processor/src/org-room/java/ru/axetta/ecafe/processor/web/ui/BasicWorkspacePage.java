@@ -34,6 +34,10 @@ public class BasicWorkspacePage extends BasicPage {
     public String getPageFilename() {
         return "default";
     }
+    
+    public String getPageDirectoryRoot() {
+        return "/include";
+    }
 
     public UIComponent getMainMenuComponent() {
         return mainMenuComponent;

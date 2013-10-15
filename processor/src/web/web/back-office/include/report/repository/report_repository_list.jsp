@@ -44,8 +44,14 @@ function checkReporitoryDate () {
                 <h:inputText value="#{reportRepositoryListPage.filter.tag}" styleClass="input-text" />
                 <h:outputText escape="true" value="Название отчета" styleClass="output-text" />
                 <h:inputText value="#{reportRepositoryListPage.filter.reportName}" styleClass="input-text" />
-                <h:outputText escape="true" value="Номер организации" styleClass="output-text" />
-                <h:inputText value="#{reportRepositoryListPage.filter.orgNum}" styleClass="input-text" />
+                <h:outputText escape="true" value="Организации" styleClass="output-text" />
+                <h:panelGroup styleClass="borderless-div">
+                    <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                       styleClass="command-link" style="width: 25px;" >
+                    </a4j:commandButton>
+                    <h:outputText styleClass="output-text" escape="true" value=" {#{reportRepositoryListPage.orgsFilter}}" />
+                </h:panelGroup>
                 <h:outputText escape="true" value="Дата создания" styleClass="output-text" />
                 <rich:calendar value="#{reportRepositoryListPage.filter.createdDate}" datePattern="dd.MM.yyyy"
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false" />

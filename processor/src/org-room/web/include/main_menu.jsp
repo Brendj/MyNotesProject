@@ -42,6 +42,9 @@
             <rich:menuItem submitMode="ajax" id="discountEditPageMenuItem"
                            binding="#{setupDiscountPage.mainMenuComponent}" value="Установка льгот"
                            action="#{setupDiscountPage.show}" reRender="workspaceForm" />
+            <rich:menuItem submitMode="ajax" id="registrySynch"
+                           binding="#{NSIOrgRegistrySynchPage.mainMenuComponent}" value="Синхронизация с Реестрами"
+                           action="#{NSIOrgRegistrySynchPage.show}" reRender="workspaceForm" />
         </rich:dropDownMenu>
 
         <%-- Управление заявками на питание --%>

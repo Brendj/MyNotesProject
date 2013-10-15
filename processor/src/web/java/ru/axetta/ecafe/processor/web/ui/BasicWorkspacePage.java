@@ -4,10 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui;
 
-import com.sun.faces.taglib.html_basic.CommandLinkTag;
-
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-
 import org.richfaces.component.html.HtmlPanelMenuGroup;
 import org.richfaces.component.html.HtmlPanelMenuItem;
 

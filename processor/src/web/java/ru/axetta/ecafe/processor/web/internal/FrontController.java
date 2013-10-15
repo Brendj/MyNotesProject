@@ -9,7 +9,10 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeErrorItem;
+import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem;
 import ru.axetta.ecafe.processor.web.internal.front.items.TempCardOperationItem;
 import ru.axetta.ecafe.processor.web.internal.front.items.VisitorItem;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
@@ -29,10 +32,7 @@ import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.persistence.Person.isEmptyFullNameFields;
 import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyDocumentParams;
@@ -65,6 +65,119 @@ public class FrontController extends HttpServlet {
             throws FrontControllerException {
         checkRequestValidity(orgId);
         return "OK";
+    }
+
+    @WebMethod(operationName = "loadRegistryChangeItems")
+    public List<RegistryChangeItem> loadRegistryChangeItems(@WebParam(name = "idOfOrg") long idOfOrg,
+                                                            @WebParam(name = "revisionDate") long revisionDate) {
+        try {
+            List<RegistryChangeItem> items = new ArrayList<RegistryChangeItem>();
+            List<RegistryChange> changes = DAOService.getInstance().getLastRegistryChanges(idOfOrg, revisionDate);
+            for (RegistryChange c : changes) {
+                RegistryChangeItem i = new RegistryChangeItem(c.getIdOfOrg(),
+                                                              c.getIdOfMigrateOrgTo() == null ? -1L : c.getIdOfMigrateOrgTo(),
+                                                              c.getIdOfMigrateOrgFrom() == null ? -1L : c.getIdOfMigrateOrgFrom(),
+                                                              c.getCreateDate(), c.getIdOfRegistryChange(),
+                                                              c.getClientGUID(), c.getFirstName(), c.getSecondName(),
+                                                              c.getSurname(), c.getGroupName(), c.getFirstNameFrom(),
+                                                              c.getSecondNameFrom(), c.getSurnameFrom(), c.getGroupNameFrom(),
+                                                              c.getIdOfClient() == null ? -1L : c.getIdOfClient(),
+                                                              c.getOperation(), c.getApplied());
+                items.add(i);
+            }
+            return items;
+        } catch (Exception e) {
+            logger.error("Failed to load registry change items form database", e);
+            return Collections.EMPTY_LIST;
+        }
+    }
+
+    @WebMethod(operationName = "refreshRegistryChangeItems")
+    public List<RegistryChangeItem> refreshRegistryChangeItems(@WebParam(name = "idOfOrg") long idOfOrg) {
+        try {
+            RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).syncClientsWithRegistry(idOfOrg,false, new StringBuffer(), true);
+            return loadRegistryChangeItems(idOfOrg, -1L);   //  -1 значит последняя загрузка из Реестров
+        } catch (Exception e) {
+            logger.error("Failed to refresh registry change items", e);
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    @WebMethod(operationName = "proceedRegitryChangeItem")
+    /* Если метод возвращает null, значит операция произведена успешно, иначсе это будет сообщение об ошибке */
+    public String proceedRegitryChangeItem(@WebParam(name = "changesList") List<Long> changesList,
+                                           @WebParam(name = "operation") int operation,
+                                           @WebParam(name = "fullNameValidation") boolean fullNameValidation) {
+        if (operation != ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE) {
+            return null;
+        }
+
+        try {
+            for (Long idOfRegistryChange : changesList) {
+                RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).applyRegistryChange(idOfRegistryChange, fullNameValidation);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to commit registry change item", e);
+            return "При подтверждении изменения из Реестров, произошла ошибка: " + e.getMessage();
+        }
+
+        return null;
+    }
+
+    @WebMethod(operationName = "loadRegistryChangeRevisions")
+    public List<Long> loadRegistryChangeRevisions(@WebParam(name = "idOfOrg") long idOfOrg) {
+        try {
+            return DAOService.getInstance().getRegistryChangeRevisions(idOfOrg);
+        } catch (Exception e) {
+            logger.error("Failed to load registry change revisions list", e);
+        }
+        return Collections.EMPTY_LIST;
+    }
+
+    @WebMethod(operationName = "loadRegistryChangeErrorItems")
+    public List<RegistryChangeErrorItem> loadRegistryChangeErrorItems(@WebParam(name = "idOfOrg") long idOfOrg) {
+        try {
+            List<RegistryChangeErrorItem> items = new ArrayList<RegistryChangeErrorItem>();
+            List<RegistryChangeError> errors = DAOService.getInstance().getRegistryChangeErrors(idOfOrg);
+            for (RegistryChangeError e : errors) {
+                String orgName = DAOService.getInstance().findOrById(e.getIdOfOrg()).getOfficialName();
+                RegistryChangeErrorItem i = new RegistryChangeErrorItem(e.getIdOfRegistryChangeError(), e.getIdOfOrg(),
+                                                                        e.getRevisionCreateDate(), e.getCreateDate(),
+                                                                        e.getCommentCreateDate(), e.getError(), e.getComment(),
+                                                                        orgName, e.getCommentAuthor());
+                items.add(i);
+            }
+            return items;
+        } catch (Exception e) {
+            logger.error("Failed to load registry change error items from database", e);
+            return Collections.EMPTY_LIST;
+        }
+    }
+
+    @WebMethod(operationName = "addRegistryChangeError")
+    public String addRegistryChangeError(@WebParam(name = "idOfOrg") long idOfOrg,
+                                         @WebParam(name = "revisionDate") long revisionDate,
+                                         @WebParam(name = "error") String error) {
+        try {
+            DAOService.getInstance().addRegistryChangeError(idOfOrg, revisionDate, error);
+            return null;
+        } catch (Exception e) {
+            logger.error("Failed to add comment for registry change error", e);
+            return e.getMessage();
+        }
+    }
+
+    @WebMethod(operationName = "commentRegistryChangeError")
+    public String commentRegistryChangeError(@WebParam(name = "idOfRegistryChangeError") long idOfRegistryChangeError,
+                                             @WebParam(name = "comment") String comment,
+                                             @WebParam(name = "author") String author) {
+        try {
+            DAOService.getInstance().addRegistryChangeErrorComment(idOfRegistryChangeError, comment, author);
+            return null;
+        } catch (Exception e) {
+            logger.error("Failed to add comment for registry change error", e);
+            return e.getMessage();
+        }
     }
 
     /* Выполняет проверку наличия «не нашей customerType=1» карты с физическим идентификатором  cardNo в таблице временных карт. */

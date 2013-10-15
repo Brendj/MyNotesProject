@@ -81,6 +81,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Integer thinClientMinClaimsEditableDays;
     private int smsPaymentType;
     private Long smsDefaultSubscriptionFee;
+    private Integer syncRegisterDaysTimeout;
 
 
     private List<BankOptionItem> banks;
@@ -462,6 +463,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.smsDefaultSubscriptionFee = smsDefaultSubscriptionFee;
     }
 
+    public Integer getSyncRegisterDaysTimeout() {
+        return syncRegisterDaysTimeout;
+    }
+
+    public void setSyncRegisterDaysTimeout(Integer syncRegisterDaysTimeout) {
+        this.syncRegisterDaysTimeout = syncRegisterDaysTimeout;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -517,6 +526,7 @@ public class OptionPage extends BasicWorkspacePage {
         syncRegisterMaxAttempts = runtimeContext.getOptionValueInt(Option.OPTION_MSK_NSI_MAX_ATTEMPTS);
         syncRegisterSupportEmail = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_SUPPORT_EMAIL);
         thinClientMinClaimsEditableDays = runtimeContext.getOptionValueInt(Option.OPTION_THIN_CLIENT_MIN__CLAIMS_EDITABLE_DAYS);
+        syncRegisterDaysTimeout = runtimeContext.getOptionValueInt(Option.OPTION_MSK_NSI_REGISTRY_CHANGE_DAYS_TIMEOUT);
 
 
         syncLimits = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS);
@@ -621,6 +631,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_LIMITS, syncLimits);
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_RETRY_AFTER, retryAfter);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_SUPPORT_EMAIL, syncRegisterSupportEmail);
+            runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_REGISTRY_CHANGE_DAYS_TIMEOUT, syncRegisterDaysTimeout);
 
 
             runtimeContext.saveOptionValues();

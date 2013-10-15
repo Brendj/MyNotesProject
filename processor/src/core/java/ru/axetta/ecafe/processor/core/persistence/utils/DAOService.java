@@ -1482,4 +1482,61 @@ public class DAOService {
         Org org = entityManager.find(Org.class, idOfOrg);
         return org.getFriendlyOrg();
     }
+
+    public List<RegistryChange> getLastRegistryChanges(long idOfOrg, long revisionDate) throws Exception {
+        if (revisionDate < 1L) {
+            revisionDate = getLastRegistryChangeUpdate(idOfOrg);
+        }
+        if (revisionDate < 1) {
+            return Collections.EMPTY_LIST;
+        }
+        TypedQuery<RegistryChange> query = entityManager.createQuery("from RegistryChange where idOfOrg=:idOfOrg and createDate=:lastUpdate order by groupName, surname, firstName, secondName",RegistryChange.class);
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("lastUpdate", revisionDate);
+        return query.getResultList();
+    }
+
+    public long getLastRegistryChangeUpdate(long idOfOrg) throws Exception {
+        Query q = entityManager.createNativeQuery("SELECT max(createDate) FROM cf_RegistryChange where idOfOrg=:idOfOrg");
+        q.setParameter("idOfOrg", idOfOrg);
+        Object res = q.getSingleResult();
+        return Long.parseLong("" + (res == null || res.toString().length() < 1 ? 0 : res.toString()));
+    }
+
+    public List<Long> getRegistryChangeRevisions(long idOfOrg) throws Exception {
+        TypedQuery<Long> query = entityManager.createQuery("select distinct createDate from RegistryChange where idOfOrg=:idOfOrg order by createDate desc",Long.class);
+        query.setParameter("idOfOrg",idOfOrg);
+        return query.getResultList();
+    }
+    
+    public List<RegistryChangeError> getRegistryChangeErrors(long idOfOrg) throws Exception{
+        String orgClause = "";
+        if (idOfOrg > -1) {
+            orgClause = "where idOfOrg=:idOfOrg";
+        }
+        TypedQuery<RegistryChangeError> query = entityManager.createQuery("from RegistryChangeError " + orgClause + " order by createDate desc",RegistryChangeError.class);
+        if (idOfOrg > -1) {
+            query.setParameter("idOfOrg", idOfOrg);
+        }
+        return query.getResultList();
+    }
+
+    public void addRegistryChangeErrorComment(long idOfRegistryChangeError, String comment, String author) throws Exception {
+        Session session = (Session) entityManager.getDelegate();
+        RegistryChangeError e = entityManager.find(RegistryChangeError.class, idOfRegistryChangeError);
+        e.setComment(comment);
+        e.setCommentAuthor(author);
+        e.setCommentCreateDate(System.currentTimeMillis());
+        session.update(e);
+    }
+
+    public void addRegistryChangeError(long idOfOrg, long revisionDate, String error) throws Exception {
+        Session session = (Session) entityManager.getDelegate();
+        RegistryChangeError e = new RegistryChangeError();
+        e.setIdOfOrg(idOfOrg);
+        e.setRevisionCreateDate(revisionDate);
+        e.setError(error);
+        e.setCreateDate(System.currentTimeMillis());
+        session.save(e);
+    }
 }

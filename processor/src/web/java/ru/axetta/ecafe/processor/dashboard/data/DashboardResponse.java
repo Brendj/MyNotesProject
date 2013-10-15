@@ -4,9 +4,10 @@
 
 package ru.axetta.ecafe.processor.dashboard.data;
 
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,6 +17,63 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class DashboardResponse {
+
+    public static class NamedParams {
+        public static final String HREF_PARAM = "href";
+        protected String name;
+        protected Long longValue;
+        protected Date dateValue;
+        protected Map<String, String> params;
+
+        public NamedParams (String name, long value) {
+            name = parseParams(name);
+            this.name = name;
+            longValue = value;
+
+        }
+
+        public NamedParams (String name, Date value) {
+            name = parseParams(name);
+            this.name = name;
+            dateValue = value;
+        }
+        
+        public String getStringValue() {
+            if (dateValue != null) {
+                return new SimpleDateFormat("dd.MM.yyyy HH:mm:ss").format(dateValue);
+            } else if (longValue != null) {
+                return "" + longValue;
+            } else {
+                return "";
+            }
+        }
+        
+        public String getParamName() {
+                return name;
+        }
+        
+        public String getHref() {
+             return params.get(HREF_PARAM);
+        }
+        
+        public Object getHrefBean() {
+            return RuntimeContext.getAppContext().getBean(getHref());
+        }
+        
+        protected String parseParams (String name) {
+            params = new HashMap<String, String>();
+            if (!name.startsWith("{")) {
+                return name;
+            }
+            String paramsStr = name.substring(1, name.indexOf("}"));
+            String paramsList [] = paramsStr.split(",");
+            for (String paramSet : paramsList) {
+                String p [] = paramSet.split("=");
+                params.put(p[0], p[1]);
+            }
+            return name.substring(name.indexOf("}") + 1);
+        }
+    }
 
     public static class OrgBasicStatItem {
 

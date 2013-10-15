@@ -27,6 +27,7 @@ import javax.persistence.TypedQuery;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 /**
  * Created with IntelliJ IDEA.
@@ -58,6 +59,9 @@ public class SMSSubscriptionFeeService {
 
     @PostConstruct
     protected void init() {
+        if (RuntimeContext.isOrgRoomRunning()) {
+            return;
+        }
         defaultSubFee = runtimeContext.getOptionValueLong(Option.OPTION_SMS_DEFAULT_SUBSCRIPTION_FEE);
         paymentType = runtimeContext.getOptionValueInt(Option.OPTION_SMS_PAYMENT_TYPE);
     }

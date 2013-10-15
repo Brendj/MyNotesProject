@@ -43,6 +43,9 @@
     <f:subview id="replaceClientView">
         <c:import url="include/modal/feed_plan/replace_client.jsp" />
     </f:subview>
+    <f:subview id="NSIOrgRegistrySynchErrorView">
+        <c:import url="back-office/include/service/msk/nsi_org_registry_sync_error.jsp" />
+    </f:subview>
 
 
     <table width="100%" cellspacing="4px" cellpadding="0" class="main-grid">

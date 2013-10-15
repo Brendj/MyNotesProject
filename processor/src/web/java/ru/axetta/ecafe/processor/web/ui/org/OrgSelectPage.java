@@ -66,6 +66,12 @@ public class OrgSelectPage extends BasicPage {
         }
     }
 
+    public void cancelFilter() {
+        selectedItem = new OrgShortItem();
+        MainPage.getSessionInstance().updateOrgSelectPage();
+    }
+    //action="#{}"
+
     public void fill(Session session) throws Exception {
         this.items = retrieveOrgs(session);
     }

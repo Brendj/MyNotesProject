@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.web.ui;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Function;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.ui.modal.YesNoConfirmPanel;
 import ru.axetta.ecafe.processor.web.ui.modal.feed_plan.ClientFeedActionPanel;
 import ru.axetta.ecafe.processor.web.ui.modal.feed_plan.DisableComplexPanel;
@@ -34,14 +36,6 @@ public class MainPage {
 
     private HtmlPanelMenu mainMenu;
     private BasicWorkspacePage currentWorkspacePage = new DefaultWorkspacePage();
-    private Long idoforg = 0L;
-
-    public void setIdoforg (Long idoforg) {
-        this.idoforg = idoforg;
-    }
-    public Long getIdoforg () {
-        return idoforg;
-    }
 
 
     public static MainPage getSessionInstance() {
@@ -80,10 +74,6 @@ public class MainPage {
 
 
 
-
-    /*******************************************************************************************************************
-     *                                     Список страниц
-     ******************************************************************************************************************/
 
 
 
@@ -132,5 +122,13 @@ public class MainPage {
         OrderRegistrationResultPanel panel = RuntimeContext.getAppContext().getBean(OrderRegistrationResultPanel.class);
         panel.fill();
         panel.addCallbackListener(page);
+    }
+
+    public User getCurrentUser() throws Exception {
+        return null;
+    }
+
+    public boolean isEligibleToEditReports() throws Exception {
+        return Boolean.FALSE;
     }
 }

@@ -34,3 +34,40 @@ insert into cf_thin_client_users values (1032, 'testerov', 'R2hiZHRuMDA=', 1, 13
 
 -- Поправка бага ECAFE-1179
 ALTER TABLE cf_reportinfo ALTER COLUMN reportname TYPE character varying(512);
+
+
+-- Таблица для хранения поступивших из Реестров изменений
+create table CF_RegistryChange (
+  IdOfRegistryChange bigserial not null,
+  IdOfOrg bigint not null,
+  CreateDate bigint not null,
+  ClientGUID varchar(40) not null,
+  FirstName varchar(64) not null,
+  SecondName varchar(128) not null,
+  Surname varchar(128) not null,
+  GroupName varchar(64) not null,
+  FirstNameFrom varchar(64),
+  SecondNameFrom varchar(128),
+  SurnameFrom varchar(128),
+  GroupNameFrom varchar(64),
+  IdOfMigrateOrgTo bigint,
+  IdOfMigrateOrgFrom bigint,
+  IdOfClient bigint,
+  Operation integer not null,
+  Applied boolean not null default false,
+  CONSTRAINT cf_registrychange_pk PRIMARY KEY (IdOfRegistryChange),
+  CONSTRAINT cf_registrychange_org FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg)
+);
+
+-- Таблица для хранения ошибок по поступившим из Реестров изменениям
+create table CF_RegistryChange_Errors (
+  IdOfRegistryChangeError bigserial not null,
+  IdOfOrg bigint not null,
+  RevisionCreateDate bigint not null,
+  Error varchar(256) not null,
+  Comment varchar(256) default '',
+  CommentAuthor VARCHAR(64) default '',
+  CreateDate bigint not null,
+  CommentCreateDate bigint,
+  CONSTRAINT CF_RegistryChange_Errors_pk PRIMARY KEY (IdOfRegistryChangeError)
+);

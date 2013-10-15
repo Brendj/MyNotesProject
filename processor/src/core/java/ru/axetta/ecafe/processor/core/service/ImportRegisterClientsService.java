@@ -8,14 +8,12 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.mail.File;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +39,10 @@ import java.util.*;
 @Component
 @Scope("singleton")
 public class ImportRegisterClientsService {
+    public static final int CREATE_OPERATION = 1;
+    public static final int DELETE_OPERATION = 2;
+    public static final int MODIFY_OPERATION = 3;
+    public static final int MOVE_OPERATION   = 4;
 
     private static final int MAX_CLIENTS_PER_TRANSACTION = 50;
     @PersistenceContext(unitName = "processorPU")
@@ -51,6 +53,7 @@ public class ImportRegisterClientsService {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImportRegisterClientsService.class);
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private static final String ORG_SYNC_MARKER = "СИНХРОНИЗАЦИЯ_РЕЕСТРЫ";
+    private static final long MILLISECONDS_IN_DAY = 86400000L;
 
 
     public static boolean isOn() {
@@ -91,7 +94,7 @@ public class ImportRegisterClientsService {
         
         StringBuffer logBuffer = new StringBuffer();
         return RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
-                .syncClientsWithRegistry(org, performChanges, logBuffer, true);
+                .syncClientsWithRegistry(idOfOrg, performChanges, logBuffer, true);
     }
 
 
@@ -100,6 +103,8 @@ public class ImportRegisterClientsService {
             return;
         }
         List<Org> orgs = DAOService.getInstance().getOrderedSynchOrgsList();
+        RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
+                .checkRegistryChangesValidity();
 
         int maxAttempts = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_MSK_NSI_MAX_ATTEMPTS);
         for (Org org : orgs) {
@@ -110,7 +115,7 @@ public class ImportRegisterClientsService {
             while (attempt < maxAttempts) {
                 try {
                     RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
-                            .syncClientsWithRegistry(org, true, null, false);
+                            .syncClientsWithRegistry(org.getIdOfOrg(), true, null, false);
                     break;
                 } catch (SocketTimeoutException ste) {
                 } catch (Exception e) {
@@ -129,6 +134,214 @@ public class ImportRegisterClientsService {
         //if (allOperationsAreFinished) {
         setLastUpdateDate(new Date(System.currentTimeMillis()));
         //}
+    }
+
+    @Transactional
+    public void checkRegistryChangesValidity() {
+        long minCreateDate = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_MSK_NSI_REGISTRY_CHANGE_DAYS_TIMEOUT) * MILLISECONDS_IN_DAY;
+        Calendar cal = new GregorianCalendar();
+        cal.setTimeInMillis(System.currentTimeMillis() - minCreateDate);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        Session session = (Session) em.getDelegate();
+        Query q = session.createSQLQuery("delete from cf_registrychange where createDate<:minCreateDate");
+        q.setLong("minCreateDate", cal.getTimeInMillis());
+        q.executeUpdate();
+    }
+
+    @Transactional
+    public void saveClients(String synchDate, String date, long ts, Org org,
+                            List<ExpandedPupilInfo> pupils, StringBuffer logBuffer) throws Exception {
+        log(synchDate + "Начато сохранение списка клиентов для " + org.getOfficialName() + " в БД", logBuffer);
+
+
+        //  Открываем сессию и загружаем клиентов, которые сейчас находятся в БД
+        Session session = (Session) em.getDelegate();
+        List<Client> currentClients = DAOUtils.findClientsForOrgAndFriendly(em, org);
+        List<Org> orgsList = DAOUtils.findFriendlyOrgs(em, org);   //  Текущая организация и дружественные ей
+
+
+        //  Находим только удаления и подсчитываем их, если их количество больще чем ограничение, то прекращаем обновление школы и
+        //  отправляем уведомление на email
+        List<Client> clientsToRemove = new ArrayList<Client>();
+        for (Client dbClient : currentClients) {
+            boolean found = false;
+            for (ExpandedPupilInfo pupil : pupils) {
+                if (pupil.getGuid() != null && dbClient.getClientGUID() != null && pupil.getGuid()
+                        .equals(dbClient.getClientGUID())) {
+                    found = true;
+                    break;
+                }
+            }
+            try {
+                ClientGroup currGroup = dbClient.getClientGroup();
+                //  Если клиент из Реестров не найден используя GUID из ИС ПП и группа у него еще не "Отчисленные", "Удаленные"
+                //  увеличиваем количество клиентов, подлежих удалению
+                Long currGroupId = currGroup==null?null:currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
+                if (!found && !emptyIfNull(dbClient.getClientGUID()).equals("") && currGroupId != null &&
+                    !currGroupId.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) &&
+                    !currGroupId.equals(ClientGroup.Predefined.CLIENT_DELETED.getValue())) {
+                    log(synchDate + "Удаление " +
+                            emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(dbClient.getPerson().getSurname())
+                            + " " +
+                            emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(
+                            dbClient.getPerson().getSecondName()) + ", " +
+                            emptyIfNull(dbClient.getClientGroup().getGroupName()), logBuffer);
+                    addClientChange(ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION);
+                }
+            } catch (Exception e) {
+                logError("Failed to delete client " + dbClient, e, logBuffer);
+            }
+        }
+
+
+        //  Проходим по ответу от Реестров и анализируем надо ли обновлять его или нет
+        for (ExpandedPupilInfo pupil : pupils) {
+            FieldProcessor.Config fieldConfig;
+            boolean updateClient = false;
+            Client cl = DAOUtils.findClientByGuid(em, emptyIfNull(pupil.getGuid()));
+            if (cl == null) {
+                fieldConfig = new ClientManager.ClientFieldConfig();
+            } else {
+                fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
+            }
+            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.CLIENT_GUID, pupil.getGuid(),
+                    cl == null ? null : cl.getClientGUID(),
+                    updateClient);
+            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SURNAME, pupil.getFamilyName(),
+                    cl == null ? null : cl.getPerson().getSurname(), updateClient);
+            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.NAME, pupil.getFirstName(),
+                    cl == null ? null : cl.getPerson().getFirstName(), updateClient);
+            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SECONDNAME, pupil.getSecondName(),
+                    cl == null ? null : cl.getPerson().getSecondName(), updateClient);
+            if (pupil.getGroup() != null) {
+                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP, pupil.getGroup(),
+                        cl == null ? null : cl.getClientGroup().getGroupName(), updateClient);
+            }
+            //  Проверяем организацию и дружественные ей - если клиент был переведен из другого ОУ, то перемещаем его
+            boolean guidFound = false;
+            for (Org o : orgsList) {
+                if (o.getGuid().equals(pupil.getGuidOfOrg())) {
+                    guidFound = true;
+                    break;
+                }
+            }
+            if (cl != null && !cl.getOrg().getGuid().equals(pupil.getGuidOfOrg()) && !guidFound) {
+                Org newOrg = DAOService.getInstance().getOrgByGuid(pupil.getGuidOfOrg());
+                log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(
+                        cl.getPerson().getSurname()) + " " +
+                        emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(cl.getPerson().getSecondName())
+                        + ", " +
+                        emptyIfNull(cl.getClientGroup().getGroupName()) + " из школы " + cl.getOrg().getIdOfOrg()
+                        + " в школу " + newOrg.getIdOfOrg(), logBuffer);
+                addClientChange(ts, org.getIdOfOrg(), newOrg.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION);
+                continue;
+            }
+            if (!updateClient) {
+                continue;
+            }
+
+
+            try {
+                //  Если клиента по GUID найти не удалось, это значит что он новый - добавляем его
+                if (cl == null) {
+                    try {
+                        log(synchDate + "Добавление " + pupil.getGuid() + ", " +
+                                pupil.getFamilyName() + " " + pupil.getFirstName() + " " +
+                                pupil.getSecondName() + ", " + pupil.getGroup(), logBuffer);
+                        addClientChange(ts, org.getIdOfOrg(), fieldConfig, CREATE_OPERATION);
+                    } catch (Exception e) {
+                        // Не раскомментировать, очень много исключений будет из-за дублирования клиентов
+                        logError("Ошибка добавления клиента", e, logBuffer);
+                    }
+                    //  Иначе - обновляем клиента в БД
+                } else {
+                    log(synchDate + "Изменение " +
+                            emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
+                            emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(
+                            cl.getPerson().getSecondName()) + ", " +
+                            emptyIfNull(cl.getClientGroup().getGroupName()) + " на " +
+                            emptyIfNull(pupil.getGuid()) + ", " + emptyIfNull(pupil.getFamilyName()) + " "
+                            + emptyIfNull(pupil.getFirstName()) + " " +
+                            emptyIfNull(pupil.getSecondName()) + ", " + emptyIfNull(pupil.getGroup()), logBuffer);
+                    addClientChange(ts, org.getIdOfOrg(), fieldConfig, cl, MODIFY_OPERATION);
+                }
+            } catch (Exception e) {
+                logError("Failed to add client for " + org.getIdOfOrg() + " org", e, logBuffer);
+            }
+        }
+        log(synchDate + "Синхронизация завершена для " + org.getOfficialName(), logBuffer);
+    }
+
+
+    private void addClientChange(long ts, long idOfOrg, FieldProcessor.Config fieldConfig, int operation) throws Exception {
+        //  ДОБАВИТЬ ЗАПИСЬ ОБ ИЗМЕНЕНИИ ПОЛЬЗОВАТЕЛЯ И УКАЗАТЬ СООТВЕТСТВУЮЩУЮ ОПЕРАЦИЮ
+        addClientChange(ts, idOfOrg, fieldConfig, null, operation);
+    }
+
+
+    private void addClientChange(long ts, long idOfOrg,
+            FieldProcessor.Config fieldConfig,
+            Client currentClient, int operation) throws Exception {
+        addClientChange(ts, idOfOrg, null, fieldConfig, currentClient, operation);
+    }
+
+
+    private void addClientChange(long ts, long idOfOrg, Long idOfMigrateOrg,
+                                 FieldProcessor.Config fieldConfig,
+                                 Client currentClient, int operation) throws Exception {
+        //  ДОБАВИТЬ ЗАПИСЬ ОБ ИЗМЕНЕНИИ ПОЛЬЗОВАТЕЛЯ И УКАЗАТЬ СООТВЕТСТВУЮЩУЮ ОПЕРАЦИЮ
+        Session sess = (Session) em.getDelegate();
+        if (currentClient != null) {
+            currentClient = em.merge(currentClient);
+        }
+
+        RegistryChange ch = new RegistryChange();
+        ch.setClientGUID(fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID));
+        ch.setFirstName(fieldConfig.getValue(ClientManager.FieldId.NAME));
+        ch.setSecondName(fieldConfig.getValue(ClientManager.FieldId.SECONDNAME));
+        ch.setSurname(fieldConfig.getValue(ClientManager.FieldId.SURNAME));
+        ch.setGroupName(fieldConfig.getValue(ClientManager.FieldId.GROUP));
+        ch.setIdOfClient(currentClient == null ? null : currentClient.getIdOfClient());
+        ch.setIdOfOrg(idOfOrg);
+        ch.setOperation(operation);
+        ch.setCreateDate(ts);
+        ch.setApplied(false);
+        if (operation == MOVE_OPERATION) {
+            ch.setIdOfMigrateOrgFrom(currentClient.getOrg().getIdOfOrg());
+            ch.setIdOfMigrateOrgTo(idOfMigrateOrg);
+        }
+        if (operation == MODIFY_OPERATION) {
+            ClientGroup currentGroup = currentClient.getClientGroup();
+            currentGroup = em.merge(currentGroup);
+            ch.setFirstNameFrom(currentClient.getPerson().getFirstName());
+            ch.setSecondNameFrom(currentClient.getPerson().getSecondName());
+            ch.setSurnameFrom(currentClient.getPerson().getSurname());
+            ch.setGroupNameFrom(currentGroup.getGroupName());
+        }
+        sess.save(ch);
+    }
+
+
+    private void addClientChange(long ts, long idOfOrg, Client currentClient, int operation) throws Exception {
+        //  ДОБАВИТЬ ЗАПИСЬ ОБ УДАЛЕНИИ В БД
+        Session sess = (Session) em.getDelegate();
+        currentClient = em.merge(currentClient);
+
+        RegistryChange ch = new RegistryChange();
+        ch.setClientGUID(currentClient.getClientGUID());
+        ch.setFirstName(currentClient.getPerson().getFirstName());
+        ch.setSecondName(currentClient.getPerson().getSecondName());
+        ch.setSurname(currentClient.getPerson().getSurname());
+        ch.setGroupName(currentClient.getClientGroup().getGroupName());
+        ch.setIdOfClient(currentClient.getIdOfClient());
+        ch.setIdOfOrg(idOfOrg);
+        ch.setOperation(operation);
+        ch.setCreateDate(ts);
+        ch.setApplied(false);
+        sess.save(ch);
     }
 
 
@@ -358,20 +571,87 @@ public class ImportRegisterClientsService {
             return guidInfo;
         }
     }
+
+    @Transactional
+    public void applyRegistryChange(long idOfRegistryChange, boolean fullNameValidation) throws Exception {
+        RegistryChange change = em.find(RegistryChange.class, idOfRegistryChange);
+        Session session = null;
+        try {
+            session = (Session) em.getDelegate();
+        } catch (Exception e) {
+            logger.error("Failed to craete session", e);
+            throw e;
+        }
+
+
+        Client dbClient = null;
+        if (change.getIdOfClient() != null) {
+            dbClient = em.find(Client.class, change.getIdOfClient());
+        }
+
+        switch (change.getOperation()) {
+            case CREATE_OPERATION:
+                //  добавление нового клиента
+                FieldProcessor.Config createConfig = new ClientManager.ClientFieldConfig();
+                createConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
+                createConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
+                createConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
+                createConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
+                createConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
+                ClientManager.registerClientTransactionFree(change.getIdOfOrg(),
+                        (ClientManager.ClientFieldConfig) createConfig, fullNameValidation, session);
+                break;
+            case DELETE_OPERATION:
+                ClientGroup deletedClientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session, change.getIdOfOrg(),
+                        ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
+                if (deletedClientGroup == null) {
+                    deletedClientGroup = DAOUtils.createNewClientGroup
+                                (session, change.getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
+                }
+                dbClient.setIdOfClientGroup(deletedClientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                session.save(dbClient);
+                break;
+            case MOVE_OPERATION:
+                Org newOrg = em.find(Org.class, change.getIdOfMigrateOrgTo());
+                dbClient.setOrg(newOrg);
+            case MODIFY_OPERATION:
+                String date = new SimpleDateFormat("dd.mm.yyyy").format(new Date(System.currentTimeMillis()));
+                FieldProcessor.Config modifyConfig = new ClientManager.ClientFieldConfigForUpdate();
+                modifyConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
+                modifyConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
+                modifyConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
+                modifyConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
+                modifyConfig.setValue(ClientManager.FieldId.GROUP, change.getGroupName());
+                ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) modifyConfig,
+                                                          em.find(Org.class, change.getIdOfOrg()),
+                                                          String.format(MskNSIService.COMMENT_AUTO_MODIFY, date),
+                                                          dbClient, session, true);
+                break;
+            default:
+                logger.error("Unknown update registry change operation " + change.getOperation());
+        }
+        change.setApplied(true);
+        session.update(change);
+    }
     
     @Transactional
-    public StringBuffer syncClientsWithRegistry(Org org, boolean performChanges, StringBuffer logBuffer, boolean manualCheckout) throws Exception {
+    public StringBuffer syncClientsWithRegistry(long idOfOrg, boolean performChanges, StringBuffer logBuffer, boolean manualCheckout) throws Exception {
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
+        Org org = em.find(Org.class, idOfOrg);
         String synchDate = "[Синхронизация с Реестрами от " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                 .format(new Date(System.currentTimeMillis())) + " для " + org.getIdOfOrg() + "]: ";
-        org = em.find(Org.class, org.getIdOfOrg());
         OrgRegistryGUIDInfo orgGuids = new OrgRegistryGUIDInfo(org);
         log(synchDate + "Производится синхронизация для " + org.getOfficialName()+" GUID ["+orgGuids.getGuidInfo()+"]", logBuffer);
 
         //  Итеративно загружаем клиентов, используя ограничения
-        List<ExpandedPupilInfo> pupils = nsiService.getPupilsByOrgGUID(orgGuids.orgGuids, null, null, null);
+        List<ExpandedPupilInfo> pupils = nsiService.getPupilsByOrgGUID(orgGuids.orgGuids, null, null, null);//test();
         log(synchDate + "Получено " + pupils.size() +" записей", logBuffer);
-        parseClients(synchDate, date, org, pupils, performChanges, logBuffer, manualCheckout);
+        //  !!!!!!!!!!
+        //  !!!!!!!!!!
+        //  parseClients(synchDate, date, org, pupils, performChanges, logBuffer, manualCheckout);
+        //  !!!!!!!!!!
+        //  !!!!!!!!!!
+        saveClients(synchDate, date, System.currentTimeMillis(), org, pupils, logBuffer);
         return logBuffer;
     }
 
