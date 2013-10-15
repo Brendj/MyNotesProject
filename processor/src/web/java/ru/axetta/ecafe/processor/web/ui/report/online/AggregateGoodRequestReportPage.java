@@ -110,4 +110,8 @@ public class AggregateGoodRequestReportPage extends OnlineReportWithContragentPa
     }
 
 
+    public String getGetStringIdOfOrgList() {
+        return idOfContragentOrgList.toString().replaceAll("[^0-9,]","");
+    }
+
 }

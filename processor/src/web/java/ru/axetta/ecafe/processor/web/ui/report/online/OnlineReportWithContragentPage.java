@@ -66,4 +66,8 @@ public class OnlineReportWithContragentPage extends OnlineReportPage {
             }
         }
     }
+
+    public String getContragentStringIdOfOrgList() {
+        return idOfContragentOrgList.toString().replaceAll("[^0-9,]","");
+    }
 }

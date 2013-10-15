@@ -97,4 +97,9 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
         }
     }
 
+
+
+    public String getGetStringIdOfOrgList() {
+        return idOfOrgList.toString().replaceAll("[^0-9,]","");
+    }
 }

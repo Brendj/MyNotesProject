@@ -30,6 +30,7 @@
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" >
                 <f:setPropertyActionListener value="2" target="#{mainPage.orgListSelectPage.filterMode}" />
+                <f:setPropertyActionListener value="#{aggregateGoodRequestReportPage.getContragentStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" value="{#{aggregateGoodRequestReportPage.contragentFilter}}" />
         </h:panelGroup>
@@ -40,6 +41,7 @@
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" >
                 <f:setPropertyActionListener value="0" target="#{mainPage.orgListSelectPage.filterMode}" />
+                <f:setPropertyActionListener value="#{aggregateGoodRequestReportPage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" value=" {#{aggregateGoodRequestReportPage.filter}}" />
         </h:panelGroup>

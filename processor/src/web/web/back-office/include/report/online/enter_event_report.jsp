@@ -32,7 +32,9 @@
         <h:panelGroup>
             <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" />
+                               styleClass="command-link" style="width: 25px;" >
+                <f:setPropertyActionListener value="#{mainPage.enterEventReportPage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+            </a4j:commandButton>
             <h:outputText styleClass="output-text" id="enterEventFilter" escape="true" value=" {#{mainPage.enterEventReportPage.filter}}" />
         </h:panelGroup>
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildEnterEventReport}"

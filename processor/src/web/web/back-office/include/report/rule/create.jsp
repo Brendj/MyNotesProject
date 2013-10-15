@@ -109,7 +109,9 @@
             <h:panelGroup  rendered="#{item.type=='org'}">
                 <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                                   styleClass="command-link" style="width: 25px;" />
+                                   styleClass="command-link" style="width: 25px;" >
+                    <f:setPropertyActionListener value="#{mainPage.reportRuleCreatePage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                </a4j:commandButton>
                 <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.reportRuleCreatePage.filter}}" />
             </h:panelGroup>
         </rich:column>

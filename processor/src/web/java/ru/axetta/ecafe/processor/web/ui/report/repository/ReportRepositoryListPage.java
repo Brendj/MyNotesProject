@@ -121,4 +121,9 @@ public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, Repor
             }
         }
     }
+
+
+    public String getGetStringIdOfOrgList() {
+        return idOfOrgList.toString().replaceAll("[^0-9,]","");
+    }
 }

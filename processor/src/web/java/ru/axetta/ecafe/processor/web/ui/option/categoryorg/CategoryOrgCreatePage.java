@@ -91,4 +91,7 @@ public class CategoryOrgCreatePage extends BasicWorkspacePage implements OrgList
 
     }
 
+    public String getGetStringIdOfOrgList() {
+        return idOfOrgList.toString().replaceAll("[^0-9,]","");
+    }
 }

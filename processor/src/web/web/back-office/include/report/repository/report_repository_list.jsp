@@ -49,6 +49,7 @@ function checkReporitoryDate () {
                     <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                                        oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                        styleClass="command-link" style="width: 25px;" >
+                        <f:setPropertyActionListener value="#{reportRepositoryListPage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
                     </a4j:commandButton>
                     <h:outputText styleClass="output-text" escape="true" value=" {#{reportRepositoryListPage.orgsFilter}}" />
                 </h:panelGroup>
