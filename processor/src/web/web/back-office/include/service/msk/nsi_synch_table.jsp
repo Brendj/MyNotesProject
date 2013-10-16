@@ -41,6 +41,12 @@
         </rich:column>
         <rich:column>
             <f:facet name="header">
+                <h:outputText value="Всего" />
+            </f:facet>
+            <h:outputText styleClass="output-text" value="#{e.total}" />
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">
                 <h:outputText value="Добавленных" />
             </f:facet>
             <h:outputText styleClass="output-text" value="#{e.created}" />

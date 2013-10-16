@@ -85,15 +85,19 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
                 switch (operation) {
                     case ImportRegisterClientsService.CREATE_OPERATION:
                         i.setCreated(count);
+                        i.addTotal(count);
                         break;
                     case ImportRegisterClientsService.DELETE_OPERATION:
                         i.setDeleted(count);
+                        i.addTotal(count);
                         break;
                     case ImportRegisterClientsService.MODIFY_OPERATION:
                         i.setModified(count);
+                        i.addTotal(count);
                         break;
                     case ImportRegisterClientsService.MOVE_OPERATION:
                         i.setMoved(count);
+                        i.addTotal(count);
                         break;
                 }
             }
@@ -120,6 +124,7 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
         protected long moved;
         protected long created;
         protected long deleted;
+        protected long total;
 
         public Item(long idoforg, String orgName) {
             this.idoforg = idoforg;
@@ -128,6 +133,7 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
             moved = 0L;
             created = 0L;
             deleted = 0L;
+            total = 0L;
         }
 
         public long getIdoforg() {
@@ -176,6 +182,18 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
 
         public void setDeleted(long deleted) {
             this.deleted = deleted;
+        }
+
+        public long getTotal() {
+            return total;
+        }
+
+        public void setTotal(long total) {
+            this.total = total;
+        }
+
+        public void addTotal(long count) {
+            total += count;
         }
     }
 }
