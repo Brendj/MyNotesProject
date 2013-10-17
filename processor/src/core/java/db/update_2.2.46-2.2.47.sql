@@ -35,7 +35,6 @@ insert into cf_thin_client_users values (1032, 'testerov', 'R2hiZHRuMDA=', 1, 13
 -- Поправка бага ECAFE-1179
 ALTER TABLE cf_reportinfo ALTER COLUMN reportname TYPE character varying(512);
 
-
 -- Таблица для хранения поступивших из Реестров изменений
 create table CF_RegistryChange (
   IdOfRegistryChange bigserial not null,
@@ -71,3 +70,4 @@ create table CF_RegistryChange_Errors (
   CommentCreateDate bigint,
   CONSTRAINT CF_RegistryChange_Errors_pk PRIMARY KEY (IdOfRegistryChangeError)
 );
+--! ФИНАЛИЗИРОВАН (Кадыров, 131017) НЕ МЕНЯТЬ
