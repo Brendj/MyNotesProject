@@ -31,7 +31,7 @@
     </h:panelGrid>
     <rich:dataTable id="employeeHistoryReportTable" value="#{employeeHistoryReportPage.cardEventOperationItems}" var="employeer" rows="10" rowKeyVar="row"
                     columnClasses="center-aligned-column, center-aligned-column, center-aligned-column"
-                    footerClass="data-table-footer" rendered="#{not empty employeeHistoryReportPage.cardEventOperationItems}">
+                    footerClass="data-table-footer">
         <f:facet name="header">
             <rich:columnGroup>
                 <rich:column headerClass="center-aligned-column">
