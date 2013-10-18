@@ -230,6 +230,15 @@
         <url-pattern>/integro</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>AcquiropayPaymentServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.acquiropay.AcquiropayPaymentServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AcquiropayPaymentServlet</servlet-name>
+        <url-pattern>/regpay-acquiropay</url-pattern>
+    </servlet-mapping>
+
     <filter-mapping>
         <filter-name>RichfacesFilter</filter-name>
         <servlet-name>Faces Servlet</servlet-name>

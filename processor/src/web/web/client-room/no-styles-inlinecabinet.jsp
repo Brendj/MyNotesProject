@@ -3,6 +3,7 @@
   ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
   --%>
 
+<%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
 <%@ page import="ru.axetta.ecafe.util.UriUtils" %>
@@ -12,13 +13,13 @@
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.net.URI" %>
 <%@ page import="java.util.Arrays" %>
-<%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
 
 
 <%
     final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.inlinecabinet_jsp");
     final String PARAMS_TO_REMOVE[] = {
-            "submit", "start-date", "end-date", "org-id", "order-id", "stage", "password", "login", "contractId"};
+            "submit", "start-date", "end-date", "org-id", "order-id", "stage", "password", "login", "contractId",
+            "command", "bs"};
     final String PAGE_PARAM = "page";
     final String LOGOUT_PAGE = "logout";
     final String SHOW_CARDS_PAGE = "show-cards";
@@ -34,6 +35,7 @@
     final String SHOW_LIBRARY = "show-library";
     final String RECOVER_PARAM = "recover";
     final String PASSWORD_PARAM = "password";
+    final String AUTO_REFILL_PAGE = "balance_auto_refill";
     Boolean recoverPassword = Boolean.FALSE;
 
     if (StringUtils.isEmpty(request.getCharacterEncoding())) {
@@ -85,12 +87,15 @@
     String hidePagesAttr=(String)request.getAttribute("hidePages");
     if (hidePagesAttr==null) hidePagesAttr="";
     hidePagesAttr+=","+RuntimeContext.getInstance().getPropertiesValue(RuntimeContext.PARAM_NAME_HIDDEN_PAGES_IN_CLIENT_ROOM, "");
+    //if (!RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_BALANCE_AUTOREFILL)) {
+    //    hidePagesAttr += "," + AUTO_REFILL_PAGE;
+    //}
     String[] pageNames = {
             SHOW_ORDERS_AND_PAYMENTS_PAGE, SHOW_MENU_PAGE, null, SHOW_JOURNAL,  SHOW_LIBRARY, PAY_BANK_INFO, PREPARE_PAY_PAGE,
-            SHOW_CARDS_PAGE,CHANGE_PERSONAL_INFO_PAGE, CHANGE_PASSWORD_PAGE, LOGOUT_PAGE};
+            AUTO_REFILL_PAGE ,SHOW_CARDS_PAGE,CHANGE_PERSONAL_INFO_PAGE, CHANGE_PASSWORD_PAGE, LOGOUT_PAGE};
     String[] labels = {
             "Покупки и платежи", "Узнать меню",  "Дневник", "Посещение школы", "Данные книговыдачи библиотеки", "Оплата в банке", "Оплата он-лайн",
-            "Мои карты", "Личные данные", "Изменить пароль", "Выход"};
+            "Автопополнение", "Мои карты", "Личные данные", "Изменить пароль", "Выход"};
 %>
 <table width="100%">
     <tr>
@@ -153,6 +158,8 @@
 <jsp:include page="pages/show-journal.jsp" />
 <%} else if (StringUtils.equals(pageName, SHOW_LIBRARY)) {%>
 <jsp:include page="pages/show-library.jsp" />
+<%} else if (StringUtils.equals(pageName, AUTO_REFILL_PAGE)) {%>
+<jsp:include page="pages/balance_auto_refill.jsp" />
 <%
 } else {
     if (StringUtils.isNotEmpty(pageName) && logger.isWarnEnabled()) {
