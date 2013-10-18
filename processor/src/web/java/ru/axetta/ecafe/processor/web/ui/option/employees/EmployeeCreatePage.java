@@ -36,7 +36,9 @@ public class EmployeeCreatePage extends BasicWorkspacePage{
     public Object save(){
         try {
             Long id = serviceBean.saveEmployee(employee);
-            printMessage("Данные успешно сохранены");
+            String info = employee.getFullName();
+            employee = new VisitorItem();
+            printMessage("Данные '"+info+"' успешно сохранены");
         } catch (Exception e) {
             printError("Ошибка при сохранении: "+e.getMessage());
             LOGGER.error("Error by update employee info:",e);
