@@ -122,8 +122,17 @@
 <%
     Random r = new Random();
     int cf = r.nextInt();
+    while (cf < 0) {
+        cf = r.nextInt();
+    }
     int cf2 = r.nextInt();
+    while (cf2 < 0) {
+        cf2 = r.nextInt();
+    }
     int cf3 = r.nextInt();
+    while (cf3 < 0) {
+        cf3 = r.nextInt();
+    }
 
 %>
 <form action="https://secure.acquiropay.com" method="post" enctype="application/x-www-form-urlencoded"
@@ -135,8 +144,8 @@
     <input type="hidden" name="cf2" value="<%=cf2%>" />
     <input type="hidden" name="cf3" value="<%=cf3%>" />
     <input type="hidden" name="token" value="<%=CryptoUtils
-                .MD5(516 + "3814" + '*' + String.valueOf(cf) + String.valueOf("cf2") +
-                        String.valueOf("cf3") + "YunW2hD8Zs4").toLowerCase()%>" />
+                .MD5(516 + "3814" + '*' + String.valueOf(cf) + String.valueOf(cf2) +
+                        String.valueOf(cf3) + "YunW2hD8Zs4").toLowerCase()%>" />
     <input type="submit" value="Отправить запрос" />
 </form>
 <%-- Скрипт автосабмита формы --%>
