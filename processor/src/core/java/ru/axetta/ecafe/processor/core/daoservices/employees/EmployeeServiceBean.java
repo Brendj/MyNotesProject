@@ -4,7 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.daoservices.employees;
 
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.CardTemp;
+import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.Visitor;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -32,25 +35,22 @@ import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.isDateEqLtCurre
  * To change this template use File | Settings | File Templates.
  */
 @Repository
-@Transactional
 public class EmployeeServiceBean {
 
-    final String FIND_ALL_EMPLOYEE_ITEMS = "select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(v) from Visitor v where v.VisitorType=1 order by v.idOfVisitor";
-    final String FIND_ALL_EMPLOYEE_ITEMS_ORDER_BY_NAME = "select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(v) from Visitor v where v.VisitorType=1 order by v.person.firstName";
-    final String FIND_ALL_TEMP_CARD_BY_EMPLOYEE = "select new ru.axetta.ecafe.processor.core.daoservices.employees.CardItem(ct) from CardTemp ct where ct.visitor.idOfVisitor=:idOfVisitor and ct.clientTypeEnum=2 order by ct.createDate desc";
-    final String FIND_ALL_TEMP_CARD_BY_EMPLOYEE_TYPE = "select new ru.axetta.ecafe.processor.core.daoservices.employees.CardItem(ct, ct.visitor) from CardTemp ct where ct.clientTypeEnum=2 order by ct.createDate desc";
+    final String FIND_ALL_EMPLOYEE_ITEMS = "select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(v) from Visitor v where v.visitorType=1 order by v.idOfVisitor";
+    final String FIND_ALL_EMPLOYEE_ITEMS_ORDER_BY_NAME = "select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(v) from Visitor v where v.visitorType=1 order by v.person.firstName";
+    final String FIND_ALL_TEMP_CARD_BY_EMPLOYEE = "select new ru.axetta.ecafe.processor.core.daoservices.employees.CardItem(ct) from CardTemp ct where ct.visitor.idOfVisitor=:idOfVisitor and ct.visitorType=2 order by ct.createDate desc";
+    final String FIND_ALL_TEMP_CARD_BY_EMPLOYEE_TYPE = "select new ru.axetta.ecafe.processor.core.daoservices.employees.CardItem(ct, ct.visitor) from CardTemp ct where ct.visitorType=2 order by ct.createDate desc";
     final String FIND_ENTER_EVENT_BY_EMPLOYEE ="select new ru.axetta.ecafe.processor.core.daoservices.employees.CardEventOperationItem(ee.evtDateTime, ee.passDirection, ee.org.idOfOrg, ee.org.shortName, ee.org.refectoryType) from EnterEvent ee where ee.idOfVisitor=:idOfVisitor and ee.evtDateTime between :beginDate and :endDate order by ee.evtDateTime desc, ee.idOfVisitor asc";
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
-    @Transactional(readOnly = true)
     public List<VisitorItem> findAllEmployees(){
         TypedQuery<VisitorItem> query = entityManager.createQuery(FIND_ALL_EMPLOYEE_ITEMS, VisitorItem.class);
         return query.getResultList();
     }
 
-    @Transactional(readOnly = true)
     public List<VisitorItem> generateEmployeeHistoryReport(Date beginDate, Date endDate){
         List<VisitorItem> reportResult = new ArrayList<VisitorItem>();
         Calendar calendar = Calendar.getInstance();
@@ -91,7 +91,7 @@ public class EmployeeServiceBean {
             throw new Exception(message);
         }
         Visitor visitor = entityManager.find(Visitor.class, idOfEmployer);
-        if(visitor.getVisitorType()!=VisitorType.EMPLOYEE){
+        if(!visitor.getVisitorType().equals(Visitor.EMPLOYEE_TYPE)){
             throw new Exception("клиент не является инженером.");
         }
         CardTemp cardTemp = DAOUtils.findCardTempByCardNo((Session) entityManager.getDelegate(), cardItem.getCardNo());
@@ -103,7 +103,8 @@ public class EmployeeServiceBean {
         }
         if (cardTemp != null) {
             if(cardItem.getId()==null){
-                if(cardTemp.getClientTypeEnum()!= ClientTypeEnum.EMPLOYEE) {
+                //if(cardTemp.getClientTypeEnum()!= ClientTypeEnum.EMPLOYEE)
+                if(cardTemp.getVisitorType()!= 2){
                     throw new Exception("карта не предназначена для сотрудников.");
                 }
                 if(cardTemp.getCardPrintedNo()!=null && !cardTemp.getCardPrintedNo().equals(cardPrintedNo)){
@@ -121,7 +122,7 @@ public class EmployeeServiceBean {
             }
         } else {
             if(cardItem.getId()==null){
-                cardTemp = new CardTemp(cardItem.getCardNo(), cardPrintedNo, cardItem.getCardStation(),  ClientTypeEnum.EMPLOYEE);
+                cardTemp = new CardTemp(cardItem.getCardNo(), cardPrintedNo, cardItem.getCardStation(), 2); // ClientTypeEnum.EMPLOYEE);
                 cardTemp.setValidDate(cardItem.getValidDate());
                 cardTemp.setVisitor(visitor);
                 entityManager.persist(cardTemp);
@@ -138,6 +139,7 @@ public class EmployeeServiceBean {
         return cardTemp.getIdOfCartTemp();
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public Long saveEmployee(VisitorItem visitorItem) throws Exception{
         if(isEmptyFullNameFields(visitorItem.getFirstName(), visitorItem.getSurname(), visitorItem.getSecondName())) {
             throw new  Exception("все поля ФИО должны быть заполнены.");
@@ -173,7 +175,7 @@ public class EmployeeServiceBean {
             visitor.setDriverLicenceDate(visitorItem.getDriverLicenceDate());
             visitor.setWarTicketNumber(visitorItem.getWarTicketNumber());
             visitor.setWarTicketDate(visitorItem.getWarTicketDate());
-            visitor.setVisitorType(VisitorType.EMPLOYEE);
+            visitor.setVisitorType(Visitor.EMPLOYEE_TYPE);
             entityManager.persist(visitor);
             return visitor.getIdOfVisitor();
         } else {
@@ -192,27 +194,24 @@ public class EmployeeServiceBean {
                 visitor.setDriverLicenceDate(visitorItem.getDriverLicenceDate());
                 visitor.setWarTicketNumber(visitorItem.getWarTicketNumber());
                 visitor.setWarTicketDate(visitorItem.getWarTicketDate());
-                visitor.setVisitorType(VisitorType.EMPLOYEE);
+                visitor.setVisitorType(Visitor.EMPLOYEE_TYPE);
                 entityManager.persist(visitor);
                 return visitor.getIdOfVisitor();
             }
         }
     }
 
-    @Transactional(readOnly = true)
     public List<CardItem> findCardsByEmployee(Long idOfVisitor) {
         TypedQuery<CardItem> query = entityManager.createQuery(FIND_ALL_TEMP_CARD_BY_EMPLOYEE, CardItem.class);
         query.setParameter("idOfVisitor",idOfVisitor);
         return query.getResultList();
     }
 
-    @Transactional(readOnly = true)
     public List<CardItem> findCardsByEmployeeTypes() {
         TypedQuery<CardItem> query = entityManager.createQuery(FIND_ALL_TEMP_CARD_BY_EMPLOYEE_TYPE, CardItem.class);
         return query.getResultList();
     }
 
-    @Transactional(readOnly = true)
     public VisitorItem getEmployeeByCard(Long id) throws Exception {
         TypedQuery<VisitorItem> query = entityManager.createQuery("select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(ct.visitor) from CardTemp ct where ct.id=:id", VisitorItem.class);
         query.setParameter("id", id);
@@ -227,4 +226,5 @@ public class EmployeeServiceBean {
             }
         }
     }
+
 }

@@ -11,13 +11,13 @@
             <generator class="identity"/>
         </id>
         <property name="cardNo" column="CardNo" type="long" not-null="true" unique="true"/>
-        <!--<property name="visitorType" column="VisitorType" type="integer"/>-->
-        <property name="clientTypeEnum" column="VisitorType" update="false" >
-            <type name="org.hibernate.type.EnumType">
-                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ClientTypeEnum</param>
-                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER-->
-            </type>
-        </property>
+        <property name="visitorType" column="VisitorType" type="integer" update="false"/>
+        <!--<property name="clientTypeEnum" column="VisitorType" update="false" >-->
+            <!--<type name="org.hibernate.type.EnumType">-->
+                <!--<param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ClientTypeEnum</param>-->
+                <!--<param name="type">4</param> &lt;!&ndash; http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER&ndash;&gt;-->
+            <!--</type>-->
+        <!--</property>-->
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
         <property name="cardPrintedNo" column="CardPrintedNo" type="string"/>
         <property name="cardStation" column="CardStation">

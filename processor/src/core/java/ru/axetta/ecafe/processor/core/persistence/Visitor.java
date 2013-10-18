@@ -15,6 +15,8 @@ import java.util.Set;
  */
 public class Visitor {
 
+    public static final Integer DEFAULT_TYPE = 0;
+    public static final Integer EMPLOYEE_TYPE = 1;
     private Long idOfVisitor;
     private Person person;
     private String passportNumber;
@@ -23,7 +25,8 @@ public class Visitor {
     private Date driverLicenceDate;
     private String warTicketNumber;
     private Date warTicketDate;
-    private VisitorType visitorType;
+    //private VisitorType visitorType;
+    private Integer visitorType;
     private Set<CardTemp> cards = new HashSet<CardTemp>();
 
     protected Visitor() {}
@@ -104,11 +107,11 @@ public class Visitor {
         this.cards = cards;
     }
 
-    public VisitorType getVisitorType() {
+    public Integer getVisitorType() {
         return visitorType;
     }
 
-    public void setVisitorType(VisitorType visitorType) {
+    public void setVisitorType(Integer visitorType) {
         this.visitorType = visitorType;
     }
 

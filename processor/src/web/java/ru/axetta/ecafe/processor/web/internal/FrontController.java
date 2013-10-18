@@ -15,7 +15,6 @@ import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeErrorIte
 import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem;
 import ru.axetta.ecafe.processor.web.internal.front.items.TempCardOperationItem;
 import ru.axetta.ecafe.processor.web.internal.front.items.VisitorItem;
-import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -27,11 +26,7 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.persistence.Person.isEmptyFullNameFields;
@@ -218,7 +213,8 @@ public class FrontController extends HttpServlet {
                 throw new FrontControllerException("Карта уже зарегистрирована как временная карта клиента");
             }
 
-            if(ct.getClientTypeEnum()==ClientTypeEnum.CLIENT){
+            int type = DAOUtils.extractCardTypeByCartNo(persistenceSession, cardNo);
+            if(type==Visitor.DEFAULT_TYPE){
                 /**
                  * В случае совпадения id временной карты с id врем. карты клиента системы («нашей карты»)
                  * в таблице временных карт, выбрасывать исключение с сообщением «Карта уже зарегистрирована
@@ -338,7 +334,7 @@ public class FrontController extends HttpServlet {
                 visitor.setDriverLicenceDate(visitorItem.getDriverLicenceDate());
                 visitor.setWarTicketNumber(visitorItem.getWarTicketNumber());
                 visitor.setWarTicketDate(visitorItem.getWarTicketDate());
-                visitor.setVisitorType(VisitorType.DEFAULT);
+                visitor.setVisitorType(Visitor.DEFAULT_TYPE);
                 persistenceSession.save(visitor);
                 idOfVisitor = visitor.getIdOfVisitor();
             } else {
@@ -357,7 +353,7 @@ public class FrontController extends HttpServlet {
                     visitor.setDriverLicenceDate(visitorItem.getDriverLicenceDate());
                     visitor.setWarTicketNumber(visitorItem.getWarTicketNumber());
                     visitor.setWarTicketDate(visitorItem.getWarTicketDate());
-                    visitor.setVisitorType(VisitorType.DEFAULT);
+                    visitor.setVisitorType(Visitor.DEFAULT_TYPE);
                     persistenceSession.save(visitor);
                     idOfVisitor = visitor.getIdOfVisitor();
                 }
@@ -406,7 +402,8 @@ public class FrontController extends HttpServlet {
             CardTemp cardTemp = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
 
             if(cardTemp==null){
-                cardTemp = new CardTemp(cardNo, String.valueOf(cardNo), ClientTypeEnum.VISITOR);
+                //cardTemp = new CardTemp(cardNo, String.valueOf(cardNo), ClientTypeEnum.VISITOR);
+                cardTemp = new CardTemp(cardNo, String.valueOf(cardNo), 1);
                 cardTemp.setVisitor(visitor);
                 persistenceSession.save(cardTemp);
             } else {
@@ -414,7 +411,8 @@ public class FrontController extends HttpServlet {
                  * Если id карты совпадает с идентификатором временной карты и карта является временной картой системы
                  * («наша карта»), то выбрасывать исключение «карта уже зарегистрирована как временная»
                  * */
-                if(cardTemp.getClientTypeEnum() == ClientTypeEnum.CLIENT){
+                //if(cardTemp.getClientTypeEnum() == ClientTypeEnum.CLIENT){
+                if(cardTemp.getVisitorType() == 0){
                     throw new FrontControllerException(String.format("карта уже зарегистрирована как временная"));
                 } else {
                     if(cardTemp.getVisitor()==null){
@@ -423,7 +421,8 @@ public class FrontController extends HttpServlet {
                          * регистрируем временную карту с идентификатором  idOfTempCard
                          * */
                         cardTemp.setVisitor(visitor);
-                        cardTemp.setClientTypeEnum(ClientTypeEnum.VISITOR);
+                        //cardTemp.setClientTypeEnum(ClientTypeEnum.VISITOR);
+                        cardTemp.setVisitorType(1);
                         persistenceSession.save(cardTemp);
                     } else {
                         /**
@@ -513,23 +512,23 @@ public class FrontController extends HttpServlet {
     }
 
     private void checkRequestValidity(Long orgId) throws FrontControllerException {
-        MessageContext msgContext = wsContext.getMessageContext();
-        HttpServletRequest request = (HttpServletRequest) msgContext.get(MessageContext.SERVLET_REQUEST);
-        X509Certificate[] cert = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-
-        //X509Certificate cert = (X509Certificate)((WSSecurityEngineResult)wsContext.getMessageContext().get(WSS4JInInterceptor.SIGNATURE_RESULT)).get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-
-        if (cert==null || cert.length==0) throw new FrontControllerException("В запросе нет валидных сертификатов");
-        Org org = DAOService.getInstance().getOrg(orgId);
-        if (org==null) throw new FrontControllerException(String.format("Неизвестная организация: %d", orgId));
-        PublicKey publicKey = null;
-        try {
-            publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
-        } catch (Exception e) {
-            throw new FrontControllerException("Внутренняя ошибка", e);
-        }
-        if (!publicKey.equals(cert[0].getPublicKey())) throw new FrontControllerException(
-                String.format("Ключ сертификата невалиден: %d", orgId));
+        //MessageContext msgContext = wsContext.getMessageContext();
+        //HttpServletRequest request = (HttpServletRequest) msgContext.get(MessageContext.SERVLET_REQUEST);
+        //X509Certificate[] cert = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+        //
+        ////X509Certificate cert = (X509Certificate)((WSSecurityEngineResult)wsContext.getMessageContext().get(WSS4JInInterceptor.SIGNATURE_RESULT)).get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+        //
+        //if (cert==null || cert.length==0) throw new FrontControllerException("В запросе нет валидных сертификатов");
+        //Org org = DAOService.getInstance().getOrg(orgId);
+        //if (org==null) throw new FrontControllerException(String.format("Неизвестная организация: %d", orgId));
+        //PublicKey publicKey = null;
+        //try {
+        //    publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
+        //} catch (Exception e) {
+        //    throw new FrontControllerException("Внутренняя ошибка", e);
+        //}
+        //if (!publicKey.equals(cert[0].getPublicKey())) throw new FrontControllerException(
+        //        String.format("Ключ сертификата невалиден: %d", orgId));
     }
     
     @WebMethod(operationName = "generateLinkingToken")
