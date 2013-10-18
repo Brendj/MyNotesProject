@@ -50,7 +50,7 @@
                     <h:outputText escape="true" value="Редактировать" />
                 </rich:column>
 
-                <rich:column headerClass="column-header" rowspan="2" colspan="1">
+                <rich:column headerClass="column-header" rowspan="2" colspan="1" rendered="false">
                     <h:outputText escape="true" value="Удалить" />
                 </rich:column>
 
@@ -116,7 +116,7 @@
             </a4j:commandLink>
         </rich:column>
 
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" rendered="false">
             <a4j:commandLink reRender="mainMenu, workspaceForm"  styleClass="command-link">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
             </a4j:commandLink>
