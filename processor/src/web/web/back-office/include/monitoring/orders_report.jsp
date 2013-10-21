@@ -15,7 +15,7 @@
         <h:panelGroup>
             <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{ordersMonitoringReportPage.missingCount}"
                              action="#{mainPage.showGoodRequestReportPage}" styleClass="command-link">
-                <f:setPropertyActionListener value="1" target="#{mainPage.goodRequestReportPage.requestsFilter}" />
+                <f:setPropertyActionListener value="-1" target="#{mainPage.goodRequestReportPage.requestsFilter}" />
                 <f:setPropertyActionListener value="2" target="#{mainPage.goodRequestReportPage.daysLimit}" />
                 <f:setPropertyActionListener value="#{ordersMonitoringReportPage.missingStartDate}" target="#{mainPage.goodRequestReportPage.startDate}" />
             </a4j:commandLink>

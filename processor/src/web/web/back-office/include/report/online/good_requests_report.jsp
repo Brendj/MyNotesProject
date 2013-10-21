@@ -63,6 +63,7 @@
             <f:selectItem itemValue="1" itemLabel="Отображать заявки к исполнению"/>
             <f:selectItem itemValue="2" itemLabel="Отображать закрытые заявки"/>
             <f:selectItem itemValue="3" itemLabel="Отображать все заявки"/>
+            <f:selectItem itemValue="-1" itemLabel="Отображать организации с отсутствием заявкок за последние дни"/>
         </h:selectOneMenu>
 
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildGoodRequestReport}"

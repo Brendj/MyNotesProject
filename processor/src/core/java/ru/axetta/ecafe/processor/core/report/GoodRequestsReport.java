@@ -24,6 +24,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class GoodRequestsReport extends BasicReport {
+    public static final long REQUESTS_MONITORING_TIMEOUT = 172800000;          //  2 дня
     public static final String OVERALL_TITLE = "ИТОГО";
     public static final String OVERALL_ALL_TITLE = "ВСЕГО";
     private static final DateFormat MONTHLY_DATE_FORMAT = new SimpleDateFormat("dd.MM");
@@ -59,6 +60,9 @@ public class GoodRequestsReport extends BasicReport {
             List<RequestItem> items = new LinkedList<RequestItem>();
             GoodRequestsReport report = new GoodRequestsReport(generateTime, new Date().getTime() - generateTime.getTime(),
                     hideMissedColumns, startDate, endDate, items);
+
+            long startDateLong = startDate.getTime();
+            long endDateLong = endDate.getTime();
 
             String goodCondition = "";
             if (goodName.equals("")) {
@@ -103,9 +107,13 @@ public class GoodRequestsReport extends BasicReport {
                 }
                 suppliersCondition = suppliersCondition + ")) ";
             }
-
-            long startDateLong = startDate.getTime();
-            long endDateLong = endDate.getTime();
+            String notCreatedAtConfition = "";
+            if (requestsFilter == -1) {
+                //  Если выбрано отображение тех школ, у которых были
+                // заявки указанный период, но не было заявок последнии дни
+                long limit = System.currentTimeMillis() - REQUESTS_MONITORING_TIMEOUT;
+                notCreatedAtConfition = "and (cf_goods_requests.createddate < " + (limit) + ") ";
+            }
 
             String sql = "select requests.org, requests.orgFull, requests.good, requests.d, int8(sum(requests.cnt)) "+
                          "from (select substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') as org, cf_orgs.officialname as orgFull, "+
@@ -119,6 +127,7 @@ public class GoodRequestsReport extends BasicReport {
                          "      where cf_orgs.officialname<> '' and " +
                          "            " + stateCondition +
                          "            (cf_goods_requests.donedate between " + startDateLong + " and " + endDateLong + ") "+
+                         "            " + notCreatedAtConfition +
                          "            " + goodCondition +
                          "            " + orgCondition +
                          "            " + suppliersCondition + ") as requests "+
