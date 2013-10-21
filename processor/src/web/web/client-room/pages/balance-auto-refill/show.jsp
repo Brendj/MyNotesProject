@@ -17,6 +17,7 @@
 <%--<%@ page import="java.text.SimpleDateFormat" %>--%>
 <%--<%@ page import="java.util.TimeZone" %>--%>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.CryptoUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
 <%@ page import="java.util.Random" %>
 
 <%--<%--%>
@@ -129,10 +130,7 @@
     while (cf2 < 0) {
         cf2 = r.nextInt();
     }
-    int cf3 = r.nextInt();
-    while (cf3 < 0) {
-        cf3 = r.nextInt();
-    }
+    ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
 
 %>
 <form action="https://secure.acquiropay.com" method="post" enctype="application/x-www-form-urlencoded"
@@ -142,10 +140,10 @@
     <input type="hidden" name="amount" value="*" />
     <input type="hidden" name="cf" value="<%=cf%>" />
     <input type="hidden" name="cf2" value="<%=cf2%>" />
-    <input type="hidden" name="cf3" value="<%=cf3%>" />
+    <input type="hidden" name="cf3" value="<%=clientAuthToken.getContractId()%>" />
     <input type="hidden" name="token" value="<%=CryptoUtils
                 .MD5(516 + "3814" + '*' + String.valueOf(cf) + String.valueOf(cf2) +
-                        String.valueOf(cf3) + "YunW2hD8Zs4").toLowerCase()%>" />
+                        String.valueOf(clientAuthToken.getContractId()) + "YunW2hD8Zs4").toLowerCase()%>" />
     <input type="submit" value="Отправить запрос" />
 </form>
 <%-- Скрипт автосабмита формы --%>
