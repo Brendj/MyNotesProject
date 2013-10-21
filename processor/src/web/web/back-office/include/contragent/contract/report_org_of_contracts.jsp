@@ -36,7 +36,7 @@
     <h:panelGrid styleClass="borderless-grid" rendered="#{orgOfContractsReportPage.contractsReport!=null}">
         <h:outputText escape="true" value="Организации по контрактам" styleClass="output-text" />
         <rich:dataTable id="orgOfContractsReportTable" value="#{orgOfContractsReportPage.contractsReport.items}"
-                        var="item" rowKeyVar="row" rows="15"  reRender="menuViewListScroller" footerClass="data-table-footer"
+                        var="item" rowKeyVar="row" rows="50"  reRender="menuViewListScroller" footerClass="data-table-footer"
                         columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, center-aligned-column">
             <f:facet name="header">
                 <rich:columnGroup>
@@ -48,6 +48,9 @@
                     </rich:column>
                     <rich:column headerClass="center-aligned-column">
                         <h:outputText escape="true" value="Контрагент" styleClass="column-header" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column">
+                        <h:outputText escape="true" value="Поставщик" styleClass="column-header" />
                     </rich:column>
                 </rich:columnGroup>
             </f:facet>
@@ -66,6 +69,12 @@
                 <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.contragentName}" action="#{mainPage.showContragentViewPage}"
                                  styleClass="command-link">
                     <f:setPropertyActionListener value="#{item.idOfContragent}" target="#{mainPage.selectedIdOfContragent}" />
+                </a4j:commandLink>
+            </rich:column>
+            <rich:column styleClass="right-aligned-column">
+                <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.supplierName}" action="#{mainPage.showContragentViewPage}"
+                                 styleClass="command-link">
+                    <f:setPropertyActionListener value="#{item.idOfSupplier}" target="#{mainPage.selectedIdOfContragent}" />
                 </a4j:commandLink>
             </rich:column>
             <f:facet name="footer">

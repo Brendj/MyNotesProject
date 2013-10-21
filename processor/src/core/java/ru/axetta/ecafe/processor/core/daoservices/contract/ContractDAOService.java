@@ -32,6 +32,8 @@ public class ContractDAOService {
         Criteria criteria = session.createCriteria(Org.class);
         criteria.createAlias("contract","contr", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("contr.contragent","agent", JoinType.LEFT_OUTER_JOIN);
+        criteria.createCriteria("defaultSupplier","contragent", JoinType.LEFT_OUTER_JOIN);
+        //criteria.add(Restrictions.eq("contragent.id", 1L));
         Criterion mainRestriction = Restrictions.disjunction();
 
         Criterion dateRestriction =  Restrictions.conjunction();
@@ -56,6 +58,9 @@ public class ContractDAOService {
                 .add(Projections.property("contr.contractNumber"), "contractNumber")
                 .add(Projections.property("agent.idOfContragent"), "idOfContragent")
                 .add(Projections.property("agent.contragentName"), "contragentName")
+                .add(Projections.property("contragent.idOfContragent"), "idOfSupplier")
+                .add(Projections.property("contragent.contragentName"), "supplierName")
+
         );
         criteria.addOrder(Order.asc("idOfOrg"));
         criteria.setResultTransformer(Transformers.aliasToBean(OrgContractReportItem.class));

@@ -15,17 +15,21 @@ public class OrgContractReportItem {
     private String contractNumber;
     private Long idOfContragent;
     private String contragentName;
+    private Long idOfSupplier;
+    private String supplierName;
 
     public OrgContractReportItem() {   }
 
     public OrgContractReportItem(Long idOfOrg, String shortName, Long idOfContract, String contractName,
-            Long idOfContragent, String contragentName) {
+            Long idOfContragent, String contragentName, Long idOfSupplier, String supplierName) {
         this.idOfOrg = idOfOrg;
         this.shortName = shortName;
         this.idOfContract = idOfContract;
         this.contractNumber = contractName;
         this.idOfContragent = idOfContragent;
         this.contragentName = contragentName;
+        this.idOfSupplier = idOfSupplier;
+        this.supplierName = supplierName;
     }
 
     public Long getIdOfOrg() {
@@ -74,5 +78,21 @@ public class OrgContractReportItem {
 
     public void setContragentName(String contragentName) {
         this.contragentName = contragentName;
+    }
+
+    public Long getIdOfSupplier() {
+        return idOfSupplier;
+    }
+
+    public void setIdOfSupplier(Long idOfSupplier) {
+        this.idOfSupplier = idOfSupplier;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
     }
 }
