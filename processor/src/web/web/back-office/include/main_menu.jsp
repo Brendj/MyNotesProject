@@ -753,6 +753,12 @@
 
     <rich:panelMenuItem id="projectStateMenuItem" label="Ключевые показатели"
                         onclick="window.open('/processor/back-office/project_state.jsp', 'Ключевые показатели')" />
+
+    <rich:panelMenuItem id="ordersMonitoringMenuItem"
+                        binding="#{ordersMonitoringReportPage.mainMenuComponent}"
+                        label="Заказ питания" action="#{ordersMonitoringReportPage.show}"
+                        reRender="workspaceForm" />
+
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="reportOnlineGroupMenu" binding="#{mainPage.reportOnlineGroupPage.mainMenuComponent}"
