@@ -1468,4 +1468,11 @@ public class DAOUtils {
         q.setParameter("toTime", to.getTime());
         return (List<Object[]>)q.getResultList();
     }
+
+    public static int extractCardTypeByCartNo(Session session, Long cardNo) {
+        Query query = session.createQuery("select visitorType from CardTemp where cardNo=:cardNo");
+        query.setParameter("cardNo", cardNo);
+        return (Integer) query.uniqueResult();
+    }
+
 }
