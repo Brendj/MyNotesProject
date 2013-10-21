@@ -90,10 +90,10 @@ public class CWOACReport extends BasicReportForAllOrgJob {
                     "o.idoforg, \n" +
                     "o.shortname, \n" +
                     "o.district, \n" +
-                    "sum(grp.totalcount / 1000) AS requestCount \n" +
-                    "FROM cf_goods_requests gr JOIN cf_goods_requests_positions grp ON (gr.IdOfGoodsRequest = grp.IdOfGoodsRequest) \n" +
-                    "JOIN cf_orgs o ON (gr.orgOwner = o.idoforg) \n" +
-                    "JOIN cf_goods g ON (g.IdOfGood = grp.IdOfGood) \n" +
+                    "sum(coalesce(grp.totalcount / 1000, 0)) AS requestCount \n" +
+                    "FROM cf_orgs o LEFT JOIN cf_goods_requests gr on (gr.orgOwner = o.idoforg) \n" +
+                    "LEFT JOIN cf_goods_requests_positions grp ON (gr.IdOfGoodsRequest = grp.IdOfGoodsRequest) \n" +
+                    "LEFT JOIN cf_goods g ON (g.IdOfGood = grp.IdOfGood) \n" +
                     "WHERE gr.doneDate BETWEEN :startDate AND :endDate \n" +
                     "GROUP BY o.idoforg, o.shortname, o.district")
                     .setParameter("startDate", startTime.getTime())
@@ -106,7 +106,7 @@ public class CWOACReport extends BasicReportForAllOrgJob {
             }
             query = session.createSQLQuery("SELECT \n" +
                     "ord.idoforg, \n" +
-                    "sum(CASE WHEN ord.ordertype = 4 THEN det.qty ELSE 0 END) AS consumedCount, \n" +
+                    "sum(CASE WHEN ord.ordertype = 4 OR ord.ordertype = 6 THEN det.qty ELSE 0 END) AS consumedCount, \n" +
                     "sum(CASE WHEN ord.ordertype = 6 THEN det.qty ELSE 0 END) AS writtenOffCount \n" +
                     "FROM cf_orders ord JOIN CF_OrderDetails det ON (ord.idoforder = det.idoforder AND ord.idoforg = det.idoforg) \n" +
                     "JOIN cf_goods g ON (g.IdOfGood = det.IdOfGood) \n" +
