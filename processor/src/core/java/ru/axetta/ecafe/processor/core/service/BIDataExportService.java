@@ -66,12 +66,12 @@ public class BIDataExportService {
         //  Общеобразовательные учреждения (Orgs)
         //  ------------------------------------------
         TYPES.add(new BIDataExportType("orgs",
-                "select cf_orgs.idoforg, cf_orgs.officialname, cf_orgs.address, cf_orgs.district, array_to_string(array_agg(cf_categoryorg_orgs.idofcategoryorg), ',') as orgCategory, cf_orgs.state as isInProm "
+                "select cf_orgs.idoforg, cf_orgs.shortname, cf_orgs.address, cf_orgs.district, array_to_string(array_agg(cf_categoryorg_orgs.idofcategoryorg), ',') as orgCategory, cf_orgs.state as isInProm "
                         + "from cf_orgs "
                         + "left join cf_categoryorg_orgs on cf_categoryorg_orgs.idoforg=cf_orgs.idoforg "
                         + "where cf_orgs.state<>0 "
-                        + "group by cf_orgs.idoforg, cf_orgs.officialname, cf_orgs.address, cf_orgs.district "
-                        + "order by cf_orgs.officialname",
+                        + "group by cf_orgs.idoforg, cf_orgs.shortname, cf_orgs.address, cf_orgs.district "
+                        + "order by cf_orgs.shortname",
                 new String[]{"idoforg", "officialname", "address", "district", "orgCategory", "isInProm"}));
 
         //  ------------------------------------------
@@ -668,10 +668,10 @@ public class BIDataExportService {
         //  ------------------------------------------
         //  Общеобразовательные учреждения (Orgs)
         //  ------------------------------------------
-        TYPES.add(new BIDataExportType("orgs", "select cf_orgs.idoforg, cf_orgs.officialname, cf_orgs.address " +
+        TYPES.add(new BIDataExportType("orgs", "select cf_orgs.idoforg, cf_orgs.shortname, cf_orgs.address " +
                 "from cf_orgs " +
-                //"where cf_orgs.officialname<>'' " +
-                "order by cf_orgs.officialname", new String[]{"idoforg", "officialname", "address"}));
+                //"where cf_orgs.shortname<>'' " +
+                "order by cf_orgs.shortname", new String[]{"idoforg", "officialname", "address"}));
 
         //  ------------------------------------------
         //  Поставщики питания (Contragents)
