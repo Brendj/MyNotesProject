@@ -160,7 +160,7 @@
 	<detail>
 		<band height="20" splitType="Stretch">
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="21040b76-2d41-4a4c-b3fc-f8a5718e03b5" x="137" y="0" width="165" height="20"/>
+				<reportElement uuid="21040b76-2d41-4a4c-b3fc-f8a5718e03b5" stretchType="RelativeToBandHeight" x="137" y="0" width="165" height="20"/>
 				<box leftPadding="5">
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -232,7 +232,7 @@
 				<textFieldExpression><![CDATA[$F{writtenOffCount} / ((double) $F{requestCount}) * 100]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="e047acda-c740-46ca-97f6-0884f37365ac" x="0" y="0" width="137" height="20"/>
+				<reportElement uuid="e047acda-c740-46ca-97f6-0884f37365ac" stretchType="RelativeToBandHeight" x="0" y="0" width="137" height="20"/>
 				<box leftPadding="5">
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -243,8 +243,8 @@
 				<textElement/>
 				<textFieldExpression><![CDATA[$F{district}]]></textFieldExpression>
 			</textField>
-			<textField pattern="#,##0;-#,##0">
-				<reportElement uuid="36a646d9-b028-4962-8c07-af319c6e0d14" x="302" y="0" width="90" height="20"/>
+			<textField isStretchWithOverflow="true" pattern="#,##0;-#,##0">
+				<reportElement uuid="36a646d9-b028-4962-8c07-af319c6e0d14" stretchType="RelativeToBandHeight" x="302" y="0" width="90" height="20"/>
 				<box leftPadding="0" rightPadding="5">
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
