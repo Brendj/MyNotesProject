@@ -69,4 +69,4 @@ create table CF_RegistryChange_Errors (
   CommentCreateDate bigint,
   CONSTRAINT CF_RegistryChange_Errors_pk PRIMARY KEY (IdOfRegistryChangeError)
 );
---! ФИНАЛИЗИРОВАН (Кадыров, 131017) НЕ МЕНЯТЬ
+--! ФИНАЛИЗИРОВАН (Кадыров, 131021) НЕ МЕНЯТЬ
