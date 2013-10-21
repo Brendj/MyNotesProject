@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.monitoring;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.report.GoodRequestsReport;
 import ru.axetta.ecafe.processor.dashboard.DashboardServiceBean;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
@@ -35,7 +36,6 @@ import java.util.*;
 @Component
 @Scope(value = "session")
 public class OrdersMonitoringReportPage extends BasicWorkspacePage {
-    private static final long SQL_TIMEOUT = 172800000;          //  2 дня
     private static final long LINK_PARAM_TIMEOUT = 604800000;   //  неделя
 
     private static final Logger logger = LoggerFactory.getLogger(OrdersMonitoringReportPage.class);
@@ -73,7 +73,7 @@ public class OrdersMonitoringReportPage extends BasicWorkspacePage {
                     + "from cf_orgs "
                     + "join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
                     + "where cf_orgs.state=:state");
-            q.setLong("timeout", SQL_TIMEOUT);
+            q.setLong("timeout", GoodRequestsReport.REQUESTS_MONITORING_TIMEOUT);
             q.setInteger("state", 1);
             List res = q.list();
             missingCount = ((BigInteger) res.get(0)).intValue();
