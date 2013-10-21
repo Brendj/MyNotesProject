@@ -1729,7 +1729,6 @@ public class Processor implements SyncProcessor,
             for (SyncRequest.OrgStructure.Group reqGroup : reqStructure.getGroups()) {
                 try {
                     processSyncOrgStructureGroup(persistenceSession, organization, reqGroup);
-                    throw new Exception("test");
                 } catch (Exception e) {
                     String message = String.format("Failed to process: %s", reqGroup);
                     logger.error(message, e);
