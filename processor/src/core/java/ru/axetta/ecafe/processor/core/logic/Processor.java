@@ -601,6 +601,8 @@ public class Processor implements SyncProcessor,
             if (request.getOrgStructure() != null) {
                 resOrgStructure = processSyncOrgStructure(request.getIdOfOrg(), request.getOrgStructure(), syncHistory);
             }
+            if(resOrgStructure!=null && resOrgStructure.getResult()>0)
+                createSyncHistory(request.getIdOfOrg(), syncHistory, resOrgStructure.getError());
         } catch (Exception e) {
             resOrgStructure = new SyncResponse.ResOrgStructure(1, "Unexpected error");
             String message = String.format("Failed to process OrgStructure, IdOfOrg == %s", request.getIdOfOrg());
@@ -978,9 +980,8 @@ public class Processor implements SyncProcessor,
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            Org org = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
-            SyncHistoryException syncHistoryException = new SyncHistoryException(org, syncHistory, s);
-            persistenceSession.save(syncHistoryException);
+            DAOUtils.createSyncHistory(persistenceSession, idOfOrg, syncHistory, s);
+            persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -1728,9 +1729,9 @@ public class Processor implements SyncProcessor,
             for (SyncRequest.OrgStructure.Group reqGroup : reqStructure.getGroups()) {
                 try {
                     processSyncOrgStructureGroup(persistenceSession, organization, reqGroup);
+                    throw new Exception("test");
                 } catch (Exception e) {
                     String message = String.format("Failed to process: %s", reqGroup);
-                    createSyncHistory(idOfOrg,syncHistory, message);
                     logger.error(message, e);
                     return new SyncResponse.ResOrgStructure(2, message);
                 }
@@ -1919,10 +1920,10 @@ public class Processor implements SyncProcessor,
 
             for (Object[] v : DAOUtils.getClientsAndCardsForOrgs(persistenceSession, idOfOrgSet)) {
                 Client client = (Client) v[0];
-                if (!client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()
+                if (client.getClientGroup() == null || (!client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()
                         .equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) && !client.getClientGroup()
                         .getCompositeIdOfClientGroup().getIdOfClientGroup()
-                        .equals(ClientGroup.Predefined.CLIENT_DELETED.getValue())) {
+                        .equals(ClientGroup.Predefined.CLIENT_DELETED.getValue()))) {
                     Card card = (Card) v[1];
                     accRegistry.addItem(new SyncResponse.AccRegistry.Item(client, card));
                 }

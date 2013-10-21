@@ -1475,4 +1475,9 @@ public class DAOUtils {
         return (Integer) query.uniqueResult();
     }
 
+    public static void createSyncHistory(Session session, long idOfOrg, SyncHistory history, String s) throws Exception {
+        Org org = DAOUtils.getOrgReference(session, idOfOrg);
+        SyncHistoryException syncHistoryException = new SyncHistoryException(org, history, s);
+        session.save(syncHistoryException);
+    }
 }
