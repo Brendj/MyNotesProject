@@ -360,7 +360,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
     }
     
     public int getTotalCount() {
-        return items.size();
+        return items == null ? 0 : items.size();
     }
 
     public int getCreationsCount() {
@@ -397,6 +397,9 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
     }
     
     private int getCountOfOperation(int operation) {
+        if (items == null) {
+            return 0;
+        }
         int count = 0;
         for (WebRegistryChangeItem i : items) {
             if (!i.isApplied() && i.getOperation() == operation) {
