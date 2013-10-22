@@ -219,7 +219,7 @@ public class ReportPage extends BasicWorkspacePage {
             return;
         }
 
-        ReportHandleRule rule = DAOService.getInstance().getReportHandleRule(ruleId);
+        //ReportHandleRule rule = DAOService.getInstance().getReportHandleRule(ruleId);
         DateFormat dateFormat = new SimpleDateFormat();
         DateFormat timeFormat = new SimpleDateFormat();
         BasicJasperReport.ManualBuilder resultBuilder = new BasicJasperReport.ManualBuilder("", dateFormat, timeFormat);
