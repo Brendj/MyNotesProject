@@ -93,7 +93,9 @@ public class DashboardServiceBean {
             Query q = entityManager.createNativeQuery(
                     "select 'Доставлено SMS' as name, count(cf_clientsms.idofsms) as value, 'long' as type "
                             + "from cf_clientsms "
-                            + "where deliverystatus=:deliveredSMSStatus and servicesenddate>:maxDate "
+                            + "where "
+                            //+ "deliverystatus=:deliveredSMSStatus and "
+                            + "servicesenddate>:maxDate "
                             + "union all "
                             /*+ "select 'Количество не доставленных SMS' as name, count(cf_clientsms.idofsms) as value, 'long' as type "
                          + "from cf_clientsms "
