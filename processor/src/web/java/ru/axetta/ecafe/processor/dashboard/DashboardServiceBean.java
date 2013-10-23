@@ -92,19 +92,19 @@ public class DashboardServiceBean {
             List<DashboardResponse.NamedParams> params = new ArrayList<DashboardResponse.NamedParams>();
             Query q = entityManager.createNativeQuery(
                     "select 'Доставлено SMS' as name, count(cf_clientsms.idofsms) as value, 'long' as type "
-                    + "from cf_clientsms "
-                    + "where deliverystatus=:deliveredSMSStatus and servicesenddate>:maxDate "
-                    + "union all "
-                    /*+ "select 'Количество не доставленных SMS' as name, count(cf_clientsms.idofsms) as value, 'long' as type "
-                    + "from cf_clientsms "
-                    + "where deliverystatus=:notDeliveredSMSStatus "
-                    + "union all "*/
-                    + "select 'Последнее SMS' as name, max(cf_clientsms.servicesenddate) as value, 'date' as type "
-                    + "from cf_clientsms "
-                    + "union all "
-                    + "select '{href=NSIOrgRegistrySynchPage}Ошибок при сверке с Реестрами' as name, count(cf_registrychange_errors.idofregistrychangeerror) as value, 'long' as type "
-                    + "from cf_registrychange_errors "
-                    + "where comment is null or comment=''");
+                            + "from cf_clientsms "
+                            + "where deliverystatus=:deliveredSMSStatus and servicesenddate>:maxDate "
+                            + "union all "
+                            /*+ "select 'Количество не доставленных SMS' as name, count(cf_clientsms.idofsms) as value, 'long' as type "
+                         + "from cf_clientsms "
+                         + "where deliverystatus=:notDeliveredSMSStatus "
+                         + "union all "*/
+                            + "select 'Последнее SMS' as name, max(cf_clientsms.servicesenddate) as value, 'date' as type "
+                            + "from cf_clientsms "
+                            + "union all "
+                            + "select '{href=NSIOrgRegistrySynchPage}Ошибок при сверке с Реестрами' as name, count(cf_registrychange_errors.idofregistrychangeerror) as value, 'long' as type "
+                            + "from cf_registrychange_errors "
+                            + "where comment is null or comment=''");
             q.setParameter("deliveredSMSStatus", ClientSms.DELIVERED_TO_RECIPENT);
             q.setParameter("maxDate", now.getTimeInMillis());
             //q.setParameter("notDeliveredSMSStatus", ClientSms.NOT_DELIVERED_TO_RECIPENT);
@@ -286,9 +286,9 @@ public class DashboardServiceBean {
             for (Long orgID : orgStats.keySet()) {
                 DashboardResponse.OrgBasicStatItem statItem = orgStats.get(orgID);
                 if (statItem.getNumberOfVendingOrders () == null)
-                    {
+                {
                     statItem.setNumberOfVendingOrders(0L);
-                    }
+                }
             }
 
 
@@ -334,11 +334,11 @@ public class DashboardServiceBean {
                 }
                 if (studentsPayOrdersCount != null && statItem.getNumberOfPayOrders() != 0) {
                     per3 = (double) studentsPayOrdersCount / (double) (statItem.getNumberOfStudentClients() +
-                                                                       statItem.getNumberOfNonStudentClients());
+                            statItem.getNumberOfNonStudentClients());
                 }
                 if (employeePayOrdersCount != null && statItem.getNumberOfPayOrders() != 0) {
                     per4 = (double) employeePayOrdersCount / (double) (statItem.getNumberOfNonStudentClients() +
-                                                                       statItem.getNumberOfStudentClients());
+                            statItem.getNumberOfStudentClients());
                 }
                 if (studentsUniqueCount != null && studentsDiscountsCount != 0) {
                     per5 = (double) studentsUniqueCount / (double) studentsDiscountsCount;
@@ -372,7 +372,7 @@ public class DashboardServiceBean {
             orgBasicStatItem.setNumberOfDiscountOrders((Long)result[n++]);
             orgBasicStatItem.setNumberOfPayOrders((Long)result[n++]);
 
-            
+
 
             String queryText = "SELECT org.idOfOrg, org.officialName, org.district, org.location, org.tag, org.lastSuccessfulBalanceSync, "
                                                 + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState=:contractState) AS numOfClients, "
@@ -433,15 +433,15 @@ public class DashboardServiceBean {
 
 
     public int zeroIfNull (Integer val)
-        {
+    {
         return val == null ? 0 : val;
-        }
+    }
 
 
     public double beautifyPercent (double percent)
-        {
+    {
         return new BigDecimal(percent).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-        }
+    }
 
     public DashboardResponse getOrgInfo(DashboardResponse dashboardResponse, Date dt, Long idOfOrg) throws Exception {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
@@ -629,12 +629,37 @@ public class DashboardServiceBean {
             //items.add(new DashboardResponse.OrgSyncStatItem(org.getShortName(), org.getLastSuccessfulBalanceSync(),
             //        org.getLastUnSuccessfulBalanceSync(),
             //        runtimeContext.getProcessor().getOrgSyncAddress(org.getIdOfOrg())));
-            items.add(new DashboardResponse.OrgSyncStatItem(org.getShortName(), org.getLastSuccessfulBalanceSync(),
-                            org.getLastUnSuccessfulBalanceSync(),org.getRemoteAddress(), org.getClientVersion()));
+            String tags = parseTags(org.getTag());
+            items.add(new DashboardResponse.OrgSyncStatItem(org.getShortName(), tags, org.getLastSuccessfulBalanceSync(),
+                    org.getLastUnSuccessfulBalanceSync(),org.getRemoteAddress(), org.getClientVersion()));
 
         }
         orgSyncStats.setOrgSyncStatItems(items);
         return orgSyncStats;
+    }
+
+    public String parseTags(String orgTagsStr) {
+        if (orgTagsStr == null || orgTagsStr.length() < 1) {
+            return "";
+        }
+        String allowedTagsStr = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_MSK_MONITORING_ALLOWED_TAGS);
+        if (allowedTagsStr == null || allowedTagsStr.length() < 1) {
+            return "";
+        }
+        String allowedTags [] = allowedTagsStr.split(",");
+        String orgTags [] = orgTagsStr.split(",");
+        String result = "";
+        for (String allowedTag : allowedTags) {
+            for (String orgTag : orgTags) {
+                if (allowedTag.trim().equals(orgTag.trim())) {
+                    if (result.length() > 0) {
+                        result = result + "<br/>";
+                    }
+                    result = result + allowedTag;
+                }
+            }
+        }
+        return result;
     }
 
 

@@ -349,14 +349,16 @@ public class DashboardResponse {
     public static class OrgSyncStatItem {
 
         private String orgName;
+        private String tags;
         private Date lastSuccessfulBalanceSync;
         private Date lastUnSuccessfulBalanceSync;
         private String remoteAddr;
         private String version;
 
-        public OrgSyncStatItem(String orgName, Date lastSuccessfulBalanceSync, Date lastUnSuccessfulBalanceSync,
+        public OrgSyncStatItem(String orgName, String tags, Date lastSuccessfulBalanceSync, Date lastUnSuccessfulBalanceSync,
                 String remoteAddr, String version) {
             this.orgName = orgName;
+            this.tags = tags;
             this.lastSuccessfulBalanceSync = lastSuccessfulBalanceSync;
             this.lastUnSuccessfulBalanceSync = lastUnSuccessfulBalanceSync;
             this.remoteAddr = remoteAddr;
@@ -381,6 +383,10 @@ public class DashboardResponse {
 
         public String getVersion() {
             return version;
+        }
+        
+        public String getTags() {
+            return tags;
         }
     }
 

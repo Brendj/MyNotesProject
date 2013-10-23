@@ -45,10 +45,17 @@
                 <h:outputText escape="true" value="#{item.orgName}" styleClass="output-text"
                               style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}" />
             </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Тэги" />
+                </f:facet>
+                <h:outputText escape="false" value="#{item.tags}" styleClass="output-text"
+                              style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}" />
+            </rich:column>
 
             <rich:column headerClass="column-header">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Посл. успешная синхр. балансов" />
+                    <h:outputText escape="false" value="Посл. успешная <br/>синхр. балансов" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.lastSuccessfulBalanceSync}"
                               style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}"
@@ -57,7 +64,7 @@
 
             <rich:column headerClass="column-header">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Посл. неудачная синхр. балансов" />
+                    <h:outputText escape="false" value="Посл. неудачная <br/>синхр. балансов" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.lastUnSuccessfulBalanceSync}"
                               style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}"

@@ -82,6 +82,7 @@ public class OptionPage extends BasicWorkspacePage {
     private int smsPaymentType;
     private Long smsDefaultSubscriptionFee;
     private Integer syncRegisterDaysTimeout;
+    private String monitoringAllowedTags;
 
 
     private List<BankOptionItem> banks;
@@ -471,6 +472,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.syncRegisterDaysTimeout = syncRegisterDaysTimeout;
     }
 
+    public String getMonitoringAllowedTags() {
+        return monitoringAllowedTags;
+    }
+
+    public void setMonitoringAllowedTags(String monitoringAllowedTags) {
+        this.monitoringAllowedTags = monitoringAllowedTags;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -527,6 +536,7 @@ public class OptionPage extends BasicWorkspacePage {
         syncRegisterSupportEmail = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_SUPPORT_EMAIL);
         thinClientMinClaimsEditableDays = runtimeContext.getOptionValueInt(Option.OPTION_THIN_CLIENT_MIN__CLAIMS_EDITABLE_DAYS);
         syncRegisterDaysTimeout = runtimeContext.getOptionValueInt(Option.OPTION_MSK_NSI_REGISTRY_CHANGE_DAYS_TIMEOUT);
+        monitoringAllowedTags = runtimeContext.getOptionValueString(Option.OPTION_MSK_MONITORING_ALLOWED_TAGS);
 
 
         syncLimits = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS);
@@ -632,6 +642,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_RETRY_AFTER, retryAfter);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_SUPPORT_EMAIL, syncRegisterSupportEmail);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_REGISTRY_CHANGE_DAYS_TIMEOUT, syncRegisterDaysTimeout);
+            runtimeContext.setOptionValue(Option.OPTION_MSK_MONITORING_ALLOWED_TAGS, monitoringAllowedTags);
 
 
             runtimeContext.saveOptionValues();
