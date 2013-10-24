@@ -222,6 +222,11 @@ public class ImportRegisterClientsService {
             if (pupil.getGroup() != null) {
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP, pupil.getGroup(),
                         cl == null ? null : cl.getClientGroup().getGroupName(), updateClient);
+            } else {
+                //  Если группа у клиента не указана, то перемещаем его в Другие
+                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP,
+                        ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup(),
+                        cl == null ? null : cl.getClientGroup().getGroupName(), updateClient);
             }
             //  Проверяем организацию и дружественные ей - если клиент был переведен из другого ОУ, то перемещаем его
             boolean guidFound = false;
