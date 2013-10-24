@@ -4,14 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.daoservices.employees;
 
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.CardTemp;
-import ru.axetta.ecafe.processor.core.persistence.Person;
-import ru.axetta.ecafe.processor.core.persistence.Visitor;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +51,53 @@ public class EmployeeServiceBean {
         return query.getResultList();
     }
 
+    @Transactional
+    public List<VisitorItem> employeeHistoryReport(Date beginDate, Date endDate){
+        Session session = entityManager.unwrap(Session.class);
+        List<VisitorItem> reportResult = new ArrayList<VisitorItem>();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(beginDate);
+        Criteria visitorCriteria = session.createCriteria(Visitor.class);
+        visitorCriteria.add(Restrictions.eq("visitorType", 1));
+        List<Visitor> visitors = visitorCriteria.list();
+        while (endDate.getTime()>calendar.getTimeInMillis()){
+            VisitorItem currentVisitor = null;
+            Date startDate = calendar.getTime();
+            calendar.add(Calendar.DATE,1);
+            Date finishDate = calendar.getTime();
+            for (Visitor visitor: visitors){
+                Criteria criteria = session.createCriteria(EnterEvent.class);
+                criteria.add(Restrictions.eq("idOfVisitor", visitor.getIdOfVisitor()));
+                criteria.add(Restrictions.between("evtDateTime", startDate, finishDate));
+                criteria.addOrder(Order.desc("evtDateTime"));
+                criteria.addOrder(Order.asc("idOfVisitor"));
+                List<EnterEvent> enterEvents = criteria.list();
+
+                //ee.evtDateTime between :beginDate and :endDate order by ee.evtDateTime desc, ee.idOfVisitor asc
+                if(enterEvents!=null && !enterEvents.isEmpty()){
+                    currentVisitor = new VisitorItem();
+                    final Person person = visitor.getPerson();
+                    currentVisitor.setFirstName(person.getFirstName());
+                    currentVisitor.setSecondName(person.getSecondName());
+                    currentVisitor.setSurname(person.getSurname());
+                    currentVisitor.setOperationDate(startDate);
+                    List<CardEventOperationItem> cardEventOperationItems = new ArrayList<CardEventOperationItem>();
+                    for (EnterEvent events: enterEvents){
+                        final Org org = events.getOrg();
+                        cardEventOperationItems.add(new CardEventOperationItem(events.getEvtDateTime(), events.getPassDirection(), org
+                                .getIdOfOrg(), org.getShortName(), org.getRefectoryType()));
+                    }
+                    currentVisitor.addOperationItem(cardEventOperationItems);
+                }
+                if(currentVisitor!=null) {
+                    reportResult.add(currentVisitor);
+                    currentVisitor=null;
+                }
+            }
+        }
+        return reportResult;
+    }
+
     public List<VisitorItem> generateEmployeeHistoryReport(Date beginDate, Date endDate){
         List<VisitorItem> reportResult = new ArrayList<VisitorItem>();
         Calendar calendar = Calendar.getInstance();
@@ -73,11 +120,11 @@ public class EmployeeServiceBean {
                     currentVisitor.setOperationDate(startDate);
                     currentVisitor.addOperationItem(cardEventOperationItems);
                 }
+                if(currentVisitor!=null) {
+                    reportResult.add(currentVisitor);
+                    currentVisitor=null;
+                }
             }
-            if(currentVisitor!=null) {
-                reportResult.add(currentVisitor);
-            }
-
         }
         return reportResult;
     }

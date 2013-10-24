@@ -40,6 +40,7 @@ public class EmployeeHistoryReportPage extends OnlineReportPage{
 
     public Object buildReport(){
         cardEventOperationItems = serviceBean.generateEmployeeHistoryReport(this.startDate, this.endDate);
+        //cardEventOperationItems = serviceBean.employeeHistoryReport(this.startDate, this.endDate);
         return null;
     }
 

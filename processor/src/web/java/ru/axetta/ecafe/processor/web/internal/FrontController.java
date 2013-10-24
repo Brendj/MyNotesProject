@@ -353,7 +353,9 @@ public class FrontController extends HttpServlet {
                     visitor.setDriverLicenceDate(visitorItem.getDriverLicenceDate());
                     visitor.setWarTicketNumber(visitorItem.getWarTicketNumber());
                     visitor.setWarTicketDate(visitorItem.getWarTicketDate());
-                    visitor.setVisitorType(Visitor.DEFAULT_TYPE);
+                    if(visitor.getVisitorType()==null){
+                        visitor.setVisitorType(Visitor.DEFAULT_TYPE);
+                    }
                     persistenceSession.save(visitor);
                     idOfVisitor = visitor.getIdOfVisitor();
                 }
