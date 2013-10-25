@@ -40,4 +40,4 @@ DELETE FROM cf_sources CASCADE;
 DELETE FROM cf_trade_material_goods CASCADE;
 DELETE FROM cf_typesofaccompanyingdocuments CASCADE;
 DELETE FROM cf_state_changes;
-UPDATE cf_orderdetails SET idofgood=  null;
+UPDATE cf_orderdetails SET idofgood = null where idofgood is not null;
