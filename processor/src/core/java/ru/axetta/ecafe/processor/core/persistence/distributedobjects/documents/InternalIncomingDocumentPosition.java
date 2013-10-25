@@ -61,8 +61,11 @@ public class InternalIncomingDocumentPosition extends DistributedObject {
     @Override
     protected InternalIncomingDocumentPosition parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         Date dateOfGoodsCreationDate = XMLUtils.getDateTimeAttributeValue(node, "GoodsCreationDate");
         if (dateOfGoodsCreationDate != null)
             setGoodsCreationDate(dateOfGoodsCreationDate);

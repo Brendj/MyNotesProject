@@ -66,8 +66,11 @@ public class StateChange extends DistributedObject {
     @Override
     protected StateChange parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         Long longStateFrom = XMLUtils.getLongAttributeValue(node, "StateFrom");
         if (longStateFrom != null)
             setStateFrom(longStateFrom);

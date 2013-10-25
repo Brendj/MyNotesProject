@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -35,8 +36,11 @@ public class ActOfInventarization extends DistributedObject {
     @Override
     protected ActOfInventarization parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         Date dateOfActOfDifference = XMLUtils.getDateTimeAttributeValue(node, "Date");
         if (dateOfActOfDifference != null)
             setDateOfAct(dateOfActOfDifference);

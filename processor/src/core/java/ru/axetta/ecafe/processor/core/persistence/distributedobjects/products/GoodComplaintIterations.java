@@ -47,8 +47,11 @@ public class GoodComplaintIterations extends DistributedObject {
     @Override
     protected GoodComplaintIterations parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         guidOfComplaint = XMLUtils.getStringAttributeValue(node, "GuidOfComplaint", 36);
         iterationNumber = XMLUtils.getIntegerAttributeValue(node, "IterationNumber");
         iterationStatusNumber = XMLUtils.getIntegerAttributeValue(node, "Status");

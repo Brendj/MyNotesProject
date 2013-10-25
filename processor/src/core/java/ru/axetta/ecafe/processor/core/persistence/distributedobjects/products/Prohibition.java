@@ -82,8 +82,11 @@ public class Prohibition extends DistributedObject {
     @Override
     protected Prohibition parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         idOfClient = XMLUtils.getLongAttributeValue(node, "IdOfClient");
         guidOfProduct = XMLUtils.getStringAttributeValue(node, "GuidOfProduct", 36);
         guidOfProductGroup = XMLUtils.getStringAttributeValue(node, "GuidOfProductGroup", 36);

@@ -61,8 +61,11 @@ public class Staff extends DistributedObject {
     @Override
     protected Staff parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         Long longIdOfClient = XMLUtils.getLongAttributeValue(node, "IdOfClient");
         if (longIdOfClient != null)
             setIdOfClient(longIdOfClient);

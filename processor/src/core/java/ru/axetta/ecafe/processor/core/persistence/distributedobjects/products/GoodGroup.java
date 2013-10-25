@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Element;
@@ -53,7 +54,11 @@ public class GoodGroup extends DistributedObject {
     @Override
     protected GoodGroup parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if(longOrgOwner != null) setOrgOwner(longOrgOwner);
+        if (longOrgOwner != null){
+            setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         String stringNameOfGoodsGroup = XMLUtils.getStringAttributeValue(node, "Name", 128);
         if(stringNameOfGoodsGroup!=null) setNameOfGoodsGroup(stringNameOfGoodsGroup);
         setSendAll(SendToAssociatedOrgs.SendToAll);

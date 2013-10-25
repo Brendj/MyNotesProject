@@ -61,8 +61,11 @@ public class GoodBasicBasketPrice extends DistributedObject {
     @Override
     protected GoodBasicBasketPrice parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         Long longPrice = XMLUtils.getLongAttributeValue(node, "Price");
         if (longPrice != null)
             setPrice(longPrice);

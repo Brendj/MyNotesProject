@@ -53,8 +53,11 @@ public class WayBill extends DistributedObject {
     @Override
     protected WayBill parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         String stringNumber = XMLUtils.getStringAttributeValue(node, "Number", 128);
         if (stringNumber != null)
             setNumber(stringNumber);

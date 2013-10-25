@@ -56,8 +56,11 @@ public class GoodRequestPosition extends DistributedObject {
     @Override
     protected GoodRequestPosition parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         Integer integerUnitsScale = XMLUtils.getIntegerAttributeValue(node, "UnitsScale");
         if (integerUnitsScale != null)
             setUnitsScale(UnitScale.fromInteger(integerUnitsScale));

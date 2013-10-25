@@ -39,8 +39,11 @@ public class ECafeSettings extends DistributedObject{
     @Override
     protected ECafeSettings parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         String stringValue = XMLUtils.getStringAttributeValue(node, "Value", 128);
         if (stringValue != null)
             setSettingValue(stringValue);

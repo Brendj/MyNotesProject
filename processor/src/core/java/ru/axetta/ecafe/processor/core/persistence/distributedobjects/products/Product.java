@@ -109,8 +109,11 @@ public class Product extends DistributedObject implements IConfigProvider {
     @Override
     protected Product parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         String stringCode = XMLUtils.getStringAttributeValue(node, "Code", 16);
         if (stringCode != null) {
             setCode(stringCode);

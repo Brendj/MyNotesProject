@@ -277,6 +277,11 @@ public class Processor implements SyncProcessor,
                     response = buildClientsParamsSyncResponse(request);
                     break;
                 }
+                case TYPE_GET_GET_ACC_REGISGTRY_UPDATE:{
+                    // обработка синхронизации параметров клиента
+                    response = buildAccRegisgtryUpdate(request);
+                    break;
+                }
             }
 
         } catch (Exception e) {
@@ -849,6 +854,67 @@ public class Processor implements SyncProcessor,
         } catch (Exception e) {
             logger.error(String.format("Failed to build ClientRegistry, IdOfOrg == %s", request.getIdOfOrg()),
                     e);
+        }
+
+        try {
+            directiveElement = processSyncDirective(request.getIdOfOrg());
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()),
+                    e);
+        }
+
+        Date syncEndTime = new Date();
+
+        return new SyncResponse(request.getSyncType(), request.getIdOfOrg(),
+                request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+                resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
+                resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
+                correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
+                directiveElement);
+    }
+
+    /* Do process short synchronization for update AccRegisgtryUpdate parameters */
+    private SyncResponse buildAccRegisgtryUpdate(SyncRequest request) {
+
+        Long idOfPacket = null; // регистируются и заполняются только для полной синхронизации
+        SyncHistory idOfSync = null;
+
+        SyncResponse.ResPaymentRegistry resPaymentRegistry = null;
+        SyncResponse.AccRegistry accRegistry = null;
+        SyncResponse.AccIncRegistry accIncRegistry = null;
+        SyncResponse.ClientRegistry clientRegistry = null;
+        SyncResponse.ResOrgStructure resOrgStructure = null;
+        SyncResponse.ResMenuExchangeData resMenuExchange = null;
+        SyncResponse.ResDiary resDiary = null;
+        SyncResponse.ResEnterEvents resEnterEvents = null;
+        ResTempCardsOperations resTempCardsOperations = null;
+        TempCardOperationData tempCardOperationData = null;
+        SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
+        ComplexRoles complexRoles = null;
+        SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
+        Manager manager = null;
+        OrgOwnerData orgOwnerData = null;
+        QuestionaryData questionaryData = null;
+        GoodsBasicBasketData goodsBasicBasketData = null;
+        DirectiveElement directiveElement = null;
+
+        // Build AccRegistry
+        try {
+            accRegistry = getAccRegistry(request.getIdOfOrg());
+        } catch (Exception e) {
+            accRegistry = new SyncResponse.AccRegistry();
+            String message = String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg());
+            logger.error(message, e);
+
+        }
+
+        try {
+            if(request.getTempCardsOperations()!=null){
+                resTempCardsOperations = processTempCardsOperations(request.getTempCardsOperations());
+            }
+        } catch (Exception e) {
+            String message = String.format("processTempCardsOperations: %s", e.getMessage());
+            logger.error(message, e);
         }
 
         try {

@@ -59,8 +59,11 @@ public class InternalIncomingDocument extends DistributedObject {
     @Override
     protected InternalIncomingDocument parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         Integer integerState = XMLUtils.getIntegerAttributeValue(node, "State");
         if (integerState != null)
             setState(integerState);

@@ -72,10 +72,11 @@ public class DistributedObjectDAO {
     }
 
     public List<DOConfirm> getDOConfirms(Long orgOwner, String doClassName, String guid) {
+        /*and UPPER(distributedObjectClassName) = :sp .setParameter("sp", doClassName.toUpperCase())*/
         TypedQuery<DOConfirm> query = entityManager.createQuery(
-                "select distinct d from DOConfirm as d where orgOwner = :fp and UPPER(distributedObjectClassName) = :sp and guid = :tp",
+                "select distinct d from DOConfirm as d where orgOwner = :fp and guid = :tp",
                 DOConfirm.class);
-        query.setParameter("fp", orgOwner).setParameter("sp", doClassName.toUpperCase()).setParameter("tp", guid);
+        query.setParameter("fp", orgOwner).setParameter("tp", guid);
         return query.getResultList();
     }
 

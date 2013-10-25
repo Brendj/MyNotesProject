@@ -76,8 +76,11 @@ public class TradeMaterialGood extends DistributedObject {
     @Override
     protected TradeMaterialGood parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         Date dateNameOfGood = XMLUtils.getDateTimeAttributeValue(node, "GoodsCreationDate");
         if (dateNameOfGood != null)
             setGoodsCreationDate(dateNameOfGood);

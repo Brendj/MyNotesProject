@@ -83,8 +83,11 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
     @Override
     protected TechnologicalMap parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         String stringNameOfTechnologicalMap = XMLUtils.getStringAttributeValue(node, "Name", 128);
         if (stringNameOfTechnologicalMap != null) {
             setNameOfTechnologicalMap(stringNameOfTechnologicalMap);

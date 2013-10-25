@@ -57,6 +57,8 @@ public class GoodRequest extends DistributedObject {
                 throw new DistributedObjectException("NOT_CREATED_A_GOOD_REQUEST_BECAUSE_YOU_HAVE_NO_RIGHT");
             }
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
         }
         Date dateDateOfGoodsRequest = XMLUtils.getDateTimeAttributeValue(node, "Date");
         String stringNumber = XMLUtils.getStringAttributeValue(node, "Number", 128);

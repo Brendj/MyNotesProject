@@ -68,8 +68,11 @@ public class Good extends DistributedObject {
     @Override
     protected Good parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         String stringNameOfGood = XMLUtils.getStringAttributeValue(node, "Name", 512);
         if (stringNameOfGood != null)
             setNameOfGood(stringNameOfGood);

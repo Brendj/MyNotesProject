@@ -60,8 +60,11 @@ public class GoodComplaintOrders extends DistributedObject {
     @Override
     protected GoodComplaintOrders parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         guidOfComplaintIteration = XMLUtils.getStringAttributeValue(node, "GuidOfComplaintIteration", 36);
         idOfOrderDetail = XMLUtils.getLongAttributeValue(node, "IdOfOrg");
         idOfOrderDetail = XMLUtils.getLongAttributeValue(node, "IdOfOrderDetail");

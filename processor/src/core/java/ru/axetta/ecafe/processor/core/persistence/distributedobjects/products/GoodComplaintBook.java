@@ -43,8 +43,11 @@ public class GoodComplaintBook extends DistributedObject {
     @Override
     protected GoodComplaintBook parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         idOfClient = XMLUtils.getLongAttributeValue(node, "IdOfClient");
         guidOfGood = XMLUtils.getStringAttributeValue(node, "GuidOfGoods", 36);
         setSendAll(SendToAssociatedOrgs.SendToAll);

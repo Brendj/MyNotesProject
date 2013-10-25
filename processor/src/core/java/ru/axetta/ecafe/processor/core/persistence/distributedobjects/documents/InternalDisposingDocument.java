@@ -51,8 +51,11 @@ public class InternalDisposingDocument extends DistributedObject {
     @Override
     protected InternalDisposingDocument parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         Integer integerType = XMLUtils.getIntegerAttributeValue(node, "Type");
         if (integerType != null)
             setType(integerType);

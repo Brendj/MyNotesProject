@@ -72,9 +72,11 @@ public class ProductListPage extends BasicWorkspacePage implements ProductGroupS
     public void reload() throws Exception {
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
-        productList = daoService
-                .findProductByConfigurationProvider(selectedProductGroup, selectedConfigurationProvider.getIdOfConfigurationProvider(),
-                        deletedStatusSelected, orgOwners, null);
+        if(selectedConfigurationProvider==null){
+            productList = daoService.findProductByConfigurationProvider(selectedProductGroup, null,deletedStatusSelected, orgOwners, null);
+        } else {
+            productList = daoService.findProductByConfigurationProvider(selectedProductGroup, selectedConfigurationProvider.getIdOfConfigurationProvider(),deletedStatusSelected, orgOwners, null);
+        }
     }
 
     public Object selectConfigurationProvider() throws Exception {

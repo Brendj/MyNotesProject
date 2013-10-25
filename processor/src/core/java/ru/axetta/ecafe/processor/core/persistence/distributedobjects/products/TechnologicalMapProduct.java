@@ -26,7 +26,7 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
+        setOrgOwner(((TechnologicalMapProduct) distributedObject).getOrgOwner());
         setGrossWeight(((TechnologicalMapProduct) distributedObject).getGrossWeight());
         setNetWeight(((TechnologicalMapProduct) distributedObject).getNetWeight());
         setProduct(((TechnologicalMapProduct) distributedObject).getProduct());
@@ -47,8 +47,11 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
     @Override
     protected TechnologicalMapProduct parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         Integer integerGrossMass = XMLUtils.getIntegerAttributeValue(node, "GWeight");
         if (integerGrossMass != null) {
             setGrossWeight(integerGrossMass);

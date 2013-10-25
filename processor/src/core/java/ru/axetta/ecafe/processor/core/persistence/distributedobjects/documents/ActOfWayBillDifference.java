@@ -46,8 +46,11 @@ public class ActOfWayBillDifference extends DistributedObject {
     @Override
     protected ActOfWayBillDifference parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null){
             setOrgOwner(longOrgOwner);
+        } else {
+            throw new DistributedObjectException("OrgOwner is empty");
+        }
         Date dateOfActOfDifference = XMLUtils.getDateTimeAttributeValue(node, "Date");
         if (dateOfActOfDifference != null)
             setDate(dateOfActOfDifference);
