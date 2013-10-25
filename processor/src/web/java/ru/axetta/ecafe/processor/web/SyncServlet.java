@@ -85,6 +85,7 @@ public class SyncServlet extends HttpServlet {
                 idOfOrg = SyncRequest.Builder.getIdOfOrg(namedNodeMap);
                 idOfSync = SyncRequest.Builder.getIdOfSync(namedNodeMap);
                 syncType = SyncRequest.Builder.getSyncType(namedNodeMap);
+                if(syncType==null) throw new Exception("Unknown sync type");
             } catch (Exception e) {
                 final String message = String.format("Failed to extract required packet attribute [remote address: %s]",
                         request.getRemoteAddr());
