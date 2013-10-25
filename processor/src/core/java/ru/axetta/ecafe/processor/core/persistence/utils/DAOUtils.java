@@ -15,7 +15,6 @@ import ru.axetta.ecafe.util.DigitalSignatureUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.*;
-import org.hibernate.Query;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
@@ -24,7 +23,8 @@ import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.*;
@@ -598,9 +598,9 @@ public class DAOUtils {
     }
 
     public static void changeClientBalance(Session session, Long idOfClient, long sum) {
-        Query q=session.createQuery("UPDATE Client SET balance=balance+? WHERE idOfClient=?");
-        q.setLong(0, sum);
-        q.setLong(1, idOfClient);
+        Query q = session.createQuery("UPDATE Client SET balance = balance + :charge WHERE idOfClient = :id")
+                .setParameter("charge", sum)
+                .setParameter("id", idOfClient);
         q.executeUpdate();
     }
 

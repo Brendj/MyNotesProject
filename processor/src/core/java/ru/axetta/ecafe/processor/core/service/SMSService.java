@@ -87,64 +87,17 @@ public class SMSService {
                         sender, phoneNumber, text), e);
             }
         }
+        ClientSms clientSms = null;
+        boolean result = false;
         if (null != sendResponse && sendResponse.isSuccess()) {
-            RuntimeContext.getFinancialOpsManager().createClientSmsCharge(client, sendResponse.getMessageId(), phoneNumber,
-                    messageType, text, new Date());
-            return true;
-        }
-        return false;
-    }
-
-    /*
-
-    @Async
-    public void sendSMSAsync(Client client, int messageType, String text) throws Exception {
-        sendSMS(client, messageType, text);
-    }
-
-    public synchronized boolean sendSMS(Client client, int messageType, String text) throws Exception {
-        String phoneNumber, sender;
-        if (client == null) {
-            throw new Exception("Client doesn't exist");
-        }
-        if (!client.isNotifyViaSMS()) {
-            return false;
-        }
-        phoneNumber = client.getMobile();
-        if (StringUtils.isEmpty(phoneNumber)) {
-            return false;
-        }
-        phoneNumber = PhoneNumberCanonicalizator.canonicalize(phoneNumber);
-        if (StringUtils.length(phoneNumber) != 11) {
-            return false;
-        }
-        sender = StringUtils.substring(StringUtils.defaultString(client.getOrg().getSmsSender()), 0, 11);
-
-        SendResponse sendResponse = null;
-        ISmsService smsService = runtimeContext.getSmsService();
-        try {
-            logger.info(String.format("sending SMS, sender: %s, phoneNumber: %s, text: %s",
-                    sender, phoneNumber, text));
-            sendResponse = smsService.sendTextMessage(sender, phoneNumber, text);
-            logger.info(String.format("sent SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s, RC: %s, error: %s",
-                    sendResponse.getMessageId(), sender, phoneNumber, text, sendResponse.getStatusCode(), sendResponse.getError()));
-        } catch (Exception e) {
-            if (logger.isWarnEnabled()) {
-                logger.warn(String.format(
-                        "Failed to send SMS, sender: %s, phoneNumber: %s, text: %s",
-                        sender, phoneNumber, text), e);
-            }
-        }
-        if (null != sendResponse && sendResponse.isSuccess()) {
-            ClientSms clientSms = RuntimeContext.getFinancialOpsManager()
+            clientSms = RuntimeContext.getFinancialOpsManager()
                     .createClientSmsCharge(client, sendResponse.getMessageId(), phoneNumber, messageType, text,
                             new Date());
-            createdClientSms.set(clientSms);
-            return true;
+            result = true;
         }
-        return false;
+        createdClientSms.set(clientSms);
+        return result;
     }
-    */
 
     public static ClientSms getCreatedClientSms() {
         return createdClientSms.get();

@@ -5,10 +5,8 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientSms;
-import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.persistence.SubscriptionFee;
+import ru.axetta.ecafe.processor.core.logic.FinancialOpsManager;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
@@ -23,11 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
+import javax.persistence.Query;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 /**
  * Created with IntelliJ IDEA.
@@ -51,8 +49,14 @@ public class SMSSubscriptionFeeService {
     @Autowired
     private RuntimeContext runtimeContext;
 
+    private SMSSubscriptionFeeService getSelfProxy() {
+        return RuntimeContext.getAppContext().getBean(SMSSubscriptionFeeService.class);
+    }
+
     @Autowired
     private EventNotificationService enService;
+    @Autowired
+    private FinancialOpsManager fOpsManager;
 
     private Long defaultSubFee;
     private int paymentType;
@@ -66,90 +70,110 @@ public class SMSSubscriptionFeeService {
         paymentType = runtimeContext.getOptionValueInt(Option.OPTION_SMS_PAYMENT_TYPE);
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public void notifyClientsAboutSMSSubscriptionFee() throws Exception {
+        if (!RuntimeContext.getInstance().isMainNode()) {
+            return;
+        }
         if (paymentType != SMS_PAYMENT_BY_SUBSCRIPTION_FEE) {
             return;
         }
         String withdrawDate = CalendarUtils.dateToString(CalendarUtils.getFirstDayOfNextMonth(new Date()));
         String currentDate = CalendarUtils.dateToString(new Date());
-        List<Client> clients = findClientsWithNotificationViaSMS();
-        for (Client client : clients) {
-            Long smsFee = client.getOrg().getSubscriptionPrice() == 0 ? defaultSubFee
+        List<Long> ids = findClientsIdWithNotificationViaSMS();
+        for (Long id : ids) {
+            Client client = em.find(Client.class, id);
+            Long smsSubFee = client.getOrg().getSubscriptionPrice() == 0 ? defaultSubFee
                     : client.getOrg().getSubscriptionPrice();
-            if (client.getBalance() - smsFee < 0) {
+            if (client.getBalance() - smsSubFee < 0) {
                 String[] values = {
                         "contractId", client.getContractId().toString(), "withdrawDate", withdrawDate,
-                        "smsSubscriptionFee", CurrencyStringUtils.copecksToRubles(smsFee), "date", currentDate};
-                enService.sendSMS(client, EventNotificationService.NOTIFICATION_SMS_SUBSCRIPTION_FEE, values, false);
+                        "smsSubscriptionFee", CurrencyStringUtils.copecksToRubles(smsSubFee), "date", currentDate};
+                enService.sendSMS(client, EventNotificationService.NOTIFICATION_SMS_SUBSCRIPTION_FEE, values);
             }
         }
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.NEVER)
     public void smsSubscriptionFeeWithdraw() {
+        if (!RuntimeContext.getInstance().isMainNode()) {
+            return;
+        }
         if (paymentType != SMS_PAYMENT_BY_SUBSCRIPTION_FEE) {
             return;
         }
+        logger.info("SMS subscription fee withdraw service work begin.");
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        int month = Calendar.getInstance().get(Calendar.MONTH);
         String withdrawDate = CalendarUtils.dateToString(new Date());
-        List<Client> clients = findClientsWithoutWithdraw();
-        for (Client client : clients) {
+        List<Long> ids = findClientsIdWithoutWithdraw(year, month, 10000);
+        for (Long id : ids) {
             try {
-                processOneClient(client, withdrawDate);
+                getSelfProxy().processOneClient(id, withdrawDate, year, month);
             } catch (Exception ex) {
-                logger.error("Unable to withdraw SMS subscription fee for client with contract_id = {}.",
-                        client.getContractId());
+                logger.error("Unable to withdraw SMS subscription fee for client with id = {}. Cause: {}", id,
+                        ex.getMessage());
             }
         }
+        logger.info("SMS subscription fee withdraw service work end.");
     }
 
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
-    private void processOneClient(Client client, String withdrawDate) throws Exception {
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
+    public void processOneClient(Long id, String withdrawDate, int year, int month) throws Exception {
+        Client client = em.find(Client.class, id);
         Long smsSubFee =
                 client.getOrg().getSubscriptionPrice() == 0 ? defaultSubFee : client.getOrg().getSubscriptionPrice();
         String[] values = {
                 "contractId", client.getContractId().toString(), "date", withdrawDate, "smsSubscriptionFee",
                 CurrencyStringUtils.copecksToRubles(smsSubFee), "withdrawDate", withdrawDate};
         if (client.getBalance() - smsSubFee < 0) {
-            client.setNotifyViaSMS(false);
             enService.sendSMS(client, EventNotificationService.NOTIFICATION_SMS_SUB_FEE_WITHDRAW_NOT_SUCCESS, values,
                     false);
+            client.setNotifyViaSMS(false);
         } else {
+            Session session = em.unwrap(Session.class);
             // Снимаем абон. плату за смс-сервис
-            SubscriptionFee sf = RuntimeContext.getFinancialOpsManager()
-                    .createSubscriptionFeeCharge((Session) em.getDelegate(), client, smsSubFee,
-                            Calendar.getInstance().get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH) + 1,
-                            SubscriptionFee.TYPE_SMS_SERVICE);
+            SubscriptionFee sf = fOpsManager.createSubscriptionFeeCharge(session, client, smsSubFee, year, month,
+                    SubscriptionFee.TYPE_SMS_SERVICE);
+            logger.info("Withdraw from client with contract_id = {}", client.getContractId());
             // Уведомляем клиента об активации услуги.
             boolean sendResult = enService
                     .sendSMS(client, EventNotificationService.NOTIFICATION_SMS_SUB_FEE_WITHDRAW_SUCCESS, values, false);
             if (sendResult) {
                 ClientSms clientSms = SMSService.getCreatedClientSms();
                 clientSms.setTransaction(sf.getTransaction());
-                em.merge(clientSms);
+                session.merge(clientSms);
             }
         }
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    private List<Client> findClientsWithNotificationViaSMS() {
-        TypedQuery<Client> query = em
-                .createQuery("select distinct c from Client c where c.notifyViaSMS = :param", Client.class)
-                .setParameter("param", true);
-        return query.getResultList();
+    @SuppressWarnings("unchecked")
+    private List<Long> findClientsIdWithoutWithdraw(int year, int month, int rowCount) {
+        Query query = em.createQuery("select distinct c.idOfClient \n" +
+                "from Client c where c.notifyViaSMS = :notify and (c.idOfClientGroup not in (:cg) or c.idOfClientGroup is null) \n"
+                + "and c not in (select c2 from AccountTransaction at join at.client c2 join at.subscriptionFeesInternal sf \n"
+                + "where sf.subscriptionYear = :year and sf.periodNo = :month and sf.subscriptionType = :type)")
+                .setParameter("notify", true)
+                .setParameter("cg", Arrays.asList(
+                        ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
+                        ClientGroup.Predefined.CLIENT_DELETED.getValue()))
+                .setParameter("year", year)
+                .setParameter("month", month)
+                .setParameter("type", SubscriptionFee.TYPE_SMS_SERVICE);
+        if (rowCount > 0) {
+            query.setMaxResults(rowCount);
+        }
+        return (List<Long>) query.getResultList();
     }
 
-    // Возвращает клиентов, у которых не списывалась абон. плата за текущий месяц.
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    private List<Client> findClientsWithoutWithdraw() {
-        int year = Calendar.getInstance().get(Calendar.YEAR);
-        int month = Calendar.getInstance().get(Calendar.MONTH) + 1;
-        TypedQuery<Client> query = em.createQuery(
-                "select distinct c from Client c where c.notifyViaSMS = :param and c not in "
-                        + "(select c2 from AccountTransaction at join at.client c2 join at.subscriptionFeesInternal sf " +
-                        "where sf.subscriptionYear = :year and sf.periodNo = :month and sf.subscriptionType = :type)",
-                Client.class).setParameter("param", true).setParameter("year", year).setParameter("month", month)
-                .setParameter("type", SubscriptionFee.TYPE_SMS_SERVICE);
-        return query.getResultList();
+    @SuppressWarnings("unchecked")
+    private List<Long> findClientsIdWithNotificationViaSMS() {
+        Query query = em.createQuery("select distinct c.idOfClient from Client c where c.notifyViaSMS = :notify and "
+                + " (c.idOfClientGroup not in (:cg) or c.idOfClientGroup is null)")
+                .setParameter("notify", true)
+                .setParameter("cg", Arrays.asList(
+                        ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
+                        ClientGroup.Predefined.CLIENT_DELETED.getValue()));
+        return (List<Long>) query.getResultList();
     }
 }

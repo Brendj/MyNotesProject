@@ -45,8 +45,7 @@ public class FinancialOpsManager {
     public ClientSms createClientSmsCharge(Client client, String idOfSms, String phone, Integer contentsType,
             String textContents, Date serviceSendTime) throws Exception {
 
-        Session session = (Session)em.getDelegate();
-        
+        Session session = em.unwrap(Session.class);
         long priceOfSms = client.getOrg().getPriceOfSms();
         int paymentType = runtimeContext.getOptionValueInt(Option.OPTION_SMS_PAYMENT_TYPE);
         //Card card = DAOUtils.findActiveCard(em, client);
@@ -64,7 +63,8 @@ public class FinancialOpsManager {
             Contragent operatorContragent = DAOUtils.findContragentByClass(session, Contragent.OPERATOR);
             Contragent clientContragent = DAOUtils.findContragentByClass(session, Contragent.CLIENT);
             // уменьшаем позицию Оператор - Клиент
-            getCurrentPositionsManager(session).changeCurrentPosition(-priceOfSms, operatorContragent, clientContragent);
+            getCurrentPositionsManager(session)
+                    .changeCurrentPosition(-priceOfSms, operatorContragent, clientContragent);
         }
 
         ClientSms clientSms = new ClientSms(idOfSms, client, accountTransaction, phone, contentsType, textContents,

@@ -240,6 +240,7 @@ public class EventNotificationService {
         if (text.length() > 68) {
             text = text.substring(0, 67) + "..";
         }
+        boolean result;
         try {
             int clientSMSType;
             if (type.equals(NOTIFICATION_ENTER_EVENT)) {
@@ -260,15 +261,16 @@ public class EventNotificationService {
             }
             if (sendAsync) {
                 smsService.sendSMSAsync(client.getIdOfClient(), clientSMSType, text);
+                result = true;
             } else {
-                smsService.sendSMS(client.getIdOfClient(), clientSMSType, text);
+                result = smsService.sendSMS(client.getIdOfClient(), clientSMSType, text);
             }
         } catch (Exception e) {
             String message = String.format("Failed to send SMS notification to client with contract_id = %s.", client.getContractId());
             logger.error(message, e);
             return false;
         }
-        return true;
+        return result;
     }
 
     private boolean isSMSNotificationEnabledForType(String type) {
