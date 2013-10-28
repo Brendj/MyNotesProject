@@ -74,17 +74,18 @@ public class SMSService {
 
         SendResponse sendResponse = null;
         ISmsService smsService = runtimeContext.getSmsService();
-        try {
-            logger.info(String.format("sending SMS, sender: %s, phoneNumber: %s, text: %s",
-                    sender, phoneNumber, text));
-            sendResponse = smsService.sendTextMessage(sender, phoneNumber, text);
-            logger.info(String.format("sent SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s, RC: %s, error: %s",
+        logger.info("sending SMS, sender: {}, phoneNumber: {}, text: {}", new Object[]{sender, phoneNumber, text});
+        for (int i = 0; i < 3; i++) {
+            try {
+                sendResponse = smsService.sendTextMessage(sender, phoneNumber, text);
+                logger.info(String.format("sent SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s, RC: %s, error: %s",
                     sendResponse.getMessageId(), sender, phoneNumber, text, sendResponse.getStatusCode(), sendResponse.getError()));
-        } catch (Exception e) {
-            if (logger.isWarnEnabled()) {
-                logger.warn(String.format(
-                        "Failed to send SMS, sender: %s, phoneNumber: %s, text: %s",
-                        sender, phoneNumber, text), e);
+                if (sendResponse.isSuccess()) {
+                    break;
+                }
+            } catch (Exception e) {
+                logger.warn("Failed to send SMS, sender: {}, phoneNumber: {}, text: {}, exception: {}",
+                        new Object[]{sender, phoneNumber, text, e});
             }
         }
         ClientSms clientSms = null;
