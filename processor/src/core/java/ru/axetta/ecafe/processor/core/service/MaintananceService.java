@@ -36,7 +36,7 @@ public class MaintananceService {
     @Autowired
     private RuntimeContext runtimeContext;
 
-
+    @Transactional
     public void run() {
         if (!RuntimeContext.getInstance().isMainNode()) {
             return;
