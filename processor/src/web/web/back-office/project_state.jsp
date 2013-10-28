@@ -402,7 +402,7 @@ function addPeriod (container, title, value)
     </ul>
     <div id="tabs-1" style="padding: 0px; margin: 0px">
         <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_01" name="period" onchange="drawActivityCharts()"></select></div>
-        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_01" name="region" onchange="drawActivityCharts()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_01" name="region" onchange="drawActivityCharts()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option><option value="ЮОУО">ЮОУО</option></select></div>
         <div id="activeChart" style="width: 100%; height: 310px;"></div><br/>
         <div id="uniqueChart" style="width: 100%; height: 310px;"></div>
     </div>
@@ -410,13 +410,13 @@ function addPeriod (container, title, value)
         <div id="contentsChart" style="width: 100%; height: 500px;"></div>
     </div>
     <div id="tabs-3" style="padding: 0px; margin: 0px">
-        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_02" name="region" onchange="drawRefillCharts()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_02" name="region" onchange="drawRefillCharts()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option><option value="ЮОУО">ЮОУО</option></select></div>
         <div id="refillChart" style="width: 100%; height: 500px;"></div>
         <div id="refillAvgChart" style="width: 100%; height: 500px;"></div>
         <div id="refillProgressChart" style="width: 100%; height: 500px;"></div>
     </div>
     <div id="tabs-4" style="padding: 0px; margin: 0px">
-        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_03" name="region" onchange="drawInformingChart()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_03" name="region" onchange="drawInformingChart()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option><option value="ЮОУО">ЮОУО</option></select></div>
         <div id="informingChart" style="width: 100%; height: 500px;"></div>
     </div>
     <div id="tabs-5" style="padding: 0px; margin: 0px">
@@ -425,7 +425,7 @@ function addPeriod (container, title, value)
     </div>
     <div id="tabs-6" style="padding: 0px; margin: 0px">
         <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_02" name="period" onchange="draw(drawVisitorsChart)"></select></div>
-        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_04" name="region" onchange="drawVisitorsChart()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_04" name="region" onchange="drawVisitorsChart()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option><option value="ЮОУО">ЮОУО</option></select></div>
         <div id="visitorsChart" style="width: 100%; height: 500px;"></div>
     </div>
     <div id="tabs-7" style="padding: 0px; margin: 0px">
