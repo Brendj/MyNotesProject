@@ -397,7 +397,7 @@ public class SetupDiscountPage extends BasicWorkspacePage {
     }
 
     public String getPageTitle() {
-        return "Групповое питание";
+        return "Установка льгот";
     }
 
     public void resetMessages() {

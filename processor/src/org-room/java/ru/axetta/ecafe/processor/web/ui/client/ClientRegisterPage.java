@@ -154,13 +154,13 @@ public class ClientRegisterPage extends BasicWorkspacePage {
     }
 
     public void doModifyClient(ActionEvent actionEvent) {
-        RegisterClient lastClient = clientsForRegister.get(clientsForRegister.size() - 1);
+        /*RegisterClient lastClient = clientsForRegister.get(clientsForRegister.size() - 1);
         if (!lastClient.isNewClientAdded()) {
             if (isClientModified(lastClient)) {
                 clientsForRegister.add(new RegisterClient());
                 lastClient.setNewClientAdded(true);
             }
-        }
+        }*/
     }
 
     public void doRemoveClient (RegisterClient client) {
@@ -280,6 +280,9 @@ public class ClientRegisterPage extends BasicWorkspacePage {
     }
 
     public static void registerClient (Session session, ClientListEditPage.SelectedClient client, Org org, boolean checkFullname) throws Exception {
+        if (org == null) {
+            org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);
+        }
         if (session == null || !session.isConnected()) {
             throw new Exception("Отсутствует соединение с базой данных");
         }
@@ -346,6 +349,7 @@ public class ClientRegisterPage extends BasicWorkspacePage {
                     .get(ru.axetta.ecafe.processor.core.persistence.Client.class, newIdOfClient);
         }
         List<Long> idOfCategoryList = new ArrayList<Long>();
+        client.initDiscounts(ClientListEditPage.loadDiscounts(session));
         for (Long idofcategorydiscount : client.getDiscounts().keySet()) {
             if (client.getDiscounts().get(idofcategorydiscount).equals(Boolean.FALSE)) {
                 continue;

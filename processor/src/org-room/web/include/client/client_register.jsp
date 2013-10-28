@@ -71,6 +71,7 @@
                         <h:outputText value="Фамилия"/>
                     </f:facet>
                     <h:inputText value="#{client.surname}" style="width:150px;" disabled="#{client.added}">
+                        <a4j:support event="onchange" reRender="" actionListener="#{clientRegisterPage.doModifyClient}" />
                     </h:inputText>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};">
@@ -130,7 +131,7 @@
                         <h:outputText value="Факс"/>
                     </f:facet>
                     <rich:jQuery selector="#faxInput" query="mask('(999) 999-9999')" timing="immediate"/>
-                    <h:inputText id="faxInput" value="#{client.fax}" style="width:150px;" disabled="#{client.added}">
+                    <h:inputText id="faxInput" value="#{client.fax}" style="width:150px;" disabled="true">
                     </h:inputText>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};" rendered="#{clientRegisterPage.showEmail}">
@@ -198,6 +199,7 @@
     </h:panelGrid>
     </a4j:region>
 
+    <a4j:region>
     <h:panelGrid columns="3" columnClasses="submit_col1" style="width:100%;">
         <h:panelGrid styleClass="borderless-grid" columns="2" style="width: 70%">
             <h:selectBooleanCheckbox value="#{clientRegisterPage.registerTwins}" styleClass="output-text" ></h:selectBooleanCheckbox>
@@ -210,5 +212,6 @@
         </a4j:status>
         <a4j:commandButton value="Зарегистрировать" action="#{clientRegisterPage.doApply}" reRender="clientRegisterGrid" />
     </h:panelGrid>
+    </a4j:region>
 </h:panelGrid>
 </a4j:form>

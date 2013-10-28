@@ -172,7 +172,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
 
         loadGroups(session);
         buildGroupsTree(clients);
-        loadDiscounts(session);
+        categoryDiscounts = loadDiscounts(session);
     }
 
     @Transactional
@@ -285,7 +285,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
 
         loadEnterEvents(session, new Date());
         loadMigrationHistory(session);
-        loadClientDiscounts(session);
+        loadClientDiscounts(session, selectedClient, categoryDiscounts);
     }
 
     @Transactional
@@ -301,7 +301,9 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         }
     }
 
-    public void loadClientDiscounts(Session session) {
+    public static void loadClientDiscounts(Session session,
+                                           SelectedClient selectedClient,
+                                           List<CategoryDiscount> categoryDiscounts) {
         selectedClient.initDiscounts(categoryDiscounts);
         org.hibernate.Query q = session.createSQLQuery("select idofcategorydiscount "
                                                         + "from cf_clients_categorydiscounts "
@@ -433,7 +435,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         Session session = null;
         try {
             session = (Session) entityManager.getDelegate();
-            loadDiscounts(session);
+            categoryDiscounts = loadDiscounts(session);
         } catch (Exception e) {
             logger.error("Failed to load group for org", e);
         } finally {
@@ -441,17 +443,14 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         }
     }
 
-    public void loadDiscounts(Session session) {
-        if (categoryDiscounts == null) {
-            categoryDiscounts = new ArrayList<CategoryDiscount>();
-        } else {
-            return;
-        }
+    public static List<CategoryDiscount> loadDiscounts(Session session) {
+        List<CategoryDiscount> categoryDiscounts = new ArrayList<CategoryDiscount>();
         Map<Long, String> categories = DAOServices.getInstance().loadDiscountCategories(session);
         for (Long idofcategorydiscount : categories.keySet()) {
             String name = categories.get(idofcategorydiscount);
             categoryDiscounts.add(new CategoryDiscount(idofcategorydiscount, name));
         }
+        return categoryDiscounts;
     }
 
     @Transactional
@@ -1115,7 +1114,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
             return discounts;
         }
 
-        private SelectedClient initDiscounts (List<CategoryDiscount> baseDiscounts) {
+        public SelectedClient initDiscounts (List<CategoryDiscount> baseDiscounts) {
             if (discounts != null) {
                 discounts.clear();
             } else {
