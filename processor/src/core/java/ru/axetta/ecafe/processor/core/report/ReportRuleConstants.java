@@ -201,7 +201,8 @@ public class ReportRuleConstants {
             new ReportHint(BeneficiarySummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(DeliveredServicesReport.class.getCanonicalName(), new int[]{3, -20/*, 31, 32, 33, 34, 35, 36, 37*/}),
             new ReportHint(CWOACReport.class.getCanonicalName(), new int[]{}),
-            new ReportHint(SSTSReport.class.getCanonicalName(), new int[]{20})
+            new ReportHint(SSTSReport.class.getCanonicalName(), new int[]{20}),
+            new ReportHint(ActiveClientsReport.class.getCanonicalName(), new int[]{})
             // отрицательное значение - обязательное
     };
 

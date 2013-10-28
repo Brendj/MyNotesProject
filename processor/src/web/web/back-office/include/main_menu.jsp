@@ -866,6 +866,9 @@
                         binding="#{mainPage.clientsBenefitsReportPage.mainMenuComponent}"
                         label="Расчет комплексов по льготным правилам"
                         action="#{mainPage.showClientsBenefitsReportPage}" reRender="workspaceForm" />
+    <rich:panelMenuItem id="activeClientsMenuItem" binding="#{activeClientsReportPage.mainMenuComponent}"
+                        label="Отчет по доступным клиентам" action="#{activeClientsReportPage.show}"
+                        reRender="workspaceForm" />
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
     <rich:panelMenuItem id="manualReportRunnerMenuItem" binding="#{manualReportRunnerPage.mainMenuComponent}"
                         label="Ручной запуск отчетов" action="#{manualReportRunnerPage.show}"

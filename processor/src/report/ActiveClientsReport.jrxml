@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SalesReport" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.2" value="rowGroup"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
+	<property name="ireport.zoom" value="1.3310000000000015"/>
+	<property name="ireport.x" value="461"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab Data Text" hAlign="Center">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+			<topPen lineWidth="1.0" lineColor="#000000"/>
+			<leftPen lineWidth="1.0" lineColor="#000000"/>
+			<bottomPen lineWidth="1.0" lineColor="#000000"/>
+			<rightPen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 2_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 3_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="region" mode="Opaque" forecolor="#000000" backcolor="#99CCFF" hAlign="Center" vAlign="Middle" fontSize="10" isBold="true"/>
+	<subDataset name="Table Dataset 1" uuid="f9c27042-f9d0-4f15-83cb-2bcd8d0d457f"/>
+	<subDataset name="Table Dataset 2" uuid="2adc723e-b208-4505-8596-b618c3c6293e"/>
+	<subDataset name="Table Dataset 3" uuid="9862e719-4c1b-456d-83e2-a629b6d8d74b"/>
+	<subDataset name="Table Dataset 4" uuid="73697646-e656-41e3-89d5-9d40680c1422"/>
+	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date"/>
+	<field name="shortname" class="java.lang.String"/>
+	<field name="num" class="java.lang.String"/>
+	<field name="region" class="java.lang.String"/>
+	<field name="totalCount" class="java.lang.Long"/>
+	<field name="paymentCount" class="java.lang.Long"/>
+	<field name="discountCount" class="java.lang.Long"/>
+	<field name="idOfOrg" class="java.lang.Long"/>
+	<field name="value" class="java.lang.Long"/>
+	<field name="active" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="68" splitType="Stretch">
+			<elementGroup/>
+			<staticText>
+				<reportElement uuid="24f636d2-0418-42b4-9970-a94414684b99" x="0" y="0" width="802" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Оказанные услуги]]></text>
+			</staticText>
+			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
+				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" x="83" y="32" width="81" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{startDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="3b0a9d12-9433-4356-a2c3-59a58c8d9810" x="0" y="32" width="83" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Период отчета:]]></text>
+			</staticText>
+			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
+				<reportElement uuid="bc23afa8-7f9c-4f60-8502-75c07da67f28" x="192" y="32" width="102" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{endDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="36fcdcb0-9ad6-4df9-a1c3-8dd4c631dac7" x="164" y="32" width="28" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[по]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<detail>
+		<band/>
+	</detail>
+	<lastPageFooter>
+		<band height="32"/>
+	</lastPageFooter>
+	<summary>
+		<band height="237">
+			<crosstab>
+				<reportElement uuid="5f966044-d9d0-4053-9cc0-a70d80157163" x="0" y="0" width="802" height="105"/>
+				<crosstabParameter name="parameter1"/>
+				<crosstabHeaderCell>
+					<cellContents>
+						<staticText>
+							<reportElement uuid="946f92b4-2b50-42b7-a8d0-7ff2e683877b" style="Crosstab Data Text" x="0" y="0" width="339" height="52"/>
+							<textElement verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<text><![CDATA[Название учреждения]]></text>
+						</staticText>
+					</cellContents>
+				</crosstabHeaderCell>
+				<rowGroup name="idOfOrg" width="0">
+					<bucket class="java.lang.Long">
+						<bucketExpression><![CDATA[$F{idOfOrg}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="8270dbff-c129-4dcc-aece-3bb6bb6982ee" style="Crosstab Data Text" x="0" y="0" width="0" height="26"/>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{idOfOrg}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="region" width="339">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{region}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#FFFFFF" mode="Transparent" style="region">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="5a36a4fd-590d-4c17-9ef4-9f01e87de22d" style="Crosstab Data Text" x="283" y="0" width="56" height="26"/>
+								<textElement verticalAlignment="Middle">
+									<font size="10" isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{region}]]></textFieldExpression>
+							</textField>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="90d5dabe-443c-4e27-af78-f6f3f59c2a8b" style="Crosstab Data Text" x="221" y="0" width="62" height="26"/>
+								<textElement verticalAlignment="Middle">
+									<font size="10" isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{num}]]></textFieldExpression>
+							</textField>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="85319abb-5111-43d2-a68f-6b6787da454e" x="0" y="0" width="221" height="26"/>
+								<textElement verticalAlignment="Middle">
+									<font size="10" isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{shortname}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="a7c69884-6ce6-4661-8eb8-728e4703db88" style="Crosstab Data Text" x="0" y="0" width="339" height="25"/>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[String.format("Итого по %s", $V{region})]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="value" height="52">
+					<bucket class="java.lang.Long">
+						<bucketExpression><![CDATA[$F{value}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents>
+							<staticText>
+								<reportElement uuid="bdc5b2eb-b512-4713-acb5-882881715774" style="Crosstab Data Text" x="0" y="0" width="76" height="52"/>
+								<textElement verticalAlignment="Middle">
+									<font size="10" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Количество учащихся (шт.)]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="10189a41-a6ea-4528-89f7-5e5d6d79d020" style="Crosstab Data Text" x="76" y="0" width="150" height="52"/>
+								<textElement verticalAlignment="Middle">
+									<font size="10" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Количество клиентов , совершавших покупки за последние 1 месяца]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="2ef2b4ee-e0c2-4e4c-a8b6-5e1a42945301" style="Crosstab Data Text" x="226" y="0" width="93" height="52"/>
+								<textElement verticalAlignment="Middle">
+									<font size="10" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Количество клиентов-бесплатников]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="60a7c113-0c48-4286-ad8c-1e11dbb2753d" style="Crosstab Data Text" x="319" y="0" width="60" height="52"/>
+								<textElement verticalAlignment="Middle">
+									<font size="10" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Активных клиентов]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="totalMeasure" class="java.lang.Long" calculation="Sum">
+					<measureExpression><![CDATA[$F{totalCount}]]></measureExpression>
+				</measure>
+				<measure name="paymentMeasure" class="java.lang.Long" calculation="Sum">
+					<measureExpression><![CDATA[$F{paymentCount}]]></measureExpression>
+				</measure>
+				<measure name="discountMeasure" class="java.lang.Long" calculation="Sum">
+					<measureExpression><![CDATA[$F{discountCount}]]></measureExpression>
+				</measure>
+				<measure name="num" class="java.lang.String">
+					<measureExpression><![CDATA[$F{num}]]></measureExpression>
+				</measure>
+				<measure name="shortname" class="java.lang.String" calculation="Count">
+					<measureExpression><![CDATA[$F{shortname}]]></measureExpression>
+				</measure>
+				<measure name="activeMeasure" class="java.lang.String" calculation="Count">
+					<measureExpression><![CDATA[$F{active}]]></measureExpression>
+				</measure>
+				<crosstabCell width="379" height="26">
+					<cellContents>
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="ac5ac51b-56b5-4280-bf48-3407f76741f9" style="Crosstab Data Text" x="0" y="0" width="76" height="26"/>
+							<textElement verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$V{totalMeasure}]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="464ca60f-4178-4370-aede-5839c19d0f32" style="Crosstab Data Text" x="76" y="0" width="150" height="26"/>
+							<textElement verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$V{paymentMeasure}]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="cb67f917-8ba1-49ac-bd61-840624e2715f" style="Crosstab Data Text" x="226" y="0" width="93" height="26"/>
+							<textElement verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$V{discountMeasure}]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="21a00631-45da-4ea8-a65f-1a111b77826c" style="Crosstab Data Text" x="319" y="0" width="60" height="26"/>
+							<textElement verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$V{activeMeasure}]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="e8240a6a-ee49-4a98-90f1-c48010a89249" style="Crosstab Data Text" x="0" y="0" width="0" height="26"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{value}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="379" height="25" rowTotalGroup="region">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="8e7c6bb4-7c14-440f-8214-23a2b6c815c1" style="Crosstab Data Text" x="0" y="0" width="76" height="25"/>
+							<textElement verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$V{totalMeasure}]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="12c17c4f-2643-4835-8804-9a52b153eb9d" style="Crosstab Data Text" x="76" y="0" width="150" height="25"/>
+							<textElement verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$V{paymentMeasure}]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="fc3961e5-65b4-4f20-b71c-96b4afeda7b8" style="Crosstab Data Text" x="226" y="0" width="93" height="25"/>
+							<textElement verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$V{discountMeasure}]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="a49c762a-e432-4c7f-b393-2aa42e37a78a" style="Crosstab Data Text" x="319" y="0" width="60" height="25"/>
+							<textElement verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[String.format("%d.%02d", $V{paymentMeasure}, Math.abs($V{paymentMeasure}%100))]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="7706aac4-088a-43ae-961d-b4a95c378f91" style="Crosstab Data Text" x="0" y="0" width="0" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{value}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="idOfOrg">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell columnTotalGroup="value">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="idOfOrg" columnTotalGroup="value">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="region" columnTotalGroup="value">
+					<cellContents/>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+	<noData>
+		<band height="57"/>
+	</noData>
+</jasperReport>

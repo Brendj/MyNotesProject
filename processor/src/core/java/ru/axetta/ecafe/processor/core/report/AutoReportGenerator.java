@@ -607,6 +607,28 @@ public class AutoReportGenerator {
             }
         }));
 
+        REPORT_DEFS.add(new ReportDef(ActiveClientsReport.class, ActiveClientsReport.AutoReportBuildJob.class, new JobDetailCreator() {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
+                Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + ActiveClientsReport.class.getSimpleName() + ".jasper";
+
+                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName,
+                        new ActiveClientsReport(),
+                        autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
+                        autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
+                        reportTemplate, (Calendar) autoReportGenerator.getCalendar().clone(),
+                        (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                        (DateFormat) autoReportGenerator.getTimeFormat().clone());
+
+                JobDetail jobDetail = new JobDetail(jobName, Scheduler.DEFAULT_GROUP, jobClass);
+                jobDetail.getJobDataMap()
+                        .put(ActiveClientsReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                return jobDetail;
+            }
+        }));
+
         REPORT_DEFS.add(new ReportDef(ComplaintCountByGoodReport.class, ComplaintCountByGoodReport.AutoReportBuildJob.class, new JobDetailCreator() {
             public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
                 Class jobClass = BasicReportJob.AutoReportBuildJob.class;
