@@ -119,4 +119,21 @@ public class CardTempOperation {
 
     protected CardTempOperation() {
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        CardTempOperation that = (CardTempOperation) o;
+        return idOfCardTempOperation != null && idOfCardTempOperation.equals(that.idOfCardTempOperation);
+    }
+
+    @Override
+    public int hashCode() {
+        return idOfCardTempOperation != null ? idOfCardTempOperation.hashCode() : 0;
+    }
 }
