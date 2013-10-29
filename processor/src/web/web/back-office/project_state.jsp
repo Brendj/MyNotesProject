@@ -1,14 +1,58 @@
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Option" %>
+<%@ page import="org.hibernate.Session" %>
+<%@ page import="org.hibernate.Transaction" %>
+<%@ page import="ru.axetta.ecafe.processor.core.utils.HibernateUtils" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="org.slf4j.Logger" %>
+<%@ page import="org.slf4j.LoggerFactory" %>
+<%@ page import="org.hibernate.Query" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>ИС ПП - панель мониторинга</title>
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" />
 
-<%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Option" %>
 <%
+    final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.project_state");
+
     String externalURL = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_EXTERNAL_URL);
+    List<String> regions = new ArrayList<String>();
+    regions.add("Все округа");
+
+    RuntimeContext runtimeContext = null;
+    Session persistenceSession = null;
+    Transaction persistenceTransaction = null;
+    try {
+        runtimeContext = RuntimeContext.getInstance();
+        persistenceSession = runtimeContext.createPersistenceSession();
+        persistenceTransaction = persistenceSession.beginTransaction();
+
+        Query q = persistenceSession.createSQLQuery("select distinct cf_orgs.district from cf_orgs where cf_orgs.district<>'' order by cf_orgs.district");
+        List res = q.list();
+        for (Object reg : res) {
+            regions.add((String) reg);
+        }
+
+        persistenceTransaction.commit();
+        persistenceTransaction = null;
+    } catch (RuntimeContext.NotInitializedException e) {
+        throw new UnavailableException(e.getMessage());
+    } catch (Exception e) {
+        throw new ServletException(e);
+    } finally {
+        HibernateUtils.rollback(persistenceTransaction, logger);
+        HibernateUtils.close(persistenceSession, logger);
+    }
+
+
+    String regionsStr = "";
+    for (String region : regions) {
+        regionsStr += "<option value=\"" + region + "\">" + region + "</option>";
+    }
 %>
 
 <script src="http://code.jquery.com/jquery-1.8.2.js"></script>
@@ -443,25 +487,25 @@ function addPeriod (container, title, value)
     </ul>
     <div id="tabs-1" style="padding: 0px; margin: 0px">
         <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_01" name="period" onchange="drawActivityCharts()"></select></div>
-        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_01" name="region" onchange="drawActivityCharts()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option><option value="ЮОУО">ЮОУО</option></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_01" name="region" onchange="drawActivityCharts()"><%= regionsStr %></select></div>
         <div id="activeChart" style="width: 100%; height: 310px;"></div><br/>
     </div>
     <div id="tabs-11" style="padding: 0px; margin: 0px">
         <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_011" name="period" onchange="drawActivityCharts()"></select></div>
-        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_011" name="region" onchange="drawActivityCharts()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option><option value="ЮОУО">ЮОУО</option></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_011" name="region" onchange="drawActivityCharts()"><%= regionsStr %></select></div>
         <div id="uniqueChart" style="width: 100%; height: 310px;"></div>
     </div>
     <div id="tabs-2" style="padding: 0px; margin: 0px">
         <div id="contentsChart" style="width: 100%; height: 500px;"></div>
     </div>
     <div id="tabs-3" style="padding: 0px; margin: 0px">
-        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_02" name="region" onchange="drawRefillCharts()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option><option value="ЮОУО">ЮОУО</option></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_02" name="region" onchange="drawRefillCharts()"><%= regionsStr %></select></div>
         <div id="refillChart" style="width: 100%; height: 500px;"></div>
         <div id="refillAvgChart" style="width: 100%; height: 500px;"></div>
         <div id="refillProgressChart" style="width: 100%; height: 500px;"></div>
     </div>
     <div id="tabs-4" style="padding: 0px; margin: 0px">
-        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_03" name="region" onchange="drawInformingChart()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option><option value="ЮОУО">ЮОУО</option></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_03" name="region" onchange="drawInformingChart()"><%= regionsStr %></select></div>
         <div id="informingChart" style="width: 100%; height: 500px;"></div>
     </div>
     <div id="tabs-5" style="padding: 0px; margin: 0px">
@@ -470,7 +514,7 @@ function addPeriod (container, title, value)
     </div>
     <div id="tabs-6" style="padding: 0px; margin: 0px">
         <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_02" name="period" onchange="draw('drawVisitorsChart')"></select></div>
-        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_04" name="region" onchange="drawVisitorsChart()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option><option value="ЮОУО">ЮОУО</option></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_04" name="region" onchange="drawVisitorsChart()"><%= regionsStr %></select></div>
         <div id="visitorsChart" style="width: 100%; height: 500px;"></div>
     </div>
     <div id="tabs-7" style="padding: 0px; margin: 0px">
