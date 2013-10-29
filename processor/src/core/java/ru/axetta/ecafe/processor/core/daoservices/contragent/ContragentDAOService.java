@@ -45,7 +45,8 @@ public class ContragentDAOService extends AbstractDAOService {
         criteria.createAlias("contragent","c").add(Restrictions.eq("c.classId", Contragent.PAY_AGENT));
         criteria.setProjection( Projections.projectionList()
                 .add(Projections.sum("paySum") )
-                .add( Projections.groupProperty("c.idOfContragent"))
+                .add(Projections.groupProperty("c.idOfContragent"))
+                .add(Projections.count("idOfClientPayment"))
         );
         criteria.add(Restrictions.between("createTime",startDate, endDate));
         List list = criteria.list();

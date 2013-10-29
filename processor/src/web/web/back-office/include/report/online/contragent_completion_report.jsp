@@ -59,6 +59,9 @@
                     <h:outputText value="Агент" />
                 </rich:column>
                 <rich:column rowspan="2">
+                    <h:outputText value="Количество оплат" />
+                </rich:column>
+                <rich:column rowspan="2">
                     <h:outputText value="Итого"/>
                 </rich:column>
                 <rich:column breakBefore="true">
@@ -95,6 +98,9 @@
                 <f:convertNumber pattern="#0.00"/>
             </h:outputText>
         </rich:columns>
+        <rich:column>
+            <h:outputText value="#{contragentCompletionItem.paymentsCount}" />
+        </rich:column>
         <rich:column>
             <h:outputText value="#{contragentCompletionItem.totalSumByOrg / 100}">
                 <f:convertNumber pattern="#0.00"/>

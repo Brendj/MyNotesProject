@@ -6,7 +6,8 @@ package ru.axetta.ecafe.processor.core.daoservices.contragent;
 
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,6 +30,7 @@ public class ContragentCompletionItem {
     /* имена контрагентов по приему платежей */
     private HashMap<Long,Long> contragentPayItems = new HashMap<Long, Long>();
     private Long totalSumByOrg;
+    private int paymentsCount;
 
     public ContragentCompletionItem(List<Contragent> contragentList) {
         Integer i=0;
@@ -44,6 +46,7 @@ public class ContragentCompletionItem {
             Object[] objects = (Object[]) ob;
             Long id = (Long) objects[1];
             Long value = (Long) objects[0];
+            paymentsCount += ((Long) objects[2]).intValue();
             contragentPayItems.put(id, value);
             totalSumByOrg+=value;
         }
@@ -99,5 +102,9 @@ public class ContragentCompletionItem {
 
     public void setEducationalTags(String educationalTags) {
         this.educationalTags = educationalTags;
+    }
+
+    public int getPaymentsCount() {
+        return paymentsCount;
     }
 }
