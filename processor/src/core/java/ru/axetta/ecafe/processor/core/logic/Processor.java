@@ -567,8 +567,8 @@ public class Processor implements SyncProcessor,
         QuestionaryData questionaryData = null;
         GoodsBasicBasketData goodsBasicBasketData = null;
         DirectiveElement directiveElement = null;
-
         List<Long> errorClientIds = new ArrayList<Long>();
+        boolean bError = false;
 
         idOfPacket = generateIdOfPacket(request.getIdOfOrg());
         // Register sync history
@@ -590,6 +590,7 @@ public class Processor implements SyncProcessor,
             String message = String.format("Failed to process PaymentRegistry, IdOfOrg == %s", request.getIdOfOrg());
             createSyncHistory(request.getIdOfOrg(),syncHistory, message);
             logger.error(message, e);
+            bError = true;
         }
 
         // Process ClientParamRegistry
@@ -687,6 +688,7 @@ public class Processor implements SyncProcessor,
         } catch (Exception e) {
             logger.error(String.format("Failed to process enter events, IdOfOrg == %s", request.getIdOfOrg()),
                     e);
+            bError = true;
         }
 
         try {
@@ -797,6 +799,12 @@ public class Processor implements SyncProcessor,
         } catch (Exception e) {
             logger.error(String.format("Failed to process of Distribution Manager, IdOfOrg == %s",
                     request.getIdOfOrg()), e);
+        }
+
+        if (bError) {
+            DAOService.getInstance().updateLastUnsuccessfulBalanceSync(request.getIdOfOrg());
+        } else {
+            DAOService.getInstance().updateLastSuccessfulBalanceSync(request.getIdOfOrg());
         }
 
         Date syncEndTime = new Date();
@@ -993,7 +1001,7 @@ public class Processor implements SyncProcessor,
             }
         } catch (Exception e) {
             logger.error(
-                    String.format("Failed to process PaymentRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
+                    String.format("Failed to process Payment Registry, IdOfOrg == %s", request.getIdOfOrg()), e);
             bError = true;
         }
 
@@ -1010,7 +1018,7 @@ public class Processor implements SyncProcessor,
                 resEnterEvents = processSyncEnterEvents(request.getEnterEvents());
             }
         } catch (Exception e) {
-            logger.error(String.format("Failed to process enter events, IdOfOrg == %s", request.getIdOfOrg()),
+            logger.error(String.format("Failed to process Enter Events, IdOfOrg == %s", request.getIdOfOrg()),
                     e);
             bError = true;
         }
