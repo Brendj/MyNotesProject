@@ -59,7 +59,7 @@ public class SMSService {
             if (client == null) {
                 throw new Exception ("Client doesn't exist");
             }
-            if(!client.isNotifyViaSMS()) return false;
+            if(!client.isNotifyViaSMS() && messageType!=ClientSms.TYPE_LINKING_TOKEN) return false;
             phoneNumber = client.getMobile();
             if (!StringUtils.isNotEmpty(phoneNumber)) return false;
             phoneNumber = PhoneNumberCanonicalizator.canonicalize(phoneNumber);
