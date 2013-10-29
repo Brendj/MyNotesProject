@@ -23,7 +23,7 @@
 <style>
     a { font-size: 12px; }
     .ui-tabs-vertical { width: 1120px; }
-    .ui-tabs-vertical .ui-tabs-nav { padding: .2em .1em .2em .2em; float: left; width: 220px; }
+    .ui-tabs-vertical .ui-tabs-nav { padding: .2em .1em .2em .2em; float: left; width: 230px; }
     .ui-tabs-vertical .ui-tabs-nav li { clear: left; width: 100%; border-bottom-width: 1px !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; }
     .ui-tabs-vertical .ui-tabs-nav li a { display:block; }
     .ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active { padding-bottom: 0; padding-right: .1em; border-right-width: 1px; border-right-width: 1px; }
@@ -136,14 +136,25 @@
 <script type="text/javascript">
 google.load ("visualization", "1", {packages: ["corechart"]});
 google.load('visualization', '1', {packages: ['table']});
-google.setOnLoadCallback (drawActiveChart);
-google.setOnLoadCallback (drawUniqueChart);
-var inter;
+google.setOnLoadCallback (drawActivityCharts);
+//google.setOnLoadCallback (drawUniqueChart);
+/*var inter;
 var inter2;
-var inter3;
+var inter3;*/
+var methodsStack;
+
+function executeNext () {
+    var methodToExecute = methodsStack.pop();
+    if (methodToExecute == null || methodToExecute.length < 1) {
+        return;
+    }
+    window[methodToExecute]();
+}
+
+
 function drawActiveChart ()
 {
-    clearInterval (inter);
+    //clearInterval (inter);
 
     var container = document.getElementById('activeChart');
     var chart = new google.visualization.LineChart(container);
@@ -152,24 +163,26 @@ function drawActiveChart ()
         chartArea: {width: '70%', height: '80%', left: '50'}, fontSize: 11};
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
+    executeNext();
 }
 
 function drawUniqueChart ()
 {
-    clearInterval (inter2);
+    //clearInterval (inter2);
 
     var container = document.getElementById('uniqueChart');
     var chart = new google.visualization.LineChart(container);
-    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=UniqueChart&period=' + $("#select_period_01").val() + '&region=' + $("#select_region_01").val());
+    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=UniqueChart&period=' + $("#select_period_011").val() + '&region=' + $("#select_region_011").val());
     var options = { title: 'Количество уникальных пользователей по услугам в день', width: '100%', height: '100%', legend: {position: 'right', alignment: 'end'},
         chartArea: {width: '70%', height: '80%', left: '50'}, fontSize: 11};
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
+    executeNext();
 }
 
 function drawContentsChart()
 {
-    clearInterval (inter);
+    //clearInterval (inter);
 
     var container = document.getElementById('contentsChart');
     var chart = new google.visualization.PieChart(container);
@@ -177,6 +190,7 @@ function drawContentsChart()
     var options = { title: 'Состав потребления питания в ОУ', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие' };
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
+    executeNext();
 }
 
 function toUTF8(str)
@@ -186,7 +200,7 @@ function toUTF8(str)
 
 function drawRefillChart ()
 {
-    clearInterval (inter);
+    //clearInterval (inter);
 
     var container = document.getElementById('refillChart');
     var chart = new google.visualization.PieChart(container);
@@ -194,11 +208,12 @@ function drawRefillChart ()
     var options = { title: 'Обеспечение пополнения лицевых счетов учащихся (количество транзакций)', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие' };
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
+    executeNext();
 }
 
 function drawRefillAvgChart ()
 {
-    clearInterval (inter2);
+    //clearInterval (inter2);
 
     var container = document.getElementById('refillAvgChart');
     var chart = new google.visualization.ColumnChart(container);
@@ -206,11 +221,12 @@ function drawRefillAvgChart ()
     var options = { title: 'Обеспечение пополнения лицевых счетов учащихся (средняя сумма пополнения)', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие' };
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
+    executeNext();
 }
 
 function drawRefillProgressChart ()
 {
-    clearInterval (inter3);
+    //clearInterval (inter3);
 
     var container = document.getElementById('refillProgressChart');
     var chart = new google.visualization.SteppedAreaChart(container);
@@ -218,11 +234,12 @@ function drawRefillProgressChart ()
     var options = { title: 'Обеспечение пополнения лицевых счетов учащихся (динамика пополнений)', isStacked: true, vAxis: {title: 'Динамика пополнений относительно всех пополнений', maxValue: 100, viewWindow: {max: 100}} };
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
+    executeNext();
 }
 
 function drawInformingChart()
 {
-    clearInterval (inter);
+    //clearInterval (inter);
 
     var container = document.getElementById('informingChart');
     var chart = new google.visualization.PieChart(container);
@@ -230,11 +247,12 @@ function drawInformingChart()
     var options = { title: 'Организация информирования родителей', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие'  };
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
+    executeNext();
 }
 
 function drawBenefitsChart()
 {
-    clearInterval (inter);
+    //clearInterval (inter);
 
     var container = document.getElementById('benefitsChart');
     var chart = new google.visualization.PieChart(container);
@@ -242,11 +260,12 @@ function drawBenefitsChart()
     var options = { title: 'Детализация льготных категорий кроме 1-4 класса', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие'  };
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
+    executeNext();
 }
 
 function drawBenefitPartChart()
 {
-    clearInterval (inter2);
+    //clearInterval (inter2);
 
     var container = document.getElementById('benefitPartChart');
     var chart = new google.visualization.PieChart(container);
@@ -254,11 +273,12 @@ function drawBenefitPartChart()
     var options = { title: 'Льготные категории по питанию в общем составе учащихся', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие'  };
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
+    executeNext();
 }
 
 function drawVisitorsChart()
 {
-    clearInterval (inter);
+    //clearInterval (inter);
 
     var container = document.getElementById('visitorsChart');
     var chart = new google.visualization.AreaChart(container);
@@ -267,12 +287,13 @@ function drawVisitorsChart()
         chartArea: {width: '90%', height: '70%', left: '50'}, fontSize: 11};
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
+    executeNext();
 }
 
 
 function drawRatingDescChart()
 {
-    clearInterval (inter);
+    //clearInterval (inter);
 
     var container = document.getElementById('orgsRatingChartDesc');
     var table = new google.visualization.Table(container);
@@ -283,12 +304,13 @@ function drawRatingDescChart()
     var queryWrapper = new QueryWrapper(query, table, options, container, true);
     queryWrapper.sendAndDraw();
     drawToolbar();
+    executeNext();
 }
 
 
 function drawRatingAscChart()
 {
-    clearInterval (inter2);
+    //clearInterval (inter2);
 
     var container = document.getElementById('orgsRatingChartAsc');
     var table = new google.visualization.Table(container);
@@ -299,6 +321,7 @@ function drawRatingAscChart()
     var queryWrapper = new QueryWrapper(query, table, options, container, true);
     queryWrapper.sendAndDraw();
     drawToolbar();
+    executeNext();
 }
 
 function drawToolbar() {
@@ -312,37 +335,54 @@ function drawToolbar() {
 
 function drawRatingCharts ()
 {
-    inter = setInterval(drawRatingDescChart, 10);
-    inter2 = setInterval(drawRatingAscChart, 10);
+    /*inter = setInterval(drawRatingDescChart, 10);
+    inter2 = setInterval(drawRatingAscChart, 10);*/
+    methodsStack = ["drawRatingDescChart", "drawRatingAscChart"];
+    executeNext();
 }
 
 function drawBenefitsCharts ()
 {
-    inter = setInterval(drawBenefitsChart, 10);
+    //inter = setInterval(drawBenefitsChart, 10);
     //inter2 = setInterval(drawBenefitPartChart, 10);
+    methodsStack = ["drawBenefitsChart"];
+    executeNext();
 }
 
 function drawActivityCharts ()
 {
-    inter = setInterval(drawActiveChart, 10);
-    inter2 = setInterval(drawUniqueChart, 10);
+    /*inter = setInterval(drawActiveChart, 10);*/
+    methodsStack = ["drawActiveChart"];
+    executeNext();
+}
+
+function drawUniqueCharts () {
+
+    /*inter2 = setInterval(drawUniqueChart, 10);*/
+    methodsStack = ["drawUniqueChart"];
+    executeNext();
 }
 
 function drawRefillCharts ()
 {
-    inter = setInterval(drawRefillChart, 10);
+    /*inter = setInterval(drawRefillChart, 10);
     inter2 = setInterval(drawRefillAvgChart, 10);
-    inter3 = setInterval(drawRefillProgressChart, 10);
+    inter3 = setInterval(drawRefillProgressChart, 10);*/
+    methodsStack = ["drawRefillChart", "drawRefillAvgChart", "drawRefillProgressChart"];
+    executeNext();
 }
 
 function draw (func)
 {
-    inter = setInterval(func, 10);
+    /*inter = setInterval(func, 10);*/
+    methodsStack = [func];
+    executeNext();
 }
 
 function initPeriods ()
 {
     initPeriodsFor (document.getElementById ('select_period_01'));
+    initPeriodsFor (document.getElementById ('select_period_011'));
     initPeriodsFor (document.getElementById ('select_period_02'));
 }
 
@@ -392,18 +432,23 @@ function addPeriod (container, title, value)
 <body>
 <div id="tabs">
     <ul>
-        <li><a href="#tabs-1" onclick="drawActivityCharts()">Статус исполнения проекта <br>внедрения ИС ПП</a></li>
-        <li><a href="#tabs-2" onclick="draw(drawContentsChart)">Состав потребления <br>питания в ОУ</a></li>
+        <li><a href="#tabs-1" onclick="drawActivityCharts()">Количество активных ОУ <br>по услугам в день</a></li>
+        <li><a href="#tabs-11" onclick="drawUniqueCharts()">Количество уникальных <br>пользователей по услугам в день</a></li>
+        <li><a href="#tabs-2" onclick="draw('drawContentsChart')">Состав потребления <br>питания в ОУ</a></li>
         <li><a href="#tabs-3" onclick="drawRefillCharts()">Обеспечение пополнения<br>лицевых счетов учащихся</a></li>
-        <li><a href="#tabs-4" onclick="draw(drawInformingChart)">Организация <br>информирования родителей</a></li>
+        <li><a href="#tabs-4" onclick="draw('drawInformingChart')">Организация <br>информирования родителей</a></li>
         <li><a href="#tabs-5" onclick="drawBenefitsCharts()">Показатели числа льготников<br/>по питанию в общем составе<br/> учащихся</a></li>
-        <li><a href="#tabs-6" onclick="draw(drawVisitorsChart)">Посещаемость</a></li>
+        <li><a href="#tabs-6" onclick="draw('drawVisitorsChart')">Посещаемость</a></li>
         <li><a href="#tabs-7" onclick="drawRatingCharts()">Рейтинг ОУ</a></li>
     </ul>
     <div id="tabs-1" style="padding: 0px; margin: 0px">
         <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_01" name="period" onchange="drawActivityCharts()"></select></div>
         <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_01" name="region" onchange="drawActivityCharts()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option><option value="ЮОУО">ЮОУО</option></select></div>
         <div id="activeChart" style="width: 100%; height: 310px;"></div><br/>
+    </div>
+    <div id="tabs-11" style="padding: 0px; margin: 0px">
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_011" name="period" onchange="drawActivityCharts()"></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_011" name="region" onchange="drawActivityCharts()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option><option value="ЮОУО">ЮОУО</option></select></div>
         <div id="uniqueChart" style="width: 100%; height: 310px;"></div>
     </div>
     <div id="tabs-2" style="padding: 0px; margin: 0px">
@@ -424,7 +469,7 @@ function addPeriod (container, title, value)
         <div id="benefitPartChart" style="width: 100%; height: 310px;"></div>
     </div>
     <div id="tabs-6" style="padding: 0px; margin: 0px">
-        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_02" name="period" onchange="draw(drawVisitorsChart)"></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_02" name="period" onchange="draw('drawVisitorsChart')"></select></div>
         <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_04" name="region" onchange="drawVisitorsChart()"><option value="Все округа">Все округа</option><option value="ЮВАО">ЮВАО</option><option value="САО">САО</option><option value="ЮОУО">ЮОУО</option></select></div>
         <div id="visitorsChart" style="width: 100%; height: 500px;"></div>
     </div>
