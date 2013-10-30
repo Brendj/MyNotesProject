@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -36,7 +37,10 @@ public class MaintananceService {
     @Autowired
     private RuntimeContext runtimeContext;
 
-    @Transactional
+    private MaintananceService getProxy() {
+        return RuntimeContext.getAppContext().getBean(MaintananceService.class);
+    }
+
     public void run() {
         if (!RuntimeContext.getInstance().isMainNode()) {
             return;
@@ -54,7 +58,7 @@ public class MaintananceService {
                 logger.info("Starting DB maintanance procedures...");
                 lastCleanDate = new Date();
                 try {
-                    String report = clean(false);
+                    String report = getProxy().clean(false);
                     logger.info("DB maintanance procedures finished successfully. " + report);
                 } catch (Exception e) {
                     logger.error("Database cleaning failed", e);
@@ -65,7 +69,7 @@ public class MaintananceService {
                 logger.info("Starting DB maintanance procedures: source organizations...");
                 srcOrgLastCleanDate = new Date();
                 try {
-                    String report = clean(true);
+                    String report = getProxy().clean(true);
                     logger.info("DB maintanance procedures finished successfully. " + report);
                 } catch (Exception e) {
                     logger.error("Database cleaning failed", e);
@@ -74,7 +78,7 @@ public class MaintananceService {
         }
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public String clean(boolean isSource) throws Exception {
         long menuDaysForDeletion = runtimeContext.getOptionValueInt(
                 isSource ? Option.OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION : Option.OPTION_MENU_DAYS_FOR_DELETION);
