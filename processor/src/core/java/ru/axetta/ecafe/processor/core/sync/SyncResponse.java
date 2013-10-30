@@ -116,6 +116,21 @@ public class SyncResponse {
             private final Date validTime;
             private final Date issueTime;
 
+            public Item(Card card) {
+                this.cardNo = card.getCardNo();
+                this.cardType = card.getCardType();
+                this.idOfClient = card.getClient().getIdOfClient();
+                this.updateTime = card.getUpdateTime();
+                Client client = card.getClient();
+                this.balance = client.getBalance();
+                this.limit = client.getLimit();
+                this.expenditureLimit = client.getExpenditureLimit();
+                this.state = card.getState();
+                this.lockReason = card.getLockReason();
+                this.validTime = card.getValidTime();
+                this.issueTime = card.getIssueTime();
+            }
+
             public Item(Client client, Card card) {
                 this.cardNo = card.getCardNo();
                 this.cardType = card.getCardType();

@@ -699,53 +699,16 @@ public class DAOUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Object[]> getClientsAndCardsForOrg(Session persistenceSession, Long idOfOrg) {
-        Query query = persistenceSession.createQuery(
-                "select cl, card from Card card, Client cl where card.client=cl and cl.org.idOfOrg=:idOfOrg");
-        query.setParameter("idOfOrg", idOfOrg);
-        return (List<Object[]>)query.list();
-    }
-
-
-    @SuppressWarnings("unchecked")
-    public static List<Object[]> getClientsAndCardsForOrgs(Session persistenceSession, Set<Long> idOfOrgs) {
-
-        List<ClientGroup> deletingAndLeavingClientGroup = new ArrayList<ClientGroup>();
-
-        /* раскомментировать TODO: Добавить в условие выборки исключение клиентов из групп Выбывшие и Удаленные (ECAFE-629) */
-        //Set<CompositeIdOfClientGroup> clientGroups = new HashSet<CompositeIdOfClientGroup>();
-        //for (Long idOfOrg: idOfOrgs){
-        //    CompositeIdOfClientGroup deletedClientGroup = new CompositeIdOfClientGroup(idOfOrg,ClientGroup.Predefined.CLIENT_DELETED.getValue());
-        //    CompositeIdOfClientGroup leavingClientGroup = new CompositeIdOfClientGroup(idOfOrg,ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-        //    clientGroups.add(deletedClientGroup);
-        //    clientGroups.add(leavingClientGroup);
-        //}
-        //Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
-        //clientGroupCriteria.add(Restrictions.in("compositeIdOfClientGroup",clientGroups));
-        //deletingAndLeavingClientGroup = clientGroupCriteria.list();
-
-        String sql;
-        if (deletingAndLeavingClientGroup.isEmpty()){
-            sql = "select cl, card from Card card, Client cl where card.client=cl and cl.org.idOfOrg in (:idOfOrg)";
-        } else {
-            sql = "select cl, card from Card card, Client cl where card.client=cl and cl.org.idOfOrg in (:idOfOrg) and not (cl.clientGroup in (:deletingAndLeavingClientGroup))";
+    public static List<Card> getClientsAndCardsForOrgs(Session persistenceSession, Set<Long> idOfOrgs, List<Long> clientIds) {
+        Criteria clientCardsCriteria = persistenceSession.createCriteria(Card.class);
+        clientCardsCriteria.createCriteria("client","cl", JoinType.LEFT_OUTER_JOIN);
+        if (clientIds!=null && !clientIds.isEmpty()) {
+            clientCardsCriteria.add(Restrictions.in("cl.idOfClient", clientIds));
         }
-
-        Query query = persistenceSession.createQuery(sql);
-        query.setParameterList("idOfOrg", idOfOrgs);
-        if (!deletingAndLeavingClientGroup.isEmpty()){
-            query.setParameterList("deletingAndLeavingClientGroup", deletingAndLeavingClientGroup);
-        }
-        return (List<Object[]>)query.list();
+        clientCardsCriteria.createCriteria("cl.org","o", JoinType.LEFT_OUTER_JOIN);
+        clientCardsCriteria.add(Restrictions.in("o.idOfOrg", idOfOrgs));
+        return clientCardsCriteria.list();
     }
-
-    @SuppressWarnings("unchecked")
-    public static List<Object[]> getClientsAndCardsForOrganization(Session persistenceSession, Long idOfOrg) {
-        Query query = persistenceSession.createQuery("select cl, card from Card card, Client cl where card.client=cl and (cl.org.idOfOrg in (select fo.idOfOrg from Org org join org.friendlyOrg fo where org.idOfOrg=:idOfOrg) or (cl.idOfOrg=:idOfOrg))");
-        query.setParameter("idOfOrg", idOfOrg);
-        return (List<Object[]>)query.list();
-    }
-
 
     public static EnterEvent findEnterEvent(Session persistenceSession, CompositeIdOfEnterEvent compositeIdOfEnterEvent) throws Exception {
         return (EnterEvent) persistenceSession.get(EnterEvent.class, compositeIdOfEnterEvent);

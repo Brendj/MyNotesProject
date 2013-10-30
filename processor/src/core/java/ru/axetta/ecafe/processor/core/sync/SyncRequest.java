@@ -12,6 +12,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.client.request.ClientRequest
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperationBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
+import ru.axetta.ecafe.processor.core.sync.request.AccRegistryUpdateRequest;
+import ru.axetta.ecafe.processor.core.sync.request.AccRegistryUpdateRequestBuilder;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -2218,6 +2220,7 @@ public class SyncRequest {
         private final TempCardsOperationBuilder tempCardsOperationBuilder;
         private Manager manager;
         private final ClientRequestBuilder clientRequestBuilder;
+        private final AccRegistryUpdateRequestBuilder accRegistryUpdateRequestBuilder = new AccRegistryUpdateRequestBuilder();
 
         public Builder() {
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
@@ -2259,10 +2262,6 @@ public class SyncRequest {
             if(namedNodeMap.getNamedItem("ClientVersion")==null) return null;
             return namedNodeMap.getNamedItem("ClientVersion").getTextContent();
         }
-
-        //public static int getSyncType(NamedNodeMap namedNodeMap) throws Exception {
-        //    return parseSyncType(getStringValueNullSafe(namedNodeMap, "Type"));
-        //}
 
         public static SyncType getSyncType(NamedNodeMap namedNodeMap) throws Exception {
             return SyncType.parse(getStringValueNullSafe(namedNodeMap, "Type"));
@@ -2335,6 +2334,12 @@ public class SyncRequest {
                 clientRegistryRequest = clientRegistryRequestBuilder.build(clientRegistryRequestNode);
             }
 
+            Node accRegistryUpdateRequestParseRequestNode = findFirstChildElement(envelopeNode, "AccRegistryUpdateRequest");
+            AccRegistryUpdateRequest accRegistryUpdateRequest = null;
+            if (accRegistryUpdateRequestParseRequestNode != null) {
+               accRegistryUpdateRequest=accRegistryUpdateRequestBuilder.build(accRegistryUpdateRequestParseRequestNode);
+            }
+
             Node orgStructureNode = findFirstChildElement(envelopeNode, "OrgStructure");
             OrgStructure orgStructure = null;
             if (orgStructureNode != null) {
@@ -2403,18 +2408,17 @@ public class SyncRequest {
 
             return new SyncRequest(remoteAddr, version, syncType , clientVersion, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
-                    enterEvents, tempCardsOperations, clientRequests, manager);
+                    enterEvents, tempCardsOperations, clientRequests, manager, accRegistryUpdateRequest);
         }
 
 
     }
 
-    private final SyncType syncType;
-
     public SyncType getSyncType() {
         return syncType;
     }
 
+    private final SyncType syncType;
     private final String remoteAddr;
     private final long protoVersion;
     private final long idOfOrg;
@@ -2435,11 +2439,14 @@ public class SyncRequest {
     private final TempCardsOperations tempCardsOperations;
     private final ClientRequests clientRequests;
     private final Manager manager;
+    private final AccRegistryUpdateRequest accRegistryUpdateRequest;
 
     public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket,
             PaymentRegistry paymentRegistry, AccIncRegistryRequest accIncRegistryRequest, ClientParamRegistry clientParamRegistry,
             ClientRegistryRequest clientRegistryRequest, OrgStructure orgStructure, MenuGroups menuGroups, ReqMenu reqMenu, ReqDiary reqDiary, String message,
-            EnterEvents enterEvents, TempCardsOperations tempCardsOperations, ClientRequests clientRequests, Manager manager) {
+            EnterEvents enterEvents,
+            TempCardsOperations tempCardsOperations, ClientRequests clientRequests, Manager manager,
+            AccRegistryUpdateRequest accRegistryUpdateRequest) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.syncType = syncType;
@@ -2447,6 +2454,7 @@ public class SyncRequest {
         this.tempCardsOperations = tempCardsOperations;
         this.clientRequests = clientRequests;
         this.manager = manager;
+        this.accRegistryUpdateRequest = accRegistryUpdateRequest;
         this.idOfOrg = org.getIdOfOrg();
         this.org = org;
         this.syncTime = syncTime;
@@ -2537,6 +2545,10 @@ public class SyncRequest {
 
     public ClientRequests getClientRequests() {
         return clientRequests;
+    }
+
+    public AccRegistryUpdateRequest getAccRegistryUpdateRequest() {
+        return accRegistryUpdateRequest;
     }
 
     @Override

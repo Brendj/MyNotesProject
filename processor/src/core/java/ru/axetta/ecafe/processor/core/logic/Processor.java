@@ -33,6 +33,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTem
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardOperationProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
+import ru.axetta.ecafe.processor.core.sync.request.AccRegistryUpdateRequest;
 import ru.axetta.ecafe.processor.core.sync.response.DirectiveElement;
 import ru.axetta.ecafe.processor.core.sync.response.GoodsBasicBasketData;
 import ru.axetta.ecafe.processor.core.sync.response.QuestionaryData;
@@ -568,6 +569,7 @@ public class Processor implements SyncProcessor,
         GoodsBasicBasketData goodsBasicBasketData = null;
         DirectiveElement directiveElement = null;
         List<Long> errorClientIds = new ArrayList<Long>();
+
         boolean bError = false;
 
         idOfPacket = generateIdOfPacket(request.getIdOfOrg());
@@ -654,7 +656,7 @@ public class Processor implements SyncProcessor,
 
         // Build AccRegistry
         try {
-            accRegistry = getAccRegistry(request.getIdOfOrg());
+            accRegistry = getAccRegistry(request.getIdOfOrg(), null);
         } catch (Exception e) {
             accRegistry = new SyncResponse.AccRegistry();
             String message = String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg());
@@ -846,7 +848,35 @@ public class Processor implements SyncProcessor,
         QuestionaryData questionaryData = null;
         GoodsBasicBasketData goodsBasicBasketData = null;
         DirectiveElement directiveElement = null;
+        AccRegistryUpdateRequest accRegistryUpdateRequest = null;
         List<Long> errorClientIds = new ArrayList<Long>();
+
+
+
+
+        // Build AccRegistryUpdateRequest
+        try {
+            accRegistryUpdateRequest = request.getAccRegistryUpdateRequest();
+        } catch (Exception e) {
+            accRegistry = new SyncResponse.AccRegistry();
+            String message = String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg());
+            logger.error(message, e);
+
+        }
+
+        // Build AccRegistry
+        try {
+            if(accRegistryUpdateRequest!=null){
+                accRegistry = getAccRegistry(request.getIdOfOrg(), accRegistryUpdateRequest.getClientIds());
+            } else {
+                accRegistry = getAccRegistry(request.getIdOfOrg(), null);
+            }
+        } catch (Exception e) {
+            accRegistry = new SyncResponse.AccRegistry();
+            String message = String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg());
+            logger.error(message, e);
+
+        }
 
         try {
             processSyncClientParamRegistry(idOfSync, request.getIdOfOrg(), request.getClientParamRegistry(),errorClientIds);
@@ -862,6 +892,15 @@ public class Processor implements SyncProcessor,
         } catch (Exception e) {
             logger.error(String.format("Failed to build ClientRegistry, IdOfOrg == %s", request.getIdOfOrg()),
                     e);
+        }
+
+        try {
+            if(request.getTempCardsOperations()!=null){
+                resTempCardsOperations = processTempCardsOperations(request.getTempCardsOperations());
+            }
+        } catch (Exception e) {
+            String message = String.format("processTempCardsOperations: %s", e.getMessage());
+            logger.error(message, e);
         }
 
         try {
@@ -905,10 +944,24 @@ public class Processor implements SyncProcessor,
         QuestionaryData questionaryData = null;
         GoodsBasicBasketData goodsBasicBasketData = null;
         DirectiveElement directiveElement = null;
+        AccRegistryUpdateRequest accRegistryUpdateRequest = null;
 
+        // Build AccRegistryUpdateRequest
+        try {
+            accRegistryUpdateRequest = request.getAccRegistryUpdateRequest();
+        } catch (Exception e) {
+            accRegistry = new SyncResponse.AccRegistry();
+            String message = String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg());
+            logger.error(message, e);
+
+        }
         // Build AccRegistry
         try {
-            accRegistry = getAccRegistry(request.getIdOfOrg());
+            if(accRegistryUpdateRequest!=null){
+                accRegistry = getAccRegistry(request.getIdOfOrg(), accRegistryUpdateRequest.getClientIds());
+            } else {
+                accRegistry = getAccRegistry(request.getIdOfOrg(), null);
+            }
         } catch (Exception e) {
             accRegistry = new SyncResponse.AccRegistry();
             String message = String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg());
@@ -1973,7 +2026,7 @@ public class Processor implements SyncProcessor,
         }
     }
 
-    private SyncResponse.AccRegistry getAccRegistry(Long idOfOrg) throws Exception {
+    private SyncResponse.AccRegistry getAccRegistry(Long idOfOrg, List<Long> clientIds) throws Exception {
         SyncResponse.AccRegistry accRegistry = new SyncResponse.AccRegistry();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -1991,16 +2044,28 @@ public class Processor implements SyncProcessor,
             }
             idOfOrgSet.add(idOfOrg);
 
-            for (Object[] v : DAOUtils.getClientsAndCardsForOrgs(persistenceSession, idOfOrgSet)) {
-                Client client = (Client) v[0];
+            //for (Object[] v : DAOUtils.getClientsAndCardsForOrgs(persistenceSession, idOfOrgSet, clientIds)) {
+            //    Client client = (Client) v[0];
+            //    if (client.getClientGroup() == null || (!client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()
+            //            .equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) && !client.getClientGroup()
+            //            .getCompositeIdOfClientGroup().getIdOfClientGroup()
+            //            .equals(ClientGroup.Predefined.CLIENT_DELETED.getValue()))) {
+            //        Card card = (Card) v[1];
+            //        accRegistry.addItem(new SyncResponse.AccRegistry.Item(client, card));
+            //    }
+            //}
+
+            List<Card> cards = DAOUtils.getClientsAndCardsForOrgs(persistenceSession, idOfOrgSet, clientIds);
+            for (Card card : cards) {
+                Client client = card.getClient();
                 if (client.getClientGroup() == null || (!client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()
                         .equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) && !client.getClientGroup()
                         .getCompositeIdOfClientGroup().getIdOfClientGroup()
                         .equals(ClientGroup.Predefined.CLIENT_DELETED.getValue()))) {
-                    Card card = (Card) v[1];
-                    accRegistry.addItem(new SyncResponse.AccRegistry.Item(client, card));
+                    accRegistry.addItem(new SyncResponse.AccRegistry.Item(card));
                 }
             }
+
             // Добавляем карты перемещенных клиентов.
             List<Client> allocClients = ClientManager.findAllAllocatedClients(persistenceSession, org);
             for (Client client : allocClients) {
@@ -2871,6 +2936,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
         for (Card card : lockableCards) {
             if (card.getState() == Card.ACTIVE_STATE) {
                 card.setState(Card.LOCKED_STATE);
+                card.setLockReason("Выпуск новой карты");
                 persistenceSession.update(card);
             }
         }
