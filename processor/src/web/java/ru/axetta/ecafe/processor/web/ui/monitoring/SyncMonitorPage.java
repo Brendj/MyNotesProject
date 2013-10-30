@@ -4,10 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui.monitoring;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.dashboard.DashboardServiceBean;
 import ru.axetta.ecafe.processor.dashboard.data.DashboardResponse;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -16,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -39,6 +33,7 @@ public class SyncMonitorPage extends BasicWorkspacePage {
     private Date lastUpdate;
     private List<DashboardResponse.PaymentSystemStatItem> payStatItems;
     private List<DashboardResponse.NamedParams> namedParams;
+    private List<DashboardResponse.MenuLastLoadItem> lastLoadItems;
     
 
     public SyncMonitorPage() {
@@ -48,6 +43,7 @@ public class SyncMonitorPage extends BasicWorkspacePage {
         this.payStatItems = dashboardServiceBean.getPaymentSystemInfo(new Date()).getPaymentSystemItemInfos();
         this.items = dashboardServiceBean.getOrgSyncInfo().getOrgSyncStatItems();
         this.namedParams = dashboardServiceBean.getNamedParams();
+        this.lastLoadItems = dashboardServiceBean.getMenuLastLoad();
         if (lastUpdate == null) {
             lastUpdate = new Date();
         }
@@ -71,6 +67,9 @@ public class SyncMonitorPage extends BasicWorkspacePage {
         return lastUpdate;
     }
 
+    public List<DashboardResponse.MenuLastLoadItem> getLastLoadItems() {
+        return lastLoadItems;
+    }
 
     public long getCurrentTimeMillis() {
         return System.currentTimeMillis();

@@ -8,10 +8,13 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.dashboard.data.DashboardResponse;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
+import org.hibernate.sql.JoinType;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +110,7 @@ public class DashboardServiceBean {
                             + "select '{href=NSIOrgRegistrySynchPage}Ошибок при сверке с Реестрами' as name, count(cf_registrychange_errors.idofregistrychangeerror) as value, 'long' as type "
                             + "from cf_registrychange_errors "
                             + "where comment is null or comment=''");
-            q.setParameter("deliveredSMSStatus", ClientSms.DELIVERED_TO_RECIPENT);
+            //q.setParameter("deliveredSMSStatus", ClientSms.DELIVERED_TO_RECIPENT);
             q.setParameter("maxDate", now.getTimeInMillis());
             //q.setParameter("notDeliveredSMSStatus", ClientSms.NOT_DELIVERED_TO_RECIPENT);
             List queryResult = q.getResultList();
@@ -561,30 +564,6 @@ public class DashboardServiceBean {
         return dashboardResponse;
     }
 
-    private Date getCurrentDayStartTime(Calendar currentTimeStamp) {
-        int month = currentTimeStamp.get(Calendar.MONTH);
-        int year = currentTimeStamp.get(Calendar.YEAR);
-        int dom = currentTimeStamp.get(Calendar.DAY_OF_MONTH);
-
-        Calendar dayStart = Calendar.getInstance();
-        dayStart.set(year, month, dom, 0, 0, 0);
-
-        Date dayStartDate = dayStart.getTime();
-        return dayStartDate;
-    }
-
-    private Date getCurrentDayEndTime(Calendar currentTimeStamp) {
-        int month = currentTimeStamp.get(Calendar.MONTH);
-        int year = currentTimeStamp.get(Calendar.YEAR);
-        int dom = currentTimeStamp.get(Calendar.DAY_OF_MONTH);
-
-        Calendar dayEnd = Calendar.getInstance();
-        dayEnd.set(year, month, dom + 1, 0, 0, 0);
-
-        Date dayEndDate = dayEnd.getTime();
-        return dayEndDate;
-    }
-
     public DashboardResponse.PaymentSystemStats getPaymentSystemInfo(Date dt) {
         DashboardResponse.PaymentSystemStats paymentSystemStats = new DashboardResponse.PaymentSystemStats();
         //// получение данных по платежам
@@ -677,5 +656,28 @@ public class DashboardServiceBean {
         dashboardResponse = getOrgInfo(dashboardResponse, dt, idOfOrg);
         dashboardResponse.setPaymentSystemStats(getPaymentSystemInfo(dt));
         return dashboardResponse;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DashboardResponse.MenuLastLoadItem> getMenuLastLoad() {
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_SUPPORTS);
+        def.setReadOnly(true);
+        TransactionStatus status = txManager.getTransaction(def);
+        List<DashboardResponse.MenuLastLoadItem> items = null;
+        try {
+            Criteria criteria = entityManager.unwrap(Session.class).createCriteria(Menu.class);
+            criteria.createAlias("org", "o", JoinType.INNER_JOIN)
+                    .createAlias("o.defaultSupplier", "ds", JoinType.INNER_JOIN)
+                    .setProjection(Projections.projectionList().add(Projections.max("createTime"), "lastLoadTime")
+                            .add(Projections.groupProperty("ds.contragentName"), "contragent"))
+                    .setResultTransformer(Transformers.aliasToBean(DashboardResponse.MenuLastLoadItem.class));
+            items = (List<DashboardResponse.MenuLastLoadItem>) criteria.list();
+            txManager.commit(status);
+        } catch (Exception e) {
+            txManager.rollback(status);
+            throw new RuntimeException(e.getMessage());
+        }
+        return items;
     }
 }

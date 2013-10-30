@@ -132,6 +132,24 @@
                     <h:outputText escape="true" value="#{item.numOfOperations}" styleClass="output-text"/>
                 </rich:column>
             </rich:dataTable>
+
+            <rich:dataTable id="menuLastLoad" value="#{syncMonitorPage.lastLoadItems}" var="item"
+                            footerClass="data-table-footer" columnClasses="center-aligned-column">
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Контрагент ТСП" />
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.contragent}" styleClass="output-text" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="Посл. загрузка меню" />
+                    </f:facet>
+                    <h:outputText escape="true" value="#{item.lastLoadTime}" styleClass="output-text"
+                                  converter="timeConverter" />
+                </rich:column>
+            </rich:dataTable>
+
         </h:panelGrid>
 
     </h:panelGrid>

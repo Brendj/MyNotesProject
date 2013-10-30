@@ -577,4 +577,26 @@ public class DashboardResponse {
     public void setPaymentSystemStats(PaymentSystemStats paymentSystemStats) {
         this.paymentSystemStats = paymentSystemStats;
     }
+
+    public static class MenuLastLoadItem {
+
+        private String contragent;
+        private Date lastLoadTime;
+
+        public String getContragent() {
+            return contragent;
+        }
+
+        public void setContragent(String contragent) {
+            this.contragent = contragent;
+        }
+
+        public Date getLastLoadTime() {
+            return lastLoadTime;
+        }
+
+        public void setLastLoadTime(Date lastLoadTime) {
+            this.lastLoadTime = lastLoadTime;
+        }
+    }
 }
