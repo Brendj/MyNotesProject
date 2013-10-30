@@ -106,7 +106,7 @@ public class RNIPLoadPaymentsService {
         PAYMENT_PARAMS.add("Amount");               //  Сумма платежа
         PAYMENT_PARAMS.add("PaymentDate");          // Дата платежа
         PAYMENT_PARAMS.add("NUM_DOGOVOR");          // Это номер договора в нашей БД
-        PAYMENT_PARAMS.add("SRV_CODE");             // Здесь содержится
+        PAYMENT_PARAMS.add("Srv_Code");             // Здесь содержится
         PAYMENT_PARAMS.add("BIK");                  // БИК банка
     }
 
@@ -128,7 +128,7 @@ public class RNIPLoadPaymentsService {
 
 
     private Date getLastUpdateDate() {
-        try {
+        /*try {
             String d = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_TIME);
             if (d == null || d.length() < 1) {
                 return new Date(0);
@@ -137,7 +137,16 @@ public class RNIPLoadPaymentsService {
         } catch (Exception e) {
             logger.error("Failed to parse date from options", e);
         }
-        return new Date(0);
+        return new Date(0);*/
+        Calendar cal = new GregorianCalendar();
+        cal.set(Calendar.YEAR, 2013);
+        cal.set(Calendar.MONTH, 3);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
     }
 
 
@@ -341,7 +350,7 @@ public class RNIPLoadPaymentsService {
         transformer.transform(new DOMSource(doc), new StreamResult(writer));
         String msg = writer.getBuffer().toString().replaceAll("\n|\r", "");
 
-        //Array.writeFile("D:/2/test.xml.signed.uri.xml", msg.getBytes("utf-8")); // !!!!!!!! ЗАМЕНИТЬ !!!!!!!!
+        //Array.writeFile("C:/1/test.xml.signed.uri.xml", msg.getBytes("utf-8")); // !!!!!!!! ЗАМЕНИТЬ !!!!!!!!
 
         /*** а) Проверка подписи (локально) ***/
         // Получение блока, содержащего сертификат.
@@ -502,7 +511,7 @@ public class RNIPLoadPaymentsService {
             try {
                 paymentID             = p.get("SystemIdentifier").trim();//SupplierBillID
                 String paymentDate    = p.get("PaymentDate").trim();
-                String contragentKey  = p.get("SRV_CODE").substring(5, 10).trim();
+                String contragentKey  = p.get("Srv_Code").substring(5, 10).trim();
                 String bic            = p.get("BIK");
                 long idOfContragent  = getContragentByRNIPCode(contragentKey, contrgents);
                 if (idOfContragent == 0) {
