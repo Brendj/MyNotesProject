@@ -112,18 +112,18 @@ public class ProjectStateReportService {
                         +
                         "from cf_enterevents as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.evtdatetime >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 " +
+                        "      regOrgSrc.evtdatetime < EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 " +
                         REGION_SENSITIVE_CLAUSE + " " +
                         "union " +
                         "select distinct regOrgSrc.idoforg as v, date_trunc('day', to_timestamp(regOrgSrc.createddate / 1000)) as d "
                         +
                         "from cf_orders as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.createddate >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 " +
+                        "      regOrgSrc.createddate < EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 " +
                         REGION_SENSITIVE_CLAUSE + ") as oo "+
                         "group by d " +
                         "order by 1", ACTIVE_CHART_1_DATA).setIncremental(true),
@@ -133,9 +133,9 @@ public class ProjectStateReportService {
                         +
                         "from cf_enterevents as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.evtdatetime >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 " +
+                        "      regOrgSrc.evtdatetime < EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 " +
                         REGION_SENSITIVE_CLAUSE + ") as oo "+
                         "group by d " +
                         "order by 1", ACTIVE_CHART_2_DATA).setIncremental(true),
@@ -145,9 +145,9 @@ public class ProjectStateReportService {
                         +
                         "from cf_orders as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.createddate >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 AND "
+                        "      regOrgSrc.createddate < EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 AND "
                         +
                         "      regOrgSrc.socdiscount=0 " + REGION_SENSITIVE_CLAUSE + ") as oo " +
                         "group by d " +
@@ -158,7 +158,7 @@ public class ProjectStateReportService {
                         +
                         "from cf_orders as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.createddate between %DATE_CLAUSE% "
+                        "where %DATE_CLAUSE% "
                         +
                         "                                     AND "
                         +
@@ -175,18 +175,18 @@ public class ProjectStateReportService {
                         +
                         "from cf_enterevents as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.evtdatetime >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
+                        "      regOrgSrc.evtdatetime < EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
                         + REGION_SENSITIVE_CLAUSE + " "+
                         "union " +
                         "select distinct regOrgSrc.idofclient as v, date_trunc('day', to_timestamp(regOrgSrc.createddate / 1000)) as d "
                         +
                         "from cf_orders as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.createddate >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 " + REGION_SENSITIVE_CLAUSE + ") as oo "
+                        "      regOrgSrc.createddate < EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 " + REGION_SENSITIVE_CLAUSE + ") as oo "
                         +
                         "group by d " +
                         "order by 1", UNIQUE_CHART_1_DATA).setIncremental(true),
@@ -196,9 +196,9 @@ public class ProjectStateReportService {
                         +
                         "from cf_enterevents as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.evtdatetime >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 " +
+                        "      regOrgSrc.evtdatetime < EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 " +
                         REGION_SENSITIVE_CLAUSE + ") as oo " +
                         "group by d " +
                         "order by 1", UNIQUE_CHART_2_DATA).setIncremental(true),
@@ -208,9 +208,9 @@ public class ProjectStateReportService {
                         +
                         "from cf_orders as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.createddate >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 AND "
+                        "      regOrgSrc.createddate < EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 AND "
                         +
                         "      regOrgSrc.socdiscount=0 " + REGION_SENSITIVE_CLAUSE + ") as oo " +
                         "group by d " +
@@ -221,7 +221,7 @@ public class ProjectStateReportService {
                         +
                         "from cf_orders as regOrgSrc " +
                         REGION_SENSITIVE_JOIN + " "+
-                        "where regOrgSrc.createddate between %DATE_CLAUSE% AND "
+                        "where %DATE_CLAUSE% AND "
                         +
                         "      regOrgSrc.socdiscount<>0 " + REGION_SENSITIVE_CLAUSE + ") as oo " +
                         "group by d " +
@@ -235,9 +235,9 @@ public class ProjectStateReportService {
                         "from cf_orders as regOrgSrc " +
                         "left join cf_orderdetails on regOrgSrc.idoforg=cf_orderdetails.idoforg and regOrgSrc.idoforder=cf_orderdetails.idoforder "
                         +
-                        "where regOrgSrc.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
+                        "where regOrgSrc.createddate >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
                         +
-                        "                                    EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 AND "
+                        "      regOrgSrc.createddate < EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 AND "
                         +
                         "      cf_orderdetails.menugroup<>'' " +
                         "group by cf_orderdetails.menugroup", new Object[][]{
@@ -265,7 +265,7 @@ public class ProjectStateReportService {
                         "where cf_clientpayments.idofcontragent=" + PAY_AGENTS_CLAUSE + " and cf_clientpayments.paysum<>0 " +REGION_SENSITIVE_CLAUSE + " " +
                         "group by cf_contragents.contragentname " +
                         "order by 1", REFILL_CHART_02_DATA).setValueType(Double.class), },
-                        new Object[][]{
+                new Object[][]{
                         {ValueType.TEXT, "Способ пополнения"}, {ValueType.NUMBER, PAY_AGENTS_COLUMNS, REFILL_CHART_02_DATA}}, REFILL_CHART_02_DATA));
         TYPES.put("RefillProgressChart", new ComplexType(new Type[]{
                 new SimpleType("select bycontr.dat, bycontr.cnt / byall.cnt * 100 "
@@ -277,8 +277,8 @@ public class ProjectStateReportService {
                         + "left join cf_clients as regOrgSrc on cf_transactions.idofclient=regOrgSrc.idofclient "
                         + REGION_SENSITIVE_JOIN + " "
                         + "where cf_clientpayments.idofcontragent=" + PAY_AGENTS_CLAUSE + " and "
-                        + "      cf_clientpayments.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
-                        + "                                            EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
+                        + "      cf_clientpayments.createddate >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
+                        + "      cf_clientpayments.createddate < EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
                         + REGION_SENSITIVE_CLAUSE + " "
                         + "group by cf_clientpayments.createddate) as ooo "
                         + "group by ooo.dat) as bycontr, "
@@ -289,15 +289,15 @@ public class ProjectStateReportService {
                         + "left join cf_transactions on cf_clientpayments.idoftransaction=cf_transactions.idoftransaction "
                         + "left join cf_clients as regOrgSrc on cf_transactions.idofclient=regOrgSrc.idofclient "
                         + REGION_SENSITIVE_JOIN + " "
-                        + "where cf_clientpayments.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
-                        + "                                            EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
+                        + "where cf_clientpayments.createddate >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
+                        + "      cf_clientpayments.createddate < EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
                         + REGION_SENSITIVE_CLAUSE + " "
                         + "group by cf_clientpayments.createddate) as kkk "
                         + "group by kkk.dat) as byall "
                         + "where bycontr.dat = byall.dat "
                         + "order by bycontr.dat", REFILL_PROGRESS_0_CHART).setIncremental(true).setValueType (Double.class)},
                 new Object[][]{
-                {ValueType.DATE, "Дата"}, {ValueType.NUMBER, PAY_AGENTS_COLUMNS, REFILL_PROGRESS_0_CHART}},
+                        {ValueType.DATE, "Дата"}, {ValueType.NUMBER, PAY_AGENTS_COLUMNS, REFILL_PROGRESS_0_CHART}},
                 REFILL_PROGRESS_0_CHART));
         TYPES.put("InformingChart",
                 new SimpleType("select 'Не предоставлены данные для информирования', count(regOrgSrc.idofclient) " +
@@ -324,30 +324,30 @@ public class ProjectStateReportService {
                         "where regOrgSrc.mobile<>'' and cf_cards.state=0 " + REGION_SENSITIVE_CLAUSE, new Object[][]{
                         {ValueType.TEXT, "Способ информирования"}, {ValueType.NUMBER, "Количество клиентов", INFORMING_CHART_DATA}},
                         INFORMING_CHART_DATA));
-                new SimpleType("select 'Льготные категории 1-4 класс', count(cf_clients.idofclient) "
-                        + "from cf_clients "
-                        + "left join cf_cards on cf_clients.idOfClient=cf_cards.idOfClient "
-                        + "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
-                        + "where cf_clients.discountmode<>0 and cf_cards.state=0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 and CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<=4 "
+        new SimpleType("select 'Льготные категории 1-4 класс', count(cf_clients.idofclient) "
+                + "from cf_clients "
+                + "left join cf_cards on cf_clients.idOfClient=cf_cards.idOfClient "
+                + "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
+                + "where cf_clients.discountmode<>0 and cf_cards.state=0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 and CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<=4 "
 
-                        + "union "
+                + "union "
 
-                        + "select 'Прочие льготные категории', count(cf_clients.idofclient) "
-                        + "from cf_clients "
-                        + "left join cf_cards on cf_clients.idOfClient=cf_cards.idOfClient "
-                        + "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
-                        + "where cf_clients.discountmode<>0 and cf_cards.state=0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)>4 "
+                + "select 'Прочие льготные категории', count(cf_clients.idofclient) "
+                + "from cf_clients "
+                + "left join cf_cards on cf_clients.idOfClient=cf_cards.idOfClient "
+                + "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
+                + "where cf_clients.discountmode<>0 and cf_cards.state=0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)>4 "
 
-                        + "union "
+                + "union "
 
-                        + "select 'Не имеющие льгот', count(distinct cf_clients.idofclient) "
-                        + "from cf_clients "
-                        + "left join cf_cards on cf_clients.idOfClient=cf_cards.idOfClient "
-                        + "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
-                        + "where cf_clients.discountmode=0 and cf_cards.state=0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0",
-                        new Object[][]{
-                                {ValueType.TEXT, "Льготные категории по питанию в общем составе учащихся"},
-                                {ValueType.NUMBER, "Количество учащихся", BENEFIT_PART_CHART_DATA}}, BENEFIT_PART_CHART_DATA);
+                + "select 'Не имеющие льгот', count(distinct cf_clients.idofclient) "
+                + "from cf_clients "
+                + "left join cf_cards on cf_clients.idOfClient=cf_cards.idOfClient "
+                + "left join cf_clientgroups on cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup and cf_clients.idoforg=cf_clientgroups.idoforg "
+                + "where cf_clients.discountmode=0 and cf_cards.state=0 AND CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0",
+                new Object[][]{
+                        {ValueType.TEXT, "Льготные категории по питанию в общем составе учащихся"},
+                        {ValueType.NUMBER, "Количество учащихся", BENEFIT_PART_CHART_DATA}}, BENEFIT_PART_CHART_DATA);
         TYPES.put("BenefitPartChart",
                 new SimpleType("select 'Льготные категории 1-4 класс', count(cf_clients.idofclient) "
                         + "from cf_clients "
@@ -420,7 +420,7 @@ public class ProjectStateReportService {
                         REGION_SENSITIVE_JOIN + " " +
                         "where CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 and CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<=4 "
                         + REGION_SENSITIVE_CLAUSE + " " +
-                        "      and cf_enterevents.evtdatetime BETWEEN EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
+                        "      and cf_enterevents.evtdatetime >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND cf_enterevents.evtdatetime < EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
                         +
                         "group by cf_enterevents.idofclient, cf_enterevents.idoforg, cf_enterevents.evtdatetime) events on events.o = overall.o "
                         +
@@ -448,7 +448,7 @@ public class ProjectStateReportService {
                         + REGION_SENSITIVE_JOIN + " " +
                         "where CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 and CAST(substring(groupname FROM '[0-9]+') AS INTEGER)>=5 "
                         +
-                        "      and cf_enterevents.evtdatetime BETWEEN EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
+                        "      and cf_enterevents.evtdatetime >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND cf_enterevents.evtdatetime < EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
                         + REGION_SENSITIVE_CLAUSE + " " +
                         "group by cf_enterevents.idofclient, cf_enterevents.idoforg, cf_enterevents.evtdatetime) events on events.o = overall.o "
                         +
@@ -723,9 +723,9 @@ public class ProjectStateReportService {
         cal.set(Calendar.MILLISECOND, 0);
 
 
-        /*cal.set(Calendar.YEAR, 2013);
-        cal.set(Calendar.MONTH, Calendar.MARCH);
-        cal.set(Calendar.DAY_OF_MONTH, DAY_OF_MONTH);*/
+        cal.set(Calendar.YEAR, 2013);
+        cal.set(Calendar.MONTH, Calendar.OCTOBER);
+        cal.set(Calendar.DAY_OF_MONTH, 28);
 
         return cal;
     }
@@ -762,8 +762,8 @@ public class ProjectStateReportService {
                 Calendar minD = new GregorianCalendar();
                 maxD.setTimeInMillis(max.getTimeInMillis() + DISCOUNT_FLOWCHARTS_DATE_INCREMENT);
                 minD.setTimeInMillis(min.getTimeInMillis() + DISCOUNT_FLOWCHARTS_DATE_INCREMENT);
-                sql = sql.replaceAll("%DATE_CLAUSE%", "EXTRACT(EPOCH FROM TIMESTAMP '" + DB_DATE_FORMAT.format(minD.getTime()) + "') * 1000 AND "
-                                                    + "EXTRACT(EPOCH FROM TIMESTAMP '" + DB_DATE_FORMAT.format(maxD.getTime()) + "') * 1000");
+                sql = sql.replaceAll("%DATE_CLAUSE%", "regOrgSrc.createddate >= EXTRACT(EPOCH FROM TIMESTAMP '" + DB_DATE_FORMAT.format(minD.getTime()) + "') * 1000 AND "
+                        + "regOrgSrc.createddate < EXTRACT(EPOCH FROM TIMESTAMP '" + DB_DATE_FORMAT.format(maxD.getTime()) + "') * 1000");
 
             } else {
                 sql = sql.replaceAll("%MAXIMUM_DATE_CLAUSE%", "EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000");
@@ -1013,7 +1013,7 @@ public class ProjectStateReportService {
             //  Обрабаытваем агентов - для каждого из них, выбираем данные того типа, который ему соответствует
             int agentCount = 0;
             if ((t.getReportType() == REFILL_CHART_02_DATA || t.getReportType() == REFILL_PROGRESS_0_CHART) &&
-                t.getColumns().length > 0 && ((String) t.getColumns()[1][1]).equals(PAY_AGENTS_COLUMNS)) {
+                    t.getColumns().length > 0 && ((String) t.getColumns()[1][1]).equals(PAY_AGENTS_COLUMNS)) {
                 agentCount = PAY_AGENTS_LIST.size();
             }
             int agentI = 0;
@@ -1078,13 +1078,13 @@ public class ProjectStateReportService {
 
     public String encode (String str, String encoding)
     {
-    /*if (encoding != null) {
-        try {
-            str = new String(str.getBytes("UTF-8"), encoding);
-        } catch (Exception e) {
-        }
-    }*/
-    return str;
+        /*if (encoding != null) {
+            try {
+                str = new String(str.getBytes("UTF-8"), encoding);
+            } catch (Exception e) {
+            }
+        }*/
+        return str;
     }
 
 
@@ -1293,15 +1293,15 @@ public class ProjectStateReportService {
     public void parseOrgsPayments(Object dataSource, Object sessionObj, Object paramsObj) {
         parseOrgsRequest(dataSource, sessionObj, paramsObj,
                 "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) "
-                + "from cf_orgs "
-                + "left join cf_friendly_organization on cf_orgs.idoforg=currentorg "
-                + "left join cf_orders on cf_orders.idoforg=idoffriendlyorg or cf_orders.idoforg=currentorg "
-                + "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient "
-                + "where cf_orders.socdiscount=0 and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and "
-                + "      cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
-                + "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and cf_orgs.state<>0 "
-                + "group by cf_orgs.idoforg "
-                + "order by cf_orgs.idoforg"
+                        + "from cf_orgs "
+                        + "left join cf_friendly_organization on cf_orgs.idoforg=currentorg "
+                        + "left join cf_orders on cf_orders.idoforg=idoffriendlyorg or cf_orders.idoforg=currentorg "
+                        + "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient "
+                        + "where cf_orders.socdiscount=0 and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and "
+                        + "      cf_orders.createddate >= EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        + "      cf_orders.createddate < EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and cf_orgs.state<>0 "
+                        + "group by cf_orgs.idoforg "
+                        + "order by cf_orgs.idoforg"
                 /*"select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
                 "from cf_orders, cf_orgs " +
                 "where cf_orders.socdiscount=0 and cf_orgs.idoforg=cf_orders.idoforg and " +
@@ -1316,15 +1316,15 @@ public class ProjectStateReportService {
     public void parseOrgsDiscounts(Object dataSource, Object sessionObj, Object paramsObj) {
         parseOrgsRequest(dataSource, sessionObj, paramsObj,
                 "select cf_orgs.idoforg, count(distinct cf_orders.idofclient) "
-                + "from cf_orgs "
-                + "left join cf_friendly_organization on cf_orgs.idoforg=currentorg "
-                + "left join cf_orders on cf_orders.idoforg=idoffriendlyorg or cf_orders.idoforg=currentorg "
-                + "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient "
-                + "where cf_orders.socdiscount<>0 and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and "
-                + "      cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
-                + "                                    EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and cf_orgs.state<>0 "
-                + "group by cf_orgs.idoforg "
-                + "order by cf_orgs.idoforg"
+                        + "from cf_orgs "
+                        + "left join cf_friendly_organization on cf_orgs.idoforg=currentorg "
+                        + "left join cf_orders on cf_orders.idoforg=idoffriendlyorg or cf_orders.idoforg=currentorg "
+                        + "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient "
+                        + "where cf_orders.socdiscount<>0 and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and "
+                        + "      cf_orders.createddate >= EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        + "      cf_orders.createddate < EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and cf_orgs.state<>0 "
+                        + "group by cf_orgs.idoforg "
+                        + "order by cf_orgs.idoforg"
                 /*"select cf_orgs.idoforg, count(distinct cf_orders.idofclient) " +
                         "from cf_orders, cf_orgs " +
                         "where cf_orders.socdiscount<>0 and cf_orgs.idoforg=cf_orders.idoforg and " +
@@ -1339,15 +1339,15 @@ public class ProjectStateReportService {
     public void parseOrgsEvents(Object dataSource, Object sessionObj, Object paramsObj) {
         parseOrgsRequest(dataSource, sessionObj, paramsObj,
                 "select cf_orgs.idoforg, count(distinct cf_enterevents.idofclient) "
-                + "from cf_orgs "
-                + "left join cf_friendly_organization on cf_orgs.idoforg=currentorg "
-                + "left join cf_enterevents on cf_enterevents.idoforg=idoffriendlyorg or cf_enterevents.idoforg=currentorg "
-                + "left join cf_clients on cf_enterevents.idofclient=cf_clients.idofclient "
-                + "where cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and "
-                + "      cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
-                + "                                         EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and cf_orgs.state<>0 "
-                + "group by cf_orgs.idoforg "
-                + "order by cf_orgs.idoforg"
+                        + "from cf_orgs "
+                        + "left join cf_friendly_organization on cf_orgs.idoforg=currentorg "
+                        + "left join cf_enterevents on cf_enterevents.idoforg=idoffriendlyorg or cf_enterevents.idoforg=currentorg "
+                        + "left join cf_clients on cf_enterevents.idofclient=cf_clients.idofclient "
+                        + "where cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and "
+                        + "      cf_enterevents.evtdatetime >= EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
+                        + "      cf_enterevents.evtdatetime < EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and cf_orgs.state<>0 "
+                        + "group by cf_orgs.idoforg "
+                        + "order by cf_orgs.idoforg"
                 /*"select cf_orgs.idoforg, count(distinct cf_enterevents.idofclient) " +
                         "from cf_enterevents, cf_orgs " +
                         "where cf_orgs.idoforg=cf_enterevents.idoforg and " +
@@ -1465,12 +1465,12 @@ public class ProjectStateReportService {
         Map<Object[], Long> clientsCount = new HashMap<Object[], Long>();
         org.hibernate.Query q = session.createSQLQuery(
                 "select cf_orgs.idoforg, officialname, count(distinct cf_clients.idofclient) as cnt "
-                + "from cf_orgs "
-                + "left join cf_friendly_organization on cf_orgs.idoforg=currentorg "
-                + "left join cf_clients on cf_clients.idoforg=idoffriendlyorg or cf_clients.idoforg=currentorg "
-                + "where cf_orgs.state<>0 and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " "
-                + "group by cf_orgs.idoforg, officialname "
-                + "order by cf_orgs.idoforg"
+                        + "from cf_orgs "
+                        + "left join cf_friendly_organization on cf_orgs.idoforg=currentorg "
+                        + "left join cf_clients on cf_clients.idoforg=idoffriendlyorg or cf_clients.idoforg=currentorg "
+                        + "where cf_orgs.state<>0 and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " "
+                        + "group by cf_orgs.idoforg, officialname "
+                        + "order by cf_orgs.idoforg"
                 /*"select distinct dat.idoforg, dat.officialname, int8(max(dat.cnt)) "
                         + "from (select dat.idoforg, dat.officialname, sum(dat.cnt) as cnt "
                         + "      from (select cf_orgs.idoforg, cf_orgs.officialname, friends.cnt "
