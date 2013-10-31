@@ -33,7 +33,7 @@
         <c:if test="${!empty mainPage.allOrgsDiscountsReportPage.allOrgsDiscountsReport.itemsList}" >
         <h:outputText value="Отчет по льготам организаций" styleClass="output-text" />
             <rich:dataTable id="orgsDiscountsReportTable" value="#{mainPage.allOrgsDiscountsReportPage.allOrgsDiscountsReport.itemsList}"
-                        var="item" rowKeyVar="row" rows="15" footerClass="data-table-footer">
+                        var="item" rowKeyVar="row" rows="20" footerClass="data-table-footer">
 
                     <rich:column styleClass="center-aligned-column">
                         <f:facet name="header">
@@ -53,7 +53,6 @@
                 </c:if>
 
                 <f:facet name="footer">
-                    <h:outputText value="Итого: #{mainPage.allOrgsDiscountsReportPage.allOrgsDiscountsReport.count}" escape="true" styleClass="output-text"/>
                     <rich:datascroller for="orgsDiscountsReportTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
                                        stepControls="auto" boundaryControls="hide">
                         <f:facet name="previous">
@@ -66,6 +65,7 @@
                 </f:facet>
 
             </rich:dataTable>
+            <h:outputText value="Итого: #{mainPage.allOrgsDiscountsReportPage.allOrgsDiscountsReport.count}" escape="true" styleClass="output-text"/>
 
             <%--<h:commandButton value="Выгрузить в SCV" action="#{mainPage.showArgOrgsDiscountsCSVList}"--%>
                          <%--styleClass="command-button" />--%>

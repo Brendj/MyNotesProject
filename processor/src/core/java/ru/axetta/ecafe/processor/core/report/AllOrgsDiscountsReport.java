@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
-import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
-
 import org.hibernate.Session;
 
 import java.util.*;
@@ -25,13 +23,13 @@ public class AllOrgsDiscountsReport extends BasicReport {
 
     final static String staticColumnNames[] = {"Наименование ОУ", "Всего льготных"};
 
-    private static List<OrgDiscounts> itemsList;
+    private List<OrgDiscounts> itemsList;
     private List<String> columnNames;
 
     public Long getCount() {
         Long result = 0L;
         for (OrgDiscounts discounts : itemsList) {
-            result += ((Long)discounts.getValues().get(1)).longValue();
+            result += (Long) discounts.getValues().get(1);
         }
         return result;
     }
@@ -48,9 +46,7 @@ public class AllOrgsDiscountsReport extends BasicReport {
         super(generateTime, generateDuration);
         this.itemsList = itemsList;
         columnNames = new ArrayList<String>();
-        for (String name : staticColumnNames) {
-            columnNames.add(name);
-        }
+        columnNames.addAll(Arrays.asList(staticColumnNames));
         columnNames.addAll(dynamicColumnNames);
     }
 
@@ -58,9 +54,7 @@ public class AllOrgsDiscountsReport extends BasicReport {
         super();
         this.itemsList = Collections.emptyList();
         columnNames = new ArrayList<String>();
-        for (String name : staticColumnNames) {
-            columnNames.add(name);
-        }
+        columnNames.addAll(Arrays.asList(staticColumnNames));
     }
 
     public static class Builder {
@@ -125,7 +119,7 @@ public class AllOrgsDiscountsReport extends BasicReport {
                 if (item == null) {
                     throw new Exception("Ошибка при формирования отчета по льготам: в таблице ClientsCategoryDiscount обнаружен клиент, которого нет в таблице Clients.");
                 } else {
-                    item.setValue(categoryIndexMap.get((Long)discount[1]).intValue()+2, (Long)discount[2]);
+                    item.setValue(categoryIndexMap.get((Long) discount[1]) + 2, (Long) discount[2]);
                 }
             }
 
@@ -157,9 +151,7 @@ public class AllOrgsDiscountsReport extends BasicReport {
 
         public List<Object> getValues() {
             List<Object> result = new ArrayList<Object>(value.length);
-            for (Object o : value) {
-                result.add(o);
-            }
+            result.addAll(Arrays.asList(value));
             return result;
         }
 
