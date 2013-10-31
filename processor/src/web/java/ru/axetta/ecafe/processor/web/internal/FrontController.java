@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeErrorIte
 import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem;
 import ru.axetta.ecafe.processor.web.internal.front.items.TempCardOperationItem;
 import ru.axetta.ecafe.processor.web.internal.front.items.VisitorItem;
+import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -25,8 +26,12 @@ import javax.annotation.Resource;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
+import java.security.cert.X509Certificate;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
+import java.security.PublicKey;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.persistence.Person.isEmptyFullNameFields;
@@ -514,23 +519,23 @@ public class FrontController extends HttpServlet {
     }
 
     private void checkRequestValidity(Long orgId) throws FrontControllerException {
-        //MessageContext msgContext = wsContext.getMessageContext();
-        //HttpServletRequest request = (HttpServletRequest) msgContext.get(MessageContext.SERVLET_REQUEST);
-        //X509Certificate[] cert = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-        //
-        ////X509Certificate cert = (X509Certificate)((WSSecurityEngineResult)wsContext.getMessageContext().get(WSS4JInInterceptor.SIGNATURE_RESULT)).get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        //
-        //if (cert==null || cert.length==0) throw new FrontControllerException("В запросе нет валидных сертификатов");
-        //Org org = DAOService.getInstance().getOrg(orgId);
-        //if (org==null) throw new FrontControllerException(String.format("Неизвестная организация: %d", orgId));
-        //PublicKey publicKey = null;
-        //try {
-        //    publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
-        //} catch (Exception e) {
-        //    throw new FrontControllerException("Внутренняя ошибка", e);
-        //}
-        //if (!publicKey.equals(cert[0].getPublicKey())) throw new FrontControllerException(
-        //        String.format("Ключ сертификата невалиден: %d", orgId));
+        MessageContext msgContext = wsContext.getMessageContext();
+        HttpServletRequest request = (HttpServletRequest) msgContext.get(MessageContext.SERVLET_REQUEST);
+        X509Certificate[] cert = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+
+        //X509Certificate cert = (X509Certificate)((WSSecurityEngineResult)wsContext.getMessageContext().get(WSS4JInInterceptor.SIGNATURE_RESULT)).get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+
+        if (cert==null || cert.length==0) throw new FrontControllerException("В запросе нет валидных сертификатов");
+        Org org = DAOService.getInstance().getOrg(orgId);
+        if (org==null) throw new FrontControllerException(String.format("Неизвестная организация: %d", orgId));
+        PublicKey publicKey = null;
+        try {
+            publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
+        } catch (Exception e) {
+            throw new FrontControllerException("Внутренняя ошибка", e);
+        }
+        if (!publicKey.equals(cert[0].getPublicKey())) throw new FrontControllerException(
+                String.format("Ключ сертификата невалиден: %d", orgId));
     }
     
     @WebMethod(operationName = "generateLinkingToken")

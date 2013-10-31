@@ -40,7 +40,7 @@ public class OnlinePaymentProcessor {
                     clientId,
                     null,
                     request.getTspContragentId(),
-                    new Date(),
+                    request.getPayDate()==null?new Date():request.getPayDate(),
                     request.getSum(),
                     request.getPaymentMethod(),
                     null,
@@ -89,6 +89,7 @@ public class OnlinePaymentProcessor {
         private final Long tspContragentId;
 
         private final boolean bCheckOnly;
+        private Date payDate = null;
 
         public PayRequest(int protoVersion, boolean bCheckOnly, long contragentId, Long tspContragentId, int paymentMethod, long clientId, String paymentId, String paymentAdditionalId, long sum, boolean bNegativeSum)
                 throws Exception {
@@ -142,6 +143,14 @@ public class OnlinePaymentProcessor {
 
         public int getProtoVersion() {
             return protoVersion;
+        }
+
+        public Date getPayDate() {
+            return payDate;
+        }
+
+        public void setPayDate(Date payDate) {
+            this.payDate = payDate;
         }
 
         @Override

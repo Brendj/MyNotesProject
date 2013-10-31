@@ -758,6 +758,8 @@ public class Client {
         return new String(Base64.encodeBase64(arrayOutputStream.toByteArray()), CharEncoding.US_ASCII);
     }
 
+    /* не использовать метод для получения имени группы*/
+    @Deprecated
     public String getClientGroupTypeAsString() {
         long idOfClientGroup = getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup();
         if (idOfClientGroup >= ClientGroup.PREDEFINED_ID_OF_GROUP_OTHER) {

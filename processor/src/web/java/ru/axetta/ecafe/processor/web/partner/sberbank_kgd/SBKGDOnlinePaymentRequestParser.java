@@ -73,9 +73,11 @@ public class SBKGDOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
             receipt = parseResult.getParam("receipt");
             date = parseResult.getParam("date");
             source = source + "/" + date;
-            return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, false ,defaultContragentId,
-                    null, paymentMethod, contractId,
+            final OnlinePaymentProcessor.PayRequest payRequest = new OnlinePaymentProcessor.PayRequest(
+                    OnlinePaymentProcessor.PayRequest.V_0, false, defaultContragentId, null, paymentMethod, contractId,
                     receipt, source, sum, false);
+            payRequest.setPayDate(timeFormat.parse(date));
+            return payRequest;
         }
         if(action.equals("status")){
             receipt = parseResult.getParam("receipt");
@@ -84,30 +86,6 @@ public class SBKGDOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
                     receipt, source, sum, false);
         }
         return null;
-        //if(action.equals("check") || action.equals("payment")){
-        //    String number = parseResult.getParam("number");
-        //    contractId = Long.parseLong(number);
-        //    Integer type = 0;
-        //    if(!(parseResult.getParam("type")==null || parseResult.getParam("type").equals(""))){
-        //        type = parseResult.getReqIntParam("type");
-        //    }
-        //    String amount = parseResult.getParam("amount");
-        //    String replacedString = amount.replaceAll(",", ".");
-        //    Double result = Double.parseDouble(replacedString);
-        //    sum =  result.longValue() * 100;
-        //}
-        //if(action.equals("payment") || action.equals("status")){
-        //    receipt = parseResult.getParam("receipt");
-        //    bCheckOnly = false;
-        //}
-        //if(action.equals("status")){
-        //    date = parseResult.getParam("date");
-        //}
-        //int paymentMethod= ClientPayment.ATM_PAYMENT_METHOD;
-        //String source = action +"/" + date;
-        //return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, bCheckOnly,
-        //        defaultContragentId, null, paymentMethod, contractId,
-        //        receipt, source, sum, false);
     }
 
     @Override
