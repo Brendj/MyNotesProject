@@ -310,7 +310,6 @@
     <f:facet name="header">
         <h:outputText value="Удаление клиента" styleClass="output-text" />
     </f:facet>
-    <a4j:form styleClass="borderless-form">
         <table class="borderless-grid" width="100%">
             <tr>
                 <td style="text-align: center;">
@@ -322,7 +321,7 @@
                     <h:panelGroup styleClass="borderless-div">
                         <a4j:commandButton value="Да" ajaxSingle="true" action="#{mainPage.removeClientFromList}"
                                            oncomplete="#{rich:component('removedClientDeletePanel')}.hide();"
-                                           reRender="mainMenu, clientListTable, #{mainPage.topMostPage.pageComponent.id}"
+                                           reRender="mainMenu, clientListTable"
                                            styleClass="command-button">
                         </a4j:commandButton>
                         <a4j:commandButton value="Отмена" styleClass="command-button"
@@ -331,5 +330,4 @@
                 </td>
             </tr>
         </table>
-    </a4j:form>
 </rich:modalPanel>

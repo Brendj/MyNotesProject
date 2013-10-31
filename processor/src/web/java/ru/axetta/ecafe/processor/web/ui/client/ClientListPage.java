@@ -4,12 +4,15 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.util.*;
 
@@ -320,16 +323,32 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         this.items = items;
     }
 
-    /**
-     * удаление клиента из списка
-     * @param clientId
-     */
+    // Удаляет клиента. Не физически, а переводит в группу "Удаленные".
     public void removeClientFromList(Long clientId) {
         for (Item item : this.getItems()) {
             if (item.getIdOfClient().equals(clientId)) {
                 this.getItems().remove(item);
                 break;
             }
+        }
+        Session session = null;
+        Transaction tr = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            tr = session.beginTransaction();
+            Client client = DAOUtils.findClient(session, clientId);
+            ClientGroup cg = DAOUtils.findClientGroup(session, new CompositeIdOfClientGroup(
+                    client.getOrg().getIdOfOrg(), ClientGroup.Predefined.CLIENT_DELETED.getValue()));
+            if (cg == null) {
+                cg = DAOUtils.createClientGroup(session, client.getOrg().getIdOfOrg(),
+                        ClientGroup.Predefined.CLIENT_DELETED);
+            }
+            client.setIdOfClientGroup(cg.getCompositeIdOfClientGroup().getIdOfClientGroup());
+            tr.commit();
+        } catch (Exception ex) {
+            HibernateUtils.rollback(tr, null);
+        } finally {
+            HibernateUtils.close(session, null);
         }
     }
 
