@@ -723,9 +723,9 @@ public class ProjectStateReportService {
         cal.set(Calendar.MILLISECOND, 0);
 
 
-        cal.set(Calendar.YEAR, 2013);
+        /*cal.set(Calendar.YEAR, 2013);
         cal.set(Calendar.MONTH, Calendar.OCTOBER);
-        cal.set(Calendar.DAY_OF_MONTH, 28);
+        cal.set(Calendar.DAY_OF_MONTH, 28);*/
 
         return cal;
     }
