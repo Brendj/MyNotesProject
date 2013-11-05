@@ -343,6 +343,9 @@ public class MainPage {
     private final DeliveredServicesReportPage deliveredServicesReportPage = new DeliveredServicesReportPage ();
     private final ClientsBenefitsReportPage clientsBenefitsReportPage = new ClientsBenefitsReportPage ();
 
+    private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
+
+
     public BasicWorkspacePage getGoodGroupPage() {
         return goodGroupPage;
     }
@@ -5041,6 +5044,10 @@ public Long getSelectedIdOfReportRule() {
         return budgetFoodGroupMenu;
     }
 
+    public BasicWorkspacePage getRepositoryUtilityGroupMenu() {
+        return repositoryUtilityGroupMenu;
+    }
+
     public Object showGoodRequestsGroupMenu () {
         currentWorkspacePage = goodRequestsGroupMenu;
         updateSelectedMainMenu();
@@ -5049,6 +5056,12 @@ public Long getSelectedIdOfReportRule() {
 
     public Object showBudgetFoodGroupMenu () {
         currentWorkspacePage = budgetFoodGroupMenu;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showRepositoryUtilityGroupMenu () {
+        currentWorkspacePage = repositoryUtilityGroupMenu;
         updateSelectedMainMenu();
         return null;
     }

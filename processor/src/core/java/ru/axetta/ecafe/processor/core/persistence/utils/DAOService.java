@@ -1539,4 +1539,25 @@ public class DAOService {
         e.setCreateDate(System.currentTimeMillis());
         session.save(e);
     }
+
+    public List<String> getCurrentRepositoryReportNames() {
+        TypedQuery<String> query = entityManager.createQuery("select distinct ruleName from ReportInfo order by ruleName",String.class);
+        return query.getResultList();
+
+    }
+
+    public void renameRepositoryReports(String previousName, String newName) throws Exception {
+        if (previousName == null || previousName.trim().length() < 1) {
+            throw new Exception("Отсутствует старое наименование отчета");
+        }
+        if (newName == null || newName.trim().length() < 1) {
+            throw new Exception("Отсутствует новое наименование отчета");
+        }
+        Session session = (Session) entityManager.getDelegate();
+        //  cf_reporthandlerules
+        org.hibernate.Query q = session.createSQLQuery("update cf_reportinfo set rulename=:newName where rulename=:previousName");
+        q.setString("newName", newName.trim());
+        q.setString("previousName", previousName.trim());
+        q.executeUpdate();
+    }
 }
