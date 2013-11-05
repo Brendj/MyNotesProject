@@ -36,6 +36,8 @@
 
         <h:outputText escape="true" value="Запуск в ручном режиме" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.reportRuleViewPage.manualReportRun}" styleClass="output-text" disabled="true" />
+        <h:outputText escape="true" value="Время хранения в репозитории" styleClass="output-text" />
+        <h:outputText escape="true" value="#{mainPage.reportRuleViewPage.storagePeriod}" styleClass="output-text" />
 
         <h:outputText escape="true" value="Тема письма" styleClass="output-text" />
         <h:inputText readonly="true" value="#{mainPage.reportRuleViewPage.subject}" style="width: 600px;"

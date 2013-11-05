@@ -25,6 +25,37 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 public class ReportHandleRule {
+    public enum StoragePeriods {
+        NO(0L, "нет"),
+        WEEK(604800000L, "1 неделя"),
+        MONTH(2678400000L, "1 месяц"),
+        HALF_YEAR(15724800000L, "6 месяцев"),
+        ONE_YEAR(31536000000L, "1 год"),
+        TWO_YEARS(63072000000L, "2 года"),
+        THREE_YEARS(94608000000L, "3 года"),
+        FIVE_YEARS(157680000000L, "5 лет"),
+        NO_REMOVE(-1L, "не удалять");
+
+        private final long ts;
+        private final String name;
+
+        private StoragePeriods (long ts, String name) {
+            this.ts = ts;
+            this.name = name;
+        }
+
+        public long getMilliseconds() {
+            return ts;
+        }
+        
+        public String getName() {
+            return name;
+        }
+
+        public static StoragePeriods[] getPeriods() {
+            return StoragePeriods.values();
+        }
+    }
 
     public static final String UNKNOWN_FORMAT_NAME = "Неизвестный";
     public static final String[] FORMAT_NAMES = {"HTML", "XLS", "CSV", "PDF"};
@@ -56,6 +87,7 @@ public class ReportHandleRule {
     private Set<RuleCondition> ruleConditions = new HashSet<RuleCondition>();
     private String tag;
     private boolean allowManualReportRun = false;
+    private long storagePeriod;
 
     protected ReportHandleRule() {
         // For Hibernate only
@@ -241,6 +273,14 @@ public class ReportHandleRule {
 
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    public long getStoragePeriod() {
+        return storagePeriod;
+    }
+
+    public void setStoragePeriod(long storagePeriod) {
+        this.storagePeriod = storagePeriod;
     }
 
     public String findType(Session session) throws Exception {

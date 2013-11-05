@@ -39,6 +39,7 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
     private String shortName;
     private List<ReportRuleConstants.ParamHint> paramHints = Collections.emptyList();
     private String reportTemplateFileName;
+    private long storagePeriod;
     private boolean manualReportRun = false;
 
     public String getPageFilename() {
@@ -88,6 +89,15 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
     public String getShortName() {
         return shortName;
     }
+    
+    public String getStoragePeriod() {
+        for (ReportHandleRule.StoragePeriods per : ReportHandleRule.StoragePeriods.getPeriods()) {
+            if (storagePeriod == per.getMilliseconds()) {
+                return per.getName();
+            }
+        }
+        return "";
+    }
 
     public List<ReportRuleConstants.ParamHint> getParamHints() {
         return paramHints;
@@ -112,6 +122,7 @@ public class ReportRuleViewPage extends BasicWorkspacePage {
         this.documentFormat = reportHandleRule.getDocumentFormat();
         this.subject = reportHandleRule.getSubject();
         this.routeAddresses = new LinkedList<String>();
+        this.storagePeriod = reportHandleRule.getStoragePeriod();
         addAddress(this.routeAddresses, reportHandleRule.getRoute0());
         addAddress(this.routeAddresses, reportHandleRule.getRoute1());
         addAddress(this.routeAddresses, reportHandleRule.getRoute2());

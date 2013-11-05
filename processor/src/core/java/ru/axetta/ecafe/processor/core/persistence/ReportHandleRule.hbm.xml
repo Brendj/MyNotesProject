@@ -29,6 +29,7 @@
         <property name="route8" column="Route8" type="string" length="128"/>
         <property name="route9" column="Route9" type="string" length="128"/>
         <property name="remarks" column="Remarks" type="string" length="1024"/>
+        <property name="storagePeriod" column="StoragePeriod" type="long"/>
         <property name="allowManualReportRun" column="AllowManualReportRun" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
 
                   not-null="true"/>

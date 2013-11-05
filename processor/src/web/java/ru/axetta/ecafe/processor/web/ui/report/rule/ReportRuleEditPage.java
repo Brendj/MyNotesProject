@@ -72,6 +72,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
     private final ReportTemplateFileNameMenu reportTemplateFileNameMenu = new ReportTemplateFileNameMenu();
     private List<Hint> hints = new ArrayList <Hint> ();
     private boolean manualReportRun = false;
+    private long storagePeriod;
 
 
     public CCAccountFilter getContragentFilter() {
@@ -230,6 +231,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
         reportHandleRule.setSubject(this.subject);
         reportHandleRule.setEnabled(this.enabled);
         reportHandleRule.setAllowManualReportRun (manualReportRun);
+        reportHandleRule.setStoragePeriod(storagePeriod);
 
         reportHandleRule.setTemplateFileName(this.reportTemplateFileName);
 
@@ -393,6 +395,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
         this.idOfReportHandleRule = reportHandleRule.getIdOfReportHandleRule();
         this.ruleName = reportHandleRule.getRuleName();
         this.tag = reportHandleRule.getTag();
+        storagePeriod = reportHandleRule.getStoragePeriod();
 
         Set<RuleCondition> ruleConditions = reportHandleRule.getRuleConditions();
         this.reportType = reportHandleRule.findType(session);
@@ -580,6 +583,22 @@ public class ReportRuleEditPage  extends OnlineReportPage
             }
             stringBuilder.append(value);
         }
+    }
+    
+    public List<SelectItem> getStoragePeriods() {
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        for (ReportHandleRule.StoragePeriods per : ReportHandleRule.StoragePeriods.getPeriods()) {
+            items.add(new SelectItem(per.getMilliseconds(), per.getName()));
+        }
+        return items;
+    }
+
+    public long getStoragePeriod() {
+        return storagePeriod;
+    }
+
+    public void setStoragePeriod(long storagePeriod) {
+        this.storagePeriod = storagePeriod;
     }
 
     public String getMailListNames() {

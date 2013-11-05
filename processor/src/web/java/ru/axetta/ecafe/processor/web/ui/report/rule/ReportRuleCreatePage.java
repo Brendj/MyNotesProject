@@ -53,6 +53,7 @@ public class ReportRuleCreatePage  extends OnlineReportPage
     private final ReportTemplateFileNameMenu reportTemplateFileNameMenu = new ReportTemplateFileNameMenu();
     private String tag;
     private boolean manualReportRun = false;
+    private long storagePeriod;
 
     private List<ReportRuleEditPage.Hint> hints = new ArrayList<ReportRuleEditPage.Hint>();
     private final CCAccountFilter contragentFilter = new CCAccountFilter();
@@ -343,6 +344,7 @@ public class ReportRuleCreatePage  extends OnlineReportPage
         }
         reportHandleRule.setTemplateFileName(this.reportTemplateFileName);
         reportHandleRule.setAllowManualReportRun(manualReportRun);
+        reportHandleRule.setStoragePeriod(storagePeriod);
 
         session.save(reportHandleRule);
     }
@@ -364,6 +366,22 @@ public class ReportRuleCreatePage  extends OnlineReportPage
 
     public List<ReportRuleEditPage.Hint> getParamHints() {
         return hints;
+    }
+
+    public List<SelectItem> getStoragePeriods() {
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        for (ReportHandleRule.StoragePeriods per : ReportHandleRule.StoragePeriods.getPeriods()) {
+            items.add(new SelectItem(per.getMilliseconds(), per.getName()));
+        }
+        return items;
+    }
+
+    public long getStoragePeriod() {
+        return storagePeriod;
+    }
+
+    public void setStoragePeriod(long storagePeriod) {
+        this.storagePeriod = storagePeriod;
     }
 
 }

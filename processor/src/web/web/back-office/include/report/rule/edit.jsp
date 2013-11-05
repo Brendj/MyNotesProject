@@ -38,6 +38,10 @@
     </h:selectOneMenu>
     <h:outputText escape="true" value="Запуск в ручном режиме" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.reportRuleEditPage.manualReportRun}" styleClass="output-text" />
+    <h:outputText escape="true" value="Время хранения в репозитории" styleClass="output-text" />
+    <h:selectOneMenu id="revisionDates" value="#{mainPage.reportRuleEditPage.storagePeriod}" style="width:150px;" >
+        <f:selectItems value="#{mainPage.reportRuleEditPage.storagePeriods}"/>
+    </h:selectOneMenu>
     <h:outputText escape="true" value="Тема письма" styleClass="output-text" />
     <h:inputText value="#{mainPage.reportRuleEditPage.subject}" maxlength="128" style="width: 600px;"
                  styleClass="input-text" />
