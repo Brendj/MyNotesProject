@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.ui.org;
 
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
-import ru.axetta.ecafe.processor.core.persistence.MenuExchangeRule;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -17,7 +16,9 @@ import org.hibernate.Session;
 import org.hibernate.criterion.*;
 import org.hibernate.transform.Transformers;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Stack;
 
 /**
  * Created by IntelliJ IDEA.
@@ -115,17 +116,7 @@ public class OrgSelectPage extends BasicPage {
         }
 
         if (supplierFilter != 0) {
-            Criteria destMenuExchangeCriteria = session.createCriteria(MenuExchangeRule.class);
-            List menuExchangeRuleList = destMenuExchangeCriteria.list();
-            HashSet<Long> idOfSourceOrgSet = new HashSet<Long>();
-            for (Object object : menuExchangeRuleList) {
-                MenuExchangeRule menuExchangeRule = (MenuExchangeRule) object;
-                Long idOfSourceOrg = menuExchangeRule.getIdOfSourceOrg();
-                if (idOfSourceOrg != null) {
-                    idOfSourceOrgSet.add(idOfSourceOrg);
-                }
-            }
-            Criterion criterion = Restrictions.in("idOfOrg", idOfSourceOrgSet);
+            Criterion criterion = Restrictions.eq("refectoryType", Org.REFECTORY_TYPE_FOOD_FACTORY);
             if (supplierFilter == 1) {
                 criterion = Restrictions.not(criterion);
             }

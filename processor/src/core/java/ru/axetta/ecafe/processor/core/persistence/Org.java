@@ -35,7 +35,10 @@ public class Org {
 
     public static final String[] STATE_NAMES = {"Не обслуживается", "Обслуживается"};
     public static final String UNKNOWN_STATE_NAME = "Неизвестное состояние";
-    public static final String[] REFECTORY_TYPE_NAMES={"Сырьевая столовая", "Столовая-доготовочная", "Буфет-раздаточная"};
+    public static final String[] REFECTORY_TYPE_NAMES = {
+            "Сырьевая столовая", "Столовая-доготовочная", "Буфет-раздаточная", "Комбинат питания"};
+
+    public static final int REFECTORY_TYPE_FOOD_FACTORY = 3;
 
     private Long idOfOrg;
     private long version;
@@ -677,7 +680,7 @@ public class Org {
     public void setGuid(String guid) {
         this.guid = guid;
     }
-    
+
     static Pattern patterNumber = Pattern.compile("\\d+");
     public String getOrgNumberInName() {
         return extractOrgNumberFromName(shortName);
