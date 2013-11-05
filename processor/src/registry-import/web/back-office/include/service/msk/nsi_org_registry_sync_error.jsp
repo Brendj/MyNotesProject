@@ -34,9 +34,11 @@
             <h:panelGrid columns="2" styleClass="borderless-grid" id="errorCreateDataPanel">
                 <h:outputText escape="true" value="Ошибка" styleClass="output-text" />
                 <h:selectOneListbox id="subscriptions"
-                                    value="#{NSIOrgRegistrySynchErrorPage.errorType}" style="width:300px;" size="10">
+                                    value="#{NSIOrgRegistrySynchErrorPage.errorType}" style="width:400px;" size="5">
                     <f:selectItems value="#{NSIOrgRegistrySynchErrorPage.errors}"/>
                 </h:selectOneListbox>
+                <h:outputText escape="true" value="Комментарий" styleClass="output-text" />
+                <h:inputTextarea value="#{NSIOrgRegistrySynchErrorPage.errorDetails}" style="width:400px; height: 100px"/>
 
                 <a4j:status id="createStatus">
                     <f:facet name="start">

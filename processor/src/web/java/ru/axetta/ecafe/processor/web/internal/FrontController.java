@@ -143,7 +143,8 @@ public class FrontController extends HttpServlet {
                 String orgName = DAOService.getInstance().findOrById(e.getIdOfOrg()).getOfficialName();
                 RegistryChangeErrorItem i = new RegistryChangeErrorItem(e.getIdOfRegistryChangeError(), e.getIdOfOrg(),
                                                                         e.getRevisionCreateDate(), e.getCreateDate(),
-                                                                        e.getCommentCreateDate(), e.getError(), e.getComment(),
+                                                                        e.getCommentCreateDate(), e.getError(),
+                                                                        e.getErrorDetail(), e.getComment(),
                                                                         orgName, e.getCommentAuthor());
                 items.add(i);
             }
@@ -157,9 +158,10 @@ public class FrontController extends HttpServlet {
     @WebMethod(operationName = "addRegistryChangeError")
     public String addRegistryChangeError(@WebParam(name = "idOfOrg") long idOfOrg,
                                          @WebParam(name = "revisionDate") long revisionDate,
-                                         @WebParam(name = "error") String error) {
+                                         @WebParam(name = "error") String error,
+                                         @WebParam(name = "errorDetails") String errorDetails) {
         try {
-            DAOService.getInstance().addRegistryChangeError(idOfOrg, revisionDate, error);
+            DAOService.getInstance().addRegistryChangeError(idOfOrg, revisionDate, error, errorDetails);
             return null;
         } catch (Exception e) {
             logger.error("Failed to add comment for registry change error", e);

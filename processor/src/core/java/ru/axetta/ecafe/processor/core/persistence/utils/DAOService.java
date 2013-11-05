@@ -1530,13 +1530,14 @@ public class DAOService {
         session.update(e);
     }
 
-    public void addRegistryChangeError(long idOfOrg, long revisionDate, String error) throws Exception {
+    public void addRegistryChangeError(long idOfOrg, long revisionDate, String error, String errorDetails) throws Exception {
         Session session = (Session) entityManager.getDelegate();
         RegistryChangeError e = new RegistryChangeError();
         e.setIdOfOrg(idOfOrg);
         e.setRevisionCreateDate(revisionDate);
         e.setError(error);
         e.setCreateDate(System.currentTimeMillis());
+        e.setErrorDetail(errorDetails);
         session.save(e);
     }
 

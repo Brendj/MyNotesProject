@@ -19,6 +19,7 @@ public class RegistryChangeErrorItem {
     protected Long createDate;
     protected Long commentCreateDate;
     protected String error;
+    protected String errorDetail;
     protected String comment;
     protected String orgName;
     protected String commentAuthor;
@@ -27,13 +28,14 @@ public class RegistryChangeErrorItem {
     }
 
     public RegistryChangeErrorItem(Long idOfRegistryChangeError, Long idOfOrg, Long revisionCreateDate, Long createDate,
-            Long commentCreateDate, String error, String comment, String orgName, String commentAuthor) {
+            Long commentCreateDate, String error, String errorDetail, String comment, String orgName, String commentAuthor) {
         this.idOfRegistryChangeError = idOfRegistryChangeError;
         this.idOfOrg = idOfOrg;
         this.revisionCreateDate = revisionCreateDate;
         this.createDate = createDate;
         this.commentCreateDate = commentCreateDate;
         this.error = error;
+        this.errorDetail = errorDetail;
         this.comment = comment;
         this.orgName = orgName;
         this.commentAuthor = commentAuthor;
@@ -109,5 +111,13 @@ public class RegistryChangeErrorItem {
 
     public void setCommentAuthor(String commentAuthor) {
         this.commentAuthor = commentAuthor;
+    }
+
+    public String getErrorDetail() {
+        return errorDetail;
+    }
+
+    public void setErrorDetail(String errorDetail) {
+        this.errorDetail = errorDetail;
     }
 }

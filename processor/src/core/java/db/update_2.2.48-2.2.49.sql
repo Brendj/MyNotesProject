@@ -1,0 +1,1 @@
+alter table cf_registrychange_errors add column errordetails varchar(256) default ''

@@ -42,6 +42,7 @@ public class NSIOrgRegistrySynchErrorPage extends BasicWorkspacePage {
     private Map<Integer, String> errors;
     private String errorMessages;
     private String infoMessages;
+    private String errorDetails;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
@@ -93,7 +94,7 @@ public class NSIOrgRegistrySynchErrorPage extends BasicWorkspacePage {
                 return;
             }
             FrontController controller = NSIOrgRegistrySynchPageBase.createController(logger);
-            controller.addRegistryChangeError(idOfOrg, revisionCreateDate, errors.get(errorType));
+            controller.addRegistryChangeError(idOfOrg, revisionCreateDate, errors.get(errorType), errorDetails);
         } catch (Exception e) {
             logger.error("Failed to load client by name", e);
             sendError("Произошел критический сбой, пожалуйста, повторите попытку позже");
@@ -147,5 +148,13 @@ public class NSIOrgRegistrySynchErrorPage extends BasicWorkspacePage {
 
     public void setIdOfOrg(long idOfOrg) {
         this.idOfOrg = idOfOrg;
+    }
+
+    public String getErrorDetails() {
+        return errorDetails;
+    }
+
+    public void setErrorDetails(String errorDetails) {
+        this.errorDetails = errorDetails;
     }
 }

@@ -548,7 +548,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         if (sel == null) {
             return "";
         }
-        return sel.getError();
+        return "Описание: " + sel.getError() + "\r\n\r\nКомментарии: " + sel.getErrorDetail();
     }
 
     public boolean getSelectedErrorEditable() {
