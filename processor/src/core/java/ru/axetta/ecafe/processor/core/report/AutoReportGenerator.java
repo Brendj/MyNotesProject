@@ -851,6 +851,23 @@ public class AutoReportGenerator {
             }
         }));
 
+        REPORT_DEFS.add(new ReportDef(BudgetMealsShippingReport.class, BudgetMealsShippingReport.AutoReportBuildJob.class, new JobDetailCreator() {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName)
+                    throws Exception {
+                Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + "BudgetMealsShippingReport.jasper";
+                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName, new BudgetMealsShippingReport(), autoReportGenerator.getExecutorService(),
+                        autoReportGenerator.getSessionFactory(), autoReportGenerator.getAutoReportProcessor(),
+                        autoReportGenerator.getReportPath(), reportTemplate,
+                        (Calendar) autoReportGenerator.getCalendar().clone(),
+                        (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                        (DateFormat) autoReportGenerator.getTimeFormat().clone());
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
+                jobDetail.getJobDataMap().put(SSTSReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                return jobDetail;
+            }
+        }));
     } // static
 
 

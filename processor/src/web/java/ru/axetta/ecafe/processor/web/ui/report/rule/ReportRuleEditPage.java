@@ -6,7 +6,10 @@ package ru.axetta.ecafe.processor.web.ui.report.rule;
 
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
+import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.ReportRuleConstants;
 import ru.axetta.ecafe.processor.core.report.RuleConditionItem;
@@ -19,7 +22,6 @@ import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -627,6 +629,9 @@ public class ReportRuleEditPage  extends OnlineReportPage
             }
             else if (defaultRule.getConditionConstant().startsWith(RuleProcessor.CONTRAGENT_EXPRESSION)) {
                 type = "contragent";
+            }
+            else if (defaultRule.getConditionConstant().startsWith(RuleProcessor.ORG_EXPRESSION)) {
+                type = ORG;
             }
             else if (defaultRule.getConditionConstant().indexOf(RuleProcessor.COMBOBOX_EXPRESSION) >= 0) {
                 type = "combobox";
