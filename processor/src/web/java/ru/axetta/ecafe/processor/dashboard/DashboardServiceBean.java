@@ -10,11 +10,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.dashboard.data.DashboardResponse;
 
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.criterion.Projections;
-import org.hibernate.sql.JoinType;
-import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -664,15 +659,19 @@ public class DashboardServiceBean {
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_SUPPORTS);
         def.setReadOnly(true);
         TransactionStatus status = txManager.getTransaction(def);
-        List<DashboardResponse.MenuLastLoadItem> items = null;
+        List<DashboardResponse.MenuLastLoadItem> items = new ArrayList<DashboardResponse.MenuLastLoadItem>();
         try {
-            Criteria criteria = entityManager.unwrap(Session.class).createCriteria(Menu.class);
-            criteria.createAlias("org", "o", JoinType.INNER_JOIN)
-                    .createAlias("o.defaultSupplier", "ds", JoinType.INNER_JOIN)
-                    .setProjection(Projections.projectionList().add(Projections.max("createTime"), "lastLoadTime")
-                            .add(Projections.groupProperty("ds.contragentName"), "contragent"))
-                    .setResultTransformer(Transformers.aliasToBean(DashboardResponse.MenuLastLoadItem.class));
-            items = (List<DashboardResponse.MenuLastLoadItem>) criteria.list();
+            // Извлекаем посл.дату загрузки меню по орг-ям с типом "Комбинат питания".
+            Query query = entityManager.createQuery("select o.idOfOrg, o.shortName, max(m.createTime) \n"
+                    + "from Menu m join m.org o where o.refectoryType = :type group by o.idOfOrg, o.shortName")
+                    .setParameter("type", Org.REFECTORY_TYPE_FOOD_FACTORY);
+            List<Object[]> res = query.getResultList();
+            for (Object[] record : res) {
+                DashboardResponse.MenuLastLoadItem item = new DashboardResponse.MenuLastLoadItem();
+                item.setContragent((String) record[1]);
+                item.setLastLoadTime((Date) record[2]);
+                items.add(item);
+            }
             txManager.commit(status);
         } catch (Exception e) {
             txManager.rollback(status);
