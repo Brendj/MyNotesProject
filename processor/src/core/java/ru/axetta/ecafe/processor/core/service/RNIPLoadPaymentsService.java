@@ -36,9 +36,7 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -83,13 +81,17 @@ import javax.xml.parsers.DocumentBuilderFactory;
 @Scope("singleton")
 public class RNIPLoadPaymentsService {
 
+    
     /**
      * Файл с документом для подписи.
      */
     private final static String RNIP_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     private final static String LOAD_PAYMENTS_TEMPLATE = "META-INF/rnip/getPayments_byDate.xml";
-    private final static String CREATE_CATALOG_TEMPLATE = "META-INF/rnip/createCatalog.xml";
+    public final static String CREATE_CATALOG_TEMPLATE = "META-INF/rnip/createCatalog.xml";
     private final static String MODIFY_CATALOG_TEMPLATE = "META-INF/rnip/modifyCatalog.xml";
+    ////
+    public static final int REQUEST_CREATE_CATALOG=0, REQUEST_MODIFY_CATALOG=1, REQUEST_LOAD_PAYMENTS=2;
+    ////
     //private final static String LOAD_PAYMENTS_TEMPLATE = "D:/2/test.xml";// !!!!!!!!!! ЗАМенить !!!!!!!!!
     /**
      * Адрес тестового сервиса СМЭВ.
@@ -160,7 +162,7 @@ public class RNIPLoadPaymentsService {
         //  Отправка запроса на получение платежей
         SOAPMessage response = null;
         try {
-            response = executeRequest(new Date(System.currentTimeMillis()), CREATE_CATALOG_TEMPLATE, contragent);
+            response = executeRequest(new Date(System.currentTimeMillis()), REQUEST_CREATE_CATALOG, contragent);
         } catch (Exception e) {
             logger.error("Failed to request data from RNIP service", e);
         }
@@ -182,7 +184,7 @@ public class RNIPLoadPaymentsService {
         //  Отправка запроса на получение платежей
         SOAPMessage response = null;
         try {
-            response = executeRequest(new Date(System.currentTimeMillis()), MODIFY_CATALOG_TEMPLATE, contragent);
+            response = executeRequest(new Date(System.currentTimeMillis()), REQUEST_MODIFY_CATALOG, contragent);
         } catch (Exception e) {
             logger.error("Failed to request data from RNIP service", e);
         }
@@ -212,7 +214,7 @@ public class RNIPLoadPaymentsService {
             //  Отправка запроса на получение платежей
             SOAPMessage response = null;
             try {
-                response = executeRequest(updateTime, LOAD_PAYMENTS_TEMPLATE, contragent);
+                response = executeRequest(updateTime, REQUEST_LOAD_PAYMENTS, contragent);
             } catch (Exception e) {
                 logger.error("Failed to request data from RNIP service", e);
             }
@@ -245,23 +247,60 @@ public class RNIPLoadPaymentsService {
         }
 
 
-    public SOAPMessage executeRequest(Date updateTime, String fileName, Contragent contragent) throws Exception {
-        /*** Инициализация ***/
-        Init.init();
+    public SOAPMessage executeRequest(Date updateTime, int requestType, Contragent contragent) throws Exception {
+        String fileName;
+        if (requestType==REQUEST_MODIFY_CATALOG) {
+            fileName = MODIFY_CATALOG_TEMPLATE;
+        } else if (requestType==REQUEST_CREATE_CATALOG) {
+            fileName = CREATE_CATALOG_TEMPLATE;
+        } else if (requestType==REQUEST_LOAD_PAYMENTS) {
+            fileName = LOAD_PAYMENTS_TEMPLATE;
+        } else {
+            throw new Exception("Invalid request type: "+requestType);
+        }
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
+        return send(signRequest(doMacroReplacement(updateTime, new StreamSource(is), contragent), requestType));
+    }
+    
+    public static String messageToString(SOAPMessage msg) throws Exception {
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer = tf.newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+        StringWriter writer = new StringWriter();
+        Document doc = msg.getSOAPPart().getEnvelope().getOwnerDocument();
+        transformer.transform(new DOMSource(doc), new StreamResult(writer));
+        return  writer.getBuffer().toString().replaceAll("\n|\r", "");
+    }
 
-        // Инициализация Transforms алгоритмов.
-        com.sun.org.apache.xml.internal.security.Init.init();
+    PrivateKey privateKey;
+    X509Certificate cert;
 
-        // Инициализация ключевого контейнера.
-        String store = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_STORE_NAME);
-        KeyStore keyStore = KeyStore.getInstance(store);
-        keyStore.load(null, null);
+    public SOAPMessage signRequest(StreamSource requestData, int requestType) throws Exception {
+        String elementForSign=null;
+        if (requestType==REQUEST_MODIFY_CATALOG) {
+            elementForSign = "Changes";
+        } else if (requestType==REQUEST_CREATE_CATALOG) {
+            elementForSign = "ServiceCatalog";
+        }
 
-        // Получение ключа и сертификата.
-        String alias = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
-        String pass = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD);
-        PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, pass.toCharArray());
-        X509Certificate cert = (X509Certificate) keyStore.getCertificate(alias);
+        if (privateKey==null) {
+            /*** Инициализация ***/
+            Init.init();
+
+            // Инициализация Transforms алгоритмов.
+            com.sun.org.apache.xml.internal.security.Init.init();
+
+            // Инициализация ключевого контейнера.
+            String store = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_STORE_NAME);
+            KeyStore keyStore = KeyStore.getInstance(store);
+            keyStore.load(null, null);
+
+            // Получение ключа и сертификата.
+            String alias = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
+            String pass = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD);
+            privateKey = (PrivateKey) keyStore.getKey(alias, pass.toCharArray());
+            cert = (X509Certificate) keyStore.getCertificate(alias);
+        }
 
         /*** Подготовка документа ***/
         MessageFactory mf = MessageFactory.newInstance();
@@ -269,9 +308,8 @@ public class RNIPLoadPaymentsService {
         SOAPPart soapPart = message.getSOAPPart();
 
         // Читаем сообщение из файла.
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
         //FileInputStream fis = new FileInputStream(fileName);
-        soapPart.setContent(doMacroReplacement(updateTime, new StreamSource(is), contragent));//new StreamSource(fis)));
+        soapPart.setContent(requestData);//new StreamSource(fis)));
         message.getSOAPPart().getEnvelope().addNamespaceDeclaration("ds", "http://www.w3.org/2000/09/xmldsig#"); // !!!!!!! Замиенить !!!!!!!!
 
         // Формируем заголовок.
@@ -293,10 +331,39 @@ public class RNIPLoadPaymentsService {
         final Transforms transforms = new Transforms(doc);
         transforms.addTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
         XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM", xmlDSigProvider);
+        ////
         // Преобразования над блоком SignedInfo
         List<Transform> transformList = new ArrayList<Transform>();
         Transform transformC14N = fac.newTransform(Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS, (XMLStructure) null);
         transformList.add(transformC14N);
+        
+        
+        //// Подпись внутренних элементов
+        if (elementForSign!=null) {
+            Reference ref2 = fac
+                    .newReference("", fac.newDigestMethod("http://www.w3.org/2001/04/xmldsig-more#gostr3411", null),
+                            transformList, null, null);
+            // Блок SignedInfo.
+            SignedInfo si2 = fac.newSignedInfo(
+                    fac.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE, (C14NMethodParameterSpec) null),
+                    fac.newSignatureMethod("http://www.w3.org/2001/04/xmldsig-more#gostr34102001-gostr3411", null),
+                    Collections.singletonList(ref2));
+            // Блок KeyInfo.
+            KeyInfoFactory kif2 = fac.getKeyInfoFactory();
+            X509Data x509d2 = kif2.newX509Data(Collections.singletonList(cert));
+            KeyInfo ki2 = kif2.newKeyInfo(Collections.singletonList(x509d2));
+            // Подпись данных.
+            javax.xml.crypto.dsig.XMLSignature sig2 = fac.newXMLSignature(si2, ki2);
+    
+            NodeList nodeList = doc.getElementsByTagName(elementForSign);
+            for (int n=0;n<nodeList.getLength();++n) {
+                Element dataEl = (Element)nodeList.item(n);
+                DOMSignContext signContext = new DOMSignContext(privateKey, dataEl);
+                sig2.sign(signContext);
+            }
+        }
+        
+        
         // Ссылка на подписываемые данные.
         Reference ref = fac
                 .newReference("#body", fac.newDigestMethod("http://www.w3.org/2001/04/xmldsig-more#gostr3411", null),
@@ -343,12 +410,6 @@ public class RNIPLoadPaymentsService {
 
         // Получение документа в виде строки и сохранение в файл.
         //String msg = org.apache.ws.security.util.XMLUtils.PrettyDocumentToString(doc);
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer = tf.newTransformer();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-        StringWriter writer = new StringWriter();
-        transformer.transform(new DOMSource(doc), new StreamResult(writer));
-        String msg = writer.getBuffer().toString().replaceAll("\n|\r", "");
 
         //Array.writeFile("C:/1/test.xml.signed.uri.xml", msg.getBytes("utf-8")); // !!!!!!!! ЗАМЕНИТЬ !!!!!!!!
 
@@ -402,7 +463,7 @@ public class RNIPLoadPaymentsService {
 
         // Проверяем подпись.
         //System.out.println("Verified locally: " + signature.validate(valContext));
-        return send(message);
+        return message;
     }
 
 
