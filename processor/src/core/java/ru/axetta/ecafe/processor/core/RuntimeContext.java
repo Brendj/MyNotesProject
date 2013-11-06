@@ -671,13 +671,6 @@ public class RuntimeContext implements ApplicationContextAware {
                 }
 
                 /**
-                 *  Дополняем всем клиентам guid у тех у кого они пусты
-                 *  */
-                //List<Long> clients = DAOUtils.extractIdFromClientsByGUIDIsNull(entityManager);
-                //logger.info("Generate update uuid in client: "+clients.size());
-                //daoService.updateClientSetGUID(clients);
-
-                /**
                  * Инициализируем список ролей для комплексов
                  * */
                 logger.info("Initialize default complex role");
