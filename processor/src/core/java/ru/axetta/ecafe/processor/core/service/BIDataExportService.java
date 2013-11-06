@@ -259,7 +259,7 @@ public class BIDataExportService {
         now.setTimeInMillis(System.currentTimeMillis());
         clearCalendar(now);
 
-        last.setTimeInMillis(1377993600000L);
+        ///last.setTimeInMillis(1377993600000L);
 
 
         try {
