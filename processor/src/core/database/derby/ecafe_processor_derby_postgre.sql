@@ -240,19 +240,7 @@ CREATE TABLE CF_Users (
   LastEntryTime           BIGINT,              --v43
   IsBlocked               BOOLEAN NOT NULL,    --v43
   CONSTRAINT CF_Users_pk PRIMARY KEY (IdOfUser),
-  CONSTRAINT CF_Users_ShortName UNIQUE (UserName),
-  CONSTRAINT CF_Users_IdOfContragent_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent)
-);
-
---v42
--- Добавление возможности закреплять несколько контрагентов за пользователем
--- Необходимо для отображения содержимого процессанга в контексте пользователя
-create table CF_UserContragents (
-  IdOfUser        BIGINT        NOT NULL,
-  IdOfContragent  BIGINT        NOT NULL,
-  CONSTRAINT CF_UserContragents_pk PRIMARY KEY (IdOfUser, IdOfContragent),
-  CONSTRAINT CF_UserContragents_IdOfUser_fk FOREIGN KEY (IdOfUser) REFERENCES CF_Users (IdOfUser),
-  CONSTRAINT CF_UserContragents_IdOfContragent_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent)
+  CONSTRAINT CF_Users_ShortName UNIQUE (UserName)
 );
 
 CREATE TABLE CF_Functions (
@@ -267,6 +255,33 @@ CREATE TABLE CF_Permissions (
   CONSTRAINT CF_Permissions_pk PRIMARY KEY (IdOfUser, IdOfFunction),
   CONSTRAINT CF_Permissions_IdOfUser_fk FOREIGN KEY (IdOfUser) REFERENCES CF_Users (IdOfUser),
   CONSTRAINT CF_Permissions_IdOfFunction_fk FOREIGN KEY (IdOfFunction) REFERENCES CF_Functions (IdOfFunction)
+);
+
+-- Default user
+--        username: admin
+--        password: Base64(SHA1(123))
+INSERT INTO CF_Users(IdOfUser, Version, UserName, Password, LastChange, Phone, IsBlocked) VALUES(1, 0, 'admin', 'MTIz', 0, '', false);
+
+-- Default functions
+INSERT INTO CF_Functions(IdOfFunction, FunctionName) VALUES(1, 'createUser');
+INSERT INTO CF_Functions(IdOfFunction, FunctionName) VALUES(2, 'editUser');
+INSERT INTO CF_Functions(IdOfFunction, FunctionName) VALUES(3, 'deleteUser');
+INSERT INTO CF_Functions(IdOfFunction, FunctionName) VALUES(4, 'payProcess');
+
+INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(1, 1);
+INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(1, 2);
+INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(1, 3);
+INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(1, 4);
+
+--v42
+-- Добавление возможности закреплять несколько контрагентов за пользователем
+-- Необходимо для отображения содержимого процессанга в контексте пользователя
+create table CF_UserContragents (
+  IdOfUser        BIGINT        NOT NULL,
+  IdOfContragent  BIGINT        NOT NULL,
+  CONSTRAINT CF_UserContragents_pk PRIMARY KEY (IdOfUser, IdOfContragent),
+  CONSTRAINT CF_UserContragents_IdOfUser_fk FOREIGN KEY (IdOfUser) REFERENCES CF_Users (IdOfUser),
+  CONSTRAINT CF_UserContragents_IdOfContragent_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent)
 );
 
 --v24
@@ -727,6 +742,7 @@ CREATE TABLE CF_ClientSms (
 
 create index cf_clientsms_idofclient_idx on cf_clientsms(idofclient); --v25
 create index CF_ClientSms_Price_idx on CF_ClientSms(Price); --v42
+CREATE INDEX cf_clientsms_servicesenddate_idx ON cf_clientsms (servicesenddate ASC NULLS LAST); --v48
 
 CREATE TABLE CF_SchedulerJobs (
   IdOfSchedulerJob        BIGINT          NOT NULL,
@@ -825,22 +841,6 @@ CREATE TABLE CF_MenuExchangeRules (
   CONSTRAINT CF_MenuExchangeRules_IdOfDestOrg_fk FOREIGN KEY (IdOfDestOrg) REFERENCES CF_Orgs (IdOfOrg) ON DELETE CASCADE
 );
 
--- Default user
---        username: admin
---        password: Base64(SHA1(123))
-INSERT INTO CF_Users(IdOfUser, Version, UserName, Password, LastChange, Phone) VALUES(1, 0, 'admin', 'MTIz', 0, '');
-
--- Default functions
-INSERT INTO CF_Functions(IdOfFunction, FunctionName) VALUES(1, 'createUser');
-INSERT INTO CF_Functions(IdOfFunction, FunctionName) VALUES(2, 'editUser');
-INSERT INTO CF_Functions(IdOfFunction, FunctionName) VALUES(3, 'deleteUser');
-INSERT INTO CF_Functions(IdOfFunction, FunctionName) VALUES(4, 'payProcess');
-
-INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(1, 1);
-INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(1, 2);
-INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(1, 3);
-INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(1, 4);
-
 -- Default data
 
 -- Default registry data
@@ -905,14 +905,37 @@ CREATE TABLE CF_Options (
 );
 
 -- Configuration
-INSERT INTO CF_Options(IdOfOption, OptionText)
-  VALUES(1, '');
+INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(1, '');
 -- Option "with/without operator" (0 - without, 1 - with)
-INSERT INTO CF_Options(IdOfOption, OptionText)
-  VALUES(2, 0);
+INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(2, '0');
 -- Option "notify via SMS about enter events" (0 - disabled, 1 - enabled)
-INSERT INTO CF_Options(IdOfOption, OptionText)
-  VALUES(3, 0);
+INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(3, '0');
+-- Option "CLEAN MENU" (0 - disabled, 1 - enabled)
+INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(4, '1');
+-- Option "MENU DAYS FOR DELETION" (count days)
+INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(5, '30');
+-- Option "WRITE JOURNAL TRANSACTIONS" (0 - disabled, 1 - enabled)
+INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(6, '0');
+-- Option "SEND JOURNAL TRANSACTIONS TO NFP" (0 - disabled, 1 - enabled)
+INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(7, '1');
+-- Option "NFP SERVICE ADDRESS" (string URL address)
+INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(8, 'http://193.47.154.34:7002/uec-service-war/TransactionService');
+-- Option "PASSWORD RESTORE SEED" (long)
+INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(9, '');
+-- Option "NOTIFICATION TEXT" (string)
+INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(10, '');
+-- Option "DEFAULT OVERDRAFT LIMIT" (long value)
+INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(11, '0');
+-- Option "DEFAULT EXPENDITURE LIMIT" (long value)
+INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(12, '20000');
+-- Option "SMPP CLIENT STATUS" (0 - disabled, 1 - enabled)
+INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(13, '0');
+-- Option "DISABLE SMS NOTIFY EDIT IN CLIENT ROOM" (0 - disabled, 1 - enabled)
+INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(14, '0');
+-- Option "REQUEST SYNC LIMITS" (counts)
+INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(15, '100');
+-- Option "OPTION REQUEST SYNC RETRY AFTER" (Timeout millisec)
+INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(16, '3600');
 
 CREATE TABLE CF_Settlements (
   IdOfSettlement         BIGINT         NOT NULL,
@@ -2559,7 +2582,73 @@ CREATE TABLE CF_ClientAllocationRule (
   CONSTRAINT CF_ClientAllocationRule_DOrg_FK FOREIGN KEY (IdOfDestinationOrg) REFERENCES cf_orgs (IdOfOrg)
 );
 
+CREATE TABLE cf_temporary_orders (
+  IdOfOrg bigint not null,
+  IdOfClient bigInt not null,
+  IdOfComplex int not null,
+  PlanDate bigint not null,
+  Action int not null,
+  IdOfReplaceClient bigInt,
+  CreationDate bigint not null,
+  ModificationDate bigint,
+  IdOfOrder bigint default null,
+  IdOfUser bigint not null,
+  CONSTRAINT cf_temporary_orders_pk PRIMARY KEY (IdOfOrg, IdOfClient, IdOfComplex, PlanDate),
+  CONSTRAINT cf_temporary_orders_org FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg),
+  CONSTRAINT cf_temporary_orders_client FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
+);
+
+CREATE TABLE cf_thin_client_users (
+  IdOfClient bigint not null,
+  UserName varchar(64) not null,
+  Password varchar(128) not null,
+  Role int not null default 1,
+  CreationDate bigint not null,
+  ModificationDate bigint,
+  CONSTRAINT cf_thin_client_users_pk PRIMARY KEY (UserName),
+  CONSTRAINT cf_thin_client_users_client FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
+);
+
+-- Поправка бага ECAFE-1179
+ALTER TABLE cf_reportinfo ALTER COLUMN reportname TYPE character varying(512);
+
+-- Таблица для хранения поступивших из Реестров изменений
+create table CF_RegistryChange (
+  IdOfRegistryChange bigserial not null,
+  IdOfOrg bigint not null,
+  CreateDate bigint not null,
+  ClientGUID varchar(40) not null,
+  FirstName varchar(64) not null,
+  SecondName varchar(128) not null,
+  Surname varchar(128) not null,
+  GroupName varchar(64) not null,
+  FirstNameFrom varchar(64),
+  SecondNameFrom varchar(128),
+  SurnameFrom varchar(128),
+  GroupNameFrom varchar(64),
+  IdOfMigrateOrgTo bigint,
+  IdOfMigrateOrgFrom bigint,
+  IdOfClient bigint,
+  Operation integer not null,
+  Applied boolean not null default false,
+  CONSTRAINT cf_registrychange_pk PRIMARY KEY (IdOfRegistryChange),
+  CONSTRAINT cf_registrychange_org FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg)
+);
+
+-- Таблица для хранения ошибок по поступившим из Реестров изменениям
+create table CF_RegistryChange_Errors (
+  IdOfRegistryChangeError bigserial not null,
+  IdOfOrg bigint not null,
+  RevisionCreateDate bigint not null,
+  Error varchar(256) not null,
+  Comment varchar(256) default '',
+  CommentAuthor VARCHAR(64) default '',
+  CreateDate bigint not null,
+  CommentCreateDate bigint,
+  CONSTRAINT CF_RegistryChange_Errors_pk PRIMARY KEY (IdOfRegistryChangeError)
+);
+
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
-  VALUES(2, 2, 46, 130926, 0, '');
+  VALUES(2, 2, 48, 131031, 0, '');
 
