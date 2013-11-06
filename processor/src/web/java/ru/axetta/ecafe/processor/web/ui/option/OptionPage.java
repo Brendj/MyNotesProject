@@ -83,6 +83,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Long smsDefaultSubscriptionFee;
     private Integer syncRegisterDaysTimeout;
     private String monitoringAllowedTags;
+    private Boolean cleanupRepositoryReports;
 
 
     private List<BankOptionItem> banks;
@@ -480,6 +481,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.monitoringAllowedTags = monitoringAllowedTags;
     }
 
+    public Boolean getCleanupRepositoryReports() {
+        return cleanupRepositoryReports;
+    }
+
+    public void setCleanupRepositoryReports(Boolean cleanupRepositoryReports) {
+        this.cleanupRepositoryReports = cleanupRepositoryReports;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -537,6 +546,8 @@ public class OptionPage extends BasicWorkspacePage {
         thinClientMinClaimsEditableDays = runtimeContext.getOptionValueInt(Option.OPTION_THIN_CLIENT_MIN__CLAIMS_EDITABLE_DAYS);
         syncRegisterDaysTimeout = runtimeContext.getOptionValueInt(Option.OPTION_MSK_NSI_REGISTRY_CHANGE_DAYS_TIMEOUT);
         monitoringAllowedTags = runtimeContext.getOptionValueString(Option.OPTION_MSK_MONITORING_ALLOWED_TAGS);
+        cleanupRepositoryReports = runtimeContext.getOptionValueBool(Option.OPTION_MSK_CLEANUP_REPOSITORY_REPORTS);
+
 
 
         syncLimits = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS);
@@ -643,6 +654,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_SUPPORT_EMAIL, syncRegisterSupportEmail);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_REGISTRY_CHANGE_DAYS_TIMEOUT, syncRegisterDaysTimeout);
             runtimeContext.setOptionValue(Option.OPTION_MSK_MONITORING_ALLOWED_TAGS, monitoringAllowedTags);
+            runtimeContext.setOptionValue(Option.OPTION_MSK_CLEANUP_REPOSITORY_REPORTS, cleanupRepositoryReports);
 
 
             runtimeContext.saveOptionValues();

@@ -98,6 +98,12 @@
         <task:scheduled ref="benefitsRecalculationService" method="run" cron="0 15 0 ? * *" />
     </task:scheduled-tasks>
 
+
+    <task:scheduler id="cleanupRepositoryReportsSchedule" pool-size="5"/>
+    <task:scheduled-tasks scheduler="cleanupRepositoryReportsSchedule">
+        <task:scheduled ref="cleanupReportsService" method="run" cron="0 15 0 ? * *" />
+    </task:scheduled-tasks>
+
     <!--<task:scheduler id="clientsSMSSubscriptionFeeSchedule"/>-->
     <!--<task:scheduled-tasks scheduler="clientsSMSSubscriptionFeeSchedule">-->
         <!--<task:scheduled ref="smsSubscriptionFeeService" method="notifyClientsAboutSMSSubscriptionFee"-->

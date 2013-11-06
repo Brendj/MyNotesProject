@@ -433,6 +433,10 @@ public class DAOService {
     public Org findOrById(long idOfOrg) {
         return entityManager.find(Org.class, idOfOrg);
     }
+    
+    public ReportInfo findReportInfoById(long idOfReportInfo) {
+        return entityManager.find(ReportInfo.class, idOfReportInfo);
+    }
 
 
     public Client findClientById(long idOfClient) {
@@ -1560,5 +1564,18 @@ public class DAOService {
         q.setString("newName", newName.trim());
         q.setString("previousName", previousName.trim());
         q.executeUpdate();
+    }
+
+    public List<Long> getCleanupRepositoryReportsByDate() throws Exception{
+        Session session = (Session) entityManager.getDelegate();
+        org.hibernate.Query q = session.createSQLQuery(
+                "select idofreportinfo "
+                        + "from cf_reportinfo "
+                        + "left join cf_reporthandlerules on cf_reportinfo.rulename=cf_reporthandlerules.rulename "
+                        + "where cf_reporthandlerules.storageperiod<>-1 and "
+                        + "      (cf_reporthandlerules.storageperiod=0 or "
+                        + "       createddate<EXTRACT(EPOCH FROM now())*1000-cf_reporthandlerules.storageperiod)");
+        List <Long> list = (List <Long>) q.list();
+        return list;
     }
 }
