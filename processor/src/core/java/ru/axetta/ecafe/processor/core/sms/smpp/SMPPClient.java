@@ -78,7 +78,8 @@ public class SMPPClient extends ISmsService {
         if(client.getStatus()==Client.STATE_ONLINE){
             Boolean isDeliveryReport = smppListener.getMessageStack().get(messageId);
             if(isDeliveryReport==null) isDeliveryReport=false;
-            return new DeliveryResponse(isDeliveryReport?DeliveryResponse.DELIVERED:DeliveryResponse.SENT, null, null);
+            return new DeliveryResponse(DeliveryResponse.DELIVERED, null, null);
+            //return new DeliveryResponse(isDeliveryReport?DeliveryResponse.DELIVERED:DeliveryResponse.SENT, null, null);
         } else {
             return new DeliveryResponse(DeliveryResponse.UNKNOWN, null, null);
         }
