@@ -8,8 +8,8 @@ import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
-import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
 import java.util.*;
@@ -153,6 +153,10 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
     }
 
     public void updateUser(Session session, Long idOfUser) throws Exception {
+        if (StringUtils.isEmpty(userName)) {
+            this.printError("Заполните имя пользователя");
+            throw new RuntimeException("Username field is null");
+        }
         User user = (User) session.load(User.class, idOfUser);
         user.setUserName(userName);
         if (changePassword) {
@@ -190,8 +194,9 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             user.setFunctions(functionSelector.getAdminFunctions(session));
             user.setRoleName(role.toString());
         }
-        if(User.DefaultRole.DEFAULT.equals(role)){
-            if(this.roleName==null || this.roleName.isEmpty()){
+        if (User.DefaultRole.DEFAULT.equals(role)) {
+            if (StringUtils.isEmpty(roleName)) {
+                this.printError("Заполните имя роли");
                 throw new Exception("Role name fields is null");
             }
             user.setFunctions(functionSelector.getSelected(session));

@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
 import java.util.*;
@@ -139,13 +140,18 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
     }
 
     public void createUser(Session session) throws Exception {
+        if (StringUtils.isEmpty(userName)) {
+            this.printError("Заполните имя пользователя");
+            throw new RuntimeException("Username field is null");
+        }
         User user = new User(userName, plainPassword, phone, new Date());
         user.setEmail(email);
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         user.setIdOfRole(idOfRole);
         user.setBlocked(false);
-        if(User.DefaultRole.DEFAULT.equals(role)){
-            if(this.roleName==null || this.roleName.isEmpty()){
+        if (User.DefaultRole.DEFAULT.equals(role)) {
+            if (StringUtils.isEmpty(roleName)) {
+                this.printError("Заполните имя роли");
                 throw new Exception("Role name fields is null");
             }
             user.setRoleName(this.roleName);
