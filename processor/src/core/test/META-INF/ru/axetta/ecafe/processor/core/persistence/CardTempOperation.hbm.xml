@@ -11,6 +11,7 @@
         <id name="idOfCardTempOperation" column="IdOfCardTempOperation" type="long">
             <generator class="identity"/>
         </id>
+        <property name="localId" column="localIdOperation" not-null="true" type="long" />
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"
                      not-null="true"/>
         <many-to-one name="cardTemp" class="ru.axetta.ecafe.processor.core.persistence.CardTemp" column="idOfCartTemp"

@@ -64,7 +64,6 @@ public class TestDBInit {
         TestConfigUtil.runSQL(RegisterSynchSingletonBeanTest.class, null, TestConstant.SCRIPT_SYSTEMS_DROP, em);
         TestConfigUtil.runSQL(RegisterSynchSingletonBeanTest.class, null, TestConstant.SCRIPT_SYSTEM_CREATE, em);
         TestConfigUtil.runSQL(RegisterSynchSingletonBeanTest.class, null, TestConstant.SCRIPT_SYSTEM_DATA, em);
-        TestConfigUtil.runSQL(RegisterSynchSingletonBeanTest.class, null, "/db/update_2.2.41-2.2.42.sql", em);
         String content = new Scanner(TestDBInit.class.getResourceAsStream("/META-INF/test.properties")).useDelimiter("\\Z").next();
         em.createNativeQuery("UPDATE CF_Options set OptionText=:p where IdOfOption=1").setParameter("p", content).executeUpdate();
     }

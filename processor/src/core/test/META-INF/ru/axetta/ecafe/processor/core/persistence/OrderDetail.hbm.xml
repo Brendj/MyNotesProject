@@ -35,6 +35,8 @@
         <property name="menuOrigin" column="MenuOrigin" type="int" not-null="true" update="false"/>
         <property name="state" column="State" type="int" not-null="true" update="true"/>
 
+        <property name="idOfRule" column="IdOfRule" type="long" update="true"/>
+
         <property name="itemCode" column="ItemCode" type="string" length="32" not-null="true"
                   update="false"/>
 

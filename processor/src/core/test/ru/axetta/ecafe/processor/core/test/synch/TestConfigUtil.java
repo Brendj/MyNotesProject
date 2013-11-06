@@ -48,6 +48,7 @@ public class TestConfigUtil {
         String statement;
         String sql = "";
         while ((statement = br.readLine()) != null) {
+            statement = statement.toLowerCase().replaceAll("with time zone", "");
             if (!statement.startsWith("--") && !statement.trim().isEmpty()) {
                 sql = sql + (!sql.isEmpty() ? "\n" : "") + statement;
 

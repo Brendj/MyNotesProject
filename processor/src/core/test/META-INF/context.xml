@@ -35,13 +35,18 @@
         <property name="persistenceXmlLocation" value="META-INF/persistence.xml"/>
 
     </bean>
+    <alias name="entityManagerFactory" alias="processorPU"/>
+    <alias name="entityManagerFactory" alias="reportsPU"/>
 
     <bean id="jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect"/>
+
 
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
         <property name="jpaDialect" ref="jpaDialect"/>
     </bean>
+
+    <alias name="transactionManager" alias="txManager"/>
 
     <bean id="testDBInit" class="ru.axetta.ecafe.processor.core.test.synch.TestDBInit">
         <property name="platformTransactionManager" ref="transactionManager"/>
@@ -52,4 +57,8 @@
     <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
 
     <context:component-scan base-package="ru.axetta.ecafe.processor"/>
+
+    <jee:jndi-lookup id="processorPU" jndi-name="java:/processorPUFactory"/>
+    <jee:jndi-lookup id="reportsPU" jndi-name="java:/reportsPUFactory"/>
+
 </beans>
