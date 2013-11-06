@@ -520,7 +520,7 @@ public class RuntimeContext implements ApplicationContextAware {
             this.clientContractIdGenerator = createClientContractIdGenerator(properties, sessionFactory);
 
             // Start background activities
-            if (isMainNode()) {
+            if (isMainNode() && !isTestRunning()) {
                 this.autoReportGenerator.start();
             }
 
