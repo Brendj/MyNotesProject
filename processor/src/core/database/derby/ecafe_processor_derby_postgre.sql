@@ -241,6 +241,18 @@ CREATE TABLE CF_Users (
   IsBlocked               BOOLEAN NOT NULL,    --v43
   CONSTRAINT CF_Users_pk PRIMARY KEY (IdOfUser),
   CONSTRAINT CF_Users_ShortName UNIQUE (UserName)
+--,  CONSTRAINT CF_Users_IdOfContragent_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent) --v42
+);
+
+--v42
+-- Добавление возможности закреплять несколько контрагентов за пользователем
+-- Необходимо для отображения содержимого процессанга в контексте пользователя
+create table CF_UserContragents (
+  IdOfUser        BIGINT        NOT NULL,
+  IdOfContragent  BIGINT        NOT NULL,
+  CONSTRAINT CF_UserContragents_pk PRIMARY KEY (IdOfUser, IdOfContragent),
+  CONSTRAINT CF_UserContragents_IdOfUser_fk FOREIGN KEY (IdOfUser) REFERENCES CF_Users (IdOfUser),
+  CONSTRAINT CF_UserContragents_IdOfContragent_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent)
 );
 
 CREATE TABLE CF_Functions (
@@ -255,33 +267,6 @@ CREATE TABLE CF_Permissions (
   CONSTRAINT CF_Permissions_pk PRIMARY KEY (IdOfUser, IdOfFunction),
   CONSTRAINT CF_Permissions_IdOfUser_fk FOREIGN KEY (IdOfUser) REFERENCES CF_Users (IdOfUser),
   CONSTRAINT CF_Permissions_IdOfFunction_fk FOREIGN KEY (IdOfFunction) REFERENCES CF_Functions (IdOfFunction)
-);
-
--- Default user
---        username: admin
---        password: Base64(SHA1(123))
-INSERT INTO CF_Users(IdOfUser, Version, UserName, Password, LastChange, Phone, IsBlocked) VALUES(1, 0, 'admin', 'MTIz', 0, '', false);
-
--- Default functions
-INSERT INTO CF_Functions(IdOfFunction, FunctionName) VALUES(1, 'createUser');
-INSERT INTO CF_Functions(IdOfFunction, FunctionName) VALUES(2, 'editUser');
-INSERT INTO CF_Functions(IdOfFunction, FunctionName) VALUES(3, 'deleteUser');
-INSERT INTO CF_Functions(IdOfFunction, FunctionName) VALUES(4, 'payProcess');
-
-INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(1, 1);
-INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(1, 2);
-INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(1, 3);
-INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(1, 4);
-
---v42
--- Добавление возможности закреплять несколько контрагентов за пользователем
--- Необходимо для отображения содержимого процессанга в контексте пользователя
-create table CF_UserContragents (
-  IdOfUser        BIGINT        NOT NULL,
-  IdOfContragent  BIGINT        NOT NULL,
-  CONSTRAINT CF_UserContragents_pk PRIMARY KEY (IdOfUser, IdOfContragent),
-  CONSTRAINT CF_UserContragents_IdOfUser_fk FOREIGN KEY (IdOfUser) REFERENCES CF_Users (IdOfUser),
-  CONSTRAINT CF_UserContragents_IdOfContragent_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent)
 );
 
 --v24
@@ -841,6 +826,22 @@ CREATE TABLE CF_MenuExchangeRules (
   CONSTRAINT CF_MenuExchangeRules_IdOfDestOrg_fk FOREIGN KEY (IdOfDestOrg) REFERENCES CF_Orgs (IdOfOrg) ON DELETE CASCADE
 );
 
+-- Default user
+--        username: admin
+--        password: Base64(SHA1(123))
+INSERT INTO CF_Users(IdOfUser, Version, UserName, Password, LastChange, Phone, Isblocked) VALUES(1, 0, 'admin', 'MTIz', 0, '', false);
+
+-- Default functions
+INSERT INTO CF_Functions(IdOfFunction, FunctionName) VALUES(1, 'createUser');
+INSERT INTO CF_Functions(IdOfFunction, FunctionName) VALUES(2, 'editUser');
+INSERT INTO CF_Functions(IdOfFunction, FunctionName) VALUES(3, 'deleteUser');
+INSERT INTO CF_Functions(IdOfFunction, FunctionName) VALUES(4, 'payProcess');
+
+INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(1, 1);
+INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(1, 2);
+INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(1, 3);
+INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(1, 4);
+
 -- Default data
 
 -- Default registry data
@@ -870,8 +871,8 @@ ALTER TABLE CF_ComplexInfoDetail DROP CONSTRAINT CF_ComplexInfoDetail_IdOfMenuDe
 ALTER TABLE CF_ComplexInfoDetail ADD CONSTRAINT CF_ComplexInfoDetail_IdOfMenuDetail_fk FOREIGN KEY (IdOfMenuDetail) REFERENCES CF_MenuDetails (IdOfMenuDetail) ON DELETE CASCADE;
 
 -- Indexes
-CREATE index "cf_orders_createddate_idx" ON "cf_orders" (CreatedDate);
-CREATE index "cf_orders_client_idx" ON "cf_orders" (IdOfClient);
+CREATE index "cf_orders_createddate_idx" ON cf_orders(CreatedDate);
+CREATE index "cf_orders_client_idx" ON cf_orders(IdOfClient);
 
 CREATE TABLE CF_EnterEvents (
   IdOfEnterEvent          bigint    NOT NULL,
@@ -896,7 +897,7 @@ CREATE TABLE CF_EnterEvents (
 CREATE INDEX cf_enterevents_idofclient_idx on cf_enterevents(idOfClient); --v25
 CREATE INDEX cf_enterevents_idevtdt_idx on cf_enterevents(IdOfClient, EvtDateTime); --v25
 CREATE index cf_enterevents_org_event_idx ON cf_enterevents(idOfOrg, idOfEnterEvent); --v36
-CREATE INDEX cf_enterevents_idvisevtdt_idx ON cf_enterevents USING btree (idofvisitor , evtdatetime ); --v43
+CREATE INDEX cf_enterevents_idvisevtdt_idx ON cf_enterevents (idofvisitor , evtdatetime ); --v43
 
 CREATE TABLE CF_Options (
   IdOfOption    BIGINT  NOT NULL,
@@ -905,9 +906,11 @@ CREATE TABLE CF_Options (
 );
 
 -- Configuration
-INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(1, '');
+INSERT INTO CF_Options(IdOfOption, OptionText)
+  VALUES(1, '');
 -- Option "with/without operator" (0 - without, 1 - with)
-INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(2, '0');
+INSERT INTO CF_Options(IdOfOption, OptionText)
+  VALUES(2, 0);
 -- Option "notify via SMS about enter events" (0 - disabled, 1 - enabled)
 INSERT INTO CF_Options(IdOfOption, OptionText) VALUES(3, '0');
 -- Option "CLEAN MENU" (0 - disabled, 1 - enabled)
@@ -1077,7 +1080,7 @@ CREATE TABLE CF_TransactionJournal
   CONSTRAINT cf_transaction_journal_pk PRIMARY KEY (idOfTransactionJournal)
 );
 
-/* Таблица категорий Организаций */
+--  Таблица категорий Организаций 
 CREATE TABLE CF_CategoryOrg
 (
   idofcategoryorg bigserial NOT NULL,
@@ -1085,7 +1088,7 @@ CREATE TABLE CF_CategoryOrg
   CONSTRAINT cf_categoryorg_pk PRIMARY KEY (idofcategoryorg )
 );
 
-/* Таблица связка между CategoryOrg и Org */
+--  Таблица связка между CategoryOrg и Org 
 CREATE TABLE CF_CategoryOrg_Orgs
 (
   idoforgscategories bigserial NOT NULL,
@@ -1098,7 +1101,7 @@ CREATE TABLE CF_CategoryOrg_Orgs
   REFERENCES Cf_Orgs (idoforg)
 );
 
-/* Таблица связка между DiscountRules и CategoryDiscountRule */
+--  Таблица связка между DiscountRules и CategoryDiscountRule 
 CREATE TABLE CF_DiscountRules_CategoryDiscounts
 (
   idofdrcd bigserial NOT NULL,
@@ -1111,7 +1114,7 @@ CREATE TABLE CF_DiscountRules_CategoryDiscounts
   REFERENCES CF_DiscountRules (idofrule)
 );
 
-/* Таблица связка между CategoryOrg и DiscountRule */
+--  Таблица связка между CategoryOrg и DiscountRule 
 CREATE TABLE CF_DiscountRules_CategoryOrg
 (
   idofcatorgdiscrule bigserial NOT NULL,
@@ -1125,7 +1128,7 @@ CREATE TABLE CF_DiscountRules_CategoryOrg
 );
 
 
-/* Таблица связка между Client и CategoryDiscountRule */
+--  Таблица связка между Client и CategoryDiscountRule 
 CREATE TABLE CF_Clients_CategoryDiscounts
 (
   idofclienscategorydiscount bigserial NOT NULL,
@@ -1388,7 +1391,7 @@ CREATE TABLE CF_ReportInfo (
   IdOfReportInfo BigSerial NOT NULL,
   RuleName varchar(64) NOT NULL,
   DocumentFormat integer,
-  ReportName varchar(128) NOT NULL,
+  ReportName varchar(512) NOT NULL, --v47
   CreatedDate bigint NOT NULL,
   GenerationTime integer NOT NULL,
   StartDate bigint NOT NULL,
@@ -1798,7 +1801,7 @@ CREATE TABLE cf_publications
   CONSTRAINT cf_publications_GUID_key UNIQUE (GUID )
 );
 
-CREATE INDEX cf_publications_idofpublication_idx ON cf_publications USING btree (idofpublication );
+CREATE INDEX cf_publications_idofpublication_idx ON cf_publications (idofpublication );
 
 --книговыдача
 --IdOfParentCirculation - родительская выдача (древовидная структура для продления выдач)
@@ -1834,7 +1837,7 @@ CREATE TABLE cf_circulations
   CONSTRAINT cf_circulation_GUID_key UNIQUE (GUID )
 );
 
-CREATE INDEX cf_circulations_idofcirculation_idx ON cf_circulations USING btree (idofcirculation );
+CREATE INDEX cf_circulations_idofcirculation_idx ON cf_circulations (idofcirculation );
 
 --выдаваемая сущность
 --BarCode - штрихкод
@@ -1863,7 +1866,7 @@ CREATE TABLE cf_issuable
   CONSTRAINT cf_issuable_guid_key UNIQUE (guid )
 );
 
-CREATE INDEX cf_issuable_idofissuable_idx ON cf_issuable USING btree (idofissuable );
+CREATE INDEX cf_issuable_idofissuable_idx ON cf_issuable (idofissuable );
 
 --тип сопр.документа
 --TypeOfAccompanyingDocumentName - название (акт, накладная, т.п.)
@@ -2076,7 +2079,7 @@ CREATE TABLE cf_instances (
   CONSTRAINT cf_instances_guid_key UNIQUE (guid )
 );
 
-CREATE INDEX cf_instances_idofinstance_idx ON cf_instances USING btree (idofinstance );
+CREATE INDEX cf_instances_idofinstance_idx ON cf_instances (idofinstance );
 
 --журналы(тип)
 --IdOfFund - фонд
@@ -2494,15 +2497,15 @@ CREATE TABLE CF_ClientsNotificationSettings
 -- Таблица регистрации временных карт
 CREATE TABLE cf_cards_temp (
   IdOfCartTemp bigserial,
-  IdOfOrg bigint,                        /* идентификатор организациии */
-  IdOfClient bigInt,                     /* Идентификатор клиента */
-  IdOfVisitor bigint,                    /* Идентификатор посетителя */
-  VisitorType bigint not null default 0, /* Признак карты посетителя , bit, 1- карта посетителя, 0 — карта клиента, not null */
-  CardNo bigint NOT NULL,                /* номер карты */
-  CardPrintedNo character varying(24),   /* номер нанесенный на карту */
-  CardStation int not null default 0,    /* int16 или int8, not null, значения-  0 — свободна, 1 — выдана , 3 — заблокирована (? не уверен, что блокировка нужна) */
-  CreateDate bigint not null,            /* Дата и время регистрации карты */
-  ValidDate bigint,                      /* Дата завершения действия карты */
+  IdOfOrg bigint,                        --  идентификатор организациии 
+  IdOfClient bigInt,                     --  Идентификатор клиента 
+  IdOfVisitor bigint,                    --  Идентификатор посетителя 
+  VisitorType bigint not null default 0, --  Признак карты посетителя , bit, 1- карта посетителя, 0 — карта клиента, not null 
+  CardNo bigint NOT NULL,                --  номер карты 
+  CardPrintedNo character varying(24),   --  номер нанесенный на карту 
+  CardStation int not null default 0,    --  int16 или int8, not null, значения-  0 — свободна, 1 — выдана , 3 — заблокирована (? не уверен, что блокировка нужна) 
+  CreateDate bigint not null,            --  Дата и время регистрации карты 
+  ValidDate bigint,                      --  Дата завершения действия карты 
   CONSTRAINT cf_cards_temp_pk PRIMARY KEY (IdOfCartTemp),
   CONSTRAINT cf_cards_temp_organization FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg),
   CONSTRAINT CardNo_Unique UNIQUE (CardNo)
@@ -2510,14 +2513,14 @@ CREATE TABLE cf_cards_temp (
 
 -- Таблица зарегистрированных операций по временным картам
 CREATE TABLE cf_card_temp_operations(
-  IdOfCardTempOperation bigserial not null,   /* первичный ключ процесинга */
-  LocalIdOperation bigint NOT NULL,           /* первичный ключ школы */
-  IdOfOrg bigint not null,                    /* внешний ключ на IdOfOrg из соотв. таблицы — равен идентификатору организации, на которую зарегистрирована врем. карта или, в случае врем. карты посетителя — идентификатору организации, в которой была произведена эта операция. */
-  IdOfCartTemp bigint not null,               /* внешний ключ или на физ. идентификатор временной карты или на первичный ключ соотв. записи из TempCards */
-  IdOfClient bigint,                          /* Идентификатор клиента */
-  IdOfVisitor bigint,                         /* Идентификатор посетителя */
-  OperationType int not null,                 /* Тип операции- int16 или int8, not null, значения-  0 — регистрация, 1 — выдача ,2 – возврат, 3 — блокировка */
-  OperationDate bigint not null,              /* Дата и время операции */
+  IdOfCardTempOperation bigserial not null,   --  первичный ключ процесинга 
+  LocalIdOperation bigint NOT NULL,           --  первичный ключ школы 
+  IdOfOrg bigint not null,                    --  внешний ключ на IdOfOrg из соотв. таблицы — равен идентификатору организации, на которую зарегистрирована врем. карта или, в случае врем. карты посетителя — идентификатору организации, в которой была произведена эта операция. 
+  IdOfCartTemp bigint not null,               --  внешний ключ или на физ. идентификатор временной карты или на первичный ключ соотв. записи из TempCards 
+  IdOfClient bigint,                          --  Идентификатор клиента 
+  IdOfVisitor bigint,                         --  Идентификатор посетителя 
+  OperationType int not null,                 --  Тип операции- int16 или int8, not null, значения-  0 — регистрация, 1 — выдача ,2 – возврат, 3 — блокировка 
+  OperationDate bigint not null,              --  Дата и время операции 
   CONSTRAINT cf_card_temp_operations_pk PRIMARY KEY (IdOfCardTempOperation),
   CONSTRAINT cf_card_temp_operations_organization FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg),
   CONSTRAINT cf_card_temp_operation_org_local_id UNIQUE (IdOfOrg , LocalIdOperation )
@@ -2525,15 +2528,15 @@ CREATE TABLE cf_card_temp_operations(
 
 -- Таблица посетителей
 CREATE TABLE cf_visitors(
-  IdOfVisitor bigserial not null,                /* первичный ключ */
-  IdOfPerson BIGINT NOT NULL,                    /* внешний ключ на ФИО посетителя */
-  PassportNumber varchar(50),                    /* Серийный номер паспорта */
-  PassportDate BIGINT,                           /* Дата выдачи паспорта */
-  WarTicketNumber varchar(50),                   /* Серийный номер водительского удостоверения (ВУ) */
-  WarTicketDate BIGINT,                          /* Дата выдачи ВУ */
-  DriverLicenceNumber varchar(50),               /* Серийный номер военного билета (ВБ) */
-  DriverLicenceDate BIGINT,                      /* Дата выдачи ВБ */
-  VisitorType integer NOT NULL DEFAULT 0,        /* Добавлен тип постетителя (DEFAULT 0 обычный, EMPLOYEE 1 инженер) */
+  IdOfVisitor bigserial not null,                --  первичный ключ 
+  IdOfPerson BIGINT NOT NULL,                    --  внешний ключ на ФИО посетителя 
+  PassportNumber varchar(50),                    --  Серийный номер паспорта 
+  PassportDate BIGINT,                           --  Дата выдачи паспорта 
+  WarTicketNumber varchar(50),                   --  Серийный номер водительского удостоверения (ВУ) 
+  WarTicketDate BIGINT,                          --  Дата выдачи ВУ 
+  DriverLicenceNumber varchar(50),               --  Серийный номер военного билета (ВБ) 
+  DriverLicenceDate BIGINT,                      --  Дата выдачи ВБ 
+  VisitorType integer NOT NULL DEFAULT 0,        --  Добавлен тип постетителя (DEFAULT 0 обычный, EMPLOYEE 1 инженер) 
   CONSTRAINT cf_visitors_pk PRIMARY KEY (IdOfVisitor),
   CONSTRAINT cf_visitors_IdOfPerson_fk FOREIGN KEY (IdOfPerson) REFERENCES CF_Persons (IdOfPerson)
 );
@@ -2582,7 +2585,8 @@ CREATE TABLE CF_ClientAllocationRule (
   CONSTRAINT CF_ClientAllocationRule_DOrg_FK FOREIGN KEY (IdOfDestinationOrg) REFERENCES cf_orgs (IdOfOrg)
 );
 
-CREATE TABLE cf_temporary_orders (
+
+CREATE TABLE cf_temporary_orders ( --v47
   IdOfOrg bigint not null,
   IdOfClient bigInt not null,
   IdOfComplex int not null,
@@ -2598,7 +2602,7 @@ CREATE TABLE cf_temporary_orders (
   CONSTRAINT cf_temporary_orders_client FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
 );
 
-CREATE TABLE cf_thin_client_users (
+CREATE TABLE cf_thin_client_users ( --v47
   IdOfClient bigint not null,
   UserName varchar(64) not null,
   Password varchar(128) not null,
@@ -2609,11 +2613,8 @@ CREATE TABLE cf_thin_client_users (
   CONSTRAINT cf_thin_client_users_client FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
 );
 
--- Поправка бага ECAFE-1179
-ALTER TABLE cf_reportinfo ALTER COLUMN reportname TYPE character varying(512);
-
 -- Таблица для хранения поступивших из Реестров изменений
-create table CF_RegistryChange (
+create table CF_RegistryChange ( --v47
   IdOfRegistryChange bigserial not null,
   IdOfOrg bigint not null,
   CreateDate bigint not null,
@@ -2636,7 +2637,7 @@ create table CF_RegistryChange (
 );
 
 -- Таблица для хранения ошибок по поступившим из Реестров изменениям
-create table CF_RegistryChange_Errors (
+create table CF_RegistryChange_Errors (  --v47
   IdOfRegistryChangeError bigserial not null,
   IdOfOrg bigint not null,
   RevisionCreateDate bigint not null,
