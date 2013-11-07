@@ -6,6 +6,7 @@
 <%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
 <%@ page import="ru.axetta.ecafe.processor.core.card.CardNoFormat" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.*" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.HibernateUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
@@ -16,19 +17,16 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.apache.commons.lang.time.DateUtils" %>
 <%@ page import="org.hibernate.Criteria" %>
-<%@ page import="org.hibernate.Query" %>
 <%@ page import="org.hibernate.Session" %>
+<%@ page import="org.hibernate.criterion.Projections" %>
 <%@ page import="org.hibernate.criterion.Restrictions" %>
+<%@ page import="org.hibernate.sql.JoinType" %>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="java.net.URI" %>
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.*" %>
-<%@ page import="org.hibernate.sql.JoinType" %>
-<%@ page import="org.hibernate.criterion.Projections" %>
-<%@ page import="org.hibernate.Hibernate" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils" %>
 
 <%-- Код для динамической загрузки Yahoo UI Calendar dependancies --%>
 
@@ -799,7 +797,7 @@
             Criteria criteria = persistenceSession.createCriteria(Order.class);
             criteria.add(Restrictions.isNotNull("confirmerId"));
             criteria.createCriteria("client","student", JoinType.LEFT_OUTER_JOIN)
-                    .add(Restrictions.sqlRestriction("{alias}.balance - {alias}.\"Limit\" < 0"));
+                    .add(Restrictions.sqlRestriction("{alias}.balance - {alias}.limits < 0"));
            criteria.add(Restrictions.eq("student.contractId",clientAuthToken.getContractId()));
            // teacher
            // criteria.createAlias("student.person","person", JoinType.LEFT_OUTER_JOIN);

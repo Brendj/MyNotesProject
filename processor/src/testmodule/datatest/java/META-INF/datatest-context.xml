@@ -35,6 +35,7 @@
                 <value>ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/*</value>
                 <value>ru/axetta/ecafe/processor/core/persistence/distributedobjects/settings/*</value>
                 <value>ru/axetta/ecafe/processor/core/persistence/questionary/*</value>
+                <value>ru/axetta/ecafe/processor/core/persistence/regularPaymentSubscription/*</value>
             </array>
         </property>
         <!-- для запуска приложения запросов -->

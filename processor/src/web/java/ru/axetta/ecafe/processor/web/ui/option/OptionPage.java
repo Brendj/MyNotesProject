@@ -81,6 +81,9 @@ public class OptionPage extends BasicWorkspacePage {
     private Integer thinClientMinClaimsEditableDays;
     private int smsPaymentType;
     private Long smsDefaultSubscriptionFee;
+    private Boolean enableBalanceAutoRefill;
+    private String autoRefillValues;
+    private String thresholdValues;
     private Integer syncRegisterDaysTimeout;
     private String monitoringAllowedTags;
     private Boolean cleanupRepositoryReports;
@@ -465,6 +468,30 @@ public class OptionPage extends BasicWorkspacePage {
         this.smsDefaultSubscriptionFee = smsDefaultSubscriptionFee;
     }
 
+    public Boolean getEnableBalanceAutoRefill() {
+        return enableBalanceAutoRefill;
+    }
+
+    public void setEnableBalanceAutoRefill(Boolean enableBalanceAutoRefill) {
+        this.enableBalanceAutoRefill = enableBalanceAutoRefill;
+    }
+
+    public String getAutoRefillValues() {
+        return autoRefillValues;
+    }
+
+    public void setAutoRefillValues(String autoRefillValues) {
+        this.autoRefillValues = autoRefillValues;
+    }
+
+    public String getThresholdValues() {
+        return thresholdValues;
+    }
+
+    public void setThresholdValues(String thresholdValues) {
+        this.thresholdValues = thresholdValues;
+    }
+
     public Integer getSyncRegisterDaysTimeout() {
         return syncRegisterDaysTimeout;
     }
@@ -508,6 +535,9 @@ public class OptionPage extends BasicWorkspacePage {
         srcOrgMenuDaysForDeletion = runtimeContext.getOptionValueInt(Option.OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION);
         smsPaymentType = runtimeContext.getOptionValueInt(Option.OPTION_SMS_PAYMENT_TYPE);
         smsDefaultSubscriptionFee = runtimeContext.getOptionValueLong(Option.OPTION_SMS_DEFAULT_SUBSCRIPTION_FEE);
+        enableBalanceAutoRefill = runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_BALANCE_AUTOREFILL);
+        autoRefillValues = runtimeContext.getOptionValueString(Option.OPTION_AUTOREFILL_VALUES);
+        thresholdValues = runtimeContext.getOptionValueString(Option.OPTION_THRESHOLD_VALUES);
         journalTransactions = runtimeContext.getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS);
         sendJournalTransactionsToNFP = runtimeContext.getOptionValueBool(Option.OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP);
         nfpServiceAddress = runtimeContext.getOptionValueString(Option.OPTION_NFP_SERVICE_ADDRESS);
@@ -600,6 +630,9 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION, srcOrgMenuDaysForDeletion);
             runtimeContext.setOptionValue(Option.OPTION_SMS_PAYMENT_TYPE, smsPaymentType);
             runtimeContext.setOptionValue(Option.OPTION_SMS_DEFAULT_SUBSCRIPTION_FEE, smsDefaultSubscriptionFee);
+            runtimeContext.setOptionValue(Option.OPTION_ENABLE_BALANCE_AUTOREFILL, enableBalanceAutoRefill);
+            runtimeContext.setOptionValue(Option.OPTION_AUTOREFILL_VALUES, autoRefillValues);
+            runtimeContext.setOptionValue(Option.OPTION_THRESHOLD_VALUES, thresholdValues);
             runtimeContext.setOptionValue(Option.OPTION_JOURNAL_TRANSACTIONS, journalTransactions);
             runtimeContext.setOptionValue(Option.OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP, sendJournalTransactionsToNFP);
             runtimeContext.setOptionValue(Option.OPTION_NFP_SERVICE_ADDRESS, nfpServiceAddress);

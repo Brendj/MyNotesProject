@@ -306,6 +306,26 @@
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <h:outputText escape="true" value="Запретить пользователю включать/отключать СМС-информирование" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{optionPage.disableSMSNotifyEditInClientRoom}" styleClass="output-text" />
+            <h:outputText escape="true" value="Разрешить использование услуги автопополнения баланса"
+                          styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{optionPage.enableBalanceAutoRefill}" styleClass="output-text">
+                <a4j:support event="onchange" reRender="thresholdValues,autoRefillValues" />
+            </h:selectBooleanCheckbox>
+        </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid" columns="1">
+            <h:outputText escape="true" value="Настройки автопополнения баланса:" styleClass="output-text" />
+            <h:panelGrid style="margin-left: 15px;" columns="2">
+                <h:outputText escape="true" value="Пороговое значение баланса*" styleClass="output-text" />
+                <h:inputText value="#{optionPage.thresholdValues}" styleClass="input-text" size="70"
+                             converter="rublesStringConverter" id="thresholdValues"
+                             disabled="#{not optionPage.enableBalanceAutoRefill}" />
+                <h:outputText escape="true" value="Размер пополнения*" styleClass="output-text" />
+                <h:inputText value="#{optionPage.autoRefillValues}" styleClass="input-text" size="70"
+                             converter="rublesStringConverter" id="autoRefillValues"
+                             disabled="#{not optionPage.enableBalanceAutoRefill}" />
+                <h:outputText escape="true" style="font-size: 8pt;"
+                              value="* - при вводе списка значений разделителем является ';'" />
+            </h:panelGrid>
         </h:panelGrid>
     </rich:tab>
     <rich:tab label="Тонкий клиент">

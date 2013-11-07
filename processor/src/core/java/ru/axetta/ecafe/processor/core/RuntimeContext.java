@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.event.EventProcessor;
 import ru.axetta.ecafe.processor.core.logic.FinancialOpsManager;
 import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.core.mail.Postman;
+import ru.axetta.ecafe.processor.core.partner.acquiropay.AcquiropaySystemConfig;
 import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
 import ru.axetta.ecafe.processor.core.partner.elecsnet.ElecsnetConfig;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
@@ -185,6 +186,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private ElecsnetConfig partnerElecsnetConfig;
     private StdPayConfig partnerStdPayConfig;
     private IntegraPartnerConfig integraPartnerConfig;
+    private AcquiropaySystemConfig acquiropaySystemConfig;
 
     public static RuntimeContext getInstance() throws NotInitializedException {
         return getAppContext().getBean(RuntimeContext.class);
@@ -318,6 +320,9 @@ public class RuntimeContext implements ApplicationContextAware {
         return partnerRbkMoneyConfig;
     }
 
+    public AcquiropaySystemConfig getAcquiropaySystemConfig() {
+        return acquiropaySystemConfig;
+    }
     ///////////////////////////////////////////////////////////
 
 
@@ -484,6 +489,7 @@ public class RuntimeContext implements ApplicationContextAware {
                 logger.error("Failed to load partner config: " + e);
                 criticalErrors = true;
             }
+            this.acquiropaySystemConfig = new AcquiropaySystemConfig(properties, PROCESSOR_PARAM_BASE);
 
             this.syncPrivateKey = loadSyncPrivateKeyData(properties);
             this.paymentPrivateKey = loadPaymentPrivateKeyData(properties);

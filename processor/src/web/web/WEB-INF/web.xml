@@ -211,6 +211,14 @@
         <url-pattern>/soap/integro</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>RegularPaymentWS</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.acquiropay.soap.RegularPaymentWS</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RegularPaymentWS</servlet-name>
+        <url-pattern>/soap/regpay</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <servlet-name>BarcodeServlet</servlet-name>
@@ -231,11 +239,11 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>AcquiropayPaymentServlet</servlet-name>
-        <servlet-class>ru.axetta.ecafe.processor.web.partner.acquiropay.AcquiropayPaymentServlet</servlet-class>
+        <servlet-name>RegularPaymentServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.acquiropay.RegularPaymentServlet</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>AcquiropayPaymentServlet</servlet-name>
+        <servlet-name>RegularPaymentServlet</servlet-name>
         <url-pattern>/regpay-acquiropay</url-pattern>
     </servlet-mapping>
 

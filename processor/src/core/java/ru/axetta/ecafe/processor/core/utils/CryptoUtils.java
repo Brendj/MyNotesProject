@@ -17,8 +17,13 @@ import java.security.NoSuchAlgorithmException;
  */
 public class CryptoUtils {
 
-    public static String MD5(String arg) throws NoSuchAlgorithmException {
-        MessageDigest m = MessageDigest.getInstance("MD5");
+    public static String MD5(String arg) {
+        MessageDigest m;
+        try {
+            m = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e.getMessage());
+        }
         byte[] data = arg.getBytes();
         m.update(data, 0, data.length);
         BigInteger i = new BigInteger(1, m.digest());

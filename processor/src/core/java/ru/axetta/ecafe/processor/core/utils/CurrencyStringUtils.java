@@ -45,12 +45,16 @@ public final class CurrencyStringUtils {
     }
 
     public static String copecksToRubles(long sum) {
+        return copecksToRubles(sum, DEFAULT_DELIMITER);
+    }
+
+    public static String copecksToRubles(long sum, int delimiter) {
         Long absSum = Math.abs(sum);
         StringBuilder stringBuilder = new StringBuilder();
         if (0 > sum) {
             stringBuilder.append('-');
         }
-        stringBuilder.append(Long.toString(absSum / COPECKS_IN_RUBLE)).append(DELIMITERS[DEFAULT_DELIMITER])
+        stringBuilder.append(Long.toString(absSum / COPECKS_IN_RUBLE)).append(DELIMITERS[delimiter])
                 .append(String.format("%02d", absSum % COPECKS_IN_RUBLE));
         return stringBuilder.toString();
     }
