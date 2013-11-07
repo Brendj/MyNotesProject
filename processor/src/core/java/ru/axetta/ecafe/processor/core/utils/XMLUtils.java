@@ -13,6 +13,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -22,6 +23,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -50,6 +52,18 @@ public class XMLUtils {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         Document d = factory.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
         return doc.importNode(d.getDocumentElement(), true);
+    }
+
+    public static Document inputStreamToXML(InputStream is, DocumentBuilderFactory dbf) {
+        DocumentBuilder documentBuilder;
+        Document document;
+        try {
+            documentBuilder = dbf.newDocumentBuilder();
+            document = documentBuilder.parse(new InputSource(is));
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
+        return document;
     }
 
     public static String getAttributeValue(Node node, String attributeName) {
@@ -135,7 +149,7 @@ public class XMLUtils {
         return result;
     }
 
-    public static Node findFirstChildElement(Node node, String name) throws Exception {
+    public static Node findFirstChildElement(Node node, String name) {
         Node currNode = node.getFirstChild();
         while (null != currNode) {
             if (Node.ELEMENT_NODE == currNode.getNodeType() && currNode.getNodeName().equals(name)) {
@@ -146,7 +160,7 @@ public class XMLUtils {
         return null;
     }
 
-    public static Node findFirstChildTextNode(Node node) throws Exception {
+    public static Node findFirstChildTextNode(Node node) {
         Node currNode = node.getFirstChild();
         while (null != currNode) {
             if (Node.TEXT_NODE == currNode.getNodeType()) {
