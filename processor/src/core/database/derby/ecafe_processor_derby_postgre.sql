@@ -1044,6 +1044,7 @@ CREATE TABLE CF_DiscountRules (
   Priority                  Integer       NOT NULL DEFAULT 0,
   CategoriesDiscounts       Character     varying(64),
   OperationOr               integer       NOT NULL DEFAULT 0,
+  ComplexesMap              Character     varying(512),
   CONSTRAINT CF_DiscountRules_pk PRIMARY KEY (IdOfRule)
 );
 
