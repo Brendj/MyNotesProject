@@ -143,8 +143,8 @@ public class AltarixSmsServiceImpl extends ISmsService {
     public SendResponse sendTextMessage(String sender, String phoneNumber, String text) throws Exception {
         NameValuePair[] queryParameters = createQueryParameters(userServiceId, phoneNumber, text, "send", "sms");
 
-        MessageIdGenerator messageIdGenerator = RuntimeContext.getInstance().getMessageIdGenerator();
-        String messageId = messageIdGenerator.generate();
+        //MessageIdGenerator messageIdGenerator = RuntimeContext.getInstance().getMessageIdGenerator();
+        String messageId = "";//messageIdGenerator.generate();
 
         String responseString = sendServiceRequest(queryParameters);
 
