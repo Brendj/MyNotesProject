@@ -259,7 +259,11 @@ public class RNIPLoadPaymentsService {
             throw new Exception("Invalid request type: "+requestType);
         }
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(fileName);
-        return send(signRequest(doMacroReplacement(updateTime, new StreamSource(is), contragent), requestType));
+        SOAPMessage out = signRequest(doMacroReplacement(updateTime, new StreamSource(is), contragent), requestType);
+        Array.writeFile("C:/out.signed.xml", RNIPLoadPaymentsService.messageToString(out).getBytes("UTF-8"));
+        SOAPMessage in = send(out);
+        Array.writeFile("C:/in.signed.xml", RNIPLoadPaymentsService.messageToString(in).getBytes("UTF-8"));
+        return in;
     }
     
     public static String messageToString(SOAPMessage msg) throws Exception {
