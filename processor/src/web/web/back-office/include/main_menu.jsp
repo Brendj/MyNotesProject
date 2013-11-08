@@ -813,6 +813,7 @@
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
+    <%-- ----------------------------------------- --%>
     <rich:panelMenuGroup id="budgetReportGroupMenu" binding="#{mainPage.budgetFoodGroupMenu.mainMenuComponent}"
                          label="Льготное питание">
         <a4j:support event="onclick" action="#{mainPage.showBudgetFoodGroupMenu}" reRender="workspaceForm" />
@@ -823,8 +824,20 @@
                             binding="#{mainPage.deliveredServicesReportPage.mainMenuComponent}"
                             label="Отчет по предоставленным услугам"
                             action="#{mainPage.showDeliveredServicesReportPage}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="clientPaymentsReportMenuItem"
+                            binding="#{mainPage.clientPaymentsReportPage.mainMenuComponent}" label="Отчет по обороту"
+                            action="#{mainPage.showClientPaymentsReportPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
+
+    <rich:panelMenuGroup id="paymentReportsGroupMenu" binding="#{mainPage.paymentReportsGroupMenu.mainMenuComponent}"
+                         label="Отчеты по пополнениям">
+        <a4j:support event="onclick" action="#{mainPage.showPaymentReportsGroupMenu}" reRender="workspaceForm" />
+        <%--@elvariable id="contragentCompletionReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ContragentCompletionReportPage"--%>
+        <rich:panelMenuItem id="contragentCompletionReportMenuItem"
+                            binding="#{contragentCompletionReportPage.mainMenuComponent}" label="Отчет по пополнениям"
+                            action="#{contragentCompletionReportPage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"
                         label="Отчет по продажам" action="#{mainPage.showSalesReportPage}" reRender="workspaceForm" />
@@ -832,11 +845,6 @@
     <rich:panelMenuItem id="enterEventReportMenuItem" binding="#{mainPage.enterEventReportPage.mainMenuComponent}"
                         label="Отчет по турникетам" action="#{mainPage.showEnterEventReportPage}"
                         reRender="workspaceForm" />
-
-    <%--@elvariable id="contragentCompletionReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ContragentCompletionReportPage"--%>
-    <rich:panelMenuItem id="contragentCompletionReportMenuItem"
-                        binding="#{contragentCompletionReportPage.mainMenuComponent}" label="Отчет по пополнениям"
-                        action="#{contragentCompletionReportPage.show}" reRender="workspaceForm" />
 
     <%--@elvariable id="aggregateCostsAndSalesReportPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.AggregateCostsAndSalesReportPage"--%>
     <rich:panelMenuItem id="aggregateCostsAndSalesReportMenuItem"
@@ -859,9 +867,6 @@
     <%--@elvariable id="payStatsPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PayStatsPage"--%>
     <rich:panelMenuItem id="payStatsMenuItem" binding="#{payStatsPage.mainMenuComponent}" label="Отчет по агентам"
                         action="#{payStatsPage.show}" reRender="workspaceForm" />
-    <rich:panelMenuItem id="clientPaymentsReportMenuItem"
-                        binding="#{mainPage.clientPaymentsReportPage.mainMenuComponent}" label="Отчет по начислениям"
-                        action="#{mainPage.showClientPaymentsReportPage}" reRender="workspaceForm" />
     <rich:panelMenuItem id="clientsBenefitsReportMenuItem"
                         binding="#{mainPage.clientsBenefitsReportPage.mainMenuComponent}"
                         label="Расчет комплексов по льготным правилам"
