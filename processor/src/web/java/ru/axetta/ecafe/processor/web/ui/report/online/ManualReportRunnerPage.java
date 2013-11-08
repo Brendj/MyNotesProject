@@ -720,9 +720,9 @@ public class ManualReportRunnerPage extends OnlineReportPage
                 ext = "pdf";
                 contentType = "application/pdf";
             }
-            String fileName=ruleName+"."+ext;
-            fileName = URLEncoder.encode(fileName, "UTF-8").replace('+', ' ');
-            response.setHeader("Content-disposition", "attachment; filename*=\"utf8'ru-ru'"+fileName+"\"");
+            String fileName = ruleName + "." + ext;
+            fileName = URLEncoder.encode(fileName, "UTF-8").replace("+", "%20");
+            response.setHeader("Content-disposition", "attachment; filename*=utf-8'ru-RU'" + fileName);
             response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
             response.setCharacterEncoding("UTF-8");
             response.setContentType(contentType);
