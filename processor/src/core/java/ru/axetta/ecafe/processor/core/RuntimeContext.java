@@ -250,6 +250,9 @@ public class RuntimeContext implements ApplicationContextAware {
             entityManager = emf.createEntityManager();
             setSessionFactory (((Session) entityManager.getDelegate()).getSessionFactory());
         }
+        if (sessionFactory == null) {
+            setSessionFactory (((Session) entityManager.getDelegate()).getSessionFactory());
+        }
     }
 
     public Session createReportPersistenceSession() {
@@ -403,8 +406,15 @@ public class RuntimeContext implements ApplicationContextAware {
 
         String basePath = "/";
         if (isOrgRoomRunning()) {
-            Properties properties = new Properties();//loadConfig();
+            initiateOrgRoomEntityManager();
+            Properties properties = loadConfig();
             this.clientContractIdGenerator = createClientContractIdGenerator(properties, sessionFactory);
+            /* Для autoreportgenerator */
+            postman = createPostman(properties, sessionFactory);
+            RuleProcessor ruleProcessor = createRuleHandler(properties, sessionFactory, postman, postman);
+            this.autoReportProcessor = ruleProcessor;
+            this.autoReportGenerator = createAutoReportGenerator(basePath, properties, executorService, scheduler,
+                    reportsSessionFactory, ruleProcessor);
             return;
         }
         Properties properties = loadConfig();
