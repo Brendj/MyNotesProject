@@ -813,7 +813,6 @@
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
-    <%-- ----------------------------------------- --%>
     <rich:panelMenuGroup id="budgetReportGroupMenu" binding="#{mainPage.budgetFoodGroupMenu.mainMenuComponent}"
                          label="Льготное питание">
         <a4j:support event="onclick" action="#{mainPage.showBudgetFoodGroupMenu}" reRender="workspaceForm" />
