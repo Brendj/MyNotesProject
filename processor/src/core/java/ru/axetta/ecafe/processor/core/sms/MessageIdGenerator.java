@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sms;
 
 import ru.axetta.ecafe.processor.core.persistence.Registry;
+import ru.axetta.ecafe.processor.core.persistence.RegistrySMS;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -67,7 +68,7 @@ public class MessageIdGenerator {
         Session session = sessionFactory.openSession();
         try {
             transaction = session.beginTransaction();
-            Registry registry = (Registry) session.get(Registry.class, Registry.THE_ONLY_INSTANCE_ID);
+            RegistrySMS registry = (RegistrySMS) session.get(RegistrySMS.class, RegistrySMS.THE_ONLY_INSTANCE_ID);
             String timePart = StringUtils.leftPad(Long.toHexString(new Date().getTime()), 16, '0');
             String smsId = add(registry.getSmsId(), MESSAGE_ID_STEP);
             registry.setSmsId(smsId);

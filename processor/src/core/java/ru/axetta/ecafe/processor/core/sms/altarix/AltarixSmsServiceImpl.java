@@ -19,6 +19,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -96,11 +97,10 @@ public class AltarixSmsServiceImpl extends ISmsService {
      * Сохраняет параметры отправки в поле sentParameters
      *
      * @param queryParameters параметры запроса
-     * @param messageId       id сообщения
      * @return ответ сервера в виде строки, содержащий статус отправки и UUID сообщения
      * @throws Exception
      */
-    public String sendServiceRequest(NameValuePair[] queryParameters, String messageId) throws Exception {
+    public String sendServiceRequest(NameValuePair[] queryParameters) throws Exception {
 
         GetMethod httpMethod = new GetMethod(config.getServiceUrl());
         httpMethod.setQueryString(queryParameters);
@@ -143,10 +143,10 @@ public class AltarixSmsServiceImpl extends ISmsService {
     public SendResponse sendTextMessage(String sender, String phoneNumber, String text) throws Exception {
         NameValuePair[] queryParameters = createQueryParameters(userServiceId, phoneNumber, text, "send", "sms");
 
-        MessageIdGenerator messageIdGenerator = RuntimeContext.getInstance().getMessageIdGenerator();
-        String messageId = messageIdGenerator.generate();
+        //MessageIdGenerator messageIdGenerator = RuntimeContext.getInstance().getMessageIdGenerator();
+        //String messageId = messageIdGenerator.generate();
 
-        String responseString = sendServiceRequest(queryParameters, messageId);
+        String responseString = sendServiceRequest(queryParameters);
 
         int status = SendResponse.COMMON_FAILURE;
         if (responseString != null) {
@@ -155,10 +155,12 @@ public class AltarixSmsServiceImpl extends ISmsService {
                 return null;
             }
             status = Integer.parseInt(st.nextToken());
-            messageId = st.nextToken();
+            //messageId = st.nextToken();
         }
 
-        return new SendResponse(translateSendStatus(status), null, messageId);
+
+
+        return new SendResponse(translateSendStatus(status), null, UUID.randomUUID().toString());
 
     }
 

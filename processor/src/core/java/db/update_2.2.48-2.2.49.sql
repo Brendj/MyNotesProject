@@ -1,71 +1,134 @@
+--! Пока скрипт не финализирован рекоментовано писать очистку добавляемых колонок таблиц.
+--! после финализации они уберутся
+--! Информация для разработчика -- информация для пользователя
+
+-- Пакет обновлений 2.2.49
+
 -- Добавление возможности описывать причину ошибки при сверке с ИС Реестры
 alter table cf_registrychange_errors add column errordetails varchar(256) default '';
 
 -- Добавление возможности определения срока хранения отчетов для выбранного правила
 alter table CF_ReportHandleRules add column StoragePeriod bigint default -1;
 
--- ECAFE-1188 - Реализовать функцию авто-пополнения счета по банковской карте через Банк Москвы - Acquiropay
---! Таблица с информацией о подписках клиентов на автопополнение баланса с банк. карты.
+--! ECAFE-1188 - Реализовать функцию авто-пополнения счета по банковской карте через Банк Москвы - Acquiropay
+-- Информация о подписках клиентов на автопополнение баланса с банк. карты.
+-- уникальный идентификатор подписки на услугу в ИС ПП */
+-- сумма пополнения */
+-- пороговое значение баланса, при достижении ко/го баланс автопополняется */
+-- срок действия подписки (число месяцев c даты подключения) */
+-- дата, до ко\ой подписка активна (вычисляется относит-но даты подключения) */
+-- дата подключения подписки */
+-- дата отключения подписки */
+-- флаг активности подписки */
+-- статус подписки */
+-- id подписки в системе МФР */
+-- клиент */
+-- СНИЛС клиента */
+-- идентификатор системы, через ко/ую происходит автопополнение баланса */
+-- дата последнего успешного платежа */
+-- дата последнего неуспешного платежа */
+-- количество неуспешных платежей подряд */
+-- статус последнего платежа по подписке */
+-- маскированный номер карты Плательщика, вида 400000|0002 */
+-- имя держателя карты */
+-- срок действия карты, месяц */
+-- срок действия, год */
 CREATE TABLE cf_bank_subscriptions (
-  IdOfSubscription BIGSERIAL,          /* уникальный идентификатор подписки на услугу в ИС ПП */
-  PaymentAmount BIGINT NOT NULL,       /* сумма пополнения */
-  ThresholdAmount BIGINT NOT NULL,     /* пороговое значение баланса, при достижении ко/го баланс автопополняется */
-  MonthsCount INTEGER NOT NULL,        /* срок действия подписки (число месяцев c даты подключения) */
-  ValidToDate BIGINT,                  /* дата, до ко\ой подписка активна (вычисляется относит-но даты подключения) */
-  ActivationDate BIGINT,               /* дата подключения подписки */
-  DeactivationDate BIGINT,             /* дата отключения подписки */
-  IsActive INTEGER,                    /* флаг активности подписки */
-  Status VARCHAR(255),                 /* статус подписки */
-  PaymentId VARCHAR(32),               /* id подписки в системе МФР */
-  IdOfClient BIGINT NOT NULL,          /* клиент */
-  San VARCHAR(11),                     /* СНИЛС клиента */
-  PaySystem INTEGER NOT NULL,          /* идентификатор системы, через ко/ую происходит автопополнение баланса */
-  LastSuccessfulPaymentDate BIGINT,    /* дата последнего успешного платежа */
-  LastUnsuccessfulPaymentDate BIGINT,  /* дата последнего неуспешного платежа */
-  UnsuccessfulPaymentsCount INTEGER,   /* количество неуспешных платежей подряд */
-  LastPaymentStatus VARCHAR(255),      /* статус последнего платежа по подписке */
-  MaskedCardNumber VARCHAR(11),        /* маскированный номер карты Плательщика, вида 400000|0002 */
-  CardHolder VARCHAR(255),             /* имя держателя карты */
-  ExpMonth INTEGER,                    /* срок действия карты, месяц */
-  ExpYear INTEGER,                     /* срок действия, год */
+  IdOfSubscription BIGSERIAL,
+  PaymentAmount BIGINT NOT NULL,
+  ThresholdAmount BIGINT NOT NULL,
+  MonthsCount INTEGER NOT NULL,
+  ValidToDate BIGINT,
+  ActivationDate BIGINT,
+  DeactivationDate BIGINT,
+  IsActive INTEGER,
+  Status VARCHAR(255),
+  PaymentId VARCHAR(32),
+  IdOfClient BIGINT NOT NULL,
+  San VARCHAR(11),
+  PaySystem INTEGER NOT NULL,
+  LastSuccessfulPaymentDate BIGINT,
+  LastUnsuccessfulPaymentDate BIGINT,
+  UnsuccessfulPaymentsCount INTEGER,
+  LastPaymentStatus VARCHAR(255),
+  MaskedCardNumber VARCHAR(11),
+  CardHolder VARCHAR(255),
+  ExpMonth INTEGER,
+  ExpYear INTEGER,
   CONSTRAINT cf_bank_subscriptions_pk PRIMARY KEY (IdOfSubscription),
   CONSTRAINT cf_bank_subscriptions_client_fk FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
 );
 
 --!  Таблица отправленных запросов ИС ПП в МФР (на подключение подписки, ее отключение, списание средств).
+-- уникальный идентификатор запроса ИС ПП в МФР */
+-- уникальный идентификатор подписки на услугу в ИС ПП */
+-- идентификатор системы, через ко/ую проходят платежи */
+-- тип запроса (подключение, отключение, списание средств) */
+-- URL запроса */
+-- дата и время запроса */
+-- флаг успешности запроса: 1 - на запрос пришел ответ, 0 - иначе */
+-- статус ответа на запрос */
+-- обрабатываемый клиент */
+-- СНИЛС клиента */
+-- описание ошибки в случае неудачного запроса */
 CREATE TABLE cf_mfr_requests (
-  IdOfRequest BIGSERIAL,              /* уникальный идентификатор запроса ИС ПП в МФР */
-  IdOfSubscription BIGINT NOT NULL,   /* уникальный идентификатор подписки на услугу в ИС ПП */
-  PaySystem INTEGER NOT NULL,         /* идентификатор системы, через ко/ую проходят платежи */
-  RequestType INTEGER NOT NULL,       /* тип запроса (подключение, отключение, списание средств) */
-  RequestURL VARCHAR(255) NOT NULL,   /* URL запроса */
-  RequestTime BIGINT NOT NULL,        /* дата и время запроса */
-  IsSuccess INTEGER NOT NULL,         /* флаг успешности запроса: 1 - на запрос пришел ответ, 0 - иначе */
-  ResponseStatus VARCHAR(255),        /* статус ответа на запрос */
-  IdOfClient BIGINT NOT NULL,         /* обрабатываемый клиент */
-  San VARCHAR(11),                    /* СНИЛС клиента */
-  ErrorDescription VARCHAR(255),      /* описание ошибки в случае неудачного запроса */
+  IdOfRequest BIGSERIAL,
+  IdOfSubscription BIGINT NOT NULL,
+  PaySystem INTEGER NOT NULL,
+  RequestType INTEGER NOT NULL,
+  RequestURL VARCHAR(255) NOT NULL,
+  RequestTime BIGINT NOT NULL,
+  IsSuccess INTEGER NOT NULL,
+  ResponseStatus VARCHAR(255),
+  IdOfClient BIGINT NOT NULL,
+  San VARCHAR(11),
+  ErrorDescription VARCHAR(255),
   CONSTRAINT cf_mfr_requests_subscription_fk FOREIGN KEY (IdOfSubscription) REFERENCES cf_bank_subscriptions (IdOfSubscription),
   CONSTRAINT cf_mfr_requests_pk PRIMARY KEY (IdOfRequest),
   CONSTRAINT cf_mfr_requests_client_fk FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
 );
 
 --! Таблица ежемесячных платежей, осуществляемых по банковской подписке.
+-- id платежа */
+-- уникальный идентификатор подписки на услугу в ИС ПП, по ко/ой совершается платеж */
+-- уникальный идентификатор запроса ИС ПП в МФР */
+-- сумма платежа */
+-- дата и время платежа */
+-- клиент */
+-- баланс клиента на момент запуска платежа */
+-- установленное у подписки пороговое значение баланса на момент запуска */
+-- результат платежа (осуществлен или нет) */
+-- статус платежа */
+-- код авторизации */
+-- RRN транзакции */
 CREATE TABLE cf_regular_payments (
-  IdOfPayment BIGSERIAL,              /* id платежа */
-  IdOfSubscription BIGINT NOT NULL,   /* уникальный идентификатор подписки на услугу в ИС ПП, по ко/ой совершается платеж */
-  IdOfRequest BIGINT NOT NULL,        /* уникальный идентификатор запроса ИС ПП в МФР */
-  PaymentAmount BIGINT NOT NULL,      /* сумма платежа */
-  PaymentDate BIGINT,                 /* дата и время платежа */
-  IdOfClient BIGINT NOT NULL,         /* клиент */
-  ClientBalance BIGINT NOT NULL,      /* баланс клиента на момент запуска платежа */
-  ThresholdAmount BIGINT NOT NULL,    /* установленное у подписки пороговое значение баланса на момент запуска */
-  IsSuccess INTEGER NOT NULL,         /* результат платежа (осуществлен или нет) */
-  Status VARCHAR(255),                /* статус платежа */
-  AuthCode VARCHAR(6),                /* код авторизации */
-  RRN BIGINT,                         /* RRN транзакции */
+  IdOfPayment BIGSERIAL,
+  IdOfSubscription BIGINT NOT NULL,
+  IdOfRequest BIGINT NOT NULL,
+  PaymentAmount BIGINT NOT NULL,
+  PaymentDate BIGINT,
+  IdOfClient BIGINT NOT NULL,
+  ClientBalance BIGINT NOT NULL,
+  ThresholdAmount BIGINT NOT NULL,
+  IsSuccess INTEGER NOT NULL,
+  Status VARCHAR(255),
+  AuthCode VARCHAR(6),
+  RRN BIGINT,
   CONSTRAINT cf_regular_payments_pk PRIMARY KEY (IdOfPayment),
   CONSTRAINT cf_regular_payments_subscription_fk FOREIGN KEY (IdOfSubscription) REFERENCES cf_bank_subscriptions (IdOfSubscription),
   CONSTRAINT cf_regular_payments_request_fk FOREIGN KEY (IdOfRequest) REFERENCES cf_mfr_requests (IdOfRequest),
   CONSTRAINT cf_regular_payments_client_fk FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
 );
+
+--
+CREATE TABLE CF_RegistrySms (
+  IdOfRegistrySMS            BIGINT          NOT NULL,
+  Version                 BIGINT          NOT NULL,
+  SmsId                   CHAR(16)        NOT NULL,
+  CONSTRAINT CF_RegistrySms_pk PRIMARY KEY (IdOfRegistrySMS)
+);
+
+INSERT INTO CF_RegistrySms(IdOfRegistrySMS, version, smsid) VALUES (1, 0, (select smsid from CF_Registry where IdOfRegistry=1));
+ALTER TABLE cf_registry DROP COLUMN smsid;
+
+--! ФИНАЛИЗИРОВАН (Кадыров, 131108) НЕ МЕНЯТЬ

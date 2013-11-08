@@ -11,16 +11,15 @@ package ru.axetta.ecafe.processor.core.persistence;
  * Time: 14:02:41
  * To change this template use File | Settings | File Templates.
  */
-public class Registry {
+public class RegistrySMS {
 
     public static final Long THE_ONLY_INSTANCE_ID = 1L;
 
     private long version;
-    private Long idOfRegistry;
-    private Long clientRegistryVersion;
+    private Long idOfRegistrySMS;
     private String smsId;
 
-    protected Registry() {
+    protected RegistrySMS() {
         // For Hibernate only
     }
 
@@ -34,34 +33,25 @@ public class Registry {
         this.version = version;
     }
 
-    public Long getIdOfRegistry() {
-        return idOfRegistry;
+    public Long getIdOfRegistrySMS() {
+        return idOfRegistrySMS;
     }
 
-    private void setIdOfRegistry(Long idOfRegistry) {
+    private void setIdOfRegistrySMS(Long idOfRegistry) {
         // For Hibernate only
-        this.idOfRegistry = idOfRegistry;
+        this.idOfRegistrySMS = idOfRegistry;
     }
 
-    public Long getClientRegistryVersion() {
-        return clientRegistryVersion;
-    }
-
-    public void setClientRegistryVersion(Long clientRegistryVersion) {
-        this.clientRegistryVersion = clientRegistryVersion;
-    }
-
-    private String getSmsId() {
+    public String getSmsId() {
         return smsId;
     }
 
-    private void setSmsId(String smsId) {
+    public void setSmsId(String smsId) {
         this.smsId = smsId;
     }
 
     @Override
     public String toString() {
-        return "ClientRegistry{" + "idOfRegistry=" + idOfRegistry + ", clientRegistryVersion=" + clientRegistryVersion
-                + '}';
+        return "SMSRegistry{" + "idOfRegistry=" + idOfRegistrySMS + '}';
     }
 }

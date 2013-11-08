@@ -665,8 +665,15 @@ CREATE TABLE CF_Registry (
   IdOfRegistry            BIGINT          NOT NULL,
   Version                 BIGINT          NOT NULL,
   ClientRegistryVersion   BIGINT          NOT NULL,
-  SmsId                   CHAR(16)        NOT NULL,
+--  SmsId                   CHAR(16)        NOT NULL,
   CONSTRAINT CF_ClientRegistry_pk PRIMARY KEY (IdOfRegistry)
+);
+
+CREATE TABLE CF_RegistrySms (
+  IdOfRegistrySMS            BIGINT          NOT NULL,
+  Version                 BIGINT          NOT NULL,
+  SmsId                   CHAR(16)        NOT NULL,
+  CONSTRAINT CF_RegistrySms_pk PRIMARY KEY (IdOfRegistrySMS)
 );
 
 CREATE TABLE CF_ReportHandleRules (
@@ -845,8 +852,11 @@ INSERT INTO CF_Permissions(IdOfUser, IdOfFunction) VALUES(1, 4);
 -- Default data
 
 -- Default registry data
-INSERT INTO CF_Registry(IdOfRegistry, Version, ClientRegistryVersion, SmsId)
-  VALUES(1, 0, 0, '0000000000000000');
+INSERT INTO CF_Registry(IdOfRegistry, Version, ClientRegistryVersion)
+  VALUES(1, 0, 0);
+
+INSERT INTO CF_RegistrySms(IdOfRegistrySMS, Version, SmsId)
+  VALUES(1, 0, '0000000000000000');
 
 -- Default generators' values
 INSERT INTO CF_Generators(

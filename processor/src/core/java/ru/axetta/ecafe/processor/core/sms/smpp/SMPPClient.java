@@ -70,19 +70,19 @@ public class SMPPClient extends ISmsService {
         } else {
             logger.info("message sent="+sr.id);
         }
-        return new SendResponse(sr.err, sr.err != 0?null:"message sent="+sr.id, sr.id);
+        return new SendResponse(translateSendStatus(sr.err), sr.err != 0?null:"message sent="+sr.id, sr.id);
     }
 
     @Override
     public DeliveryResponse getDeliveryStatus(String messageId) throws Exception {
-        if(client.getStatus()==Client.STATE_ONLINE){
-            Boolean isDeliveryReport = smppListener.getMessageStack().get(messageId);
-            if(isDeliveryReport==null) isDeliveryReport=false;
-            return new DeliveryResponse(DeliveryResponse.DELIVERED, null, null);
-            //return new DeliveryResponse(isDeliveryReport?DeliveryResponse.DELIVERED:DeliveryResponse.SENT, null, null);
-        } else {
-            return new DeliveryResponse(DeliveryResponse.UNKNOWN, null, null);
-        }
+        return new DeliveryResponse(DeliveryResponse.DELIVERED, null, null);
+        //if(client.getStatus()==Client.STATE_ONLINE){
+        //    //Boolean isDeliveryReport = smppListener.getMessageStack().get(messageId);
+        //    //if(isDeliveryReport==null) isDeliveryReport=false;
+        //    //return new DeliveryResponse(isDeliveryReport?DeliveryResponse.DELIVERED:DeliveryResponse.SENT, null, null);
+        //} else {
+        //    return new DeliveryResponse(DeliveryResponse.UNKNOWN, null, null);
+        //}
     }
 
     public SMPPClient(Config config, Properties properties, String PATH) throws Exception{
@@ -128,6 +128,22 @@ public class SMPPClient extends ISmsService {
         } else {
             logger.error("connecting error");
         }
+    }
+
+    /**
+     * По ответу сервера делает вывод о статусе отправки
+     *
+     * @param sendStatus статус из ответа шлюза
+     * @return статус отправки
+     */
+    private int translateSendStatus(int sendStatus) {
+        if (sendStatus == 0) {
+            return SendResponse.MIN_SUCCESS_STATUS;
+        } else {
+            return SendResponse.COMMON_FAILURE;
+        }
+
+
     }
 
 }
