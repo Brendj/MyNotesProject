@@ -836,6 +836,12 @@
         <rich:panelMenuItem id="contragentCompletionReportMenuItem"
                             binding="#{contragentCompletionReportPage.mainMenuComponent}" label="Отчет по обороту"
                             action="#{contragentCompletionReportPage.show}" reRender="workspaceForm" />
+        <%--<rich:panelMenuItem id="dailySalesByGroupsReportMenuItem" binding="#{dailySalesByGroupsReportPage.mainMenuComponent}"
+                            label="Дневные продажи по категориям" action="#{dailySalesByGroupsReportPage.show}"
+                            reRender="workspaceForm" />--%>
+        <rich:panelMenuItem id="contragentPaymentReportMenuItem" binding="#{contragentPaymentReportPage.mainMenuComponent}"
+                            label="Отчет по платежам" action="#{contragentPaymentReportPage.show}"
+                            reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"

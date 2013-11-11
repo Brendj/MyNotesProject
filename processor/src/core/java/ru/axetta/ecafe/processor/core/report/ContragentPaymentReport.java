@@ -5,12 +5,12 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JREmptyDataSource;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.JRHtmlExporter;
+import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -21,6 +21,7 @@ import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.text.DateFormatSymbols;
 import java.util.*;
 
@@ -34,6 +35,7 @@ import java.util.*;
 public class ContragentPaymentReport extends BasicReportForContragentJob {
 
     public final static String PARAM_CONTRAGENT_RECEIVER_ID = "idOfContragentReceiver";
+    public final static String PARAM_PERIOD_TYPE = "periodType";
     
 
     @Override
@@ -167,7 +169,13 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             this.templateFilename = templateFilename;
         }
 
+        public Builder() {
+            templateFilename = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath() + ContragentPaymentReport.class.getSimpleName() + ".jasper";
+            exportToHTML = true;
+        }
+
         private long totalSum;
+        private boolean exportToHTML = false;
 
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
@@ -200,8 +208,23 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                     createDataSource(session, contragent, contragentReceiver, startTime, endTime, (Calendar) calendar.clone(),
                             parameterMap));
             Date generateEndTime = new Date();
-            return new ContragentPaymentReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
-                    jasperPrint, startTime, endTime, contragent.getIdOfContragent());
+            if (!exportToHTML) {
+                return new ContragentPaymentReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
+                        jasperPrint, startTime, endTime, contragent.getIdOfContragent());
+            }  else {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                JRHtmlExporter exporter = new JRHtmlExporter();
+                exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+                exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
+                exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
+                exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
+                exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
+                exporter.exportReport();
+                return new ContragentPaymentReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
+                        jasperPrint, startTime, endTime, contragent.getIdOfContragent()).setHtmlReport(os.toString("UTF-8"));
+            }
         }
 
         private JRDataSource createDataSource(Session session, Contragent contragent, Contragent contragentReceiver,
@@ -255,6 +278,16 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
     }
 
     private static final Logger logger = LoggerFactory.getLogger(ContragentPaymentReport.class);
+    private String htmlReport;
+
+    public String getHtmlReport() {
+        return htmlReport;
+    }
+
+    public ContragentPaymentReport setHtmlReport(String htmlReport) {
+        this.htmlReport = htmlReport;
+        return this;
+    }
 
     @Override
     public String getReportDistinctText() {

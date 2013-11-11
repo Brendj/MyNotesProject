@@ -5064,7 +5064,11 @@ public Long getSelectedIdOfReportRule() {
         updateSelectedMainMenu();
         return null;
     }
-    
+
+    public BasicWorkspacePage getPaymentReportsGroupMenu() {
+        return paymentReportsGroupMenu;
+    }
+
     public Object showPaymentReportsGroupMenu () {
         currentWorkspacePage = paymentReportsGroupMenu;
         updateSelectedMainMenu();
