@@ -13,6 +13,8 @@ import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.poi.util.StringUtil;
 import org.hibernate.Session;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -59,6 +61,35 @@ public class ContractEditPage extends AbstractEditPage<ContractItem> implements 
     }
 
     @Override
+    protected boolean onCheckRequiredFields() {
+        if(currentItem.getContragent()==null){
+            printError("Введите данные контрагента.");
+            return false;
+        }
+        if(StringUtils.isEmpty(currentItem.getPerformer())){
+           printError("Введите данные исполнителя.");
+           return false;
+        }
+        if(StringUtils.isEmpty(currentItem.getCustomer())){
+            printError("Введите данные заказчика.");
+            return false;
+        }
+        if(StringUtils.isEmpty(currentItem.getContractNumber())){
+            printError("Введите номер контракта.");
+            return false;
+        }
+        if(currentItem.getDateOfConclusion()==null){
+            printError("Укажите дату заключения контракта.");
+            return false;
+        }
+        if(currentItem.getDateOfClosing()==null){
+            printError("Укажите срок действия контракта.");
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public String getPageFilename() {
         return "contragent/contract/edit";
     }
@@ -85,9 +116,13 @@ public class ContractEditPage extends AbstractEditPage<ContractItem> implements 
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes)
             throws Exception {
         contragentFilter.completeContragentSelection(session, idOfContragent);
-        Contragent contragent = DAOService.getInstance().getContragentById(idOfContragent);
-        currentItem.setContragent(contragent);
-        currentItem.setPerformer(contragent.getContragentName());
+        if(idOfContragent!=null){
+            Contragent contragent = DAOService.getInstance().getContragentById(idOfContragent);
+            if(contragent!=null){
+                currentItem.setContragent(contragent);
+                currentItem.setPerformer(contragent.getContragentName());
+            }
+        }
     }
 
     public CCAccountFilter getContragentFilter() {

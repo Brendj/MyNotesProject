@@ -33,9 +33,6 @@ public class BasicGoodEditPage extends AbstractEditPage<BasicGoodItem> {
 
     private List<SelectItem> unitsScaleSelectItemList;
 
-    @Autowired
-    private DAOService daoService;
-
     @Override
     public String getPageFilename() {
         return "commodity_accounting/configuration_provider/basicGood/edit";
@@ -57,6 +54,11 @@ public class BasicGoodEditPage extends AbstractEditPage<BasicGoodItem> {
 
     public void setUnitsScaleSelectItemList(List<SelectItem> unitsScaleSelectItemList) {
         this.unitsScaleSelectItemList = unitsScaleSelectItemList;
+    }
+
+    @Override
+    protected boolean onCheckRequiredFields() {
+        return true;
     }
 
     @Override

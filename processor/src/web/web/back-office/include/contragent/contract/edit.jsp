@@ -11,7 +11,7 @@
 <% if (!ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToEditOrgs())
 { out.println("Недостаточно прав для просмотра страницы"); return; } %>
 
-<%-- Панель создания организации --%>
+<%-- Панель создания/редактирования/просмотра котрактов --%>
 <%--@elvariable id="contractEditPage" type="ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractEditPage"--%>
 <h:panelGrid id="contractEditGrid" binding="#{contractEditPage.ap.pageComponent}" styleClass="borderless-grid" columns="2">
 
@@ -24,19 +24,17 @@
                            reRender="modalContragentSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;">
-            <f:setPropertyActionListener value="0"
-                                         target="#{mainPage.multiContrFlag}" />
-            <f:setPropertyActionListener value="2"
-                                         target="#{mainPage.classTypes}" />
+            <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+            <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
         </a4j:commandButton>
     </h:panelGroup>
 
     <h:outputText escape="true" value="Исполнитель" styleClass="output-text required-field" />
-    <h:inputText value="#{contractEditPage.ap.currentEntity.performer}" maxlength="128" styleClass="input-text long-field" required="true" requiredMessage="Введите данные исполнителя." readonly="#{contractEditPage.ap.readonly}"/>
+    <h:inputText value="#{contractEditPage.ap.currentEntity.performer}" maxlength="128" styleClass="input-text long-field" readonly="#{contractEditPage.ap.readonly}"/>
     <h:outputText escape="true" value="Заказчик" styleClass="output-text required-field" />
-    <h:inputText value="#{contractEditPage.ap.currentEntity.customer}" maxlength="128" styleClass="input-text long-field" required="true" requiredMessage="Введите данные заказчика." readonly="#{contractEditPage.ap.readonly}"/>
+    <h:inputText value="#{contractEditPage.ap.currentEntity.customer}" maxlength="128" styleClass="input-text long-field" readonly="#{contractEditPage.ap.readonly}"/>
     <h:outputText escape="true" value="Номер" styleClass="output-text required-field" />
-    <h:inputText value="#{contractEditPage.ap.currentEntity.contractNumber}" maxlength="50" styleClass="input-text long-field" required="true" requiredMessage="Введите номер контракта." readonly="#{contractEditPage.ap.readonly}"/>
+    <h:inputText value="#{contractEditPage.ap.currentEntity.contractNumber}" maxlength="50" styleClass="input-text long-field" readonly="#{contractEditPage.ap.readonly}"/>
 
     <h:outputText escape="true" value="Статус" styleClass="output-text required-field" />
     <h:selectOneMenu value="#{contractEditPage.ap.currentEntity.contractState}" styleClass="input-text" readonly="#{contractEditPage.ap.readonly}">
@@ -45,10 +43,12 @@
     </h:selectOneMenu>
     <h:outputText escape="true" value="Дата заключения" styleClass="output-text required-field" />
     <rich:calendar value="#{contractEditPage.ap.currentEntity.dateOfConclusion}" datePattern="dd.MM.yyyy" converter="dateConverter"
-                   inputClass="input-text" showWeeksBar="false" required="true" requiredMessage="Укажите дату заключения контракта." readonly="#{contractEditPage.ap.readonly}"/>
+                   inputClass="input-text" showWeeksBar="false"
+                   readonly="#{contractEditPage.ap.readonly}"/>
     <h:outputText escape="true" value="Срок действия" styleClass="output-text required-field"/>
     <rich:calendar value="#{contractEditPage.ap.currentEntity.dateOfClosing}" datePattern="dd.MM.yyyy" converter="dateConverter"
-                   inputClass="input-text" showWeeksBar="false" required="true" requiredMessage="Укажите срок действия контракта." readonly="#{contractEditPage.ap.readonly}"/>
+                   inputClass="input-text" showWeeksBar="false"
+                   readonly="#{contractEditPage.ap.readonly}"/>
 
     <h:outputText escape="true" value="Организации" styleClass="output-text" />
 
@@ -64,16 +64,20 @@
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton eventsQueue="saveContractEventsQueue"  value="Создать" action="#{contractEditPage.ap.create}"
-                           reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" rendered="#{contractEditPage.ap.createMode}"/>
+                           reRender="mainMenu, workspaceTogglePanel" styleClass="command-button"
+                           rendered="#{contractEditPage.ap.createMode}"/>
 
         <a4j:commandButton eventsQueue="saveContractEventsQueue"  value="Редактировать" action="#{contractEditPage.show}"
-                           reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" rendered="#{contractEditPage.ap.readonly}"/>
+                           reRender="mainMenu, workspaceTogglePanel" styleClass="command-button"
+                           rendered="#{contractEditPage.ap.readonly}"/>
 
         <a4j:commandButton eventsQueue="saveContractEventsQueue"  value="Сохранить" action="#{contractEditPage.ap.save}"
-                           reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" rendered="#{contractEditPage.ap.editMode}"/>
+                           reRender="mainMenu, workspaceTogglePanel" styleClass="command-button"
+                           rendered="#{contractEditPage.ap.editMode}"/>
 
         <a4j:commandButton value="Восстановить" action="#{contractEditPage.ap.reload}"
-                           reRender="mainMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" rendered="#{contractEditPage.ap.editMode}"/>
+                           reRender="mainMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button"
+                           rendered="#{contractEditPage.ap.editMode}"/>
 
     </h:panelGrid>
 

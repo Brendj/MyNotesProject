@@ -32,6 +32,7 @@ public abstract class AbstractEditPage<I extends AbstractEntityItem> extends Bas
 
     @Override
     public abstract String getPageFilename();
+    protected abstract boolean onCheckRequiredFields();
 
     public AbstractSelectedEntityGroupPage getSelectedEntityGroupPage() {
         HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
@@ -89,8 +90,10 @@ public abstract class AbstractEditPage<I extends AbstractEntityItem> extends Bas
 
     protected void onCreate(){
         try {
-            currentItem.createEntity(entityManager);
-            printMessage(currentItem.toString()+ " успешно создан.");
+            if(onCheckRequiredFields()){
+                currentItem.createEntity(entityManager);
+                printMessage(currentItem.toString()+ " успешно создан.");
+            }
         } catch (Exception e) {
             logAndPrintMessage("Ошибка при создании: "+currentItem, e);
         }
@@ -98,8 +101,10 @@ public abstract class AbstractEditPage<I extends AbstractEntityItem> extends Bas
 
     protected void onSave() {
         try {
-            currentItem.updateEntity(entityManager);
-            printMessage(currentItem+" успешно изменен.");
+            if(onCheckRequiredFields()){
+                currentItem.updateEntity(entityManager);
+                printMessage(currentItem+" успешно изменен.");
+            }
         } catch (Exception e) {
             logAndPrintMessage("Ошибка при изменении: "+currentItem, e);
         }
