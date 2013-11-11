@@ -128,7 +128,17 @@ CREATE TABLE CF_RegistrySms (
   CONSTRAINT CF_RegistrySms_pk PRIMARY KEY (IdOfRegistrySMS)
 );
 
-INSERT INTO CF_RegistrySms(IdOfRegistrySMS, version, smsid) VALUES (1, 0, (select smsid from CF_Registry where IdOfRegistry=1));
-ALTER TABLE cf_registry DROP COLUMN smsid;
+
+
+INSERT INTO CF_Registry(IdOfRegistry, version, smsid) VALUES (1, 0, (select smsid from CF_Registry where IdOfRegistry=1));
+
+-- ECAFE-1224 	Перевести взаимодействие с ИС РНиП на формат 15.2
+-- ECAFE-1329 Запрос на отчетность. Изменили ширину отчета + поправили имена при выгрузке отчета в xls
+-- ECAFE-1348 В коннектор к СМС-шлюзу Альтарикс исключить генерацию messageId через базу - он не используется.
+-- Генерация осталась просто значения ящерки перенесено в другую таблицу.
+-- ECAFE-1347 При отправке СМС используется поле-генератор номера из класса Registry,
+-- где так же хранится номер текущей версии клиентского регистра что приводит к конфиктам
+-- Конфликт создается из изменения одной записи в 2-х разных транзакциях.
+-- Но при отправки СМС она не повторяется после решения ECAFE-1348.
 
 --! ФИНАЛИЗИРОВАН (Кадыров, 131108) НЕ МЕНЯТЬ
