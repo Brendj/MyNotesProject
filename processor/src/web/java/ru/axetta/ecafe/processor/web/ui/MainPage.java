@@ -5065,9 +5065,9 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    public BasicWorkspacePage getPaymentReportsGroupMenu() {
+    /*public BasicWorkspacePage getPaymentReportsGroupMenu() {
         return paymentReportsGroupMenu;
-    }
+    }*/
 
     public Object showPaymentReportsGroupMenu () {
         currentWorkspacePage = paymentReportsGroupMenu;

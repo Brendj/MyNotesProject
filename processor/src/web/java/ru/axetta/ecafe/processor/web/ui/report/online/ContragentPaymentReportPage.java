@@ -100,7 +100,8 @@ public class ContragentPaymentReportPage extends OnlineReportPage
             AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
             String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + ContragentPaymentReport.class.getSimpleName() + ".jasper";
             ContragentPaymentReport.Builder builder = new ContragentPaymentReport.Builder(templateFilename);
-            builder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+            builder.setContragent(getContragent());
+            builder.setReportProperties(fillContragentReceiver());
             Session session = RuntimeContext.getInstance().createPersistenceSession();
             contragentPaymentReport = (ContragentPaymentReport) builder.build(session,startDate, endDate, localCalendar);
 
@@ -110,7 +111,7 @@ public class ContragentPaymentReportPage extends OnlineReportPage
 
             facesContext.responseComplete();
             response.setContentType("application/xls");
-            response.setHeader("Content-disposition", "inline;filename=daily_sales.xls");
+            response.setHeader("Content-disposition", "inline;filename=contragent_payment.xls");
 
             JRXlsExporter xlsExport = new JRXlsExporter();
             //JRCsvExporter csvExporter = new JRCsvExporter();
@@ -142,6 +143,29 @@ public class ContragentPaymentReportPage extends OnlineReportPage
     @Transactional
     public void buildReport() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
+        Session persistenceSession = null;
+        try {
+            persistenceSession = (Session) em.getDelegate();
+            buildReport(persistenceSession, getContragent());
+        } catch (Exception e) {
+            getLogger().error("Failed to build sales report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null));
+        }/* finally {
+            HibernateUtils.close(persistenceSession, getLogger());
+        }*/
+    }
+
+    public void buildReport(Session session, Contragent contragent) throws Exception {
+        ContragentPaymentReport.Builder reportBuilder = new ContragentPaymentReport.Builder();
+        reportBuilder.setContragent(contragent);
+        /*reportProperties.setProperty(ContragentPaymentReport.PARAM_PERIOD_TYPE, "");*/
+        reportBuilder.setReportProperties(fillContragentReceiver());
+        contragentPaymentReport = (ContragentPaymentReport) reportBuilder.build(session, startDate, endDate, localCalendar);
+        htmlReport = contragentPaymentReport.getHtmlReport();
+    }
+    
+    private Contragent getContragent() throws Exception {
         Contragent contragent = null;
         if (contragentFilter != null && contragentFilter.getContragent() != null &&
             contragentFilter.getContragent().getIdOfContragent() != null) {
@@ -151,35 +175,22 @@ public class ContragentPaymentReportPage extends OnlineReportPage
             } catch (Exception e) { }
         }
         if (contragent == null) {
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Необходимо выбрать контрагента", null));
-            return;
+            throw new Exception("Необходимо выбрать контрагента");
         }
-
-        Session persistenceSession = null;
-        try {
-            persistenceSession = (Session) em.getDelegate();
-            buildReport(persistenceSession, contragent);
-        } catch (Exception e) {
-            getLogger().error("Failed to build sales report", e);
-        }/* finally {
-            HibernateUtils.close(persistenceSession, getLogger());
-        }*/
+        return contragent;
     }
+    
+    private Properties fillContragentReceiver() {
+        return fillContragentReceiver(new Properties());
+    } 
 
-    public void buildReport(Session session, Contragent contragent) throws Exception {
-        ContragentPaymentReport.Builder reportBuilder = new ContragentPaymentReport.Builder();
-        reportBuilder.setContragent(contragent);
-        Properties reportProperties = new Properties();
+    private Properties fillContragentReceiver(Properties props) {
         if (contragentReceiverFilter.getContragent() != null &&
-            contragentReceiverFilter.getContragent().getIdOfContragent() != null) {
-            reportProperties.setProperty(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID,
-                                         "" + contragentReceiverFilter.getContragent().getIdOfContragent());
+                contragentReceiverFilter.getContragent().getIdOfContragent() != null) {
+            props.setProperty(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID,
+                    "" + contragentReceiverFilter.getContragent().getIdOfContragent());
         }
-        /*reportProperties.setProperty(ContragentPaymentReport.PARAM_PERIOD_TYPE, "");*/
-        reportBuilder.setReportProperties(reportProperties);
-        contragentPaymentReport = (ContragentPaymentReport) reportBuilder.build(session, startDate, endDate, localCalendar);
-        htmlReport = contragentPaymentReport.getHtmlReport();
+        return props;
     }
 }
 
