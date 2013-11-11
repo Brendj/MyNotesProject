@@ -5,9 +5,12 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.JRHtmlExporter;
+import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -20,6 +23,7 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.text.DateFormatSymbols;
 import java.util.*;
 
@@ -85,9 +89,16 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
         }
 
         private final String templateFilename;
+        private boolean exportToHTML = false;
+
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
+        }
+
+        public Builder() {
+            templateFilename = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath() + DailySalesByGroupsReport.class.getSimpleName() + ".jasper";
+            exportToHTML = true;
         }
 
         @Override
@@ -109,8 +120,23 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
             Date generateEndTime = new Date();
-            return new DailySalesByGroupsReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
-                    jasperPrint, startTime, endTime, org.getIdOfOrg());
+            if (!exportToHTML) {
+                return new DailySalesByGroupsReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
+                        jasperPrint, startTime, endTime, org.getIdOfOrg());
+            } else {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                JRHtmlExporter exporter = new JRHtmlExporter();
+                exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+                exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
+                exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
+                exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
+                exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
+                exporter.exportReport();
+                return new DailySalesByGroupsReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
+                        jasperPrint, startTime, endTime, org.getIdOfOrg()).setHtmlReport(os.toString("UTF-8"));
+            }
         }
 
         private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
@@ -337,8 +363,19 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 idOfOrg);    //To change body of overridden methods use File | Settings | File Templates.
     }
     private static final Logger logger = LoggerFactory.getLogger(DailySalesByGroupsReport.class);
+    private String htmlReport;
 
     public DailySalesByGroupsReport() {}
+
+
+    public DailySalesByGroupsReport setHtmlReport(String htmlReport) {
+        this.htmlReport = htmlReport;
+        return this;
+    }
+
+    public String getHtmlReport() {
+        return htmlReport;
+    }
 
     @Override
     public BasicReportForOrgJob createInstance() {
@@ -360,4 +397,3 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
         return REPORT_PERIOD_PREV_PREV_PREV_DAY;
     }
 }
-
