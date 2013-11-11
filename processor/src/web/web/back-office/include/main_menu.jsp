@@ -834,7 +834,7 @@
         <a4j:support event="onclick" action="#{mainPage.showPaymentReportsGroupMenu}" reRender="workspaceForm" />
         <%--@elvariable id="contragentCompletionReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ContragentCompletionReportPage"--%>
         <rich:panelMenuItem id="contragentCompletionReportMenuItem"
-                            binding="#{contragentCompletionReportPage.mainMenuComponent}" label="Отчет по пополнениям"
+                            binding="#{contragentCompletionReportPage.mainMenuComponent}" label="Отчет по обороту"
                             action="#{contragentCompletionReportPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
