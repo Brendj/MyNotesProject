@@ -10,7 +10,10 @@ import net.sf.jasperreports.engine.export.JRXlsExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.DeliveredServicesReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -126,6 +129,13 @@ public class DeliveredServicesReportPage extends OnlineReportPage
 
     public void buildReport(Session session) throws Exception {
         DeliveredServicesReport.Builder reportBuilder = new DeliveredServicesReport.Builder();
+        if (idOfOrg != null) {
+            Org org = null;
+            if (idOfOrg != null && idOfOrg > -1) {
+                org = DAOService.getInstance().findOrById(idOfOrg);
+            }
+            reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+        }
         this.deliveredServices = reportBuilder.build(session, startDate, endDate, localCalendar,
                                                     contragentFilter.getContragent().getIdOfContragent(),
                                                     contractFilter.getContract().getIdOfContract());

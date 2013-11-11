@@ -190,6 +190,10 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
             if (contractOrgsCondition.length() > 0) {
                 contractOrgsCondition = " cf_orgs.idoforg in (" + contractOrgsCondition + ") and ";
             }
+            String orgCondition = "";
+            if (org != null) {
+                orgCondition = " cf_orgs.idoforg=" + org.getIdOfOrg() + " and ";
+            }
 
 
 
@@ -205,6 +209,7 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                     + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
                     + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
                     + "where cf_orderdetails.socdiscount>0 and " + contragentCondition + contractOrgsCondition
+                    + orgCondition
                     + " cf_orders.createddate between :start and :end "
                     + "group by cf_orgs.idoforg, cf_orgs.officialname, level1, level2, level3, level4, price, address "
                     + "order by cf_orgs.idoforg, cf_orgs.officialname, level1, level2, level3, level4";
