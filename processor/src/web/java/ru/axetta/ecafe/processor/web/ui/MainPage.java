@@ -5049,6 +5049,10 @@ public Long getSelectedIdOfReportRule() {
         return repositoryUtilityGroupMenu;
     }
 
+    public BasicWorkspacePage getPaymentReportsGroupMenu() {
+        return paymentReportsGroupMenu;
+    }
+
     public Object showGoodRequestsGroupMenu () {
         currentWorkspacePage = goodRequestsGroupMenu;
         updateSelectedMainMenu();
