@@ -50,6 +50,7 @@ public class RegularPaymentServlet extends HttpServlet {
         try {
             PaymentResponse callback = new PaymentResponse();
             service.fillFromRequest(callback, req);
+            logger.info("Callback request body: {}", callback.toString());
             try {
                 mfrRequestId = Long.valueOf(callback.getCf());
             } catch (NumberFormatException ex) {

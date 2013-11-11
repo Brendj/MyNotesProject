@@ -137,6 +137,7 @@ public class RegularPaymentSubscriptionService {
         payment.setClient(bs.getClient());
         payment.setClientBalance(bs.getClient().getBalance());
         payment.setThresholdAmount(bs.getThresholdAmount());
+        payment.setPaymentDate(new Date());
         em.persist(payment);
         Map<String, String> params = getParamsForPaymentRequest(payment);
         PaymentResponse pr = sendRequest(request.getRequestUrl(), params);
@@ -332,13 +333,16 @@ public class RegularPaymentSubscriptionService {
 
     private PaymentResponse sendRequest(String uri, Map<String, String> params) {
         PostMethod httpMethod = new PostMethod(uri);
+        StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : params.entrySet()) {
             httpMethod.setParameter(entry.getKey(), entry.getValue());
+            sb.append(entry.getKey()).append("=").append(entry.getValue()).append(", ");
         }
         PaymentResponse paymentResponse = new PaymentResponse();
         try {
             HttpClient httpClient = new HttpClient();
             httpClient.getParams().setContentCharset("UTF-8");
+            logger.info("Sending request to MFR: {}", sb.toString());
             int statusCode = httpClient.executeMethod(httpMethod);
             paymentResponse.setStatusCode(statusCode);
             if (statusCode == HttpStatus.SC_OK) {
@@ -352,6 +356,7 @@ public class RegularPaymentSubscriptionService {
             logger.error(ex.getMessage());
         } finally {
             httpMethod.releaseConnection();
+            logger.info("Response from MFR: {}", paymentResponse.toString());
         }
         return paymentResponse;
     }
@@ -491,37 +496,37 @@ public class RegularPaymentSubscriptionService {
         Node responseNode = XMLUtils.findFirstChildElement(doc, "response");
         Node workNode = XMLUtils.findFirstChildElement(responseNode, "status");
         if (workNode != null) {
-            pr.setStatus(StringUtils.trimToEmpty(workNode.getTextContent()));
+            pr.setStatus(StringUtils.trim(workNode.getTextContent()));
         }
         workNode = XMLUtils.findFirstChildElement(responseNode, "description");
         if (workNode != null) {
-            pr.setErrorDescription(StringUtils.trimToEmpty(workNode.getTextContent()));
+            pr.setErrorDescription(StringUtils.trim(workNode.getTextContent()));
         }
         workNode = XMLUtils.findFirstChildElement(responseNode, "payment_id");
         if (workNode != null) {
-            pr.setPaymentId(StringUtils.trimToEmpty(workNode.getTextContent()));
+            pr.setPaymentId(StringUtils.trim(workNode.getTextContent()));
         }
         workNode = XMLUtils.findFirstChildElement(responseNode, "datetime");
         if (workNode != null) {
-            pr.setDateTime(parseBankDate(StringUtils.trimToEmpty(workNode.getTextContent())));
+            pr.setDateTime(parseBankDate(StringUtils.trim(workNode.getTextContent())));
         }
         workNode = XMLUtils.findFirstChildElement(responseNode, "extended_status");
         if (workNode != null) {
-            pr.setExtendedStatus(StringUtils.trimToEmpty(workNode.getTextContent()));
+            pr.setExtendedStatus(StringUtils.trim(workNode.getTextContent()));
         }
         Node additionalNode = XMLUtils.findFirstChildElement(responseNode, "additional");
         if (additionalNode != null) {
             workNode = XMLUtils.findFirstChildElement(responseNode, "cf");
             if (workNode != null) {
-                pr.setCf(StringUtils.trimToEmpty(workNode.getTextContent()));
+                pr.setCf(StringUtils.trim(workNode.getTextContent()));
             }
             workNode = XMLUtils.findFirstChildElement(responseNode, "cf2");
             if (workNode != null) {
-                pr.setCf2(StringUtils.trimToEmpty(workNode.getTextContent()));
+                pr.setCf2(StringUtils.trim(workNode.getTextContent()));
             }
             workNode = XMLUtils.findFirstChildElement(responseNode, "cf3");
             if (workNode != null) {
-                pr.setCf3(StringUtils.trimToEmpty(workNode.getTextContent()));
+                pr.setCf3(StringUtils.trim(workNode.getTextContent()));
             }
         }
     }
@@ -539,22 +544,22 @@ public class RegularPaymentSubscriptionService {
     }
 
     public void fillFromRequest(PaymentResponse pr, HttpServletRequest request) {
-        pr.setPaymentId(StringUtils.trimToEmpty(request.getParameter("payment_id")));
-        pr.setStatus(StringUtils.trimToEmpty(request.getParameter("status")));
-        pr.setCf(StringUtils.trimToEmpty(request.getParameter("cf")));
-        pr.setCf2(StringUtils.trimToEmpty(request.getParameter("cf2")));
-        pr.setCf3(StringUtils.trimToEmpty(request.getParameter("cf3")));
-        pr.setAuthCode(StringUtils.trimToEmpty(request.getParameter("auth_code")));
-        pr.setCardHolder(StringUtils.trimToEmpty(request.getParameter("cardholder")));
-        pr.setPanMask(StringUtils.trimToEmpty(request.getParameter("pan_mask")));
-        pr.setExpMonth(StringUtils.trimToEmpty(request.getParameter("exp_month")));
-        pr.setExpYear(StringUtils.trimToEmpty(request.getParameter("exp_year")));
-        pr.setExtendedStatus(StringUtils.trimToEmpty(request.getParameter("extended_status")));
-        pr.setSign(StringUtils.trimToEmpty(request.getParameter("sign")));
-        pr.setDateTime(parseBankDate(StringUtils.trimToEmpty(request.getParameter("datetime"))));
-        pr.setErrorDescription(StringUtils.trimToEmpty(request.getParameter("description")));
-        pr.setRrn(StringUtils.trimToEmpty(request.getParameter("rrn")));
-        pr.setAuthCode(StringUtils.trimToEmpty(request.getParameter("auth_code")));
+        pr.setPaymentId(StringUtils.trim(request.getParameter("payment_id")));
+        pr.setStatus(StringUtils.trim(request.getParameter("status")));
+        pr.setCf(StringUtils.trim(request.getParameter("cf")));
+        pr.setCf2(StringUtils.trim(request.getParameter("cf2")));
+        pr.setCf3(StringUtils.trim(request.getParameter("cf3")));
+        pr.setAuthCode(StringUtils.trim(request.getParameter("auth_code")));
+        pr.setCardHolder(StringUtils.trim(request.getParameter("cardholder")));
+        pr.setPanMask(StringUtils.trim(request.getParameter("pan_mask")));
+        pr.setExpMonth(StringUtils.trim(request.getParameter("exp_month")));
+        pr.setExpYear(StringUtils.trim(request.getParameter("exp_year")));
+        pr.setExtendedStatus(StringUtils.trim(request.getParameter("extended_status")));
+        pr.setSign(StringUtils.trim(request.getParameter("sign")));
+        pr.setDateTime(parseBankDate(StringUtils.trim(request.getParameter("datetime"))));
+        pr.setErrorDescription(StringUtils.trim(request.getParameter("description")));
+        pr.setRrn(StringUtils.trim(request.getParameter("rrn")));
+        pr.setAuthCode(StringUtils.trim(request.getParameter("auth_code")));
     }
 
 }

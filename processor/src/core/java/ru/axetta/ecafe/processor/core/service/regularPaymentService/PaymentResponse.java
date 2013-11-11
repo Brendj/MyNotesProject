@@ -164,4 +164,56 @@ public class PaymentResponse {
     public void setErrorDescription(String errorDescription) {
         this.errorDescription = errorDescription;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("{");
+        sb.append("statusCode=").append(statusCode);
+        if (paymentId != null) {
+            sb.append(", paymentId=").append(paymentId);
+        }
+        if (status != null) {
+            sb.append(", status=").append(status);
+        }
+        if (extendedStatus != null) {
+            sb.append(", extendedStatus=").append(extendedStatus);
+        }
+        if (dateTime != null) {
+            sb.append(", dateTime=").append(dateTime);
+        }
+        if (cf != null) {
+            sb.append(", cf=").append(cf);
+        }
+        if (cf2 != null) {
+            sb.append(", cf2=").append(cf2);
+        }
+        if (cf3 != null) {
+            sb.append(", cf3=").append(cf3);
+        }
+        if (panMask != null) {
+            sb.append(", panMask=").append(panMask);
+        }
+        if (cardHolder != null) {
+            sb.append(", cardHolder=").append(cardHolder);
+        }
+        if (expYear != null) {
+            sb.append(", expYear=").append(expYear);
+        }
+        if (expMonth != null) {
+            sb.append(", expMonth=").append(expMonth);
+        }
+        if (sign != null) {
+            sb.append(", sign=").append(sign);
+        }
+        if (authCode != null) {
+            sb.append(", authCode=").append(authCode);
+        }
+        if (rrn != null) {
+            sb.append(", rrn=").append(rrn);
+        }
+        if (errorDescription != null) {
+            sb.append(", errorDescription=").append(errorDescription);
+        }
+        return sb.append("}").toString();
+    }
 }
