@@ -155,8 +155,8 @@ public class ClientOperationListPage extends BasicWorkspacePage {
             clientPasses.add(new ClientPassItem(event));
         }
         criteria = session.createCriteria(RegularPayment.class);
-        criteria.add(Restrictions.eq("client", client)).add(Restrictions.le("paymentDate", startTime))
-                .add(Restrictions.ge("paymentDate", endTime)).addOrder(Order.asc("paymentDate"));
+        criteria.add(Restrictions.eq("client", client)).add(Restrictions.ge("paymentDate", startTime))
+                .add(Restrictions.le("paymentDate", endTime)).addOrder(Order.asc("paymentDate"));
         regularPayments = (List<RegularPayment>) criteria.list();
     }
 

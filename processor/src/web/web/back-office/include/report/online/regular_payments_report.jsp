@@ -18,7 +18,7 @@
         <rich:calendar value="#{regularPaymentsReportPage.endDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                        inputClass="input-text" showWeeksBar="false" />
         <a4j:commandButton value="Генерировать отчет" action="#{regularPaymentsReportPage.showReport}"
-                           reRender="workspaceTogglePanel, regularPaymentsReportTable" styleClass="command-button" />
+                           reRender="regularPaymentsReportTable" styleClass="command-button" />
         <a4j:status>
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
