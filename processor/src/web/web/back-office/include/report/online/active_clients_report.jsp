@@ -51,7 +51,7 @@
                         <h:outputText styleClass="column-header" escape="true" value="Количество учащихся (шт.)" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column">
-                        <h:outputText styleClass="column-header" escape="true" value="Количество клиентов , совершавших покупки за последние 1 месяца" />
+                        <h:outputText styleClass="column-header" escape="true" value="Количество клиентов, совершавших покупки за период" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column">
                         <h:outputText styleClass="column-header" escape="true" value="Количество клиентов-бесплатников" />
