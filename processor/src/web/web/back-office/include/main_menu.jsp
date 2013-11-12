@@ -823,9 +823,6 @@
                             binding="#{mainPage.deliveredServicesReportPage.mainMenuComponent}"
                             label="Отчет по предоставленным услугам"
                             action="#{mainPage.showDeliveredServicesReportPage}" reRender="workspaceForm" />
-        <rich:panelMenuItem id="clientPaymentsReportMenuItem"
-                            binding="#{mainPage.clientPaymentsReportPage.mainMenuComponent}" label="Отчет по обороту"
-                            action="#{mainPage.showClientPaymentsReportPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
 
@@ -841,6 +838,9 @@
                             reRender="workspaceForm" />--%>
         <rich:panelMenuItem id="contragentPaymentReportMenuItem" binding="#{contragentPaymentReportPage.mainMenuComponent}"
                             label="Отчет по платежам" action="#{contragentPaymentReportPage.show}"
+                            reRender="workspaceForm" />
+        <rich:panelMenuItem id="clientPaymentsReportMenuItem" binding="#{mainPage.clientPaymentsReportPage.mainMenuComponent}"
+                            label="Отчет по начислениям" action="#{mainPage.showClientPaymentsReportPage}"
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
