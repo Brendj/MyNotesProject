@@ -84,24 +84,23 @@
     <f:facet name="header">
         <h:outputText value="Удаление пользователя" styleClass="output-text" />
     </f:facet>
-    <a4j:form styleClass="borderless-form">
-        <table class="borderless-grid" width="100%">
-            <tr>
-                <td style="text-align: center;">
-                    <h:outputText value="Вы уверены в том, что хотите удалить этого пользователя?" styleClass="output-text" />
-                </td>
-            </tr>
-            <tr>
-                <td style="text-align: center;">
-                    <h:panelGroup styleClass="borderless-div">
-                        <h:commandButton value="Да" action="#{mainPage.removeUser}"
-                                           onclick="#{rich:component('removedUserDeletePanel')}.hide();"
-                                           styleClass="command-button"/>
-                        <a4j:commandButton value="Отмена" styleClass="command-button"
-                                           onclick="#{rich:component('removedUserDeletePanel')}.hide();return false;" />
-                    </h:panelGroup>
-                </td>
-            </tr>
-        </table>
-    </a4j:form>
+    <table class="borderless-grid" width="100%">
+        <tr>
+            <td style="text-align: center;">
+                <h:outputText value="Вы уверены в том, что хотите удалить этого пользователя?"
+                              styleClass="output-text" />
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: center;">
+                <h:panelGroup styleClass="borderless-div">
+                    <a4j:commandButton value="Да" action="#{mainPage.removeUser}"
+                                       oncomplete="#{rich:component('removedUserDeletePanel')}.hide();"
+                                       styleClass="command-button" reRender="userListTable" />
+                    <a4j:commandButton value="Отмена" styleClass="command-button"
+                                       onclick="#{rich:component('removedUserDeletePanel')}.hide();return false;" />
+                </h:panelGroup>
+            </td>
+        </tr>
+    </table>
 </rich:modalPanel>
