@@ -434,7 +434,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
     }
 
     public void clear() {
-        clear(Collections.EMPTY_LIST);
+        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).clear(Collections.EMPTY_LIST);
     }
 
     @Transactional
