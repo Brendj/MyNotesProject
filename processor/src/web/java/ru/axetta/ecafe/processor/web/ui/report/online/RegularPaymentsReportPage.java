@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.report.online;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.regularPaymentsReport.RPRDataLoader;
 import ru.axetta.ecafe.processor.core.report.regularPaymentsReport.ReportItem;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
 import org.springframework.context.annotation.Scope;
@@ -32,6 +33,7 @@ public class RegularPaymentsReportPage extends OnlineReportPage {
         Session session = RuntimeContext.getInstance().createReportPersistenceSession();
         RPRDataLoader dl = new RPRDataLoader(session);
         items = dl.getReportData(getStartDate(), getEndDate());
+        HibernateUtils.close(session, null);
         return null;
     }
 

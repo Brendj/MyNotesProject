@@ -5,16 +5,11 @@
 package ru.axetta.ecafe.processor.core.service.regularPaymentService;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
-import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -44,7 +39,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
 
 /**
  * Created with IntelliJ IDEA.
@@ -67,35 +65,16 @@ public class RegularPaymentSubscriptionService {
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
 
-    private RegularPaymentSubscriptionService getSelfProxy() {
-        return RuntimeContext.getAppContext().getBean(RegularPaymentSubscriptionService.class);
+    private IRequestOperation getOperationBean(String name) {
+        return (IRequestOperation) RuntimeContext.getAppContext().getBean(name + "Request");
     }
 
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public MfrRequest createRequestForSubscriptionReg(Long contractId, Long paymentAmount, Long thresholdAmount,
             int period) throws Exception {
-        MfrRequest request = new MfrRequest();
-        request.setPaySystem(MfrRequest.ACQUIROPAY_SYSTEM);
-        request.setRequestType(MfrRequest.REQUEST_TYPE_ACTIVATION);
-        request.setRequestUrl(runtimeContext.getAcquiropaySystemConfig().getLinkingUrl());
-        Client client = DAOUtils.findClientByContractId(em.unwrap(Session.class), contractId);
-        request.setRequestTime(new Date());
-        request.setClient(client);
-        request.setSan(client.getSan());
-        BankSubscription bs = new BankSubscription();
-        bs.setPaymentAmount(paymentAmount);
-        bs.setThresholdAmount(thresholdAmount);
-        bs.setMonthsCount(period);
-        bs.setClient(client);
-        bs.setSan(client.getSan());
-        bs.setPaySystem(request.getPaySystem());
-        em.persist(bs);
-        request.setBs(bs);
-        em.persist(request);
-        return request;
+        return ((SubscriptionRegRequest) getOperationBean("subscriptionReg"))
+                .createRequestForSubscriptionReg(contractId, paymentAmount, thresholdAmount, period);
     }
 
-    @Transactional(propagation = Propagation.NEVER)
     public void checkClientBalances() {
         if (!RuntimeContext.getInstance().isMainNode()) {
             return;
@@ -107,9 +86,9 @@ public class RegularPaymentSubscriptionService {
             try {
                 BankSubscription bs = findBankSubscription(id);
                 if (bs.getValidToDate().before(today)) {
-                    getSelfProxy().deactivateSubscription(id);
+                    makeSubscriptionOperation(id, "subscriptionDelete");
                 } else {
-                    getSelfProxy().refillOneClientBalance(id);
+                    makeSubscriptionOperation(id, "regularPayment");
                 }
             } catch (Exception ex) {
                 logger.error(ex.getMessage());
@@ -118,217 +97,39 @@ public class RegularPaymentSubscriptionService {
         logger.info("RegularPaymentSubscriptionService work is over.");
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = Exception.class)
-    public void refillOneClientBalance(Long subId) {
-        BankSubscription bs = em.find(BankSubscription.class, subId);
-        MfrRequest request = new MfrRequest();
-        request.setPaySystem(MfrRequest.ACQUIROPAY_SYSTEM);
-        request.setRequestType(MfrRequest.REQUEST_TYPE_PAYMENT);
-        request.setRequestUrl(runtimeContext.getAcquiropaySystemConfig().getPaymentUrl());
-        request.setRequestTime(new Date());
-        request.setClient(bs.getClient());
-        request.setSan(bs.getClient().getSan());
-        request.setBs(bs);
-        em.persist(request);
-        RegularPayment payment = new RegularPayment();
-        payment.setBankSubscription(bs);
-        payment.setMfrRequest(request);
-        payment.setPaymentAmount(bs.getPaymentAmount());
-        payment.setClient(bs.getClient());
-        payment.setClientBalance(bs.getClient().getBalance());
-        payment.setThresholdAmount(bs.getThresholdAmount());
-        payment.setPaymentDate(new Date());
-        em.persist(payment);
-        Map<String, String> params = getParamsForPaymentRequest(payment);
-        PaymentResponse pr = sendRequest(request.getRequestUrl(), params);
-        processPaymentResponse(request, pr);
-    }
-
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
-    public boolean deactivateSubscription(Long bsId) {
-        BankSubscription bs = em.find(BankSubscription.class, bsId);
-        MfrRequest mfrRequest = new MfrRequest();
-        mfrRequest.setPaySystem(MfrRequest.ACQUIROPAY_SYSTEM);
-        mfrRequest.setRequestType(MfrRequest.REQUEST_TYPE_DEACTIVATION);
-        mfrRequest.setRequestUrl(runtimeContext.getAcquiropaySystemConfig().getPaymentUrl());
-        mfrRequest.setRequestTime(new Date());
-        mfrRequest.setClient(bs.getClient());
-        mfrRequest.setSan(bs.getClient().getSan());
-        mfrRequest.setBs(bs);
-        em.persist(mfrRequest);
-        Map<String, String> params = getParamsForDeactivation(mfrRequest);
-        PaymentResponse response = sendRequest(mfrRequest.getRequestUrl(), params);
-        processPaymentResponse(mfrRequest, response);
-        if (MfrRequest.SUBSCRIPTION_DEACTIVATED.equalsIgnoreCase(response.getStatus())) {
-            bs.setActive(false);
-            bs.setDeactivationDate(response.getDateTime());
-            bs.setStatus(MfrRequest.SUBSCRIPTION_DEACTIVATED);
-            return true;
-        } else {
-            return false;
+    private boolean makeSubscriptionOperation(Long subscriptionId, String operationName) {
+        IRequestOperation operation = getOperationBean(operationName);
+        MfrRequest mfrRequest = operation.createRequest(subscriptionId);
+        Map<String, String> params = operation.getRequestParams(mfrRequest);
+        PaymentResponse paymentResponse = sendRequest(mfrRequest.getRequestUrl(), params);
+        operation.processResponse(mfrRequest.getIdOfRequest(), paymentResponse);
+        if (operationName.equals("subscriptionDelete")) {
+            return operation.postProcessResponse(mfrRequest.getIdOfRequest(), paymentResponse);
         }
+        return true;
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public void updateBankSubscription(Long bsId, Long paymentAmount, Long thresholdAmount, int period) {
-        BankSubscription bs = em.find(BankSubscription.class, bsId);
-        bs.setPaymentAmount(paymentAmount);
-        bs.setThresholdAmount(thresholdAmount);
-        bs.setMonthsCount(period);
-        bs.setValidToDate(CalendarUtils.addMonth(new Date(), period));
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public void checkSubscriptionStatus(Long bsId) {
-        BankSubscription bs = em.find(BankSubscription.class, bsId);
-        MfrRequest mfrRequest = new MfrRequest();
-        mfrRequest.setPaySystem(MfrRequest.ACQUIROPAY_SYSTEM);
-        mfrRequest.setRequestType(MfrRequest.REQUEST_TYPE_STATUS_CHECK);
-        mfrRequest.setRequestUrl(runtimeContext.getAcquiropaySystemConfig().getPaymentUrl());
-        mfrRequest.setRequestTime(new Date());
-        mfrRequest.setClient(bs.getClient());
-        mfrRequest.setSan(bs.getClient().getSan());
-        mfrRequest.setBs(bs);
-        em.persist(mfrRequest);
-        Map<String, String> params = getParamsForStatusChecking(bs);
-        PaymentResponse response = sendRequest(mfrRequest.getRequestUrl(), params);
-        processPaymentResponse(mfrRequest, response);
+    public void refillOneClientBalance(Long bsId) {
+        makeSubscriptionOperation(bsId, "regularPayment");
     }
 
     // Обработка callback'а на запрос активации подписки на автопополнение.
-    @Transactional(rollbackFor = Exception.class)
-    public void processSubscriptionActivated(Long mfrRequestId, PaymentResponse paymentResponse) throws Exception {
-        MfrRequest mfrRequest = em.find(MfrRequest.class, mfrRequestId);
-        mfrRequest.setResponseStatus(paymentResponse.getStatus());
-        if (MfrRequest.SUBSCRIPTION_ACTIVATED.equalsIgnoreCase(paymentResponse.getStatus())) {
-            BankSubscription bs = mfrRequest.getBs();
-            bs.setStatus(MfrRequest.SUBSCRIPTION_ACTIVATED);
-            bs.setActive(true);
-            bs.setPaymentId(paymentResponse.getPaymentId());
-            bs.setActivationDate(paymentResponse.getDateTime());
-            bs.setMaskedCardNumber(paymentResponse.getPanMask());
-            bs.setCardHolder(paymentResponse.getCardHolder());
-            Integer expYear = StringUtils.isEmpty(paymentResponse.getExpYear()) ? null
-                    : Integer.valueOf(paymentResponse.getExpYear());
-            bs.setExpYear(expYear);
-            Integer expMonth = StringUtils.isEmpty(paymentResponse.getExpMonth()) ? null
-                    : Integer.valueOf(paymentResponse.getExpMonth());
-            bs.setExpMonth(expMonth);
-            Date validToDate = CalendarUtils.addMonth(paymentResponse.getDateTime(), bs.getMonthsCount());
-            if (expMonth != null && expYear != null) {
-                Date cardValidityDate = CalendarUtils.getDateOfLastDay(expYear, expMonth);
-                bs.setValidToDate(cardValidityDate.before(validToDate) ? cardValidityDate : validToDate);
-            } else {
-                bs.setValidToDate(validToDate);
-            }
-        } else if (MfrRequest.ERROR.equalsIgnoreCase(paymentResponse.getStatus())) {
-            mfrRequest.setErrorDescription(paymentResponse.getErrorDescription());
-        }
+    public void processSubscriptionActivated(Long mfrRequestId, PaymentResponse paymentResponse) {
+        getOperationBean("subscriptionReg").postProcessResponse(mfrRequestId, paymentResponse);
     }
 
     // Обработка callback'а на запрос проведения регулярного пополнения (списания с карты).
-    @Transactional(rollbackFor = Exception.class)
-    public void processRegularPayment(Long mfrRequestId, PaymentResponse paymentResponse) throws Exception {
-        MfrRequest mfrRequest = em.find(MfrRequest.class, mfrRequestId);
-        mfrRequest.setResponseStatus(paymentResponse.getStatus());
-        RegularPayment rp = findPaymentByMfrRequest(mfrRequest.getIdOfRequest());
-        BankSubscription bs = rp.getBankSubscription();
-        if (MfrRequest.PAYMENT_SUCCESSFUL.equalsIgnoreCase(paymentResponse.getStatus())) {
-            rp.setSuccess(true);
-            rp.setStatus(MfrRequest.PAYMENT_SUCCESSFUL);
-            rp.setPaymentDate(paymentResponse.getDateTime());
-            rp.setAuthCode(paymentResponse.getAuthCode());
-            rp.setRrn(Long.valueOf(paymentResponse.getRrn()));
-            // Сохраняем дату последнего успешного платежа по подписке
-            // и сбрасываем счетчик неуспешных платежей подряд.
-            bs.setLastSuccessfulPaymentDate(rp.getPaymentDate());
-            bs.setUnsuccessfulPaymentsCount(0);
-            bs.setLastPaymentStatus(MfrRequest.PAYMENT_SUCCESSFUL);
-        } else if (MfrRequest.ERROR.equalsIgnoreCase(paymentResponse.getStatus())) {
-            rp.setStatus(MfrRequest.ERROR);
-            // Сохраняем дату неуспешного платежа по подписке
-            // и увеличиваем счетчик неуспешных платежей подряд.
-            bs.setLastUnsuccessfulPaymentDate(new Date());
-            bs.setUnsuccessfulPaymentsCount(bs.getUnsuccessfulPaymentsCount() + 1);
-            bs.setLastPaymentStatus(MfrRequest.ERROR);
-            mfrRequest.setErrorDescription(paymentResponse.getErrorDescription());
-        }
+    public void processRegularPayment(Long mfrRequestId, PaymentResponse paymentResponse) {
+        getOperationBean("regularPayment").postProcessResponse(mfrRequestId, paymentResponse);
     }
 
     // Возвращает параметры для запроса по активации подписки (привязка карты).
     public Map<String, String> getParamsForRegRequest(MfrRequest mfrRequest) {
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("action", RuntimeContext.getInstance().getAcquiropaySystemConfig().getLinkingUrl());
-        String productId = String.valueOf(runtimeContext.getAcquiropaySystemConfig().getProductId());
-        // ID поставщика питания №1 в системе МФР
-        params.put("product_id", productId);
-        String account = ContractIdFormat.format(mfrRequest.getClient().getContractId());
-        params.put("product_name", "Подписка на оплату Школьного питания л/с " + account);
-        params.put("amount", "*");
-        // ID запроса ИС ПП
-        params.put("cf", mfrRequest.getIdOfRequest().toString());
-        // Уникальный идентификатор подписки ИС ПП
-        params.put("cf2", mfrRequest.getBs().getIdOfSubscription().toString());
-        // Номер лицевого счета учащегося
-        params.put("cf3", account);
-        String merchantId = String.valueOf(runtimeContext.getAcquiropaySystemConfig().getMerchantId());
-        String secretWord = runtimeContext.getAcquiropaySystemConfig().getSecretWord();
-        // Идентификатор безопасности MD5(merchant_id + product_id + [amount] + cf +cf2 + cf3 + secret_word)
-        String token = CryptoUtils
-                .MD5(merchantId + productId + params.get("amount") + params.get("cf") + params.get("cf2") +
-                        params.get("cf3") + secretWord).toLowerCase();
-        params.put("token", token);
-        return params;
+        return getOperationBean("subscriptionReg").getRequestParams(mfrRequest);
     }
 
-    // Возвращает параметры для запроса по проведению платежа.
-    private Map<String, String> getParamsForPaymentRequest(RegularPayment payment) {
-        Map<String, String> params = new HashMap<String, String>();
-        // код операции
-        params.put("opcode", "rebill");
-        // сумма платежа
-        params.put("amount", CurrencyStringUtils.copecksToRubles(payment.getPaymentAmount(), 0));
-        // ID запроса ИС ПП
-        params.put("cf", payment.getMfrRequest().getIdOfRequest().toString());
-        String paymentId = payment.getBankSubscription().getPaymentId();
-        // ID подписки в системе МФР
-        params.put("payment_id", paymentId);
-        String merchantId = String.valueOf(runtimeContext.getAcquiropaySystemConfig().getMerchantId());
-        String secretWord = runtimeContext.getAcquiropaySystemConfig().getSecretWord();
-        // Идентификатор безопасности MD5(merchant_id + payment_id + [amount]  + secret_word)
-        String token = CryptoUtils.MD5(merchantId + paymentId + params.get("amount") + secretWord).toLowerCase();
-        params.put("token", token);
-        return params;
-    }
-
-    // Возвращает параметры для запроса по деактивации подписки.
-    private Map<String, String> getParamsForDeactivation(MfrRequest mfrRequest) {
-        Map<String, String> params = new HashMap<String, String>();
-        // код операции
-        params.put("opcode", "stop_rebilling");
-        // ID подписки в системе МФР
-        params.put("payment_id", mfrRequest.getBs().getPaymentId());
-        String merchantId = String.valueOf(runtimeContext.getAcquiropaySystemConfig().getMerchantId());
-        String secretWord = runtimeContext.getAcquiropaySystemConfig().getSecretWord();
-        // Идентификатор безопасности MD5(merchant_id + payment_id + secret_word)
-        String token = CryptoUtils.MD5(merchantId + params.get("payment_id") + secretWord).toLowerCase();
-        params.put("token", token);
-        return params;
-    }
-
-    // Возвращает параметры для запроса по проверке статуса подписки.
-    private Map<String, String> getParamsForStatusChecking(BankSubscription bs) {
-        Map<String, String> params = new HashMap<String, String>();
-        // код операции
-        params.put("opcode", "check_status");
-        // ID подписки в системе МФР
-        params.put("payment_id", bs.getPaymentId());
-        String merchantId = String.valueOf(runtimeContext.getAcquiropaySystemConfig().getMerchantId());
-        String secretWord = runtimeContext.getAcquiropaySystemConfig().getSecretWord();
-        // Идентификатор безопасности MD5(merchant_id + payment_id + secret_word)
-        String token = CryptoUtils.MD5(merchantId + params.get("payment_id") + secretWord).toLowerCase();
-        params.put("token", token);
-        return params;
+    public boolean deactivateSubscription(Long subscriptionId) {
+        return makeSubscriptionOperation(subscriptionId, "subscriptionDelete");
     }
 
     private PaymentResponse sendRequest(String uri, Map<String, String> params) {
@@ -396,20 +197,22 @@ public class RegularPaymentSubscriptionService {
         return result;
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public void updateBankSubscription(Long bsId, Long paymentAmount, Long thresholdAmount, int period) {
+        BankSubscription bs = em.find(BankSubscription.class, bsId);
+        bs.setPaymentAmount(paymentAmount);
+        bs.setThresholdAmount(thresholdAmount);
+        bs.setMonthsCount(period);
+        bs.setValidToDate(CalendarUtils.addMonth(new Date(), period));
+    }
+
     @SuppressWarnings("unchecked")
     private List<Long> findSubscriptions(int rows) {
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
         Query query = em.createQuery("select distinct bs.idOfSubscription from BankSubscription bs \n" +
-                "where bs.active = :active and bs.activationDate is not null and bs.client.balance <= bs.thresholdAmount \n" +
-                "and ((bs.lastSuccessfulPaymentDate < :today or bs.lastSuccessfulPaymentDate is null) and " +
-                "(bs.lastUnsuccessfulPaymentDate < :today or bs.lastUnsuccessfulPaymentDate is null)) \n" +
-                "and (bs.client.idOfClientGroup not in (:cg) or bs.client.idOfClientGroup is null)")
-                .setParameter("today", today)
-                .setParameter("active", true)
-                .setParameter("cg", Arrays.asList(
-                        ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
-                        ClientGroup.Predefined.CLIENT_DELETED.getValue())
-                );
+                "where bs.active = :active and bs.activationDate is not null and bs.client.contractId = :c")
+                .setParameter("c", 600023L)
+                .setParameter("active", true);
         if (rows != 0) {
             query.setMaxResults(rows);
         }
@@ -463,14 +266,6 @@ public class RegularPaymentSubscriptionService {
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public MfrRequest findMfrRequest(Long id) {
         return em.find(MfrRequest.class, id);
-    }
-
-    @SuppressWarnings("unchecked")
-    private RegularPayment findPaymentByMfrRequest(Long mfrRequestId) {
-        Criteria criteria = em.unwrap(Session.class).createCriteria(RegularPayment.class);
-        criteria.createAlias("mfrRequest", "mr").add(Restrictions.eq("mr.idOfRequest", mfrRequestId));
-        List<RegularPayment> res = (List<RegularPayment>) criteria.list();
-        return res.isEmpty() ? null : res.get(0);
     }
 
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -528,18 +323,6 @@ public class RegularPaymentSubscriptionService {
             if (workNode != null) {
                 pr.setCf3(StringUtils.trim(workNode.getTextContent()));
             }
-        }
-    }
-
-    private void processPaymentResponse(MfrRequest request, PaymentResponse response) {
-        if (response.getStatusCode() == HttpStatus.SC_OK) {
-            request.setSuccess(true);
-        } else {
-            request.setErrorDescription(String.valueOf(response.getStatusCode()));
-        }
-        request.setResponseStatus(response.getStatus());
-        if (MfrRequest.ERROR.equalsIgnoreCase(response.getStatus())) {
-            request.setErrorDescription(response.getErrorDescription());
         }
     }
 

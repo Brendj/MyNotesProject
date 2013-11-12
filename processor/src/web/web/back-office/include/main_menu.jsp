@@ -872,6 +872,10 @@
     <%--@elvariable id="payStatsPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PayStatsPage"--%>
     <rich:panelMenuItem id="payStatsMenuItem" binding="#{payStatsPage.mainMenuComponent}" label="Отчет по агентам"
                         action="#{payStatsPage.show}" reRender="workspaceForm" />
+    <%--@elvariable id="regularPaymentsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegularPaymentsReportPage"--%>
+    <rich:panelMenuItem id="regularPaymentsReportMenuItem" binding="#{regularPaymentsReportPage.mainMenuComponent}"
+                        label="Отчет по регулярным платежам" action="#{regularPaymentsReportPage.show}"
+                        reRender="workspaceForm" />
     <rich:panelMenuItem id="clientsBenefitsReportMenuItem"
                         binding="#{mainPage.clientsBenefitsReportPage.mainMenuComponent}"
                         label="Расчет комплексов по льготным правилам"

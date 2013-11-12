@@ -58,12 +58,20 @@
         <td>
             <div class="output-text">Дата отключения</div>
         </td>
+        <td>
+            <div class="output-text">Последний удачный платеж</div>
+        </td>
+        <td>
+            <div class="output-text">Последний неудачный платеж</div>
+        </td>
         <td></td>
     </tr>
 
 <%
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+        DateFormat tf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+        tf.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
         for (int i = 0; i < list.size(); i++) {
             BankSubscription bs = list.get(i);
             String params = "&command=edit&bs=" + bs.getIdOfSubscription();
@@ -71,6 +79,8 @@
             String activationDate = df.format(bs.getActivationDate());
             String validToDate = df.format(bs.getValidToDate());
             String deactivationDate = bs.getDeactivationDate() == null ? "" : df.format(bs.getDeactivationDate());
+            String lastUnsPayment = bs.getLastUnsuccessfulPaymentDate() == null ? "" : tf.format(bs.getLastUnsuccessfulPaymentDate());
+            String lastSucPayment = bs.getLastSuccessfulPaymentDate() == null ? "" : tf.format(bs.getLastSuccessfulPaymentDate());
 %>
     <tr>
         <td>
@@ -96,6 +106,14 @@
         </td>
         <td>
             <div class="output-text"><%=deactivationDate%>
+            </div>
+        </td>
+        <td>
+            <div class="output-text"><%=lastSucPayment%>
+            </div>
+        </td>
+        <td>
+            <div class="output-text"><%=lastUnsPayment%>
             </div>
         </td>
         <td>

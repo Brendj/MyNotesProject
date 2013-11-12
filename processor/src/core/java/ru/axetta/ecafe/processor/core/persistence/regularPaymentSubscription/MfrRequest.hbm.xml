@@ -10,7 +10,7 @@
         <id name="idOfRequest" column="IdOfRequest" type="long">
             <generator class="identity"/>
         </id>
-        <many-to-one name="bs"
+        <many-to-one name="bankSubscription"
                      class="ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription"
                      column="IdOfSubscription" lazy="proxy"/>
         <property name="paySystem" column="PaySystem" type="integer" not-null="true"/>
@@ -26,5 +26,9 @@
                      column="IdOfClient" lazy="proxy"/>
         <property name="san" column="San" type="string" length="11"/>
         <property name="errorDescription" column="ErrorDescription" type="string" length="255"/>
+        <set name="regularPayments" inverse="true" cascade="save-update" lazy="true">
+            <key column="IdOfRequest"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment"/>
+        </set>
     </class>
 </hibernate-mapping>

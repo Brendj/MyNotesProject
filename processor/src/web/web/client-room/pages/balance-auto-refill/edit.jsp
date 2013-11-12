@@ -161,7 +161,7 @@
 
 <%
     }
-    List<RegularPayment> paymentList = rpService.getSubscriptionPayments(bsId, null, null, true);
+    List<RegularPayment> paymentList = rpService.getSubscriptionPayments(bsId, null, null, false);
     if (!paymentList.isEmpty()) {
         int i = 1;
 %>
@@ -190,6 +190,9 @@
         </td>
         <td>
             <div class="output-text">RRN транзакции</div>
+        </td>
+        <td>
+            <div class="output-text">Платеж успешный</div>
         </td>
     </tr>
 <%
@@ -221,6 +224,10 @@
         </td>
         <td>
             <div class="output-text"><%=rp.getRrn()%>
+            </div>
+        </td>
+        <td>
+            <div class="output-text"><%=rp.isSuccess() ? "Да" : "Нет"%>
             </div>
         </td>
     </tr>

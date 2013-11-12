@@ -7,6 +7,9 @@ package ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,7 +33,7 @@ public class MfrRequest {
     public static final String ERROR = "KO";
 
     private Long idOfRequest;
-    private BankSubscription bs;
+    private BankSubscription bankSubscription;
     private int paySystem;
     private int requestType;
     private String requestUrl;
@@ -40,6 +43,7 @@ public class MfrRequest {
     private Client client;
     private String san;
     private String errorDescription;
+    private Set<RegularPayment> regularPayments = new HashSet<RegularPayment>();
 
     public Long getIdOfRequest() {
         return idOfRequest;
@@ -49,12 +53,12 @@ public class MfrRequest {
         this.idOfRequest = idOfRequest;
     }
 
-    public BankSubscription getBs() {
-        return bs;
+    public BankSubscription getBankSubscription() {
+        return bankSubscription;
     }
 
-    public void setBs(BankSubscription bs) {
-        this.bs = bs;
+    public void setBankSubscription(BankSubscription bankSubscription) {
+        this.bankSubscription = bankSubscription;
     }
 
     public int getPaySystem() {
@@ -127,6 +131,24 @@ public class MfrRequest {
 
     public void setErrorDescription(String errorDescription) {
         this.errorDescription = errorDescription;
+    }
+
+    protected Set<RegularPayment> getRegularPayments() {
+        return regularPayments;
+    }
+
+    protected void setRegularPayments(Set<RegularPayment> regularPayments) {
+        this.regularPayments = regularPayments;
+    }
+
+    public void addRegularPayment(RegularPayment regularPayment) {
+        regularPayment.setMfrRequest(this);
+        regularPayments.add(regularPayment);
+    }
+
+    public RegularPayment getRegularPayment() {
+        Iterator<RegularPayment> iter = regularPayments.iterator();
+        return iter.hasNext() ? iter.next() : null;
     }
 
     @Override

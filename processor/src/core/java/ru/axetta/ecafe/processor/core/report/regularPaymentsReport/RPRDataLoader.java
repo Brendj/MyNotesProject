@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.report.regularPaymentsReport;
 
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -61,7 +59,6 @@ public class RPRDataLoader {
             items.add(item);
         }
         tr.commit();
-        HibernateUtils.close(session, null);
         return items;
     }
 }
