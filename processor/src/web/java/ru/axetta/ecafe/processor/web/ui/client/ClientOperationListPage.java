@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.items.ClientPassItem;
@@ -38,6 +39,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
     private List<AccountRefund> accountRefundList = new ArrayList<AccountRefund>();
     private List<AccountTransaction> accountTransactionList = new ArrayList<AccountTransaction>();
     private List<ClientPassItem> clientPasses = new ArrayList<ClientPassItem>();
+    private List<RegularPayment> regularPayments = new ArrayList<RegularPayment>();
 
     public String getPageFilename() {
         return "client/operation_list";
@@ -101,6 +103,14 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         return clientPasses;
     }
 
+    public List<RegularPayment> getRegularPayments() {
+        return regularPayments;
+    }
+
+    public void setRegularPayments(List<RegularPayment> regularPayments) {
+        this.regularPayments = regularPayments;
+    }
+
     @SuppressWarnings("unchecked")
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
@@ -144,6 +154,10 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         for (EnterEvent event : res) {
             clientPasses.add(new ClientPassItem(event));
         }
+        criteria = session.createCriteria(RegularPayment.class);
+        criteria.add(Restrictions.eq("client", client)).add(Restrictions.le("paymentDate", startTime))
+                .add(Restrictions.ge("paymentDate", endTime)).addOrder(Order.asc("paymentDate"));
+        regularPayments = (List<RegularPayment>) criteria.list();
     }
 
 }

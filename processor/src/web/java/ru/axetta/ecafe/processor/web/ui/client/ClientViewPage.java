@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Criteria;
@@ -103,6 +104,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private String clientGroupName;
     private Long externalId;
     private String clientGUID;
+    private List<BankSubscription> bankSubscriptions;
 
 
     public Long getExternalId() {
@@ -256,6 +258,15 @@ public class ClientViewPage extends BasicWorkspacePage {
         return clientNotificationSettingViewPage;
     }
 
+    public List<BankSubscription> getBankSubscriptions() {
+        return bankSubscriptions;
+    }
+
+    public void setBankSubscriptions(List<BankSubscription> bankSubscriptions) {
+        this.bankSubscriptions = bankSubscriptions;
+    }
+
+    @SuppressWarnings("unchecked")
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
         Org org = client.getOrg();
@@ -314,6 +325,10 @@ public class ClientViewPage extends BasicWorkspacePage {
                 this.categoriesDiscounts.add(categoryDiscount);
             }
         }
+        Criteria bankSubscriptionCriteria = session.createCriteria(BankSubscription.class);
+        bankSubscriptionCriteria.add(Restrictions.eq("client", client))
+                .add(Restrictions.isNotNull("activationDate"));
+        this.bankSubscriptions = (List<BankSubscription>) bankSubscriptionCriteria.list();
 
         // Категории скидок старое не используется
         //categoryDiscountNames = new ArrayList<String>();

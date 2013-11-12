@@ -977,7 +977,7 @@ public class DAOUtils {
 
     public static ClientGroup createClientGroup(Session persistenceSession, Long idOfOrg, String clientGroupName) {
         ClientGroup.Predefined predefined = ClientGroup.Predefined.parse(clientGroupName);
-        Long idOfClientGroup =null;
+        Long idOfClientGroup;
         /* если группа предопредлелена */
         if(predefined!=null){
             idOfClientGroup = predefined.getValue();
@@ -985,15 +985,11 @@ public class DAOUtils {
             /* иначе это класс */
             Query q = persistenceSession.createQuery("select max(compositeIdOfClientGroup.idOfClientGroup) from ClientGroup where compositeIdOfClientGroup.idOfOrg=:idOfOrg and compositeIdOfClientGroup.idOfClientGroup<:idOfClientGroup");
             q.setParameter("idOfOrg", idOfOrg);
-            q.setParameter("idOfClientGroup",1100000000L);
+            q.setParameter("idOfClientGroup", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
             List l = q.list();
-            Long compositeIdOfClientGroup;
-            if(l==null || l.isEmpty() || l.get(0)==null){
-                compositeIdOfClientGroup = ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue();
-            } else {
-                compositeIdOfClientGroup =  (Long)l.get(0);
-            }
-            idOfClientGroup = compositeIdOfClientGroup + 1 ;
+            Long res = l.isEmpty() || l.get(0) == null ? ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue()
+                    : (Long) l.get(0);
+            idOfClientGroup = res + 1;
         }
         CompositeIdOfClientGroup compositeIdOfClientGroup = new CompositeIdOfClientGroup(idOfOrg,idOfClientGroup);
         ClientGroup clientGroup = new ClientGroup(compositeIdOfClientGroup, clientGroupName);

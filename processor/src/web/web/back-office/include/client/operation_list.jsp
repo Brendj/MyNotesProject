@@ -503,6 +503,68 @@
     </rich:column>
 </rich:dataTable>
 
+<h:outputText value="Регулярные платежи:" />
+<rich:dataTable id="regularPaymentsTable" var="pay" value="#{mainPage.clientOperationListPage.regularPayments}"
+                rowKeyVar="row" footerClass="data-table-footer" rows="8"
+                columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, left-aligned-column">
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="№" />
+        </f:facet>
+        <h:outputText escape="true" value="#{row+1}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Идентификатор" />
+        </f:facet>
+        <h:outputText escape="true" value="#{pay.idOfPayment}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Время платежа" />
+        </f:facet>
+        <h:outputText escape="true" value="#{pay.paymentDate}" styleClass="output-text"
+                      converter="timeMinuteConverter" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Сумма" />
+        </f:facet>
+        <h:outputText escape="true" value="#{pay.paymentAmount}" styleClass="output-text"
+                      converter="copeckSumConverter" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Баланс до пополнения" />
+        </f:facet>
+        <h:outputText escape="true" value="#{pay.clientBalance}" styleClass="output-text"
+                      converter="copeckSumConverter" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Платеж успешный" />
+        </f:facet>
+        <h:outputText escape="true" value='#{pay.success ? "Да" : "Нет"}' styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="RRN транзакции" />
+        </f:facet>
+        <h:outputText escape="true" value="#{pay.rrn}" styleClass="output-text" />
+    </rich:column>
+    <f:facet name="footer">
+        <rich:datascroller for="regularPaymentsTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                           stepControls="auto" boundaryControls="hide">
+            <f:facet name="previous">
+                <h:graphicImage value="/images/16x16/left-arrow.png" />
+            </f:facet>
+            <f:facet name="next">
+                <h:graphicImage value="/images/16x16/right-arrow.png" />
+            </f:facet>
+        </rich:datascroller>
+    </f:facet>
+</rich:dataTable>
+
 </h:panelGrid>
 <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages" warnClass="warn-messages" />
 </h:panelGrid>
