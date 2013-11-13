@@ -228,7 +228,7 @@ public class GoodRequestsReport extends BasicReport {
                 }
             }
         } else {
-            for (long ts=startDate.getTime(); ts<=endDate.getTime(); ts+=86400000){
+            for (long ts=startDate.getTime(); ts<endDate.getTime(); ts+=86400000){
                 Date tmp = new Date(ts);
                 dates.add (tmp);
             }
