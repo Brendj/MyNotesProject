@@ -29,6 +29,7 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
         String ruleName, reportName, orgNum, tag;
         Date createdDate, startDate, endDate;
         List<Long> idOfOrgList;
+        private Long idOfContragentReceiver;
 
         @Override
         public boolean isEmpty() {
@@ -62,6 +63,9 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
             if (startDate!=null) {
                 crit.add(Restrictions.ge("startDate", CalendarUtils.truncateToDayOfMonth(startDate)));
                 if (endDate==null) endDate = CalendarUtils.addOneDay(startDate);
+            }
+            if (idOfContragentReceiver != null) {
+                crit.add(Restrictions.eq("idOfContragentReceiver", idOfContragentReceiver));
             }
             if (endDate!=null) {
                 Calendar localCalendar = Calendar.getInstance();
@@ -134,6 +138,14 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
         public void setIdOfOrgList(List<Long> idOfOrgList) {
             this.idOfOrgList = idOfOrgList;
         }
+
+        public Long getIdOfContragentReceiver() {
+            return idOfContragentReceiver;
+        }
+
+        public void setIdOfContragentReceiver(Long idOfContragentReceiver) {
+            this.idOfContragentReceiver = idOfContragentReceiver;
+        }
     }
 
 
@@ -148,6 +160,8 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
     private String reportFile;
     private String orgNum;
     private String tag;
+    private Long idOfContragentReceiver;
+    private String contragentReceiver;
     private List<Long> idOfOrgList;
 
     @Override
@@ -163,6 +177,8 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
         reportFile = entity.getReportFile();
         orgNum = entity.getOrgNum();
         tag = entity.getTag();
+        idOfContragentReceiver = entity.getIdOfContragentReceiver();
+        contragentReceiver = entity.getContragentReceiver();
     }
 
     @Override
@@ -230,6 +246,22 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
 
     public String getTag() {
         return tag;
+    }
+
+    public Long getIdOfContragentReceiver() {
+        return idOfContragentReceiver;
+    }
+
+    public void setIdOfContragentReceiver(Long idOfContragentReceiver) {
+        this.idOfContragentReceiver = idOfContragentReceiver;
+    }
+
+    public String getContragentReceiver() {
+        return contragentReceiver;
+    }
+
+    public void setContragentReceiver(String contragentReceiver) {
+        this.contragentReceiver = contragentReceiver;
     }
 
     @Override

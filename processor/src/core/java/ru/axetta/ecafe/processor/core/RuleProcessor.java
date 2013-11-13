@@ -507,7 +507,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                                 basicReportJob.getEndTime(), relativeReportFilePath,
                                                 report.getProperties()
                                                         .getProperty(ReportPropertiesUtils.P_ORG_NUMBER_IN_NAME),
-                                                idOfOrg, currRule.getTag());
+                                                idOfOrg, currRule.getTag(), null, null);
                             }
 
                             if (basicReport instanceof OrgBalanceReport) {
@@ -523,7 +523,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                                 basicReportJob.getBaseTime(), relativeReportFilePath,
                                                 report.getProperties()
                                                         .getProperty(ReportPropertiesUtils.P_ORG_NUMBER_IN_NAME),
-                                                idOfOrg, currRule.getTag());
+                                                idOfOrg, currRule.getTag(), null, null);
                             }
 
                         }

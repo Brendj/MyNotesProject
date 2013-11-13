@@ -46,3 +46,8 @@ CREATE TABLE CF_Circulations (
   CONSTRAINT CF_Circulation_IdOfClient_fk FOREIGN KEY (IdOfClient) REFERENCES CF_Clients (IdOfClient),
   CONSTRAINT CF_Circulation_IdOfPublication_fk FOREIGN KEY (IdOfPublication, IdOfOrg) REFERENCES CF_Publications (IdOfPublication, IdOfOrg)
 );
+
+
+-- Добавление протоколирования контрагента-получателя в БД для возможности последующего фильтра
+alter table CF_ReportInfo add column IdOfContragentReceiver bigint default null;
+alter table CF_ReportInfo add column ContragentReceiver varchar(128) null;

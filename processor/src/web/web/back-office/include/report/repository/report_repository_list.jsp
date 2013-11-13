@@ -53,6 +53,22 @@ function checkReporitoryDate () {
                     </a4j:commandButton>
                     <h:outputText styleClass="output-text" escape="true" value=" {#{reportRepositoryListPage.orgsFilter}}" />
                 </h:panelGroup>
+
+                <h:outputText escape="true" value="Контрагент-получатель" styleClass="output-text" />
+                <h:panelGroup styleClass="borderless-div">
+                    <h:inputText value="#{reportRepositoryListPage.contragentReceiverFilter.contragent.contragentName}" readonly="true"
+                                 styleClass="input-text" style="margin-right: 2px;" />
+                    <a4j:commandButton value="..." action="#{contragentPaymentReportPage.showContragentSelectPage(true)}"
+                                       reRender="modalContragentSelectorPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                                       styleClass="command-link" style="width: 25px;">
+                        <f:setPropertyActionListener value="0"
+                                                     target="#{mainPage.multiContrFlag}" />
+                        <f:setPropertyActionListener value="2"
+                                                     target="#{mainPage.classTypes}" />
+                    </a4j:commandButton>
+                </h:panelGroup>
+
                 <h:outputText escape="true" value="Дата создания" styleClass="output-text" />
                 <rich:calendar value="#{reportRepositoryListPage.filter.createdDate}" datePattern="dd.MM.yyyy"
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
@@ -106,6 +122,12 @@ function checkReporitoryDate () {
                 <h:outputText escape="true" value="Номер организации" />
             </f:facet>
             <h:outputText escape="true" value="#{item.orgNum}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Контрагент-получатель" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.contragentReceiver}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

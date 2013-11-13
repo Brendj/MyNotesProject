@@ -21,6 +21,9 @@
         <property name="orgNum" column="OrgNum" type="string" length="12" not-null="false"/>
         <property name="idOfOrg" column="IdOfOrg" type="long" not-null="false"/>
         <property name="tag" column="Tag" type="string" length="12" not-null="false"/>
+        <property name="idOfContragentReceiver" column="IdOfContragentReceiver" type="long" not-null="false"/>
+        <property name="contragentReceiver" column="ContragentReceiver" type="string" length="128" not-null="false"/>
+
 
     </class>
 </hibernate-mapping>

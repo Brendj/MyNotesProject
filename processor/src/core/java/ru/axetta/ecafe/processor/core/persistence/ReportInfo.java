@@ -20,13 +20,16 @@ public class ReportInfo {
     private String orgNum;
     private Long idOfOrg;
     private String tag;
+    private Long idOfContragentReceiver;
+    private String contragentReceiver;
     
     protected ReportInfo() {
 
     }
 
     public ReportInfo(String ruleName, Integer documentFormat, String reportName, Date createdDate, Long generationTime,
-            Date startDate, Date endDate, String reportFile, String orgNum, Long idOfOrg, String tag) {
+            Date startDate, Date endDate, String reportFile, String orgNum, Long idOfOrg, String tag, Long idOfContragentReceiver, 
+            String contragentReceiver) {
         this.ruleName = ruleName;
         this.documentFormat = documentFormat;
         this.reportName = reportName;
@@ -39,6 +42,8 @@ public class ReportInfo {
         if (this.orgNum!=null && orgNum.length()>12) orgNum=orgNum.substring(0, 11);
         this.idOfOrg = idOfOrg;
         this.tag = tag;
+        this.idOfContragentReceiver = idOfContragentReceiver;
+        this.contragentReceiver = contragentReceiver;
     }
 
     public String getReportFile() {
@@ -137,6 +142,22 @@ public class ReportInfo {
         this.tag = tag;
     }
 
+    public Long getIdOfContragentReceiver() {
+        return idOfContragentReceiver;
+    }
+
+    public void setIdOfContragentReceiver(Long idOfContragentReceiver) {
+        this.idOfContragentReceiver = idOfContragentReceiver;
+    }
+
+    public String getContragentReceiver() {
+        return contragentReceiver;
+    }
+
+    public void setContragentReceiver(String contragentReceiver) {
+        this.contragentReceiver = contragentReceiver;
+    }
+
     @Override
     public String toString() {
         return "ReportInfo{" +
@@ -149,6 +170,8 @@ public class ReportInfo {
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
                 ", reportFile='" + reportFile + '\'' +
+                ", idOfContragentReceiver='" + idOfContragentReceiver + '\'' +
+                ", contragentReceiver='" + contragentReceiver + '\'' +
                 '}';
     }
 }

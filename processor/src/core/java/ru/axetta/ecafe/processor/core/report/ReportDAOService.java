@@ -527,7 +527,7 @@ public class ReportDAOService {
             Long generationTime, Date startDate, Date endDate, String reportFile, String orgNum, Long idOfOrg,
             String tag) {
         ReportInfo ri = new ReportInfo(ruleName, documentFormat, reportName, createdDate, generationTime, startDate,
-                endDate, reportFile, orgNum, idOfOrg, tag);
+                endDate, reportFile, orgNum, idOfOrg, tag, null, null);
         entityManager.persist(ri);
         return ri;
     }

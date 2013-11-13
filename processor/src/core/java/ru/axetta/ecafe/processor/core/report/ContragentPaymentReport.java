@@ -209,8 +209,10 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                             parameterMap));
             Date generateEndTime = new Date();
             if (!exportToHTML) {
-                return new ContragentPaymentReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
+                ContragentPaymentReport report = new ContragentPaymentReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                         jasperPrint, startTime, endTime, contragent.getIdOfContragent());
+                report.setReportProperties(getReportProperties());
+                return report;
             }  else {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 JRHtmlExporter exporter = new JRHtmlExporter();
@@ -222,8 +224,10 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
                 exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
                 exporter.exportReport();
-                return new ContragentPaymentReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
+                ContragentPaymentReport report = new ContragentPaymentReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                         jasperPrint, startTime, endTime, contragent.getIdOfContragent()).setHtmlReport(os.toString("UTF-8"));
+                report.setReportProperties(getReportProperties());
+                return report;
             }
         }
 

@@ -10,9 +10,12 @@ import ru.axetta.ecafe.processor.core.persistence.ReportInfo;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractListPage;
+import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
+import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -24,9 +27,10 @@ import java.util.Map;
 
 @Component
 @Scope("session")
-public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, ReportRepositoryItem> implements OrgListSelectPage.CompleteHandlerList {
+public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, ReportRepositoryItem> implements OrgListSelectPage.CompleteHandlerList, ContragentSelectPage.CompleteHandler {
     BasicWorkspacePage groupPage = new BasicWorkspacePage();
     ReportRepositoryItem.Filter filter = new ReportRepositoryItem.Filter();
+    private final CCAccountFilter contragentReceiverFilter = new CCAccountFilter();
     
     File fileToDownload;
     private ReportRepositoryItem selectedItem;
@@ -70,6 +74,10 @@ public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, Repor
         }                                 
         return items;
     }
+
+    public CCAccountFilter getContragentReceiverFilter() {
+        return contragentReceiverFilter;
+    }
     
     public Object downloadReportFile() {
         return "downloadReportFile";
@@ -103,6 +111,11 @@ public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, Repor
 
     public String getOrgsFilter() {
         return orgsFilter;
+    }
+
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
+        contragentReceiverFilter.completeContragentSelection(session, idOfContragent);
+        filter.setIdOfContragentReceiver(idOfContragent);
     }
 
     public void completeOrgListSelection(Map<Long, String> orgMap) throws HibernateException {

@@ -588,6 +588,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
                 buildReport(values, null);
             } catch (Exception e) {
                 errorMessage = String.format("Во время выполнения отчета, возникла ошибка: %s", e.getMessage());
+                logger.error("Failed to create report", e);
                 return;
             }
         }
@@ -655,11 +656,26 @@ public class ManualReportRunnerPage extends OnlineReportPage
             File f = new File(RuntimeContext.getInstance().getAutoReportGenerator().getReportPath());
             String relativeReportFilePath = reportDocument.getReportFile().getAbsolutePath()
                     .substring(f.getAbsolutePath().length());
+            Contragent contragent = null;
+            if (values != null && values.get("idOfContragentReceiver") != null) {
+                List<String> tmpList = values.get("idOfContragentReceiver");
+                if (tmpList != null && tmpList.size() > 0) {
+                    try {
+                        long idOfContragentReceiver = Long.parseLong(tmpList.get(0));
+                        contragent = DAOService.getInstance().getContragentById(idOfContragentReceiver);
+                    } catch (Exception e) {
+                        contragent = null;
+                    }
+                }
+            }
             //  Информацию о том, что отчет выполнен, добавляем в БД
             DAOService.getInstance()
                     .registerReport(rule.getRuleName(), rule.getDocumentFormat(), subject, report.getGenerateTime(),
                             report.getGenerateDuration(), report.getStartTime(), report.getEndTime(),
-                            relativeReportFilePath, org.getOrgNumberInName(), org.getIdOfOrg(), rule.getTag());
+                            relativeReportFilePath, org == null ? "" : org.getOrgNumberInName(),
+                            org == null ? null : org.getIdOfOrg(), rule.getTag(),
+                            contragent == null ? null : contragent.getIdOfContragent(),
+                            contragent == null ? null : contragent.getContragentName());
             infoMessage = "Отчеты успешно созданы и помещены в репозиторий";
         } else if (documentFormat == ReportHandleRule.HTML_FORMAT) {
             //  Если выбран html, то необходимо выполнить отчет в строку и отобразить его на странице, а так же, добавить
