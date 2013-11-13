@@ -107,7 +107,7 @@ public class RegularPaymentRequest implements IRequestOperation {
             // Сохраняем дату неуспешного платежа по подписке
             // и увеличиваем счетчик неуспешных платежей подряд.
             BankSubscription bs = request.getBankSubscription();
-            bs.setLastUnsuccessfulPaymentDate(new Date());
+            bs.setLastUnsuccessfulPaymentDate(rp.getPaymentDate());
             bs.setUnsuccessfulPaymentsCount(bs.getUnsuccessfulPaymentsCount() + 1);
             bs.setLastPaymentStatus(MfrRequest.ERROR);
         }
@@ -123,6 +123,7 @@ public class RegularPaymentRequest implements IRequestOperation {
         if (MfrRequest.PAYMENT_SUCCESSFUL.equalsIgnoreCase(paymentResponse.getStatus())) {
             rp.setSuccess(true);
             rp.setStatus(MfrRequest.PAYMENT_SUCCESSFUL);
+            rp.setPaymentDate(paymentResponse.getDateTime());
             rp.setAuthCode(paymentResponse.getAuthCode());
             rp.setRrn(Long.valueOf(paymentResponse.getRrn()));
             // Сохраняем дату последнего успешного платежа по подписке
