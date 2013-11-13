@@ -12,7 +12,9 @@ import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,6 +37,8 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
     private String roleName;
     private final UserRoleEnumTypeMenu userRoleEnumTypeMenu = new UserRoleEnumTypeMenu();
     //private Contragent currentContragent;
+    private String contragentFilter;
+    private String contragentIds;
 
     public void setIdOfRole(Integer idOfRole) {
         this.idOfRole = idOfRole;
@@ -116,18 +120,35 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
         this.contragentItem = contragentItem;
     }*/
 
-    public String getContragentsFilter () {
-        if (contragentItems == null) {
-            return "";
-        }
+    public String getContragentFilter() {
+        return contragentFilter;
+    }
+
+    public void setContragentFilter(String contragentFilter) {
+        this.contragentFilter = contragentFilter;
+    }
+
+    public String getContragentIds() {
+        return contragentIds;
+    }
+
+    public void setContragentIds(String contragentIds) {
+        this.contragentIds = contragentIds;
+    }
+
+    private void setContragentFilterInfo(List<ContragentItem> contragentItems) {
         StringBuilder str = new StringBuilder();
+        StringBuilder ids = new StringBuilder();
         for (ContragentItem it : contragentItems) {
             if (str.length() > 0) {
                 str.append("; ");
+                ids.append(",");
             }
             str.append(it.getContragentName());
+            ids.append(it.getIdOfContragent());
         }
-        return str.toString();
+        contragentFilter = str.toString();
+        contragentIds = ids.toString();
     }
 
     public FunctionSelector getFunctionSelector() {
@@ -157,18 +178,18 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
             user.setRoleName(this.roleName);
             user.setFunctions(functionSelector.getSelected(session));
         }
-        if(role.equals(User.DefaultRole.SUPPLIER)){
+        if (role.equals(User.DefaultRole.SUPPLIER)) {
             user.setFunctions(functionSelector.getSupplierFunctions(session));
             user.setRoleName(role.toString());
-            if(contragentItems==null || contragentItems.size() < 1){
-                throw new Exception("Contragents list is empty");
+            if (contragentItems.isEmpty()) {
+                this.printError("Список контрагентов пуст.");
+                throw new RuntimeException("Contragent list is empty");
             }
-            Set<Contragent> contragents = new HashSet<Contragent>();
-            for (ContragentItem it : this.contragentItems) {
-                Contragent contragent = (Contragent) session.load(Contragent.class, it.getIdOfContragent());
-                contragents.add(contragent);
-            }
-            user.setContragents(contragents);
+        }
+        user.getContragents().clear();
+        for (ContragentItem it : this.contragentItems) {
+            Contragent contragent = (Contragent) session.load(Contragent.class, it.getIdOfContragent());
+            user.getContragents().add(contragent);
         }
         if(role.equals(User.DefaultRole.MONITORING)){
             user.setFunctions(functionSelector.getMonitoringFunctions(session));
@@ -181,27 +202,21 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
         session.save(user);
     }
 
-    public Boolean getIsSupplier(){
-        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
-        return role.equals(User.DefaultRole.SUPPLIER);
-    }
-
     public Boolean getIsDefault(){
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.DEFAULT);
     }
 
-    public void completeContragentListSelection(Session session, List<Long> idOfContragentList, int multiContrFlag, String classTypes) throws Exception {
-        if (null != idOfContragentList) {
-            contragentItems.clear();
-            StringBuilder str = new StringBuilder();
-            for (Long idOfContragent : idOfContragentList) {
-                Contragent currentContragent = (Contragent) session.load(Contragent.class, idOfContragent);
-                ContragentItem contragentItem = new ContragentItem(currentContragent);
-                contragentItems.add(contragentItem);
-            }
-
+    @Override
+    public void completeContragentListSelection(Session session, List<Long> idOfContragentList, int multiContrFlag,
+            String classTypes) throws Exception {
+        contragentItems.clear();
+        for (Long idOfContragent : idOfContragentList) {
+            Contragent currentContragent = (Contragent) session.load(Contragent.class, idOfContragent);
+            ContragentItem contragentItem = new ContragentItem(currentContragent);
+            contragentItems.add(contragentItem);
         }
+        setContragentFilterInfo(contragentItems);
     }
 
     public static class ContragentItem {

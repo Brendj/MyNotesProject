@@ -58,21 +58,19 @@
                                          target="#{mainPage.classTypes}" />
         </a4j:commandButton>
     </h:panelGroup>--%>
-    <h:outputText escape="true" value="Список контрагентов" styleClass="output-text required-field" rendered="#{mainPage.userEditPage.isSupplier}"/>
-    <h:panelGroup styleClass="borderless-div" rendered="#{mainPage.userEditPage.isSupplier}">
-        <h:inputText value="#{mainPage.userEditPage.contragentsFilter}" readonly="true"
-                     styleClass="input-text" style="margin-right: 2px;" />
+    <h:outputText escape="true" value="Список контрагентов" styleClass="output-text" />
+    <h:panelGroup styleClass="borderless-div">
         <a4j:commandButton value="..." action="#{mainPage.showContragentListSelectPage}"
                            reRender="modalContragentListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
-                           styleClass="command-link" style="width: 25px;" >
-            <f:setPropertyActionListener value="0"
-                                         target="#{mainPage.multiContrFlag}" />
-            <f:setPropertyActionListener value="2"
-                                         target="#{mainPage.classTypes}" />
+                           styleClass="command-link" style="width: 25px;">
+            <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+            <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
+            <f:setPropertyActionListener value="#{mainPage.userEditPage.contragentIds}"
+                                         target="#{mainPage.contragentListSelectPage.selectedIds}" />
         </a4j:commandButton>
+        <h:outputText value="{#{mainPage.userEditPage.contragentFilter}}" styleClass="output-text" escape="true" />
     </h:panelGroup>
-
 
     <h:outputText escape="true" value="Права пользователя" styleClass="output-text" rendered="#{mainPage.userEditPage.isDefault}"/>
     <rich:dataTable value="#{mainPage.userEditPage.functionSelector.items}" var="item" rendered="#{mainPage.userEditPage.isDefault}">

@@ -2131,8 +2131,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
 
     public Object showContragentListSelectPage () {
         BasicPage currentTopMostPage = getTopMostPage();
-        if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler
-                || currentTopMostPage instanceof ContragentListSelectPage) {
+        if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
             RuntimeContext runtimeContext = null;
             Session persistenceSession = null;
@@ -2144,10 +2143,9 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 contragentListSelectPage.fill(persistenceSession, multiContrFlag, classTypes);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
-                if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler) {
-                    contragentListSelectPage.pushCompleteHandler((ContragentListSelectPage.CompleteHandler) currentTopMostPage);
-                    modalPages.push(contragentListSelectPage);
-                }
+                contragentListSelectPage
+                        .pushCompleteHandler((ContragentListSelectPage.CompleteHandler) currentTopMostPage);
+                modalPages.push(contragentListSelectPage);
             } catch (Exception e) {
                 logger.error("Failed to fill contragents list selection page", e);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -2289,6 +2287,23 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
 
     }
 
+    public Object cancelContragentListSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            contragentListSelectPage.cancelContragentListSelection();
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == contragentListSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("{}", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора списка контрагентов",
+                            null));
+        }
+        return null;
+    }
 
     public Object completeContractSelection () {
         FacesContext facesContext = FacesContext.getCurrentInstance();

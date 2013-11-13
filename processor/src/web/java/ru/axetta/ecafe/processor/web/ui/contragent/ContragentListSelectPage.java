@@ -72,6 +72,7 @@ public class ContragentListSelectPage extends BasicPage {
     //private Item selectedItem = new Item();
     private String filter, classTypesString;
     private int multiContrFlag;
+    private String selectedIds;
 
     public void pushCompleteHandler(CompleteHandler handler) {
         completeHandlers.push(handler);
@@ -91,6 +92,10 @@ public class ContragentListSelectPage extends BasicPage {
                     multiContrFlag, classTypesString);
             completeHandlers.pop();
         }
+    }
+
+    public void cancelContragentListSelection() {
+        completeHandlers.clear();
     }
 
     public List<Item> getItems() {
@@ -131,14 +136,26 @@ public class ContragentListSelectPage extends BasicPage {
         this.filter = filter;
     }
 
+    public String getSelectedIds() {
+        return selectedIds;
+    }
+
+    public void setSelectedIds(String selectedIds) {
+        this.selectedIds = selectedIds;
+    }
+
     public void fill(Session session, int multiContrFlag, String classTypes) throws Exception {
         this.multiContrFlag = multiContrFlag;
-        List<Item> items = new LinkedList<Item>();
+        List<Item> items = new ArrayList<Item>();
+        List<String> selectedIdsList = Arrays.asList(StringUtils.split(selectedIds, ","));
         List contragents = retrieveContragents(session, classTypes);
         for (Object object : contragents) {
             Contragent contragent = (Contragent) object;
             Item item = new Item(contragent);
             items.add(item);
+            if (selectedIdsList.contains(item.getIdOfContragent().toString())) {
+                item.setSelected(true);
+            }
         }
         this.items = items;
     }

@@ -50,19 +50,18 @@
         </a4j:commandButton>
     </h:panelGroup>--%>
 
-    <h:outputText escape="true" value="Список контрагентов" styleClass="output-text required-field" rendered="#{mainPage.userCreatePage.isSupplier}"/>
-    <h:panelGroup styleClass="borderless-div" rendered="#{mainPage.userCreatePage.isSupplier}">
-        <h:inputText value="#{mainPage.userCreatePage.contragentsFilter}" readonly="true"
-                     styleClass="input-text" style="margin-right: 2px;" />
+    <h:outputText escape="true" value="Список контрагентов" styleClass="output-text" />
+    <h:panelGroup styleClass="borderless-div">
         <a4j:commandButton value="..." action="#{mainPage.showContragentListSelectPage}"
                            reRender="modalContragentListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
-                           styleClass="command-link" style="width: 25px;" >
-            <f:setPropertyActionListener value="0"
-                                         target="#{mainPage.multiContrFlag}" />
-            <f:setPropertyActionListener value="2"
-                                         target="#{mainPage.classTypes}" />
+                           styleClass="command-link" style="width: 25px;">
+            <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+            <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
+            <f:setPropertyActionListener value="#{mainPage.userCreatePage.contragentIds}"
+                                         target="#{mainPage.contragentListSelectPage.selectedIds}" />
         </a4j:commandButton>
+        <h:outputText value="#{mainPage.userCreatePage.contragentFilter}" escape="true" styleClass="output-text" />
     </h:panelGroup>
 
     <h:outputText escape="true" value="Права пользователя" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault}"/>

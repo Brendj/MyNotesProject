@@ -77,12 +77,10 @@
                                            reRender="#{mainPage.topMostPage.pageComponent.id}"
                                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.hide();"
                                            styleClass="command-button" style="width: 80px; margin-right: 4px;" />
-                        <a4j:commandButton value="Отмена" action="#{mainPage.completeContragentListSelection}"
+                        <a4j:commandButton value="Отмена" action="#{mainPage.cancelContragentListSelection}"
                                            reRender="#{mainPage.topMostPage.pageComponent.id}"
-                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.hide();"
+                                           oncomplete="#{rich:component('modalContragentListSelectorPanel')}.hide();return false;"
                                            styleClass="command-button" style="width: 80px;">
-                            <%--<f:setPropertyActionListener value="#{null}"
-                                                         target="#{mainPage.contragentListSelectPage.selectedItem}" />--%>
                         </a4j:commandButton>
                     </h:panelGroup>
                 </td>
