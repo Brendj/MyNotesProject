@@ -126,7 +126,7 @@ public class GoodRequestsReport extends BasicReport {
                          "      " + (suppliersCondition.length() < 1 ? "" : "join cf_menuexchangerules on idofdestorg=cf_orgs.idoforg ") +
                          "      where cf_orgs.officialname<> '' and " +
                          "            " + stateCondition +
-                         "            (cf_goods_requests.donedate between " + startDateLong + " and " + endDateLong + ") "+
+                         "            (cf_goods_requests.donedate>=" + startDateLong + " and cf_goods_requests.donedate<" + endDateLong + ") "+
                          "            " + notCreatedAtConfition +
                          "            " + goodCondition +
                          "            " + orgCondition +

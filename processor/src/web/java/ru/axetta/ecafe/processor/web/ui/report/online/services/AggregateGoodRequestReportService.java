@@ -138,6 +138,7 @@ public class AggregateGoodRequestReportService {
                 }
             }
         }
+        Collections.sort(aggregateGoodRequestReportItems, new ReportComparator());
 
         return aggregateGoodRequestReportItems;
     }
@@ -252,8 +253,28 @@ public class AggregateGoodRequestReportService {
                 }
             }
         }
+        
+        Collections.sort(aggregateGoodRequestReportItems, new ReportComparator());
 
         return aggregateGoodRequestReportItems;
     }
 
+
+    public class ReportComparator implements Comparator
+    {
+        public int compare ( Object object1 , Object object2 )
+        {
+            AggregateGoodRequestReportItem i1 = (AggregateGoodRequestReportItem) object1;
+            AggregateGoodRequestReportItem i2 = (AggregateGoodRequestReportItem) object2;
+            if (i1.getDoneDate().before(i2.getDoneDate())) {
+                return -1;
+            } else if (i1.getDoneDate().after(i2.getDoneDate())) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+    }
 }
+
+
