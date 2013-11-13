@@ -228,8 +228,8 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                 String level3 = (String) e[3];
                 String level4 = (String) e[4];
                 int count = ((BigInteger) e[5]).intValue();
-                long price = ((BigInteger) e[6]).longValue();
-                long summary = ((BigInteger) e[7]).longValue();
+                long price = ((BigInteger) e[6]).longValue() / 1000;
+                long summary = ((BigInteger) e[7]).longValue() / 1000;
                 String address = (String) e[8];
                 String orgNum = (e[9] == null ? "" : (String) e[9]);
                 long idoforg = ((BigInteger) e[10]).longValue();
