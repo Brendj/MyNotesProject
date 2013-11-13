@@ -406,7 +406,9 @@ public class Processor implements SyncProcessor,
         }
         CardTemp ct = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
         if (ct != null) {
-            throw new Exception("Временная карта уже зарегистрирована на клиента: " );
+            throw new Exception(String.format(
+                    "Карта с таким номером уже зарегистрирована как временная на клиента: %s. Статус карты - %s.",
+                    ct.getClient().getIdOfClient(), ct.getCardStation()));
         }
         if (state == Card.ACTIVE_STATE) {
             lockActiveCards(persistenceSession, client.getCards());
@@ -1600,7 +1602,7 @@ public class Processor implements SyncProcessor,
             Iterator<SyncRequest.ClientParamRegistry.ClientParamItem> clientParamItems = clientParamRegistry
                     .getPayments().iterator();
 
-            HashMap<Long, HashMap<String, ClientGroup>> orgMap = new HashMap<Long, HashMap<String, ClientGroup>>(0);
+            HashMap<Long, HashMap<String, ClientGroup>> orgMap = new HashMap<Long, HashMap<String, ClientGroup>>();
             Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
             Set<Org> orgSet = org.getFriendlyOrg();
             /* совместимость организаций которые не имеют дружественных организаций */
@@ -2954,14 +2956,15 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
         }
         CardTemp cardTemp = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
         if (cardTemp != null) {
-            if(cardTemp.getCardPrintedNo()!=null && !cardTemp.getCardPrintedNo().equals(cardPrintedNo)){
+            if (cardTemp.getCardPrintedNo() != null && !cardTemp.getCardPrintedNo().equals(cardPrintedNo)) {
                 cardTemp.setCardPrintedNo(cardPrintedNo);
             } else {
-                throw new Exception("Временная карта уже зарегистрирована на временная: " );
+                throw new Exception(
+                        String.format("Временная карта уже зарегистрирована на клиента: %s. Статус карты - %s.",
+                                cardTemp.getClient().getIdOfClient(), cardTemp.getCardStation()));
             }
         } else {
-            cardTemp = new CardTemp(org,cardNo, cardPrintedNo);
-
+            cardTemp = new CardTemp(org, cardNo, cardPrintedNo);
         }
         persistenceSession.save(cardTemp);
     }
