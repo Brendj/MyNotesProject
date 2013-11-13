@@ -15,6 +15,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentCompletionReportItem;
 import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentDAOService;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Contract;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 
@@ -139,6 +140,7 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
 
+            
             List<ActiveClientsItem> result = new ArrayList<ActiveClientsItem>();
             String sql =
                   "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
@@ -146,6 +148,7 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
                 + "from cf_orgs "
                 + "left join cf_clients as totalClients on cf_orgs.idoforg=totalClients.idoforg "
                 + "where cf_orgs.district is not null and cf_orgs.district<>'' "
+                          + getClientsClause("totalClients")
                 + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
                 + "union all "
                 + "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
@@ -153,6 +156,7 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
                 + "from cf_orgs "
                 + "left join cf_clients as discountClients on cf_orgs.idoforg=discountClients.idoforg and discountClients.discountmode<>0 "
                 + "where cf_orgs.district is not null and cf_orgs.district<>'' "
+                          + getClientsClause("discountClients")
                 + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
                 + "union all "
                 + "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
@@ -161,7 +165,9 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
                 + "join cf_orders as orders on cf_orgs.idoforg=orders.idoforg and "
                 + "                       orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startCal.getTime()) + "') * 1000 AND "
                 + "                                                  EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endCal.getTime()) + "') * 1000 "
+                + "join cf_clients as ordclients on orders.idofclient=ordclients.idofclient "
                 + "where cf_orgs.district is not null and cf_orgs.district<>'' "
+                        + getClientsClause("ordclients")
                 + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
                 + "order by district, shortname, valType";
             Query query = session.createSQLQuery(sql);
@@ -241,6 +247,12 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
 
             return result;
         }
+    }
+    
+    private static String getClientsClause(String table) {
+        String onlyActiveClients = " AND " + table + ".idOfClientGroup>=" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() +
+                                   " AND " + table + ".idOfClientGroup<" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() + " ";
+        return onlyActiveClients;
     }
 
 
