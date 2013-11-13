@@ -53,6 +53,7 @@ public class Contragent {
     private String inn;
     private String bank;
     private String bic;
+    private String okato;
     private String corrAccount;
     private String account;
     private Date createTime;
@@ -95,6 +96,7 @@ public class Contragent {
         this.publicKey = publicKey;
         this.kpp = kpp;
         this.ogrn = ogrn;
+        okato = "";
         this.needAccountTranslate = needAccountTranslate;
     }
 
@@ -498,6 +500,14 @@ public class Contragent {
 
     public void setOgrn(String ogrn) {
         this.ogrn = ogrn;
+    }
+
+    public String getOkato() {
+        return okato;
+    }
+
+    public void setOkato(String okato) {
+        this.okato = okato;
     }
 
     @Override

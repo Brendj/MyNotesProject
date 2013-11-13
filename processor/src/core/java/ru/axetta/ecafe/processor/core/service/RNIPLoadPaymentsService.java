@@ -669,6 +669,9 @@ public class RNIPLoadPaymentsService {
         if (content.indexOf("%KPP%") > 1) {
             content = content.replaceAll("%KPP%", contragent.getKpp());
         }
+        if (content.indexOf("%OKATO%") > 1) {
+            content = content.replaceAll("%OKATO%", contragent.getOkato());
+        }
         if (content.indexOf("%OGRN%") > 1) {
             content = content.replaceAll("%OGRN%", contragent.getOgrn());
         }

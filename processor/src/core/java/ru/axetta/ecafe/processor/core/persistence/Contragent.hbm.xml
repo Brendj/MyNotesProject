@@ -32,6 +32,7 @@
         <property name="inn" column="INN" type="string" length="90"/>
         <property name="bank" column="Bank" type="string" length="90"/>
         <property name="bic" column="BIC" type="string" length="15"/>
+        <property name="okato" column="OKATO" type="string" length="11"/>
         <property name="corrAccount" column="CorrAccount" type="string" length="20"/>
         <property name="account" column="Account" type="string" length="20"/>
         <property name="kpp" column="kpp" type="string" length="10" />

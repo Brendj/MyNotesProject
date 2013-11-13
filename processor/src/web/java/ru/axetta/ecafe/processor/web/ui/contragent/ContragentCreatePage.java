@@ -91,6 +91,7 @@ public class ContragentCreatePage extends BasicWorkspacePage {
     private String inn;
     private String bank;
     private String bic;
+    private String okato;
     private String corrAccount;
     private String account;
     private String publicKey;
@@ -280,6 +281,14 @@ public class ContragentCreatePage extends BasicWorkspacePage {
         this.needAccountTranslate = needAccountTranslate;
     }
 
+    public String getOkato() {
+        return okato;
+    }
+
+    public void setOkato(String okato) {
+        this.okato = okato;
+    }
+
     public void fill(Session session) throws Exception {
     }
 
@@ -303,6 +312,7 @@ public class ContragentCreatePage extends BasicWorkspacePage {
         contragent.setInn(this.inn.trim());
         contragent.setBank(this.bank.trim());
         contragent.setBic(this.bic.trim());
+        contragent.setOkato(this.okato.trim());
         contragent.setCorrAccount(this.corrAccount.trim());
         contragent.setAccount(this.account.trim());
         contragent.setPublicKeyGOSTAlias(this.publicKeyGOSTAlias);
@@ -334,6 +344,9 @@ public class ContragentCreatePage extends BasicWorkspacePage {
         }
         if (isEmpty(contragent.getOgrn())) {
             throw new IllegalStateException("Необходимо указать ОГРН");
+        }
+        if (isEmpty(contragent.getOkato())) {
+            throw new IllegalStateException("Необходимо указать ОКАТО");
         }
         if (isEmpty(contragent.getCorrAccount())) {
             throw new IllegalStateException("Необходимо указать номер Коррсчета");

@@ -72,6 +72,7 @@ public class ContragentViewPage extends BasicWorkspacePage {
     private String inn;
     private String bank;
     private String bic;
+    private String okato;
     private String corrAccount;
     private String account;
     private Date createTime;
@@ -190,6 +191,10 @@ public class ContragentViewPage extends BasicWorkspacePage {
         this.ogrn = ogrn;
     }
 
+    public String getOkato() {
+        return okato;
+    }
+
     public void fill(Session session, Long idOfContragent) throws Exception {
         Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
         this.idOfContragent = contragent.getIdOfContragent();
@@ -208,6 +213,7 @@ public class ContragentViewPage extends BasicWorkspacePage {
         this.inn = contragent.getInn();
         this.bank = contragent.getBank();
         this.bic = contragent.getBic();
+        this.okato = contragent.getOkato();
         this.corrAccount = contragent.getCorrAccount();
         this.account = contragent.getAccount();
         this.createTime = contragent.getCreateTime();
