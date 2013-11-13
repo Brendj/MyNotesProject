@@ -3575,22 +3575,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 res.description = RC_CLIENT_NOT_FOUND_DESC;
                 return res;
             }
-            Set<ClientNotificationSetting> currentSettings = client.getNotificationSettings();
-            currentSettings.clear();
-            // Причина вызова flush() описана здесь https://forum.hibernate.org/viewtopic.php?t=934483 :)
-            persistenceSession.flush();
             if (notificationTypes != null) {
-                for (Long type : notificationTypes) {
-                    ClientNotificationSetting.Predefined pd = ClientNotificationSetting.Predefined.parse(type);
-                    if (pd == null || pd.getValue()
+                for (ClientNotificationSetting.Predefined pd : ClientNotificationSetting.Predefined.values()) {
+                    ClientNotificationSetting cns = new ClientNotificationSetting(client, pd.getValue());
+                    if (notificationTypes.contains(pd.getValue()) || pd.getValue()
                             .equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
-                        continue;
+                        client.getNotificationSettings().add(cns);
+                    } else {
+                        client.getNotificationSettings().remove(cns);
                     }
-                    currentSettings.add(new ClientNotificationSetting(client, pd.getValue()));
                 }
             }
-            currentSettings.add(new ClientNotificationSetting(client,
-                    ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue()));
             persistenceTransaction.commit();
         } catch (Exception e) {
             res.resultCode = RC_INTERNAL_ERROR;

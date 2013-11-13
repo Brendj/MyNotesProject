@@ -665,19 +665,15 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setCategoriesDiscounts(
                 clientCategories.length() == 0 ? "" : clientCategories.substring(0, clientCategories.length() - 1));
         client.setCategories(categoryDiscountSet);
-        /* Удаление всех существующих настроек оповещения смс */
-        client.getNotificationSettings().clear();
-        // Причина вызова flush() описана здесь https://forum.hibernate.org/viewtopic.php?t=934483 :)
-        persistenceSession.flush();
         /* настройки смс оповещений */
         for (NotificationSettingItem item : notificationSettings) {
+            ClientNotificationSetting newSetting = new ClientNotificationSetting(client, item.getNotifyType());
             if (item.isEnabled()) {
-                ClientNotificationSetting newSetting = new ClientNotificationSetting(client, item.getNotifyType());
                 client.getNotificationSettings().add(newSetting);
+            } else {
+                client.getNotificationSettings().remove(newSetting);
             }
         }
-        client.getNotificationSettings().add(new ClientNotificationSetting(client,
-                ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue()));
         if (isReplaceOrg) {
             ClientGroup clientGroup = DAOUtils
                     .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, org.getIdOfOrg(),

@@ -9,9 +9,6 @@ import ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting;
 import ru.axetta.ecafe.processor.web.ui.client.items.NotificationSettingItem;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -26,28 +23,20 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 public class ClientRoomNotificationSettingsUtils {
-   static Logger logger = LoggerFactory.getLogger(ClientRoomNotificationSettingsUtils.class);
 
-
-    public static void setNotificationSettings (Session session, Client cl, HttpServletRequest request, String paramPrefix, String onHTMLPattern) {
-        /* Удаление всех существующих настроек оповещения смс */
-        cl.getNotificationSettings().clear();
-        // Причина вызова flush() описана здесь https://forum.hibernate.org/viewtopic.php?t=934483 :)
-        session.flush();
+    public static void setNotificationSettings(Client cl, HttpServletRequest request, String paramPrefix,
+            String onHTMLPattern) {
         for (ClientNotificationSetting.Predefined def : ClientNotificationSetting.Predefined.values()) {
-            if (def.getValue().equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
-                continue;
-            }
             String paramName = paramPrefix + "-" + def.getValue();
             boolean isEnabled = StringUtils.equals(request.getParameter(paramName), onHTMLPattern);
-            if (isEnabled) {
-                ClientNotificationSetting newSetting = new ClientNotificationSetting(cl, def.getValue());
-                cl.getNotificationSettings().add(newSetting);
+            ClientNotificationSetting setting = new ClientNotificationSetting(cl, def.getValue());
+            if (isEnabled || def.getValue()
+                    .equals(ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
+                cl.getNotificationSettings().add(setting);
+            } else {
+                cl.getNotificationSettings().remove(setting);
             }
         }
-        ClientNotificationSetting newSetting = new ClientNotificationSetting(cl,
-                ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue());
-        cl.getNotificationSettings().add(newSetting);
     }
 
     public static List<NotificationSettingItem> getNotificationSettings(Client cl) {

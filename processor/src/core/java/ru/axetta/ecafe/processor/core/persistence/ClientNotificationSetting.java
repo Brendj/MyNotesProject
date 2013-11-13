@@ -156,4 +156,23 @@ public class ClientNotificationSetting {
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ClientNotificationSetting setting = (ClientNotificationSetting) o;
+        return notifyType.equals(setting.notifyType) && client.equals(setting.client);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = notifyType.hashCode();
+        result = 31 * result + client.hashCode();
+        return result;
+    }
 }

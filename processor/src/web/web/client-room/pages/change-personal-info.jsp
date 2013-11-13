@@ -127,7 +127,7 @@
                             client.setUpdateTime(new Date());
                             client.setExpenditureLimit(expenditureLimit);
                             persistenceSession.update(client);
-                            ClientRoomNotificationSettingsUtils.setNotificationSettings(persistenceSession, client, request, NOTIFY_RULE_PARAM, HTML_TRUE);
+                            ClientRoomNotificationSettingsUtils.setNotificationSettings(client, request, NOTIFY_RULE_PARAM, HTML_TRUE);
                             dataProcessSucceed = true;
                         }
                     } else {
