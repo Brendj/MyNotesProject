@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.service.regularPaymentService;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
@@ -39,10 +40,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -210,9 +208,16 @@ public class RegularPaymentSubscriptionService {
     private List<Long> findSubscriptions(int rows) {
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
         Query query = em.createQuery("select distinct bs.idOfSubscription from BankSubscription bs \n" +
-                "where bs.active = :active and bs.activationDate is not null and bs.client.contractId = :c")
-                .setParameter("c", 600023L)
-                .setParameter("active", true);
+                "where bs.active = :active and bs.activationDate is not null and bs.client.balance <= bs.thresholdAmount \n" +
+                "and ((bs.lastSuccessfulPaymentDate < :today or bs.lastSuccessfulPaymentDate is null) and " +
+                "(bs.lastUnsuccessfulPaymentDate < :today or bs.lastUnsuccessfulPaymentDate is null)) \n" +
+                "and (bs.client.idOfClientGroup not in (:cg) or bs.client.idOfClientGroup is null)")
+                .setParameter("today", today)
+                .setParameter("active", true)
+                .setParameter("cg", Arrays.asList(
+                        ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
+                        ClientGroup.Predefined.CLIENT_DELETED.getValue())
+                );
         if (rows != 0) {
             query.setMaxResults(rows);
         }
