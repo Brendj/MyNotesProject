@@ -42,8 +42,12 @@ import java.util.*;
  */
 @Component
 @Scope("session")
-public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedActionListener, DisableComplexListener, ReplaceClientListener,
+public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActionListener, */DisableComplexListener, ReplaceClientListener,
         YesNoListener {
+    public static final int PAY_CLIENT     = 1;
+    public static final int BLOCK_CLIENT   = 2;
+    public static final int INSIDE_CLIENT  = 1;
+    public static final int OUTSIDE_CLIENT = 2;
     private static final long MILLIS_IN_DAY           = 86400000L;
     private static final long ELEMENTARY_CLASSES_TYPE = Long.MIN_VALUE;
     private static final long MIDDLE_CLASSES_TYPE     = Long.MIN_VALUE + 1;
@@ -183,7 +187,8 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         String sql = "select cf_clientgroups.idofclientgroup, cf_clientgroups.groupname, cf_clients.idofclient, cf_persons.firstname, "
                 + "       cf_persons.secondname, cf_persons.surname, cf_clientscomplexdiscounts.idofrule, description, "
                 + "       cf_clientscomplexdiscounts.idofcomplex, cf_discountrules.priority, CAST(substring(groupname FROM '[0-9]+') AS INTEGER) as groupNum, "
-                + "       cf_complexinfo.currentprice, cf_temporary_orders.action, cf_temporary_orders.IdOfOrder, cf_temporary_orders.idofreplaceclient "
+                + "       cf_complexinfo.currentprice, cf_temporary_orders.action, cf_temporary_orders.IdOfOrder, cf_temporary_orders.idofreplaceclient, "
+                + "       cf_temporary_orders.inBuilding "
                 + "from cf_clients "
                 + "join cf_clientscomplexdiscounts on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient "
                 + "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "
@@ -219,6 +224,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
             Integer action = HibernateUtils.getDbInt(o[12]);
             Long idoforder = HibernateUtils.getDbLong(o[13]);
             Long idofreplaceclient = HibernateUtils.getDbLong(o[14]);
+            Integer inBuilding = HibernateUtils.getDbInt(o[15]);
             if (price == null) {
                 price = 0L;
             }
@@ -226,7 +232,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
 
             //  Добавляем клиента
             Client cl = new Client(idofclientgroup, idofclient, firstName, secondname, surname,
-                    idofrule, ruleDescription, idofcomplex, priority, price, action);
+                    idofrule, ruleDescription, idofcomplex, priority, price, action, inBuilding);
             if (action != null) {
                 cl.setTemporarySaved(true);
             }
@@ -323,11 +329,11 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
     }
 
     @Transactional
-    public void saveClient (List<Client> clients, Integer actionType) {
+    public void saveClient (List<Client> clients) {
         Session session = null;
         try {
             session = (Session) entityManager.getDelegate();
-            saveClient(session, clients, actionType);
+            saveClient(session, clients);
         } catch (Exception e) {
             logger.error("Failed to save client's into temporary table", e);
             //sendError("Не удалось изменить статус питания клиента " + client.getFullName() + ": " + e.getMessage());
@@ -336,17 +342,13 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         }
     }
 
-    public void saveClient(Session session, List<Client> clients, Integer actionType) {
+    public void saveClient(Session session, List<Client> clients) {
         for (Client client : clients) {
-            if (actionType != null && client.getActionType() == actionType) {
-                continue;
-            }
-
-            saveClient(session, client, actionType);
+            saveClient(session, client);
         }
     }
 
-    public void saveClient(Session session, Client client, Integer actionType) {
+    public void saveClient(Session session, Client client) {
         //  Если уже имеется заказ, значит сохранение во временную таблицу запрещено
         if (client.getSaved()) {
             return;
@@ -358,12 +360,12 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         if (client.getTemporarySaved()) {
             sql = "update cf_temporary_orders set action=:action, "
                   + "idofreplaceclient=" + (client.getIdofReplaceClient() == null ? "null" : ":idofreplaceclient") + ", "
-                  + "modificationdate=:date, idofuser=:idofuser "
+                  + "modificationdate=:date, idofuser=:idofuser, inBuilding=:inBuilding "
                   + "where idofclient=:idofclient and idofcomplex=:idofcomplex and plandate=:plandate";
         } else {
-            sql = "insert into cf_temporary_orders (idoforg, idofclient, idofcomplex, plandate, action, creationdate, idofuser, idofreplaceclient) "
+            sql = "insert into cf_temporary_orders (idoforg, idofclient, idofcomplex, plandate, action, creationdate, idofuser, idofreplaceclient, inBuilding) "
                 + "values (:idoforg, :idofclient, :idofcomplex, :plandate, :action, :date, :idofuser, "
-                + (client.getIdofReplaceClient() == null ? "null" : ":idofreplaceclient") + ")";
+                + (client.getIdofReplaceClient() == null ? "null" : ":idofreplaceclient") + ", :inBuilding)";
         }
 
         clearDate(planDate);
@@ -372,9 +374,10 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         query.setLong("idofclient", client.getIdofclient());
         query.setInteger("idofcomplex", client.getComplex());
         query.setLong("plandate", planDate.getTimeInMillis());
-        query.setInteger("action", actionType == null ? client.getActionType() : actionType);
+        query.setInteger("action", client.getActionType());
         query.setLong("date", currentTS);
         query.setLong("idofuser", -1L);
+        query.setInteger("inBuilding", client.getInBuilding());
         if (!client.getTemporarySaved()) {
             query.setLong("idoforg", org.getIdOfOrg());
         }
@@ -382,7 +385,6 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
             query.setLong("idofreplaceclient", client.getIdofReplaceClient());
         }
         query.executeUpdate();
-        client.setActionType(actionType == null ? client.getActionType() : actionType);
         client.setTemporarySaved(true);
     }
 
@@ -405,7 +407,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         Map <Client, String> result = new HashMap<Client, String>();
         boolean hasError = false;
         for (Client client : clients) {
-            if (client.getActionType() != ClientFeedActionEvent.PAY_CLIENT || client.getSaved()) {
+            if (client.getActionType() != PAY_CLIENT || client.getSaved()) {
                 continue;
             }
             //  Ошибка, для теста
@@ -537,10 +539,43 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         orderRegistrationResult = false;
     }
     
-    public void doShowClientFeedActionPanel(Client cl) {
+    /*public void doShowClientFeedActionPanel(Client cl) {
         resetMessages();
         selectedClient = cl;
         MainPage.getSessionInstance().doShowClientFeedActionPanel();
+    }*/
+
+    public void doChangeClientInBuilding(Client cl) {
+        cl.setInBuilding(cl.getInBuilding() == INSIDE_CLIENT ? OUTSIDE_CLIENT : INSIDE_CLIENT);
+        if (cl.getInBuilding() == OUTSIDE_CLIENT) {
+            cl.setActionType(BLOCK_CLIENT);
+        }
+        ArrayList<Client> clients = new ArrayList<Client>();
+        clients.add(cl);
+        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).saveClient(clients);
+    }
+
+    public void doChangeClientAction(Client cl) {
+        cl.setActionType(cl.getActionType() == PAY_CLIENT ? BLOCK_CLIENT : PAY_CLIENT);
+        ArrayList<Client> clients = new ArrayList<Client>();
+        clients.add(cl);
+        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).saveClient(clients);
+    }
+
+    public void doChangeAllClientsPayAction() {
+        doChangeAllClientsAction (PAY_CLIENT);
+    }
+
+    public void doChangeAllClientsBlockAction() {
+        doChangeAllClientsAction (BLOCK_CLIENT);
+    }
+
+    private void doChangeAllClientsAction(int action) {
+        List<Client> clients = getClients();
+        for (Client cl : clients) {
+            cl.setActionType(action);
+        }
+        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).saveClient(clients);
     }
     
     public void doShowReplaceClientPanel(Client cl) {
@@ -567,7 +602,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
     }
 
-    public void onClientFeedActionEvent (ClientFeedActionEvent event) {
+    /*public void onClientFeedActionEvent (ClientFeedActionEvent event) {
         //  Если значение было установлено для всех, то выполняем выбранную операцию для всех отображаемых клиентов
         int actionType = event.getActionType();
         List<Client> clients = null;
@@ -579,7 +614,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
             clients.add(selectedClient);
         }
         RuntimeContext.getAppContext().getBean(FeedPlanPage.class).saveClient(clients, actionType);
-    }
+    }*/
 
     public void onDisableComplexEvent (DisableComplexEvent event) {
         //disabledComplexes = event.getComplexes();
@@ -617,7 +652,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         }
         List<Client> updateClients = new ArrayList<Client>();
         updateClients.add(target);
-        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).saveClient(updateClients, null);
+        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).saveClient(updateClients);
     }
 
     public Date getPlanDate() {
@@ -696,7 +731,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
                 payed.put(cl.getComplex(), now);
             }
             //  К оплате
-            else if (cl.getActionType() == ClientFeedActionEvent.PAY_CLIENT) {
+            else if (cl.getActionType() == PAY_CLIENT) {
                 Integer now = toPay.get(cl.getComplex());
                 if (now == null) {
                     now = 0;
@@ -796,7 +831,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
                 //  Найдя нужный комплекс, приступаем к подсчету оплаченных комплексов
                 int count = 0;
                 for (Client cl : c.getClients()) {
-                    if (cl.getActionType() == ClientFeedActionEvent.PAY_CLIENT) {
+                    if (cl.getActionType() == PAY_CLIENT) {
                         count++;
                     }
                 }
@@ -997,6 +1032,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         protected int complex;
         protected int priority;
         protected int actionType;
+        protected int inBuilding;
         protected long price;
         protected boolean temporarySaved;
         protected Long idoforder;
@@ -1008,7 +1044,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
 
         public Client(long idofclientgroup, long idofclient, String firstname, String secondname,
                 String surname, long idofrule, String ruleDescription, int complex, int priority,
-                long price, Integer action) {
+                long price, Integer action, Integer inBuilding) {
             this.idofclientgroup = idofclientgroup;
             this.idofclient = idofclient;
             this.firstname = firstname;
@@ -1018,7 +1054,8 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
             this.ruleDescription = ruleDescription;
             this.complex = complex;
             this.priority = priority;
-            actionType = action == null ? ClientFeedActionEvent.RELEASE_CLIENT : action;
+            actionType = action == null ? BLOCK_CLIENT : action;
+            this.inBuilding = inBuilding == null ? OUTSIDE_CLIENT : inBuilding;
             this.price = price;
         }
 
@@ -1124,12 +1161,10 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
 
         public String getAction() {
             switch (actionType) {
-                case ClientFeedActionEvent.BLOCK_CLIENT:
+                case BLOCK_CLIENT:
                     return "БЛОК";
-                case ClientFeedActionEvent.PAY_CLIENT:
+                case PAY_CLIENT:
                     return "ОПЛАТА";
-                case ClientFeedActionEvent.RELEASE_CLIENT:
-                    return "...";
                 default:
                     return "...";
             }
@@ -1137,14 +1172,31 @@ public class FeedPlanPage extends BasicWorkspacePage implements ClientFeedAction
         
         public String getActionIcon() {
             switch (actionType) {
-                case ClientFeedActionEvent.BLOCK_CLIENT:
+                case BLOCK_CLIENT:
                     return "stop";
-                case ClientFeedActionEvent.PAY_CLIENT:
+                case PAY_CLIENT:
                     return "play";
-                case ClientFeedActionEvent.RELEASE_CLIENT:
-                    return "stop";
                 default:
                     return "stop";
+            }
+        }
+
+        public void setInBuilding(int inBuilding) {
+            this.inBuilding = inBuilding;
+        }
+        
+        public int getInBuilding() {
+            return inBuilding;
+        }
+        
+        public String getInBuildingIcon() {
+            switch (inBuilding) {
+                case INSIDE_CLIENT:
+                    return "inside";
+                case OUTSIDE_CLIENT:
+                    return "outside";
+                default: 
+                    return "outside";
             }
         }
 

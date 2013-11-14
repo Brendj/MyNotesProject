@@ -100,6 +100,15 @@ white-space: nowrap;
 .status {
     width: 49%
 }
+
+.allButtonsCol1 {
+    width: 99%;
+    text-align: right;
+}
+.allButtonsCol2 {
+     width: 1%;
+     text-align: right;
+ }
 </style>
 
 <%--@elvariable id="feedPlanPage" type="ru.axetta.ecafe.processor.web.ui.feed.FeedPlanPage"--%>
@@ -139,12 +148,30 @@ white-space: nowrap;
                 <rich:dataTable id="planTable" value="#{feedPlanPage.clients}" var="client" style="width: 100%">
                     <rich:column style="text-align: center;" styleClass="#{client.lineStyleClass}">
                         <f:facet name="header">
-                            <h:outputText styleClass="output-text-mod" value="Оплата"/>
+                            <h:outputText styleClass="output-text-mod" value="В школе"/>
                         </f:facet>
-                        <h:graphicImage url="/images/icon/#{client.actionIcon}.png"/>
+                        <a4j:commandLink styleClass="output-text-mod" rendered="#{!client.saved}">
+                            <a4j:support event="onclick" action="#{feedPlanPage.doChangeClientInBuilding(client)}"
+                                         status="feedPlanStatus" reRender="planGrid"/>
+                            <h:graphicImage url="/images/icon/#{client.inBuildingIcon}.png"/>
+                        </a4j:commandLink>
+                        <h:graphicImage url="/images/icon/#{client.inBuildingIcon}.png" rendered="#{client.saved}"/>
                     </rich:column>
 
                     <rich:column style="text-align: center;" styleClass="#{client.lineStyleClass}">
+                        <f:facet name="header">
+                            <h:outputText styleClass="output-text-mod" value="Оплата"/>
+                        </f:facet>
+
+                        <a4j:commandLink styleClass="output-text-mod" rendered="#{!client.saved}">
+                            <a4j:support event="onclick" action="#{feedPlanPage.doChangeClientAction(client)}"
+                                         status="feedPlanStatus" reRender="planGrid"/>
+                            <h:graphicImage url="/images/icon/#{client.actionIcon}.png"/>
+                        </a4j:commandLink>
+                        <h:graphicImage url="/images/icon/#{client.actionIcon}.png" rendered="#{client.saved}"/>
+                    </rich:column>
+
+                    <%--<rich:column style="text-align: center;" styleClass="#{client.lineStyleClass}">
                         <f:facet name="header">
                             <h:outputText styleClass="output-text-mod" value="Оператор"/>
                         </f:facet>
@@ -153,7 +180,7 @@ white-space: nowrap;
                                          oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('clientFeedActionPanel')}.show();" status="feedPlanStatus"/>
                         </a4j:commandLink>
                         <h:outputText styleClass="output-text-mod" value="#{client.action}" rendered="#{client.saved}"/>
-                    </rich:column>
+                    </rich:column>--%>
 
                     <rich:column style="text-align: center;" styleClass="#{client.lineStyleClass}">
                         <f:facet name="header">
@@ -239,11 +266,18 @@ white-space: nowrap;
                 </rich:dataTable>
                 </a4j:region>
             </rich:panel>
+            
+            <h:panelGrid columns="2" columnClasses="allButtonsCol1, allButtonsCol2">
+                <a4j:region>
+                    <a4j:commandButton action="#{feedPlanPage.doChangeAllClientsBlockAction}" value="Сбросить ВСЕХ" reRender="planGrid"/>
+                    <a4j:commandButton action="#{feedPlanPage.doChangeAllClientsPayAction}" value="Платить ВСЕХ" reRender="planGrid"/>
+                </a4j:region>
+            </h:panelGrid>
         </h:panelGrid>
 
         <h:panelGrid id="messages">
-            <h:outputText escape="true" value="#{feedPlanPage.errorMessages}" rendered="#{not empty feedPlanPage.errorMessages}" styleClass="error-messages" />
             <h:outputText escape="true" value="#{feedPlanPage.infoMessages}" rendered="#{not empty feedPlanPage.infoMessages}" styleClass="info-messages" />
+            <h:outputText escape="true" value="#{feedPlanPage.errorMessages}" rendered="#{not empty feedPlanPage.errorMessages}" styleClass="error-messages" />
         </h:panelGrid>
 
         <h:panelGrid id="totalMessage" columns="2" columnClasses="totalMessage_col1,totalMessage_col2">

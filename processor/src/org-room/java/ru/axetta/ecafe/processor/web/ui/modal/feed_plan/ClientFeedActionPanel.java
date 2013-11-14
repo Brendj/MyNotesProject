@@ -64,45 +64,45 @@ public class ClientFeedActionPanel extends BasicWorkspacePage {
     }
 
     public void doPay() {
-        ClientFeedActionEvent event = new ClientFeedActionEvent(ClientFeedActionEvent.PAY_CLIENT);
+        /*ClientFeedActionEvent event = new ClientFeedActionEvent(ClientFeedActionEvent.PAY_CLIENT);
         for (ClientFeedActionListener l : listeners) {
             l.onClientFeedActionEvent(event);
-        }
+        }*/
     }
 
     public void doBlock() {
-        ClientFeedActionEvent event = new ClientFeedActionEvent(ClientFeedActionEvent.BLOCK_CLIENT);
+        /*ClientFeedActionEvent event = new ClientFeedActionEvent(ClientFeedActionEvent.BLOCK_CLIENT);
         for (ClientFeedActionListener l : listeners) {
             l.onClientFeedActionEvent(event);
-        }
+        }*/
     }
 
     public void doRelease() {
-        ClientFeedActionEvent event = new ClientFeedActionEvent(ClientFeedActionEvent.RELEASE_CLIENT);
+        /*ClientFeedActionEvent event = new ClientFeedActionEvent(ClientFeedActionEvent.RELEASE_CLIENT);
         for (ClientFeedActionListener l : listeners) {
             l.onClientFeedActionEvent(event);
-        }
+        }*/
     }
 
     public void doPayAllClients() {
-        ClientFeedActionEvent event = new ClientFeedActionEvent(ClientFeedActionEvent.PAY_CLIENT + ClientFeedActionEvent.ALL_CLIENTS);
+        /*ClientFeedActionEvent event = new ClientFeedActionEvent(ClientFeedActionEvent.PAY_CLIENT + ClientFeedActionEvent.ALL_CLIENTS);
         for (ClientFeedActionListener l : listeners) {
             l.onClientFeedActionEvent(event);
-        }
+        }*/
     }
 
     public void doBlockAllClients() {
-        ClientFeedActionEvent event = new ClientFeedActionEvent(ClientFeedActionEvent.BLOCK_CLIENT + ClientFeedActionEvent.ALL_CLIENTS);
+        /*ClientFeedActionEvent event = new ClientFeedActionEvent(ClientFeedActionEvent.BLOCK_CLIENT + ClientFeedActionEvent.ALL_CLIENTS);
         for (ClientFeedActionListener l : listeners) {
             l.onClientFeedActionEvent(event);
-        }
+        }*/
     }
 
     public void doReleaseAllClients() {
-        ClientFeedActionEvent event = new ClientFeedActionEvent(ClientFeedActionEvent.RELEASE_CLIENT + ClientFeedActionEvent.ALL_CLIENTS);
+        /*ClientFeedActionEvent event = new ClientFeedActionEvent(ClientFeedActionEvent.RELEASE_CLIENT + ClientFeedActionEvent.ALL_CLIENTS);
         for (ClientFeedActionListener l : listeners) {
             l.onClientFeedActionEvent(event);
-        }
+        }*/
     }
 
 
