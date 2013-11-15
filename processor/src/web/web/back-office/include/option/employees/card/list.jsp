@@ -49,7 +49,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Последний день действия" />
             </f:facet>
-            <h:outputText escape="true" value="#{card.validDate}" converter="timeConverter" styleClass="output-text" />
+            <h:outputText escape="true" value="#{card.validDate}" converter="dateConverter" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

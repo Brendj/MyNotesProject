@@ -15,6 +15,16 @@
 <%--@elvariable id="employeeEditPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeeEditPage"--%>
 <h:panelGrid id="employeeListGrid" binding="#{employeeListPage.pageComponent}" styleClass="borderless-grid">
 
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText escape="true" value="Показывать" styleClass="output-text" />
+        <h:selectOneMenu value="#{employeeListPage.showMode}" styleClass="output-text">
+            <f:selectItem itemValue="0" itemLabel="Всех" />
+            <f:selectItem itemValue="1" itemLabel="Актуальных" />
+            <f:selectItem itemValue="2" itemLabel="Удаленных" />
+            <a4j:support event="onchange" action="#{employeeListPage.show}" reRender="employeeListTable" />
+        </h:selectOneMenu>
+    </h:panelGrid>
+
     <rich:dataTable id="employeeListTable" value="#{employeeListPage.employees}" var="employee" rows="20" rowKeyVar="row"
                     columnClasses="right-aligned-column,
                     right-aligned-column, right-aligned-column, right-aligned-column,
@@ -50,7 +60,7 @@
                     <h:outputText escape="true" value="Редактировать" />
                 </rich:column>
 
-                <rich:column headerClass="column-header" rowspan="2" colspan="1" rendered="false">
+                <rich:column headerClass="column-header" rowspan="2" colspan="1">
                     <h:outputText escape="true" value="Удалить" />
                 </rich:column>
 
@@ -110,15 +120,18 @@
         </rich:column>
 
         <rich:column headerClass="column-header">
-            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{employeeEditPage.show}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{employeeEditPage.show}"
+                             styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{employee}" target="#{employeeGroupPage.currentEmployee}"/>
+                <f:setPropertyActionListener value="#{employee}" target="#{employeeGroupPage.currentEmployee}" />
             </a4j:commandLink>
         </rich:column>
 
-        <rich:column headerClass="column-header" rendered="false">
-            <a4j:commandLink reRender="mainMenu, workspaceForm"  styleClass="command-link">
+        <rich:column headerClass="column-header">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{employeeListPage.deleteEmployee}"
+                             styleClass="command-link" rendered="#{not employee.deleted}">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                <f:setPropertyActionListener value="#{employee}" target="#{employeeGroupPage.currentEmployee}" />
             </a4j:commandLink>
         </rich:column>
 

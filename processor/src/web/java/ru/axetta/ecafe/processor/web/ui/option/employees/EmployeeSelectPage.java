@@ -10,13 +10,11 @@ import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
-import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Stack;
 
 /**
  * Created with IntelliJ IDEA.
@@ -55,7 +53,7 @@ public class EmployeeSelectPage  extends BasicPage {
     }
 
     public Object show() {
-        employees = serviceBean.findAllEmployees();
+        employees = serviceBean.findAllEmployees(false);
         MainPage.getSessionInstance().registerModalPageShow(this);
         return null;
     }

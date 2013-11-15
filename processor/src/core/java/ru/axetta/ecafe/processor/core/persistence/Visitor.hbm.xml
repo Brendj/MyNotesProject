@@ -33,6 +33,7 @@
         <!-- Информация по военному билету -->
         <property name="warTicketNumber" column="WarTicketNumber" type="string"/>
         <property name="warTicketDate" column="WarTicketDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="deleted" column="IsDeleted" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
 
         <set name="cards" inverse="true" cascade="all">
             <key column="IdOfVisitor"/>

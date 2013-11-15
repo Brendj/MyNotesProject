@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.daoservices.employees;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -38,6 +39,7 @@ import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.isDateEqLtCurre
 public class EmployeeServiceBean {
 
     final String FIND_ALL_EMPLOYEE_ITEMS = "select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(v) from Visitor v where v.visitorType=1 order by v.idOfVisitor";
+    final String FIND_ALL_EMPLOYEE_ITEMS_BY_DELETED = "select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(v) from Visitor v where v.visitorType = 1 and v.deleted = :deleted order by v.idOfVisitor";
     final String FIND_ALL_EMPLOYEE_ITEMS_ORDER_BY_NAME = "select new ru.axetta.ecafe.processor.core.daoservices.employees.VisitorItem(v) from Visitor v where v.visitorType=1 order by v.person.firstName";
     final String FIND_ALL_TEMP_CARD_BY_EMPLOYEE = "select new ru.axetta.ecafe.processor.core.daoservices.employees.CardItem(ct) from CardTemp ct where ct.visitor.idOfVisitor=:idOfVisitor and ct.visitorType=2 order by ct.createDate desc";
     final String FIND_ALL_TEMP_CARD_BY_EMPLOYEE_TYPE = "select new ru.axetta.ecafe.processor.core.daoservices.employees.CardItem(ct, ct.visitor) from CardTemp ct where ct.visitorType=2 order by ct.createDate desc";
@@ -48,6 +50,12 @@ public class EmployeeServiceBean {
 
     public List<VisitorItem> findAllEmployees(){
         TypedQuery<VisitorItem> query = entityManager.createQuery(FIND_ALL_EMPLOYEE_ITEMS, VisitorItem.class);
+        return query.getResultList();
+    }
+
+    public List<VisitorItem> findAllEmployees(boolean deletedEmployees) {
+        TypedQuery<VisitorItem> query = entityManager.createQuery(FIND_ALL_EMPLOYEE_ITEMS_BY_DELETED, VisitorItem.class)
+                .setParameter("deleted", deletedEmployees);
         return query.getResultList();
     }
 
@@ -131,6 +139,10 @@ public class EmployeeServiceBean {
 
     @Transactional(rollbackFor = Exception.class)
     public Long saveEmployeeCard(CardItem cardItem, Long idOfEmployer) throws Exception{
+        Date today = CalendarUtils.truncateToDayOfMonth(new Date());
+        if (cardItem.getValidDate().before(today)) {
+            throw new RuntimeException("Последний день действия карты не может быть меньше текущего дня.");
+        }
         Card c = DAOUtils.findCardByCardNo((Session) entityManager.getDelegate(), cardItem.getCardNo());
         if (c != null) {
             final String format = "карта уже зарегистрирована на клиента: %d.";
@@ -246,6 +258,12 @@ public class EmployeeServiceBean {
                 return visitor.getIdOfVisitor();
             }
         }
+    }
+
+    @Transactional
+    public void deleteEmployee(Long idOfVisitor) {
+        Visitor visitor = entityManager.getReference(Visitor.class, idOfVisitor);
+        visitor.setDeleted(true);
     }
 
     public List<CardItem> findCardsByEmployee(Long idOfVisitor) {

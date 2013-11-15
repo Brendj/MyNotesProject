@@ -31,6 +31,7 @@ public class VisitorItem {
     private Date driverLicenceDate;
     private String warTicketNumber;
     private Date warTicketDate;
+    private boolean deleted;
     private List<CardItem> cardItems = new ArrayList<CardItem>();
 
     private Date operationDate;
@@ -48,6 +49,7 @@ public class VisitorItem {
         this.warTicketNumber = item.getWarTicketNumber();
         this.warTicketDate = item.getWarTicketDate();
         this.operationDate = item.getOperationDate();
+        this.deleted = item.isDeleted();
     }
 
     public VisitorItem() {
@@ -70,6 +72,7 @@ public class VisitorItem {
         this.driverLicenceDate = visitor.getDriverLicenceDate();
         this.warTicketNumber = visitor.getWarTicketNumber();
         this.warTicketDate = visitor.getWarTicketDate();
+        this.deleted = visitor.isDeleted();
     }
 
     public String getFullName(){
@@ -217,6 +220,14 @@ public class VisitorItem {
 
     public void setWarTicketDate(Date warTicketDate) {
         this.warTicketDate = warTicketDate;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     @Override

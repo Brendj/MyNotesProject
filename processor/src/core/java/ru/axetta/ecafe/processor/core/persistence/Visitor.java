@@ -28,6 +28,7 @@ public class Visitor {
     //private VisitorType visitorType;
     private Integer visitorType;
     private Set<CardTemp> cards = new HashSet<CardTemp>();
+    private boolean deleted;
 
     protected Visitor() {}
 
@@ -113,6 +114,14 @@ public class Visitor {
 
     public void setVisitorType(Integer visitorType) {
         this.visitorType = visitorType;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     @Override

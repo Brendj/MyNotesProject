@@ -13,3 +13,6 @@ alter table CF_Contragents add column OKATO varchar(11) default '';
 
 -- Возможность указания присутствия ученика в школе для тонкого клиента
 alter table cf_temporary_orders add column InBuilding int not null default 2;
+
+--! ECAFE-1248 Не работает кнопка удаления не актуальных инженеров
+ALTER TABLE CF_Visitors ADD COLUMN IsDeleted INTEGER NOT NULL DEFAULT 0;
