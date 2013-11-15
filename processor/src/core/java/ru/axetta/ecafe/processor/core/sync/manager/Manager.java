@@ -58,6 +58,10 @@ public class Manager {
     private SyncHistory syncHistory;
     private Document conflictDocument;
 
+    public void setSyncHistory(SyncHistory syncHistory) {
+        this.syncHistory = syncHistory;
+    }
+
     private DOSyncService doService;
 
     public Manager(Long idOfOrg) {
@@ -276,6 +280,25 @@ public class Manager {
                     distributedObject = updateDeleteState(distributedObject, currentMaxVersion);
                     distributedObject.setTagName(tagName);
                 }
+            } else {
+                Transaction persistenceTransaction = null;
+                try {
+                    persistenceSession = sessionFactory.openSession();
+                    persistenceTransaction = persistenceSession.beginTransaction();
+                    Org org = null;
+                    org = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
+                    DistributedObjectException de = distributedObject.getDistributedObjectException();
+                    SyncHistoryException syncHistoryException = new SyncHistoryException(org, syncHistory, "Error processCurrentObject: " + de.getMessage());
+                    persistenceSession.save(syncHistoryException);
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
+                } catch (Exception e){
+                    logger.error("Failed to save error: ",e);
+                } finally {
+                    HibernateUtils.rollback(persistenceTransaction, logger);
+                    HibernateUtils.close(persistenceSession, logger);
+                }
+
             }
         } catch (DistributedObjectException e) {
             // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю

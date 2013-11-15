@@ -798,6 +798,7 @@ public class Processor implements SyncProcessor,
         try {
             if (request.getManager() != null) {
                 manager = request.getManager();
+                manager.setSyncHistory(syncHistory);
                 manager.process(persistenceSessionFactory);
             }
         } catch (Exception e) {
@@ -2069,10 +2070,12 @@ public class Processor implements SyncProcessor,
             }
 
             // Добавляем карты перемещенных клиентов.
-            List<Client> allocClients = ClientManager.findAllAllocatedClients(persistenceSession, org);
-            for (Client client : allocClients) {
-                for (Card card : client.getCards()) {
-                    accRegistry.addItem(new SyncResponse.AccRegistry.Item(client, card));
+            if(clientIds==null || clientIds.isEmpty()){
+                List<Client> allocClients = ClientManager.findAllAllocatedClients(persistenceSession, org);
+                for (Client client : allocClients) {
+                    for (Card card : client.getCards()) {
+                        accRegistry.addItem(new SyncResponse.AccRegistry.Item(client, card));
+                    }
                 }
             }
             /*Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
