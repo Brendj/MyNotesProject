@@ -120,7 +120,7 @@ CREATE TABLE cf_regular_payments (
   CONSTRAINT cf_regular_payments_client_fk FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
 );
 
---
+
 CREATE TABLE CF_RegistrySms (
   IdOfRegistrySMS            BIGINT          NOT NULL,
   Version                 BIGINT          NOT NULL,
@@ -130,7 +130,7 @@ CREATE TABLE CF_RegistrySms (
 
 
 
-INSERT INTO CF_Registry(IdOfRegistry, version, smsid) VALUES (1, 0, (select smsid from CF_Registry where IdOfRegistry=1));
+INSERT INTO CF_RegistrySMS(IdOfRegistrySMS, version, smsid) VALUES (1, 0, (select smsid from CF_Registry where IdOfRegistry=1));
 
 -- ECAFE-1224 	Перевести взаимодействие с ИС РНиП на формат 15.2
 -- ECAFE-1329 Запрос на отчетность. Изменили ширину отчета + поправили имена при выгрузке отчета в xls
