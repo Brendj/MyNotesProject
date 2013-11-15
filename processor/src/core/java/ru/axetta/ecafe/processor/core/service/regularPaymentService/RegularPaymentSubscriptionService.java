@@ -208,12 +208,11 @@ public class RegularPaymentSubscriptionService {
     private List<Long> findSubscriptions(int rows) {
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
         Query query = em.createQuery("select distinct bs.idOfSubscription from BankSubscription bs \n" +
-                "where bs.active = :active and bs.activationDate is not null and bs.client.balance <= bs.thresholdAmount \n" +
+                "where bs.active = true and bs.client.balance <= bs.thresholdAmount \n" +
                 "and ((bs.lastSuccessfulPaymentDate < :today or bs.lastSuccessfulPaymentDate is null) and " +
                 "(bs.lastUnsuccessfulPaymentDate < :today or bs.lastUnsuccessfulPaymentDate is null)) \n" +
                 "and (bs.client.idOfClientGroup not in (:cg) or bs.client.idOfClientGroup is null)")
                 .setParameter("today", today)
-                .setParameter("active", true)
                 .setParameter("cg", Arrays.asList(
                         ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
                         ClientGroup.Predefined.CLIENT_DELETED.getValue())
