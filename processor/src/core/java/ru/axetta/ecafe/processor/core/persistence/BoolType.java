@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.usertype.UserType;
+import org.hibernate.usertype.EnhancedUserType;
 
 import java.io.Serializable;
 import java.sql.PreparedStatement;
@@ -21,7 +21,7 @@ import java.sql.Types;
  * Time: 14:31:41
  * To change this template use File | Settings | File Templates.
  */
-public class BoolType implements UserType {
+public class BoolType implements EnhancedUserType {
 
     private static final int[] SQL_TYPES = {Types.INTEGER};
 
@@ -92,4 +92,18 @@ public class BoolType implements UserType {
         return nullSafeGet(resultSet, strings, o);
     }
 
+    @Override
+    public String objectToSQLString(Object o) {
+        return toXMLString(o);
+    }
+
+    @Override
+    public String toXMLString(Object o) {
+        return ((Boolean) o) ? "1" : "0";
+    }
+
+    @Override
+    public Object fromXMLString(String s) {
+        return s.equals("1") ? Boolean.TRUE : Boolean.FALSE;
+    }
 }
