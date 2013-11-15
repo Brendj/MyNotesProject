@@ -508,7 +508,7 @@
     </copyright>
     <module2copyright />
   </component>
-  <component name="DataSourceManagerImpl" format="xml" hash="2420295322">
+  <component name="DataSourceManagerImpl" format="xml" hash="3165194431">
     <data-source source="LOCAL" name="Moscow Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
       <identifier-quote-string>&quot;</identifier-quote-string>
       <synchronize>true</synchronize>

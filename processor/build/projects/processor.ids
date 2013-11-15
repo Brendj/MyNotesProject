@@ -1184,7 +1184,7 @@
       <column name="createddate" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
       <column name="sendall" sqlType="int4" length="10" precision="0" nullable="true" jdbcType="4" def="MA=="/>
       <column name="settingvalue" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12"/>
-      <column name="identificator" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
+      <column name="identificator" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
       <column name="globalversiononcreate" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
       <column name="settingtext" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12"/>
       <primary-key name="cf_ecafesetting_pk" columns="idofecafesetting"/>
@@ -2742,6 +2742,7 @@
       <column name="templatefilename" sqlType="varchar" length="256" precision="0" nullable="true" jdbcType="12"/>
       <column name="tag" sqlType="varchar" length="12" precision="0" nullable="true" jdbcType="12"/>
       <column name="allowmanualreportrun" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" def="MA=="/>
+      <column name="storageperiod" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5" def="KC0xKQ=="/>
       <primary-key name="cf_reporthandlerules_pk" columns="idofreporthandlerule"/>
       <exported-key name="cf_ruleconditions_idofreporthandlerule_fk" table="cf_ruleconditions" schema="public" catalog="amoscow" columns="idofreporthandlerule"/>
     </table>
