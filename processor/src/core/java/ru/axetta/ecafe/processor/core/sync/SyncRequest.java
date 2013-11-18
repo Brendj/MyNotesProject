@@ -1673,8 +1673,8 @@ public class SyncRequest {
                 return date;
             }
 
-            public Enumeration<ReqMenuDetail> getReqMenuDetails() {
-                return Collections.enumeration(reqMenuDetails);
+            public Iterator<ReqMenuDetail> getReqMenuDetails() {
+                return reqMenuDetails.iterator();
             }
 
             public String getRawXmlText() {
@@ -1723,8 +1723,12 @@ public class SyncRequest {
             this.settingsSectionRawXML = settingsSectionRawXML;
         }
 
-        public Enumeration<Item> getItems() {
-            return Collections.enumeration(items);
+        //public Enumeration<Item> getItems() {
+        //    return Collections.enumeration(items);
+        //}
+
+        public Iterator<Item> getItems(){
+           return items.iterator();
         }
 
         public String getSettingsSectionRawXML() {

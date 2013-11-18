@@ -2206,13 +2206,13 @@ public class Processor implements SyncProcessor,
                     persistenceTransaction = null;
                 }
 
-                Enumeration<SyncRequest.ReqMenu.Item> menuItems = reqMenu.getItems();
+                Iterator<SyncRequest.ReqMenu.Item> menuItems = reqMenu.getItems();
                 boolean bFirstMenuItem = true;
-                while (menuItems.hasMoreElements()) {
+                while (menuItems.hasNext()) {
                     //  Открываем тразнакцию для каждого дня
                     persistenceTransaction = persistenceSession.beginTransaction();
 
-                    SyncRequest.ReqMenu.Item item = menuItems.nextElement();
+                    SyncRequest.ReqMenu.Item item = menuItems.next();
                     /// сохраняем данные меню для распространения
                     if (bOrgIsMenuExchangeSource) {
                         MenuExchange menuExchange = new MenuExchange(item.getDate(), idOfOrg, item.getRawXmlText(),
@@ -2348,7 +2348,7 @@ public class Processor implements SyncProcessor,
     }
 
     private void processReqMenuDetails(Session persistenceSession, Menu menu, SyncRequest.ReqMenu.Item item,
-            Enumeration<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails,
+            Iterator<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails,
             HashMap<Long, MenuDetail> localIdsToMenuDetailMap) throws Exception {
         // Ищем "лишние" элементы меню
         List<MenuDetail> superfluousMenuDetails = new LinkedList<MenuDetail>();
@@ -2364,8 +2364,8 @@ public class Processor implements SyncProcessor,
         }
 
         // Добавляем новые элементы из пришедшего меню
-        while (reqMenuDetails.hasMoreElements()) {
-            SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.nextElement();
+        while (reqMenuDetails.hasNext()) {
+            SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
             boolean exists = false;
 
             /*if ((bOrgIsMenuExchangeSource && DAOUtils.findMenuDetailByLocalId(persistenceSession, menu, reqMenuDetail.getIdOfMenu()) == null) ||
@@ -2431,9 +2431,9 @@ public class Processor implements SyncProcessor,
     }
 
     private static boolean find(MenuDetail menuDetail, SyncRequest.ReqMenu.Item menuItem) throws Exception {
-        Enumeration<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails = menuItem.getReqMenuDetails();
-        while (reqMenuDetails.hasMoreElements()) {
-            SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.nextElement();
+        Iterator<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails = menuItem.getReqMenuDetails();
+        while (reqMenuDetails.hasNext()) {
+            SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
             if (areMenuDetailsEqual(menuDetail, reqMenuDetail)) {
                 return true;
             }

@@ -184,7 +184,7 @@ public class Client {
         this.categoriesInternal = categoriesInternal;
     }
 
-    public Client() {
+    protected Client() {
         // For Hibernate only
     }
 
@@ -723,15 +723,12 @@ public class Client {
             return false;
         }
         final Client client = (Client) o;
-        if (!idOfClient.equals(client.getIdOfClient())) {
-            return false;
-        }
-        return true;
+        return idOfClient != null && idOfClient.equals(client.getIdOfClient());
     }
 
     @Override
     public int hashCode() {
-        return idOfClient.hashCode();
+        return idOfClient == null ? 0 : idOfClient.hashCode();
     }
 
     @Override
