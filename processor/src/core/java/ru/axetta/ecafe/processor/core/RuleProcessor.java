@@ -500,6 +500,13 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                         RuntimeContext.getInstance().getAutoReportGenerator().getReportPath());
                                 String relativeReportFilePath = reportDocument.getReportFile().getAbsolutePath()
                                         .substring(f.getAbsolutePath().length());
+                                Long idOfContragent = null;
+                                String contragentReceiver = null;
+                                if (basicReport instanceof BasicReportForContragentJob) {
+                                    BasicReportForContragentJob contragentJob  = (BasicReportForContragentJob) basicReport;
+                                    idOfContragent = Long.valueOf(contragentJob.getReportDistinctText());
+                                    contragentReceiver = contragentJob.getReportDistinctText();
+                                }
                                 DAOService.getInstance()
                                         .registerReport(currRule.getRuleName(), currRule.getDocumentFormat(),
                                                 subject, basicReport.getGenerateTime(),
@@ -507,7 +514,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                                 basicReportJob.getEndTime(), relativeReportFilePath,
                                                 report.getProperties()
                                                         .getProperty(ReportPropertiesUtils.P_ORG_NUMBER_IN_NAME),
-                                                idOfOrg, currRule.getTag(), null, null);
+                                                idOfOrg, currRule.getTag(), idOfContragent, contragentReceiver);
                             }
 
                             if (basicReport instanceof OrgBalanceReport) {

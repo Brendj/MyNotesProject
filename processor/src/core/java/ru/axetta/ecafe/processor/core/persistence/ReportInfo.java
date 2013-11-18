@@ -28,7 +28,7 @@ public class ReportInfo {
     }
 
     public ReportInfo(String ruleName, Integer documentFormat, String reportName, Date createdDate, Long generationTime,
-            Date startDate, Date endDate, String reportFile, String orgNum, Long idOfOrg, String tag, Long idOfContragentReceiver, 
+            Date startDate, Date endDate, String reportFile, String orgNum, Long idOfOrg, String tag, Long idOfContragentReceiver,
             String contragentReceiver) {
         this.ruleName = ruleName;
         this.documentFormat = documentFormat;
