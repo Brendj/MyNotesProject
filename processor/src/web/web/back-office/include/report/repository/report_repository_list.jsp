@@ -54,6 +54,23 @@ function checkReporitoryDate () {
                     <h:outputText styleClass="output-text" escape="true" value=" {#{reportRepositoryListPage.orgsFilter}}" />
                 </h:panelGroup>
 
+                <h:outputText escape="true" value="Контрагент" styleClass="output-text" />
+                <h:panelGroup styleClass="borderless-div">
+                    <h:inputText value="#{reportRepositoryListPage.contragentFilter.contragent.contragentName}" readonly="true"
+                                 styleClass="input-text" style="margin-right: 2px;" />
+                    <a4j:commandButton value="..." action="#{contragentPaymentReportPage.showContragentSelectPage(true)}"
+                                       reRender="modalContragentSelectorPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                                       styleClass="command-link" style="width: 25px;">
+                        <f:setPropertyActionListener value="#{false}"
+                                                     target="#{reportRepositoryListPage.selectReceiver}" />
+                        <f:setPropertyActionListener value="0"
+                                                     target="#{mainPage.multiContrFlag}" />
+                        <f:setPropertyActionListener value="1"
+                                                     target="#{mainPage.classTypes}" />
+                    </a4j:commandButton>
+                </h:panelGroup>
+
                 <h:outputText escape="true" value="Контрагент-получатель" styleClass="output-text" />
                 <h:panelGroup styleClass="borderless-div">
                     <h:inputText value="#{reportRepositoryListPage.contragentReceiverFilter.contragent.contragentName}" readonly="true"
@@ -62,6 +79,8 @@ function checkReporitoryDate () {
                                        reRender="modalContragentSelectorPanel"
                                        oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
                                        styleClass="command-link" style="width: 25px;">
+                        <f:setPropertyActionListener value="#{true}"
+                                                     target="#{reportRepositoryListPage.selectReceiver}" />
                         <f:setPropertyActionListener value="0"
                                                      target="#{mainPage.multiContrFlag}" />
                         <f:setPropertyActionListener value="2"
@@ -122,6 +141,12 @@ function checkReporitoryDate () {
                 <h:outputText escape="true" value="Номер организации" />
             </f:facet>
             <h:outputText escape="true" value="#{item.orgNum}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Контрагент" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.contragent}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

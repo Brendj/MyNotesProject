@@ -116,6 +116,10 @@ public abstract class BasicReportForContragentJob extends BasicReportJob {
 
     protected Long idOfContragent;
 
+    public Long getIdOfContragent() {
+        return idOfContragent;
+    }
+
     protected void prepare() {
         if (!hasPrint() && idOfContragent != null && templateFilename != null && sessionFactory != null) {
             // templateFilename может содержать только имя файла отчета или относительный путь к нему

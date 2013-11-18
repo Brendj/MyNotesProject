@@ -501,11 +501,17 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                 String relativeReportFilePath = reportDocument.getReportFile().getAbsolutePath()
                                         .substring(f.getAbsolutePath().length());
                                 Long idOfContragent = null;
-                                String contragentReceiver = null;
+                                String contragent = null;
                                 if (basicReport instanceof BasicReportForContragentJob) {
                                     BasicReportForContragentJob contragentJob  = (BasicReportForContragentJob) basicReport;
-                                    idOfContragent = Long.valueOf(contragentJob.getReportDistinctText());
-                                    contragentReceiver = contragentJob.getReportDistinctText();
+                                    idOfContragent = contragentJob.getIdOfContragent();
+                                    contragent = DAOService.getInstance().getContragentById(idOfContragent).getContragentName();
+                                }
+                                Long idOfContragentReceiver = null;
+                                String contragentReceiver = null;
+                                if (reportProperties != null) {
+                                    idOfContragentReceiver = Long.valueOf(reportProperties.getProperty(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID));
+                                    contragentReceiver = DAOService.getInstance().getContragentById(idOfContragentReceiver).getContragentName();
                                 }
                                 DAOService.getInstance()
                                         .registerReport(currRule.getRuleName(), currRule.getDocumentFormat(),
@@ -514,7 +520,8 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                                 basicReportJob.getEndTime(), relativeReportFilePath,
                                                 report.getProperties()
                                                         .getProperty(ReportPropertiesUtils.P_ORG_NUMBER_IN_NAME),
-                                                idOfOrg, currRule.getTag(), idOfContragent, contragentReceiver);
+                                                idOfOrg, currRule.getTag(), idOfContragentReceiver, contragentReceiver,
+                                                idOfContragent, contragent);
                             }
 
                             if (basicReport instanceof OrgBalanceReport) {
@@ -530,7 +537,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                                 basicReportJob.getBaseTime(), relativeReportFilePath,
                                                 report.getProperties()
                                                         .getProperty(ReportPropertiesUtils.P_ORG_NUMBER_IN_NAME),
-                                                idOfOrg, currRule.getTag(), null, null);
+                                                idOfOrg, currRule.getTag(), null, null, null, null);
                             }
 
                         }

@@ -656,13 +656,25 @@ public class ManualReportRunnerPage extends OnlineReportPage
             File f = new File(RuntimeContext.getInstance().getAutoReportGenerator().getReportPath());
             String relativeReportFilePath = reportDocument.getReportFile().getAbsolutePath()
                     .substring(f.getAbsolutePath().length());
-            Contragent contragent = null;
-            if (values != null && values.get("idOfContragentReceiver") != null) {
-                List<String> tmpList = values.get("idOfContragentReceiver");
+            Contragent contragentReceiver = null;
+            if (values != null && values.get(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID) != null) {
+                List<String> tmpList = values.get(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID);
                 if (tmpList != null && tmpList.size() > 0) {
                     try {
                         long idOfContragentReceiver = Long.parseLong(tmpList.get(0));
-                        contragent = DAOService.getInstance().getContragentById(idOfContragentReceiver);
+                        contragentReceiver = DAOService.getInstance().getContragentById(idOfContragentReceiver);
+                    } catch (Exception e) {
+                        contragentReceiver = null;
+                    }
+                }
+            }
+            Contragent contragent = null;
+            if (values != null && values.get("idOfContragent") != null) {
+                List<String> tmpList = values.get("idOfContragent");
+                if (tmpList != null && tmpList.size() > 0) {
+                    try {
+                        long idOfContragent = Long.parseLong(tmpList.get(0));
+                        contragent = DAOService.getInstance().getContragentById(idOfContragent);
                     } catch (Exception e) {
                         contragent = null;
                     }
@@ -674,6 +686,8 @@ public class ManualReportRunnerPage extends OnlineReportPage
                             report.getGenerateDuration(), report.getStartTime(), report.getEndTime(),
                             relativeReportFilePath, org == null ? "" : org.getOrgNumberInName(),
                             org == null ? null : org.getIdOfOrg(), rule.getTag(),
+                            contragentReceiver == null ? null : contragentReceiver.getIdOfContragent(),
+                            contragentReceiver == null ? null : contragentReceiver.getContragentName(),
                             contragent == null ? null : contragent.getIdOfContragent(),
                             contragent == null ? null : contragent.getContragentName());
             infoMessage = "Отчеты успешно созданы и помещены в репозиторий";

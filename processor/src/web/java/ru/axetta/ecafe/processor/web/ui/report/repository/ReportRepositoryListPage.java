@@ -28,9 +28,11 @@ import java.util.Map;
 @Component
 @Scope("session")
 public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, ReportRepositoryItem> implements OrgListSelectPage.CompleteHandlerList, ContragentSelectPage.CompleteHandler {
+    private boolean selectReceiver;
     BasicWorkspacePage groupPage = new BasicWorkspacePage();
     ReportRepositoryItem.Filter filter = new ReportRepositoryItem.Filter();
     private final CCAccountFilter contragentReceiverFilter = new CCAccountFilter();
+    private final CCAccountFilter contragentFilter = new CCAccountFilter();
     
     File fileToDownload;
     private ReportRepositoryItem selectedItem;
@@ -75,6 +77,18 @@ public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, Repor
         return items;
     }
 
+    public boolean isSelectReceiver() {
+        return selectReceiver;
+    }
+
+    public void setSelectReceiver(boolean selectReceiver) {
+        this.selectReceiver = selectReceiver;
+    }
+
+    public CCAccountFilter getContragentFilter() {
+        return contragentFilter;
+    }
+
     public CCAccountFilter getContragentReceiverFilter() {
         return contragentReceiverFilter;
     }
@@ -114,8 +128,13 @@ public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, Repor
     }
 
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
-        contragentReceiverFilter.completeContragentSelection(session, idOfContragent);
-        filter.setIdOfContragentReceiver(idOfContragent);
+        if (selectReceiver) {
+            contragentReceiverFilter.completeContragentSelection(session, idOfContragent);
+            filter.setIdOfContragentReceiver(idOfContragent);
+        } else {
+            contragentFilter.completeContragentSelection(session, idOfContragent);
+            filter.setIdOfContragent(idOfContragent);
+        }
     }
 
     public void completeOrgListSelection(Map<Long, String> orgMap) throws HibernateException {
