@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import javax.faces.model.SelectItem;
@@ -536,8 +537,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
         if (null != idOfOrg) {
+            Long oldOrgId = this.org.getIdOfOrg();
             Org org = (Org) session.load(Org.class, idOfOrg);
             this.org = new OrgItem(org);
+            if (!oldOrgId.equals(idOfOrg) && !idOfCategoryList.isEmpty()) {
+                newOrgHasCatDiscount = checkOrgDiscounts(session, idOfOrg);
+            }
         }
     }
 
@@ -779,6 +784,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private String filter = "Не выбрано";
     private List<Long> idOfCategoryList = new ArrayList<Long>();
     private Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
+    private boolean newOrgHasCatDiscount = true;
 
     public String getFilter() {
         return filter;
@@ -804,6 +810,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.categoryDiscountSet = categoryDiscountSet;
     }
 
+    public boolean isNewOrgHasCatDiscount() {
+        return newOrgHasCatDiscount;
+    }
+
+    public void setNewOrgHasCatDiscount(boolean newOrgHasCatDiscount) {
+        this.newOrgHasCatDiscount = newOrgHasCatDiscount;
+    }
+
     public void completeCategoryListSelection(Map<Long, String> categoryMap) throws HibernateException {
         //To change body of implemented methods use File | Settings | File Templates.
         if (null != categoryMap) {
@@ -822,4 +836,16 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
     }
 
+    // Проверяет, имеет ли организация льготы по категориям льгот клиента.
+    @SuppressWarnings("unchecked")
+    private boolean checkOrgDiscounts(Session session, Long idOfOrg) {
+        Criteria criteria = session.createCriteria(CategoryDiscount.class)
+                .createAlias("discountRulesInternal", "dri")
+                .createAlias("dri.categoryOrgsInternal", "coi")
+                .createAlias("coi.orgsInternal", "o")
+                .add(Restrictions.eq("o.idOfOrg", idOfOrg))
+                .add(Restrictions.in("idOfCategoryDiscount", idOfCategoryList))
+                .setProjection(Projections.projectionList().add(Projections.countDistinct("idOfCategoryDiscount")));
+        return (Long) criteria.uniqueResult() > 0;
+    }
 }

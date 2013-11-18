@@ -1760,6 +1760,23 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         return null;
     }
 
+    public Object cancelOrgSelection() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            orgSelectPage.cancelOrgSelection();
+            if (!modalPages.empty()) {
+                if (modalPages.peek() == orgSelectPage) {
+                    modalPages.pop();
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to complete org selection", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора организации", null));
+        }
+        return null;
+    }
+
     //01.11.2011
     public Object completeOrgListSelectionOk() {
         FacesContext facesContext = FacesContext.getCurrentInstance();

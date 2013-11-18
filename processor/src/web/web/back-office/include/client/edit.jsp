@@ -26,6 +26,9 @@
         <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" />
+        <h:outputText value="Внимание! Выбранная организация не имеет льготы по всем категориям данного клиента."
+                      rendered="#{not mainPage.clientEditPage.newOrgHasCatDiscount}"
+                      styleClass="warn-messages output-text" style="margin-left: 10px;"/>
     </h:panelGroup>
     <h:outputText escape="true" value="Сменить пароль" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.changePassword}" styleClass="output-text">

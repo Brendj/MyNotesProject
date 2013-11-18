@@ -90,8 +90,9 @@
                                            reRender="#{mainPage.topMostPage.pageComponent.id}"
                                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.hide();"
                                            styleClass="command-button" style="width: 80px; margin-right: 4px;" />
-                        <a4j:commandButton value="Отмена"
-                                           onclick="#{rich:component('modalOrgSelectorPanel')}.hide();return false;"
+                        <a4j:commandButton value="Отмена" action="#{mainPage.cancelOrgSelection}"
+                                           reRender="#{mainPage.topMostPage.pageComponent.id}"
+                                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.hide();"
                                            styleClass="command-button" style="width: 80px;" />
                     </h:panelGroup>
                 </td>

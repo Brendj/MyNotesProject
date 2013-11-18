@@ -67,9 +67,14 @@ public class OrgSelectPage extends BasicPage {
         }
     }
 
-    public void cancelFilter() {
+    public void cancelOrgSelection() {
+        completeHandlers.clear();
+    }
+
+    public Object cancelFilter() {
         selectedItem = new OrgShortItem();
         MainPage.getSessionInstance().updateOrgSelectPage();
+        return null;
     }
     //action="#{}"
 
