@@ -195,10 +195,10 @@ public class MenuLoadPage extends BasicWorkspacePage {
                     daoService.persistEntity(menuExchangeSettings);
                 }
 
-                Enumeration<SyncRequest.ReqMenu.Item> menuItems = reqMenu.getItems();
+                Iterator<SyncRequest.ReqMenu.Item> menuItems = reqMenu.getItems();
                 boolean bFirstMenuItem = true;
-                while (menuItems.hasMoreElements()) {
-                    SyncRequest.ReqMenu.Item item = menuItems.nextElement();
+                while (menuItems.hasNext()) {
+                    SyncRequest.ReqMenu.Item item = menuItems.next();
                     /// сохраняем данные меню для распространения
                     if (bOrgIsMenuExchangeSource) {
                         MenuExchange menuExchange = new MenuExchange(item.getDate(), idOfOrg, item.getRawXmlText(),
@@ -214,8 +214,7 @@ public class MenuLoadPage extends BasicWorkspacePage {
                         daoService.persistEntity(menu);
                     }
                     processReqAssortment(organization, menuDate, item.getReqAssortments());
-                    processReqMenuDetails(organization, menuDate, menu, item,
-                            item.getReqMenuDetails());
+                    processReqMenuDetails(organization, menuDate, menu, item, item.getReqMenuDetails());
                     processReqComplexInfos(organization, menuDate, menu, item.getReqComplexInfos());
                     bFirstMenuItem = false;
                 }
@@ -357,10 +356,10 @@ public class MenuLoadPage extends BasicWorkspacePage {
 
     @Transactional
     protected void processReqMenuDetails(Org organization, Date menuDate, Menu menu,
-            SyncRequest.ReqMenu.Item item, Enumeration<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails)
+            SyncRequest.ReqMenu.Item item, Iterator<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails)
             throws Exception {
-        while (reqMenuDetails.hasMoreElements()) {
-            SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.nextElement();
+        while (reqMenuDetails.hasNext()) {
+            SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
             if (null == findMenuDetailByLocalId(menu, reqMenuDetail.getIdOfMenu())) {
                 MenuDetail menuDetail = new MenuDetail(menu, reqMenuDetail.getPath(), reqMenuDetail.getName(),
                         reqMenuDetail.getMenuOrigin(), reqMenuDetail.getAvailableNow(),
@@ -410,9 +409,9 @@ public class MenuLoadPage extends BasicWorkspacePage {
 
     @Transactional
     protected boolean find(MenuDetail menuDetail, SyncRequest.ReqMenu.Item menuItem) throws Exception {
-        Enumeration<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails = menuItem.getReqMenuDetails();
-        while (reqMenuDetails.hasMoreElements()) {
-            SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.nextElement();
+        Iterator<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails = menuItem.getReqMenuDetails();
+        while (reqMenuDetails.hasNext()) {
+            SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
             Long localIdOfMenu = menuDetail.getLocalIdOfMenu();
             // если есть локальный ID то ищем по нему, если нет - то по имени
             if ((localIdOfMenu != null && reqMenuDetail.getIdOfMenu() != null && (localIdOfMenu
