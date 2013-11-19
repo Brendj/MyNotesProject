@@ -29,7 +29,7 @@ public class Way4PaymentTest extends TestCase {
     public static void setUpClientSSL() throws Exception {
         KeyStore ks = KeyStore.getInstance("pkcs12");
 
-        ks.load(new FileInputStream("C:\\Temp\\certs\\ispp_khb_gimnazia_3.pfx"), "1".toCharArray());
+        ks.load(new FileInputStream("C:\\test.pfx"), "1".toCharArray());
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
         kmf.init(ks, "1".toCharArray());
