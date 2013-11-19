@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.AccessDiniedException;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
+import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.event.EventNotificator;
 import ru.axetta.ecafe.processor.core.event.PaymentProcessEvent;
 import ru.axetta.ecafe.processor.core.event.SyncEvent;
@@ -29,6 +30,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRolePro
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardOperationProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
@@ -80,6 +82,7 @@ public class Processor implements SyncProcessor,
         OK(0, "Ok"),
         UNKNOWN_ERROR(100, "Unknown error"),
         CLIENT_NOT_FOUND(105, "Client not found"),
+        SUB_BALANCE_NOT_FOUND(106, "Client sub balance not found"),
         CARD_NOT_FOUND(120, "Card acceptable for transfer not found"),
         CONTRAGENT_NOT_FOUND(130, "Contragent not found"),
         PAYMENT_ALREADY_REGISTERED(140, "Payment is already registered"),
@@ -118,28 +121,66 @@ public class Processor implements SyncProcessor,
 
             Contragent contragent = DAOUtils.findContragent(persistenceSession, idOfContragent);
             if (null == contragent) {
-                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null,
+                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
                         PaymentProcessResult.CONTRAGENT_NOT_FOUND.getCode(),
                         String.format("%s. IdOfContragent == %s, ContractId == %s",
                                 PaymentProcessResult.CONTRAGENT_NOT_FOUND.getDescription(), idOfContragent,
                                 payment.getContractId()), null);
             }
             if (DAOUtils.existClientPayment(persistenceSession, contragent, payment.getIdOfPayment())) {
-                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null,
+                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
                         PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getCode(),
                         String.format("%s. IdOfContragent == %s, IdOfPayment == %s",
                                 PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getDescription(), idOfContragent,
                                 payment.getIdOfPayment()), null);
             }
-            Client client = findPaymentClient(persistenceSession, contragent, payment.getContractId(),
-                    payment.getClientId());
-            if (null == client) {
-                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null,
+
+            Integer subBalanceNum = null;
+            Long  contractId=null;
+
+            if(payment.getContractId()!=null){
+                String contractIdstr = String.valueOf(payment.getContractId());
+                if(ContractIdGenerator.luhnTest(contractIdstr)){
+                    subBalanceNum = 0;
+                    contractId = payment.getContractId();
+                } else {
+                    int len = contractIdstr.length();
+                    if(len>2 && ContractIdGenerator.luhnTest(contractIdstr.substring(0, len - 2))){
+                        subBalanceNum = Integer.parseInt(contractIdstr.substring(len-2));
+                        contractId = Long.parseLong(contractIdstr.substring(0, len-2));
+                    }
+                }
+            }
+
+            if(contractId==null) {
+                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
                         PaymentProcessResult.CLIENT_NOT_FOUND.getCode(),
                         String.format("%s. IdOfContragent == %s, ContractId == %s, ClientId == %s",
                                 PaymentProcessResult.CLIENT_NOT_FOUND.getDescription(), idOfContragent,
                                 payment.getContractId(), payment.getClientId()), null);
             }
+
+            //Client client = findPaymentClient(persistenceSession, contragent, payment.getContractId(), payment.getClientId());
+            Client client = findPaymentClient(persistenceSession, contragent, contractId,  payment.getClientId());
+
+            if (null == client) {
+                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
+                        PaymentProcessResult.CLIENT_NOT_FOUND.getCode(),
+                        String.format("%s. IdOfContragent == %s, ContractId == %s, ClientId == %s",
+                                PaymentProcessResult.CLIENT_NOT_FOUND.getDescription(), idOfContragent,
+                                payment.getContractId(), payment.getClientId()), null);
+            }
+
+            Boolean enableSubBalanceOperation = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_SUB_BALANCE_OPERATION);
+
+            if(subBalanceNum!=null && subBalanceNum>1 && enableSubBalanceOperation) {
+                return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
+                        PaymentProcessResult.SUB_BALANCE_NOT_FOUND.getCode(),
+                        String.format("%s. IdOfContragent == %s, ContractId == %s, ClientId == %s",
+                                PaymentProcessResult.SUB_BALANCE_NOT_FOUND.getDescription(), idOfContragent,
+                                payment.getContractId(), payment.getClientId()), null);
+            }
+
             Long idOfClient = client.getIdOfClient();
             Long paymentTspContragentId = null;
             HashMap<String, String> payAddInfo = new HashMap<String, String>();
@@ -147,7 +188,7 @@ public class Processor implements SyncProcessor,
             if (payment.getTspContragentId() != null) {
                 // если явно указан контрагент ТСП получатель, проверяем что он соответствует организации клиента
                 if (defaultTsp == null || !defaultTsp.getIdOfContragent().equals(payment.getTspContragentId())) {
-                    return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null,
+                    return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
                             PaymentProcessResult.TSP_CONTRAGENT_IS_PROHIBITED.getCode(),
                             String.format("%s. IdOfTspContragent == %s, ContractId == %s, ClientId == %s",
                                     PaymentProcessResult.TSP_CONTRAGENT_IS_PROHIBITED.getDescription(),
@@ -174,16 +215,20 @@ public class Processor implements SyncProcessor,
                     logger.info("Processing payment with balance reset: " + client + "; current balance=" + client
                             .getBalance() + "; set balance=" + paymentSum);
                 }
-                RuntimeContext.getFinancialOpsManager()
-                        .createClientPayment(persistenceSession, client, payment.getPaymentMethod(), paymentSum,
-                                ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT, payment.getPayTime(), payment.getIdOfPayment(),
-                                contragent, payment.getAddPaymentMethod(), payment.getAddIdOfPayment());
+                //RuntimeContext.getFinancialOpsManager()
+                //        .createClientPayment(persistenceSession, client, payment.getPaymentMethod(), paymentSum,
+                //                ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT, payment.getPayTime(), payment.getIdOfPayment(),
+                //                contragent, payment.getAddPaymentMethod(), payment.getAddIdOfPayment());
+
+                final FinancialOpsManager financialOpsManager = RuntimeContext.getFinancialOpsManager();
+                financialOpsManager.createClientPayment(persistenceSession, client, contragent, payment.getPaymentMethod(), paymentSum,
+                         payment.getPayTime(), payment.getIdOfPayment(), payment.getAddPaymentMethod(), payment.getAddIdOfPayment(), subBalanceNum);
 
                 persistenceSession.flush();
             }
             PaymentResponse.ResPaymentRegistry.Item result = new PaymentResponse.ResPaymentRegistry.Item(payment,
                     idOfClient, client.getContractId(), paymentTspContragentId, null, client.getBalance(),
-                    PaymentProcessResult.OK.getCode(), PaymentProcessResult.OK.getDescription(), client, null,
+                    PaymentProcessResult.OK.getCode(), PaymentProcessResult.OK.getDescription(), client, client.getSubBalance1(),
                     payAddInfo);
 
             persistenceTransaction.commit();
@@ -406,9 +451,16 @@ public class Processor implements SyncProcessor,
         }
         CardTemp ct = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
         if (ct != null) {
-            throw new Exception(String.format(
-                    "Карта с таким номером уже зарегистрирована как временная на клиента: %s. Статус карты - %s.",
-                    ct.getClient().getIdOfClient(), ct.getCardStation()));
+            if(ct.getClient()!=null){
+                throw new Exception(String.format(
+                        "Карта с таким номером уже зарегистрирована как временная на клиента: %s. Статус карты - %s.",
+                        ct.getClient().getIdOfClient(), ct.getCardStation()));
+            }
+            if(ct.getVisitor()!=null){
+                throw new Exception(String.format(
+                        "Карта с таким номером уже зарегистрирована как временная на посетителя: %s. Статус карты - %s.",
+                        ct.getVisitor().getIdOfVisitor(), ct.getCardStation()));
+            }
         }
         if (state == Card.ACTIVE_STATE) {
             lockActiveCards(persistenceSession, client.getCards());
@@ -552,7 +604,7 @@ public class Processor implements SyncProcessor,
         Long idOfPacket = null;
         SyncHistory syncHistory = null; // регистируются и заполняются только для полной синхронизации
 
-        SyncResponse.ResPaymentRegistry resPaymentRegistry = null;
+        ResPaymentRegistry resPaymentRegistry = null;
         SyncResponse.AccRegistry accRegistry = null;
         SyncResponse.AccIncRegistry accIncRegistry = null;
         SyncResponse.ClientRegistry clientRegistry = null;
@@ -582,7 +634,7 @@ public class Processor implements SyncProcessor,
                 request.getRemoteAddr());
         // Process paymentRegistry
         try {
-            if (request.getPaymentRegistry().getPayments().hasMoreElements()) {
+            if (request.getPaymentRegistry().getPayments().hasNext()) {
                 if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
                     createSyncHistory(request.getIdOfOrg(),syncHistory, "no license slots available");
                     throw new Exception("no license slots available");
@@ -833,7 +885,7 @@ public class Processor implements SyncProcessor,
         Long idOfPacket = null; // регистируются и заполняются только для полной синхронизации
         SyncHistory idOfSync = null;
 
-        SyncResponse.ResPaymentRegistry resPaymentRegistry = null;
+        ResPaymentRegistry resPaymentRegistry = null;
         SyncResponse.AccRegistry accRegistry = null;
         SyncResponse.AccIncRegistry accIncRegistry = null;
         SyncResponse.ClientRegistry clientRegistry = null;
@@ -929,7 +981,7 @@ public class Processor implements SyncProcessor,
         Long idOfPacket = null; // регистируются и заполняются только для полной синхронизации
         SyncHistory idOfSync = null;
 
-        SyncResponse.ResPaymentRegistry resPaymentRegistry = null;
+        ResPaymentRegistry resPaymentRegistry = null;
         SyncResponse.AccRegistry accRegistry = null;
         SyncResponse.AccIncRegistry accIncRegistry = null;
         SyncResponse.ClientRegistry clientRegistry = null;
@@ -1003,7 +1055,7 @@ public class Processor implements SyncProcessor,
 
         Long idOfPacket = null, idOfSync = null; // регистируются и заполняются только для полной синхронизации
 
-        SyncResponse.ResPaymentRegistry resPaymentRegistry = null;
+        ResPaymentRegistry resPaymentRegistry = null;
         SyncResponse.AccRegistry accRegistry = null;
         SyncResponse.AccIncRegistry accIncRegistry = null;
         SyncResponse.ClientRegistry clientRegistry = null;
@@ -1040,7 +1092,7 @@ public class Processor implements SyncProcessor,
         try {
             if (request.getPaymentRegistry() != null) {
                 if (request.getPaymentRegistry().getPayments() != null) {
-                    if (request.getPaymentRegistry().getPayments().hasMoreElements()) {
+                    if (request.getPaymentRegistry().getPayments().hasNext()) {
                         if (!RuntimeContext.getInstance()
                                 .isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
                             String clientVersion = (request.getClientVersion()==null?"":request.getClientVersion());
@@ -1176,21 +1228,21 @@ public class Processor implements SyncProcessor,
         }
     }
 
-    private SyncResponse.ResPaymentRegistry processSyncPaymentRegistry(Long idOfSync, Long idOfOrg,
-            SyncRequest.PaymentRegistry paymentRegistry, List<Long> errorClientIds) throws Exception {
-        SyncResponse.ResPaymentRegistry resPaymentRegistry = new SyncResponse.ResPaymentRegistry();
-        Enumeration<SyncRequest.PaymentRegistry.Payment> payments = paymentRegistry.getPayments();
-        while (payments.hasMoreElements()) {
-            SyncRequest.PaymentRegistry.Payment payment = payments.nextElement();
-            SyncResponse.ResPaymentRegistry.Item resAcc;
+    private ResPaymentRegistry processSyncPaymentRegistry(Long idOfSync, Long idOfOrg,
+            PaymentRegistry paymentRegistry, List<Long> errorClientIds) throws Exception {
+        ResPaymentRegistry resPaymentRegistry = new ResPaymentRegistry();
+        Iterator<Payment> payments = paymentRegistry.getPayments();
+        while (payments.hasNext()) {
+            Payment Payment = payments.next();
+            ResPaymentRegistryItem resAcc;
             try {
-                resAcc = processSyncPaymentRegistryPayment(idOfSync, idOfOrg, payment, errorClientIds);
+                resAcc = processSyncPaymentRegistryPayment(idOfSync, idOfOrg, Payment, errorClientIds);
                 if (resAcc.getResult() != 0) {
                     logger.error("Failure in response payment registry: " + resAcc);
                 }
             } catch (Exception e) {
-                logger.error(String.format("Failed to process payment == %s", payment), e);
-                resAcc = new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 100, "Internal error");
+                logger.error(String.format("Failed to process payment == %s", Payment), e);
+                resAcc = new ResPaymentRegistryItem(Payment.getIdOfOrder(), 100, "Internal error");
             }
             // TODO: если resAcc.getResult() != 0 записать в журнал ошибок синхры
             resPaymentRegistry.addItem(resAcc);
@@ -1209,7 +1261,7 @@ public class Processor implements SyncProcessor,
                 resAcc = processPayPaymentRegistryPayment(idOfContragent, payment);
             } catch (Exception e) {
                 logger.error(String.format("Failed to process payment == %s", payment), e);
-                resAcc = new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null,
+                resAcc = new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
                         PaymentProcessResult.UNKNOWN_ERROR.getCode(),
                         PaymentProcessResult.UNKNOWN_ERROR.getDescription(), null);
             }
@@ -1218,27 +1270,26 @@ public class Processor implements SyncProcessor,
         return resPaymentRegistry;
     }
 
-    private static SyncRequest.PaymentRegistry.Payment.Purchase findPurchase(
-            SyncRequest.PaymentRegistry.Payment payment, Long idOfOrderDetail) throws Exception {
-        Iterator<SyncRequest.PaymentRegistry.Payment.Purchase> purchases = payment.getPurchases();
+    private static Purchase findPurchase(Payment Payment, Long idOfOrderDetail) throws Exception {
+        Iterator<Purchase> purchases = Payment.getPurchases().iterator();
         while (purchases.hasNext()) {
-            SyncRequest.PaymentRegistry.Payment.Purchase purchase = purchases.next();
-            if (idOfOrderDetail.equals(purchase.getIdOfOrderDetail())) {
-                return purchase;
+            Purchase Purchase = purchases.next();
+            if (idOfOrderDetail.equals(Purchase.getIdOfOrderDetail())) {
+                return Purchase;
             }
         }
         return null;
     }
 
-    private static void updateOrderDetails(Session session, Order order, SyncRequest.PaymentRegistry.Payment payment)
+    private static void updateOrderDetails(Session session, Order order, Payment Payment)
             throws Exception {
         Set<OrderDetail> orderDetails = order.getOrderDetails();
         for (OrderDetail orderDetail : orderDetails) {
             if (StringUtils.isEmpty(orderDetail.getRootMenu())) {
-                SyncRequest.PaymentRegistry.Payment.Purchase purchase = findPurchase(payment,
+                Purchase Purchase = findPurchase(Payment,
                         orderDetail.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
-                if (null != purchase) {
-                    String rootMenu = purchase.getRootMenu();
+                if (null != Purchase) {
+                    String rootMenu = Purchase.getRootMenu();
                     if (StringUtils.isNotEmpty(rootMenu)) {
                         orderDetail.setRootMenu(rootMenu);
                         session.update(orderDetail);
@@ -1354,8 +1405,8 @@ public class Processor implements SyncProcessor,
         return goodsBasicBasketData;
     }
 
-    private SyncResponse.ResPaymentRegistry.Item processSyncPaymentRegistryPayment(Long idOfSync, Long idOfOrg,
-            SyncRequest.PaymentRegistry.Payment payment, List<Long> errorClientIds) throws Exception {
+    public ResPaymentRegistryItem processSyncPaymentRegistryPayment(Long idOfSync, Long idOfOrg,
+            Payment Payment, List<Long> errorClientIds) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -1366,24 +1417,24 @@ public class Processor implements SyncProcessor,
             //Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
             Long idOfOrganization = DAOUtils.getIdOfOrg(persistenceSession, idOfOrg);
             if (null == idOfOrganization) {
-                return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 130,
+                return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 130,
                         String.format("Organization no found, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
-                                payment.getIdOfOrder()));
+                                Payment.getIdOfOrder()));
             }
             // Check order existence
-            if (DAOUtils.existOrder(persistenceSession, idOfOrg, payment.getIdOfOrder())) {
+            if (DAOUtils.existOrder(persistenceSession, idOfOrg, Payment.getIdOfOrder())) {
                 Order order = DAOUtils
-                        .findOrder(persistenceSession, new CompositeIdOfOrder(idOfOrg, payment.getIdOfOrder()));
+                        .findOrder(persistenceSession, new CompositeIdOfOrder(idOfOrg, Payment.getIdOfOrder()));
                 // if order == payment (may be last sync result was not transferred to client)
                 Long orderCardNo = order.getCard() == null ? null : order.getCard().getCardNo();
-                if ((("" + orderCardNo).equals("" + payment.getCardNo())) && (order.getCreateTime()
-                        .equals(payment.getTime())) && (order.getSumByCard().equals(payment.getSumByCard()))) {
-                    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 0,
+                if ((("" + orderCardNo).equals("" + Payment.getCardNo())) && (order.getCreateTime()
+                        .equals(Payment.getTime())) && (order.getSumByCard().equals(Payment.getSumByCard()))) {
+                    return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 0,
                             "Order is already registered");
                 } else {
-                    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 110, String.format(
+                    return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 110, String.format(
                             "Order already registered but attributes differ, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
-                            payment.getIdOfOrder()));
+                            Payment.getIdOfOrder()));
                 }
                 /* updateOrderDetails(persistenceSession, order, payment);
                 // Commit data model transaction
@@ -1397,26 +1448,26 @@ public class Processor implements SyncProcessor,
             }
             // If cardNo specified - load card from data model
             Card card = null;
-            Long cardNo = payment.getCardNo();
+            Long cardNo = Payment.getCardNo();
             if (null != cardNo) {
                 card = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
                 if (null == card) {
-                    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 200,
+                    return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 200,
                             String.format("Unknown card, IdOfOrg == %s, IdOfOrder == %s, CardNo == %s", idOfOrg,
-                                    payment.getIdOfOrder(), cardNo));
+                                    Payment.getIdOfOrder(), cardNo));
                 }
             }
             // If client specified - load client from data model
             Client client = null;
-            Long idOfClient = payment.getIdOfClient();
+            Long idOfClient = Payment.getIdOfClient();
             if (null != idOfClient) {
                 client = DAOUtils.findClient(persistenceSession, idOfClient);
                 // Check client existance
 
                 if (null == client) {
-                    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 210,
+                    return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 210,
                             String.format("Unknown client, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s", idOfOrg,
-                                    payment.getIdOfOrder(), idOfClient));
+                                    Payment.getIdOfOrder(), idOfClient));
                 }
             }
             if (null != card) {
@@ -1425,9 +1476,9 @@ public class Processor implements SyncProcessor,
                     client = card.getClient();
                 } else if (!card.getClient().getIdOfClient().equals(client.getIdOfClient())) {
                     // Specified client isn't the owner of the specified card
-                    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 230, String.format(
+                    return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 230, String.format(
                             "Client isn't the owner of the specified card, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s, CardNo == %s",
-                            idOfOrg, payment.getIdOfOrder(), idOfClient, cardNo));
+                            idOfOrg, Payment.getIdOfOrder(), idOfClient, cardNo));
                 }
             }
             if (null != client && card != null) {
@@ -1480,70 +1531,70 @@ public class Processor implements SyncProcessor,
                 //}
             }
             // Verify spicified sums to be valid non negative numbers
-            if (payment.getSumByCard() < 0 || payment.getSumByCash() < 0 || payment.getSocDiscount() < 0
-                    || payment.getRSum() < 0 || payment.getGrant() < 0) {
-                return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 250,
+            if (Payment.getSumByCard() < 0 || Payment.getSumByCash() < 0 || Payment.getSocDiscount() < 0
+                    || Payment.getRSum() < 0 || Payment.getGrant() < 0) {
+                return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 250,
                         String.format("Negative sum(s) are specified, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
-                                payment.getIdOfOrder()));
+                                Payment.getIdOfOrder()));
             }
-            if (0 != payment.getSumByCard() && card == null) {
+            if (0 != Payment.getSumByCard() && card == null) {
                 // Check if card is specified
-                return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 240, String.format(
+                return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 240, String.format(
                         "Payment has card part but doesn't specify CardNo, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s",
-                        idOfOrg, payment.getIdOfOrder(), idOfClient));
+                        idOfOrg, Payment.getIdOfOrder(), idOfClient));
             }
             // Create order
             RuntimeContext.getFinancialOpsManager()
-                    .createOrderCharge(persistenceSession, payment, idOfOrg, client, card, payment.getConfirmerId());
+                    .createOrderCharge(persistenceSession, Payment, idOfOrg, client, card, Payment.getConfirmerId());
             long totalPurchaseDiscount = 0;
             long totalPurchaseRSum = 0;
             // Register order details (purchase)
-            Iterator<SyncRequest.PaymentRegistry.Payment.Purchase> purchases = payment.getPurchases();
+            Iterator<Purchase> purchases = Payment.getPurchases().iterator();
             while (purchases.hasNext()) {
-                SyncRequest.PaymentRegistry.Payment.Purchase purchase = purchases.next();
+                Purchase Purchase = purchases.next();
                 if (null != DAOUtils.findOrderDetail(persistenceSession,
-                        new CompositeIdOfOrderDetail(idOfOrg, purchase.getIdOfOrderDetail()))) {
-                    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 120, String.format(
+                        new CompositeIdOfOrderDetail(idOfOrg, Purchase.getIdOfOrderDetail()))) {
+                    return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 120, String.format(
                             "Order detail is already registered, IdOfOrg == %s, IdOfOrder == %s, IdOfOrderDetail == %s",
-                            idOfOrg, payment.getIdOfOrder(), purchase.getIdOfOrderDetail()));
+                            idOfOrg, Payment.getIdOfOrder(), Purchase.getIdOfOrderDetail()));
                 }
-                if (purchase.getDiscount() < 0 || purchase.getRPrice() < 0 || purchase.getQty() < 0) {
-                    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 250, String.format(
+                if (Purchase.getDiscount() < 0 || Purchase.getrPrice() < 0 || Purchase.getQty() < 0) {
+                    return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 250, String.format(
                             "Negative sum(s) or quantitiy are specified, IdOfOrg == %s, IdOfOrder == %s, IdOfPurchase == %s",
-                            idOfOrg, payment.getIdOfOrder(), purchase.getQty()));
+                            idOfOrg, Payment.getIdOfOrder(), Purchase.getQty()));
                 }
                 OrderDetail orderDetail = new OrderDetail(
-                        new CompositeIdOfOrderDetail(idOfOrg, purchase.getIdOfOrderDetail()), payment.getIdOfOrder(),
-                        purchase.getQty(), purchase.getDiscount(), purchase.getSocDiscount(), purchase.getRPrice(),
-                        purchase.getName(), purchase.getRootMenu(), purchase.getMenuGroup(), purchase.getMenuOrigin(),
-                        purchase.getMenuOutput(), purchase.getType());
-                if (purchase.getItemCode() != null) {
-                    orderDetail.setItemCode(purchase.getItemCode());
+                        new CompositeIdOfOrderDetail(idOfOrg, Purchase.getIdOfOrderDetail()), Payment.getIdOfOrder(),
+                        Purchase.getQty(), Purchase.getDiscount(), Purchase.getSocDiscount(), Purchase.getrPrice(),
+                        Purchase.getName(), Purchase.getRootMenu(), Purchase.getMenuGroup(), Purchase.getMenuOrigin(),
+                        Purchase.getMenuOutput(), Purchase.getType());
+                if (Purchase.getItemCode() != null) {
+                    orderDetail.setItemCode(Purchase.getItemCode());
                 }
-                if ( purchase.getIdOfRule() != null) {
-                    orderDetail.setIdOfRule(purchase.getIdOfRule());
+                if ( Purchase.getIdOfRule() != null) {
+                    orderDetail.setIdOfRule(Purchase.getIdOfRule());
                 }
-                if (purchase.getGuidOfGoods() != null) {
-                    Good good = DAOUtils.findGoodByGuid(persistenceSession, purchase.getGuidOfGoods());
+                if (Purchase.getGuidOfGoods() != null) {
+                    Good good = DAOUtils.findGoodByGuid(persistenceSession, Purchase.getGuidOfGoods());
                     if (good != null) {
                         orderDetail.setGood(good);
                     }
                 }
                 persistenceSession.save(orderDetail);
-                totalPurchaseDiscount += purchase.getDiscount() * purchase.getQty();
-                totalPurchaseRSum += purchase.getRPrice() * purchase.getQty();
+                totalPurchaseDiscount += Purchase.getDiscount() * Purchase.getQty();
+                totalPurchaseRSum += Purchase.getrPrice() * Purchase.getQty();
             }
             // Check payment sums
-            if (totalPurchaseRSum != payment.getRSum() || totalPurchaseDiscount != payment.getSocDiscount() + payment
-                    .getTrdDiscount() + payment.getGrant()) {
-                return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 300,
+            if (totalPurchaseRSum != Payment.getRSum() || totalPurchaseDiscount != Payment.getSocDiscount() + Payment
+                    .getTrdDiscount() + Payment.getGrant()) {
+                return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 300,
                         String.format("Invalid total sum by order, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
-                                payment.getIdOfOrder()));
+                                Payment.getIdOfOrder()));
             }
-            if (payment.getRSum() != payment.getSumByCard() + payment.getSumByCash()) {
-                return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 310,
+            if (Payment.getRSum() != Payment.getSumByCard() + Payment.getSumByCash()) {
+                return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 310,
                         String.format("Invalid sum of order card and cash payments, IdOfOrg == %s, IdOfOrder == %s",
-                                idOfOrg, payment.getIdOfOrder()));
+                                idOfOrg, Payment.getIdOfOrder()));
             }
 
             // Commit data model transaction
@@ -1556,11 +1607,11 @@ public class Processor implements SyncProcessor,
             if(client!=null){
                 RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                         .sendNotificationAsync(client, EventNotificationService.MESSAGE_PAYMENT,
-                                generatePaymentNotificationParams(persistenceSession, client, payment));
+                                generatePaymentNotificationParams(persistenceSession, client, Payment));
             }
 
             // Return no errors
-            return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 0, null);
+            return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 0, null);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1672,6 +1723,9 @@ public class Processor implements SyncProcessor,
             client.setFreePayMaxCount(clientParamItem.getFreePayMaxCount());
             client.setLastFreePayTime(clientParamItem.getLastFreePayTime());
             client.setDiscountMode(clientParamItem.getDiscountMode());
+            if(clientParamItem.getExpenditureLimit()!=null){
+                client.setExpenditureLimit(clientParamItem.getExpenditureLimit());
+            }
             /**/
             if (clientParamItem.getDiscountMode() == Client.DISCOUNT_MODE_BY_CATEGORY) {
                 /* распарсим строку с категориями */
@@ -2057,8 +2111,8 @@ public class Processor implements SyncProcessor,
             //        accRegistry.addItem(new SyncResponse.AccRegistry.Item(client, card));
             //    }
             //}
-
             List<Card> cards = DAOUtils.getClientsAndCardsForOrgs(persistenceSession, idOfOrgSet, clientIds);
+            logger.debug("card counts " + cards.size());
             for (Card card : cards) {
                 Client client = card.getClient();
                 if (client.getClientGroup() == null || (!client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()
@@ -2068,8 +2122,7 @@ public class Processor implements SyncProcessor,
                     accRegistry.addItem(new SyncResponse.AccRegistry.Item(card));
                 }
             }
-
-            // Добавляем карты перемещенных клиентов.
+						 // Добавляем карты перемещенных клиентов.
             if(clientIds==null || clientIds.isEmpty()){
                 List<Client> allocClients = ClientManager.findAllAllocatedClients(persistenceSession, org);
                 for (Client client : allocClients) {
@@ -2109,7 +2162,7 @@ public class Processor implements SyncProcessor,
             for (AccountTransaction accountTransaction : accountTransactionList) {
                 SyncResponse.AccIncRegistry.Item accIncItem = new SyncResponse.AccIncRegistry.Item(
                         accountTransaction.getIdOfTransaction(), accountTransaction.getClient().getIdOfClient(),
-                        accountTransaction.getTransactionTime(), accountTransaction.getTransactionSum());
+                        accountTransaction.getTransactionTime(), accountTransaction.getTransactionSum(), accountTransaction.getTransactionSubBalance1Sum());
                 accIncRegistry.addItem(accIncItem);
             }
             accIncRegistry.setDate(currentDate);
@@ -2240,16 +2293,16 @@ public class Processor implements SyncProcessor,
                         if(detailsHashCode==null || !detailsHashCode.equals(detailsHashCode1)){
                             menu.setDetailsHashCode(detailsHashCode1);
                             persistenceSession.save(menu);
-                        }
+                    }
                     }
                     // проверяем спомощью хеш-кода изменилось ли меню, в случае если изменилось то перезаписываем
                     HashMap<Long, MenuDetail> localIdsToMenuDetailMap = new HashMap<Long, MenuDetail>();
                     if(detailsHashCode==null || !detailsHashCode.equals(detailsHashCode1)){
-                        processReqAssortment(persistenceSession, organization, menuDate, item.getReqAssortments());
-                        processReqMenuDetails(persistenceSession, menu, item, item.getReqMenuDetails(),
-                                localIdsToMenuDetailMap);
-                        processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos(),
-                                localIdsToMenuDetailMap);
+                    processReqAssortment(persistenceSession, organization, menuDate, item.getReqAssortments());
+                processReqMenuDetails(persistenceSession, menu, item, item.getReqMenuDetails(),
+                            localIdsToMenuDetailMap);
+                    processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos(),
+                            localIdsToMenuDetailMap);
                     } else {
                         processLocalIdsToMenuDetailMap(menu, item, item.getReqMenuDetails(), localIdsToMenuDetailMap);
                         processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos(),
@@ -3069,24 +3122,28 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                 "firstName", client.getPerson().getFirstName(), "eventName", eventName, "eventTime", time};
     }
 
-    private String[] generatePaymentNotificationParams(Session session, Client client, SyncRequest.PaymentRegistry.Payment payment) {
+    private String[] generatePaymentNotificationParams(Session session, Client client, Payment payment) {
         long complexes = 0L;
         long others = 0L;
-        Iterator<SyncRequest.PaymentRegistry.Payment.Purchase> purchases = payment.getPurchases();
+        Iterator<Purchase> purchases = payment.getPurchases().iterator();
         while (purchases.hasNext()) {
-            SyncRequest.PaymentRegistry.Payment.Purchase purchase = purchases.next();
-            if (purchase.getType() >= OrderDetail.TYPE_COMPLEX_MIN && purchase.getType() <= OrderDetail.TYPE_COMPLEX_MAX) {
-                complexes += purchase.getSocDiscount() + purchase.getRPrice();
+            Purchase Purchase = purchases.next();
+            if (Purchase.getType() >= OrderDetail.TYPE_COMPLEX_MIN && Purchase.getType() <= OrderDetail.TYPE_COMPLEX_MAX) {
+                complexes += Purchase.getSocDiscount() + Purchase.getrPrice();
             } else {
-                others += purchase.getSocDiscount() + purchase.getRPrice();
+                others += Purchase.getSocDiscount() + Purchase.getrPrice();
             }
         }
 
         //String date = new SimpleDateFormat("dd.MM.yy HH:mm").format(new Date(System.currentTimeMillis()));
         String date = new SimpleDateFormat("dd.MM.yy HH:mm").format(payment.getTime());
+        String contractId = String.valueOf(client.getContractId());
+        if(payment.getOrderType().equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)){
+           contractId=contractId+"01";
+        }
         return new String[] {
                 "date", date,
-                "contractId", String.valueOf(client.getContractId()),
+                "contractId", contractId,
                 "others", CurrencyStringUtils.copecksToRubles(others),
                 "complexes", CurrencyStringUtils.copecksToRubles(complexes) };
     }

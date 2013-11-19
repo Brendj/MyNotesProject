@@ -6,10 +6,12 @@ package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.SMSSubscriptionFeeService;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Payment;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
 import org.hibernate.Criteria;
@@ -23,11 +25,15 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.util.Date;
 
 @Component
 @Scope("singleton")
 public class FinancialOpsManager {
+
+    static Boolean useOperatorScheme = null;
+
     @PersistenceContext(unitName = "processorPU")
     EntityManager em;
 
@@ -92,7 +98,7 @@ public class FinancialOpsManager {
         return subscriptionFee;
     }
 
-    public void createOrderCharge(Session session, SyncRequest.PaymentRegistry.Payment payment, Long idOfOrg,
+    public void createOrderCharge(Session session, Payment payment, Long idOfOrg,
             Client client, Card card, Long confirmerId) throws Exception {
         // By default we have no transaction
         AccountTransaction orderTransaction = null;
@@ -113,9 +119,18 @@ public class FinancialOpsManager {
             //persistenceSession.update(client);
 
             // зарегистрировать транзакцию и провести по балансу
-            orderTransaction = ClientAccountManager.processAccountTransaction(session, client, card,
-                    -payment.getSumByCard(), ""+idOfOrg+"/"+payment.getIdOfOrder(),
-                    AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, new Date());
+            if(payment.getOrderType()==null || !payment.getOrderType().equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)){
+                orderTransaction = ClientAccountManager.processAccountTransaction(session, client, card,
+                        -payment.getSumByCard(), ""+idOfOrg+"/"+payment.getIdOfOrder(),
+                        AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE, new Date());
+            } else {
+                // регистрируем оплату только с первого субсчета
+                orderTransaction = ClientAccountManager.processAccountTransaction(session, client, card, -payment.getSumByCard(),
+                        "" + idOfOrg + "/" + payment.getIdOfOrder(), AccountTransaction.SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE, new Date(), 1); // processSubBalance1AccountTransaction();
+                SubscriptionFee subscriptionFee = new SubscriptionFee(payment.getTime().getYear(), payment.getTime().getMonth(), orderTransaction,
+                        payment.getSumByCard(), payment.getTime(), SubscriptionFee.TYPE_FEEDING_SERVICE);
+                session.save(subscriptionFee);
+            }
         }
 
         POS pos = null;
@@ -187,7 +202,7 @@ public class FinancialOpsManager {
         session.save(transactionJournal);
     }
 
-    public void createClientPayment(Session session, Client client, Integer paymentMethod, Long paySum, Integer payType,
+   /* public void createClientPayment(Session session, Client client, Integer paymentMethod, Long paySum, Integer payType,
             Date createTime, String idOfPayment, Contragent contragent,
             String addPaymentMethod, String addIdOfPayment)
             throws Exception {
@@ -199,6 +214,29 @@ public class FinancialOpsManager {
         ClientPayment clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, payType, createTime,
                 idOfPayment, contragent, getContragentReceiverForPayments(session, client), addPaymentMethod, addIdOfPayment);
         registerClientPayment(session, clientPayment, client);
+    }*/
+
+    public void createClientPayment(Session session, Client client, Contragent contragent, Integer paymentMethod, Long paySum,
+            Date createTime, String idOfPayment, String addPaymentMethod, String addIdOfPayment, Integer subScribeNum)
+            throws Exception {
+        // регистрируем транзакцию и проводим по балансу
+        if(subScribeNum==null || subScribeNum.equals(0)){
+            AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
+                    null, paySum, idOfPayment,
+                    AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date());
+            // регистрируем платеж клиента
+            ClientPayment clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT, createTime,
+                    idOfPayment, contragent, getContragentReceiverForPayments(session, client), addPaymentMethod, addIdOfPayment);
+            registerClientPayment(session, clientPayment, client);
+        } else {
+            // TODO: логика по субсчетам
+            AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client, null, paySum, idOfPayment,
+                    AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE, new Date(), subScribeNum);
+            // регистрируем платеж клиента
+            ClientPayment clientPayment = new ClientPayment(accountTransaction, paymentMethod, paySum, ClientPayment.CLIENT_TO_SUB_ACCOUNT_PAYMENT, createTime,
+                    idOfPayment, contragent, getContragentReceiverForPayments(session, client), addPaymentMethod, addIdOfPayment);
+            registerSubBalance1ClientPayment(session, clientPayment, client);
+        }
     }
 
     private Contragent getContragentReceiverForPayments(Session session, Client client) {
@@ -243,7 +281,26 @@ public class FinancialOpsManager {
             });
     }
 
-    static Boolean useOperatorScheme = null;
+    private void registerSubBalance1ClientPayment(Session session,
+            ClientPayment clientPayment,
+            Client client) throws Exception {
+        Long paySum = clientPayment.getPaySum();
+        Contragent payAgent = clientPayment.getContragent();
+
+        getCurrentPositionsManager(session).changeClientPaymentPosition(payAgent, paySum, clientPayment.getContragentReceiver());
+        session.save(clientPayment);
+        final String contractId = String.valueOf(client.getContractId())+"01";
+        final Long balance = client.getSubBalance1()==null?0L:client.getSubBalance1();
+        eventNotificationService.sendNotificationAsync(client, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, new String[]{
+                "paySum",CurrencyStringUtils.copecksToRubles(paySum),
+                "balance", CurrencyStringUtils.copecksToRubles(balance),
+                "contractId", contractId,
+                "surname",client.getPerson().getSurname(),
+                "firstName",client.getPerson().getFirstName()
+        });
+    }
+
+
     private boolean isOperatorScheme(Session session) {
         if (useOperatorScheme!=null) return useOperatorScheme;
         return useOperatorScheme = DAOUtils.getOptionValueBool(session, Option.OPTION_WITH_OPERATOR, false);
@@ -336,6 +393,73 @@ public class FinancialOpsManager {
         session.flush();
         accountTransaction.updateSource(accountRefund.getIdOfAccountRefund() + "");
         session.update(accountTransaction);
+    }
+
+    @Transactional
+    public void createSubAccountTransfer(Client client, Integer fromBalance, Integer toBalance, Long sum) throws Exception{
+        Session session = (Session)em.getDelegate();
+        if (sum<=0) throw new AccountTransactionException("Сумма перевода должна быть больше нуля");
+        Long fromBalanceLong = client.getContractId() * 100 + fromBalance;
+        Long toBalanceLong = client.getContractId() * 100 + toBalance;
+        final Long fromSubBalance;
+        /* проверим существует ли данные субсчета */
+        try {
+            fromSubBalance = client.getSubBalance(fromBalance);
+        } catch (NullPointerException e){
+            throw new AccountTransactionException(e.getMessage());
+        }
+        try {
+            Long toSubBalance = client.getSubBalance(toBalance);
+        } catch (NullPointerException e){
+            throw new AccountTransactionException(e.getMessage());
+        }
+        checkBalance(fromBalanceLong, fromSubBalance, sum);
+        Date dt = new Date();
+        if(fromBalance==1){
+            final String qlString = "from CycleDiagram where stateDiagram=0 and client=:client";
+            TypedQuery<CycleDiagram> query = em.createQuery(qlString, CycleDiagram.class);
+            query.setParameter("client", client);
+            query.setMaxResults(1);
+            CycleDiagram cycleDiagram = query.getSingleResult();
+            Long limit = cycleDiagram.getWeekPrice();
+            checkBalance(fromBalanceLong, fromSubBalance - limit, sum);
+        }
+
+        // регистрируем транзакцию на исходящем счете клиента
+        AccountTransaction accountTransactionOnBenefactor = ClientAccountManager.processAccountTransaction(session, client,
+                null, -sum, "",
+                AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE, dt, fromBalance);
+        // регистрируем транзакцию на получателе счета клиента
+        AccountTransaction accountTransactionOnBeneficiary = ClientAccountManager.processAccountTransaction(session, client,
+                null, sum, "",
+                AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE, dt, toBalance);
+
+        SubAccountTransfer subAccountTransfer = new SubAccountTransfer(dt, client, fromBalanceLong, toBalanceLong, "",
+                accountTransactionOnBenefactor, accountTransactionOnBeneficiary, sum);
+
+        session.save(accountTransactionOnBenefactor);
+        session.save(accountTransactionOnBeneficiary);
+        session.save(subAccountTransfer);
+        session.flush();
+        accountTransactionOnBenefactor.updateSource(subAccountTransfer.getIdOfSubAccountTransfer() + "");
+        accountTransactionOnBeneficiary.updateSource(subAccountTransfer.getIdOfSubAccountTransfer() + "");
+        session.update(accountTransactionOnBenefactor);
+        session.update(accountTransactionOnBeneficiary);
+    }
+
+    private static void checkBalance(Long contractId, Long balance, Long sum) throws AccountTransactionException {
+        if (balance<sum) {
+            final String s = CurrencyStringUtils.copecksToRubles(balance);
+            final String message = String.format("Недостаточно средств на лицевом счете (%s)", contractId);
+            throw new AccountTransactionException(message);
+        }
+    }
+
+    public static class AccountTransactionException extends Exception{
+
+        public AccountTransactionException(String message) {
+            super(message);
+        }
     }
 
 }

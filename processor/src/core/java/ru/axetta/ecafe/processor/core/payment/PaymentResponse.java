@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.payment;
 
-import sun.management.counter.LongCounter;
-
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Person;
@@ -124,6 +122,7 @@ public class PaymentResponse {
             private final Long tspContragentId;
             private final Long idOfCard;
             private final Long balance;
+            private final Long subBalance1;
             private final int result;
             private final String error;
             private final ClientInfo client;
@@ -131,13 +130,14 @@ public class PaymentResponse {
             private final HashMap<String, String> addInfo;
 
             public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long contractId, Long tspContragentId, Long idOfCard, Long balance,
-                    int result, String error, HashMap<String, String> addInfo) {
+                    Long subBalance1, int result, String error, HashMap<String, String> addInfo) {
                 this.payment = payment;
                 this.idOfClient = idOfClient;
                 this.contractId = contractId;
                 this.tspContragentId = tspContragentId;
                 this.idOfCard = idOfCard;
                 this.balance = balance;
+                this.subBalance1 = subBalance1;
                 this.result = result;
                 this.error = error;
                 this.client = null;
@@ -146,7 +146,7 @@ public class PaymentResponse {
             }
 
             public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long contractId, Long tspContragentId, Long idOfCard, Long balance,
-                    int result, String error, Client client, HashMap<String, String> addInfo) {
+                    int result, String error, Client client, Long subBalance1, HashMap<String, String> addInfo) {
                 this.payment = payment;
                 this.idOfClient = idOfClient;
                 this.contractId = contractId;
@@ -155,13 +155,14 @@ public class PaymentResponse {
                 this.balance = balance;
                 this.result = result;
                 this.error = error;
+                this.subBalance1 = subBalance1;
                 this.client = new ClientInfo(client);
                 this.card = null;
                 this.addInfo = addInfo;
             }
 
             public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long contractId, Long tspContragentId, Long idOfCard, Long balance,
-                    int result, String error, Client client, Card card, HashMap<String, String> addInfo) {
+                    int result, String error, Client client, Card card, Long subBalance1, HashMap<String, String> addInfo) {
                 this.payment = payment;
                 this.idOfClient = idOfClient;
                 this.contractId = contractId;
@@ -170,6 +171,7 @@ public class PaymentResponse {
                 this.balance = balance;
                 this.result = result;
                 this.error = error;
+                this.subBalance1 = subBalance1;
                 this.client = new ClientInfo(client);
                 if (null == card) {
                     this.card = null;
@@ -223,6 +225,10 @@ public class PaymentResponse {
                 return addInfo;
             }
 
+            public Long getSubBalance1() {
+                return subBalance1;
+            }
+
             public Element toElement(Document document) throws Exception {
                 Element element = document.createElement("RPT");
                 element.setAttribute("IdOfPayment", this.payment.getIdOfPayment());
@@ -236,7 +242,7 @@ public class PaymentResponse {
             @Override
             public String toString() {
                 return "Item{" + "payment=" + payment + ", idOfClient=" + idOfClient + ", idOfCard=" + idOfCard
-                        + ", balance=" + balance + ", result=" + result + ", error='" + error + '\'' + ", client="
+                        + ", balance=" + balance +  ", subBalance1=" + subBalance1 + ", result=" + result + ", error='" + error + '\'' + ", client="
                         + client + ", card=" + card + '}';
             }
         }
@@ -247,8 +253,8 @@ public class PaymentResponse {
             this.items.add(item);
         }
 
-        public Enumeration<Item> getItems() {
-            return Collections.enumeration(items);
+        public Iterator<Item> getItems() {
+            return items.iterator();
         }
 
         public Element toElement(Document document) throws Exception {

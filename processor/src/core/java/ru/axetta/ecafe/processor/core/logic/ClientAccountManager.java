@@ -17,7 +17,7 @@ public class ClientAccountManager {
 
     public static AccountTransaction processAccountTransaction(Session session, Client client, Card card, long transactionSum,
             String source, int sourceType, Date transactionTime) throws Exception {
-        AccountTransaction accountTransaction = new AccountTransaction(client, card, transactionSum, source,
+        AccountTransaction accountTransaction = new AccountTransaction(client, card, client.getContractId(), transactionSum, source,
                 sourceType, transactionTime);
         accountTransaction.setOrg(client.getOrg());
         session.save(accountTransaction);
@@ -26,14 +26,37 @@ public class ClientAccountManager {
         return accountTransaction;
     }
 
+    public static AccountTransaction processAccountTransaction(Session session, Client client, Card card, long transactionSum,
+            String source, int sourceType, Date transactionTime, Integer subBalance) throws Exception {
+        final Long subBalanceNum = client.getContractId() * 100 + subBalance;
+        AccountTransaction accountTransaction = new AccountTransaction(client, card, subBalanceNum, transactionSum, source,
+                sourceType, transactionTime);
+        accountTransaction.setOrg(client.getOrg());
+        if(subBalance>0){
+            Long sum = client.getSubBalance(subBalance);
+            if(sum ==null) sum=0L;
+            accountTransaction.setSubBalance1BeforeTransaction(sum);
+            accountTransaction.setTransactionSubBalance1Sum(transactionSum);
+        }
+        session.save(accountTransaction);
+        DAOUtils.changeClientBalance(session, client.getIdOfClient(), transactionSum);
+        client.addBalanceNotForSave(transactionSum);
+        if(subBalance>0){
+            DAOUtils.changeClientSubBalance(session, client.getIdOfClient(), transactionSum, subBalance, client.getSubBalanceIsNull(subBalance));
+            client.addSubBalanceNotForSave(transactionSum, subBalance);
+        }
+        return accountTransaction;
+    }
+
     public static AccountTransaction cancelAccountTransaction(Session session, AccountTransaction transaction,
             Date transactionTime) throws Exception {
-        AccountTransaction cancelTransaction = new AccountTransaction(transaction.getClient(), null,
+        final Client client = transaction.getClient();
+        AccountTransaction cancelTransaction = new AccountTransaction(client, null, client.getContractId(),
                 -transaction.getTransactionSum(), ""+transaction.getIdOfTransaction(),
                 AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE, transactionTime);
         cancelTransaction.setOrg(transaction.getOrg());
         session.save(cancelTransaction);
-        DAOUtils.changeClientBalance(session, transaction.getClient().getIdOfClient(), -transaction.getTransactionSum());
+        DAOUtils.changeClientBalance(session, client.getIdOfClient(), -transaction.getTransactionSum());
         return cancelTransaction;
     }
 }

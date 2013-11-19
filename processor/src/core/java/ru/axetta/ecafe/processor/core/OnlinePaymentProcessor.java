@@ -53,7 +53,7 @@ public class OnlinePaymentProcessor {
             PaymentResponse.ResPaymentRegistry.Item.ClientInfo client=processResult.getClient();
             return new PayResponse(request.protoVersion, request.isCheckOnly(), processResult.getResult(),
                     processResult.getError(), processResult.getTspContragentId(), clientId, request.getPaymentId(), processResult.getBalance(),
-                    (client==null || client.getPerson()==null)?null:client.getPerson().getFirstName(),
+                    processResult.getSubBalance1(), (client==null || client.getPerson()==null)?null:client.getPerson().getFirstName(),
                     (client==null || client.getPerson()==null)?null:client.getPerson().getSurname(),
                     (client==null || client.getPerson()==null)?null:client.getPerson().getSecondName(),
                     getCardPrintedNo(processResult.getCard()), processResult.getAddInfo());
@@ -61,7 +61,7 @@ public class OnlinePaymentProcessor {
             logger.error(String.format("Failed to process request: %s", request), e);
             return new PayResponse(request.protoVersion, request.isCheckOnly(), Processor.PaymentProcessResult.UNKNOWN_ERROR.getCode(),
                     Processor.PaymentProcessResult.UNKNOWN_ERROR.getDescription(), request.getTspContragentId(), clientId, request.getPaymentId(), null,
-                    null, null, null, null, null);
+                    null, null, null, null, null, null);
         }
     }
 
@@ -72,7 +72,7 @@ public class OnlinePaymentProcessor {
 
     public static PayResponse generateErrorResponse(Processor.PaymentProcessResult result) {
         return new OnlinePaymentProcessor.PayResponse(0, true, result.getCode(),
-            result.getDescription(), null, null, null, null, null, null, null, null, null);
+            result.getDescription(), null, null, null, null, null, null, null, null, null, null);
     }
 
     public static class PayRequest {
@@ -167,6 +167,7 @@ public class OnlinePaymentProcessor {
         private final Long clientId;
         private final String paymentId, clientFirstName, clientSurname, clientSecondName;
         private final Long balance;
+        private final Long subBalance1;
         private final Long cardPrintedNo;
         private final int resultCode;
         private final String resultDescription;
@@ -174,7 +175,7 @@ public class OnlinePaymentProcessor {
         private final HashMap<String, String> addInfo;
 
         public PayResponse(int protoVersion, boolean bCheckOnly, int resultCode, String resultDescription, Long tspContragentId, Long clientId, String paymentId,
-                Long balance, String clientFirstName, String clientSurname, String clientSecondName, Long cardPrintedNo, HashMap<String, String> addInfo) {
+                Long balance, Long subBalance1, String clientFirstName, String clientSurname, String clientSecondName, Long cardPrintedNo, HashMap<String, String> addInfo) {
             this.protoVersion = protoVersion;
             this.bCheckOnly = bCheckOnly;
             this.resultCode=resultCode;
@@ -183,6 +184,7 @@ public class OnlinePaymentProcessor {
             this.clientId = clientId;
             this.paymentId = paymentId;
             this.balance = balance;
+            this.subBalance1 = subBalance1;
             this.clientSecondName = clientSecondName;
             this.clientFirstName = clientFirstName;
             this.clientSurname = clientSurname;
@@ -246,17 +248,22 @@ public class OnlinePaymentProcessor {
             return addInfo;
         }
 
+        public Long getSubBalance1() {
+            return subBalance1;
+        }
+
         @Override
         public String toString() {
             return "PayResponse{" +
                     "protoVersion=" + protoVersion +
                     ", bCheckOnly=" + bCheckOnly +
-                    ", clientId=" + clientId +
+                    //", clientId=" + clientId +
                     ", paymentId='" + paymentId + '\'' +
                     ", clientFirstName='" + clientFirstName + '\'' +
                     ", clientSurname='" + clientSurname + '\'' +
                     ", clientSecondName='" + clientSecondName + '\'' +
                     ", balance=" + balance +
+                    ", subBalance1=" + subBalance1 +
                     ", cardPrintedNo=" + cardPrintedNo +
                     ", resultCode=" + resultCode +
                     ", resultDescription='" + resultDescription + '\'' +

@@ -319,10 +319,10 @@ public class PaymentProcessEvent extends BasicEvent {
                     PaymentResponse paymentResponse = rawEvent.getPaymentResponse();
                     List<PaymentItem> paymentItems = new LinkedList<PaymentItem>();
 
-                    Enumeration<PaymentResponse.ResPaymentRegistry.Item> paymentResponses = paymentResponse
+                    Iterator<PaymentResponse.ResPaymentRegistry.Item> paymentResponses = paymentResponse
                             .getResAccRegistry().getItems();
-                    while (paymentResponses.hasMoreElements()) {
-                        PaymentResponse.ResPaymentRegistry.Item responseItem = paymentResponses.nextElement();
+                    while (paymentResponses.hasNext()) {
+                        PaymentResponse.ResPaymentRegistry.Item responseItem = paymentResponses.next();
                         Long idOfClient = responseItem.getIdOfClient();
                         Client client = null;
                         if (null != idOfClient) {
