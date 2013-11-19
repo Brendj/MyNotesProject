@@ -30,10 +30,16 @@ public class EventNotificationService {
 
     Logger logger = LoggerFactory.getLogger(EventNotificationService.class);
 
-    public static String NOTIFICATION_ENTER_EVENT = "enterEvent", NOTIFICATION_BALANCE_TOPUP = "balanceTopup", MESSAGE_LINKING_TOKEN_GENERATED = "linkingToken", MESSAGE_RESTORE_PASSWORD = "restorePassword", MESSAGE_PAYMENT = "payment";
+    public static String NOTIFICATION_ENTER_EVENT = "enterEvent";
+    public static String NOTIFICATION_BALANCE_TOPUP = "balanceTopup";
+    public static String MESSAGE_LINKING_TOKEN_GENERATED = "linkingToken";
+    public static String MESSAGE_RESTORE_PASSWORD = "restorePassword";
+    public static String MESSAGE_PAYMENT = "payment";
     public static String NOTIFICATION_SMS_SUBSCRIPTION_FEE = "smsSubscriptionFee";
     public static String NOTIFICATION_SMS_SUB_FEE_WITHDRAW_SUCCESS = "smsSubFeeWithdrawSuccessful";
     public static String NOTIFICATION_SMS_SUB_FEE_WITHDRAW_NOT_SUCCESS = "smsSubFeeWithdrawNotSuccessful";
+    public static String NOTIFICATION_SUBSCRIPTION_FEEDING = "subscriptionFeeding";
+    public static String NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS = "subFeeWithdrawNotSuccessful";
     public static String TYPE_SMS = "sms", TYPE_EMAIL_TEXT = "email.text", TYPE_EMAIL_SUBJECT = "email.subject";
     Properties notificationText;
     Boolean notifyBySMSAboutEnterEvent;
@@ -44,22 +50,27 @@ public class EventNotificationService {
     static final String[] DEFAULT_MESSAGES = {
             NOTIFICATION_ENTER_EVENT + "." + TYPE_SMS,
             "[eventName] [eventTime] ([contractId] [surname] [firstName]). Баланс: [balance] р.",
+            NOTIFICATION_ENTER_EVENT + "." + TYPE_EMAIL_SUBJECT,
+            "Уведомление о времени прихода и ухода",
             NOTIFICATION_ENTER_EVENT + "." + TYPE_EMAIL_TEXT,
-            "<html>\n" + "<body>\n" + "Уважаемый клиент, <br/><br/>\n" + "\n"
-                    + "[eventName] [eventTime] ([surname] [firstName]). <br/>\n"
-                    + "Текущий баланс лицевого счета [balance] рублей. <br/>\n" + "<br/>\n" + "С уважением,<br/>\n"
-                    + "Служба поддержки клиентов\n" + "<br/><br/>\n"
-                    + "<p style=\"color:#cccccc;font-size:xx-small;font-weight:bold\">Вы можете отключить данные уведомления в своем личном кабинете</p>\n"
-                    + "</body>\n" + "</html>", NOTIFICATION_ENTER_EVENT + "." + TYPE_EMAIL_SUBJECT,
-            "Уведомление о времени прихода и ухода", NOTIFICATION_BALANCE_TOPUP + "." + TYPE_SMS,
+            "<html>\n" + "<body>\n" + "Уважаемый клиент, <br/><br/>\n\n"
+            + "[eventName] [eventTime] ([surname] [firstName]). <br/>\n"
+            + "Текущий баланс лицевого счета [balance] рублей. <br/>\n" + "<br/>\n" + "С уважением,<br/>\n"
+            + "Служба поддержки клиентов\n" + "<br/><br/>\n"
+            + "<p style=\"color:#cccccc;font-size:xx-small;font-weight:bold\">Вы можете отключить данные уведомления в своем личном кабинете</p>\n"
+            + "</body>\n" + "</html>",
+            NOTIFICATION_BALANCE_TOPUP + "." + TYPE_SMS,
             "Зачислено [paySum]; баланс [balance] ([contractId] [surname] [firstName])",
-            NOTIFICATION_BALANCE_TOPUP + "." + TYPE_EMAIL_TEXT, "<html>\n<body>\nУважаемый клиент, <br/><br/>\n" + "\n"
+            NOTIFICATION_BALANCE_TOPUP + "." + TYPE_EMAIL_TEXT,
+            "<html>\n<body>\nУважаемый клиент, <br/><br/>\n" + "\n"
             + "на Ваш лицевой счет ([contractId] [surname] [firstName]) были зачислены средства в размере [paySum] руб.<br/>\n"
             + "Текущий баланс лицевого счета [balance] руб.\n" + "<br/><br/>\n" + "С уважением,<br/>\n"
             + "Служба поддержки клиентов\n" + "<br/><br/>\n"
             + "<p style=\"color:#cccccc;font-size:xx-small;font-weight:bold\">Вы можете отключить данные уведомления в своем личном кабинете</p>\n"
-            + "</body>\n" + "</html>", NOTIFICATION_BALANCE_TOPUP + "." + TYPE_EMAIL_SUBJECT,
-            "Уведомление о пополнении баланса", MESSAGE_RESTORE_PASSWORD + "." + TYPE_EMAIL_TEXT,
+            + "</body>\n" + "</html>",
+            NOTIFICATION_BALANCE_TOPUP + "." + TYPE_EMAIL_SUBJECT,
+            "Уведомление о пополнении баланса",
+            MESSAGE_RESTORE_PASSWORD + "." + TYPE_EMAIL_TEXT,
             "Если Вы не запрашивали восстановление пароля, пожалуйста, удалите данное письмо. Для восстановления пароля перейдите по ссылке [url]",
             MESSAGE_RESTORE_PASSWORD + "." + TYPE_EMAIL_SUBJECT, "Восстановление пароля",
             /////
@@ -85,7 +96,24 @@ public class EventNotificationService {
             NOTIFICATION_SMS_SUB_FEE_WITHDRAW_SUCCESS + "." + TYPE_SMS,
             "Списание [date] Л/с: [contractId] Сервис SMS: [smsSubscriptionFee] р.",
             NOTIFICATION_SMS_SUB_FEE_WITHDRAW_NOT_SUCCESS + "." + TYPE_SMS,
-            "Л/с: [contractId] Сервис SMS отключен. Причина: недостаточный баланс."
+            "Л/с: [contractId] Сервис SMS отключен. Причина: недостаточный баланс.",
+
+
+            NOTIFICATION_SUBSCRIPTION_FEEDING + "." + TYPE_SMS,
+            "Л/с: [contractId] Сервис АП: не забудьте пополнить баланс до [withdrawDate]",
+            NOTIFICATION_SUBSCRIPTION_FEEDING + "." + TYPE_EMAIL_SUBJECT,
+            "Уведомление о состоянии субсчета абоненского питания",
+            NOTIFICATION_SUBSCRIPTION_FEEDING + "." + TYPE_EMAIL_TEXT,
+            "<html>\n<body>\nУважаемый клиент, <br/><br/>\n\n"
+                    + "не забудьте пополнить баланс до [withdrawDate]. <br/>\n"
+                    + "Текущий баланс лицевого счета ([contractId]) [balance] рублей. "
+                    + "<br/>\n<br/>\nС уважением,<br/>\nСлужба поддержки клиентов\n<br/><br/>\n"
+                    + "<p style=\"color:#cccccc;font-size:xx-small;font-weight:bold\">Вы можете отключить данные уведомления в своем личном кабинете</p>\n"
+                    + "</body>\n</html>",
+
+
+            NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS + "." + TYPE_SMS,
+            "Л/с: [contractId] Сервис АП отключен. Причина: недостаточный баланс."
     };
 
     String getDefaultText(String name) {
@@ -256,6 +284,8 @@ public class EventNotificationService {
             } else if (type.equals(NOTIFICATION_SMS_SUB_FEE_WITHDRAW_SUCCESS) || type
                     .equals(NOTIFICATION_SMS_SUB_FEE_WITHDRAW_NOT_SUCCESS)) {
                 clientSMSType = ClientSms.TYPE_SMS_SUB_FEE_WITHDRAW;
+            } else if(type.equals(NOTIFICATION_SUBSCRIPTION_FEEDING)){
+                clientSMSType = ClientSms.TYPE_SUBSCRIPTION_FEEDING;
             } else {
                 throw new Exception("No client SMS type defined for notification " + type);
             }
