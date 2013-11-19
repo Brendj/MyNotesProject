@@ -209,6 +209,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Integer contractState;
     private Integer payForSMS;
     private Long balance;
+    private Long subBalance0;
+    private Long subBalance1;
     private Long limit;
     private Long expenditureLimit;
     private String clientGroupName;
@@ -274,6 +276,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public Long getBalance() {
         return balance;
+    }
+
+    public Long getSubBalance0() {
+        return subBalance0;
+    }
+
+    public Long getSubBalance1() {
+        return subBalance1;
     }
 
     public Long getLimit() {
@@ -542,8 +552,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             this.org = new OrgItem(org);
             if (!oldOrgId.equals(idOfOrg) && !idOfCategoryList.isEmpty()) {
                 newOrgHasCatDiscount = checkOrgDiscounts(session, idOfOrg);
-            }
         }
+    }
     }
 
     public Object changeClientCategory() {
@@ -748,6 +758,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.contractState = client.getContractState();
         this.payForSMS = client.getPayForSMS();
         this.balance = client.getBalance();
+        this.subBalance1 = client.getSubBalance1()==null?0L:client.getSubBalance1();
+        this.subBalance0 = this.balance - this.subBalance1;
         this.limit = client.getLimit();
         this.expenditureLimit = client.getExpenditureLimit();
         this.freePayMaxCount = client.getFreePayMaxCount();

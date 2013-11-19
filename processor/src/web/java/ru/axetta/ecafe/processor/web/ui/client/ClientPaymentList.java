@@ -126,7 +126,11 @@ public class ClientPaymentList {
 
     public void fill(Session session, Client client, Date startTime, Date endTime) throws Exception {
         Criteria criteria = session.createCriteria(ClientPayment.class);
-        criteria.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT));
+        Criterion sendToAndOrgRestriction = Restrictions.disjunction()
+                .add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT))
+                .add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_SUB_ACCOUNT_PAYMENT));
+        //criteria.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT));
+        criteria.add(sendToAndOrgRestriction);
         criteria.add(Restrictions.ge("createTime", startTime));
         criteria.add(Restrictions.le("createTime", endTime));
         criteria = criteria.createCriteria("transaction").addOrder(org.hibernate.criterion.Order.desc("transactionTime"));

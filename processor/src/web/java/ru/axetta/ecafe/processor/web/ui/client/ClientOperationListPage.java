@@ -142,6 +142,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         for (Object o : criteria.list()) {
             AccountTransaction accTrans = (AccountTransaction)o;
             if (accTrans.getCard()!=null) accTrans.getCard().getCardNo(); // lazy load    TODO: для этого необходимо изменить запрос используя join и projections
+            if (accTrans.getClient()!=null) accTrans.getClient().getContractId(); // lazy load    TODO: для этого необходимо изменить запрос используя join и projections
             accountTransactionList.add(accTrans);
         }
 

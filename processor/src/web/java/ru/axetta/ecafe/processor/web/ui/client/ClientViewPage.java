@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -99,6 +100,11 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Date lastFreePayTime;
     private Integer discountMode;
     private Long balance;
+    private Long subBalance0;
+    private Long subBalance1;
+
+    private Boolean wasSuspended;
+
     private Long limit;
     private Long expenditureLimit;
     private String clientGroupName;
@@ -148,6 +154,14 @@ public class ClientViewPage extends BasicWorkspacePage {
 
     public Long getBalance() {
         return balance;
+    }
+
+    public Long getSubBalance0() {
+        return subBalance0;
+    }
+
+    public Long getSubBalance1() {
+        return subBalance1;
     }
 
     public Long getLimit() {
@@ -258,6 +272,14 @@ public class ClientViewPage extends BasicWorkspacePage {
         return clientNotificationSettingViewPage;
     }
 
+		public Boolean getWasSuspended() {
+        return wasSuspended;
+    }
+
+    public void setWasSuspended(Boolean wasSuspended) {
+        this.wasSuspended = wasSuspended;
+    }
+
     public List<BankSubscription> getBankSubscriptions() {
         return bankSubscriptions;
     }
@@ -296,6 +318,8 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.clientCardListViewPage.fill(client);
         this.clientNotificationSettingViewPage.fill(client);
         this.balance = client.getBalance();
+        this.subBalance1 = client.getSubBalance1()==null?0L:client.getSubBalance1();
+        this.subBalance0 = this.balance - this.subBalance1;
         this.limit = client.getLimit();
         this.expenditureLimit = client.getExpenditureLimit();
         this.clientGUID = client.getClientGUID();
@@ -352,6 +376,15 @@ public class ClientViewPage extends BasicWorkspacePage {
         for (CategoryDiscount categoryDiscount : categoryDiscountList) {
             categoryDiscountNames.add(categoryDiscount.getCategoryName());
         }   */
+
+        //Criteria criteria = session.createCriteria(SubscriptionFeeding.class);
+        //criteria.add(Restrictions.eq("idOfClient", idOfClient));
+        //criteria.setProjection(Projections.projectionList()
+        //        .add(Projections.))
+        //SubscriptionFeeding subscriptionFeeding =
+
+        this.wasSuspended = DAOUtils.wasSuspendedLastSubscriptionFeedingByClient(session, idOfClient);
+
     }
 
 }
