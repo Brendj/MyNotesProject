@@ -228,8 +228,8 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                 String level3 = (String) e[3];
                 String level4 = (String) e[4];
                 int count = ((BigInteger) e[5]).intValue();
-                long price = ((BigInteger) e[6]).longValue() / 1000;
-                long summary = ((BigInteger) e[7]).longValue() / 1000;
+                long price = ((BigInteger) e[6]).longValue();
+                long summary = ((BigInteger) e[7]).longValue();
                 String address = (String) e[8];
                 String orgNum = (e[9] == null ? "" : (String) e[9]);
                 long idoforg = ((BigInteger) e[10]).longValue();
@@ -240,8 +240,8 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                 item.setLevel3(level3);
                 item.setLevel4(level4);
                 item.setCount(count);
-                item.setPrice(price);
-                item.setSummary(summary);
+                item.setPrice(price / 1000);
+                item.setSummary(summary / 1000);
                 item.setOrgnum(orgNum);
                 item.setAddress(address);
                 item.setIdoforg(idoforg);

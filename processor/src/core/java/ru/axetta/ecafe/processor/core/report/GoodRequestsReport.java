@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.DocumentState;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
