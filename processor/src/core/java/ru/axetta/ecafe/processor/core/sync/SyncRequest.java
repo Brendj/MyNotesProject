@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.core.sync.request.AccRegistryUpdateRequestBuild
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.text.StrTokenizer;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -859,9 +860,9 @@ public class SyncRequest {
 
                 public static class ReqComplexInfoDetail {
 
-                    ReqMenuDetail reqMenuDetail;
-                    Long idOfItem;
-                    Integer count;
+                    private ReqMenuDetail reqMenuDetail;
+                    private Long idOfItem;
+                    private Integer count;
 
                     ReqComplexInfoDetail(ReqMenuDetail reqMenuDetail, Long idOfItem, Integer count) {
                         this.reqMenuDetail = reqMenuDetail;
@@ -880,7 +881,6 @@ public class SyncRequest {
                     public Integer getCount() {
                         return count;
                     }
-
 
                     public static class Builder {
 
@@ -913,6 +913,38 @@ public class SyncRequest {
                             }
                             return new ReqComplexInfoDetail(reqMenuDetail, idOfItem, menuItemCount);
                         }
+                    }
+
+                    @Override
+                    public boolean equals(Object o) {
+                        if (this == o) {
+                            return true;
+                        }
+                        if (o == null || getClass() != o.getClass()) {
+                            return false;
+                        }
+
+                        ReqComplexInfoDetail that = (ReqComplexInfoDetail) o;
+
+                        if (count != null ? !count.equals(that.count) : that.count != null) {
+                            return false;
+                        }
+                        if (idOfItem != null ? !idOfItem.equals(that.idOfItem) : that.idOfItem != null) {
+                            return false;
+                        }
+
+                        return true;
+                    }
+
+                    @Override
+                    public int hashCode() {
+                        //int result = idOfItem != null ? idOfItem.hashCode() : 0;
+                        //result = 31 * result + (count != null ? count.hashCode() : 0);
+                        //return result;
+                        HashCodeBuilder builder = new HashCodeBuilder();
+                        builder.append(count);
+                        builder.append(idOfItem);
+                        return builder.toHashCode();
                     }
                 }
 
@@ -992,6 +1024,45 @@ public class SyncRequest {
                                 '}';
                     }
 
+                    @Override
+                    public boolean equals(Object o) {
+                        if (this == o) {
+                            return true;
+                        }
+                        if (o == null || getClass() != o.getClass()) {
+                            return false;
+                        }
+
+                        ReqComplexInfoDiscountDetail that = (ReqComplexInfoDiscountDetail) o;
+
+                        if (isAllGroups != that.isAllGroups) {
+                            return false;
+                        }
+                        if (Double.compare(that.size, size) != 0) {
+                            return false;
+                        }
+                        if (idOfClientGroup != null ? !idOfClientGroup.equals(that.idOfClientGroup)
+                                : that.idOfClientGroup != null) {
+                            return false;
+                        }
+                        if (maxCount != null ? !maxCount.equals(that.maxCount) : that.maxCount != null) {
+                            return false;
+                        }
+
+                        return true;
+                    }
+
+                    @Override
+                    public int hashCode() {
+                        int result;
+                        long temp;
+                        temp = Double.doubleToLongBits(size);
+                        result = (int) (temp ^ (temp >>> 32));
+                        result = 31 * result + isAllGroups;
+                        result = 31 * result + (maxCount != null ? maxCount.hashCode() : 0);
+                        result = 31 * result + (idOfClientGroup != null ? idOfClientGroup.hashCode() : 0);
+                        return result;
+                    }
                 }
 
                 public static class Builder {
@@ -1014,7 +1085,6 @@ public class SyncRequest {
                         // получение id товара по guid
                         Node goodsGuidNode = namedNodeMap.getNamedItem("GoodsGuid");
                         String goodsGuid = null;
-                        Integer idOfGood = null;
                         if (goodsGuidNode != null) {
                             goodsGuid = StringUtils.substring(goodsGuidNode.getTextContent(), 0, 36);
                         }
@@ -1126,6 +1196,69 @@ public class SyncRequest {
                     return goodsGuid;
                 }
 
+                @Override
+                public boolean equals(Object o) {
+                    if (this == o) {
+                        return true;
+                    }
+                    if (o == null || getClass() != o.getClass()) {
+                        return false;
+                    }
+
+                    ReqComplexInfo that = (ReqComplexInfo) o;
+
+                    if (complexId != that.complexId) {
+                        return false;
+                    }
+                    if (modeFree != that.modeFree) {
+                        return false;
+                    }
+                    if (modeGrant != that.modeGrant) {
+                        return false;
+                    }
+                    if (modeOfAdd != that.modeOfAdd) {
+                        return false;
+                    }
+                    if (complexInfoDetails != null ? !complexInfoDetails.equals(that.complexInfoDetails)
+                            : that.complexInfoDetails != null) {
+                        return false;
+                    }
+                    if (complexInfoDiscountDetail != null ? !complexInfoDiscountDetail
+                            .equals(that.complexInfoDiscountDetail) : that.complexInfoDiscountDetail != null) {
+                        return false;
+                    }
+                    if (complexMenuName != null ? !complexMenuName.equals(that.complexMenuName)
+                            : that.complexMenuName != null) {
+                        return false;
+                    }
+                    if (currentPrice != null ? !currentPrice.equals(that.currentPrice) : that.currentPrice != null) {
+                        return false;
+                    }
+                    if (goodsGuid != null ? !goodsGuid.equals(that.goodsGuid) : that.goodsGuid != null) {
+                        return false;
+                    }
+                    if (useTrDiscount != null ? !useTrDiscount.equals(that.useTrDiscount)
+                            : that.useTrDiscount != null) {
+                        return false;
+                    }
+
+                    return true;
+                }
+
+                @Override
+                public int hashCode() {
+                    HashCodeBuilder builder = new HashCodeBuilder();
+                    builder.append(complexMenuName);
+                    builder.append(modeFree);
+                    builder.append(modeGrant);
+                    builder.append(modeOfAdd);
+                    builder.append(useTrDiscount);
+                    builder.append(complexInfoDetails);
+                    builder.append(complexInfoDiscountDetail);
+                    builder.append(currentPrice);
+                    builder.append(goodsGuid);
+                    return builder.toHashCode();
+                }
             }
 
             public static class ReqMenuDetail {
@@ -1392,6 +1525,114 @@ public class SyncRequest {
                             + minFe + ", menuOrigin=" + menuOrigin + ", availableNow=" + availableNow
                             + ", flags=" + flags + ", priority=" + priority + '}';
                 }
+
+                @Override
+                public boolean equals(Object o) {
+                    if (this == o) {
+                        return true;
+                    }
+                    if (o == null || getClass() != o.getClass()) {
+                        return false;
+                    }
+
+                    ReqMenuDetail that = (ReqMenuDetail) o;
+
+                    if (availableNow != that.availableNow) {
+                        return false;
+                    }
+                    if (menuOrigin != that.menuOrigin) {
+                        return false;
+                    }
+                    if (calories != null ? !calories.equals(that.calories) : that.calories != null) {
+                        return false;
+                    }
+                    if (carbohydrates != null ? !carbohydrates.equals(that.carbohydrates)
+                            : that.carbohydrates != null) {
+                        return false;
+                    }
+                    if (fat != null ? !fat.equals(that.fat) : that.fat != null) {
+                        return false;
+                    }
+                    if (flags != null ? !flags.equals(that.flags) : that.flags != null) {
+                        return false;
+                    }
+                    if (group != null ? !group.equals(that.group) : that.group != null) {
+                        return false;
+                    }
+                    if (idOfMenu != null ? !idOfMenu.equals(that.idOfMenu) : that.idOfMenu != null) {
+                        return false;
+                    }
+                    if (minCa != null ? !minCa.equals(that.minCa) : that.minCa != null) {
+                        return false;
+                    }
+                    if (minFe != null ? !minFe.equals(that.minFe) : that.minFe != null) {
+                        return false;
+                    }
+                    if (minMg != null ? !minMg.equals(that.minMg) : that.minMg != null) {
+                        return false;
+                    }
+                    if (minP != null ? !minP.equals(that.minP) : that.minP != null) {
+                        return false;
+                    }
+                    if (name != null ? !name.equals(that.name) : that.name != null) {
+                        return false;
+                    }
+                    if (output != null ? !output.equals(that.output) : that.output != null) {
+                        return false;
+                    }
+                    if (path != null ? !path.equals(that.path) : that.path != null) {
+                        return false;
+                    }
+                    if (price != null ? !price.equals(that.price) : that.price != null) {
+                        return false;
+                    }
+                    if (priority != null ? !priority.equals(that.priority) : that.priority != null) {
+                        return false;
+                    }
+                    if (protein != null ? !protein.equals(that.protein) : that.protein != null) {
+                        return false;
+                    }
+                    if (vitA != null ? !vitA.equals(that.vitA) : that.vitA != null) {
+                        return false;
+                    }
+                    if (vitB1 != null ? !vitB1.equals(that.vitB1) : that.vitB1 != null) {
+                        return false;
+                    }
+                    if (vitC != null ? !vitC.equals(that.vitC) : that.vitC != null) {
+                        return false;
+                    }
+                    if (vitE != null ? !vitE.equals(that.vitE) : that.vitE != null) {
+                        return false;
+                    }
+
+                    return true;
+                }
+
+                @Override
+                public int hashCode() {
+                    HashCodeBuilder builder = new HashCodeBuilder();
+                    builder.append(path);
+                    builder.append(name);
+                    builder.append(group);
+                    builder.append(output);
+                    builder.append(price);
+                    builder.append(protein);
+                    builder.append(fat);
+                    builder.append(carbohydrates);
+                    builder.append(calories);
+                    builder.append(vitB1);
+                    builder.append(vitC);
+                    builder.append(vitA);
+                    builder.append(vitE);
+                    builder.append(minP);
+                    builder.append(minMg);
+                    builder.append(minFe);
+                    builder.append(menuOrigin);
+                    builder.append(availableNow);
+                    builder.append(flags);
+                    builder.append(priority);
+                    return builder.toHashCode();
+                }
             }
 
             public static class ReqAssortment {
@@ -1582,6 +1823,99 @@ public class SyncRequest {
                             + ", vitC=" + vitC + ", vitA=" + vitA + ", vitE=" + vitE + ", minCa=" + minCa + ", minP="
                             + minP + ", minMg=" + minMg + ", minFe=" + minFe + '}';
                 }
+
+                @Override
+                public boolean equals(Object o) {
+                    if (this == o) {
+                        return true;
+                    }
+                    if (o == null || getClass() != o.getClass()) {
+                        return false;
+                    }
+
+                    ReqAssortment that = (ReqAssortment) o;
+
+                    if (menuOrigin != that.menuOrigin) {
+                        return false;
+                    }
+                    if (price != that.price) {
+                        return false;
+                    }
+                    if (calories != null ? !calories.equals(that.calories) : that.calories != null) {
+                        return false;
+                    }
+                    if (carbohydrates != null ? !carbohydrates.equals(that.carbohydrates)
+                            : that.carbohydrates != null) {
+                        return false;
+                    }
+                    if (fat != null ? !fat.equals(that.fat) : that.fat != null) {
+                        return false;
+                    }
+                    if (fullName != null ? !fullName.equals(that.fullName) : that.fullName != null) {
+                        return false;
+                    }
+                    if (group != null ? !group.equals(that.group) : that.group != null) {
+                        return false;
+                    }
+                    if (menuOutput != null ? !menuOutput.equals(that.menuOutput) : that.menuOutput != null) {
+                        return false;
+                    }
+                    if (minCa != null ? !minCa.equals(that.minCa) : that.minCa != null) {
+                        return false;
+                    }
+                    if (minFe != null ? !minFe.equals(that.minFe) : that.minFe != null) {
+                        return false;
+                    }
+                    if (minMg != null ? !minMg.equals(that.minMg) : that.minMg != null) {
+                        return false;
+                    }
+                    if (minP != null ? !minP.equals(that.minP) : that.minP != null) {
+                        return false;
+                    }
+                    if (name != null ? !name.equals(that.name) : that.name != null) {
+                        return false;
+                    }
+                    if (protein != null ? !protein.equals(that.protein) : that.protein != null) {
+                        return false;
+                    }
+                    if (vitA != null ? !vitA.equals(that.vitA) : that.vitA != null) {
+                        return false;
+                    }
+                    if (vitB1 != null ? !vitB1.equals(that.vitB1) : that.vitB1 != null) {
+                        return false;
+                    }
+                    if (vitC != null ? !vitC.equals(that.vitC) : that.vitC != null) {
+                        return false;
+                    }
+                    if (vitE != null ? !vitE.equals(that.vitE) : that.vitE != null) {
+                        return false;
+                    }
+
+                    return true;
+                }
+
+                @Override
+                public int hashCode() {
+                    HashCodeBuilder builder = new HashCodeBuilder();
+                    builder.append(name);
+                    builder.append(fullName);
+                    builder.append(group);
+                    builder.append(menuOutput);
+                    builder.append(price);
+                    builder.append(protein);
+                    builder.append(fat);
+                    builder.append(carbohydrates);
+                    builder.append(calories);
+                    builder.append(vitB1);
+                    builder.append(vitC);
+                    builder.append(vitA);
+                    builder.append(vitE);
+                    builder.append(minP);
+                    builder.append(minMg);
+                    builder.append(minFe);
+                    builder.append(menuOrigin);
+                    return builder.toHashCode();
+                }
             }
 
             public static class Builder {
@@ -1597,6 +1931,7 @@ public class SyncRequest {
                 }
 
                 public Item build(Node itemNode, LoadContext loadContext) throws Exception {
+
                     NamedNodeMap namedNodeMap = itemNode.getAttributes();
                     Date date = loadContext.dateOnlyFormat.parse(namedNodeMap.getNamedItem("Value").getTextContent());
                     ////// process ML items (menu list)
@@ -1682,6 +2017,57 @@ public class SyncRequest {
             }
 
             @Override
+            public boolean equals(Object o) {
+                if (this == o) {
+                    return true;
+                }
+                if (o == null || getClass() != o.getClass()) {
+                    return false;
+                }
+
+                Item item = (Item) o;
+
+                if (date != null ? !date.equals(item.date) : item.date != null) {
+                    return false;
+                }
+                if (reqAssortments != null ? !reqAssortments.equals(item.reqAssortments)
+                        : item.reqAssortments != null) {
+                    return false;
+                }
+                if (reqComplexInfos != null ? !reqComplexInfos.equals(item.reqComplexInfos)
+                        : item.reqComplexInfos != null) {
+                    return false;
+                }
+                if (reqMenuDetails != null ? !reqMenuDetails.equals(item.reqMenuDetails)
+                        : item.reqMenuDetails != null) {
+                    return false;
+                }
+
+                return true;
+            }
+
+            @Override
+            public int hashCode() {
+                HashCodeBuilder builder = new HashCodeBuilder();
+                if(reqMenuDetails != null){
+                    for (ReqMenuDetail obj : reqMenuDetails) {
+                        builder.append(obj);
+                    }
+                }
+                if(reqComplexInfos != null){
+                    for (ReqComplexInfo obj : reqComplexInfos) {
+                        builder.append(obj);
+                    }
+                }
+                if(reqAssortments != null){
+                    for (ReqAssortment obj : reqAssortments) {
+                        builder.append(obj);
+                    }
+                }
+                return builder.toHashCode();
+            }
+
+            @Override
             public String toString() {
                 return "Item{" +
                         "date=" + date +
@@ -1722,10 +2108,6 @@ public class SyncRequest {
             this.items = items;
             this.settingsSectionRawXML = settingsSectionRawXML;
         }
-
-        //public Enumeration<Item> getItems() {
-        //    return Collections.enumeration(items);
-        //}
 
         public Iterator<Item> getItems(){
            return items.iterator();

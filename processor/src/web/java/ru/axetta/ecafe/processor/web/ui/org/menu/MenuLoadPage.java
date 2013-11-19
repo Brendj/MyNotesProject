@@ -210,7 +210,7 @@ public class MenuLoadPage extends BasicWorkspacePage {
                     Menu menu = findMenu(organization, Menu.ORG_MENU_SOURCE, menuDate);
                     if (null == menu) {
                         menu = new Menu(organization, menuDate, new Date(), Menu.ORG_MENU_SOURCE,
-                                bFirstMenuItem ? Menu.FLAG_ANCHOR_MENU : Menu.FLAG_NONE);
+                                bFirstMenuItem ? Menu.FLAG_ANCHOR_MENU : Menu.FLAG_NONE, item.hashCode());
                         daoService.persistEntity(menu);
                     }
                     processReqAssortment(organization, menuDate, item.getReqAssortments());

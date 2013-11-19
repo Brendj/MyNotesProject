@@ -27,27 +27,21 @@ public class Menu {
     private Date menuDate;
     private Date createTime;
     private Integer menuSource;
-    private Set<MenuDetail> menuDetails = new HashSet<MenuDetail>();
     private int flags;
-
-    public int getFlags() {
-        return flags;
-    }
-
-    public void setFlags(int flags) {
-        this.flags = flags;
-    }
+    private Integer detailsHashCode;
+    private Set<MenuDetail> menuDetails = new HashSet<MenuDetail>();
 
     protected Menu() {
         // For Hibernate only
     }
 
-    public Menu(Org org, Date menuDate, Date createTime, int menuSource, int flags) throws Exception {
+    public Menu(Org org, Date menuDate, Date createTime, int menuSource, int flags, Integer detailsHashCode) throws Exception {
         this.org = org;
         this.menuDate = menuDate;
         this.createTime = createTime;
         this.menuSource = menuSource;
         this.flags = flags;
+        this.detailsHashCode = detailsHashCode;
     }
 
     public Long getIdOfMenu() {
@@ -115,6 +109,22 @@ public class Menu {
 
     public void removeMenuDetail(MenuDetail menuDetail) {
         getMenuDetailsInternal().remove(menuDetail);
+    }
+
+    public int getFlags() {
+        return flags;
+    }
+
+    public void setFlags(int flags) {
+        this.flags = flags;
+    }
+
+    public Integer getDetailsHashCode() {
+        return detailsHashCode;
+    }
+
+    public void setDetailsHashCode(Integer detailsHashCode) {
+        this.detailsHashCode = detailsHashCode;
     }
 
     @Override

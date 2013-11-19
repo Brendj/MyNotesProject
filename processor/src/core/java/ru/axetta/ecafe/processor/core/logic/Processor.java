@@ -2224,17 +2224,34 @@ public class Processor implements SyncProcessor,
 
                     ////
                     Menu menu = DAOUtils.findMenu(persistenceSession, organization, Menu.ORG_MENU_SOURCE, menuDate);
+                    Integer detailsHashCode = null;
+                    // Подсчитываем хеш-код входных данных
+                    final int detailsHashCode1 = item.hashCode();
                     if (null == menu) {
+                        // Если меню не найдено то создаем
                         menu = new Menu(organization, menuDate, new Date(), Menu.ORG_MENU_SOURCE,
-                                bFirstMenuItem ? Menu.FLAG_ANCHOR_MENU : Menu.FLAG_NONE);
+                                bFirstMenuItem ? Menu.FLAG_ANCHOR_MENU : Menu.FLAG_NONE, detailsHashCode1);
                         persistenceSession.save(menu);
+                    } else {
+                        // если меню найдено смотрим его хеш-код
+                        detailsHashCode = menu.getDetailsHashCode();
+                        // обновляем занчение хеша в случае если оно пусто (меню возможно уже есть но не имееет хеша)
+                        // или в случае если меню изменилось
+                        if(detailsHashCode==null || !detailsHashCode.equals(detailsHashCode1)){
+                            menu.setDetailsHashCode(detailsHashCode1);
+                            persistenceSession.save(menu);
+                        }
                     }
-                    processReqAssortment(persistenceSession, organization, menuDate, item.getReqAssortments());
-                    HashMap<Long, MenuDetail> localIdsToMenuDetailMap = new HashMap<Long, MenuDetail>();
-                    processReqMenuDetails(persistenceSession, menu, item, item.getReqMenuDetails(),
-                            localIdsToMenuDetailMap);
-                    processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos(),
-                            localIdsToMenuDetailMap);
+                    // проверяем спомощью хеш-кода изменилось ли меню, в случае если изменилось то перезаписываем
+                    if(detailsHashCode==null || !detailsHashCode.equals(detailsHashCode1)){
+                        processReqAssortment(persistenceSession, organization, menuDate, item.getReqAssortments());
+                        HashMap<Long, MenuDetail> localIdsToMenuDetailMap = new HashMap<Long, MenuDetail>();
+                        processReqMenuDetails(persistenceSession, menu, item, item.getReqMenuDetails(),
+                                localIdsToMenuDetailMap);
+                        processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos(),
+                                localIdsToMenuDetailMap);
+                    }
+
                     bFirstMenuItem = false;
 
 

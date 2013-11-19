@@ -43,6 +43,7 @@ public class WayBill extends DistributedObject {
         XMLUtils.setAttributeIfNotNull(element, "Date", CalendarUtils.toStringFullDateTimeWithLocalTimeZone(dateOfWayBill));
         XMLUtils.setAttributeIfNotNull(element, "State", state.ordinal());
         XMLUtils.setAttributeIfNotNull(element, "Shipper", shipper);
+        XMLUtils.setAttributeIfNotNull(element, "INN", inn);
         XMLUtils.setAttributeIfNotNull(element, "Receiver", receiver);
         XMLUtils.setAttributeIfNotNull(element, "GuidOfStaff", staff.getGuid());
         if (actOfWayBillDifference != null) {
@@ -67,6 +68,9 @@ public class WayBill extends DistributedObject {
         Integer integerState = XMLUtils.getIntegerAttributeValue(node, "State");
         if (integerState != null)
             setState(DocumentState.values()[integerState]);
+        String stringInn = XMLUtils.getStringAttributeValue(node, "INN", 128);
+        if (stringInn != null)
+            setShipper(stringInn);
         String stringShipper = XMLUtils.getStringAttributeValue(node, "Shipper", 128);
         if (stringShipper != null)
             setShipper(stringShipper);
@@ -85,6 +89,7 @@ public class WayBill extends DistributedObject {
         setNumber(((WayBill) distributedObject).getNumber());
         setDateOfWayBill(((WayBill) distributedObject).getDateOfWayBill());
         setState(((WayBill) distributedObject).getState());
+        setInn(((WayBill) distributedObject).getInn());
         setShipper(((WayBill) distributedObject).getShipper());
         setReceiver(((WayBill) distributedObject).getReceiver());
     }
@@ -92,6 +97,7 @@ public class WayBill extends DistributedObject {
     private String number;
     private Date dateOfWayBill;
     private DocumentState state;
+    private String inn;
     private String shipper;
     private String receiver;
     private ActOfWayBillDifference actOfWayBillDifference;
@@ -198,4 +204,11 @@ public class WayBill extends DistributedObject {
         this.actOfWayBillDifference = actOfWayBillDifference;
     }
 
+    public String getInn() {
+        return inn;
+    }
+
+    public void setInn(String inn) {
+        this.inn = inn;
+    }
 }

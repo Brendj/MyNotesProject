@@ -22,6 +22,7 @@
                   not-null="true" update="false"/>
         <property name="menuSource" column="MenuSource" type="int" not-null="true" update="false"/>
         <property name="flags" column="Flags" type="int" not-null="true" update="true"/>
+        <property name="detailsHashCode" column="DetailsHashCode" type="int" not-null="true" update="true"/>
         <set name="menuDetailsInternal" inverse="true" cascade="all">
             <key column="IdOfMenu"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.MenuDetail"/>
