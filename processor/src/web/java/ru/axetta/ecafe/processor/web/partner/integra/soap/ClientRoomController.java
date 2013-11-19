@@ -115,90 +115,94 @@ public interface ClientRoomController {
     @WebMethod
     Long getContractIdByCardNo(@WebParam(name="cardId") String cardId);
     @WebMethod
-    public ClientSummaryExt[] getSummaryByGuardSan(@WebParam(name="guardSan") String guardSan);
+    ClientSummaryExt[] getSummaryByGuardSan(@WebParam(name="guardSan") String guardSan);
     @WebMethod
-    public Result enableNotificationBySMS(@WebParam(name="contractId") Long contractId, @WebParam(name="state") boolean state);
+    Result enableNotificationBySMS(@WebParam(name="contractId") Long contractId, @WebParam(name="state") boolean state);
     @WebMethod
-    public Result enableNotificationByEmail(@WebParam(name="contractId") Long contractId, @WebParam(name="state") boolean state);
+    Result enableNotificationByEmail(@WebParam(name="contractId") Long contractId, @WebParam(name="state") boolean state);
     @WebMethod
-    public Result changeMobilePhone(@WebParam(name="contractId") Long contractId, @WebParam(name="mobilePhone") String mobilePhone);
+    Result changeMobilePhone(@WebParam(name="contractId") Long contractId, @WebParam(name="mobilePhone") String mobilePhone);
     @WebMethod
-    public Result changeEmail(@WebParam(name="contractId") Long contractId, @WebParam(name="email") String email);
+    Result changeEmail(@WebParam(name="contractId") Long contractId, @WebParam(name="email") String email);
     @WebMethod
-    public Result changeExpenditureLimit(@WebParam(name="contractId") Long contractId, @WebParam(name="limit") long limit);
+    Result changeExpenditureLimit(@WebParam(name="contractId") Long contractId, @WebParam(name="limit") long limit);
     @WebMethod
-    public Result changePassword(@WebParam(name="contractId") Long contractId, @WebParam(name="base64passwordHash")  String base64passwordHash);
+    Result changePassword(@WebParam(name="contractId") Long contractId, @WebParam(name="base64passwordHash")  String base64passwordHash);
     @WebMethod
-    public CirculationListResult getCirculationList(@WebParam(name = "contractId") Long contractId, @WebParam(name="state") int state);
+    CirculationListResult getCirculationList(@WebParam(name = "contractId") Long contractId, @WebParam(name="state") int state);
 
     @WebMethod
-    public Result authorizeClient(@WebParam(name="contractId") Long contractId, @WebParam(name="token") String token);
+    Result authorizeClient(@WebParam(name="contractId") Long contractId, @WebParam(name="token") String token);
 
     @WebMethod
-    public ActivateLinkingTokenResult activateLinkingToken(@WebParam(name = "linkingToken") String linkingToken);
+    ActivateLinkingTokenResult activateLinkingToken(@WebParam(name = "linkingToken") String linkingToken);
     @WebMethod
-    public Result sendLinkingTokenByContractId(@WebParam(name="contractId") Long contractId);
+    Result sendLinkingTokenByContractId(@WebParam(name="contractId") Long contractId);
     @WebMethod
-    public Result sendLinkingTokenByMobile(@WebParam(name="mobilePhone") String mobilePhone);
+    Result sendLinkingTokenByMobile(@WebParam(name="mobilePhone") String mobilePhone);
     @WebMethod
-    public GenerateLinkingTokenResult generateLinkingToken(@WebParam(name="contractId") Long contractId);
+    GenerateLinkingTokenResult generateLinkingToken(@WebParam(name="contractId") Long contractId);
 
     @WebMethod
-    public SendResult sendPasswordRecoverURLFromEmail(@WebParam(name="contractId") Long contractId,@WebParam(name="request")RequestWebParam request);
+    SendResult sendPasswordRecoverURLFromEmail(@WebParam(name="contractId") Long contractId,@WebParam(name="request")RequestWebParam request);
     @WebMethod
-    public CheckPasswordResult checkPasswordRestoreRequest(@WebParam(name="request")RequestWebParam request);
-     @WebMethod
-    public IdResult getIdOfClient(@WebParam(name="contractId")Long contractId);
-     @WebMethod
-    public IdResult getIdOfContragent(@WebParam(name="contragentName")String contragentName);
-      @WebMethod
-    public IdResult createPaymentOrder(@WebParam(name="idOfClient")Long idOfClient,
+    CheckPasswordResult checkPasswordRestoreRequest(@WebParam(name="request")RequestWebParam request);
+    @WebMethod
+    IdResult getIdOfClient(@WebParam(name="contractId")Long contractId);
+    @WebMethod
+    IdResult getIdOfContragent(@WebParam(name="contragentName")String contragentName);
+    @WebMethod
+    IdResult createPaymentOrder(@WebParam(name="idOfClient")Long idOfClient,
               @WebParam(name="idOfContragent")Long idOfContragent,
               @WebParam(name="paymentMethod")int paymentMethod,
               @WebParam(name="copecksAmount")Long copecksAmount,
               @WebParam(name="contragentSum")Long contragentSum);
 
     @WebMethod
-    public Result changePaymentOrderStatus(@WebParam(name="idOfClient")Long idOfClient,
+    Result changePaymentOrderStatus(@WebParam(name="idOfClient")Long idOfClient,
             @WebParam(name="idOfClientPaymentOrder")Long idOfClientPaymentOrder,
              @WebParam(name="orderStatus") int orderStatus);
-     @WebMethod
-    public RBKMoneyConfigResult getRBKMoneyConfig();
+    @WebMethod
+    RBKMoneyConfigResult getRBKMoneyConfig();
 
     @WebMethod
-    public ChronopayConfigResult getChronopayConfig();
+    ChronopayConfigResult getChronopayConfig();
 
-     @WebMethod
-    public BanksData getBanks();
+    @WebMethod
+    BanksData getBanks();
 
     @WebMethod (operationName = "changePersonalInfo")
-    public Result changePersonalInfo(@WebParam(name="contractId") Long contractId,@WebParam(name="limit") Long limit,
+    Result changePersonalInfo(@WebParam(name="contractId") Long contractId,@WebParam(name="limit") Long limit,
            @WebParam(name="address") String address,@WebParam(name="phone") String phone,@WebParam(name="mobilePhone") String mobilePhone,
            @WebParam(name="email") String email,@WebParam(name="smsNotificationState") boolean smsNotificationState);
 
 
     @WebMethod(operationName="getHiddenPages")
-    public HiddenPagesResult getHiddenPages();
+    HiddenPagesResult getHiddenPages();
 
     @WebMethod(operationName="getComplexList")
-    public ComplexListResult getComplexList(@WebParam(name = "contractId") Long contractId,
+    ComplexListResult getComplexList(@WebParam(name = "contractId") Long contractId,
             final Date startDate, final Date endDate);
 
     @WebMethod(operationName="getNotificationSettings")
-    public ClientNotificationSettingsResult getClientNotificationSettings(@WebParam(name = "contractId") Long contractId);
+    ClientNotificationSettingsResult getClientNotificationSettings(@WebParam(name = "contractId") Long contractId);
 
     @WebMethod(operationName="setNotificationSettings")
-    public ClientNotificationChangeResult setClientNotificationSettings (@WebParam(name = "contractId") Long contractId,
+    ClientNotificationChangeResult setClientNotificationSettings (@WebParam(name = "contractId") Long contractId,
                                                                          @WebParam(name = "notificationType") List<Long> notificationTypes);
 
     @WebMethod(operationName="getNotificationTypes")
-    public ClientNotificationSettingsResult getClientNotificationTypes ();
+    ClientNotificationSettingsResult getClientNotificationTypes ();
 
     @WebMethod(operationName="getStudentsByCanNotConfirmPayment")
-    public StudentsConfirmPaymentData getStudentsByCanNotConfirmPayment(@WebParam(name = "contractId") Long contractId);
+    ClientConfirmPaymentData getStudentsByCanNotConfirmPayment(@WebParam(name = "contractId") Long contractId);
 
     @WebMethod(operationName="getClientStats")
     ClientRoomControllerWS.ClientStatsResult getClientStats(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate,
             @WebParam(name = "type") int type);
+
+    @WebMethod(operationName = "transferBalance")
+    Result transferBalance(@WebParam(name = "contractId") Long contractId, @WebParam(name = "fromSub") Integer fromSub,
+            @WebParam(name = "toSub") Integer toSub, @WebParam(name = "amount") Long amount);
 }

@@ -7,8 +7,10 @@ package ru.axetta.ecafe.processor.web.partner.integra.soap;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ClientPasswordRecover;
 import ru.axetta.ecafe.processor.core.client.ClientStatsReporter;
+import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.client.RequestWebParam;
 import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService;
+import ru.axetta.ecafe.processor.core.logic.FinancialOpsManager;
 import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
@@ -85,7 +87,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_CLIENT_HAS_THIS_SNILS_ALREADY = 140L;
     private static final Long RC_INVALID_DATA = 150L;
     private static final Long RC_NO_CONTACT_DATA = 160L;
-    private static final Long RC_CAN_NOT_CONFIRM_PAYMENT = 170L;
+    private static final Long RC_CLIENT_FINANCIAL_OPERATION_ERROR = 170L;
 
     private static final String RC_OK_DESC = "OK";
     private static final String RC_CLIENT_NOT_FOUND_DESC = "Клиент не найден";
@@ -95,8 +97,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_CLIENT_AUTHORIZATION_FAILED_DESC = "Ошибка авторизации клиента";
     private static final String RC_INTERNAL_ERROR_DESC = "Внутренняя ошибка";
     private static final String RC_NO_CONTACT_DATA_DESC = "У лицевого счета нет контактных данных";
-    private static final String RC_CAN_NOT_CONFIRM_PAYMENT_DESC = "Лицевой счет не может подтвердить оплату";
-
+    private static final String RC_DO_NOT_ACCESS_TO_SUB_BALANCE_DESC = "Нет доступа к субсчетам";
 
     @Resource
     private WebServiceContext context;
@@ -104,13 +105,62 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     static class Processor {
 
-        public void process(Client client, Data data, ObjectFactory objectFactory, Session persistenceSession,
+        public void process(Client client,Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session persistenceSession,
                 Transaction transaction) throws Exception {
         }
 
         public void process(Org org, Data data, ObjectFactory objectFactory, Session persistenceSession,
                 Transaction transaction) throws Exception {
         }
+    }
+
+    @Override
+    public Result transferBalance(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "fromSub") Integer fromSub, @WebParam(name = "toSub") Integer toSub,
+            @WebParam(name = "amount") Long amount) {
+
+        authenticateRequest(contractId);
+
+        Result r = new Result();
+        r.resultCode = RC_OK;
+        r.description = RC_OK_DESC;
+        Boolean enableSubBalanceOperation = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_SUB_BALANCE_OPERATION);
+        if(enableSubBalanceOperation){
+
+            Client client;
+            final DAOService instance = DAOService.getInstance();
+            try {
+                client = instance.getClientByContractId(contractId);
+            } catch (Exception e) {
+                logger.error("INTERNAL ERROR", e);
+                r.resultCode = RC_INTERNAL_ERROR;
+                r.description = RC_INTERNAL_ERROR_DESC;
+                return r;
+            }
+            if (client==null) {
+                r.resultCode = RC_CLIENT_NOT_FOUND;
+                r.description = RC_CLIENT_NOT_FOUND_DESC;
+                return r;
+            }
+
+            try {
+                FinancialOpsManager financialOpsManager = RuntimeContext.getAppContext().getBean(FinancialOpsManager.class);
+                financialOpsManager.createSubAccountTransfer(client, fromSub, toSub, amount);
+            } catch (FinancialOpsManager.AccountTransactionException ate){
+                r.resultCode = RC_CLIENT_FINANCIAL_OPERATION_ERROR;
+                r.description = ate.getMessage();
+                logger.error("Failed to process client room controller request", ate);
+            } catch (Exception e) {
+                r.resultCode = RC_INTERNAL_ERROR;
+                r.description = RC_INTERNAL_ERROR_DESC;
+                logger.error("Failed to process client room controller request", e);
+            }
+        } else {
+            r.resultCode = RC_CLIENT_FINANCIAL_OPERATION_ERROR;
+            r.description = RC_DO_NOT_ACCESS_TO_SUB_BALANCE_DESC;
+        }
+
+        return r;
     }
 
     @Override
@@ -1286,16 +1336,22 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     class ClientRequest {
 
-        public Data process(Long contractId, Processor processor) {
-            return process(contractId, CLIENT_ID_INTERNALID, processor);
-        }
+        final static int CLIENT_ID_INTERNALID = 0, CLIENT_ID_SAN = 1, CLIENT_ID_EXTERNAL_ID = 2, CLIENT_ID_GUID = 3, CLIENT_SUB_ID = 4;
 
-        final static int CLIENT_ID_INTERNALID = 0, CLIENT_ID_SAN = 1, CLIENT_ID_EXTERNAL_ID = 2, CLIENT_ID_GUID = 3;
+        public Data process(Long contractId, Processor processor) {
+            String contractIdStr = String.valueOf(contractId);
+            int len = contractIdStr.length();
+            if(len>2 && ContractIdGenerator.luhnTest(contractIdStr.substring(0, len - 2))){
+                return process(contractId, CLIENT_SUB_ID, processor);
+            } else {
+                return process(contractId, CLIENT_ID_INTERNALID, processor);
+            }
+        }
 
         public Data process(Object id, int clientIdType, Processor processor) {
             ObjectFactory objectFactory = new ObjectFactory();
             Data data = objectFactory.createData();
-
+            Integer subBalanceNum=0;
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
@@ -1311,6 +1367,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     clientCriteria.add(Restrictions.eq("externalId", (Long) id));
                 } else if (clientIdType == CLIENT_ID_GUID) {
                     clientCriteria.add(Restrictions.eq("clientGUID", (String) id));
+                } else if (clientIdType == CLIENT_SUB_ID) {
+                    String subBalanceNumber = (String) id;
+                    int len = subBalanceNumber.length();
+                    subBalanceNum = Integer.parseInt(subBalanceNumber.substring(len-2));
+                    clientCriteria.add(Restrictions.eq("contractId", Long.parseLong(subBalanceNumber.substring(0, len-2))));
                 }
 
                 List<Client> clients = clientCriteria.list();
@@ -1323,10 +1384,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     data.setDescription(RC_SEVERAL_CLIENTS_WERE_FOUND_DESC);
                 } else {
                     Client client = (Client) clients.get(0);
-                    processor.process(client, data, objectFactory, persistenceSession, persistenceTransaction);
-                    data.setIdOfContract(client.getContractId());
-                    data.setResultCode(RC_OK);
-                    data.setDescription("OK");
+                    try {
+                        client.getSubBalance(subBalanceNum);
+                        processor.process(client, subBalanceNum, data, objectFactory, persistenceSession, persistenceTransaction);
+                        data.setIdOfContract(client.getContractId());
+                        data.setResultCode(RC_OK);
+                        data.setDescription(RC_OK_DESC);
+                    } catch (NullPointerException e){
+                        data.setResultCode(RC_CLIENT_NOT_FOUND);
+                        data.setDescription(RC_CLIENT_NOT_FOUND_DESC);
+                    }
                 }
                 persistenceSession.flush();
                 persistenceTransaction.commit();
@@ -1341,7 +1408,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             return data;
         }
-
 
     }
 
@@ -1392,7 +1458,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(contractId);
 
         Data data = new ClientRequest().process(contractId, new Processor() {
-            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processSummary(client, data, objectFactory, session);
             }
@@ -1411,7 +1477,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         Data data = new ClientRequest()
                 .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
-                    public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+                    public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
                             Transaction transaction) throws Exception {
                         processSummary(client, data, objectFactory, session);
                     }
@@ -1442,7 +1508,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
 
         Data data = new ClientRequest().process(idVal, idType, new Processor() {
-            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processSummary(client, data, objectFactory, session);
             }
@@ -1464,6 +1530,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         clientSummaryExt.setDateOfContract(toXmlDateTime(client.getContractTime()));
         /* Текущий баланс клиента */
         clientSummaryExt.setBalance(client.getBalance());
+        /* Баланс субсчета АП клиента */
+        final Long subBalance1 = client.getSubBalance1()==null?0L:client.getSubBalance1();
+        clientSummaryExt.setSubBalance1(subBalance1);
+        /* Баланс основного счета клиента */
+        clientSummaryExt.setSubBalance0(client.getBalance() - subBalance1);
         /* лимит овердрафта */
         clientSummaryExt.setOverdraftLimit(client.getLimit());
         /* Статус контракта (Текстовое значение) */
@@ -1545,12 +1616,29 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public PurchaseListResult getPurchaseList(Long contractId, final Date startDate, final Date endDate) {
-        authenticateRequest(contractId);
+
+        Long clientContractId = contractId;
+        String contractIdstr = String.valueOf(contractId);
+        if(ContractIdGenerator.luhnTest(contractIdstr)){
+            clientContractId = contractId;
+        } else {
+            int len = contractIdstr.length();
+            if(len>2 && ContractIdGenerator.luhnTest(contractIdstr.substring(0, len - 2))){
+                clientContractId = Long.parseLong(contractIdstr.substring(0, len-2));
+            }
+        }
+
+        authenticateRequest(clientContractId);
 
         Data data = new ClientRequest().process(contractId, new Processor() {
-            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
-                processPurchaseList(client, data, objectFactory, session, endDate, startDate);
+                if(subBalanceNum.equals(0)){
+                    processPurchaseList(client, data, objectFactory, session, endDate, startDate, null);
+                }
+                if(subBalanceNum.equals(1)){
+                    processPurchaseList(client, data, objectFactory, session, endDate, startDate, OrderTypeEnumType.SUBSCRIPTION_FEEDING);
+                }
             }
         });
         PurchaseListResult purchaseListResult = new PurchaseListResult();
@@ -1567,9 +1655,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         Data data = new ClientRequest()
                 .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
-                    public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+                    public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
                             Transaction transaction) throws Exception {
-                        processPurchaseList(client, data, objectFactory, session, endDate, startDate);
+                        processPurchaseList(client, data, objectFactory, session, endDate, startDate, null);
                     }
                 });
 
@@ -1581,13 +1669,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     private void processPurchaseList(Client client, Data data, ObjectFactory objectFactory, Session session,
-            Date endDate, Date startDate) throws DatatypeConfigurationException {
+            Date endDate, Date startDate, OrderTypeEnumType orderType) throws DatatypeConfigurationException {
         int nRecs = 0;
         Date nextToEndDate = DateUtils.addDays(endDate, 1);
         Criteria ordersCriteria = session.createCriteria(Order.class);
         ordersCriteria.add(Restrictions.eq("client", client));
         ordersCriteria.add(Restrictions.ge("createTime", startDate));
         ordersCriteria.add(Restrictions.lt("createTime", nextToEndDate));
+        if(orderType!=null){
+            ordersCriteria.add(Restrictions.lt("orderType", orderType));
+        }
         ordersCriteria.addOrder(org.hibernate.criterion.Order.asc("createTime"));
         List ordersList = ordersCriteria.list();
         PurchaseListExt purchaseListExt = objectFactory.createPurchaseListExt();
@@ -1638,9 +1729,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(contractId);
 
         Data data = new ClientRequest().process(contractId, new Processor() {
-            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
-                processPaymentList(client, data, objectFactory, session, endDate, startDate);
+                processPaymentList(client, subBalanceNum, data, objectFactory, session, endDate, startDate);
             }
         });
 
@@ -1658,9 +1749,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         Data data = new ClientRequest()
                 .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
-                    public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+                    public void process(Client client, Integer subBalanceNum,  Data data, ObjectFactory objectFactory, Session session,
                             Transaction transaction) throws Exception {
-                        processPaymentList(client, data, objectFactory, session, endDate, startDate);
+                        processPaymentList(client, subBalanceNum, data, objectFactory, session, endDate, startDate);
                     }
                 });
 
@@ -1672,11 +1763,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return paymentListResult;
     }
 
-    private void processPaymentList(Client client, Data data, ObjectFactory objectFactory, Session session,
+    private void processPaymentList(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
             Date endDate, Date startDate) throws Exception {
         Date nextToEndDate = DateUtils.addDays(endDate, 1);
         Criteria clientPaymentsCriteria = session.createCriteria(ClientPayment.class);
-        clientPaymentsCriteria.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT));
+        if(subBalanceNum!=null && subBalanceNum.equals(1)){
+            clientPaymentsCriteria.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_SUB_ACCOUNT_PAYMENT));
+        } else {
+            clientPaymentsCriteria.add(Restrictions.eq("payType", ClientPayment.CLIENT_TO_ACCOUNT_PAYMENT));
+        }
         clientPaymentsCriteria.addOrder(org.hibernate.criterion.Order.asc("createTime"));
         clientPaymentsCriteria.add(Restrictions.ge("createTime", startDate));
         clientPaymentsCriteria.add(Restrictions.lt("createTime", nextToEndDate));
@@ -1704,7 +1799,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(contractId);
 
         Data data = new ClientRequest().process(contractId, new Processor() {
-            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processMenuList(client.getOrg(), data, objectFactory, session, startDate, endDate);
             }
@@ -1723,7 +1818,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         Data data = new ClientRequest()
                 .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
-                    public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+                    public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
                             Transaction transaction) throws Exception {
                         processMenuList(client.getOrg(), data, objectFactory, session, startDate, endDate);
                     }
@@ -1761,7 +1856,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(contractId);
 
         Data data = new ClientRequest().process(contractId, new Processor() {
-            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processComplexList(client.getOrg(), data, objectFactory, session, startDate, endDate);
             }
@@ -1965,7 +2060,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(contractId);
 
         Data data = new ClientRequest().process(contractId, new Processor() {
-            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processCardList(client, data, objectFactory);
             }
@@ -1984,7 +2079,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         Data data = new ClientRequest()
                 .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
-                    public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+                    public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
                             Transaction transaction) throws Exception {
                         processCardList(client, data, objectFactory);
                     }
@@ -2021,7 +2116,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(contractId);
 
         Data data = new ClientRequest().process(contractId, new Processor() {
-            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processEnterEventList(client, data, objectFactory, session, endDate, startDate);
             }
@@ -2040,7 +2135,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         Data data = new ClientRequest()
                 .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
-                    public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+                    public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
                             Transaction transaction) throws Exception {
                         processEnterEventList(client, data, objectFactory, session, endDate, startDate);
                     }
@@ -2633,7 +2728,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         final int fState = state;
         Data data = new ClientRequest().process(contractId, new Processor() {
-            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processCirculationList(client, data, objectFactory, session, fState);
             }
@@ -3411,7 +3506,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(contractId);
 
         Data data = new ClientRequest().process(contractId, new Processor() {
-            public void process(Client client, Data data, ObjectFactory objectFactory, Session session,
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
                 processQuestionaryList(client, data, objectFactory, session, currentDate, QuestionaryType.MENU);
             }
@@ -3599,13 +3694,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public StudentsConfirmPaymentData getStudentsByCanNotConfirmPayment(
+    public ClientConfirmPaymentData getStudentsByCanNotConfirmPayment(
             @WebParam(name = "contractId") Long contractId) {
-        // authenticateRequest(contractId);
+        authenticateRequest(contractId);
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        StudentsConfirmPaymentData studentsConfirmPaymentData = new StudentsConfirmPaymentData();
+        ClientConfirmPaymentData studentsConfirmPaymentData = new ClientConfirmPaymentData();
         try {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
@@ -3616,12 +3711,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 studentsConfirmPaymentData.description = RC_CLIENT_NOT_FOUND_DESC;
                 studentsConfirmPaymentData.studentsConfirmPaymentList = new StudentsConfirmPaymentList();
             } else {
+                List<StudentMustPayItem> studentMustPayItemList = new ArrayList<StudentMustPayItem>();
                 if (teacher.getCanConfirmGroupPayment()) {
-                    List students = DAOUtils
-                            .fetchStudentsByCanNotConfirmPayment(persistenceSession, teacher.getIdOfClient());
+                    List students = DAOUtils.fetchStudentsByCanNotConfirmPayment(persistenceSession, teacher.getIdOfClient());
                     Long idOfClient = null;
                     Long sum = 0L;
-                    List<StudentMustPayItem> studentMustPayItemList = new ArrayList<StudentMustPayItem>();
                     for (Object object : students) {
                         Object[] student = (Object[]) object;
                         Long balance = Long.valueOf(String.valueOf(student[3]));
@@ -3648,10 +3742,39 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     studentsConfirmPaymentData.studentsConfirmPaymentList = new StudentsConfirmPaymentList(
                             studentMustPayItemList);
                 } else {
-                    studentsConfirmPaymentData.resultCode = RC_CAN_NOT_CONFIRM_PAYMENT;
-                    studentsConfirmPaymentData.description = RC_CAN_NOT_CONFIRM_PAYMENT_DESC;
-                    studentsConfirmPaymentData.studentsConfirmPaymentList = new StudentsConfirmPaymentList();
+                    List students = DAOUtils.fetchTeacherByDoConfirmPayment(persistenceSession);
+                    Long idOfClient = null;
+                    Long sum = 0L;
+
+                    for (Object object : students) {
+                        Object[] student = (Object[]) object;
+                        if(Long.valueOf(String.valueOf(student[7])).equals(teacher.getIdOfClient())){
+                            Long balance = Long.valueOf(String.valueOf(student[3]));
+                            Long paySum = Long.valueOf(String.valueOf(student[4]));
+                            Long currentIdOfClient = Long.valueOf(String.valueOf(student[6]));
+                            if (idOfClient == null || (!idOfClient.equals(currentIdOfClient))) {
+                                idOfClient = currentIdOfClient;
+                                sum = 0L;
+                            }
+                            if (balance + sum < 0 && idOfClient.equals(currentIdOfClient)) {
+                                sum += paySum;
+                                StudentMustPayItem mustPayItem = new StudentMustPayItem();
+                                Person person = teacher.getPerson();
+                                mustPayItem.setFirstName(person.getFirstName());
+                                mustPayItem.setSurname(person.getSurname());
+                                mustPayItem.setSecondName(person.getSecondName());
+                                mustPayItem.setBalance(balance);
+                                mustPayItem.setCreateTime((Date) student[5]);
+                                mustPayItem.setPaySum(paySum);
+                                studentMustPayItemList.add(mustPayItem);
+                            }
+                        }
+                    }
                 }
+                studentsConfirmPaymentData.resultCode = RC_OK;
+                studentsConfirmPaymentData.description = RC_OK_DESC;
+                studentsConfirmPaymentData.studentsConfirmPaymentList = new StudentsConfirmPaymentList(
+                        studentMustPayItemList);
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
