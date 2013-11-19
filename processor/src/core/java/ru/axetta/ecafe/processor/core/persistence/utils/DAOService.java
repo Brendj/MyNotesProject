@@ -1107,26 +1107,18 @@ public class DAOService {
     }
 
 
-    public List<Good> findGoods(Boolean deletedStatusSelected){
-        TypedQuery<Good> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from Good order by globalId",Good.class);
-        } else {
-            query = entityManager.createQuery("from Good where deletedState=false order by globalId",Good.class);
-        }
-        return query.getResultList();
-    }
-
-
-    public List<Good> findGoods(List<Long> orgOwners, Boolean deletedStatusSelected){
-        TypedQuery<Good> query;
-        if(deletedStatusSelected){
-            query = entityManager.createQuery("from Good where orgOwner in :orgOwner order by globalId",Good.class);
-        } else {
-            query = entityManager.createQuery("from Good where orgOwner in :orgOwner and deletedState=false order by globalId",Good.class);
-        }
-        query.setParameter("orgOwner", orgOwners);
-        return query.getResultList();
+    @SuppressWarnings("unchecked")
+    public List<Good> findGoods(ConfigurationProvider configurationProvider, GoodGroup goodGroup,  List<Long> orgOwners, Boolean deletedStatusSelected){
+        Session session = (Session) entityManager.getDelegate();
+        Criteria criteria = session.createCriteria(Good.class);
+        if(goodGroup!=null) criteria.add(Restrictions.eq("goodGroup",goodGroup));
+        if(orgOwners!=null && !orgOwners.isEmpty()) criteria.add(Restrictions.in("orgOwner",orgOwners));
+        if(configurationProvider!=null)
+            criteria.add(Restrictions.eq("idOfConfigurationProvider",configurationProvider.getIdOfConfigurationProvider()));
+        if(deletedStatusSelected!=null && !deletedStatusSelected) criteria.add(Restrictions.eq("deletedState",false));
+        //if(StringUtils.isNotEmpty(nameOfGoodsGroup))
+        //    criteria.add(Restrictions.ilike("nameOfGoodsGroup",nameOfGoodsGroup, MatchMode.ANYWHERE));
+        return criteria.list();
     }
 
 
@@ -1277,7 +1269,27 @@ public class DAOService {
         return query.getResultList();
     }
 
+    public List<Product> findProduct(ProductGroup productGroup, ConfigurationProvider provider, String filter, List<Long> orgOwners,
+            Boolean deletedStatusSelected) {
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.findProduct(session, productGroup, provider, filter, orgOwners, deletedStatusSelected);
+    }
 
+
+    public List<GoodGroup> findGoodGroup(ConfigurationProvider provider, String filter, List<Long> orgOwners, Boolean deletedStatusSelected) {
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.findGoodGroup(session, provider, filter, orgOwners, deletedStatusSelected);
+    }
+
+    public Long countProductsByProductGroup(ProductGroup currentProductGroup) {
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.countProductByProductGroup(session, currentProductGroup);
+    }
+
+    public List<Product> findProductByProductGroup(ProductGroup currentProductGroup) {
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.findProductByProductGroup(session, currentProductGroup);
+    }
 
     public List<TechnologicalMap> findTechnologicalMapByConfigurationProvider(Boolean deletedStatusSelected) {
         TypedQuery<TechnologicalMap> query;
@@ -1491,7 +1503,7 @@ public class DAOService {
     public List<RegistryChange> getLastRegistryChanges(long idOfOrg, long revisionDate) throws Exception {
         if (revisionDate < 1L) {
             revisionDate = getLastRegistryChangeUpdate(idOfOrg);
-        }
+}
         if (revisionDate < 1) {
             return Collections.EMPTY_LIST;
         }

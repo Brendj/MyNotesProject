@@ -7,8 +7,13 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
@@ -25,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import java.lang.InstantiationException;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.*;
@@ -148,6 +154,17 @@ public class DAOUtils {
                         ClientGroup.Predefined.CLIENT_DELETED.getValue()));
         return (List<Long>) query.list();
     }
+
+    public static boolean wasSuspendedLastSubscriptionFeedingByClient(Session session, long idOfClient){
+        Query query = session.createQuery("from SubscriptionFeeding where idOfClient=:idOfClient and dateDeactivateService>=:currentDate order by dateDeactivateService desc");
+        query.setParameter("idOfClient", idOfClient);
+        query.setParameter("currentDate", new Date());
+        query.setMaxResults(1);
+        SubscriptionFeeding subscriptionFeeding = (SubscriptionFeeding) query.uniqueResult();
+        if(subscriptionFeeding==null) return false;
+        return subscriptionFeeding.getWasSuspended();
+    }
+
 
     public static Org findOrg(Session persistenceSession, long idOfOrg) throws Exception {
         return (Org) persistenceSession.get(Org.class, idOfOrg);
@@ -604,6 +621,28 @@ public class DAOUtils {
         q.executeUpdate();
     }
 
+    // TODO: при добавленее нового поля субсчета необходио добавлять в логику
+    public static void changeClientSubBalance1(Session session, Long idOfClient, long sum, boolean addOrNew) {
+        final String queryAddString = "UPDATE Client SET subBalance1=subBalance1+? WHERE idOfClient=?";
+        final String queryNewString = "UPDATE Client SET subBalance1=? WHERE idOfClient=?";
+        final String queryString = addOrNew?queryNewString:queryAddString;
+        Query q=session.createQuery(queryString);
+        q.setLong(0, sum);
+        q.setLong(1, idOfClient);
+        q.executeUpdate();
+    }
+
+    // TODO: при добавленее нового поля субсчета необходио добавлять в логику
+    public static void changeClientSubBalance(Session session, Long idOfClient, long sum, int subBalanceNum, boolean addOrNew) {
+        final String queryAddString = String.format("UPDATE Client SET subBalance%d=subBalance%d+? WHERE idOfClient=?", subBalanceNum, subBalanceNum);
+        final String queryNewString = String.format("UPDATE Client SET subBalance%d=? WHERE idOfClient=?", subBalanceNum);
+        final String queryString = addOrNew?queryNewString:queryAddString;
+        Query q=session.createQuery(queryString);
+        q.setLong(0, sum);
+        q.setLong(1, idOfClient);
+        q.executeUpdate();
+    }
+
     public static void deleteAssortmentForDate(Session persistenceSession, Org organization, Date menuDate) {
         Date endDate = DateUtils.addDays(menuDate, 1);
         Query q = persistenceSession.createQuery("DELETE FROM Assortment WHERE org=:org AND beginDate>=:fromDate AND beginDate<=:endDate");
@@ -990,7 +1029,7 @@ public class DAOUtils {
             Long res = l.isEmpty() || l.get(0) == null ? ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue()
                     : (Long) l.get(0);
             idOfClientGroup = res + 1;
-        }
+            }
         CompositeIdOfClientGroup compositeIdOfClientGroup = new CompositeIdOfClientGroup(idOfOrg,idOfClientGroup);
         ClientGroup clientGroup = new ClientGroup(compositeIdOfClientGroup, clientGroupName);
         persistenceSession.save(clientGroup);
@@ -1136,20 +1175,29 @@ public class DAOUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends DistributedObject> T findDistributedObjectByRefGUID(Class<T> clazz, Session session, String guid){
-        Criteria criteria = session.createCriteria(DistributedObject.class);
-        criteria.add(Restrictions.eq("guid",guid));
+    public static <T extends DistributedObject> T findDistributedObjectByRefGUID(Class<T> clazz, Session session, String guid) throws DistributedObjectException{
+        DistributedObject refDistributedObject = null;
+        try {
+            refDistributedObject = clazz.newInstance();
+            Criteria criteria = session.createCriteria(clazz);
+            criteria.add(Restrictions.eq("guid",guid));
+            refDistributedObject.createProjections(criteria, 0,"");
+            criteria.setMaxResults(1);
+            return (T) criteria.uniqueResult();
+        } catch (Exception e) {
+            throw new DistributedObjectException(e.getMessage());
+        }
         //return (DistributedObject) criteria.uniqueResult();
         //String sql = "from "+clazz.getClass()+" where guid=:guid";
         //Query query = session.createQuery(sql);
         //query.setParameter("guid", guid);
         //List list = query.list();
-        List list = criteria.list();
-        if(list==null || list.isEmpty()){
-            return null;
-        } else {
-            return (T) list.get(0);
-        }
+        //List list = criteria.list();
+        //if(list==null || list.isEmpty()){
+        //    return null;
+        //} else {
+        //    return (T) list.get(0);
+        //}
     }
 
     @SuppressWarnings("unchecked")
@@ -1352,6 +1400,25 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static List fetchTeacherByDoConfirmPayment(Session persistenceSession) {
+        Criteria criteria = persistenceSession.createCriteria(Order.class);
+        criteria.add(Restrictions.isNotNull("confirmerId"));
+        criteria.createCriteria("client","student", JoinType.LEFT_OUTER_JOIN)
+                .add(Restrictions.sqlRestriction("{alias}.balance + {alias}.limits < 0"));
+        criteria.createAlias("student.person","person", JoinType.LEFT_OUTER_JOIN);
+        criteria.setProjection(Projections.projectionList()
+                .add(Projections.property("person.firstName"), "firstName")
+                .add(Projections.property("person.surname"), "surname")
+                .add(Projections.property("person.secondName"), "secondName")
+                .add(Projections.property("student.balance"), "balance")
+                .add(Projections.property("RSum"), "rSum")
+                .add(Projections.property("createTime"), "createTime")
+                .add(Projections.property("student.idOfClient"), "idOfClient")
+                .add(Projections.property("confirmerId"), "confirmerId")
+        );
+        return criteria.list();
+    }
+
     @SuppressWarnings("unchecked")
     public static Client findTeacherPaymentForStudents(Session persistenceSession, Long contractId) {
         Criteria criteriaCanConfirmGroupPayment = persistenceSession.createCriteria(Client.class);
@@ -1428,7 +1495,7 @@ public class DAOUtils {
         return (List<Object[]>)q.getResultList();
     }
 
-    public static int extractCardTypeByCartNo(Session session, Long cardNo) {
+		public static int extractCardTypeByCartNo(Session session, Long cardNo) {
         Query query = session.createQuery("select visitorType from CardTemp where cardNo=:cardNo");
         query.setParameter("cardNo", cardNo);
         return (Integer) query.uniqueResult();
@@ -1438,5 +1505,78 @@ public class DAOUtils {
         Org org = DAOUtils.getOrgReference(session, idOfOrg);
         SyncHistoryException syncHistoryException = new SyncHistoryException(org, history, s);
         session.save(syncHistoryException);
+    }
+
+
+    public static boolean isCommodityAccountingByOrg(Session session, Long idOfOrg){
+        Query query = session.createQuery("select org.commodityAccounting from Org org where org.idOfOrg=:idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        Boolean f = (Boolean) query.uniqueResult();
+        if(f == null) return false;
+        else return f;
+    }
+
+    public static Boolean isSupplierByOrg(Session session, Long idOfOrg) {
+        Query query = session.createQuery("select org.refectoryType from Org org where org.idOfOrg=:idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        int refectoryType = (Integer) query.uniqueResult();
+        //{"Сырьевая столовая" - 0, "Столовая-доготовочная" - 1,
+        // "Буфет-раздаточная" - 2, "Комбинат питания" - 3}
+        return refectoryType==3;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<Product> findProductByProductGroup(Session session, ProductGroup currentProductGroup) {
+        Criteria productCriteria = session.createCriteria(Product.class);
+        productCriteria.add(Restrictions.eq("productGroup", currentProductGroup));
+        return productCriteria.list();
+    }
+
+    public static Long countProductByProductGroup(Session session, ProductGroup currentProductGroup) {
+        Criteria productCriteria = session.createCriteria(Product.class);
+        productCriteria.add(Restrictions.eq("productGroup", currentProductGroup));
+        productCriteria.setProjection(Projections.count("globalId"));
+        return (Long) productCriteria.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<GoodGroup> findGoodGroup(Session session, ConfigurationProvider provider, String nameFilter, List<Long> orgOwners,
+            Boolean deletedStatusSelected) {
+        Criteria goodGroupCriteria = session.createCriteria(GoodGroup.class);
+        if(provider!=null){
+            goodGroupCriteria.add(Restrictions.eq("idOfConfigurationProvider", provider.getIdOfConfigurationProvider()));
+        }
+        if(!StringUtils.isEmpty(nameFilter)){
+            goodGroupCriteria.add(Restrictions.ilike("nameOfGoodsGroup", nameFilter, MatchMode.ANYWHERE));
+        }
+        if(orgOwners!=null){
+            goodGroupCriteria.add(Restrictions.in("orgOwner", orgOwners));
+        }
+        if(deletedStatusSelected!=null && !deletedStatusSelected){
+            goodGroupCriteria.add(Restrictions.eq("deletedState",false));
+        }
+        return goodGroupCriteria.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<Product> findProduct(Session session, ProductGroup productGroup, ConfigurationProvider provider, String nameFilter, List<Long> orgOwners,
+            Boolean deletedStatusSelected) {
+        Criteria productCriteria = session.createCriteria(Product.class);
+        if(productGroup!=null){
+            productCriteria.add(Restrictions.eq("productGroup", productGroup));
+        }
+        if(provider!=null){
+            productCriteria.add(Restrictions.eq("idOfConfigurationProvider", provider.getIdOfConfigurationProvider()));
+        }
+        if(!StringUtils.isEmpty(nameFilter)){
+            productCriteria.add(Restrictions.ilike("productName", nameFilter, MatchMode.ANYWHERE));
+        }
+        if(orgOwners!=null){
+            productCriteria.add(Restrictions.in("orgOwner", orgOwners));
+        }
+        if(deletedStatusSelected!=null && !deletedStatusSelected){
+            productCriteria.add(Restrictions.eq("deletedState",false));
+        }
+        return productCriteria.list();
     }
 }
