@@ -4,9 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.settings;
 
+import ru.axetta.ecafe.processor.core.daoservices.org.SettingService;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.faces.event.ValueChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
 

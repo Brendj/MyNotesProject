@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.goodRequest.goodRequestPosition;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequestPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.springframework.context.annotation.Scope;

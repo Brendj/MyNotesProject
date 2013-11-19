@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.org;
 
-import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
-import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -63,6 +60,8 @@ public class OrgViewPage extends BasicWorkspacePage {
     private String latitude;
     private String longitude;
     private Integer refectoryType;
+    // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
+    //private OrganizationType type;
     private String refectoryTypeStringRepresentation;
 
     public String getFriendlyFilterOrgs() {
@@ -234,6 +233,10 @@ public class OrgViewPage extends BasicWorkspacePage {
         return refectoryTypeStringRepresentation;
     }
 
+    //public OrganizationType getType() {
+    //    return type;
+    //}
+
     public void fill(Session session, Long idOfOrg) throws Exception {
         Org org = (Org) session.load(Org.class, idOfOrg);
         this.idOfOrg = org.getIdOfOrg();
@@ -274,6 +277,7 @@ public class OrgViewPage extends BasicWorkspacePage {
 
         this.refectoryType = org.getRefectoryType();
         getRefectoryTypeStringRepresentation();
+        //this.type= org.getType();
 
         ////  menu exchange source
         Long menuExchangeSourceOrgId = DAOUtils.findMenuExchangeSourceOrg(session, idOfOrg);
@@ -305,6 +309,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.mailingListReportsOnVisits = org.getMailingListReportsOnVisits();
         this.mailingListReports1 = org.getMailingListReports1();
         this.mailingListReports2 = org.getMailingListReports2();
+
 
     }
 

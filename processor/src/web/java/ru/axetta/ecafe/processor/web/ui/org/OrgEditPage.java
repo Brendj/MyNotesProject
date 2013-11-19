@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.org;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -65,7 +66,6 @@ public class OrgEditPage extends BasicWorkspacePage
     private String mailingListReports2;
     private String guid;
     private ConfigurationProvider configurationProvider;
-    private String configurationProviderName;
     private List<Long> idOfOrgList = new ArrayList<Long>();
     private String city;
     private String district;
@@ -73,6 +73,11 @@ public class OrgEditPage extends BasicWorkspacePage
     private String latitude;
     private String longitude;
     private Boolean fullSyncParam;
+    private Boolean changeCommodityAccounting;
+
+    // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
+    //private OrganizationType type;
+    private final OrganizationTypeMenu organizationTypeMenu = new OrganizationTypeMenu();
 
     private Integer refectoryType;
     private List<SelectItem> refectoryTypeComboMenuItems;
@@ -179,14 +184,16 @@ public class OrgEditPage extends BasicWorkspacePage
             }
         }
 
-        if(this.configurationProvider==null){
+
+
+        org.setCommodityAccounting(changeCommodityAccounting);
+        if(changeCommodityAccounting){
+            org.setConfigurationProvider(configurationProvider);
+            fullSyncParam=true;
+        } else {
             org.setConfigurationProvider(null);
-        }else{
-            ConfigurationProvider cp = (ConfigurationProvider) session.load(ConfigurationProvider.class, this.configurationProvider.getIdOfConfigurationProvider());
-            if(cp!=null){
-                org.setConfigurationProvider(cp);
-            }
         }
+        //org.setType(this.type);
 
         if(this.fullSyncParam){
             org.setFullSyncParam(fullSyncParam);
@@ -234,6 +241,9 @@ public class OrgEditPage extends BasicWorkspacePage
         this.guid = org.getGuid();
         this.fullSyncParam = org.getFullSyncParam();
 
+        this.changeCommodityAccounting = org.getCommodityAccounting();
+        //this.type = org.getType();
+
         this.refectoryType = org.getRefectoryType();
         if (this.refectoryType == null) {
             this.refectoryType = -1;
@@ -276,6 +286,21 @@ public class OrgEditPage extends BasicWorkspacePage
                 idOfOrgList.add(friendlyOrg.getIdOfOrg());
             }
             filterFriendlyOrgs = stringBuilder.toString();
+        }
+    }
+
+    public void checkCommodityAccountingConfiguration(Session session) throws Exception{
+        //Org org = (Org) session.load(Org.class, menuExchangeSourceOrg);
+        if(menuExchangeSourceOrg!=null){
+            Org org = DAOUtils.findOrg(session, menuExchangeSourceOrg);
+            final Long idOfProvider = configurationProvider.getIdOfConfigurationProvider();
+            configurationProvider = ConfigurationProviderService.loadConfigurationProvider(session, idOfProvider);
+            if(!configurationProvider.getOrgs().contains(org)){
+                final StringBuilder message = new StringBuilder("Организации - источника меню школы ")
+                        .append("'").append(org.getShortName()).append("'")
+                        .append(" не входит в текущую конфигурацию провайдера");
+                throw new Exception(message.toString());
+            }
         }
     }
 
@@ -322,12 +347,8 @@ public class OrgEditPage extends BasicWorkspacePage
 
     @Override
     public void select(ConfigurationProvider configurationProvider) {
+        if(configurationProvider!=null) configurationProvider.getName();    // lazy load
         this.configurationProvider = configurationProvider;
-        if(null != configurationProvider){
-            this.configurationProviderName = configurationProvider.getName();
-        } else {
-            this.configurationProviderName = "";
-        }
     }
 
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
@@ -385,12 +406,21 @@ public class OrgEditPage extends BasicWorkspacePage
         return filterFriendlyOrgs;
     }
 
-    public String getConfigurationProviderName() {
-        return configurationProviderName;
+    public ConfigurationProvider getConfigurationProvider() {
+        return configurationProvider;
     }
 
-    public void setConfigurationProviderName(String configurationProviderName) {
-        this.configurationProviderName = configurationProviderName;
+    public String getConfigurationProviderName() {
+        if(configurationProvider==null) return null;
+        else return configurationProvider.getName();
+    }
+
+    public void setChangeCommodityAccounting(Boolean changeCommodityAccounting) {
+        this.changeCommodityAccounting = changeCommodityAccounting;
+    }
+
+    public Boolean getChangeCommodityAccounting() {
+        return changeCommodityAccounting;
     }
 
     public String getINN() {
@@ -691,5 +721,17 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setFullSyncParam(Boolean fullSyncParam) {
         this.fullSyncParam = fullSyncParam;
+    }
+
+    //public OrganizationType getType() {
+    //    return type;
+    //}
+    //
+    //public void setType(OrganizationType type) {
+    //    this.type = type;
+    //}
+
+    public OrganizationTypeMenu getOrganizationTypeMenu() {
+        return organizationTypeMenu;
     }
 }

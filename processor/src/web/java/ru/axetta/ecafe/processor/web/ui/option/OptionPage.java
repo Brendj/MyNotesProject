@@ -87,7 +87,8 @@ public class OptionPage extends BasicWorkspacePage {
     private Integer syncRegisterDaysTimeout;
     private String monitoringAllowedTags;
     private Boolean cleanupRepositoryReports;
-
+    private Boolean enableSubscriptionFeeding;
+    private Boolean enableSubBalanceOperation;
 
     private List<BankOptionItem> banks;
 
@@ -516,6 +517,22 @@ public class OptionPage extends BasicWorkspacePage {
         this.cleanupRepositoryReports = cleanupRepositoryReports;
     }
 
+    public Boolean getEnableSubscriptionFeeding() {
+        return enableSubscriptionFeeding;
+    }
+
+    public void setEnableSubscriptionFeeding(Boolean enableSubscriptionFeeding) {
+        this.enableSubscriptionFeeding = enableSubscriptionFeeding;
+    }
+
+    public Boolean getEnableSubBalanceOperation() {
+        return enableSubBalanceOperation;
+    }
+
+    public void setEnableSubBalanceOperation(Boolean enableSubBalanceOperation) {
+        this.enableSubBalanceOperation = enableSubBalanceOperation;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -577,6 +594,8 @@ public class OptionPage extends BasicWorkspacePage {
         syncRegisterDaysTimeout = runtimeContext.getOptionValueInt(Option.OPTION_MSK_NSI_REGISTRY_CHANGE_DAYS_TIMEOUT);
         monitoringAllowedTags = runtimeContext.getOptionValueString(Option.OPTION_MSK_MONITORING_ALLOWED_TAGS);
         cleanupRepositoryReports = runtimeContext.getOptionValueBool(Option.OPTION_MSK_CLEANUP_REPOSITORY_REPORTS);
+        enableSubscriptionFeeding = runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_SUBSCRIPTION_FEEDING);
+        enableSubBalanceOperation = runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_SUB_BALANCE_OPERATION);
 
 
 
@@ -642,6 +661,8 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_CHRONOPAY_RATE, chronopayRate);
             runtimeContext.setOptionValue(Option.OPTION_SMPP_CLIENT_STATUS, smppClientStatus);
             runtimeContext.setOptionValue(Option.OPTION_EXTERNAL_URL, externalURL);
+            runtimeContext.setOptionValue(Option.OPTION_ENABLE_SUBSCRIPTION_FEEDING, enableSubscriptionFeeding);
+            runtimeContext.setOptionValue(Option.OPTION_ENABLE_SUB_BALANCE_OPERATION, enableSubBalanceOperation);
 
             bankListPage.save();
 

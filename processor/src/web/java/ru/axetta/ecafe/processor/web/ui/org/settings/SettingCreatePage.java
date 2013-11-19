@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.settings;
 
+import ru.axetta.ecafe.processor.core.daoservices.org.SettingService;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
@@ -63,6 +64,7 @@ public class SettingCreatePage extends BasicWorkspacePage implements OrgSelectPa
                 case 1: setting.setSettingValue("Microsoft XPS Document Writer;42;1;22;6;12;Спасибо;"); break;
                 case 2: setting.setSettingValue("Microsoft XPS Document Writer;42;1;16;12;12;Спасибо;"); break;
                 case 3: setting.setSettingValue("0;0:00;100;");break;
+                case 4: setting.setSettingValue("2;5;3;3;");break;
             }
             setting.setSettingsId(SettingsIds.fromInteger(settingsIds));
             parserBySettingValue = setting.getSplitSettingValue();

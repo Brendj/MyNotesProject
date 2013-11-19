@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.org;
 
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -64,6 +65,9 @@ public class OrgCreatePage extends BasicWorkspacePage
     private String longitude;
     private Integer refectoryType;
     private SelectItem[] refectoryTypeComboMenuItems = readRefectoryTypeComboMenuItems();
+    // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
+    //private OrganizationType type;
+    private final OrganizationTypeMenu organizationTypeMenu = new OrganizationTypeMenu();
 
     public String getINN() {
         return INN;
@@ -437,5 +441,17 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setGuid(String guid) {
         this.guid = guid;
+    }
+
+    //public OrganizationType getType() {
+    //    return type;
+    //}
+    //
+    //public void setType(OrganizationType type) {
+    //    this.type = type;
+    //}
+
+    public OrganizationTypeMenu getOrganizationTypeMenu() {
+        return organizationTypeMenu;
     }
 }
