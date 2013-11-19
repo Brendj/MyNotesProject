@@ -46,6 +46,7 @@ public class Way4PaymentServlet extends OnlinePaymentServlet {
         ((Way4PaymentRequestParser)requestParser).setLinkConfig(linkConfig);
         ///
         return linkConfig.remoteAddressMask;
+        //return httpRequest.getRemoteAddr();
     }
 
     @Override
