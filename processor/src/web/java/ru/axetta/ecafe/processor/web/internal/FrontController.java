@@ -467,7 +467,7 @@ public class FrontController extends HttpServlet {
         ///
         try {
             return RuntimeContext.getInstance().getCardManager().createCard(clientId, cardNo, cardType, Card.ACTIVE_STATE,
-                    validTime, Card.ISSUED_LIFE_STATE, null, issuedTime, cardPrintedNo);
+                    validTime, Card.ISSUED_LIFE_STATE, "", issuedTime, cardPrintedNo);
         } catch (Exception e) {
             logger.error("Failed registerCard", e);
             throw new FrontControllerException(String.format("Ошибка при регистрации карты: %s", e.getMessage()), e);
