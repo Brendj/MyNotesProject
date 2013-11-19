@@ -158,6 +158,8 @@
             clientCriteria.add(Restrictions.eq("contractId", clientAuthToken.getContractId()));
             Client client = (Client) clientCriteria.uniqueResult();
             List <NotificationSettingItem> notifications = ClientRoomNotificationSettingsUtils.getNotificationSettings(client);
+            Long subBalance1 = client.getSubBalance1()==null?0L:client.getSubBalance1();
+            Long subBalance0 = client.getBalance() - subBalance1;
 %>
 
 <form action="<%=StringEscapeUtils.escapeHtml(response.encodeURL(formAction.toString()))%>" method="post"
@@ -244,6 +246,26 @@
             <td>
                 <div class="output-text"><%=StringEscapeUtils
                         .escapeHtml(CurrencyStringUtils.copecksToRubles(client.getBalance()))%>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="output-text">Основнй счет</div>
+            </td>
+            <td>
+                <div class="output-text"><%=StringEscapeUtils
+                        .escapeHtml(CurrencyStringUtils.copecksToRubles(subBalance0))%>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="output-text">Субсчет АП</div>
+            </td>
+            <td>
+                <div class="output-text"><%=StringEscapeUtils
+                        .escapeHtml(CurrencyStringUtils.copecksToRubles(subBalance1))%>
                 </div>
             </td>
         </tr>
