@@ -24,14 +24,7 @@ public class ComplexInfo {
     private MenuDetail menuDetail;
     private Long currentPrice;
     private Good good;
-
-    public Date getMenuDate() {
-        return menuDate;
-    }
-
-    public void setMenuDate(Date menuDate) {
-        this.menuDate = menuDate;
-    }
+    private Integer usedSubscriptionFeeding;
 
     protected ComplexInfo() {
 
@@ -46,6 +39,7 @@ public class ComplexInfo {
         this.modeGrant = modeGrant;
         this.modeOfAdd = modeOfAdd;
         this.complexName = complexName;
+
     }
 
     public String getComplexName() {
@@ -142,6 +136,22 @@ public class ComplexInfo {
 
     public void setGood(Good good) {
         this.good = good;
+    }
+
+    public Date getMenuDate() {
+        return menuDate;
+    }
+
+    public void setMenuDate(Date menuDate) {
+        this.menuDate = menuDate;
+    }
+
+    public Integer getUsedSubscriptionFeeding() {
+        return usedSubscriptionFeeding;
+    }
+
+    public void setUsedSubscriptionFeeding(Integer usedSubscriptionFeeding) {
+        this.usedSubscriptionFeeding = usedSubscriptionFeeding;
     }
 
     @Override

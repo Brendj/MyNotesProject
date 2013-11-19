@@ -2243,11 +2243,15 @@ public class Processor implements SyncProcessor,
                         }
                     }
                     // проверяем спомощью хеш-кода изменилось ли меню, в случае если изменилось то перезаписываем
+                    HashMap<Long, MenuDetail> localIdsToMenuDetailMap = new HashMap<Long, MenuDetail>();
                     if(detailsHashCode==null || !detailsHashCode.equals(detailsHashCode1)){
                         processReqAssortment(persistenceSession, organization, menuDate, item.getReqAssortments());
-                        HashMap<Long, MenuDetail> localIdsToMenuDetailMap = new HashMap<Long, MenuDetail>();
                         processReqMenuDetails(persistenceSession, menu, item, item.getReqMenuDetails(),
                                 localIdsToMenuDetailMap);
+                        processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos(),
+                                localIdsToMenuDetailMap);
+                    } else {
+                        processLocalIdsToMenuDetailMap(menu, item, item.getReqMenuDetails(), localIdsToMenuDetailMap);
                         processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos(),
                                 localIdsToMenuDetailMap);
                     }
@@ -2289,6 +2293,10 @@ public class Processor implements SyncProcessor,
             if (goodsGuid != null) {
                 Good good = DAOUtils.findGoodByGuid(persistenceSession, goodsGuid);
                 complexInfo.setGood(good);
+            }
+            Integer usedSubscriptionFeeding = reqComplexInfo.getUsedSubscriptionFeeding();
+            if (usedSubscriptionFeeding != null) {
+                complexInfo.setUsedSubscriptionFeeding(usedSubscriptionFeeding);
             }
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqComplexInfo.getReqMenuDetail();
             if (reqMenuDetail != null) {
@@ -2361,6 +2369,20 @@ public class Processor implements SyncProcessor,
                     reqAssortment.getVitC(), reqAssortment.getVitA(), reqAssortment.getVitE(), reqAssortment.getMinCa(),
                     reqAssortment.getMinP(), reqAssortment.getMinMg(), reqAssortment.getMinFe());
             persistenceSession.save(assortment);
+        }
+    }
+
+    private void processLocalIdsToMenuDetailMap(Menu menu, SyncRequest.ReqMenu.Item item,
+            Iterator<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails,
+            HashMap<Long, MenuDetail> localIdsToMenuDetailMap) throws Exception {
+        while (reqMenuDetails.hasNext()) {
+            SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
+            for (MenuDetail menuDetail : menu.getMenuDetails()) {
+                if (areMenuDetailsEqual(menuDetail, reqMenuDetail)) {
+                    localIdsToMenuDetailMap.put(reqMenuDetail.getIdOfMenu(), menuDetail);
+                    break;
+                }
+            }
         }
     }
 

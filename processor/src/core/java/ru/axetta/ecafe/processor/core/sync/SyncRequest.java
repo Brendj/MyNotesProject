@@ -915,37 +915,6 @@ public class SyncRequest {
                         }
                     }
 
-                    @Override
-                    public boolean equals(Object o) {
-                        if (this == o) {
-                            return true;
-                        }
-                        if (o == null || getClass() != o.getClass()) {
-                            return false;
-                        }
-
-                        ReqComplexInfoDetail that = (ReqComplexInfoDetail) o;
-
-                        if (count != null ? !count.equals(that.count) : that.count != null) {
-                            return false;
-                        }
-                        if (idOfItem != null ? !idOfItem.equals(that.idOfItem) : that.idOfItem != null) {
-                            return false;
-                        }
-
-                        return true;
-                    }
-
-                    @Override
-                    public int hashCode() {
-                        //int result = idOfItem != null ? idOfItem.hashCode() : 0;
-                        //result = 31 * result + (count != null ? count.hashCode() : 0);
-                        //return result;
-                        HashCodeBuilder builder = new HashCodeBuilder();
-                        builder.append(count);
-                        builder.append(idOfItem);
-                        return builder.toHashCode();
-                    }
                 }
 
                 public static class ReqComplexInfoDiscountDetail {
@@ -1024,45 +993,6 @@ public class SyncRequest {
                                 '}';
                     }
 
-                    @Override
-                    public boolean equals(Object o) {
-                        if (this == o) {
-                            return true;
-                        }
-                        if (o == null || getClass() != o.getClass()) {
-                            return false;
-                        }
-
-                        ReqComplexInfoDiscountDetail that = (ReqComplexInfoDiscountDetail) o;
-
-                        if (isAllGroups != that.isAllGroups) {
-                            return false;
-                        }
-                        if (Double.compare(that.size, size) != 0) {
-                            return false;
-                        }
-                        if (idOfClientGroup != null ? !idOfClientGroup.equals(that.idOfClientGroup)
-                                : that.idOfClientGroup != null) {
-                            return false;
-                        }
-                        if (maxCount != null ? !maxCount.equals(that.maxCount) : that.maxCount != null) {
-                            return false;
-                        }
-
-                        return true;
-                    }
-
-                    @Override
-                    public int hashCode() {
-                        int result;
-                        long temp;
-                        temp = Double.doubleToLongBits(size);
-                        result = (int) (temp ^ (temp >>> 32));
-                        result = 31 * result + isAllGroups;
-                        result = 31 * result + (maxCount != null ? maxCount.hashCode() : 0);
-                        result = 31 * result + (idOfClientGroup != null ? idOfClientGroup.hashCode() : 0);
-                        return result;
-                    }
                 }
 
                 public static class Builder {
@@ -1088,6 +1018,13 @@ public class SyncRequest {
                         if (goodsGuidNode != null) {
                             goodsGuid = StringUtils.substring(goodsGuidNode.getTextContent(), 0, 36);
                         }
+
+                        Node usedSubscriptionFeedingNode = namedNodeMap.getNamedItem("usedSubscriptionFeeding");
+                        int usedSubscriptionFeeding = 0;
+                        if (usedSubscriptionFeedingNode != null) {
+                            usedSubscriptionFeeding = Integer.parseInt(usedSubscriptionFeedingNode.getTextContent());
+                        }
+
                         int modeFree = Integer.parseInt(namedNodeMap.getNamedItem("d").getTextContent());
                         int modeGrant = Integer.parseInt(namedNodeMap.getNamedItem("g").getTextContent());
                         int modeOfAdd = Integer.parseInt(namedNodeMap.getNamedItem("m").getTextContent());
@@ -1119,7 +1056,7 @@ public class SyncRequest {
                             childNode = childNode.getNextSibling();
                         }
                         return new ReqComplexInfo(complexId, complexMenuName, modeFree, modeGrant, modeOfAdd,
-                                    reqComplexInfoDetailLinkedList, useTrDiscount, reqMenuDetail, reqComplexInfoDiscountDetail, currentPrice, goodsGuid);
+                                usedSubscriptionFeeding, reqComplexInfoDetailLinkedList, useTrDiscount, reqMenuDetail, reqComplexInfoDiscountDetail, currentPrice, goodsGuid);
                     }
 
                 }
@@ -1129,6 +1066,7 @@ public class SyncRequest {
                 private final int modeFree;
                 private final int modeGrant;
                 private final int modeOfAdd;
+                private final int usedSubscriptionFeeding;
                 private final Integer useTrDiscount;
                 private final ReqMenuDetail reqMenuDetail;
                 private final List<ReqComplexInfoDetail> complexInfoDetails;
@@ -1137,13 +1075,14 @@ public class SyncRequest {
                 private final String goodsGuid;
 
                 public ReqComplexInfo(int complexId, String complexMenuName, int modeFree, int modeGrant, int modeOfAdd,
-                        List<ReqComplexInfoDetail> complexInfoDetails, Integer useTrDiscount, ReqMenuDetail reqMenuDetail,
+                        int usedSubscriptionFeeding, List<ReqComplexInfoDetail> complexInfoDetails, Integer useTrDiscount, ReqMenuDetail reqMenuDetail,
                         ReqComplexInfoDiscountDetail complexInfoDiscountDetail, Long currentPrice, String goodsGuid) {
                     this.complexId = complexId;
                     this.complexMenuName = complexMenuName;
                     this.modeFree = modeFree;
                     this.modeGrant = modeGrant;
                     this.modeOfAdd = modeOfAdd;
+                    this.usedSubscriptionFeeding = usedSubscriptionFeeding;
                     this.complexInfoDetails = complexInfoDetails;
                     this.useTrDiscount = useTrDiscount;
                     this.complexInfoDiscountDetail = complexInfoDiscountDetail;
@@ -1196,69 +1135,10 @@ public class SyncRequest {
                     return goodsGuid;
                 }
 
-                @Override
-                public boolean equals(Object o) {
-                    if (this == o) {
-                        return true;
-                    }
-                    if (o == null || getClass() != o.getClass()) {
-                        return false;
-                    }
-
-                    ReqComplexInfo that = (ReqComplexInfo) o;
-
-                    if (complexId != that.complexId) {
-                        return false;
-                    }
-                    if (modeFree != that.modeFree) {
-                        return false;
-                    }
-                    if (modeGrant != that.modeGrant) {
-                        return false;
-                    }
-                    if (modeOfAdd != that.modeOfAdd) {
-                        return false;
-                    }
-                    if (complexInfoDetails != null ? !complexInfoDetails.equals(that.complexInfoDetails)
-                            : that.complexInfoDetails != null) {
-                        return false;
-                    }
-                    if (complexInfoDiscountDetail != null ? !complexInfoDiscountDetail
-                            .equals(that.complexInfoDiscountDetail) : that.complexInfoDiscountDetail != null) {
-                        return false;
-                    }
-                    if (complexMenuName != null ? !complexMenuName.equals(that.complexMenuName)
-                            : that.complexMenuName != null) {
-                        return false;
-                    }
-                    if (currentPrice != null ? !currentPrice.equals(that.currentPrice) : that.currentPrice != null) {
-                        return false;
-                    }
-                    if (goodsGuid != null ? !goodsGuid.equals(that.goodsGuid) : that.goodsGuid != null) {
-                        return false;
-                    }
-                    if (useTrDiscount != null ? !useTrDiscount.equals(that.useTrDiscount)
-                            : that.useTrDiscount != null) {
-                        return false;
-                    }
-
-                    return true;
+                public int getUsedSubscriptionFeeding() {
+                    return usedSubscriptionFeeding;
                 }
 
-                @Override
-                public int hashCode() {
-                    HashCodeBuilder builder = new HashCodeBuilder();
-                    builder.append(complexMenuName);
-                    builder.append(modeFree);
-                    builder.append(modeGrant);
-                    builder.append(modeOfAdd);
-                    builder.append(useTrDiscount);
-                    builder.append(complexInfoDetails);
-                    builder.append(complexInfoDiscountDetail);
-                    builder.append(currentPrice);
-                    builder.append(goodsGuid);
-                    return builder.toHashCode();
-                }
             }
 
             public static class ReqMenuDetail {
@@ -2051,11 +1931,6 @@ public class SyncRequest {
                 HashCodeBuilder builder = new HashCodeBuilder();
                 if(reqMenuDetails != null){
                     for (ReqMenuDetail obj : reqMenuDetails) {
-                        builder.append(obj);
-                    }
-                }
-                if(reqComplexInfos != null){
-                    for (ReqComplexInfo obj : reqComplexInfos) {
                         builder.append(obj);
                     }
                 }

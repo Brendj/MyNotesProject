@@ -13,3 +13,5 @@ ALTER TABLE CF_WayBills ADD COLUMN inn character varying(32);
 
 -- Добавлен хэшкод для сранения меню при синхронизации
 ALTER TABLE CF_Menu ADD COLUMN DetailsHashCode int;
+
+ALTER TABLE cf_complexinfo ADD COLUMN usedsubscriptionfeeding integer default 0;
