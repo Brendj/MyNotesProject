@@ -67,14 +67,14 @@ public class RNIPTest {
         String modifyCatalogFileName = "C:\\Work\\Work.dev\\SVN\\ecafe-jb7\\processor\\src\\web\\web\\WEB-INF\\classes\\META-INF\\rnip\\modifyCatalog.xml";
         String createCatalogFileName = "C:\\Work\\Work.dev\\SVN\\ecafe-jb7\\processor\\src\\web\\web\\WEB-INF\\classes\\META-INF\\rnip\\createCatalog.xml";
         String loadPaymentFileName = "C:\\Work\\Work.dev\\SVN\\ecafe-jb7\\processor\\src\\web\\web\\WEB-INF\\classes\\META-INF\\rnip\\getPayments_byDate.xml";
-        RNIPLoadPaymentsService s = new RNIPLoadPaymentsService();
-        SOAPMessage msg = s.signRequest(new StreamSource(new FileInputStream(modifyCatalogFileName)), RNIPLoadPaymentsService.REQUEST_MODIFY_CATALOG);
-        Array.writeFile("C:/test_modifyCatalog.signed.xml", RNIPLoadPaymentsService.messageToString(msg).getBytes("UTF-8"));
-
-        msg=s.signRequest(new StreamSource(new FileInputStream(createCatalogFileName)), RNIPLoadPaymentsService.REQUEST_CREATE_CATALOG);
-        Array.writeFile("C:/test_createCatalog.signed.xml", RNIPLoadPaymentsService.messageToString(msg).getBytes("UTF-8"));
-
-        msg= s.signRequest(new StreamSource(new FileInputStream(loadPaymentFileName)), RNIPLoadPaymentsService.REQUEST_LOAD_PAYMENTS);
-        Array.writeFile("C:/test_loadPayment.signed.xml", RNIPLoadPaymentsService.messageToString(msg).getBytes("UTF-8"));
+        //RNIPLoadPaymentsService s = new RNIPLoadPaymentsService();
+        //SOAPMessage msg = s.signRequest(new StreamSource(new FileInputStream(modifyCatalogFileName)), RNIPLoadPaymentsService.REQUEST_MODIFY_CATALOG);
+        //Array.writeFile("C:/test_modifyCatalog.signed.xml", RNIPLoadPaymentsService.messageToString(msg).getBytes("UTF-8"));
+        //
+        //msg=s.signRequest(new StreamSource(new FileInputStream(createCatalogFileName)), RNIPLoadPaymentsService.REQUEST_CREATE_CATALOG);
+        //Array.writeFile("C:/test_createCatalog.signed.xml", RNIPLoadPaymentsService.messageToString(msg).getBytes("UTF-8"));
+        //
+        //msg= s.signRequest(new StreamSource(new FileInputStream(loadPaymentFileName)), RNIPLoadPaymentsService.REQUEST_LOAD_PAYMENTS);
+        //Array.writeFile("C:/test_loadPayment.signed.xml", RNIPLoadPaymentsService.messageToString(msg).getBytes("UTF-8"));
     }
 }
