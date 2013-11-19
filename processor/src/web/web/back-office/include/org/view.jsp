@@ -50,6 +50,8 @@
     <h:outputText escape="true" value="Тип пищеблока" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgViewPage.refectoryTypeStringRepresentation}" readonly="true"
                  styleClass="input-text" />
+   <%-- <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgViewPage.type}" readonly="true" styleClass="input-text" />--%>
     <h:outputText escape="true" value="Номер договора" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.contractId}" styleClass="input-text" />
     <h:outputText escape="true" value="Дата заключения договора" styleClass="output-text" />
@@ -68,7 +70,6 @@
            </rich:column>
         </rich:dataTable>
     </h:panelGrid>
-    <%-- Kadyrov D.I. 09.02.2011 --%>
 
     <h:outputText escape="true" value="Физическое лицо по договору" styleClass="output-text" />
     <h:panelGrid styleClass="borderless-grid" columns="2">
@@ -100,7 +101,7 @@
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.subscriptionPrice}" converter="copeckSumConverter"
                  styleClass="input-text" />
     <h:outputText escape="true" value="Идентификатор организации - источника меню" styleClass="output-text" />
-    <h:inputText readonly="true" value="#{mainPage.orgViewPage.menuExchangeSourceOrgName}" styleClass="input-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.menuExchangeSourceOrgName}" styleClass="input-text long-field" />
 
     <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.configurationProviderName}" styleClass="input-text" />

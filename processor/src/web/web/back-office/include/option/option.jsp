@@ -63,6 +63,17 @@
             <h:inputText value="#{optionPage.smsDefaultSubscriptionFee}" styleClass="input-text"
                          converter="copeckSumConverter" size="5" />
         </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Включить абоненское питание" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{optionPage.enableSubscriptionFeeding}" styleClass="output-text" />
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Включить работу по субсчетам" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{optionPage.enableSubBalanceOperation}" styleClass="output-text" />
+        </h:panelGrid>
+
     </rich:tab>
     <rich:tab label="Платежные системы">
         <h:outputText escape="true" value="Выводить в личный кабинет" styleClass="output-text" />

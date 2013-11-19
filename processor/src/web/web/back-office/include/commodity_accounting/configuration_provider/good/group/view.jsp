@@ -20,6 +20,10 @@
         <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{goodGroupViewPage.currentOrg.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
             <f:setPropertyActionListener value="#{goodGroupViewPage.currentOrg.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
         </a4j:commandLink>
+        <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
+        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{goodGroupViewPage.currentConfigurationProvider.name}" action="#{configurationProviderViewPage.show}" styleClass="command-link">
+            <f:setPropertyActionListener value="#{goodGroupViewPage.currentConfigurationProvider}" target="#{selectedConfigurationProviderGroupPage.selectConfigurationProvider}" />
+        </a4j:commandLink>
         <h:outputText escape="true" value="Статус" styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{goodGroupViewPage.currentGoodGroup.deletedState}" readonly="true" disabled="true"/>
         <h:outputText escape="true" value="Товары (количество)" styleClass="output-text" />

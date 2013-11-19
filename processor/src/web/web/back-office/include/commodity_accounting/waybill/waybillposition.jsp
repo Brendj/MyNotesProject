@@ -19,42 +19,42 @@
 <h:panelGrid id="ctOfWayBillDifferencePositionListPage" binding="#{wayBillPositionListPage.pageComponent}"
              styleClass="borderless-grid">
 
-    <rich:simpleTogglePanel label="Фильтр (#{wayBillPositionListPage.filter.status})" switchType="client" opened="true"
+    <rich:simpleTogglePanel label="Фильтр (#{wayBillPositionListPage.status})" switchType="client" opened="true"
                             headerClass="filter-panel-header">
 
         <h:panelGrid columns="2" styleClass="borderless-grid">
-           <%-- <h:outputText escape="true" value="Организация" styleClass="output-text" />
+            <h:outputText escape="true" value="Организация" styleClass="output-text" />
             <h:panelGroup styleClass="borderless-div">
                 <h:inputText value="#{wayBillPositionListPage.shortName}" readonly="true" styleClass="input-text"
                              style="margin-right: 2px;" />
                 <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;" />
-            </h:panelGroup>--%>
+            </h:panelGroup>
             <h:outputText escape="true" value="Номер документа в накладной" styleClass="output-text" />
             <h:inputText value="#{wayBillPositionListPage.wayBillItem.number}" styleClass="input-text" disabled="true" readonly="true"/>
             <h:outputText escape="true" value="Удаленные акты" styleClass="output-text" />
-            <h:selectOneMenu id="selectDeletedStatus" value="#{wayBillPositionListPage.filter.deletedState}" styleClass="input-text">
+            <h:selectOneMenu id="selectDeletedStatus" value="#{wayBillPositionListPage.deletedState}" styleClass="input-text">
                 <f:selectItem itemLabel="Скрыть" itemValue="true"/>
                 <f:selectItem itemLabel="Показать" itemValue="false"/>
             </h:selectOneMenu>
-            <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
-            <rich:calendar value="#{wayBillPositionListPage.filter.startDate}" datePattern="dd.MM.yyyy"
+           <%-- <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
+            <rich:calendar value="#{wayBillPositionListPage.startDate}" datePattern="dd.MM.yyyy"
                            converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
             <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
-            <rich:calendar value="#{wayBillPositionListPage.filter.endDate}" datePattern="dd.MM.yyyy"
-                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+            <rich:calendar value="#{wayBillPositionListPage.endDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />--%>
         </h:panelGrid>
 
         <h:panelGrid columns="2" styleClass="borderless-grid">
-            <a4j:commandButton value="Применить" action="#{wayBillPositionListPage.reload}"
+            <a4j:commandButton value="Применить" action="#{wayBillPositionListPage.show}"
                                reRender="workspaceTogglePanel" styleClass="command-button" />
-            <a4j:commandButton value="Очистить" action="#{wayBillPositionListPage.resetFilter}"
+            <a4j:commandButton value="Очистить" action="#{wayBillPositionListPage.reset}"
                                reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button"/>
         </h:panelGrid>
     </rich:simpleTogglePanel>
 
-    <rich:dataTable value="#{wayBillPositionListPage.itemList}" var="wayBillPosition" rowKeyVar="row">
+    <rich:dataTable value="#{wayBillPositionListPage.wayBillPositionItems}" var="wayBillPosition" rowKeyVar="row">
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="№" />
@@ -119,19 +119,19 @@
             </f:facet>
             <h:outputText escape="true" value="#{wayBillPosition.goodsCreationDate}" styleClass="output-text" converter="timeConverter"/>
         </rich:column>
-        <rich:column headerClass="column-header" sortBy="#{wayBillPosition.orgOwner.idOfOrg}">
+        <rich:column headerClass="column-header" sortBy="#{wayBillPosition.orgOwner}">
             <f:facet name="header">
                 <h:outputText escape="true" value="Организация" />
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{wayBillPosition.orgOwner.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
-                <f:setPropertyActionListener value="#{wayBillPosition.orgOwner.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{wayBillPosition.orgOwnerShortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+                <f:setPropertyActionListener value="#{wayBillPosition.orgOwner}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Статус" />
             </f:facet>
-            <h:outputText escape="true" value="#{wayBillPosition.deletedState}" styleClass="output-text" />
+            <h:outputText escape="true" value="#{(wayBillPosition.deletedState?'Активен':'Удален')}" styleClass="output-text" />
         </rich:column>
     </rich:dataTable>
 </h:panelGrid>

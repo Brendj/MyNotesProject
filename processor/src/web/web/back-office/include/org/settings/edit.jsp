@@ -267,6 +267,24 @@
             <rich:inputNumberSlider value="#{settingEditPage.parserBySettingValue.porog}" maxValue="100"
                                     step="1" showToolTip="true" />
         </h:panelGrid>
+
+        <h:panelGrid columns="2" id="settingsCreateSubscriberFeedingPanelGrid"
+                     rendered="#{settingEditPage.settingsIds==4}">
+
+            <h:outputText escape="true" value="Количество дней, отводимое на активизацию услуги" styleClass="output-text" />
+            <h:inputText value="#{settingEditPage.parserBySettingValue.dayActivae}" styleClass="input-text" style="width: 207px"/>
+
+            <h:outputText escape="true" value="Количество дней, на которые оформляются заявки на поставку" styleClass="output-text" />
+            <h:inputText value="#{settingEditPage.parserBySettingValue.dayRequest}" styleClass="input-text" style="width: 207px"/>
+
+            <h:outputText escape="true" value="Максимальное количество дней, на котороые сформированные заявки запрещено редактировать" styleClass="output-text" />
+            <h:inputText value="#{settingEditPage.parserBySettingValue.maxDayRequest}" styleClass="input-text" style="width: 207px"/>
+
+            <h:outputText escape="true" value="Количество дней, пропустив которые, клиент приостанавливает свою подписку" styleClass="output-text" />
+            <h:inputText value="#{settingEditPage.parserBySettingValue.dayDeActivae}" styleClass="input-text" style="width: 207px"/>
+
+        </h:panelGrid>
+
     </h:panelGrid>
 
     <h:panelGrid columns="2">

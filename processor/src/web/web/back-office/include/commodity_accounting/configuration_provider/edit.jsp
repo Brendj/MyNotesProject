@@ -20,7 +20,7 @@
 <%--@elvariable id="configurationProviderEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderEditPage"--%>
 <h:panelGrid id="configurationProviderCreatePanelGrid" binding="#{configurationProviderEditPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
-    <h:panelGrid columns="2">
+    <h:panelGrid styleClass="borderless-grid" columns="2">
 
         <h:outputText escape="true" value="Наименование" styleClass="output-text required-field" />
         <h:inputText value="#{configurationProviderEditPage.currentConfigurationProvider.name}" maxlength="128" styleClass="input-text long-field" />
@@ -33,13 +33,16 @@
                                styleClass="command-link" style="width: 25px;" >
                 <f:setPropertyActionListener value="#{configurationProviderEditPage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
             </a4j:commandButton>
-            <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{configurationProviderEditPage.filter}}" />
+            <h:outputText styleClass="output-text" id="configurationProviderFilter" escape="true" value=" {#{configurationProviderEditPage.filter}}" />
         </h:panelGroup>
 
     </h:panelGrid>
 
-    <h:panelGrid styleClass="borderless-grid">
+    <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Сохрнить" action="#{configurationProviderEditPage.save}"
+                           reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+
+        <a4j:commandButton value="Востановить" action="#{configurationProviderEditPage.show}"
                            reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     </h:panelGrid>
 

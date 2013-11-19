@@ -60,6 +60,13 @@
         <f:selectItem itemValue="-1" itemLabel="-- не выставлено --" />
         <f:selectItems value="#{mainPage.orgCreatePage.refectoryTypeComboMenuItems}" />
     </h:selectOneMenu>
+
+  <%--  <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.orgCreatePage.type}" styleClass="input-text" style="width: 250px;">
+        <f:converter converterId="organizationTypeConverter"/>
+        <f:selectItems value="#{mainPage.orgCreatePage.organizationTypeMenu.items}" />
+    </h:selectOneMenu>--%>
+
     <h:outputText escape="true" value="Номер договора" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.contractId}" maxlength="50" styleClass="input-text" />
     <h:outputText escape="true" value="Дата заключения договора" styleClass="output-text" />
@@ -94,11 +101,13 @@
                  styleClass="input-text" />
     <h:outputText escape="true" value="Идентификатор организации - источника меню" styleClass="output-text" />
     <h:panelGroup styleClass="borderless-div">
-        <h:inputText value="#{mainPage.orgCreatePage.menuExchangeSourceOrgName}" readonly="true" styleClass="input-text"
+        <h:inputText value="#{mainPage.orgCreatePage.menuExchangeSourceOrgName}" readonly="true" styleClass="input-text long-field"
                      style="margin-right: 2px;" />
         <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
-                           styleClass="command-link" style="width: 25px;" />
+                           styleClass="command-link" style="width: 25px;">
+            <f:setPropertyActionListener value="2" target="#{mainPage.orgSelectPage.filterMode}" />
+        </a4j:commandButton>
     </h:panelGroup>
     <h:outputText escape="true" value="Пароль для единого входа" styleClass="output-text" />
     <h:inputSecret value="#{mainPage.orgCreatePage.plainSsoPassword}" maxlength="64" styleClass="input-text" />

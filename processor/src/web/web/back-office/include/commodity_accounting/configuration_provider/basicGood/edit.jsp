@@ -15,6 +15,15 @@
 <%--@elvariable id="basicGoodEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good.BasicGoodEditPage"--%>
 <h:panelGrid id="basicGoodEditGrid" binding="#{basicGoodEditPage.ap.pageComponent}" styleClass="borderless-grid" columns="2">
 
+    <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text required-field" />
+    <h:panelGroup styleClass="borderless-div">
+        <h:outputText value="#{basicGoodEditPage.currentConfigurationProvider.name}" styleClass="output-text" style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;" />
+        <a4j:commandButton value="..." action="#{basicGoodEditPage.selectConfigurationProvider}" reRender="configurationProviderSelectModalPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectModalPanel')}.show();"
+                           styleClass="command-link" style="width: 25px; float: right;"
+                           disabled="#{basicGoodEditPage.ap.readonly}"/>
+    </h:panelGroup>
+
     <h:outputText escape="true" value="GUID" styleClass="output-text" rendered="#{!basicGoodEditPage.ap.createMode}"/>
     <h:inputText value="#{basicGoodEditPage.ap.currentEntity.guid}" styleClass="input-text" readonly="true" disabled="true" rendered="#{!basicGoodEditPage.ap.createMode}"/>
 
@@ -24,7 +33,7 @@
     <h:outputText escape="true" value="Дата последнего изменения" styleClass="output-text" rendered="#{!basicGoodEditPage.ap.createMode}"/>
     <h:inputText value="#{basicGoodEditPage.ap.currentEntity.lastUpdate}" converter="timeConverter" styleClass="input-text" readonly="true" disabled="true" rendered="#{!basicGoodEditPage.ap.createMode}"/>
 
-    <h:outputText escape="true" value="Наименование продукта" styleClass="output-text required-field" />
+    <h:outputText escape="true" value="Наименование базового товара" styleClass="output-text required-field" />
     <h:inputText value="#{basicGoodEditPage.ap.currentEntity.nameOfGood}" maxlength="128" styleClass="input-text long-field" required="true" requiredMessage="Введите наименование продукта." readonly="#{basicGoodEditPage.ap.readonly}"/>
 
     <h:outputText escape="true" value="Единица измерения" styleClass="output-text required-field" />

@@ -68,7 +68,7 @@
                 <h:outputText escape="true" value="Номер"/>
             </f:facet>
             <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{wayBill.number}" action="#{wayBillPositionListPage.show}" styleClass="command-link">
-                <f:setPropertyActionListener value="#{wayBill.idOfWayBill}" target="#{wayBillPositionListPage.filter.idOfWayBill}" />
+                <%--<f:setPropertyActionListener value="#{wayBill.idOfWayBill}" target="#{wayBillPositionListPage.idOfWayBill}" />--%>
                 <f:setPropertyActionListener value="#{wayBill}" target="#{wayBillPositionListPage.wayBillItem}" />
             </a4j:commandLink>
         </rich:column>

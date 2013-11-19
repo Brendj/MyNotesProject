@@ -25,7 +25,13 @@
         </h:panelGroup>
         <h:outputText escape="true" value="Наименование группы" styleClass="output-text required-field" />
         <h:inputTextarea value="#{goodGroupCreatePage.goodGroup.nameOfGoodsGroup}" cols="128" rows="4" styleClass="input-text long-field" />
-
+        <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text required-field" />
+        <h:panelGroup styleClass="borderless-div">
+            <h:outputText value="#{goodGroupCreatePage.currentConfigurationProvider.name}" styleClass="output-text" style="margin-right: 2px; margin-top: 2px; width: 366px; min-height: 14px; float: left; padding: 3px; border: 1px groove #EEE; background-color: #ffffff;" />
+            <a4j:commandButton value="..." action="#{goodGroupCreatePage.currentConfigurationProvider}" reRender="configurationProviderSelectModalPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectModalPanel')}.show();"
+                               styleClass="command-link" style="width: 25px; float: right;" />
+        </h:panelGroup>
     </h:panelGrid>
 
 </h:panelGrid>

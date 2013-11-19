@@ -155,6 +155,23 @@
                      styleClass="output-text" />
     </h:panelGrid>
 
+    <h:panelGrid columns="2" id="settingsCreateSubscriberFeedingPanelGrid"
+                 rendered="#{settingViewPage.setting.settingsId.id==4}">
+
+        <h:outputText escape="true" value="Количество дней, отводимое на активизацию услуги" styleClass="output-text" />
+        <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.dayActivae}" styleClass="input-text" style="width: 207px"/>
+
+        <h:outputText escape="true" value="Количество дней, на которые оформляются заявки на поставку" styleClass="output-text" />
+        <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.dayRequest}" styleClass="input-text" style="width: 207px"/>
+
+        <h:outputText escape="true" value="Максимальное количество дней, на котороые сформированные заявки запрещено редактировать" styleClass="output-text" />
+        <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.maxDayRequest}" styleClass="input-text" style="width: 207px"/>
+
+        <h:outputText escape="true" value="Количество дней, пропустив которые, клиент приостанавливает свою подписку" styleClass="output-text" />
+        <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.dayDeActivae}" styleClass="input-text" style="width: 207px"/>
+
+    </h:panelGrid>
+
     <h:panelGrid columns="2">
         <a4j:commandButton action="#{settingViewPage.edit}" value="Редактировать" styleClass="command-button" reRender="mainMenu, workspaceTogglePanel"/>
     </h:panelGrid>

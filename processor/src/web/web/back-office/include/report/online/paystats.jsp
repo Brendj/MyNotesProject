@@ -27,10 +27,7 @@
             </f:facet>
         </a4j:status>
     </h:panelGrid>
-    <rich:spacer height="10"/>
-    
-    <h:outputText rendered="#{payStatsPage.statItems!=null}" value="Отчет по платежам агентов за период: #{payStatsPage.fromDateAsString}-#{payStatsPage.toDateAsString}"/>
-
+    <h:outputText rendered="#{payStatsPage.statItems!=null}" styleClass="output-text" escape="true" value="Отчет по платежам агентов за период: #{payStatsPage.fromDateAsString}-#{payStatsPage.toDateAsString}"/>
     <h:panelGrid styleClass="borderless-grid">
         <rich:dataTable id="payStatsPageReportTable" value="#{payStatsPage.statItems}" var="item" rowKeyVar="row"
                         rows="50" footerClass="data-table-footer">

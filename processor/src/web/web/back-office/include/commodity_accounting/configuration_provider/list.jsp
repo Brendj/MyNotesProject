@@ -25,7 +25,7 @@
              styleClass="borderless-grid" columns="1">
 
     <rich:dataTable id="configurationProviderListTable" value="#{configurationProviderListPage.configurationProviderList}" var="configurationProvider"
-                    columnClasses="left-aligned-column, left-aligned-column, center-aligned-column" width="400px" rowKeyVar="row">
+                    columnClasses="left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column" width="400px" rowKeyVar="row">
         <rich:column  headerClass="column-header">
             <f:facet name="header">
                 <h:outputText value="№" styleClass="output-text" escape="true"/>
@@ -39,6 +39,16 @@
             </f:facet>
             <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{configurationProvider.name}" action="#{configurationProviderViewPage.show}"
                            styleClass="command-link">
+                <f:setPropertyActionListener value="#{configurationProvider}" target="#{selectedConfigurationProviderGroupPage.selectConfigurationProvider}"/>
+            </a4j:commandLink>
+        </rich:column>
+
+        <rich:column headerClass="column-header" styleClass="center-aligned-column">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Редактировать" />
+            </f:facet>
+            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{configurationProviderEditPage.show}" styleClass="command-link">
+                <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{configurationProvider}" target="#{selectedConfigurationProviderGroupPage.selectConfigurationProvider}"/>
             </a4j:commandLink>
         </rich:column>

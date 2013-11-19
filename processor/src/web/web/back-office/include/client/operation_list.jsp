@@ -35,6 +35,13 @@
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
+            <h:outputText escape="true" value="Номер счета" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.sourceBalanceNumberFormat}" styleClass="output-text" rendered="#{item.sourceBalanceNumber!=null}"/>
+        <h:outputText escape="true" value="#{item.client.contractIdFormat}" styleClass="output-text" rendered="#{item.sourceBalanceNumber==null}"/>
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
             <h:outputText escape="true" value="Карта" />
         </f:facet>
         <a4j:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
@@ -52,13 +59,25 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Входящий баланс" />
         </f:facet>
-        <h:outputText escape="true" value="#{item.balanceBeforeTransaction}" converter="copeckSumConverter" styleClass="output-text" />
+        <h:outputText escape="true" value="#{item.balanceBeforeTransaction}" converter="copeckSumConverter" styleClass="output-text"/>
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Субс. АП" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.subBalance1BeforeTransaction}" converter="copeckSumConverter" styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
             <h:outputText escape="true" value="Сумма" />
         </f:facet>
-        <h:outputText escape="true" value="#{item.transactionSum}" converter="copeckSumConverter" styleClass="output-text" />
+        <h:outputText escape="true" value="#{item.transactionSum}" converter="copeckSumConverter" styleClass="output-text"/>
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Субс. АП" />
+        </f:facet>
+        <h:outputText escape="true" value="#{item.transactionSubBalance1Sum}" converter="copeckSumConverter" styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">

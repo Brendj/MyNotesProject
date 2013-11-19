@@ -650,10 +650,10 @@
                             rendered="#{wayBillPositionListPage.wayBillItem!=null}" />
     </rich:panelMenuGroup>
 
-    <%--@elvariable id="actOfInventarizationListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.ActOfInventarizationListPage"--%>
-    <rich:panelMenuItem id="actOfInventarizationListMenuItem" label="Акты инвентаризации"
-                        binding="#{actOfInventarizationListPage.mainMenuComponent}"
-                        action="#{actOfInventarizationListPage.show}" reRender="workspaceForm" />
+    <%--@elvariable id="actOfInventarizationListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.ActOfInventorizationListPage"--%>
+    <rich:panelMenuItem id="actOfInventorizationListMenuItem" label="Акты инвентаризации"
+                        binding="#{actOfInventorizationListPage.mainMenuComponent}"
+                        action="#{actOfInventorizationListPage.show}" reRender="workspaceForm" />
     <%--@elvariable id="actOfWayBillDifferencePositionListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.ActOfWayBillDifferencePositionListPage"--%>
     <rich:panelMenuItem id="actOfWayBillDifferencePositionListMenuItem" label="Акты о наличии расхождений"
                         binding="#{actOfWayBillDifferencePositionListPage.mainMenuComponent}"
@@ -991,7 +991,7 @@
                             action="#{thinClientUserEditPage.show}" reRender="workspaceForm" >
             <f:setPropertyActionListener value="-1" target="#{thinClientUserEditPage.idOfClient}" />
         </rich:panelMenuItem>
-    </rich:panelMenuGroup>
+</rich:panelMenuGroup>
 
 </rich:panelMenuGroup>
 

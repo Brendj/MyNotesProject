@@ -17,6 +17,7 @@
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
 <%--@elvariable id="configurationProviderViewPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderViewPage"--%>
+<%--@elvariable id="configurationProviderEditPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderEditPage"--%>
 <h:panelGrid styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Идентификатор" styleClass="output-text" />
     <h:inputText readonly="true" value="#{configurationProviderViewPage.currentConfigurationProvider.idOfConfigurationProvider}" styleClass="input-text"
@@ -26,14 +27,19 @@
     <h:inputText readonly="true" value="#{configurationProviderViewPage.currentConfigurationProvider.name}" styleClass="input-text"/>
 
     <h:outputText escape="true" value="Организации" styleClass="output-text" />
-    <h:inputText readonly="true" value="Данная конфигурация не привязана ни к одной организации." styleClass="input-text long-field" rendered="#{configurationProviderViewPage.currentConfigurationProvider.orgEmpty}"/>
-    <h:dataTable value="#{configurationProviderViewPage.currentConfigurationProvider.orgs}" border="0" var="org" rendered="#{!configurationProviderViewPage.currentConfigurationProvider.orgEmpty}">
-        <h:column>
+    <h:inputText readonly="true" value="Данная конфигурация не привязана ни к одной организации." styleClass="input-text long-field" rendered="#{configurationProviderViewPage.orgEmpty}"/>
+
+    <h:panelGroup rendered="#{!configurationProviderViewPage.orgEmpty}">
+        <h:outputText escape="true" value="{" styleClass="output-text" />
+        <a4j:repeat value="#{configurationProviderViewPage.orgList}" var="org">
             <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{org.shortName}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{org.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>
-        </h:column>
-    </h:dataTable>
+            <h:outputText escape="true" value="; " styleClass="output-text" />
+        </a4j:repeat>
+        <h:outputText escape="true" value="}" styleClass="output-text" />
+    </h:panelGroup>
+
     <h:outputText escape="true" value="Продукты" styleClass="output-text" />
     <a4j:commandLink reRender="mainMenu, workspaceForm" value="Перейти к списку" action="#{configurationProviderViewPage.showProducts}" styleClass="command-link"/>
 

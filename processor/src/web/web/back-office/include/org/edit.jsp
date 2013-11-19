@@ -53,16 +53,19 @@
                            reRender="modalContragentSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" >
-                <f:setPropertyActionListener value="0"
-                                             target="#{mainPage.multiContrFlag}" />
-                <f:setPropertyActionListener value="2"
-                                             target="#{mainPage.classTypes}" />
+                <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+                <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
         </a4j:commandButton>
     </h:panelGroup>
     <h:outputText escape="true" value="Тип пищеблока" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.orgEditPage.refectoryType}" styleClass="input-text" style="width: 250px;">
         <f:selectItems value="#{mainPage.orgEditPage.refectoryTypeComboMenuItems}" />
     </h:selectOneMenu>
+   <%-- <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.orgEditPage.type}" styleClass="input-text" style="width: 250px;">
+        <f:converter converterId="organizationTypeConverter"/>
+        <f:selectItems value="#{mainPage.orgEditPage.organizationTypeMenu.items}" />
+    </h:selectOneMenu>--%>
     <h:outputText escape="true" value="Номер договора" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.contractId}" maxlength="50" styleClass="input-text" />
     <h:outputText escape="true" value="Дата заключения договора" styleClass="output-text" />
@@ -112,22 +115,30 @@
     <h:outputText escape="true" value="Размер абонентской платы" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.subscriptionPrice}" converter="copeckSumConverter"
                  styleClass="input-text" />
-    <h:outputText escape="true" value="Идентификатор организации - источника меню" styleClass="output-text" />
-    <h:panelGroup styleClass="borderless-div">
-        <h:inputText value="#{mainPage.orgEditPage.menuExchangeSourceOrgName}" readonly="true" styleClass="input-text"
-                     style="margin-right: 2px;" />
-        <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
-                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
-                           styleClass="command-link" style="width: 25px;" />
-    </h:panelGroup>
 
-    <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
-    <h:panelGroup styleClass="borderless-div">
+    <h:outputText escape="true" value="Включить товарный учет" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.changeCommodityAccounting}" styleClass="output-text">
+        <a4j:support event="onclick" reRender="orgEditGrid" ajaxSingle="true" />
+    </h:selectBooleanCheckbox>
+
+    <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" rendered="#{mainPage.orgEditPage.changeCommodityAccounting}"/>
+    <h:panelGroup styleClass="borderless-div" rendered="#{mainPage.orgEditPage.changeCommodityAccounting}">
         <h:inputText value="#{mainPage.orgEditPage.configurationProviderName}" readonly="true" styleClass="input-text"
                      style="margin-right: 2px;" />
         <a4j:commandButton value="..." action="#{mainPage.orgEditPage.showConfigurationProviderSelection}" reRender="configurationProviderSelectModalPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('configurationProviderSelectModalPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" />
+    </h:panelGroup>
+
+    <h:outputText escape="true" value="Идентификатор организации - источника меню" styleClass="output-text" />
+    <h:panelGroup styleClass="borderless-div">
+        <h:inputText value="#{mainPage.orgEditPage.menuExchangeSourceOrgName}" readonly="true" styleClass="input-text long-field"
+                     style="margin-right: 2px;" />
+        <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px;">
+            <f:setPropertyActionListener value="2" target="#{mainPage.orgSelectPage.filterMode}" />
+        </a4j:commandButton>
     </h:panelGroup>
 
     <h:outputText escape="true" value="Корпуса организации" styleClass="output-text" />

@@ -56,6 +56,17 @@
     <h:outputText escape="true" value="Текущий баланс" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.balance}" readonly="true" converter="copeckSumConverter"
                  styleClass="input-text" />
+    <h:outputText escape="true" value="Основнй счет" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientViewPage.subBalance0}" readonly="true" converter="copeckSumConverter"
+                 styleClass="input-text" />
+    <h:outputText escape="true" value="Субсчет АП" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientViewPage.subBalance1}" readonly="true" converter="copeckSumConverter"
+                 styleClass="input-text" />
+
+    <h:outputText escape="true" value="Статус подписки АП" styleClass="output-text" />
+    <h:selectBooleanCheckbox disabled="true" value="#{mainPage.clientViewPage.wasSuspended}" readonly="true"
+                             styleClass="output-text" />
+
     <h:outputText escape="true" value="Лимит овердрафта" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.limit}" readonly="true" converter="copeckSumConverter"
                  styleClass="input-text" />

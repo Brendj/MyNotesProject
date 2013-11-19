@@ -15,43 +15,43 @@
   Time: 16:33
   Список Актов инвентаризации
 --%>
-<%--@elvariable id="actOfInventarizationListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.ActOfInventarizationListPage"--%>
-<h:panelGrid id="actOfInventarizationListPage" binding="#{actOfInventarizationListPage.pageComponent}"
+<%--@elvariable id="actOfInventorizationListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.ActOfInventorizationListPage"--%>
+<h:panelGrid id="actOfInventarizationListPage" binding="#{actOfInventorizationListPage.pageComponent}"
              styleClass="borderless-grid">
 
-    <rich:simpleTogglePanel label="Фильтр (#{actOfInventarizationListPage.filter.status})" switchType="client" opened="true"
+    <rich:simpleTogglePanel label="Фильтр (#{actOfInventorizationListPage.filter.status})" switchType="client" opened="true"
                             headerClass="filter-panel-header">
 
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText escape="true" value="Организация" styleClass="output-text" />
             <h:panelGroup styleClass="borderless-div">
-                <h:inputText value="#{actOfInventarizationListPage.shortName}" readonly="true" styleClass="input-text long-field"
+                <h:inputText value="#{actOfInventorizationListPage.shortName}" readonly="true" styleClass="input-text long-field"
                 style="margin-right: 2px;" />
                 <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
                 oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                 styleClass="command-link" style="width: 25px;" />
             </h:panelGroup>
             <h:outputText escape="true" value="Комиссия" styleClass="output-text" />
-            <h:inputText value="#{actOfInventarizationListPage.filter.commission}" styleClass="input-text" />
+            <h:inputText value="#{actOfInventorizationListPage.filter.commission}" styleClass="input-text" />
             <h:outputText escape="true" value="Номер документа" styleClass="output-text" />
-            <h:inputText value="#{actOfInventarizationListPage.filter.number}" styleClass="input-text" />
+            <h:inputText value="#{actOfInventorizationListPage.filter.number}" styleClass="input-text" />
             <h:outputText escape="true" value="Удаленные акты" styleClass="output-text" />
-            <h:selectOneMenu id="selectDeletedStatus" value="#{actOfInventarizationListPage.filter.deletedState}" styleClass="input-text">
+            <h:selectOneMenu id="selectDeletedStatus" value="#{actOfInventorizationListPage.filter.deletedState}" styleClass="input-text">
                 <f:selectItem itemLabel="Скрыть" itemValue="true"/>
                 <f:selectItem itemLabel="Показать" itemValue="false"/>
             </h:selectOneMenu>
             <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
-            <rich:calendar value="#{actOfInventarizationListPage.filter.startDate}" datePattern="dd.MM.yyyy"
+            <rich:calendar value="#{actOfInventorizationListPage.filter.startDate}" datePattern="dd.MM.yyyy"
                            converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
             <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
-            <rich:calendar value="#{actOfInventarizationListPage.filter.endDate}" datePattern="dd.MM.yyyy"
+            <rich:calendar value="#{actOfInventorizationListPage.filter.endDate}" datePattern="dd.MM.yyyy"
                            converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
         </h:panelGrid>
 
         <h:panelGrid columns="2" styleClass="borderless-grid">
-            <a4j:commandButton value="Применить" action="#{actOfInventarizationListPage.reload}"
+            <a4j:commandButton value="Применить" action="#{actOfInventorizationListPage.reload}"
                                reRender="workspaceTogglePanel" styleClass="command-button" />
-            <a4j:commandButton value="Очистить" action="#{actOfInventarizationListPage.resetFilter}"
+            <a4j:commandButton value="Очистить" action="#{actOfInventorizationListPage.resetFilter}"
                                reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
         </h:panelGrid>
     </rich:simpleTogglePanel>
