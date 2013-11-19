@@ -90,6 +90,19 @@ public class XMLUtils {
         return value == null || value.isEmpty() ? null : Integer.valueOf(value);
     }
 
+    public static int getIntegerValueZeroSafe(Node node, String attributeName) {
+        String value = getAttributeValue(node, attributeName);
+        return value == null || value.isEmpty() ? 0 : Integer.valueOf(value);
+    }
+
+    public static String getStringValueNullSafe(Node node, String name) throws Exception {
+        String value = getAttributeValue(node, name);
+        if (null == node) {
+            return null;
+        }
+        return node.getTextContent();
+    }
+
     public static Date getDateAttributeValue(Node node, String attributeName) throws Exception {
         String attributeValue = getAttributeValue(node, attributeName);
         try {
