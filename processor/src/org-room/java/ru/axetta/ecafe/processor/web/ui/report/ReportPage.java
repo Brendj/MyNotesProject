@@ -61,7 +61,7 @@ public class ReportPage extends BasicWorkspacePage {
     @Autowired
     private ReportDAOService proxy;
 
-    @PersistenceContext(unitName = "processorPU")
+    @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
 
     private String errorMessages;
