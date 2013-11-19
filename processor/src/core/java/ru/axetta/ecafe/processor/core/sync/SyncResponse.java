@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
+import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.ResPaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.response.DirectiveElement;
@@ -34,7 +35,7 @@ import java.util.*;
  */
 public class SyncResponse {
 
-    public static class ResPaymentRegistry {
+    /*public static class ResPaymentRegistry {
 
         public static class Item {
 
@@ -99,7 +100,7 @@ public class SyncResponse {
             return "ResPaymentRegistry{" + "items=" + items + '}';
         }
     }
-
+*/
     public static class AccRegistry {
 
         public static class Item {
@@ -109,6 +110,7 @@ public class SyncResponse {
             private final long idOfClient;
             private final Date updateTime;
             private final long balance;
+            private final Long subBalance1;
             private final long limit;
             private final long expenditureLimit;
             private final int state;
@@ -122,7 +124,12 @@ public class SyncResponse {
                 this.idOfClient = card.getClient().getIdOfClient();
                 this.updateTime = card.getUpdateTime();
                 Client client = card.getClient();
-                this.balance = client.getBalance();
+                if(client.getSubBalance1()==null){
+                    this.subBalance1 = 0L;
+                }else {
+                    this.subBalance1 = client.getSubBalance1();
+                }
+                this.balance = client.getBalance() - this.subBalance1;
                 this.limit = client.getLimit();
                 this.expenditureLimit = client.getExpenditureLimit();
                 this.state = card.getState();
@@ -137,7 +144,12 @@ public class SyncResponse {
                 this.idOfClient = card.getClient().getIdOfClient();
                 this.updateTime = card.getUpdateTime();
                 //Client client = card.getClient();
-                this.balance = client.getBalance();
+                if(client.getSubBalance1()==null){
+                    this.subBalance1 = 0L;
+                }else {
+                    this.subBalance1 = client.getSubBalance1();
+                }
+                this.balance = client.getBalance() - this.subBalance1;
                 this.limit = client.getLimit();
                 this.expenditureLimit = client.getExpenditureLimit();
                 this.state = card.getState();
@@ -162,6 +174,10 @@ public class SyncResponse {
                 return balance;
             }
 
+            public Long getSubBalance1() {
+                return subBalance1;
+            }
+
             public long getLimit() {
                 return limit;
             }
@@ -181,6 +197,7 @@ public class SyncResponse {
                 element.setAttribute("IdOfClient", Long.toString(idOfClient));
                 element.setAttribute("LastUpdate", timeFormat.format(updateTime));
                 element.setAttribute("Balance", Long.toString(balance));
+                element.setAttribute("SubBalance1", Long.toString(subBalance1));
                 element.setAttribute("Limit", Long.toString(limit));
                 element.setAttribute("ExpenditureLimit", Long.toString(expenditureLimit));
                 element.setAttribute("State", Long.toString(state));
@@ -201,7 +218,7 @@ public class SyncResponse {
             @Override
             public String toString() {
                 return "Item{" + "cardNo=" + cardNo + ", cardType=" + cardType + ", lastUpdate=" + updateTime
-                        + ", balance=" + balance + ", limit=" + limit + ", expenditureLimit=" + expenditureLimit
+                        + ", balance=" + balance + ", subBalance1=" + subBalance1 + ", limit=" + limit + ", expenditureLimit=" + expenditureLimit
                         + ", state=" + state + '}';
             }
         }
@@ -212,8 +229,12 @@ public class SyncResponse {
             this.items.add(item);
         }
 
-        public Enumeration<Item> getItems() {
-            return Collections.enumeration(items);
+        public Iterator<Item> getItems() {
+            return items.iterator();
+        }
+
+        public Integer getItemCounts() {
+            return items.size();
         }
 
         public Element toElement(Document document, DateFormat dateFormat, DateFormat timeFormat) throws Exception {
@@ -238,12 +259,14 @@ public class SyncResponse {
             private final long idOfClient;
             private final Date dateTime;
             private final long sum;
+            private final Long sumSubBalance1;
 
-            public Item(long idOfPaymentOrder, long idOfClient, Date dateTime, long sum) {
+            public Item(long idOfPaymentOrder, long idOfClient, Date dateTime, long sum, Long sumSubBalance1) {
                 this.idOfPaymentOrder = idOfPaymentOrder;
                 this.idOfClient = idOfClient;
                 this.dateTime = dateTime;
                 this.sum = sum;
+                this.sumSubBalance1 = sumSubBalance1;
             }
 
             public long getIdOfPaymentOrder() {
@@ -258,9 +281,13 @@ public class SyncResponse {
                 return dateTime;
             }
 
-            public long getSum() {
-                return sum;
+            public Long getSumSubBalance1() {
+                return sumSubBalance1;
             }
+
+            //public long getSum() {
+            //    return sum;
+            //}
 
             public Element toElement(Document document, DateFormat timeFormat) throws Exception {
                 Element element = document.createElement("AI");
@@ -268,6 +295,11 @@ public class SyncResponse {
                 element.setAttribute("IdOfClient", Long.toString(idOfClient));
                 element.setAttribute("Date", timeFormat.format(dateTime));
                 element.setAttribute("Sum", Long.toString(sum));
+                if(sumSubBalance1==null){
+                    element.setAttribute("SumSubBalance1", "0");
+                } else {
+                    element.setAttribute("SumSubBalance1", Long.toString(sumSubBalance1));
+                }
                 return element;
             }
 
@@ -1486,551 +1518,3 @@ public class SyncResponse {
     }
 
 }
-
-/* public static class ResLibraryData {
-
-        private Circulations circulations = new Circulations();
-        private Publications publications = new Publications();
-
-        public Circulations getCirculations() {
-            return circulations;
-        }
-
-        public Publications getPublications() {
-            return publications;
-        }
-
-        public void setCirculations(Circulations circulations) {
-            this.circulations = circulations;
-        }
-
-        public void setPublications(Publications publications) {
-            this.publications = publications;
-        }
-
-        public Element toElement(Document document) throws Exception {
-            Element element = document.createElement("ResLibraryData");
-            element.appendChild(circulations.toElement(document));
-            element.appendChild(publications.toElement(document));
-            return element;
-        }
-
-        public static class Circulations {
-
-            public static class Circulation {
-
-                private final long idOfCirculation;
-                private final long version;
-                private final int errCode;
-                private final String error;
-
-                public Circulation(long idOfCirculation, long version, int errCode, String error) {
-                    this.idOfCirculation = idOfCirculation;
-                    this.version = version;
-                    this.errCode = errCode;
-                    this.error = error;
-                }
-
-                public long getIdOfCirculation() {
-                    return idOfCirculation;
-                }
-
-                public long getVersion() {
-                    return version;
-                }
-
-                public int getErrCode() {
-                    return errCode;
-                }
-
-                public String getError() {
-                    return error;
-                }
-
-                public Element toElement(Document document) throws Exception {
-                    Element element = document.createElement("Circulation");
-                    element.setAttribute("IdOfCirculation", Long.toString(this.idOfCirculation));
-                    element.setAttribute("Version", Long.toString(this.version));
-                    element.setAttribute("ErrCode", Long.toString(this.errCode));
-                    if (null != this.error) {
-                        element.setAttribute("Error", this.error);
-                    }
-
-                    return element;
-                }
-
-                @Override
-                public String toString() {
-                    return "Circulation{" + "idOfCirculation=" + idOfCirculation + ", version=" + version + ", errCode="
-                            + errCode + ", error='" + error + '\'' + '}';
-                }
-            }
-
-            private final List<Circulation> circulationList = new LinkedList<Circulation>();
-
-            public void addItem(Circulation circulation) {
-                this.circulationList.add(circulation);
-            }
-
-            public Enumeration<Circulation> getCirculationList() {
-                return Collections.enumeration(circulationList);
-            }
-
-            public Element toElement(Document document) throws Exception {
-                Element element = document.createElement("Circulations");
-                for (Circulation circulation : this.circulationList) {
-                    element.appendChild(circulation.toElement(document));
-                }
-                return element;
-            }
-
-            @Override
-            public String toString() {
-                return "Circulations{" + "circulationList=" + circulationList + '}';
-            }
-        }
-
-        public static class Publications {
-
-            public static class Publication {
-
-                private final long idOfPublication;
-                private final long version;
-                private final int errCode;
-                private final String error;
-
-                public Publication(long idOfPublication, long version, int errCode, String error) {
-                    this.idOfPublication = idOfPublication;
-                    this.version = version;
-                    this.errCode = errCode;
-                    this.error = error;
-                }
-
-                public long getIdOfPublication() {
-                    return idOfPublication;
-                }
-
-                public long getVersion() {
-                    return version;
-                }
-
-                public int getErrCode() {
-                    return errCode;
-                }
-
-                public String getError() {
-                    return error;
-                }
-
-                public Element toElement(Document document) throws Exception {
-                    Element element = document.createElement("Publication");
-                    element.setAttribute("IdOfPublication", Long.toString(this.idOfPublication));
-                    element.setAttribute("Version", Long.toString(this.version));
-                    element.setAttribute("ErrCode", Long.toString(this.errCode));
-                    if (null != this.error) {
-                        element.setAttribute("Error", this.error);
-                    }
-
-                    return element;
-                }
-
-                @Override
-                public String toString() {
-                    return "Publication{" + "idOfPublication=" + idOfPublication + ", version=" + version + ", errCode="
-                            + errCode + ", error='" + error + '\'' + '}';
-                }
-            }
-
-            private final List<Publication> publicationList = new LinkedList<Publication>();
-
-            public void addItem(Publication publication) {
-                this.publicationList.add(publication);
-            }
-
-            public Enumeration<Publication> getPublicationList() {
-                return Collections.enumeration(publicationList);
-            }
-
-            public Element toElement(Document document) throws Exception {
-                Element element = document.createElement("Publications");
-                for (Publication publication : this.publicationList) {
-                    element.appendChild(publication.toElement(document));
-                }
-                return element;
-            }
-
-            @Override
-            public String toString() {
-                return "Publications{" + "publicationList=" + publicationList + '}';
-            }
-        }
-
-        @Override
-        public String toString() {
-            return "ResLibraryData{" + "circulations=" + circulations + ", publications=" + publications + '}';
-        }
-    }
-
-    public static class ResLibraryData2 {
-
-        private Publs publs = new Publs();
-        private Circuls circuls = new Circuls();
-        private CommonUpdate commonUpdate;
-        private int status;
-
-        public Publs getPubls() {
-            return publs;
-        }
-
-        public void setPubls(Publs publs) {
-            this.publs = publs;
-        }
-
-        public Circuls getCirculs() {
-            return circuls;
-        }
-
-        public void setCirculs(Circuls circuls) {
-            this.circuls = circuls;
-        }
-
-        public int getStatus() {
-            return status;
-        }
-
-        public void setStatus(int status) {
-            this.status = status;
-        }
-
-        public CommonUpdate getCommonUpdate() {
-            return commonUpdate;
-        }
-
-        public void setCommonUpdate(CommonUpdate commonUpdate) {
-            this.commonUpdate = commonUpdate;
-        }
-
-        public Element toElement(Document document) throws Exception {
-            Element element = document.createElement("ResLibraryData2");
-            element.appendChild(publs.toElement(document));
-            element.appendChild(circuls.toElement(document));
-            element.appendChild(commonUpdate.toElement(document));
-            return element;
-        }
-
-        public static class Publs {
-
-            public static class Publ {
-
-                private final long idOfPubl;
-                private final int errCode;
-                private final String error;
-
-                public Publ(long idOfPubl, int errCode, String error) {
-                    this.idOfPubl = idOfPubl;
-                    this.errCode = errCode;
-                    this.error = error;
-                }
-
-                public long getIdOfPublication() {
-                    return idOfPubl;
-                }
-
-                public int getErrCode() {
-                    return errCode;
-                }
-
-                public String getError() {
-                    return error;
-                }
-
-                public Element toElement(Document document) throws Exception {
-                    Element element = document.createElement("Publ");
-                    element.setAttribute("IdOfPublication", Long.toString(this.idOfPubl));
-                    element.setAttribute("ErrCode", Long.toString(this.errCode));
-                    if (null != this.error) {
-                        element.setAttribute("Error", this.error);
-                    }
-
-                    return element;
-                }
-
-
-            }
-
-            private final List<Publ> publList = new LinkedList<Publ>();
-
-            public void addItem(Publ publ) {
-                this.publList.add(publ);
-            }
-
-            public Enumeration<Publ> getPublList() {
-                return Collections.enumeration(publList);
-            }
-
-            public Element toElement(Document document) throws Exception {
-                Element element = document.createElement("Publs");
-                for (Publ publ : this.publList) {
-                    element.appendChild(publ.toElement(document));
-                }
-                return element;
-            }
-
-            @Override
-            public String toString() {
-                return "Publs{" + "publList=" + publList + '}';
-            }
-        }
-
-        public static class Circuls {
-
-            private int result = 0;
-
-            public static class Circul {
-
-                private final Long idOfCircul;
-                private final int errCode;
-                private final String error;
-                private final long idOfClient;
-                private final long idOfPublication;
-                private final long idOfOrg;
-
-                public Circul(Long idOfCircul, int errCode, String error, long idOfClient, long idOfPublication, long idOfOrg) {
-                    this.idOfCircul = idOfCircul;
-                    this.errCode = errCode;
-                    this.error = error;
-                    this.idOfClient = idOfClient;
-                    this.idOfPublication = idOfPublication;
-                    this.idOfOrg = idOfOrg;
-                }
-
-                public long getIdOfCircul() {
-                    return idOfCircul;
-                }
-
-                public int getErrCode() {
-                    return errCode;
-                }
-
-                public String getError() {
-                    return error;
-                }
-
-                public long getIdOfClient() {
-                    return idOfClient;
-                }
-
-                public long getIdOfPublication() {
-                    return idOfPublication;
-                }
-
-                public long getIdOfOrg() {
-                    return idOfOrg;
-                }
-
-                public Element toElement(Document document) throws Exception {
-                    Element element = document.createElement("Circul");
-                    element.setAttribute("IdOfCirculation", Long.toString(this.idOfCircul));
-                    element.setAttribute("ErrCode", Long.toString(this.errCode));
-                    if (null != this.error) {
-                        element.setAttribute("Error", this.error);
-                    }
-                    element.setAttribute("IdOfClient", Long.toString(this.idOfClient));
-                    element.setAttribute("IdOfPublication", Long.toString(this.idOfPublication));
-                    element.setAttribute("IdOfOrg", Long.toString(this.idOfOrg));
-                    return element;
-                }
-
-                @Override
-                public String toString() {
-                    return "Circul{" +
-                            "idOfCircul=" + idOfCircul +
-                            ", errCode=" + errCode +
-                            ", error='" + error + '\'' +
-                            ", idOfClient=" + idOfClient +
-                            ", idOfPublication=" + idOfPublication +
-                            ", idOfOrg=" + idOfOrg +
-                            '}';
-                }
-            }
-
-            private final List<Circul> circulList = new LinkedList<Circul>();
-
-            public int getResult() {
-                return result;
-            }
-
-            public void setResult(int result) {
-                this.result = result;
-            }
-
-            public void addItem(Circul circul) {
-                this.circulList.add(circul);
-            }
-
-            public Enumeration<Circul> getCirculList() {
-                return Collections.enumeration(circulList);
-            }
-
-            public Element toElement(Document document) throws Exception {
-                Element element = document.createElement("Circuls");
-                for (Circul circul : this.circulList) {
-                    element.appendChild(circul.toElement(document));
-                }
-                return element;
-            }
-
-            @Override
-            public String toString() {
-                return "Circuls{" + "circulList=" + circulList + '}';
-            }
-        }
-
-        public static class CommonUpdate {
-
-            private final long upToVersion;
-
-            public CommonUpdate(long upToVersion) {
-                this.upToVersion = upToVersion;
-
-            }
-
-            public static class Publ {
-
-                private Long idofpubl;
-                private String isbn;
-                private String data;
-                private String author;
-                private String title;
-                private String title2;
-                private String publicationdate;
-                private String publisher;
-                private String hash;
-                private long version;
-
-                public Publ() {
-                }
-
-                public Publ(long idofpubl, String isbn, String data, String author, String title, String title2, String publicationDate,
-                        String publisher, String hash, long version) {
-                    this.idofpubl = idofpubl;
-                    this.data = data;
-                    this.author = author;
-                    this.title = title;
-                    this.title2 = title2;
-                    this.publicationdate = publicationDate;
-                    this.publisher = publisher;
-                    this.hash = hash;
-                    this.version = version;
-                }
-
-                public Long getIdofpubl() {
-                    return idofpubl;
-                }
-
-                public String getIsbn() {
-                    return isbn;
-                }
-
-                public String getData() {
-                    return data;
-                }
-
-                public String getAuthor() {
-                    return author;
-                }
-
-                public String getTitle() {
-                    return title;
-                }
-
-                public String getTitle2() {
-                    return title2;
-                }
-
-                public String getPublicationdate() {
-                    return publicationdate;
-                }
-
-                public String getPublisher() {
-                    return publisher;
-                }
-
-                public String getHash() {
-                    return hash;
-                }
-
-                public long getVersion() {
-                    return version;
-                }
-
-                public Element toElement(Document document) throws Exception {
-                    Element element = document.createElement("Publ");
-                    element.setAttribute("IdOfPublication", Long.toString(this.idofpubl));
-                    element.setAttribute("ISBN", this.isbn);
-                    element.setAttribute("Data", this.data);
-                    element.setAttribute("Author", this.author);
-                    element.setAttribute("Title", this.title);
-                    element.setAttribute("Title2", this.title2);
-                    element.setAttribute("PublicationDate", this.publicationdate);
-                    element.setAttribute("Publisher", this.hash);
-                    element.setAttribute("Version", Long.toString(this.version));
-                    return element;
-                }
-
-                @Override
-                public String toString() {
-                    return "Publ{" +
-                            "idofpubl=" + idofpubl +
-                            ", isbn='" + isbn + '\'' +
-                            ", data='" + data + '\'' +
-                            ", author='" + author + '\'' +
-                            ", title='" + title + '\'' +
-                            ", title2='" + title2 + '\'' +
-                            ", publicationdate='" + publicationdate + '\'' +
-                            ", publisher='" + publisher + '\'' +
-                            ", hash='" + hash + '\'' +
-                            ", version=" + version +
-                            '}';
-                }
-            }
-
-            private final List<Publ> publList = new LinkedList<Publ>();
-
-            public void addItem(Publ publ) {
-                this.publList.add(publ);
-            }
-
-            public void addAll(List<Publ> publs) {
-                publList.addAll(publs);
-            }
-
-            public Enumeration<Publ> getPublList() {
-                return Collections.enumeration(publList);
-            }
-
-            public Element toElement(Document document) throws Exception {
-                Element element = document.createElement("CommonUpdate");
-                for (Publ publ : this.publList) {
-                    element.appendChild(publ.toElement(document));
-                }
-                return element;
-            }
-
-            @Override
-            public String toString() {
-                return "CommonUpdate{" +
-                        "publList=" + publList +
-                        '}';
-            }
-        }
-
-        @Override
-        public String toString() {
-            return "ResLibraryData2{" +
-                    "publs=" + publs +
-                    ", circuls=" + circuls +
-                    ", commonUpdate=" + commonUpdate +
-                    '}';
-        }
-    }*/
