@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.waybill;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfWayBillDifference;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractFilter;
 

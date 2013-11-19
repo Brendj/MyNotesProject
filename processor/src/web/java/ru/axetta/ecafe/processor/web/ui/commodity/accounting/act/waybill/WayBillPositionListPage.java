@@ -1,74 +1,71 @@
-/*
- * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
- */
-
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.waybill;
 
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.WayBill;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.WayBillPosition;
-import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractListPage;
-import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.WayBillPositionService;
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.items.WayBillPositionItem;
+import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
-import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
  * User: damir
- * Date: 18.12.12
- * Time: 16:31
+ * Date: 05.11.13
+ * Time: 11:58
  * To change this template use File | Settings | File Templates.
  */
 @Component
 @Scope("session")
-public class WayBillPositionListPage extends AbstractListPage<WayBillPosition, WayBillPositionItem> implements OrgSelectPage.CompleteHandler {
+public class WayBillPositionListPage extends BasicWorkspacePage {
 
-    private WayBillPositionFilter filter = new WayBillPositionFilter();
+    private List<WayBillPositionItem> wayBillPositionItems = new ArrayList<WayBillPositionItem>();
     private String shortName;
     private WayBillItem wayBillItem;
+    private String status;
+    private Boolean deletedState = true;
+    @Autowired
+    private WayBillPositionService service;
 
     @Override
-    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
-        if (null != idOfOrg) {
-            Org org = (Org) session.load(Org.class, idOfOrg);
-            shortName = org.getShortName();
-            this.filter.setIdOfOrg(idOfOrg);
+    public void onShow() throws Exception {
+        if(wayBillItem!=null && wayBillItem.getIdOfWayBill()!=null){
+            wayBillPositionItems = service.findByWayBill(wayBillItem.getIdOfWayBill());
         }
     }
 
-    @Override
-    protected String getPageFileName() {
-        return "commodity_accounting/waybill/waybillposition";
-    }
-
-    @Override
-    protected Class<WayBillPosition> getEntityClass() {
-        return WayBillPosition.class;
-    }
-
-    @Override
-    protected WayBillPositionItem createItem() {
-        return new WayBillPositionItem();
-    }
-
-    @Override
-    protected String getSortField() {
-        return "createdDate";
-    }
-
-    @Override
-    public WayBillPositionFilter getFilter() {
-        return filter;
-    }
-
-    public void setFilter(WayBillPositionFilter filter) {
-        this.filter = filter;
+    public Object reset(){
+        deletedState = true;
+        wayBillItem = null;
+        wayBillPositionItems = new ArrayList<WayBillPositionItem>();
+        return null;
     }
 
     public String getShortName() {
         return shortName;
+    }
+
+    public void setShortName(String shortName) {
+        this.shortName = shortName;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Boolean getDeletedState() {
+        return deletedState;
+    }
+
+    public void setDeletedState(Boolean deletedState) {
+        this.deletedState = deletedState;
     }
 
     public WayBillItem getWayBillItem() {
@@ -78,4 +75,14 @@ public class WayBillPositionListPage extends AbstractListPage<WayBillPosition, W
     public void setWayBillItem(WayBillItem wayBillItem) {
         this.wayBillItem = wayBillItem;
     }
+
+    public List<WayBillPositionItem> getWayBillPositionItems() {
+        return wayBillPositionItems;
+    }
+
+    @Override
+    public String getPageFilename() {
+        return "commodity_accounting/waybill/waybillposition";
+    }
+
 }

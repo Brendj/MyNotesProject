@@ -5,12 +5,8 @@
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.waybill;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfWayBillDifference;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfWayBillDifferencePosition;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.WayBill;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.WayBillPosition;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.ActOfWayBillDifference;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.WayBill;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractEntityItem;
 
 import javax.persistence.EntityManager;
