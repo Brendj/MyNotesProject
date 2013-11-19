@@ -22,8 +22,8 @@ public class ReportInfo {
     private String tag;
     private Long idOfContragentReceiver;
     private String contragentReceiver;
-    private Long idOfContragent;
-    private String contragent;
+    private Long idOfContragentPayer;
+    private String contragentPayer;
     
     protected ReportInfo() {
 
@@ -31,7 +31,7 @@ public class ReportInfo {
 
     public ReportInfo(String ruleName, Integer documentFormat, String reportName, Date createdDate, Long generationTime,
             Date startDate, Date endDate, String reportFile, String orgNum, Long idOfOrg, String tag, Long idOfContragentReceiver,
-            String contragentReceiver, Long idOfContragent, String contragent) {
+            String contragentReceiver, Long idOfContragentPayer, String contragentPayer) {
         this.ruleName = ruleName;
         this.documentFormat = documentFormat;
         this.reportName = reportName;
@@ -46,8 +46,8 @@ public class ReportInfo {
         this.tag = tag;
         this.idOfContragentReceiver = idOfContragentReceiver;
         this.contragentReceiver = contragentReceiver;
-        this.idOfContragent = idOfContragent;
-        this.contragent = contragent;
+        this.idOfContragentPayer = idOfContragentPayer;
+        this.contragentPayer = contragentPayer;
     }
 
     public String getReportFile() {
@@ -162,20 +162,20 @@ public class ReportInfo {
         this.contragentReceiver = contragentReceiver;
     }
 
-    public Long getIdOfContragent() {
-        return idOfContragent;
+    public Long getIdOfContragentPayer() {
+        return idOfContragentPayer;
     }
 
-    public void setIdOfContragent(Long idOfContragent) {
-        this.idOfContragent = idOfContragent;
+    public void setIdOfContragentPayer(Long idOfContragentPayer) {
+        this.idOfContragentPayer = idOfContragentPayer;
     }
 
-    public String getContragent() {
-        return contragent;
+    public String getContragentPayer() {
+        return contragentPayer;
     }
 
-    public void setContragent(String contragent) {
-        this.contragent = contragent;
+    public void setContragentPayer(String contragentPayer) {
+        this.contragentPayer = contragentPayer;
     }
 
     @Override
@@ -192,8 +192,8 @@ public class ReportInfo {
                 ", reportFile='" + reportFile + '\'' +
                 ", idOfContragentReceiver='" + idOfContragentReceiver + '\'' +
                 ", contragentReceiver='" + contragentReceiver + '\'' +
-                ", idOfContragent='" + idOfContragent + '\'' +
-                ", contragent='" + contragent + '\'' +
+                ", idOfContragent='" + idOfContragentPayer + '\'' +
+                ", contragent='" + contragentPayer + '\'' +
                 '}';
     }
 }

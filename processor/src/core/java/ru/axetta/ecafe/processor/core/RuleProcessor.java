@@ -42,6 +42,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
     public static final String ORG_EXPRESSION = "org:";
     public static final String CONTRAGENT_EXPRESSION = "contragent:";
     public static final String CONTRAGENT_PAYAGENT_EXPRESSION = "contragent-payagent:";
+    public static final String CONTRAGENT_RECEIVER_EXPRESSION = "contragent-receiver:";
     public static final String COMBOBOX_EXPRESSION = "комбобокс:";
     public static final String INPUT_EXPRESSION = "значение:";
     public static final String CHECKBOX_EXPRESSION = "чекбокс:";

@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.daoservices.context;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.User;
 
 import org.hibernate.Criteria;
@@ -21,6 +22,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -71,25 +73,56 @@ public class ContextDAOServices {
         buildOrgRestriction(idOfUser, "idOfOrg", criteria);
     }
 
-    public void buildOrgRestriction(long idOfUser, String field, Criteria criteria) {
-        List<Long> orgIds = findOrgOwnersByContragentSet(idOfUser);
-        if (orgIds.isEmpty()) {
+    public void buildOrgOrContragentRestriction (long idOfUser, String fieldOrg,
+            String fieldContragent, Criteria criteria) {
+        Set<Contragent> contragents = getRestictedContragents(idOfUser);
+        List <Org> orgs = getRestictedOrgs(contragents);
+        if ((orgs == null || orgs.size() < 1) &&
+                (contragents == null || contragents.size() < 1)) {
             return;
+        }
+        List <Long> orgIds = new ArrayList<Long>();
+        if (orgs != null) {
+            for (Org o : orgs) {
+                orgIds.add(o.getIdOfOrg());
+            }
+        }
+        List <Long> contragenIds = new ArrayList<Long>();
+        if (contragents != null) {
+            for (Contragent c : contragents) {
+                contragenIds.add(c.getIdOfContragent());
+            }
+        }
+        criteria.add(Restrictions.or(Restrictions.in(fieldOrg, orgIds), Restrictions.in(fieldContragent, contragenIds)));
+    }
+
+    public void buildOrgRestriction (long idOfUser, String field, Criteria criteria) {
+        List <Org> orgs = getRestictedOrgs(getRestictedContragents(idOfUser));
+        if (orgs == null || orgs.size() < 1) {
+            return;
+        }
+        List <Long> orgIds = new ArrayList<Long>();
+        for (Org o : orgs) {
+            orgIds.add(o.getIdOfOrg());
         }
         criteria.add(Restrictions.in(field, orgIds));
     }
 
-    public String buildOrgRestriction(long idOfUser, String field) {
-        List<Long> orgIds = findOrgOwnersByContragentSet(idOfUser);
-        if (orgIds.isEmpty()) {
+    public String buildOrgRestriction (long idOfUser) {
+        return buildOrgRestriction (idOfUser, "cf_orgs.idOfOrg");
+    }
+
+    public String buildOrgRestriction (long idOfUser, String field) {
+        List <Org> orgs = getRestictedOrgs(getRestictedContragents(idOfUser));
+        if (orgs == null || orgs.size() < 1) {
             return "";
         }
         StringBuilder str = new StringBuilder();
-        for (Long id : orgIds) {
+        for (Org org : orgs) {
             if (str.length() > 0) {
                 str.append(" or ");
             }
-            str.append(field).append("=").append(id);
+            str.append(field).append("=").append(org.getIdOfOrg());
         }
         return "(" + str.toString() + ")";
     }
@@ -144,6 +177,31 @@ public class ContextDAOServices {
             return Collections.emptySet();
         }
         return contragents;
+    }
+
+    @Transactional
+    private List<Org> getRestictedOrgs (Set<Contragent> contragents) {
+        if (contragents == null || contragents.size() < 1) {
+            return Collections.EMPTY_LIST;
+        }
+        Session persistenceSession = (Session) entityManager.getDelegate();
+        String suppliers = "";
+        for (Contragent c : contragents) {
+            if (suppliers.length() > 0) {
+                suppliers = suppliers + " or ";
+            }
+            suppliers = suppliers + "defaultSupplier=" + c.getIdOfContragent();
+        }
+        suppliers = suppliers.length() > 0 ? "where " + suppliers : "";
+
+        List<Org> orgs = new ArrayList<Org>();
+        org.hibernate.Query query = persistenceSession.createSQLQuery("select idoforg from cf_orgs " + suppliers);
+        List list = query.list();
+        for (Object row : list) {
+            BigInteger idOfOrg = (BigInteger) row;
+            orgs.add((Org) persistenceSession.load(Org.class, idOfOrg.longValue()));
+        }
+        return orgs;
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)

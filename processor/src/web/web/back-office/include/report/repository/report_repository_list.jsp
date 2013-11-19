@@ -54,9 +54,9 @@ function checkReporitoryDate () {
                     <h:outputText styleClass="output-text" escape="true" value=" {#{reportRepositoryListPage.orgsFilter}}" />
                 </h:panelGroup>
 
-                <h:outputText escape="true" value="Контрагент" styleClass="output-text" />
+                <h:outputText escape="true" value="Платежный агент" styleClass="output-text" />
                 <h:panelGroup styleClass="borderless-div">
-                    <h:inputText value="#{reportRepositoryListPage.contragentFilter.contragent.contragentName}" readonly="true"
+                    <h:inputText value="#{reportRepositoryListPage.contragentPayerFilter.contragent.contragentName}" readonly="true"
                                  styleClass="input-text" style="margin-right: 2px;" />
                     <a4j:commandButton value="..." action="#{contragentPaymentReportPage.showContragentSelectPage(true)}"
                                        reRender="modalContragentSelectorPanel"
@@ -71,7 +71,7 @@ function checkReporitoryDate () {
                     </a4j:commandButton>
                 </h:panelGroup>
 
-                <h:outputText escape="true" value="Контрагент-получатель" styleClass="output-text" />
+                <h:outputText escape="true" value="Поставщик" styleClass="output-text" />
                 <h:panelGroup styleClass="borderless-div">
                     <h:inputText value="#{reportRepositoryListPage.contragentReceiverFilter.contragent.contragentName}" readonly="true"
                                  styleClass="input-text" style="margin-right: 2px;" />
@@ -144,13 +144,13 @@ function checkReporitoryDate () {
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Контрагент" />
+                <h:outputText escape="true" value="Платежный агент" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.contragent}" styleClass="output-text" />
+            <h:outputText escape="true" value="#{item.contragentPayer}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Контрагент-получатель" />
+                <h:outputText escape="true" value="Поставщик" />
             </f:facet>
             <h:outputText escape="true" value="#{item.contragentReceiver}" styleClass="output-text" />
         </rich:column>

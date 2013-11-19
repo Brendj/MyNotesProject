@@ -624,6 +624,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
         //  Типы
         public static final String CONTRAGENT = "contragent";
         public static final String CONTRAGENT_PAYAGENT = "contragent-payagent";
+        public static final String CONTRAGENT_RECEIVER = "contragent-receiver";
         public static final String CONTRACT   = "contract";
         public static final String ORG        = "org";
         public static final String CLIENT     = "client";
@@ -644,7 +645,10 @@ public class ReportRuleEditPage  extends OnlineReportPage
             Map <String, String> defParams = RuleProcessor.getParametersFromString(defaultRule.getConditionConstant());
 
             if (defaultRule.getConditionConstant().startsWith(RuleProcessor.CONTRAGENT_PAYAGENT_EXPRESSION)) {
-                type = "contragent-payagent";
+                type = CONTRAGENT_PAYAGENT;
+            }
+            else if (defaultRule.getConditionConstant().startsWith(RuleProcessor.CONTRAGENT_RECEIVER_EXPRESSION)) {
+                type = CONTRAGENT_RECEIVER;
             }
             else if (defaultRule.getConditionConstant().startsWith(RuleProcessor.CONTRAGENT_EXPRESSION)) {
                 type = "contragent";
@@ -766,7 +770,8 @@ public class ReportRuleEditPage  extends OnlineReportPage
         }
 
         public static boolean isSuperType (String type) {
-            if (type.equals(CONTRAGENT) || type.equals(CONTRAGENT_PAYAGENT) || type.equals(CONTRACT) ||
+            if (type.equals(CONTRAGENT) || type.equals(CONTRAGENT_PAYAGENT) ||
+                type.equals(CONTRAGENT_RECEIVER) || type.equals(CONTRACT) ||
                 type.equals(ORG) || type.equals(CLIENT)) {
                 return true;
             }

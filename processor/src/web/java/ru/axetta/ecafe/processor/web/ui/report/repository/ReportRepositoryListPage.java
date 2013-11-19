@@ -32,7 +32,7 @@ public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, Repor
     BasicWorkspacePage groupPage = new BasicWorkspacePage();
     ReportRepositoryItem.Filter filter = new ReportRepositoryItem.Filter();
     private final CCAccountFilter contragentReceiverFilter = new CCAccountFilter();
-    private final CCAccountFilter contragentFilter = new CCAccountFilter();
+    private final CCAccountFilter contragentPayerFilter = new CCAccountFilter();
     
     File fileToDownload;
     private ReportRepositoryItem selectedItem;
@@ -85,8 +85,8 @@ public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, Repor
         this.selectReceiver = selectReceiver;
     }
 
-    public CCAccountFilter getContragentFilter() {
-        return contragentFilter;
+    public CCAccountFilter getContragentPayerFilter() {
+        return contragentPayerFilter;
     }
 
     public CCAccountFilter getContragentReceiverFilter() {
@@ -132,8 +132,8 @@ public class ReportRepositoryListPage extends AbstractListPage<ReportInfo, Repor
             contragentReceiverFilter.completeContragentSelection(session, idOfContragent);
             filter.setIdOfContragentReceiver(idOfContragent);
         } else {
-            contragentFilter.completeContragentSelection(session, idOfContragent);
-            filter.setIdOfContragent(idOfContragent);
+            contragentPayerFilter.completeContragentSelection(session, idOfContragent);
+            filter.setIdOfContragentPayer(idOfContragent);
         }
     }
 

@@ -35,6 +35,7 @@ import java.util.*;
 public class ContragentPaymentReport extends BasicReportForContragentJob {
 
     public final static String PARAM_CONTRAGENT_RECEIVER_ID = "idOfContragentReceiver";
+    public final static String PARAM_CONTRAGENT_PAYER_ID = "idOfContragentPayer";
     public final static String PARAM_PERIOD_TYPE = "periodType";
     
 
@@ -189,8 +190,21 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
             parameterMap.put("year", calendar.get(Calendar.YEAR));
             parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
-            parameterMap.put("contragentName", contragent.getContragentName());
 
+            String idOfContragentPayer = getReportProperties().getProperty(PARAM_CONTRAGENT_PAYER_ID);
+            Long lIdOfContragentPayer=null; Contragent contragentPayer=null;
+            if (idOfContragentPayer!=null) {
+                try {
+                    lIdOfContragentPayer=Long.parseLong(idOfContragentPayer);
+                } catch (Exception e) {
+                    throw new Exception("Ошибка парсинга идентификатора контрагента-плательщика: "+idOfContragentPayer, e);
+                }
+                contragentPayer = (Contragent)session.get(Contragent.class, Long.parseLong(idOfContragentPayer));
+                if (contragentPayer==null) {
+                    throw new Exception("Контрагент-плательщик не найден: "+idOfContragentPayer);
+                }
+            }
+            parameterMap.put("contragentName", contragentPayer.getContragentName());
             String idOfContragentReceiver = getReportProperties().getProperty(PARAM_CONTRAGENT_RECEIVER_ID);
             Long lIdOfContragentReceiver=null; Contragent contragentReceiver=null;
             if (idOfContragentReceiver!=null) {
@@ -205,12 +219,12 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 }
             }
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, contragent, contragentReceiver, startTime, endTime, (Calendar) calendar.clone(),
+                    createDataSource(session, contragentPayer, contragentReceiver, startTime, endTime, (Calendar) calendar.clone(),
                             parameterMap));
             Date generateEndTime = new Date();
             if (!exportToHTML) {
                 ContragentPaymentReport report = new ContragentPaymentReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
-                        jasperPrint, startTime, endTime, contragent.getIdOfContragent());
+                        jasperPrint, startTime, endTime, contragentPayer.getIdOfContragent());
                 report.setReportProperties(getReportProperties());
                 return report;
             }  else {
@@ -225,7 +239,7 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                 exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
                 exporter.exportReport();
                 ContragentPaymentReport report = new ContragentPaymentReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
-                        jasperPrint, startTime, endTime, contragent.getIdOfContragent()).setHtmlReport(os.toString("UTF-8"));
+                        jasperPrint, startTime, endTime, contragentPayer.getIdOfContragent()).setHtmlReport(os.toString("UTF-8"));
                 report.setReportProperties(getReportProperties());
                 return report;
             }

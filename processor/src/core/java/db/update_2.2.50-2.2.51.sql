@@ -5,8 +5,8 @@
 -- Пакет обновлений 2.2.50
 
 -- Добавление протоколирования контрагента в БД для возможности последующего фильтра
-alter table CF_ReportInfo add column IdOfContragent bigint default null;
-alter table CF_ReportInfo add column Contragent varchar(128) default null;
+alter table CF_ReportInfo add column IdOfContragentPayer bigint default null;
+alter table CF_ReportInfo add column ContragentPayer varchar(128) default null;
 
 -- Добавлено поле ИНН в накладной
 ALTER TABLE CF_WayBills ADD COLUMN inn character varying(32);

@@ -31,7 +31,7 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
         Date createdDate, startDate, endDate;
         List<Long> idOfOrgList;
         private Long idOfContragentReceiver;
-        private Long idOfContragent;
+        private Long idOfContragentPayer;
 
         @Override
         public boolean isEmpty() {
@@ -49,7 +49,8 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
             //  Ограничение на просмотр оргов для пользователя
             try {
                 Long idOfUser = MainPage.getSessionInstance().getCurrentUser().getIdOfUser();
-                ContextDAOServices.getInstance().buildOrgRestriction(idOfUser, "idOfOrg", crit);
+                ContextDAOServices.getInstance().buildOrgOrContragentRestriction(idOfUser, "idOfOrg",
+                                        ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID, crit);
             } catch (Exception e) {
             }
             if (idOfOrgList != null && idOfOrgList.size() > 0) {
@@ -69,8 +70,8 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
             if (idOfContragentReceiver != null) {
                 crit.add(Restrictions.eq(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID, idOfContragentReceiver));
             }
-            if (idOfContragent != null) {
-                crit.add(Restrictions.eq("idOfContragent", idOfContragent));
+            if (idOfContragentPayer != null) {
+                crit.add(Restrictions.eq(ContragentPaymentReport.PARAM_CONTRAGENT_PAYER_ID, idOfContragentPayer));
             }
             if (endDate!=null) {
                 Calendar localCalendar = Calendar.getInstance();
@@ -152,12 +153,12 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
             this.idOfContragentReceiver = idOfContragentReceiver;
         }
 
-        public Long getIdOfContragent() {
-            return idOfContragent;
+        public Long getIdOfContragentPayer() {
+            return idOfContragentPayer;
         }
 
-        public void setIdOfContragent(Long idOfContragent) {
-            this.idOfContragent = idOfContragent;
+        public void setIdOfContragentPayer(Long idOfContragentPayer) {
+            this.idOfContragentPayer = idOfContragentPayer;
         }
     }
 
@@ -175,8 +176,8 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
     private String tag;
     private Long idOfContragentReceiver;
     private String contragentReceiver;
-    private Long idOfContragent;
-    private String contragent;
+    private Long idOfContragentPayer;
+    private String contragentPayer;
     private List<Long> idOfOrgList;
 
     @Override
@@ -194,8 +195,8 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
         tag = entity.getTag();
         idOfContragentReceiver = entity.getIdOfContragentReceiver();
         contragentReceiver = entity.getContragentReceiver();
-        idOfContragent = entity.getIdOfContragent();
-        contragent = entity.getContragent();
+        idOfContragentPayer = entity.getIdOfContragentPayer();
+        contragentPayer = entity.getContragentPayer();
     }
 
     @Override
@@ -277,8 +278,8 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
         return contragentReceiver;
     }
 
-    public String getContragent() {
-        return contragent;
+    public String getContragentPayer() {
+        return contragentPayer;
     }
 
     public void setContragentReceiver(String contragentReceiver) {
