@@ -7,11 +7,14 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.Date;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,7 +32,7 @@ public abstract class DistributedObject{
     protected Long globalVersion;
     /* версия объекта на момент его создания */
     protected Long globalVersionOnCreate;
-     /* дата создания объекта */
+    /* дата создания объекта */
     protected Date createdDate;
     /* дата мзминения объекта */
     protected Date lastUpdate;
@@ -72,9 +75,6 @@ public abstract class DistributedObject{
         return element;
     }
 
-    /* меод добавления свойств наследника атрибутов в узел */
-    protected abstract void appendAttributes(Element element);
-
     /* метод добавления общих атрибутов в узел */
     public Element toElement(Element element){
         element.setAttribute("Guid", getGuid());
@@ -103,17 +103,114 @@ public abstract class DistributedObject{
         if (getDeletedState()) {
             return this;
         }
-        //Boolean boolSendAll = getBollAttributeValue(node,"SendAll");
-        //if(boolSendAll!=null) setSendAll(boolSendAll);
         return parseAttributes(node);
     }
 
-    /* TODO: вставить входным параметром session от hibernate*/
-    public void preProcess(Session session) throws DistributedObjectException{}
+     /* меод добавления свойств наследника атрибутов в узел */
+    protected abstract void appendAttributes(Element element);
+
+    public abstract void preProcess(Session session, Long idOfOrg) throws DistributedObjectException;
 
     protected abstract DistributedObject parseAttributes(Node node) throws Exception;
 
     public abstract void fill(DistributedObject distributedObject);
+
+    public abstract List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
+            int currentLimit, String currentLastGuid) throws Exception;
+
+    public abstract void createProjections(Criteria criteria, int currentLimit, String currentLastGuid);
+
+    //public abstract DistributedObject findByGuid(Session persistenceSession, boolean isCreate);
+
+    /**
+     * Метод для выборки объектов которые уходят от создателя к создателю без логики
+     * правил распределения, например: натройки ECafeSettings
+     * @param session
+     * @param idOfOrg
+     * @param currentMaxVersion
+     * @return
+     * @throws DistributedObjectException
+     */
+    @SuppressWarnings("unchecked")
+    protected List<DistributedObject> toSelfProcess(Session session, Long idOfOrg, Long currentMaxVersion, String currentLastGuid) throws DistributedObjectException{
+        Criteria criteria = session.createCriteria(getClass());
+        criteria.add(Restrictions.eq("orgOwner",idOfOrg));
+        criteria.add(Restrictions.gt("globalVersion",currentMaxVersion));
+        createProjections(criteria, 0, currentLastGuid);
+        criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
+        return criteria.list();
+    }
+
+    /*
+    protected List<DistributedObject> defaultProcess(Session session, Long idOfOrg, Long currentMaxVersion) throws DistributedObjectException{
+        Criteria criteria = session.createCriteria(getClass());
+
+        List<Long> menuExchangeRuleList = DAOUtils.getListIdOfOrgList(session, idOfOrg);
+
+        Criterion sendToAnyAllRestriction = Restrictions.conjunction();
+        sendToAnyAllRestriction = ((Conjunction)sendToAnyAllRestriction)
+                .add(Restrictions.isNull("orgOwner"))
+                .add(Restrictions.eq("sendAll",SendToAssociatedOrgs.SendToAll));
+
+        Criterion sendToAllRestriction = Restrictions.conjunction();
+        Set<Long> allOrg = new TreeSet<Long>();
+        allOrg.addAll(menuExchangeRuleList);
+        if(!menuExchangeRuleList.isEmpty()){
+            allOrg.addAll(DAOUtils.getListIdOfOrgList(session, menuExchangeRuleList.get(0)));
+        } else {
+            throw new DistributedObjectException("The organization has no source menu");
+        }
+        sendToAllRestriction = ((Conjunction)sendToAllRestriction)
+                .add(Restrictions.in("orgOwner",allOrg))
+                .add(Restrictions.eq("sendAll",SendToAssociatedOrgs.SendToAll));
+
+        Criterion sendToMainRestriction = Restrictions.conjunction();
+        Set<Long> mainOrg = new TreeSet<Long>();
+        mainOrg.addAll(menuExchangeRuleList);
+        mainOrg.add(idOfOrg);
+        sendToMainRestriction = ((Conjunction)sendToMainRestriction)
+                .add(Restrictions.in("orgOwner",mainOrg))
+                .add(Restrictions.eq("sendAll",SendToAssociatedOrgs.SendToMain));
+
+        Criterion sendToSelfRestriction = Restrictions.conjunction();
+        sendToSelfRestriction = ((Conjunction)sendToSelfRestriction)
+                .add(Restrictions.eq("orgOwner",idOfOrg))
+                .add(Restrictions.eq("sendAll",SendToAssociatedOrgs.SendToSelf));
+
+                */
+/* собираем все условия в дизюнкцию */    /*
+
+        Criterion sendToAndOrgRestriction = Restrictions.disjunction()
+                .add(sendToAnyAllRestriction)
+                .add(sendToAllRestriction)
+                .add(sendToMainRestriction)
+                .add(sendToSelfRestriction);
+
+        Criterion resultCriterion =  Restrictions.conjunction().add(sendToAndOrgRestriction);
+
+        Criterion restrictionCurrentMaxVersion = null;
+        if(currentMaxVersion != null){
+            restrictionCurrentMaxVersion = Restrictions.gt("globalVersion",currentMaxVersion);
+            ((Conjunction)resultCriterion).add(restrictionCurrentMaxVersion);
+            // TODO: where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion+ " and not (createVersion>"+currentMaxVersion+" and deletedState)";
+        }
+
+        criteria.add(resultCriterion);
+
+        return criteria.list();
+    }
+    */
+
+    /* идентификатор синхронизируемой организации*/
+    private Long idOfSyncOrg;
+
+    public Long getIdOfSyncOrg() {
+        return idOfSyncOrg;
+    }
+
+    public void setIdOfSyncOrg(Long idOfSyncOrg) {
+        this.idOfSyncOrg = idOfSyncOrg;
+    }
 
     /* Getters and Setters */
     public Long getOrgOwner() {
@@ -127,10 +224,10 @@ public abstract class DistributedObject{
     public String getTagName() {
         return tagName;
     }
-
     public void setTagName(String tagName) {
         this.tagName = tagName;
     }
+
     public String getGuid() {
         return guid;
     }
@@ -222,23 +319,11 @@ public abstract class DistributedObject{
 
     @Override
     public String toString() {
-        return "DistributedObject{" +
+        return getClass().getSimpleName()+ "{" +
                 "globalId=" + globalId +
                 ", globalVersion=" + globalVersion +
                 ", guid='" + guid + '\'' +
                 ", orgOwner=" + orgOwner +
-                ", className=" + getClass().getSimpleName() +
                 '}';
-    }
-
-    /* идентификатор синхронизируемой организации*/
-    private Long idOfSyncOrg;
-
-    public Long getIdOfSyncOrg() {
-        return idOfSyncOrg;
-    }
-
-    public void setIdOfSyncOrg(Long idOfSyncOrg) {
-        this.idOfSyncOrg = idOfSyncOrg;
     }
 }

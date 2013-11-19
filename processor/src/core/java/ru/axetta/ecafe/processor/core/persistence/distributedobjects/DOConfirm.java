@@ -18,6 +18,14 @@ public class DOConfirm {
     private String guid;
     private long orgOwner;
 
+    public DOConfirm() {}
+
+    public DOConfirm(String distributedObjectClassName, String guid, long orgOwner) {
+        this.distributedObjectClassName = distributedObjectClassName;
+        this.guid = guid;
+        this.orgOwner = orgOwner;
+    }
+
     public long getOrgOwner() {
         return orgOwner;
     }
