@@ -5,9 +5,9 @@
 package ru.axetta.ecafe.processor.core.daoservices.commodity.accounting;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.DocumentState;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequest;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequestPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
