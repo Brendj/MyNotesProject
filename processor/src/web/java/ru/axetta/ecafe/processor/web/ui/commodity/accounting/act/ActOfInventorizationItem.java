@@ -6,21 +6,11 @@ package ru.axetta.ecafe.processor.web.ui.commodity.accounting.act;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfInventarization;
-import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.ActOfInventorization;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractEntityItem;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.faces.model.DataModel;
-import javax.faces.model.ListDataModel;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,10 +20,10 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 
-public class ActOfInventarizationItem extends AbstractEntityItem<ActOfInventarization> {
+public class ActOfInventorizationItem extends AbstractEntityItem<ActOfInventorization> {
 
     /* Идентификатор объекта */
-    private Long idOfActOfInventarization;
+    private Long idOfActOfInventorization;
     /* версия объекта */
     private Long version;
     /* дата создания объекта */
@@ -54,8 +44,8 @@ public class ActOfInventarizationItem extends AbstractEntityItem<ActOfInventariz
     private String commission;
 
     @Override
-    public void fillForList(EntityManager entityManager, ActOfInventarization entity) {
-        idOfActOfInventarization = entity.getGlobalId();
+    public void fillForList(EntityManager entityManager, ActOfInventorization entity) {
+        idOfActOfInventorization = entity.getGlobalId();
         version = entity.getGlobalVersion();
         createdDate = entity.getCreatedDate();
         lastUpdate = entity.getLastUpdate();
@@ -75,25 +65,25 @@ public class ActOfInventarizationItem extends AbstractEntityItem<ActOfInventariz
     }
 
     @Override
-    protected void fill(EntityManager entityManager, ActOfInventarization entity) {
+    protected void fill(EntityManager entityManager, ActOfInventorization entity) {
         fillForList(entityManager, entity);
     }
 
     @Override
-    protected void saveTo(EntityManager entityManager, ActOfInventarization entity) {}
+    protected void saveTo(EntityManager entityManager, ActOfInventorization entity) {}
 
     @Override
-    public ActOfInventarization getEntity(EntityManager entityManager) {
-        return entityManager.find(ActOfInventarization.class, idOfActOfInventarization);
+    public ActOfInventorization getEntity(EntityManager entityManager) {
+        return entityManager.find(ActOfInventorization.class, idOfActOfInventorization);
     }
 
     @Override
-    protected ActOfInventarization createEmptyEntity() {
+    protected ActOfInventorization createEmptyEntity() {
         return null;
     }
 
-    public Long getIdOfActOfInventarization() {
-        return idOfActOfInventarization;
+    public Long getIdOfActOfInventorization() {
+        return idOfActOfInventorization;
     }
 
     public Long getVersion() {

@@ -5,23 +5,13 @@
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.act;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfInventarization;
-import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractFilter;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.ActOfInventorization;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractListPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.hibernate.Session;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.faces.model.DataModel;
-import javax.faces.model.ListDataModel;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,9 +22,9 @@ import java.util.List;
  */
 @Component
 @Scope("session")
-public class ActOfInventarizationListPage extends AbstractListPage<ActOfInventarization, ActOfInventarizationItem> implements OrgSelectPage.CompleteHandler {
+public class ActOfInventorizationListPage extends AbstractListPage<ActOfInventorization, ActOfInventorizationItem> implements OrgSelectPage.CompleteHandler {
 
-    private ActOfInventarizationFilter filter = new ActOfInventarizationFilter();
+    private ActOfInventorizationFilter filter = new ActOfInventorizationFilter();
     private String shortName;
 
     @Override
@@ -52,13 +42,13 @@ public class ActOfInventarizationListPage extends AbstractListPage<ActOfInventar
     }
 
     @Override
-    protected Class<ActOfInventarization> getEntityClass() {
-        return ActOfInventarization.class;
+    protected Class<ActOfInventorization> getEntityClass() {
+        return ActOfInventorization.class;
     }
 
     @Override
-    protected ActOfInventarizationItem createItem() {
-        return new ActOfInventarizationItem();
+    protected ActOfInventorizationItem createItem() {
+        return new ActOfInventorizationItem();
     }
 
     @Override
@@ -67,7 +57,7 @@ public class ActOfInventarizationListPage extends AbstractListPage<ActOfInventar
     }
 
     @Override
-    public ActOfInventarizationFilter getFilter() {
+    public ActOfInventorizationFilter getFilter() {
         return filter;
     }
 

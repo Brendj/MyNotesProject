@@ -22,7 +22,7 @@ import java.util.Date;
  * Time: 17:52
  * To change this template use File | Settings | File Templates.
  */
-public class ActOfInventarizationFilter extends AbstractFilter {
+public class ActOfInventorizationFilter extends AbstractFilter {
 
     private Long idOfOrg;
     private String number;

@@ -5,8 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.act;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfInventarization;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfWayBillDifferencePosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.ActOfWayBillDifferencePosition;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractListPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
