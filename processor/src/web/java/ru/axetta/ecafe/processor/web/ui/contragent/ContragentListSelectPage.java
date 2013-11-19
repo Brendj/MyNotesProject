@@ -146,6 +146,7 @@ public class ContragentListSelectPage extends BasicPage {
 
     public void fill(Session session, int multiContrFlag, String classTypes) throws Exception {
         this.multiContrFlag = multiContrFlag;
+        this.classTypesString = classTypes;
         List<Item> items = new ArrayList<Item>();
         List<String> selectedIdsList = Arrays.asList(StringUtils.split(selectedIds, ","));
         List contragents = retrieveContragents(session, classTypes);
@@ -178,7 +179,6 @@ public class ContragentListSelectPage extends BasicPage {
     }*/
 
     private List retrieveContragents(Session session, String classTypesString) throws HibernateException {
-        this.classTypesString = classTypesString;
         Criteria criteria = session.createCriteria(Contragent.class).addOrder(Order.asc("contragentName"));
         //  Ограничение на просмотр только тех контрагентов, которые доступны пользователю
         try {
@@ -189,7 +189,7 @@ public class ContragentListSelectPage extends BasicPage {
         if (StringUtils.isNotEmpty(filter)) {
             criteria.add(Restrictions.like("contragentName", filter, MatchMode.ANYWHERE));
         }
-        if(!classTypesString.isEmpty()) {
+        if (StringUtils.isNotEmpty(classTypesString)) {
             String[] classTypes = classTypesString.split(",");
             Criterion exp = Restrictions.eq("classId", Integer.parseInt(classTypes[0]));
             for (int i = 1; i < classTypes.length; i++) {

@@ -65,7 +65,7 @@
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;">
             <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
-            <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
+            <f:setPropertyActionListener value="0,1,2,3,4,5" target="#{mainPage.classTypes}" />
             <f:setPropertyActionListener value="#{mainPage.userEditPage.contragentIds}"
                                          target="#{mainPage.contragentListSelectPage.selectedIds}" />
         </a4j:commandButton>
