@@ -5,15 +5,20 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.LibraryDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -23,16 +28,65 @@ import java.util.Set;
  * Time: 12:23
  * To change this template use File | Settings | File Templates.
  */
-public class Instance extends DistributedObject {
+public class Instance extends LibraryDistributedObject {
+
+    private Set<Issuable> issuableInternal;
+    private Publication publication;
+    private Fund fund;
+    private InventoryBook inventoryBook;
+    private Ksu1Record ksu1Record;
+    private String guidPublication;
+    private String guidFund;
+    private String guidInventaryBook;
+    private String guidKsu1Record;
+
+    private String guidKsu2Record;
+    private Ksu2Record ksu2Record;
+    private boolean inGroup;
+
+    private String invNumber;
+    private int cost;
+
+
+    @Override
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        //criteria.createAlias("publication","p", JoinType.LEFT_OUTER_JOIN);
+        //criteria.createAlias("fund", "f", JoinType.LEFT_OUTER_JOIN);
+        //criteria.createAlias("inventoryBook", "i", JoinType.LEFT_OUTER_JOIN);
+        //criteria.createAlias("ksu1Record", "k1", JoinType.LEFT_OUTER_JOIN);
+        //criteria.createAlias("ksu2Record", "k2", JoinType.LEFT_OUTER_JOIN);
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+
+        //projectionList.add(Projections.property("inGroup"), "inGroup");
+        //projectionList.add(Projections.property("invNumber"), "invNumber");
+        //projectionList.add(Projections.property("cost"), "cost");
+
+        //projectionList.add(Projections.property("p.guid"), "guidPublication");
+        //projectionList.add(Projections.property("f.guid"), "guidFund");
+        //projectionList.add(Projections.property("i.guid"), "guidInventaryBook");
+        //projectionList.add(Projections.property("k1.guid"), "guidKsu1Record");
+        //projectionList.add(Projections.property("k2.guid"), "guidKsu2Record");
+
+        criteria.setProjection(projectionList);
+    }
+
+    @Override
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
+        return null; //toSelfProcess(session, idOfOrg, currentMaxVersion);
+    }
 
     @Override
     protected void appendAttributes(Element element) {}
 
     @Override
     public Instance parseAttributes(Node node) throws Exception {
-        //Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        //if (longOrgOwner != null)
-        //    setOrgOwner(longOrgOwner);
+        Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
+        if (longOrgOwner != null)
+            setOrgOwner(longOrgOwner);
         guidFund = XMLUtils.getStringAttributeValue(node, "GuidFund", 36);
         guidPublication = XMLUtils.getStringAttributeValue(node, "GuidPublication", 36);
         guidInventaryBook = XMLUtils.getStringAttributeValue(node, "GuidInventaryBook", 36);
@@ -46,7 +100,7 @@ public class Instance extends DistributedObject {
     }
 
     @Override
-    public void preProcess(Session session) throws DistributedObjectException {
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         Publication p = DAOUtils.findDistributedObjectByRefGUID(Publication.class, session, guidPublication);
         if(p==null) {
             DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication NOT_FOUND_VALUE");
@@ -88,28 +142,6 @@ public class Instance extends DistributedObject {
         setInGroup(((Instance) distributedObject).isInGroup());
         setInvNumber(((Instance)distributedObject).getInvNumber());
         setCost(((Instance) distributedObject).getCost());
-    }
-
-    private Publication publication;
-    private boolean inGroup;
-    private Fund fund;
-    private String invNumber;
-    private InventoryBook inventoryBook;
-    private Ksu1Record ksu1Record;
-    private Ksu2Record ksu2Record;
-    private int cost;
-    private String guidPublication;
-    private String guidFund;
-    private String guidInventaryBook;
-    private String guidKsu1Record;
-    private String guidKsu2Record;
-    private Set<Issuable> issuableInternal;
-    public Set<Issuable> getIssuableInternal() {
-        return issuableInternal;
-    }
-
-    public void setIssuableInternal(Set<Issuable> issuableInternal) {
-        this.issuableInternal = issuableInternal;
     }
 
     public Publication getPublication() {
@@ -176,6 +208,11 @@ public class Instance extends DistributedObject {
         this.cost = cost;
     }
 
+    public Set<Issuable> getIssuableInternal() {
+        return issuableInternal;
+    }
 
-
+    public void setIssuableInternal(Set<Issuable> issuableInternal) {
+        this.issuableInternal = issuableInternal;
+    }
 }

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.LibraryDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.Base64AndZip;
@@ -12,14 +13,17 @@ import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 import ru.axetta.ecafe.processor.core.utils.rusmarc.ISBN;
 import ru.axetta.ecafe.processor.core.utils.rusmarc.Record;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
+import org.hibernate.transform.Transformers;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -29,10 +33,71 @@ import java.util.Set;
  * Time: 23:10
  * To change this template use File | Settings | File Templates.
  */
-public class Publication extends DistributedObject {
+public class Publication extends /*LibraryDistributedObject*/ DistributedObject {
+
+    private static final int AUTHOR = 2;
+    private static final int TITLE = 0;
+    private static final int TITLE2 = 1;
+    private static final int PUBLISHER = 3;
+    private static final int PUBLICATION_DATE = 4;
+
+    private String isbn;
+    private byte[] data;
+    private String author;
+    private String title;
+    private String publisher;
+    private Integer hash;
+    private String title2;
+    private String publicationdate;
+    private Boolean validISBN;
+    private Set<Journal> journalInternal;
+    private Set<Instance> instanceInternal;
 
     @Override
-    public void preProcess(Session session) throws DistributedObjectException {
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit,
+            String currentLastGuid) throws Exception {
+
+        DetachedCriteria subCriteria = DetachedCriteria.forClass(Publication.class);
+        subCriteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
+        subCriteria.setProjection(Projections.min("globalVersion"));
+
+        Criteria criteria = session.createCriteria(Publication.class);
+        criteria.add(Restrictions.eq("globalVersion", currentMaxVersion + 1));
+        createProjections(criteria, currentLimit, currentLastGuid);
+        criteria.setCacheable(false);
+        criteria.setReadOnly(true);
+        criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
+        return criteria.list();
+    }
+
+    @Override
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+
+        projectionList.add(Projections.property("data"), "data");
+
+        //if(currentLimit>0){
+        //    criteria.addOrder(Order.asc("guid"));
+        //    criteria.addOrder(Order.asc("globalId"));
+        //    if(!StringUtils.isEmpty(currentLastGuid)) criteria.add(Restrictions.gt("guid", currentLastGuid));
+        //    criteria.setMaxResults(currentLimit);
+        //}
+
+        criteria.setProjection(projectionList);
+    }
+
+    @Override
+    protected void appendAttributes(Element element) {
+        String decodedString = Base64AndZip.enCode(data);
+        XMLUtils.setAttributeIfNotNull(element, "Data", decodedString);
+    }
+
+    @Override
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         if(!(isbn==null || isbn.isEmpty() || publicationdate==null || publicationdate.isEmpty() || !validISBN)){
             Criteria criteria = session.createCriteria(Publication.class);
             criteria.add(Restrictions.eq("isbn",isbn));
@@ -55,30 +120,6 @@ public class Publication extends DistributedObject {
             }
         }
 
-    }
-
-    private static final int AUTHOR = 2;
-    private static final int TITLE = 0;
-    private static final int TITLE2 = 1;
-    private static final int PUBLISHER = 3;
-    private static final int PUBLICATION_DATE = 4;
-
-    private String isbn;
-    private byte[] data;
-    private String author;
-    private String title;
-    private String publisher;
-    private Integer hash;
-    private String title2;
-    private String publicationdate;
-    private Boolean validISBN;
-    private Set<Journal> journalInternal;
-    private Set<Instance> instanceInternal;
-
-    @Override
-    protected void appendAttributes(Element element) {
-        String decodedString = Base64AndZip.enCode(data);
-        XMLUtils.setAttributeIfNotNull(element, "Data", decodedString);
     }
 
     @Override
@@ -139,6 +180,46 @@ public class Publication extends DistributedObject {
         setHash(((Publication) distributedObject).getHash());
     }
 
+    public Set<Instance> getInstanceInternal() {
+        return instanceInternal;
+    }
+
+    public void setInstanceInternal(Set<Instance> instanceInternal) {
+        this.instanceInternal = instanceInternal;
+    }
+
+    public Set<Journal> getJournalInternal() {
+        return journalInternal;
+    }
+
+    public void setJournalInternal(Set<Journal> journalInternal) {
+        this.journalInternal = journalInternal;
+    }
+
+    public Boolean getValidISBN() {
+        return validISBN;
+    }
+
+    public void setValidISBN(Boolean validISBN) {
+        this.validISBN = validISBN;
+    }
+
+    public String getPublicationdate() {
+        return publicationdate;
+    }
+
+    public void setPublicationdate(String publicationdate) {
+        this.publicationdate = publicationdate;
+    }
+
+    public String getTitle2() {
+        return title2;
+    }
+
+    public void setTitle2(String title2) {
+        this.title2 = title2;
+    }
+
     public String getIsbn() {
         return isbn;
     }
@@ -185,46 +266,6 @@ public class Publication extends DistributedObject {
 
     public void setHash(Integer hash) {
         this.hash = hash;
-    }
-
-    public Set<Instance> getInstanceInternal() {
-        return instanceInternal;
-    }
-
-    public void setInstanceInternal(Set<Instance> instanceInternal) {
-        this.instanceInternal = instanceInternal;
-    }
-
-    public Set<Journal> getJournalInternal() {
-        return journalInternal;
-    }
-
-    public void setJournalInternal(Set<Journal> journalInternal) {
-        this.journalInternal = journalInternal;
-    }
-
-    public Boolean getValidISBN() {
-        return validISBN;
-    }
-
-    public void setValidISBN(Boolean validISBN) {
-        this.validISBN = validISBN;
-    }
-
-    public String getPublicationdate() {
-        return publicationdate;
-    }
-
-    public void setPublicationdate(String publicationdate) {
-        this.publicationdate = publicationdate;
-    }
-
-    public String getTitle2() {
-        return title2;
-    }
-
-    public void setTitle2(String title2) {
-        this.title2 = title2;
     }
 
     @Override

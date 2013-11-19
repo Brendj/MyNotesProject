@@ -5,12 +5,15 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.LibraryDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -24,10 +27,28 @@ import java.util.Set;
  * Time: 19:17
  * To change this template use File | Settings | File Templates.
  */
-public class Source extends DistributedObject {
+public class Source extends LibraryDistributedObject {
+
+    private String sourceName;
+    private Integer hashCode;
+    private Set<AccompanyingDocument> accompanyingDocumentInternal;
 
     @Override
-    public void preProcess(Session session) throws DistributedObjectException {
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+
+        projectionList.add(Projections.property("sourceName"), "sourceName");
+        projectionList.add(Projections.property("hashCode"), "hashCode");
+
+        criteria.setProjection(projectionList);
+    }
+
+    @Override
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         Criteria criteria = session.createCriteria(Source.class);
         criteria.add(Restrictions.eq("hashCode", getHashCode()));
         Source source = (Source) criteria.uniqueResult();
@@ -100,6 +121,7 @@ public class Source extends DistributedObject {
         return false;
     }
 
+
     private String getStringForHash(String str) {
         StringBuilder sb = new StringBuilder(str);
         for (int i = sb.length() - 1; i >= 0; --i) {
@@ -109,15 +131,10 @@ public class Source extends DistributedObject {
         return sb.toString().toLowerCase();
     }
 
-
     @Override
     public int hashCode() {
         return 31 * ((sourceName != null ? getStringForHash(sourceName).hashCode() : 0)) + (sourceName != null ? getStringForHash(sourceName).hashCode() : 0);
     }
-
-    private String sourceName;
-    private Integer hashCode;
-    private Set<AccompanyingDocument> accompanyingDocumentInternal;
 
     public Set<AccompanyingDocument> getAccompanyingDocumentInternal() {
         return accompanyingDocumentInternal;

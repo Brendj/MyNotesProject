@@ -5,12 +5,19 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.LibraryDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -20,10 +27,40 @@ import java.util.Set;
  * Time: 11:38
  * To change this template use File | Settings | File Templates.
  */
-public class Fund extends DistributedObject {
+public class Fund extends LibraryDistributedObject {
+
+    private String fundName;
+    private Boolean stud;
+    private Set<Ksu2Record> ksu2RecordInternal;
+    private Set<Ksu1Record> ksu1RecordInternal;
+    private Set<JournalItem> journalItemInternal;
+    private Set<Journal> journalInternal;
+    private Set<Instance> instanceInternal;
+
+    @Override
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+
+        projectionList.add(Projections.property("fundName"), "fundName");
+        projectionList.add(Projections.property("stud"), "stud");
+
+        criteria.setProjection(projectionList);
+    }
+
+    @Override
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
+        return null; //toSelfProcess(session, idOfOrg, currentMaxVersion);
+    }
 
     @Override
     protected void appendAttributes(Element element) {}
+
+    @Override
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {}
 
     @Override
     public Fund parseAttributes(Node node) throws Exception {
@@ -42,18 +79,18 @@ public class Fund extends DistributedObject {
         setFundName(((Fund) distributedObject).getFundName());
     }
 
+    public String getFundName() {
+        return fundName;
+    }
+
+    public void setFundName(String fundName) {
+        this.fundName = fundName;
+    }
+
     @Override
     public String toString() {
         return String.format("Fund{fundName='%s'}", fundName);
     }
-
-    private String fundName;
-    private Boolean stud;
-    private Set<Ksu2Record> ksu2RecordInternal;
-    private Set<Ksu1Record> ksu1RecordInternal;
-    private Set<JournalItem> journalItemInternal;
-    private Set<Journal> journalInternal;
-    private Set<Instance> instanceInternal;
 
     public Set<Instance> getInstanceInternal() {
         return instanceInternal;
@@ -101,13 +138,5 @@ public class Fund extends DistributedObject {
 
     public void setStud(Boolean stud) {
         this.stud = stud;
-    }
-
-    public String getFundName() {
-        return fundName;
-    }
-
-    public void setFundName(String fundName) {
-        this.fundName = fundName;
     }
 }

@@ -5,12 +5,17 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.LibraryDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
+import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -23,7 +28,33 @@ import java.util.Set;
  * Time: 19:32
  * To change this template use File | Settings | File Templates.
  */
-public class AccompanyingDocument extends DistributedObject {
+public class AccompanyingDocument extends LibraryDistributedObject {
+
+    private TypeOfAccompanyingDocument typeOfAccompanyingDocument;
+    private String accompanyingDocumentNumber;
+    private Source source;
+
+    private String guidTypeOfAccompanyingDocument;
+    private String guidSource;
+    private Set<Ksu1Record> ksu1RecordInternal;
+
+    @Override
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        criteria.createAlias("source","s", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("typeOfAccompanyingDocument","t", JoinType.LEFT_OUTER_JOIN);
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+
+        projectionList.add(Projections.property("accompanyingDocumentNumber"), "accompanyingDocumentNumber");
+
+        projectionList.add(Projections.property("t.guid"), "guidTypeOfAccompanyingDocument");
+        projectionList.add(Projections.property("s.guid"), "guidSource");
+
+        criteria.setProjection(projectionList);
+    }
 
     @Override
     protected void appendAttributes(Element element) {
@@ -33,7 +64,7 @@ public class AccompanyingDocument extends DistributedObject {
     }
 
     @Override
-    public void preProcess(Session session) throws DistributedObjectException{
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException{
         Source s = DAOUtils.findDistributedObjectByRefGUID(Source.class, session, guidSource);
         if(s==null){
             DistributedObjectException distributedObjectException = new DistributedObjectException("Source NOT_FOUND_VALUE");
@@ -94,14 +125,6 @@ public class AccompanyingDocument extends DistributedObject {
     public void setSource(Source source) {
         this.source = source;
     }
-
-    private TypeOfAccompanyingDocument typeOfAccompanyingDocument;
-    private String accompanyingDocumentNumber;
-    private Source source;
-
-    private String guidTypeOfAccompanyingDocument;
-    private String guidSource;
-    private Set<Ksu1Record> ksu1RecordInternal;
 
     public Set<Ksu1Record> getKsu1RecordInternal() {
         return ksu1RecordInternal;

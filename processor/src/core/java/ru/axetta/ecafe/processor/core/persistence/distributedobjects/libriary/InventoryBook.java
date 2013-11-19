@@ -5,12 +5,19 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.LibraryDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -20,10 +27,36 @@ import java.util.Set;
  * Time: 11:43
  * To change this template use File | Settings | File Templates.
  */
-public class InventoryBook extends DistributedObject {
+public class InventoryBook extends LibraryDistributedObject {
+
+    private String bookName;
+    private Set<Instance> instanceInternal;
 
     @Override
-    protected void appendAttributes(Element element) {}
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+
+        //projectionList.add(Projections.property("bookName"), "bookName");
+
+        criteria.setProjection(projectionList);
+    }
+
+    @Override
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
+        return null; //toSelfProcess(session, idOfOrg, currentMaxVersion);
+    }
+
+    @Override
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {}
+
+    @Override
+    protected void appendAttributes(Element element) {
+        //setAttribute(element, "BookName", bookName);
+    }
 
     @Override
     public InventoryBook parseAttributes(Node node) throws Exception {
@@ -39,20 +72,17 @@ public class InventoryBook extends DistributedObject {
         setBookName(((InventoryBook) distributedObject).getBookName());
     }
 
-    @Override
-    public String toString() {
-        return String.format("InventoryBook{bookName='%s'}", bookName);
-    }
-
-    private String bookName;
-    private Set<Instance> instanceInternal;
-
     public String getBookName() {
         return bookName;
     }
 
     public void setBookName(String bookName) {
         this.bookName = bookName;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("InventoryBook{bookName='%s'}", bookName);
     }
 
     public Set<Instance> getInstanceInternal() {

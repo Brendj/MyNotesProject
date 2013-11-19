@@ -5,16 +5,21 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.LibraryDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -24,7 +29,42 @@ import java.util.Set;
  * Time: 12:15
  * To change this template use File | Settings | File Templates.
  */
-public class Ksu2Record extends DistributedObject {
+public class Ksu2Record extends LibraryDistributedObject {
+
+    private Integer recordNumber;
+    private Date retirementDate;
+
+    private Fund fund;
+    private RetirementReason retirementReason;
+
+    private String guidFund;
+    private String guidRetirementReason;
+    private Set<JournalItem> journalItemInternal;
+    private Set<Instance> instanceInternal;
+
+    @Override
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        //criteria.createAlias("fund", "f", JoinType.LEFT_OUTER_JOIN);
+        //criteria.createAlias("retirementReason","r", JoinType.LEFT_OUTER_JOIN);
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+
+        //projectionList.add(Projections.property("recordNumber"), "recordNumber");
+        //projectionList.add(Projections.property("retirementDate"), "retirementDate");
+
+        //projectionList.add(Projections.property("f.guid"), "guidFund");
+        //projectionList.add(Projections.property("r.guid"), "guidRetirementReason");
+
+        criteria.setProjection(projectionList);
+    }
+
+    @Override
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
+        return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid);
+    }
 
     @Override
     protected void appendAttributes(Element element) {}
@@ -40,7 +80,7 @@ public class Ksu2Record extends DistributedObject {
     }
 
     @Override
-    public void preProcess(Session session) throws DistributedObjectException{
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException{
         RetirementReason rr = DAOUtils.findDistributedObjectByRefGUID(RetirementReason.class, session, guidRetirementReason);
         if(rr==null) {
             DistributedObjectException distributedObjectException = new DistributedObjectException("RetirementReason NOT_FOUND_VALUE");
@@ -66,15 +106,6 @@ public class Ksu2Record extends DistributedObject {
         setRetirementReason(((Ksu2Record) distributedObject).getRetirementReason());
         setRetirementDate(((Ksu2Record) distributedObject).getRetirementDate());
     }
-
-    private Integer recordNumber;
-    private Fund fund;
-    private Date retirementDate;
-    private RetirementReason retirementReason;
-    private String guidFund;
-    private String guidRetirementReason;
-    private Set<JournalItem> journalItemInternal;
-    private Set<Instance> instanceInternal;
 
     public Set<Instance> getInstanceInternal() {
         return instanceInternal;

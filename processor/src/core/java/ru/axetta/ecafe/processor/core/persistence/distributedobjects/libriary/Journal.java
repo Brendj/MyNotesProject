@@ -5,15 +5,20 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.LibraryDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -23,7 +28,42 @@ import java.util.Set;
  * Time: 12:49
  * To change this template use File | Settings | File Templates.
  */
-public class Journal extends DistributedObject {
+public class Journal extends LibraryDistributedObject {
+
+    private Fund fund;
+    private Publication publication;
+    private boolean isNewspaper;
+    private int monthCount;
+    private int count;
+
+    private String guidFund;
+    private String guidPublication;
+    private Set<JournalItem> journalItemInternal;
+
+    @Override
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        //criteria.createAlias("fund","f", JoinType.LEFT_OUTER_JOIN);
+        //criteria.createAlias("publication", "p", JoinType.LEFT_OUTER_JOIN);
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+
+        //projectionList.add(Projections.property("isNewspaper"), "isNewspaper");
+        //projectionList.add(Projections.property("monthCount"), "monthCount");
+        //projectionList.add(Projections.property("count"), "count");
+
+        //projectionList.add(Projections.property("f.guid"), "guidFund");
+        //projectionList.add(Projections.property("p.guid"), "guidPublication");
+
+        criteria.setProjection(projectionList);
+    }
+
+    @Override
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
+        return null;//toSelfProcess(session, idOfOrg, currentMaxVersion);
+    }
 
     @Override
     protected void appendAttributes(Element element) {}
@@ -40,7 +80,7 @@ public class Journal extends DistributedObject {
     }
 
     @Override
-    public void preProcess(Session session) throws DistributedObjectException {
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         Publication p = DAOUtils.findDistributedObjectByRefGUID(Publication.class, session, guidPublication);
         if (p == null) {
             DistributedObjectException distributedObjectException = new DistributedObjectException("Publication NOT_FOUND_VALUE");
@@ -62,21 +102,6 @@ public class Journal extends DistributedObject {
         setMonthCount(((Journal) distributedObject).getMonthCount());
         setCount(((Journal) distributedObject).getCount());
     }
-
-    @Override
-    public String toString() {
-        return String.format("Journal{fund=%s, publication=%s, isNewspaper=%s, monthCount=%d, count=%d}", fund, publication, isNewspaper,
-                monthCount, count);
-    }
-
-    private Fund fund;
-    private Publication publication;
-    private boolean isNewspaper;
-    private int monthCount;
-    private int count;
-    private String guidFund;
-    private String guidPublication;
-    private Set<JournalItem> journalItemInternal;
 
     public Fund getFund() {
         return fund;
@@ -118,6 +143,11 @@ public class Journal extends DistributedObject {
         this.count = count;
     }
 
+    @Override
+    public String toString() {
+        return String.format("Journal{fund=%s, publication=%s, isNewspaper=%s, monthCount=%d, count=%d}", fund, publication, isNewspaper,
+                monthCount, count);
+    }
 
     public Set<JournalItem> getJournalItemInternal() {
         return journalItemInternal;
