@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -41,7 +43,11 @@ public class AccountTransaction {
     private Client client;
     private Card card;
     private Long transactionSum;
+    private Long transactionSubBalance1Sum;
     private Long balanceBeforeTransaction;
+    private Long subBalance1BeforeTransaction;
+    // Номер счета по умолчаню основной
+    private Long sourceBalanceNumber;
     private String source;
     private Integer sourceType;
     private Date transactionTime;
@@ -56,11 +62,12 @@ public class AccountTransaction {
         // For Hibernate only
     }
 
-    public AccountTransaction(Client client, Card card, long transactionSum, String source, int sourceType,
+    public AccountTransaction(Client client, Card card,Long sourceBalanceNumber,  long transactionSum, String source, int sourceType,
             Date transactionTime) throws Exception {
         this.client = client;
         this.balanceBeforeTransaction = client.getBalance();
         this.card = card;
+        this.sourceBalanceNumber = sourceBalanceNumber;
         this.transactionSum = transactionSum;
         this.source = source;
         this.sourceType = sourceType;
@@ -94,6 +101,26 @@ public class AccountTransaction {
         this.card = card;
     }
 
+    public Long getSourceBalanceNumber() {
+        return sourceBalanceNumber;
+    }
+
+    public String getSourceBalanceNumberFormat(){
+        if(ContractIdGenerator.luhnTest(String.valueOf(sourceBalanceNumber))){
+            return String.format("%08d", sourceBalanceNumber);
+        } else {
+            return String.format("%010d", sourceBalanceNumber);
+        }
+    }
+
+    public boolean getSourceBalanceNumberEqualsContractId(){
+        return sourceBalanceNumber == null || sourceBalanceNumber.equals(client.getContractId());
+    }
+
+    public void setSourceBalanceNumber(Long sourceBalanceNumber) {
+        this.sourceBalanceNumber = sourceBalanceNumber;
+    }
+
     public Long getTransactionSum() {
         return transactionSum;
     }
@@ -109,6 +136,22 @@ public class AccountTransaction {
 
     public void setBalanceBeforeTransaction(Long balanceBeforeTransaction) {
         this.balanceBeforeTransaction = balanceBeforeTransaction;
+    }
+
+    public Long getTransactionSubBalance1Sum() {
+        return transactionSubBalance1Sum;
+    }
+
+    public void setTransactionSubBalance1Sum(Long transactionSubBalance1Sum) {
+        this.transactionSubBalance1Sum = transactionSubBalance1Sum;
+    }
+
+    public Long getSubBalance1BeforeTransaction() {
+        return subBalance1BeforeTransaction;
+    }
+
+    public void setSubBalance1BeforeTransaction(Long subBalance1BeforeTransaction) {
+        this.subBalance1BeforeTransaction = subBalance1BeforeTransaction;
     }
 
     public String getSource() {

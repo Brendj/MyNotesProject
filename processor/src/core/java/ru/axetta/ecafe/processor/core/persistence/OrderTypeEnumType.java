@@ -22,7 +22,8 @@ public enum OrderTypeEnumType {
     PAY_PLAN("План платного питания"),
     REDUCED_PRICE_PLAN("План льготного питания"),
     DAILY_SAMPLE("Суточная проба"),
-    REDUCED_PRICE_PLAN_RESERVE("План льготного питания, резерв");
+    REDUCED_PRICE_PLAN_RESERVE("План льготного питания, резерв"),
+    SUBSCRIPTION_FEEDING("Абонементное питание");
 
     private final String description;
     static Map<Integer,OrderTypeEnumType> map = new HashMap<Integer,OrderTypeEnumType>();

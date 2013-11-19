@@ -30,7 +30,7 @@ public class User {
     public enum DefaultRole{
         DEFAULT(0,"настраиваемая роль"),
         ADMIN(1,"администратор"),
-        SUPPLIER(2,"поставщик питания"),
+        SUPPLIER(2,"отчетность поставщика питания"),
         MONITORING(3,"мониторинг");
 
         private Integer identification;

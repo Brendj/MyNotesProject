@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
+import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.LibVisit;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBook;
@@ -75,6 +77,9 @@ public class Client {
     private Date lastFreePayTime;
     private Integer discountMode;
     private Long balance;
+
+    private Long subBalance1;
+
     private Long limit;
     private Long expenditureLimit;
     private String categoriesDiscounts;
@@ -209,6 +214,7 @@ public class Client {
         this.clientRegistryVersion = clientRegistryVersion;
         //this.image = Hibernate.createBlob(ArrayUtils.EMPTY_BYTE_ARRAY);
         this.balance = 0L;
+        this.subBalance1 = 0L;
         this.limit = limit;
         this.expenditureLimit = expenditureLimit;
         this.categoriesDiscounts = categoriesDiscounts;
@@ -255,6 +261,53 @@ public class Client {
 
     private void setBalance(Long balance) {
         this.balance = balance;
+    }
+
+
+    public Long getSubBalance1() {
+        return subBalance1;
+    }
+
+    public Long getSubBalance(Integer num) throws Exception{
+        Long subBalance = null;
+        switch (num){
+            case 0: subBalance = getBalance(); break; // вносим сумму в основной счет
+            case 1: subBalance = getSubBalance1()==null?0L:getSubBalance1(); break; // вносим сумму в субсчет №1
+            default: {
+                // в других случаях выбрасывать исключение об отсутсвии такого субсчета
+                final long subBalanceNum = contractId * 100 + num;
+                throw new NullPointerException(String.format("Sub balance not found %d", subBalanceNum));
+            }
+        }
+        return subBalance;
+    }
+
+    public Boolean getSubBalanceIsNull(Integer num) {
+        if(num==0) return getBalance()==null;
+        if(num==1) return getSubBalance1()==null;
+        final long subBalanceNum = contractId * 100 + num;
+        throw new NullPointerException(String.format("Sub balance not found %d", subBalanceNum));
+    }
+
+    // Обновление баланса только через ClientAccountManager!
+    public void addSubBalanceNotForSave(final Long sum, final Integer num) {
+        if(num==null) throw new NullPointerException("Sub balance not found");
+        switch (num){
+            case 0: addBalanceNotForSave(sum); break; // вносим сумму в основной счет
+            case 1: {
+                Long balance = getSubBalance1();
+                if(balance==null) balance=0L;
+                setSubBalance1(balance + sum);
+            } break; // вносим сумму в субсчет №1
+            default: {
+                // в других случаях выбрасывать исключение об отсутсвии такого субсчета
+                throw new NullPointerException("Sub balance not found");
+            }
+        }
+    }
+
+    private void setSubBalance1(Long subScribe1) {
+        this.subBalance1 = subScribe1;
     }
 
     public Long getLimit() {
@@ -435,6 +488,10 @@ public class Client {
 
     public void setContractId(Long contractId) {
         this.contractId = contractId;
+    }
+
+    public String getContractIdFormat(){
+        return ContractIdFormat.format(contractId);
     }
 
     public Date getContractTime() {
@@ -724,7 +781,7 @@ public class Client {
         }
         final Client client = (Client) o;
         return idOfClient != null && idOfClient.equals(client.getIdOfClient());
-    }
+        }
 
     @Override
     public int hashCode() {

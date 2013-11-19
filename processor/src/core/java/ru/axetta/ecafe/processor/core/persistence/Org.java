@@ -77,7 +77,6 @@ public class Org {
     private String mailingListReports1;
     private String mailingListReports2;
     private ConfigurationProvider configurationProvider;
-    //private Org thisOrg;
     private String guid;
     private Contract contract;
     private Date lastSuccessfulBalanceSync;
@@ -95,6 +94,25 @@ public class Org {
     private String remoteAddress;
     private Set<ClientMigration> clientMigration = new HashSet<ClientMigration>();
     private Boolean fullSyncParam;
+    private Boolean commodityAccounting;
+    // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
+    //private OrganizationType type;
+
+    //public OrganizationType getType() {
+    //    return type;
+    //}
+    //
+    //public void setType(OrganizationType type) {
+    //    this.type = type;
+    //}
+
+    public Boolean getCommodityAccounting() {
+        return commodityAccounting;
+    }
+
+    public void setCommodityAccounting(Boolean commodityAccounting) {
+        this.commodityAccounting = commodityAccounting;
+    }
 
     public Boolean getFullSyncParam() {
         return fullSyncParam;
@@ -160,14 +178,6 @@ public class Org {
         this.contract = contract;
     }
 
-    //private Org getThisOrg() {
-    //    return thisOrg;
-    //}
-    //
-    //private  void setThisOrg(Org thisOrg) {
-    //    this.thisOrg = thisOrg;
-    //}
-
     public ConfigurationProvider getConfigurationProvider() {
         return configurationProvider;
     }
@@ -213,7 +223,6 @@ public class Org {
     public void setOGRN(String OGRN) {
         this.OGRN = OGRN;
     }
-    //private Set<EnterEvent> enterEvents;
 
     protected Org() {
         // For Hibernate only
@@ -252,13 +261,15 @@ public class Org {
         this.mailingListReports1 = mailingListReports1;
         this.mailingListReports2 = mailingListReports2;
         this.fullSyncParam=false;
+        this.commodityAccounting=false;
+        //this.type = type;
     }
 
     public Long getIdOfOrg() {
         return idOfOrg;
     }
 
-    private void setIdOfOrg(Long idOfOrg) {
+    protected void setIdOfOrg(Long idOfOrg) {
         // For Hibernate only
         this.idOfOrg = idOfOrg;
     }
@@ -680,6 +691,7 @@ public class Org {
     public void setGuid(String guid) {
         this.guid = guid;
     }
+
 
     static Pattern patterNumber = Pattern.compile("\\d+");
     public String getOrgNumberInName() {

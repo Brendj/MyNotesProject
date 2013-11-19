@@ -12,5 +12,14 @@ package ru.axetta.ecafe.processor.core.persistence;
  * To change this template use File | Settings | File Templates.
  */
 public enum ClientTypeEnum {
-    CLIENT,VISITOR,EMPLOYEE
+    CLIENT(0),VISITOR(1),EMPLOYEE(3);
+    private final int value;
+
+    private ClientTypeEnum(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
 }

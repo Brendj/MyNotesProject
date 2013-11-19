@@ -15,9 +15,10 @@ import java.util.Date;
  */
 public class SubscriptionFee {
 
-    public static final String[] TYPE_DESCRIPTIONS = {"Неизвестно", "Абонентская плата за сервис SMS"};
+    public static final String[] TYPE_DESCRIPTIONS = {"Неизвестно", "Абонентская плата за сервис SMS", "Абонементное питание"};
 
     public static final int TYPE_SMS_SERVICE = 1;
+    public static final int TYPE_FEEDING_SERVICE = 2;
 
     private Long idOfSubscriptionFee;
     private Integer subscriptionYear;

@@ -26,33 +26,6 @@ public class ConfigurationProvider {
     /* дата мзминения объекта */
     private Date lastUpdate;
     private Set<Org> orgInternal = new HashSet<Org>();
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-
-    public String getHistory(){
-        if (this.userCreate==null)
-            return "";
-        String stringUserCreate = "";
-        String stringUserEdit = "";
-        if (getUserCreate()!=null){
-            stringUserCreate = getUserCreate().getUserName();
-        }
-        if (getUserEdit()!=null){
-            stringUserEdit = getUserEdit().getUserName();
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("<span  style=\"white-space:nowrap\">");
-        sb.append("Создан: ").append(userCreate).append("<br/>")
-                .append("Дата создания: ").append(dateFormat.format(this.createdDate));
-        if (this.userEdit!=null)
-            sb.append("<br/>").append("Изменен: ").append(userEdit)
-                    .append("<br/>").append("Дата изменения: ").append(dateFormat.format(this.lastUpdate));
-        /*if (this.userDelete!=null)
-            sb.append("<br/>").append('\n').append("Удален: ").append(this.userDelete.getUserName())
-                    .append("<br/>").append("Дата удаления: ").append(dateFormat.format(this.deleteTime));*/
-        sb.append("</span>");
-        return sb.toString();
-    }
 
     public List<Org> getOrgs(){
         return new ArrayList<Org>(Collections.unmodifiableSet(getOrgInternal()));
@@ -66,8 +39,16 @@ public class ConfigurationProvider {
         orgInternal.add(org);
     }
 
-    private Set<Org> getOrgInternal() {
+    public void addOrg(Collection<Org> org){
+        orgInternal.addAll(org);
+    }
+
+    public Set<Org> getOrgInternal() {
         return orgInternal;
+    }
+
+    public void clearOrg(){
+        orgInternal.clear();
     }
 
     private void setOrgInternal(Set<Org> orgInternal) {
@@ -128,5 +109,33 @@ public class ConfigurationProvider {
 
     public void setUserEdit(User userEdit) {
         this.userEdit = userEdit;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ConfigurationProvider that = (ConfigurationProvider) o;
+
+        if (!idOfConfigurationProvider.equals(that.idOfConfigurationProvider)) {
+            return false;
+        }
+        if (!name.equals(that.name)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = idOfConfigurationProvider.hashCode();
+        result = 31 * result + name.hashCode();
+        return result;
     }
 }

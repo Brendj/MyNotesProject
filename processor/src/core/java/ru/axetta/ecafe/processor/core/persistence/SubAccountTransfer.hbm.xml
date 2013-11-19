@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2013. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.SubAccountTransfer" table="CF_SubAccount_Transfers">
+        <id name="idOfSubAccountTransfer" column="IdOfSubAccountTransfer" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="createTime" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <many-to-one name="clientTransfer" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClientTransfer"
+                     not-null="true" update="false"/>
+        <property name="balanceBenefactor" column="BalanceBenefactor"
+                     not-null="true" update="false"/>
+        <property name="balanceBeneficiary" column="BalanceBeneficiary"
+                     not-null="true" update="false"/>
+        <property name="reason" column="Reason" type="string" update="true"/>
+        <many-to-one name="transactionOnBenefactor" class="ru.axetta.ecafe.processor.core.persistence.AccountTransaction" column="IdOfTransactionOnBenefactor"
+                     not-null="true" update="false"/>
+        <many-to-one name="transactionOnBeneficiary" class="ru.axetta.ecafe.processor.core.persistence.AccountTransaction" column="IdOfTransactionOnBeneficiary"
+                     not-null="true" update="false"/>
+        <property name="transferSum" column="TransferSum" type="long" not-null="true" update="false"/>
+    </class>
+</hibernate-mapping>
+
+

@@ -28,7 +28,7 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product"/>
         </set>
 
-        <set name="orgInternal" lazy="false" cascade="all">
+        <set name="orgInternal" lazy="true" cascade="all">
             <key>
                 <column name="idOfConfigurationProvider"/>
             </key>

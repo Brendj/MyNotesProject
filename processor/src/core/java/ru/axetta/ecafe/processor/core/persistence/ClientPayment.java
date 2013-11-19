@@ -28,6 +28,7 @@ public class ClientPayment {
     public static final int KIOSK_PAYMENT_METHOD = 4;
     public static final int PAY_POINT_PAYMENT_METHOD = 4;
     public static final int CLIENT_TO_ACCOUNT_PAYMENT = 1;
+    public static final int CLIENT_TO_SUB_ACCOUNT_PAYMENT = 2;
     public static final int ATM_PAYMENT_METHOD = 8;
     public static final int INTERNET_ACQUIRING_METHOD = 11;
 
