@@ -21,7 +21,7 @@ public class LibraryGroup extends AbstractGroup {
         doClassMap.put("Source", new DOSyncClass(Source.class, 0));
         doClassMap.put("TypeOfAccompanyingDocument", new DOSyncClass(TypeOfAccompanyingDocument.class, 0));
         doClassMap.put("InventoryBook", new DOSyncClass(InventoryBook.class, 0));
-        doClassMap.put("Fund", new DOSyncClass(Fund.class, 0));
+        doClassMap.put("Fund", new DOSyncClass(Fund.class, 0)); // клиент не передает и не обрабатывает
         doClassMap.put("RetirementReason", new DOSyncClass(RetirementReason.class, 0));
         doClassMap.put("AccompanyingDocument", new DOSyncClass(AccompanyingDocument.class, 1));
         doClassMap.put("Journal", new DOSyncClass(Journal.class, 1));

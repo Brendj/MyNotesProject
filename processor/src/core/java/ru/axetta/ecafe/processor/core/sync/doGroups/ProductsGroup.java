@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.sync.doGroups;
 
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 
 /**
@@ -32,5 +34,7 @@ public class ProductsGroup extends AbstractGroup {
         doClassMap.put("Prohibition", new DOSyncClass(Prohibition.class, 3));
         doClassMap.put("ProhibitionExclusion", new DOSyncClass(ProhibitionExclusion.class, 4));
         doClassMap.put("GoodBasicBasketPrice", new DOSyncClass(GoodBasicBasketPrice.class, 3));
+        doClassMap.put("CycleDiagram", new DOSyncClass(CycleDiagram.class, 0));
+        doClassMap.put("SubscriptionFeeding", new DOSyncClass(SubscriptionFeeding.class, 0));
     }
 }

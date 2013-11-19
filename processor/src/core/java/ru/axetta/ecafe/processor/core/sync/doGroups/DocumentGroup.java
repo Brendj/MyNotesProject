@@ -4,7 +4,11 @@
 
 package ru.axetta.ecafe.processor.core.sync.doGroups;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.StateChange;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,7 +21,7 @@ public class DocumentGroup extends AbstractGroup {
 
     @Override
     protected void fill() {
-        doClassMap.put("ActOfInventarization", new DOSyncClass(ActOfInventarization.class, 0));
+        doClassMap.put("ActOfInventorization", new DOSyncClass(ActOfInventorization.class, 0));
         doClassMap.put("ActOfWayBillDifference", new DOSyncClass(ActOfWayBillDifference.class, 0));
         doClassMap.put("ActOfWayBillDifferencePosition", new DOSyncClass(ActOfWayBillDifferencePosition.class, 0));
         doClassMap.put("GoodRequest", new DOSyncClass(GoodRequest.class, 0));
