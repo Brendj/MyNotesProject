@@ -22,6 +22,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
@@ -38,6 +40,9 @@ import java.util.*;
 @Component
 @Scope("singleton")
 public class ProjectStateReportService {
+
+    @PersistenceContext(unitName = "reportsPU")
+    private EntityManager entityManager;
 
     private static final int ACTIVE_CHART_DATA = 100;
     private static final int ACTIVE_CHART_1_DATA = 101;
@@ -500,28 +505,38 @@ public class ProjectStateReportService {
 
 
     public void run() {
-        RuntimeContext runtimeContext = null;
-        Session session = null;
+        RuntimeContext.getAppContext().getBean(ProjectStateReportService.class).doRun();
+    }
+
+    @Transactional
+    public void doRun() {
         try {
-            runtimeContext = RuntimeContext.getInstance();
-            session = runtimeContext.createPersistenceSession();
-
-            initDictionaries(session);
-        } catch (Exception e) {
-        }
-
-        if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
-            //if (1 == 1) {
-            //logger.info ("Project State is turned off. You have to activate this tool using common Settings");
-            return;
-        }
-
-        Map<Integer, Boolean> clearedTypes = new HashMap<Integer, Boolean>();
-        try {
-            for (String t : TYPES.keySet()) {
-                parseType(session, TYPES.get(t), clearedTypes);
+            RuntimeContext runtimeContext = null;
+            Session session = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                session = (Session) entityManager.getDelegate();
+                /*session = runtimeContext.createPersistenceSession();*/
+    
+                initDictionaries(session);
+            } catch (Exception e) {
+            }
+    
+            if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
+                //if (1 == 1) {
+                //logger.info ("Project State is turned off. You have to activate this tool using common Settings");
+                return;
+            }
+    
+            Map<Integer, Boolean> clearedTypes = new HashMap<Integer, Boolean>();
+            try {
+                for (String t : TYPES.keySet()) {
+                    parseType(session, TYPES.get(t), clearedTypes);
+                }
+            } catch (Exception e) {
             }
         } catch (Exception e) {
+            logger.error("Failed to buid project state data", e);
         }
         //logger.info("Project state data builing is complete");
     }
