@@ -58,6 +58,10 @@ public class ClientSummaryExt {
     protected String stateOfContract;
     @XmlAttribute(name = "Balance")
     protected Long balance;
+    @XmlAttribute(name = "SubBalance0")
+    protected Long subBalance0;
+    @XmlAttribute(name = "SubBalance1")
+    protected Long subBalance1;
     @XmlAttribute(name = "OverdraftLimit")
     protected Long overdraftLimit;
     @XmlAttribute(name = "ExpenditureLimit")
@@ -201,6 +205,22 @@ public class ClientSummaryExt {
      */
     public void setBalance(Long value) {
         this.balance = value;
+    }
+
+    public Long getSubBalance0() {
+        return subBalance0;
+    }
+
+    public void setSubBalance0(Long subBalance0) {
+        this.subBalance0 = subBalance0;
+    }
+
+    public Long getSubBalance1() {
+        return subBalance1;
+    }
+
+    public void setSubBalance1(Long subBalance1) {
+        this.subBalance1 = subBalance1;
     }
 
     /**

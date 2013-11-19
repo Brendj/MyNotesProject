@@ -285,5 +285,4 @@ public class PurchaseExt {
     public void setIdOfCard(Long value) {
         this.idOfCard = value;
     }
-
 }
