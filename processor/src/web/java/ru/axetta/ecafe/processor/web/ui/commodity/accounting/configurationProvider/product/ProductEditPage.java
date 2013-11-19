@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvid
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.group.ProductGroupItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.group.ProductGroupSelect;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -35,7 +36,7 @@ import java.util.Date;
 @Scope("session")
 public class ProductEditPage extends BasicWorkspacePage implements ProductGroupSelect, ConfigurationProviderSelect {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ProductEditPage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductEditPage.class);
     private Product currentProduct;
     private ConfigurationProvider currentConfigurationProvider;
     private ProductGroup currentProductGroup;
@@ -55,7 +56,8 @@ public class ProductEditPage extends BasicWorkspacePage implements ProductGroupS
         selectedProductGroupPage.onShow();
         currentProduct = selectedProductGroupPage.getCurrentProduct();
         if(currentProduct.getIdOfConfigurationProvider()!=null){
-            currentConfigurationProvider = entityManager.find(ConfigurationProvider.class, currentProduct.getIdOfConfigurationProvider());
+            currentConfigurationProvider = entityManager.find(ConfigurationProvider.class,
+                    currentProduct.getIdOfConfigurationProvider());
         }
         if(currentProduct.getProductGroup()!=null){
             currentProductGroup = currentProduct.getProductGroup();
@@ -98,7 +100,7 @@ public class ProductEditPage extends BasicWorkspacePage implements ProductGroupS
             printMessage("Продукт сохранен успешно.");
         } catch (Exception e) {
             printError("Ошибка при сохранении продукта.");
-            logger.error("Error saved Product", e);
+            LOGGER.error("Error saved Product", e);
         }
         return null;
     }
@@ -117,7 +119,7 @@ public class ProductEditPage extends BasicWorkspacePage implements ProductGroupS
             printMessage("Продукт успешно удален.");
         }  catch (Exception e){
             printError("Ошибка при удалении продукта.");
-            logger.error("Error by delete Product.", e);
+            LOGGER.error("Error by delete Product.", e);
         }
     }
 

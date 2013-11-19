@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group;
 
+import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup;
@@ -33,10 +34,11 @@ import java.util.List;
 @Scope("session")
 public class GoodGroupViewPage extends BasicWorkspacePage {
 
-    private static final Logger logger = LoggerFactory.getLogger(GoodGroupViewPage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GoodGroupViewPage.class);
     private GoodGroup currentGoodGroup;
     private Integer countGoods;
     private Org currentOrg;
+    private ConfigurationProvider currentConfigurationProvider;
     @Autowired
     private SelectedGoodGroupGroupPage selectedGoodGroupGroupPage;
     @Autowired
@@ -51,6 +53,9 @@ public class GoodGroupViewPage extends BasicWorkspacePage {
         List<Good> goods = daoService.findGoodsByGoodGroup(currentGoodGroup, false);
         countGoods = goods.size();
         currentOrg = daoService.getOrg(currentGoodGroup.getOrgOwner());
+        if(currentGoodGroup.getIdOfConfigurationProvider()!=null){
+            currentConfigurationProvider = daoService.getConfigurationProvider(currentGoodGroup.getIdOfConfigurationProvider());
+        }
     }
 
     public Object showGoods() throws Exception{
@@ -82,4 +87,11 @@ public class GoodGroupViewPage extends BasicWorkspacePage {
         return currentOrg;
     }
 
+    public ConfigurationProvider getCurrentConfigurationProvider() {
+        return currentConfigurationProvider;
+    }
+
+    public void setCurrentConfigurationProvider(ConfigurationProvider currentConfigurationProvider) {
+        this.currentConfigurationProvider = currentConfigurationProvider;
+    }
 }

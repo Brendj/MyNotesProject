@@ -16,15 +16,13 @@ import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvid
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.technologicalMap.TechnologicalMapPanel;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.technologicalMap.TechnologicalMapSelect;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.model.SelectItem;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -41,7 +39,7 @@ import java.util.List;
 @Scope("session")
 public class GoodEditPage extends BasicWorkspacePage implements GoodGroupSelect, ProductSelect, TechnologicalMapSelect {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(GoodEditPage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GoodEditPage.class);
     private Good currentGood;
     private GoodGroup currentGoodGroup;
     private Product currentProduct;
@@ -101,6 +99,7 @@ public class GoodEditPage extends BasicWorkspacePage implements GoodGroupSelect,
             }
 
             g.setGoodGroup(currentGoodGroup);
+            g.setIdOfConfigurationProvider(currentGoodGroup.getIdOfConfigurationProvider());
             g.setGlobalVersion(daoService.updateVersionByDistributedObjects(Good.class.getSimpleName()));
             daoService.mergeDistributedObject(g, g.getGlobalVersion()+1);
             currentGood = daoService.getGood(currentGood.getGlobalId());
@@ -108,7 +107,7 @@ public class GoodEditPage extends BasicWorkspacePage implements GoodGroupSelect,
             printMessage("Товар сохранен успешно.");
         } catch (Exception e) {
             printError("Ошибка при сохранении продукта.");
-            logger.error("Error saved Product", e);
+            LOGGER.error("Error saved Product", e);
         }
         return null;
     }
@@ -129,7 +128,7 @@ public class GoodEditPage extends BasicWorkspacePage implements GoodGroupSelect,
             printMessage("Товар успешно удален.");
         }  catch (Exception e){
             printError("Ошибка при удалении товара.");
-            logger.error("Error by delete Good.", e);
+            LOGGER.error("Error by delete Good.", e);
         }
     }
 

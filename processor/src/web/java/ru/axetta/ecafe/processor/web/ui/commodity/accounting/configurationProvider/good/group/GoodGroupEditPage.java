@@ -4,11 +4,14 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group;
 
+import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
+import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderSelect;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.hibernate.Session;
@@ -18,9 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.List;
 
 /**
@@ -32,10 +32,11 @@ import java.util.List;
  */
 @Component
 @Scope("session")
-public class GoodGroupEditPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler {
+public class GoodGroupEditPage extends BasicWorkspacePage implements ConfigurationProviderSelect, OrgSelectPage.CompleteHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(GoodGroupEditPage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GoodGroupEditPage.class);
     private GoodGroup currentGoodGroup;
+    private ConfigurationProvider currentConfigurationProvider;
     private Org org;
     @Autowired
     private DAOService daoService;
@@ -43,6 +44,8 @@ public class GoodGroupEditPage extends BasicWorkspacePage implements OrgSelectPa
     private SelectedGoodGroupGroupPage selectedGoodGroupGroupPage;
     @Autowired
     private GoodGroupListPage goodGroupListPage;
+    @Autowired
+    private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
 
     @Override
     public void onShow() throws Exception {
@@ -50,12 +53,19 @@ public class GoodGroupEditPage extends BasicWorkspacePage implements OrgSelectPa
         currentGoodGroup = selectedGoodGroupGroupPage.getCurrentGoodGroup();
         currentGoodGroup = daoService.saveEntity(currentGoodGroup);
         org = daoService.findOrById(currentGoodGroup.getOrgOwner());
+        if(currentGoodGroup.getIdOfConfigurationProvider()!=null){
+            currentConfigurationProvider = daoService.getConfigurationProvider(currentGoodGroup.getIdOfConfigurationProvider());
+        }
     }
 
     public Object onSave(){
         try {
             if(org==null){
                 printError("Поле 'Организация поставщик' обязательное.");
+                return null;
+            }
+            if(currentConfigurationProvider==null){
+                printWarn("Поле 'Производственная конфигурация' обязательное.");
                 return null;
             }
             if(currentGoodGroup.getNameOfGoodsGroup() == null || currentGoodGroup.getNameOfGoodsGroup().equals("")){
@@ -70,9 +80,23 @@ public class GoodGroupEditPage extends BasicWorkspacePage implements OrgSelectPa
             printMessage("Группа товаров сохранена успешно.");
         } catch (Exception e) {
             printError("Ошибка при сохранении группы для продуктов.");
-            logger.error("Error saved Good Group",e);
+            LOGGER.error("Error saved Good Group", e);
         }
         return null;
+    }
+
+    public Object selectConfigurationProvider() throws Exception{
+        configurationProviderItemsPanel.reload();
+        if(currentConfigurationProvider!=null){
+            configurationProviderItemsPanel.setSelectConfigurationProvider(currentConfigurationProvider);
+        }
+        configurationProviderItemsPanel.pushCompleteHandler(this);
+        return null;
+    }
+
+    @Override
+    public void select(ConfigurationProvider configurationProvider) {
+        currentConfigurationProvider = configurationProvider;
     }
 
     public Object remove(){
@@ -96,7 +120,7 @@ public class GoodGroupEditPage extends BasicWorkspacePage implements OrgSelectPa
             printMessage("Группа удалена успешно.");
         }  catch (Exception e){
             printError("Ошибка при удалении группа.");
-            logger.error("Error by delete Good Group.", e);
+            LOGGER.error("Error by delete Good Group.", e);
         }
     }
 
@@ -121,5 +145,13 @@ public class GoodGroupEditPage extends BasicWorkspacePage implements OrgSelectPa
 
     public void setCurrentGoodGroup(GoodGroup currentGoodGroup) {
         this.currentGoodGroup = currentGoodGroup;
+    }
+
+    public ConfigurationProvider getCurrentConfigurationProvider() {
+        return currentConfigurationProvider;
+    }
+
+    public void setCurrentConfigurationProvider(ConfigurationProvider currentConfigurationProvider) {
+        this.currentConfigurationProvider = currentConfigurationProvider;
     }
 }

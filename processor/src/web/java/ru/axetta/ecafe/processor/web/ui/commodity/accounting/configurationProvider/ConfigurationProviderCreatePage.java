@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider;
 
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -42,7 +43,7 @@ public class ConfigurationProviderCreatePage extends BasicWorkspacePage implemen
     private String filter;
     private List<Long> idOfOrgList = new ArrayList<Long>();
     @Autowired
-    private DAOService daoService;
+    private ConfigurationProviderService service;
 
     @Override
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
@@ -76,16 +77,13 @@ public class ConfigurationProviderCreatePage extends BasicWorkspacePage implemen
         return null;
     }
 
-    @Transactional
     protected void onSave() throws Exception{
         currentConfigurationProvider.setCreatedDate(new Date());
         MainPage mainPage = MainPage.getSessionInstance();
-        currentConfigurationProvider.setUserCreate(mainPage.getCurrentUser());
-        DAOService.getInstance().persistConfigurationProvider(currentConfigurationProvider, this.idOfOrgList);
+        service.onSave(currentConfigurationProvider, mainPage.getCurrentUser(), idOfOrgList);
 
-
-        idOfOrgList.clear();
-        filter = "";
+        //idOfOrgList.clear();
+        //filter = "";
         printMessage("Производственная конфигурация сохранена успешно.");
     }
 

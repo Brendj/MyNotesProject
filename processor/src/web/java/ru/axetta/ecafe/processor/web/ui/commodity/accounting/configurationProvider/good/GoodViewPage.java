@@ -31,7 +31,7 @@ import javax.persistence.PersistenceContext;
 @Scope("session")
 public class GoodViewPage extends BasicWorkspacePage {
 
-    private static final Logger logger = LoggerFactory.getLogger(GoodViewPage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GoodViewPage.class);
     private Good currentGood;
     private Product currentProduct;
     private TechnologicalMap currentTechnologicalMap;

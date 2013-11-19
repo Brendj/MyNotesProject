@@ -37,7 +37,7 @@ import java.util.*;
 @Scope("session")
 public class GoodCreatePage extends BasicWorkspacePage implements GoodGroupSelect, ProductSelect,
         TechnologicalMapSelect {
-    private static final Logger logger = LoggerFactory.getLogger(GoodCreatePage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GoodCreatePage.class);
     private Good good;
     private GoodGroup currentGoodGroup;
     private Product currentProduct;
@@ -92,6 +92,7 @@ public class GoodCreatePage extends BasicWorkspacePage implements GoodGroupSelec
             good.setUnitsScale(UnitScale.fromInteger(unitsScale));
             good.setGlobalVersion(daoService.updateVersionByDistributedObjects(Good.class.getSimpleName()));
             good.setOrgOwner(currentGoodGroup.getOrgOwner());
+            good.setIdOfConfigurationProvider(currentGoodGroup.getIdOfConfigurationProvider());
 
             MainPage mainPage = MainPage.getSessionInstance();
             good.setUserCreate(mainPage.getCurrentUser());
@@ -103,7 +104,7 @@ public class GoodCreatePage extends BasicWorkspacePage implements GoodGroupSelec
             printMessage("Товар сохранена успешно.");
         } catch (Exception e) {
             printError("Ошибка при созданиии товара.");
-            logger.error("Error create good",e);
+            LOGGER.error("Error create good", e);
         }
         return null;
     }

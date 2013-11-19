@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider;
 
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -44,7 +45,7 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
     @Autowired
     private SelectedConfigurationProviderGroupPage selectedConfigurationProviderGroupPage;
     @Autowired
-    private DAOService daoService;
+    private ConfigurationProviderService service;
 
     @Override
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
@@ -56,7 +57,7 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
                 StringBuilder stringBuilder = new StringBuilder();
                 for (Long idOfOrg : orgMap.keySet()) {
                     idOfOrgList.add(idOfOrg);
-                    stringBuilder = stringBuilder.append(orgMap.get(idOfOrg) + "; ");
+                    stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
                 }
                 filter = stringBuilder.substring(0, stringBuilder.length() - 2);
             }
@@ -68,10 +69,13 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
         selectedConfigurationProviderGroupPage.show();
         currentConfigurationProvider = selectedConfigurationProviderGroupPage.getSelectConfigurationProvider();
         StringBuilder stringBuilder = new StringBuilder();
-        List<Org> orgs = daoService.findOrgsByConfigurationProvider(currentConfigurationProvider);
+        MainPage mainPage = MainPage.getSessionInstance();
+        mainPage.setOrgFilterOfSelectOrgListSelectPage("");
+        idOfOrgList.clear();
+        List<Org> orgs = service.findOrgsByConfigurationProvider(currentConfigurationProvider);
         for(Org org: orgs){
             idOfOrgList.add(org.getIdOfOrg());
-            stringBuilder = stringBuilder.append(org.getShortName() + "; ");
+            stringBuilder.append(org.getShortName()).append("; ");
         }
         if(stringBuilder.length()>2){
             filter = stringBuilder.substring(0, stringBuilder.length() - 2);
@@ -81,11 +85,11 @@ public class ConfigurationProviderEditPage extends BasicWorkspacePage implements
     public Object save() {
         try {
             MainPage mainPage = MainPage.getSessionInstance();
-            currentConfigurationProvider = daoService.onSave(currentConfigurationProvider, mainPage.getCurrentUser(), idOfOrgList);
+            currentConfigurationProvider = service.onSave(currentConfigurationProvider, mainPage.getCurrentUser(), idOfOrgList);
             selectedConfigurationProviderGroupPage.setSelectConfigurationProvider(currentConfigurationProvider);
             printMessage("Производственная конфигурация сохранена успешно.");
         } catch (Exception e) {
-            printError("Ошибка при сохранении производственной конфигурации.");
+            printError("Ошибка при сохранении производственной конфигурации: "+e.getMessage());
             logger.error("Error create configuration provider",e);
         }
         return null;

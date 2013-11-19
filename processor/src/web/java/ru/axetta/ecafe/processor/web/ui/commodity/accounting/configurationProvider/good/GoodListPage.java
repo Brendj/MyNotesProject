@@ -5,12 +5,15 @@
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good;
 
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
+import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
+import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderSelect;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupItemsPanel;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupSelect;
 
@@ -30,16 +33,19 @@ import java.util.List;
  */
 @Component
 @Scope("session")
-public class GoodListPage extends BasicWorkspacePage implements GoodGroupSelect{
+public class GoodListPage extends BasicWorkspacePage implements GoodGroupSelect, ConfigurationProviderSelect {
 
-    private static final Logger logger = LoggerFactory.getLogger(GoodListPage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GoodListPage.class);
     private List<Good> goodList;
     private Boolean deletedStatusSelected = Boolean.FALSE;
+    private ConfigurationProvider selectedConfigurationProvider;
     private GoodGroup selectedGoodGroup;
     @Autowired
     private DAOService daoService;
     @Autowired
     private GoodGroupItemsPanel goodGroupItemsPanel;
+    @Autowired
+    private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
     @Autowired
     private ContextDAOServices contextDAOServices;
 
@@ -51,7 +57,7 @@ public class GoodListPage extends BasicWorkspacePage implements GoodGroupSelect{
             reload();
         } catch (Exception e) {
             printError(String.format("Ошибка при загрузке данных: %s", e.getMessage()));
-            logger.error("Good onSearch error: ", e);
+            LOGGER.error("Good onSearch error: ", e);
         }
         return null;
     }
@@ -65,19 +71,7 @@ public class GoodListPage extends BasicWorkspacePage implements GoodGroupSelect{
     public void reload() throws Exception{
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
-        if(selectedGoodGroup==null){
-            if(!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
-                goodList = daoService.findGoods(deletedStatusSelected);
-            } else {
-                goodList = daoService.findGoods(orgOwners, deletedStatusSelected);
-            }
-        } else {
-            if(!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
-                goodList = daoService.findGoodsByGoodGroup(selectedGoodGroup,deletedStatusSelected);
-            } else {
-                goodList = daoService.findGoodsByGoodGroup(selectedGoodGroup,orgOwners, deletedStatusSelected);
-            }
-        }
+        goodList = daoService.findGoods(selectedConfigurationProvider, selectedGoodGroup, orgOwners, deletedStatusSelected);
     }
 
     public Object selectGoodGroup() throws Exception{
@@ -90,6 +84,18 @@ public class GoodListPage extends BasicWorkspacePage implements GoodGroupSelect{
     @Override
     public void select(GoodGroup goodGroup) {
         selectedGoodGroup = goodGroup;
+    }
+
+    public Object selectConfigurationProvider() throws Exception {
+        configurationProviderItemsPanel.reload();
+        configurationProviderItemsPanel.setSelectConfigurationProvider(selectedConfigurationProvider);
+        configurationProviderItemsPanel.pushCompleteHandler(this);
+        return null;
+    }
+
+    @Override
+    public void select(ConfigurationProvider configurationProvider) {
+        selectedConfigurationProvider = configurationProvider;
     }
 
     public String getPageTitle() {
@@ -126,5 +132,13 @@ public class GoodListPage extends BasicWorkspacePage implements GoodGroupSelect{
 
     public void setSelectedGoodGroup(GoodGroup selectedGoodGroup) {
         this.selectedGoodGroup = selectedGoodGroup;
+    }
+
+    public ConfigurationProvider getSelectedConfigurationProvider() {
+        return selectedConfigurationProvider;
+    }
+
+    public void setSelectedConfigurationProvider(ConfigurationProvider selectedConfigurationProvider) {
+        this.selectedConfigurationProvider = selectedConfigurationProvider;
     }
 }

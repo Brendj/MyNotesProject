@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.basic.good;
 
+import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -11,6 +12,8 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractEditPage;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.AbstractListPage;
+import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
+import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderSelect;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -29,9 +32,14 @@ import java.util.List;
  */
 @Component
 @Scope("session")
-public class BasicGoodEditPage extends AbstractEditPage<BasicGoodItem> {
+public class BasicGoodEditPage extends AbstractEditPage<BasicGoodItem> implements ConfigurationProviderSelect {
 
     private List<SelectItem> unitsScaleSelectItemList;
+    
+    private ConfigurationProvider currentConfigurationProvider;
+
+    @Autowired
+    private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
 
     @Override
     public String getPageFilename() {
@@ -73,5 +81,27 @@ public class BasicGoodEditPage extends AbstractEditPage<BasicGoodItem> {
             logAndPrintMessage("Ошибка при изменении: " + currentItem, e);
         }
         return null;
+    }
+
+    public Object selectConfigurationProvider() throws Exception{
+        configurationProviderItemsPanel.reload();
+        if(currentConfigurationProvider!=null){
+            configurationProviderItemsPanel.setSelectConfigurationProvider(currentConfigurationProvider);
+        }
+        configurationProviderItemsPanel.pushCompleteHandler(this);
+        return null;
+    }
+
+    @Override
+    public void select(ConfigurationProvider configurationProvider) {
+        currentConfigurationProvider = configurationProvider;
+    }
+
+    public ConfigurationProvider getCurrentConfigurationProvider() {
+        return currentConfigurationProvider;
+    }
+
+    public void setCurrentConfigurationProvider(ConfigurationProvider currentConfigurationProvider) {
+        this.currentConfigurationProvider = currentConfigurationProvider;
     }
 }

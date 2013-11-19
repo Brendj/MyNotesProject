@@ -11,19 +11,15 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,7 +36,7 @@ import java.util.Queue;
 @Scope("session")
 public class GoodGroupItemsPanel extends BasicPage {
 
-    private final static Logger logger = LoggerFactory.getLogger(GoodGroupItemsPanel.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(GoodGroupItemsPanel.class);
     private final Queue<GoodGroupSelect> completeHandlerLists = new LinkedList<GoodGroupSelect>();
 
     private List<GoodGroup> goodGroupList;
@@ -74,8 +70,8 @@ public class GoodGroupItemsPanel extends BasicPage {
 
     @PostConstruct
     public void reload() throws Exception {
-         goodGroupList = new ArrayList<GoodGroup>();
-         filter="";
+        goodGroupList = new ArrayList<GoodGroup>();
+        filter="";
         retrieveGoods();
     }
 
@@ -84,7 +80,7 @@ public class GoodGroupItemsPanel extends BasicPage {
             retrieveGoods();
         } catch (Exception e) {
             printError("Ошибка при загрузке страницы: "+e.getMessage());
-            logger.error("Error load page", e);
+            LOGGER.error("Error load page", e);
         }
         return null;
     }
@@ -92,19 +88,7 @@ public class GoodGroupItemsPanel extends BasicPage {
     private void retrieveGoods() throws Exception {
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
-        if(orgOwners==null || orgOwners.isEmpty()){
-            if (StringUtils.isEmpty(filter)){
-                goodGroupList = daoService.findGoodGroupBySuplifier(false);
-            } else{
-                goodGroupList = daoService.findGoodGroupBySuplifier(filter);
-            }
-        } else {
-            if (StringUtils.isEmpty(filter)){
-                goodGroupList = daoService.findGoodGroupBySuplifier(orgOwners,false);
-            } else{
-                goodGroupList = daoService.findGoodGroupBySuplifier(orgOwners, filter);
-            }
-        }
+        goodGroupList = daoService.findGoodGroup(null, filter, orgOwners, null);
     }
 
     public String getFilter() {

@@ -28,7 +28,7 @@ import javax.persistence.PersistenceContext;
 @Scope("session")
 public class ProductViewPage extends BasicWorkspacePage {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProductViewPage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductViewPage.class);
     private Product currentProduct;
     private ConfigurationProvider configurationProvider;
     @PersistenceContext(unitName = "processorPU")

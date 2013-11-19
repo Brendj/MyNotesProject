@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider;
 
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.User;
@@ -41,7 +42,7 @@ public class ConfigurationProviderItemsPanel extends BasicPage {
     private String filter;
 
     @Autowired
-    private DAOService daoService;
+    private ConfigurationProviderService service;
     @Autowired
     private ContextDAOServices contextDAOServices;
 
@@ -66,7 +67,6 @@ public class ConfigurationProviderItemsPanel extends BasicPage {
         return null;
     }
 
-    @PostConstruct
     public void reload() throws Exception {
         try {
             retrieveConfigurationProvider();
@@ -91,17 +91,14 @@ public class ConfigurationProviderItemsPanel extends BasicPage {
     private void retrieveConfigurationProvider() throws Exception {
         User user = MainPage.getSessionInstance().getCurrentUser();
         if(user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification())){
-            if(StringUtils.isEmpty(filter)){
-                configurationProviderList = contextDAOServices.findConfigurationProviderByContragentSet(user.getIdOfUser());
-            } else {
-                configurationProviderList = contextDAOServices.findConfigurationProviderByContragentSet(user.getIdOfUser(), filter);
-            }
+            //if(StringUtils.isEmpty(filter)){
+            //    configurationProviderList = contextDAOServices.findConfigurationProviderByContragentSet(user.getIdOfUser());
+            //} else {
+            //    configurationProviderList = contextDAOServices.findConfigurationProviderByContragentSet(user.getIdOfUser(), filter);
+            //}
+            configurationProviderList = service.findConfigurationProviderByContragentSet(user.getIdOfUser(), filter);
         } else {
-            if(StringUtils.isEmpty(filter)){
-                configurationProviderList = daoService.findConfigurationProvidersList();
-            } else {
-                configurationProviderList = daoService.findConfigurationProvidersList(filter);
-            }
+            configurationProviderList = service.findConfigurationProviderByName(filter);
         }
     }
 

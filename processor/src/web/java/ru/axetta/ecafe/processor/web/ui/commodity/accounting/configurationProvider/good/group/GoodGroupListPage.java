@@ -5,11 +5,14 @@
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group;
 
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
+import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderItemsPanel;
+import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderSelect;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,25 +30,42 @@ import java.util.List;
  */
 @Component
 @Scope("session")
-public class GoodGroupListPage extends BasicWorkspacePage {
+public class GoodGroupListPage extends BasicWorkspacePage implements ConfigurationProviderSelect {
 
-    private static final Logger logger = LoggerFactory.getLogger(GoodGroupListPage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GoodGroupListPage.class);
     private List<GoodGroup> goodGroupList;
     private Boolean deletedStatusSelected = false;
+    private ConfigurationProvider selectedConfigurationProvider;
     @Autowired
     private DAOService daoService;
     @Autowired
     private ContextDAOServices contextDAOServices;
+    @Autowired
+    private ConfigurationProviderItemsPanel configurationProviderItemsPanel;
 
     @Override
     public void onShow() {}
+
+    @Override
+    public void select(ConfigurationProvider configurationProvider) {
+        selectedConfigurationProvider = configurationProvider;
+    }
+
+    public Object selectConfigurationProvider() throws Exception{
+        configurationProviderItemsPanel.reload();
+        if(selectedConfigurationProvider !=null){
+            configurationProviderItemsPanel.setSelectConfigurationProvider(selectedConfigurationProvider);
+        }
+        configurationProviderItemsPanel.pushCompleteHandler(this);
+        return null;
+    }
 
     public Object onSearch(){
         try {
             reload();
         } catch (Exception e) {
             printError(String.format("Ошибка при загрузке данных: %s", e.getMessage()));
-            logger.error("GoodGroup onSearch error: ", e);
+            LOGGER.error("GoodGroup onSearch error: ", e);
         }
         return null;
     }
@@ -57,11 +77,7 @@ public class GoodGroupListPage extends BasicWorkspacePage {
     public void reload() throws Exception{
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
-        if(!user.getIdOfRole().equals(User.DefaultRole.SUPPLIER.getIdentification()) && (orgOwners==null || orgOwners.isEmpty())){
-            goodGroupList = daoService.findGoodGroupBySuplifier(deletedStatusSelected);
-        } else {
-            goodGroupList = daoService.findGoodGroupBySuplifier(orgOwners, deletedStatusSelected);
-        }
+        goodGroupList = daoService.findGoodGroup(selectedConfigurationProvider, null, orgOwners, deletedStatusSelected);
     }
 
     public String getPageFilename() {
@@ -90,5 +106,13 @@ public class GoodGroupListPage extends BasicWorkspacePage {
 
     public void setDeletedStatusSelected(Boolean deletedStatusSelected) {
         this.deletedStatusSelected = deletedStatusSelected;
+    }
+
+    public ConfigurationProvider getSelectedConfigurationProvider() {
+        return selectedConfigurationProvider;
+    }
+
+    public void setSelectedConfigurationProvider(ConfigurationProvider selectedConfigurationProvider) {
+        this.selectedConfigurationProvider = selectedConfigurationProvider;
     }
 }

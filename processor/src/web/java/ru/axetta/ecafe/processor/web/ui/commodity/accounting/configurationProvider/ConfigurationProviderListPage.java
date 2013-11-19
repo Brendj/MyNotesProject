@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider;
 
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 /*import ru.axetta.ecafe.processor.core.persistence.ProductGuide;
 import ru.axetta.ecafe.processor.core.persistence.User;*/
@@ -32,7 +33,7 @@ import java.util.List;
 public class ConfigurationProviderListPage extends BasicWorkspacePage {
 
     @Autowired
-    private DAOService daoService;
+    private ConfigurationProviderService service;
 
     private List<ConfigurationProvider> configurationProviderList;
 
@@ -46,7 +47,7 @@ public class ConfigurationProviderListPage extends BasicWorkspacePage {
 
     @Override
     public void onShow() throws Exception {
-        configurationProviderList = daoService.findConfigurationProvidersList();
+        configurationProviderList = service.findConfigurationProvider();
     }
 
     public List<ConfigurationProvider> getConfigurationProviderList() {

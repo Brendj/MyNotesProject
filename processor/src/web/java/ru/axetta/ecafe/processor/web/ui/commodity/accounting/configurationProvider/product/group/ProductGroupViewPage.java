@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.product.ProductListPage;
 
@@ -32,32 +33,32 @@ import javax.persistence.TypedQuery;
 @Scope("session")
 public class ProductGroupViewPage extends BasicWorkspacePage {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProductGroupViewPage.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProductGroupViewPage.class);
     private ProductGroup currentProductGroup;
-    private Integer countProducts;
+    private Long countProducts;
     private Org currentOrg;
     private ConfigurationProvider currentConfigurationProvider;
     @Autowired
     private SelectedProductGroupGroupPage selectedProductGroupGroupPage;
     @Autowired
     private ProductListPage productListPage;
-    @PersistenceContext(unitName = "processorPU")
-    private EntityManager entityManager;
+    @Autowired
+    private DAOService service;
+
 
     @Override
     public void onShow() throws Exception {
         selectedProductGroupGroupPage.onShow();
         currentProductGroup = selectedProductGroupGroupPage.getCurrentProductGroup();
-        TypedQuery<Product> query = entityManager.createQuery("from Product where productGroup=:productGroup", Product.class);
-        query.setParameter("productGroup",currentProductGroup);
-        countProducts = query.getResultList().size();
-        currentOrg = entityManager.find(Org.class,currentProductGroup.getOrgOwner());
-        currentConfigurationProvider = entityManager.find(ConfigurationProvider.class,currentProductGroup.getIdOfConfigurationProvider());
+        countProducts = service.countProductsByProductGroup(currentProductGroup);
+        currentOrg = service.getOrg(currentProductGroup.getOrgOwner());
+        currentConfigurationProvider = service.getConfigurationProvider(currentProductGroup.getIdOfConfigurationProvider());
     }
 
     public Object showProducts() throws Exception{
         productListPage.setSelectedProductGroup(currentProductGroup);
         /* Показать и удаленный */
+        productListPage.setSelectedConfigurationProvider(currentConfigurationProvider);
         productListPage.setDeletedStatusSelected(true);
         productListPage.reload();
         productListPage.show();
@@ -76,7 +77,7 @@ public class ProductGroupViewPage extends BasicWorkspacePage {
         this.currentProductGroup = currentProductGroup;
     }
 
-    public Integer getCountProducts() {
+    public Long getCountProducts() {
         return countProducts;
     }
 
