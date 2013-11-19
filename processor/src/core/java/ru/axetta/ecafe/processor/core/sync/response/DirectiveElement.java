@@ -31,6 +31,9 @@ public class DirectiveElement {
             directiveItemList.add(new DirectiveItem("FullSync","1"));
             DAOUtils.falseFullSyncByOrg(session, idOfOrg);
         }
+        Boolean commodityAccounting = DAOUtils.isCommodityAccountingByOrg(session, idOfOrg);
+        directiveItemList.add(new DirectiveItem("CommodityAccounting",commodityAccounting?"1":"0"));
+
     }
 
     public Element toElement(Document document) throws Exception {
