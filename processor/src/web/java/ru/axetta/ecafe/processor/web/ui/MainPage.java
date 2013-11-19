@@ -117,7 +117,7 @@ public class MainPage {
     private final MenuDetailsPage menuDetailsPage = new MenuDetailsPage();
     private final MenuExchangePage menuExchangePage = new MenuExchangePage();
 
-    private Long selectedIdOfMenu;
+private Long selectedIdOfMenu;
     private String selectedMenuDataXML;
 
     // Contragent manipulation
@@ -1194,13 +1194,11 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             currentWorkspacePage = orgEditPage;
         } catch (Exception e) {
             logger.error("Failed to fill org edit page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы редактирования данных организации", null));
+            final String summary = "Ошибка при подготовке страницы редактирования данных организации";
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-
-
         }
         updateSelectedMainMenu();
         return null;
@@ -1210,32 +1208,51 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         if (orgEditPage.isChangeSsoPassword() && !StringUtils
                 .equals(orgEditPage.getPlainSsoPassword(), orgEditPage.getPlainSsoPasswordConfirmation())) {
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Пароль и подтверждение пароля не совпадают", null));
-        } else {
-            RuntimeContext runtimeContext = null;
-            Session persistenceSession = null;
-            Transaction persistenceTransaction = null;
-            try {
-                runtimeContext = RuntimeContext.getInstance();
-                persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                orgEditPage.updateOrg(persistenceSession, selectedIdOfOrg);
-                selectedOrgGroupPage.fill(persistenceSession, selectedIdOfOrg);
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-                facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные организации обновлены успешно", null));
-            } catch (Exception e) {
-                logger.error("Failed to update org", e);
-                facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных организации", null));
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
-
-
+            final String summary = "Пароль и подтверждение пароля не совпадают";
+            final FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, null);
+            facesContext.addMessage(null, facesMessage);
+            return null;
+        }
+        if (orgEditPage.getChangeCommodityAccounting()) {
+            if(orgEditPage.getConfigurationProvider()==null){
+                final String summary = "Не указана 'Производственная конфигурация'";
+                final FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, null);
+                facesContext.addMessage(null, facesMessage);
+                return null;
             }
+            if(orgEditPage.getRefectoryType()!=3 && orgEditPage.getMenuExchangeSourceOrg()==null){
+                final String summary = "Не указана 'Идентификатор организации - источника меню'";
+                final FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, null);
+                facesContext.addMessage(null, facesMessage);
+                return null;
+            }
+
+        }
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            if(orgEditPage.getChangeCommodityAccounting()){
+                orgEditPage.checkCommodityAccountingConfiguration(persistenceSession);
+            }
+            orgEditPage.updateOrg(persistenceSession, selectedIdOfOrg);
+            selectedOrgGroupPage.fill(persistenceSession, selectedIdOfOrg);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            final String summary = "Данные организации обновлены успешно";
+            final FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, summary, null);
+            facesContext.addMessage(null, facesMessage);
+        } catch (Exception e) {
+            logger.error("Failed to update org", e);
+            final String summary = "Ошибка при изменении данных организации: " +e.getMessage();
+            final FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, null);
+            facesContext.addMessage(null, facesMessage);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
         return null;
     }
@@ -2165,7 +2182,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 persistenceTransaction = null;
                 contragentListSelectPage
                         .pushCompleteHandler((ContragentListSelectPage.CompleteHandler) currentTopMostPage);
-                modalPages.push(contragentListSelectPage);
+                    modalPages.push(contragentListSelectPage);
             } catch (Exception e) {
                 logger.error("Failed to fill contragents list selection page", e);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
@@ -81,8 +82,7 @@ public class IntegroServlet extends HttpServlet {
             logger.info(String.format("Starting synchronization with %s", request.getRemoteAddr()));
 
             IntegroLogger integroLogger = runtimeContext.getIntegroLogger();
-            //Org org = null;
-            Long idOfOrg = null;
+            Org org = null;
             String  idOfSync = null;
             Node dataNode = null;
             // Partial XML parsing to extract IdOfOrg & IdOfSync & type
@@ -100,10 +100,9 @@ public class IntegroServlet extends HttpServlet {
                 Document requestDocument = requestData.document;
                 dataNode = requestDocument.getFirstChild();
                 NamedNodeMap namedNodeMap=dataNode.getAttributes();
-                idOfOrg = findOrg(runtimeContext, getIdOfOrg(namedNodeMap));
-                if(idOfOrg == null) throw new Exception("Organization not found");
+                org = findOrg(runtimeContext, getIdOfOrg(namedNodeMap));
                 idOfSync = getIdOfSync(namedNodeMap);
-                integroLogger.registerIntegroRequest(requestData.document, idOfOrg, idOfSync);
+                integroLogger.registerIntegroRequest(requestData.document, org.getIdOfOrg(), idOfSync);
             } catch (Exception e){
                 logger.error("",e);
                 return;
@@ -130,50 +129,58 @@ public class IntegroServlet extends HttpServlet {
                 return;
             }*/
             /* Секция RO можент быть и пустой но идентификатор организации для подготовки ответа возмем */
-            Manager manager = new Manager(idOfOrg);
-            try {
-                // Save requestDocument by means of SyncLogger as IdOfOrg-in.xml
 
-                Node roNode = dataNode.getFirstChild();
-                roNode=roNode.getNextSibling();
-                if (roNode != null) {
-                    manager.buildRO(roNode);
-                }
-                //manager.build(roNode);
-            } catch (Exception e) {
-                logger.error("Failed to parse XML request", e);
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                return;
-            }
-
-            try {
-                manager.process(runtimeContext.createPersistenceSession().getSessionFactory());
-            } catch (Exception e) {
-                logger.error("Failed to process request", e);
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                return;
-            }
-            // Sign XML response
             Document responseDocument = null;
-            try {
-                DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-                Document document = documentBuilder.newDocument();
-                Element dataElement = document.createElement("Data");
-                document.appendChild(dataElement);
-                dataElement.appendChild(manager.toElement(document));
-                AbstractProcessor processor = new OrgOwnerProcessor(runtimeContext.createPersistenceSession(), idOfOrg);
-                OrgOwnerData orgOwnerData = (OrgOwnerData) processor.process();
-                dataElement.appendChild(orgOwnerData.toElement(document));
-                responseDocument = document;
-            } catch (Exception e) {
-                logger.error("Failed to serialize response", e);
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                return;
+
+            if(org.getCommodityAccounting()){
+                String[]  doGroupNames = new String[]{"ProductsGroup", "DocumentGroup"};
+
+                Manager manager = new Manager(org.getIdOfOrg(), doGroupNames);
+                try {
+                    // Save requestDocument by means of SyncLogger as IdOfOrg-in.xml
+
+                    Node roNode = dataNode.getFirstChild();
+                    roNode=roNode.getNextSibling();
+                    if (roNode != null) {
+                        manager.buildRO(roNode);
+                    }
+                    //manager.build(roNode);
+                } catch (Exception e) {
+                    logger.error("Failed to parse XML request", e);
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    return;
+                }
+
+                try {
+                    manager.process(runtimeContext.createPersistenceSession().getSessionFactory());
+                } catch (Exception e) {
+                    logger.error("Failed to process request", e);
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    return;
+                }
+                // Sign XML response
+
+                try {
+                    DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+                    Document document = documentBuilder.newDocument();
+                    Element dataElement = document.createElement("Data");
+                    document.appendChild(dataElement);
+                    dataElement.appendChild(manager.toElement(document));
+                    AbstractProcessor processor = new OrgOwnerProcessor(runtimeContext.createPersistenceSession(), org.getIdOfOrg());
+                    OrgOwnerData orgOwnerData = (OrgOwnerData) processor.process();
+                    dataElement.appendChild(orgOwnerData.toElement(document));
+                    responseDocument = document;
+                } catch (Exception e) {
+                    logger.error("Failed to serialize response", e);
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    return;
+                }
             }
+
             // Send XML response
             try {
-                integroLogger.registerIntegroResponse(responseDocument, idOfOrg, idOfSync);
+                integroLogger.registerIntegroResponse(responseDocument, org.getIdOfOrg(), idOfSync);
                 writeResponse(response, true, responseDocument);
             } catch (Exception e) {
                 logger.error("Failed to write response", e);
@@ -234,7 +241,7 @@ public class IntegroServlet extends HttpServlet {
         return Long.parseLong(n.getTextContent());
     }
 
-    private Long findOrg(RuntimeContext runtimeContext, Long idOfOrg) throws Exception {
+    private Org findOrg(RuntimeContext runtimeContext, Long idOfOrg) throws Exception {
         PublicKey publicKey;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -243,15 +250,15 @@ public class IntegroServlet extends HttpServlet {
             // Start data model transaction
             persistenceTransaction = persistenceSession.beginTransaction();
             // Find given org
-            //Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
-            Long ifOfOrg = DAOUtils.getIdOfOrg(persistenceSession, idOfOrg);
-            if (null == ifOfOrg) {
+            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+            //Long ifOfOrg = DAOUtils.getIdOfOrg(persistenceSession, idOfOrg);
+            if (null == org) {
                 logger.error(String.format("Unknown org with IdOfOrg == %s", idOfOrg));
                 throw new NullPointerException(String.format("Unknown org with IdOfOrg == %s", idOfOrg));
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return ifOfOrg;
+            return org;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);

@@ -1,7 +1,7 @@
 package ru.axetta.ecafe.processor.web.ui.report.online.services;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.DocumentState;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
 import ru.axetta.ecafe.processor.web.ui.org.OrgShortItem;
 import ru.axetta.ecafe.processor.web.ui.report.online.items.good.request.AggregateGoodRequestReportItem;
 import ru.axetta.ecafe.processor.web.ui.report.online.items.good.request.Commodity;
@@ -253,7 +253,7 @@ public class AggregateGoodRequestReportService {
                 }
             }
         }
-        
+
         Collections.sort(aggregateGoodRequestReportItems, new ReportComparator());
 
         return aggregateGoodRequestReportItems;
@@ -272,7 +272,7 @@ public class AggregateGoodRequestReportService {
                 return 1;
             } else {
                 return 0;
-            }
+}
         }
     }
 }
