@@ -170,10 +170,16 @@
     </converter>
 
     <converter>
+        <description>Organization Type Converter</description>
+        <converter-id>organizationTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.OrganizationTypeConverter</converter-class>
+    </converter>
+
+		<converter>
         <converter-id>rublesStringConverter</converter-id>
         <converter-class>ru.axetta.ecafe.processor.web.ui.converter.RublesStringConverter</converter-class>
     </converter>
-
+    
     <navigation-rule>
         <from-view-id>/back-office/index.jsp</from-view-id>
         <navigation-case>

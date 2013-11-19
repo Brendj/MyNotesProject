@@ -211,7 +211,7 @@
         <url-pattern>/soap/integro</url-pattern>
     </servlet-mapping>
 
-    <servlet>
+		<servlet>
         <servlet-name>RegularPaymentWS</servlet-name>
         <servlet-class>ru.axetta.ecafe.processor.web.partner.acquiropay.soap.RegularPaymentWS</servlet-class>
     </servlet>
@@ -219,6 +219,16 @@
         <servlet-name>RegularPaymentWS</servlet-name>
         <url-pattern>/soap/regpay</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>POSPaymentControllerWS</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.integra.soap.POSPaymentControllerWS</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>POSPaymentControllerWS</servlet-name>
+        <url-pattern>/soap/pos</url-pattern>
+    </servlet-mapping>
+
 
     <servlet>
         <servlet-name>BarcodeServlet</servlet-name>

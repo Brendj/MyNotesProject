@@ -135,4 +135,11 @@ the signature crypto configuration.  See SignaturePropRefId. -->
             address='http://localhost:8080/processor/soap/regpay'
             implementor='ru.axetta.ecafe.processor.web.partner.acquiropay.soap.RegularPaymentWS'/>
 
+    <jaxws:endpoint
+            id="POSPaymentControllerWS"
+            address='http://localhost:8080/processor/soap/pos'
+            implementor='ru.axetta.ecafe.processor.web.partner.integra.soap.POSPaymentControllerWS'>
+    </jaxws:endpoint>
+
+
 </beans>
