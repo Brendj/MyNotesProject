@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConfirm;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConflict;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -73,30 +74,35 @@ public class DOSyncService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void addConfirm(DOConfirm doConfirm) {
+    public void addConfirm(DOConfirm doConfirm, int currentLimit, String currentLastGuid) {
         List<DOConfirm> docList = doDAO
-                .getDOConfirms(doConfirm.getOrgOwner(), doConfirm.getDistributedObjectClassName(), doConfirm.getGuid());
+                .getDOConfirms(doConfirm.getOrgOwner(), doConfirm.getDistributedObjectClassName(), doConfirm.getGuid(), currentLimit, currentLastGuid);
         if (docList.isEmpty())
             doDAO.saveDOConfirm(doConfirm);
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void deleteDOConfirms(List<DOConfirm> doConfirms) {
+    public void deleteDOConfirms(List<DOConfirm> doConfirms, int currentLimit, String currentLastGuid) {
         for (DOConfirm confirm : doConfirms) {
-            List<DOConfirm> list = doDAO.getDOConfirms(confirm.getOrgOwner(), confirm.getDistributedObjectClassName(), confirm.getGuid());
+            List<DOConfirm> list = doDAO.getDOConfirms(confirm.getOrgOwner(), confirm.getDistributedObjectClassName(), confirm.getGuid(), currentLimit, currentLastGuid);
             for (DOConfirm doConfirm : list)
                 doDAO.removeDOConfirm(doConfirm);
         }
     }
 
     @Transactional(readOnly = true)
-    public List<DistributedObject> findConfirmedDO(Class<? extends DistributedObject> doClass, Long orgOwner) {
-        List<String> guids = doDAO.findConfirmedGuids(orgOwner, doClass.getSimpleName());
+    public List<DistributedObject> findConfirmedDO(Class<? extends DistributedObject> doClass, Long orgOwner,
+            int currentLimit, String currentLastGuid) throws Exception {
+        List<String> guids = doDAO.findConfirmedGuids(orgOwner, doClass.getSimpleName(), currentLimit, currentLastGuid);
         List<DistributedObject> doList = new ArrayList<DistributedObject>();
         if (!guids.isEmpty()) {
-            List<? extends DistributedObject> res = doDAO.findDOByGuids(doClass, guids);
+            List<? extends DistributedObject> res = doDAO.findDOByGuids(doClass, guids, currentLimit, currentLastGuid);
             doList.addAll(res);
         }
         return doList;
+    }
+
+    public boolean isCommodityAccountingByOrg(Long idOfOrg){
+        return doDAO.isCommodityAccountingByOrg(idOfOrg);
     }
 }
