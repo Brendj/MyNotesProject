@@ -510,8 +510,11 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                 Long idOfContragentReceiver = null;
                                 String contragentReceiver = null;
                                 if (reportProperties != null) {
-                                    idOfContragentReceiver = Long.valueOf(reportProperties.getProperty(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID));
-                                    contragentReceiver = DAOService.getInstance().getContragentById(idOfContragentReceiver).getContragentName();
+                                    String tmpId = reportProperties.getProperty(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID);
+                                    if (tmpId != null && tmpId.length() > 0) {
+                                        idOfContragentReceiver = Long.valueOf(tmpId);
+                                        contragentReceiver = DAOService.getInstance().getContragentById(idOfContragentReceiver).getContragentName();
+                                    }
                                 }
                                 DAOService.getInstance()
                                         .registerReport(currRule.getRuleName(), currRule.getDocumentFormat(),
