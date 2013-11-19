@@ -63,7 +63,7 @@ public class ProductListPage extends BasicWorkspacePage implements ProductGroupS
         return null;
     }
 
-    public Object onClear() throws Exception{
+    public Object onClear() throws Exception {
         selectedProductGroup = null;
         selectedConfigurationProvider = null;
         return null;
@@ -72,11 +72,7 @@ public class ProductListPage extends BasicWorkspacePage implements ProductGroupS
     public void reload() throws Exception {
         User user = MainPage.getSessionInstance().getCurrentUser();
         List<Long> orgOwners = contextDAOServices.findOrgOwnersByContragentSet(user.getIdOfUser());
-        if(selectedConfigurationProvider==null){
-            productList = daoService.findProductByConfigurationProvider(selectedProductGroup, null,deletedStatusSelected, orgOwners, null);
-        } else {
-            productList = daoService.findProductByConfigurationProvider(selectedProductGroup, selectedConfigurationProvider.getIdOfConfigurationProvider(),deletedStatusSelected, orgOwners, null);
-        }
+        productList = daoService.findProduct(selectedProductGroup, selectedConfigurationProvider, null, orgOwners, deletedStatusSelected);
     }
 
     public Object selectConfigurationProvider() throws Exception {
@@ -86,7 +82,7 @@ public class ProductListPage extends BasicWorkspacePage implements ProductGroupS
         return null;
     }
 
-    public Object selectProductGroup() throws Exception{
+    public Object selectProductGroup() throws Exception {
         productGroupItemsPanel.reload();
         productGroupItemsPanel.setSelectProductGroup(selectedProductGroup);
         productGroupItemsPanel.pushCompleteHandler(this);
@@ -103,8 +99,9 @@ public class ProductListPage extends BasicWorkspacePage implements ProductGroupS
         selectedConfigurationProvider = configurationProvider;
     }
 
+
     public String getPageTitle() {
-        return super.getPageTitle() + String.format(" (%d)", (productList==null?0:productList.size()));
+        return super.getPageTitle() + String.format(" (%d)", (productList == null ? 0 : productList.size()));
     }
 
     public String getPageFilename() {
@@ -127,8 +124,8 @@ public class ProductListPage extends BasicWorkspacePage implements ProductGroupS
         this.productList = productList;
     }
 
-    public Boolean getEmptyProductList(){
-        return  this.productList == null || this.productList.isEmpty();
+    public Boolean getEmptyProductList() {
+        return this.productList == null || this.productList.isEmpty();
     }
 
     public ProductGroup getSelectedProductGroup() {
