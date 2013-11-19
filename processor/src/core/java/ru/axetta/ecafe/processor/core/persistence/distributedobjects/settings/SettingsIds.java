@@ -18,7 +18,8 @@ public enum SettingsIds {
     CashierCheckPrinter(0,"Настройки принтера кассового чека"),
     SalesReportPrinter(1,"Настройка принтера отчета по продажам"),
     CardBalanceReportPrinter(2,"Настройка принтера отчета по балансам карт"),
-    AutoPlanPaymentSetting(3,"Настройка автооплаты льготного питания");
+    AutoPlanPaymentSetting(3,"Настройка автооплаты льготного питания"),
+    SubscriberFeeding(4,"Настройки абоненского питания");
 
     private Integer id;
     private String description;

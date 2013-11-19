@@ -9,13 +9,17 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssoc
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,8 +30,29 @@ import java.util.Date;
  */
 public class ECafeSettings extends DistributedObject{
 
+    private String settingValue;
+    private SettingsIds settingsId;
+
     @Override
-    public void preProcess(Session session) throws DistributedObjectException {}
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
+        return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid);
+    }
+
+    @Override
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+
+        projectionList.add(Projections.property("settingValue"), "settingValue");
+        projectionList.add(Projections.property("settingsId"), "settingsId");
+        criteria.setProjection(projectionList);
+    }
+
+    @Override
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {}
 
     @Override
     protected void appendAttributes(Element element) {
@@ -49,7 +74,10 @@ public class ECafeSettings extends DistributedObject{
             setSettingValue(stringValue);
         Integer intId = XMLUtils.getIntegerAttributeValue(node, "Id");
         if (intId != null){
-            setSettingsId(SettingsIds.fromInteger(intId - 1));
+            final int id = intId - 1;
+            SettingsIds settingsId1 = SettingsIds.fromInteger(id);
+            if(settingsId1==null) throw new DistributedObjectException("ECafeSettings Unknown Settings Id");
+            setSettingsId(settingsId1);
         } else {
             throw new DistributedObjectException("ECafeSettings Id not null");
         }
@@ -63,9 +91,6 @@ public class ECafeSettings extends DistributedObject{
         setSettingValue(((ECafeSettings) distributedObject).getSettingValue());
         setSettingsId(((ECafeSettings) distributedObject).getSettingsId());
     }
-
-    private String settingValue;
-    private SettingsIds settingsId;
 
     public SettingsIds getSettingsId() {
         return settingsId;
@@ -98,6 +123,7 @@ public class ECafeSettings extends DistributedObject{
                 case SalesReportPrinter: parserBySettingValue = new SalesReportPrinterSettingValue(values);break;
                 case CardBalanceReportPrinter: parserBySettingValue = new CardBalanceReportPrinterSettingValue(values); break;
                 case AutoPlanPaymentSetting: parserBySettingValue = new AutoPlanPaymentSettingSettingValue(values); break;
+                case SubscriberFeeding: parserBySettingValue = new SubscriberFeedingSettingSettingValue(values); break;
             }
         }
 
@@ -483,6 +509,64 @@ public class ECafeSettings extends DistributedObject{
 
         public void setPorog(int porog) {
             this.porog = porog;
+        }
+    }
+
+    public static class SubscriberFeedingSettingSettingValue extends AbstractParserBySettingValue{
+
+        private int dayActivae; // Количество дней, отводимое на активизацию услуги
+        private int dayRequest; // Количество дней, на которые оформляются заявки на поставку
+        private int maxDayRequest; // Максимальное количество дней, на котороые сформированные заявки запрещено редактировать
+        private int dayDeActivae;   // Количество дней, пропустив которые, клиент приостанавливает свою подписку
+
+
+        public SubscriberFeedingSettingSettingValue(String[] values) throws ParseException {
+            super(values);
+        }
+
+        @Override
+        protected void parse(String[] values) throws ParseException {
+            this.dayActivae = Integer.parseInt(values[0]);
+            this.dayRequest = Integer.parseInt(values[1]);
+            this.maxDayRequest = Integer.parseInt(values[2]);
+            this.dayDeActivae = Integer.parseInt(values[3]);
+        }
+
+        @Override
+        public String build() {
+            return dayActivae+";"+dayRequest+";"+maxDayRequest+";"+dayDeActivae+";";
+        }
+
+        public int getDayActivae() {
+            return dayActivae;
+        }
+
+        public void setDayActivae(int dayActivae) {
+            this.dayActivae = dayActivae;
+        }
+
+        public int getDayRequest() {
+            return dayRequest;
+        }
+
+        public void setDayRequest(int dayRequest) {
+            this.dayRequest = dayRequest;
+        }
+
+        public int getMaxDayRequest() {
+            return maxDayRequest;
+        }
+
+        public void setMaxDayRequest(int maxDayRequest) {
+            this.maxDayRequest = maxDayRequest;
+        }
+
+        public int getDayDeActivae() {
+            return dayDeActivae;
+        }
+
+        public void setDayDeActivae(int dayDeActivae) {
+            this.dayDeActivae = dayDeActivae;
         }
     }
 
