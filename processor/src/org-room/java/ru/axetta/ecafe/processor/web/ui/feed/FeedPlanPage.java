@@ -7,13 +7,10 @@ package ru.axetta.ecafe.processor.web.ui.feed;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestService;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.DocumentState;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequest;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.auth.LoginBean;
-import ru.axetta.ecafe.processor.web.ui.modal.YesNoConfirmPanel;
 import ru.axetta.ecafe.processor.web.ui.modal.YesNoEvent;
 import ru.axetta.ecafe.processor.web.ui.modal.YesNoListener;
 import ru.axetta.ecafe.processor.web.ui.modal.feed_plan.*;
@@ -30,7 +27,6 @@ import javax.faces.event.ValueChangeEvent;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.math.BigDecimal;
-import java.sql.PreparedStatement;
 import java.util.*;
 
 /**
@@ -345,8 +341,8 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
     public void saveClient(Session session, List<Client> clients) {
         for (Client client : clients) {
             saveClient(session, client);
+            }
         }
-    }
 
     public void saveClient(Session session, Client client) {
         //  Если уже имеется заказ, значит сохранение во временную таблицу запрещено
@@ -549,12 +545,12 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
         cl.setInBuilding(cl.getInBuilding() == INSIDE_CLIENT ? OUTSIDE_CLIENT : INSIDE_CLIENT);
         if (cl.getInBuilding() == OUTSIDE_CLIENT) {
             cl.setActionType(BLOCK_CLIENT);
-        }
+    }
         ArrayList<Client> clients = new ArrayList<Client>();
         clients.add(cl);
         RuntimeContext.getAppContext().getBean(FeedPlanPage.class).saveClient(clients);
     }
-
+    
     public void doChangeClientAction(Client cl) {
         cl.setActionType(cl.getActionType() == PAY_CLIENT ? BLOCK_CLIENT : PAY_CLIENT);
         ArrayList<Client> clients = new ArrayList<Client>();
