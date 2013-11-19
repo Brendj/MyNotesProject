@@ -239,8 +239,8 @@ public class RuntimeContext implements ApplicationContextAware {
     public Session createPersistenceSession() throws Exception {
         if (isOrgRoomRunning()) {
             initiateOrgRoomEntityManager();
-            return sessionFactory.openSession();
-        }
+        return sessionFactory.openSession();
+    }
         return sessionFactory.openSession();
     }
 
@@ -252,7 +252,7 @@ public class RuntimeContext implements ApplicationContextAware {
         }
         if (sessionFactory == null) {
             setSessionFactory (((Session) entityManager.getDelegate()).getSessionFactory());
-        }
+    }
     }
 
     public Session createReportPersistenceSession() {
