@@ -4,14 +4,19 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConfigurationProviderDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
+import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -22,7 +27,43 @@ import org.w3c.dom.Node;
  * Time: 12:57
  * To change this template use File | Settings | File Templates.
  */
-public class TechnologicalMapProduct extends DistributedObject implements IConfigProvider {
+public class TechnologicalMapProduct extends ConfigurationProviderDistributedObject {
+
+    //Масса брутто, г
+    private Integer grossWeight;
+
+    //Масса нетто, г
+    private Integer netWeight;
+
+    private TechnologicalMap technologicalMap;
+
+    private Product product;
+
+    private String guidOfP;
+    private String guidOfTM;
+    //private Long idOfConfigurationProvider;
+    private Integer numberGroupReplace;
+
+    @Override
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        criteria.createAlias("product", "p", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("technologicalMap", "tm", JoinType.LEFT_OUTER_JOIN);
+
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+        projectionList.add(Projections.property("grossWeight"), "grossWeight");
+        projectionList.add(Projections.property("netWeight"), "netWeight");
+        projectionList.add(Projections.property("numberGroupReplace"), "numberGroupReplace");
+
+        projectionList.add(Projections.property("p.guid"), "guidOfP");
+        projectionList.add(Projections.property("tm.guid"), "guidOfTM");
+
+        criteria.setProjection(projectionList);
+
+    }
 
     @Override
     public void fill(DistributedObject distributedObject) {
@@ -32,6 +73,7 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
         setProduct(((TechnologicalMapProduct) distributedObject).getProduct());
         setTechnologicalMap(((TechnologicalMapProduct) distributedObject).getTechnologicalMap());
         setNumberGroupReplace(((TechnologicalMapProduct) distributedObject).getNumberGroupReplace());
+        setIdOfConfigurationProvider(((TechnologicalMapProduct) distributedObject).getIdOfConfigurationProvider());
     }
 
     @Override
@@ -40,8 +82,8 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
         XMLUtils.setAttributeIfNotNull(element, "GWeight", grossWeight);
         XMLUtils.setAttributeIfNotNull(element, "NWeight", netWeight);
         XMLUtils.setAttributeIfNotNull(element, "NumberGroupReplace", numberGroupReplace);
-        XMLUtils.setAttributeIfNotNull(element, "GuidOfP", product.getGuid());
-        XMLUtils.setAttributeIfNotNull(element, "GuidOfTM", technologicalMap.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfP", guidOfP);
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfTM", guidOfTM);
     }
 
     @Override
@@ -71,28 +113,20 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
     }
 
     @Override
-    public void preProcess(Session session) throws DistributedObjectException {
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         Product p = DAOUtils.findDistributedObjectByRefGUID(Product.class, session, guidOfP);
         TechnologicalMap tm = DAOUtils.findDistributedObjectByRefGUID(TechnologicalMap.class, session, guidOfTM);
-        if(tm==null || p==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if (tm == null || p == null) {
+            throw new DistributedObjectException("NOT_FOUND_VALUE");
+        }
         setProduct(p);
         setTechnologicalMap(tm);
+        try {
+            idOfConfigurationProvider = ConfigurationProviderService.extractIdOfConfigurationProviderByIdOfOrg(session, idOfOrg);
+        } catch (Exception e) {
+            throw new DistributedObjectException(e.getMessage());
+        }
     }
-
-    //Масса брутто, г
-    private Integer grossWeight;
-
-    //Масса нетто, г
-    private Integer netWeight;
-
-    private TechnologicalMap technologicalMap;
-
-    private Product product;
-
-    private String guidOfP;
-    private String guidOfTM;
-    private Long idOfConfigurationProvider;
-    private Integer numberGroupReplace;
 
     public Integer getNumberGroupReplace() {
         return numberGroupReplace;
@@ -134,14 +168,6 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
         this.grossWeight = grossWeight;
     }
 
-    public Long getIdOfConfigurationProvider() {
-        return idOfConfigurationProvider;
-    }
-
-    public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
-        this.idOfConfigurationProvider = idOfConfigurationProvider;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -158,10 +184,9 @@ public class TechnologicalMapProduct extends DistributedObject implements IConfi
         }
 
         // Когда объектам не назначены guid-ы, однако указаны ссылки на базовые продукты и тех.карты
-        if (((guid == null) && (that.getGuid() == null))
-                && (that instanceof TechnologicalMapProduct)
-                && !(((TechnologicalMapProduct) that).getProduct().equals(getProduct())
-                && ((TechnologicalMapProduct) that).getTechnologicalMap().equals(getTechnologicalMap()))) {
+        if (((guid == null) && (that.getGuid() == null)) && (that instanceof TechnologicalMapProduct) && !(
+                ((TechnologicalMapProduct) that).getProduct().equals(getProduct()) && ((TechnologicalMapProduct) that).getTechnologicalMap()
+                        .equals(getTechnologicalMap()))) {
             return false;
         }
 

@@ -4,15 +4,20 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConfigurationProviderDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
+import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -25,7 +30,89 @@ import java.util.*;
  * Time: 11:07
  * To change this template use File | Settings | File Templates.
  */
-public class TechnologicalMap extends DistributedObject implements IConfigProvider {
+public class TechnologicalMap extends ConfigurationProviderDistributedObject {
+
+    /*  private String groupName;*/
+    private String nameOfTechnologicalMap;
+
+    private String numberOfTechnologicalMap;
+
+    //Технология приготовления
+    private String technologyOfPreparation;
+    private String timeOfRealization;
+
+    // Температура приготовления
+    private String tempOfPreparation;
+
+    // В 100 граммах данного блюда содержится:
+    //Пищевые вещества, г
+    private Float proteins;
+    private Float carbohydrates;
+
+    private Float fats;
+    //Минеральные вещества, мг
+    private Float microElCa;
+    private Float microElMg;
+
+    private Float microElP;
+    private Float microElFe;
+    //Энергетическая ценность (ккал)
+    private Float energyValue;
+    //Витамины, мг
+    private Float vitaminA;
+
+    private Float vitaminB1;
+
+    private Float vitaminB2;
+    private Float vitaminPp;
+    private Float vitaminC;
+    private Float vitaminE;
+    private TechnologicalMapGroup technologicalMapGroup;
+
+    //private Long idOfConfigurationProvider;
+    private Set<TechnologicalMapProduct> technologicalMapProductInternal = new HashSet<TechnologicalMapProduct>();
+    private User userCreate;
+    private User userDelete;
+
+    private User userEdit;
+    private String guidOfTMG;
+    private Integer lifeTime;
+
+    private Set<Good> goodInternal;
+
+    @Override
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        criteria.createAlias("technologicalMapGroup","tmg", JoinType.LEFT_OUTER_JOIN);
+
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+
+        projectionList.add(Projections.property("nameOfTechnologicalMap"), "nameOfTechnologicalMap");
+        projectionList.add(Projections.property("numberOfTechnologicalMap"), "numberOfTechnologicalMap");
+        projectionList.add(Projections.property("technologyOfPreparation"), "technologyOfPreparation");
+        projectionList.add(Projections.property("lifeTime"), "lifeTime");
+        projectionList.add(Projections.property("energyValue"), "energyValue");
+        projectionList.add(Projections.property("proteins"), "proteins");
+        projectionList.add(Projections.property("carbohydrates"), "carbohydrates");
+        projectionList.add(Projections.property("fats"), "fats");
+        projectionList.add(Projections.property("microElCa"), "microElCa");
+        projectionList.add(Projections.property("microElMg"), "microElMg");
+        projectionList.add(Projections.property("microElP"), "microElP");
+        projectionList.add(Projections.property("microElFe"), "microElFe");
+        projectionList.add(Projections.property("vitaminA"), "vitaminA");
+        projectionList.add(Projections.property("vitaminB1"), "vitaminB1");
+        projectionList.add(Projections.property("vitaminB2"), "vitaminB2");
+        projectionList.add(Projections.property("vitaminPp"), "vitaminPp");
+        projectionList.add(Projections.property("vitaminC"), "vitaminC");
+        projectionList.add(Projections.property("vitaminE"), "vitaminE");
+
+        projectionList.add(Projections.property("tmg.guid"), "guidOfTMG");
+
+        criteria.setProjection(projectionList);
+    }
 
     @Override
     public void fill(DistributedObject distributedObject) {
@@ -52,6 +139,8 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
         setVitaminC(((TechnologicalMap) distributedObject).getVitaminC());
         setVitaminE(((TechnologicalMap) distributedObject).getVitaminE());
         setVitaminPp(((TechnologicalMap) distributedObject).getVitaminPp());
+
+        setIdOfConfigurationProvider(((TechnologicalMap) distributedObject).getIdOfConfigurationProvider());
     }
 
     @Override
@@ -76,8 +165,8 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
         XMLUtils.setAttributeIfNotNull(element, "VPp", vitaminPp);
         XMLUtils.setAttributeIfNotNull(element, "VC", vitaminC);
         XMLUtils.setAttributeIfNotNull(element, "VE", vitaminE);
-        XMLUtils.setAttributeIfNotNull(element, "GuidOfTMG", technologicalMapGroup.getGuid());
-
+        //XMLUtils.setAttributeIfNotNull(element, "GuidOfTMG", technologicalMapGroup.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfTMG", guidOfTMG);
     }
 
     @Override
@@ -170,59 +259,16 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
     }
 
     @Override
-    public void preProcess(Session session) throws DistributedObjectException {
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         TechnologicalMapGroup tmg = DAOUtils.findDistributedObjectByRefGUID(TechnologicalMapGroup.class, session, guidOfTMG);
         if(tmg==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setTechnologicalMapGroup(tmg);
+        try {
+            idOfConfigurationProvider = ConfigurationProviderService.extractIdOfConfigurationProviderByIdOfOrg(session, idOfOrg);
+        } catch (Exception e) {
+            throw new DistributedObjectException(e.getMessage());
+        }
     }
-
-    /*  private String groupName;*/
-    private String nameOfTechnologicalMap;
-
-    private String numberOfTechnologicalMap;
-
-    //Технология приготовления
-    private String technologyOfPreparation;
-    private String timeOfRealization;
-
-    // Температура приготовления
-    private String tempOfPreparation;
-
-    // В 100 граммах данного блюда содержится:
-    //Пищевые вещества, г
-    private Float proteins;
-    private Float carbohydrates;
-
-    private Float fats;
-    //Минеральные вещества, мг
-    private Float microElCa;
-    private Float microElMg;
-
-    private Float microElP;
-    private Float microElFe;
-    //Энергетическая ценность (ккал)
-    private Float energyValue;
-    //Витамины, мг
-    private Float vitaminA;
-
-    private Float vitaminB1;
-
-    private Float vitaminB2;
-    private Float vitaminPp;
-    private Float vitaminC;
-    private Float vitaminE;
-    private TechnologicalMapGroup technologicalMapGroup;
-
-    private Long idOfConfigurationProvider;
-    private Set<TechnologicalMapProduct> technologicalMapProductInternal = new HashSet<TechnologicalMapProduct>();
-    private User userCreate;
-    private User userDelete;
-
-    private User userEdit;
-    private String guidOfTMG;
-    private Integer lifeTime;
-
-    private Set<Good> goodInternal;
 
     public Set<Good> getGoodInternal() {
         return goodInternal;
@@ -404,13 +450,13 @@ public class TechnologicalMap extends DistributedObject implements IConfigProvid
         this.vitaminE = vitaminE;
     }
 
-    public Long getIdOfConfigurationProvider() {
-        return idOfConfigurationProvider;
-    }
-
-    public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
-        this.idOfConfigurationProvider = idOfConfigurationProvider;
-    }
+    //public Long getIdOfConfigurationProvider() {
+    //    return idOfConfigurationProvider;
+    //}
+    //
+    //public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
+    //    this.idOfConfigurationProvider = idOfConfigurationProvider;
+    //}
 
     public TechnologicalMapGroup getTechnologicalMapGroup() {
         return technologicalMapGroup;

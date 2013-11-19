@@ -4,11 +4,17 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConfigurationProviderDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -24,31 +30,37 @@ import java.util.Set;
  * Time: 16:33
  * To change this template use File | Settings | File Templates.
  */
-public class GoodGroup extends DistributedObject {
+public class GoodGroup extends ConfigurationProviderDistributedObject {
 
+    private String nameOfGoodsGroup;
+    private Set<Good> goodInternal;
     private Set<ProhibitionExclusion> prohibitionExclusionInternal;
     private Set<Prohibition> prohibitionInternal;
 
-    public Set<Prohibition> getProhibitionInternal() {
-        return prohibitionInternal;
+    @Override
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+        projectionList.add(Projections.property("nameOfGoodsGroup"), "nameOfGoodsGroup");
+        criteria.setProjection(projectionList);
     }
 
-    public void setProhibitionInternal(Set<Prohibition> prohibitionInternal) {
-        this.prohibitionInternal = prohibitionInternal;
-    }
-
-    public Set<ProhibitionExclusion> getProhibitionExclusionInternal() {
-        return prohibitionExclusionInternal;
-    }
-
-    public void setProhibitionExclusionInternal(Set<ProhibitionExclusion> prohibitionExclusionInternal) {
-        this.prohibitionExclusionInternal = prohibitionExclusionInternal;
+    @Override
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
+        try {
+            idOfConfigurationProvider = ConfigurationProviderService.extractIdOfConfigurationProviderByIdOfOrg(session, idOfOrg);
+        } catch (Exception e) {
+            throw new DistributedObjectException(e.getMessage());
+        }
     }
 
     @Override
     protected void appendAttributes(Element element) {
         XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
-        XMLUtils.setAttributeIfNotNull(element, "Name", NameOfGoodsGroup);
+        XMLUtils.setAttributeIfNotNull(element, "Name", nameOfGoodsGroup);
     }
 
     @Override
@@ -69,10 +81,24 @@ public class GoodGroup extends DistributedObject {
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(distributedObject.getOrgOwner());
         setNameOfGoodsGroup(((GoodGroup) distributedObject).getNameOfGoodsGroup());
+        setIdOfConfigurationProvider(((GoodGroup) distributedObject).getIdOfConfigurationProvider());
     }
 
-    private String NameOfGoodsGroup;
-    private Set<Good> goodInternal;
+    public Set<Prohibition> getProhibitionInternal() {
+        return prohibitionInternal;
+    }
+
+    public void setProhibitionInternal(Set<Prohibition> prohibitionInternal) {
+        this.prohibitionInternal = prohibitionInternal;
+    }
+
+    public Set<ProhibitionExclusion> getProhibitionExclusionInternal() {
+        return prohibitionExclusionInternal;
+    }
+
+    public void setProhibitionExclusionInternal(Set<ProhibitionExclusion> prohibitionExclusionInternal) {
+        this.prohibitionExclusionInternal = prohibitionExclusionInternal;
+    }
 
     public List<Good> getGoods(){
         return Collections.unmodifiableList(new ArrayList<Good>(getGoodInternal()));
@@ -95,11 +121,10 @@ public class GoodGroup extends DistributedObject {
     }
 
     public String getNameOfGoodsGroup() {
-        return NameOfGoodsGroup;
+        return nameOfGoodsGroup;
     }
 
     public void setNameOfGoodsGroup(String nameOfGoodsGroup) {
-        NameOfGoodsGroup = nameOfGoodsGroup;
+        this.nameOfGoodsGroup = nameOfGoodsGroup;
     }
-
 }

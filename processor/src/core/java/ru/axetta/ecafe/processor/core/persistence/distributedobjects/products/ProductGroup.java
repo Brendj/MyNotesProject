@@ -4,12 +4,17 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConfigurationProviderDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -25,20 +30,27 @@ import java.util.Set;
  * Time: 14:45
  * To change this template use File | Settings | File Templates.
  */
-public class ProductGroup extends DistributedObject implements IConfigProvider {
+public class ProductGroup extends ConfigurationProviderDistributedObject {
 
-    private String nameOfGroup;
-    private Set<Product> productInternal;
-    private Long idOfConfigurationProvider;
-    private String classificationCode;
-    private Set<Prohibition> prohibitionInternal;
-
-    public Set<Prohibition> getProhibitionInternal() {
-        return prohibitionInternal;
+    @Override
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+        projectionList.add(Projections.property("nameOfGroup"), "nameOfGroup");
+        projectionList.add(Projections.property("classificationCode"), "classificationCode");
+        criteria.setProjection(projectionList);
     }
 
-    public void setProhibitionInternal(Set<Prohibition> prohibitionInternal) {
-        this.prohibitionInternal = prohibitionInternal;
+    @Override
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
+        try {
+            idOfConfigurationProvider = ConfigurationProviderService.extractIdOfConfigurationProviderByIdOfOrg(session, idOfOrg);
+        } catch (Exception e) {
+            throw new DistributedObjectException(e.getMessage());
+        }
     }
 
     @Override
@@ -71,6 +83,20 @@ public class ProductGroup extends DistributedObject implements IConfigProvider {
         setOrgOwner(distributedObject.getOrgOwner());
         setNameOfGroup(((ProductGroup) distributedObject).getNameOfGroup());
         setClassificationCode(((ProductGroup) distributedObject).getClassificationCode());
+        setIdOfConfigurationProvider(((ProductGroup) distributedObject).getIdOfConfigurationProvider());
+    }
+
+    private String nameOfGroup;
+    private Set<Product> productInternal;
+    private String classificationCode;
+    private Set<Prohibition> prohibitionInternal;
+
+    public Set<Prohibition> getProhibitionInternal() {
+        return prohibitionInternal;
+    }
+
+    public void setProhibitionInternal(Set<Prohibition> prohibitionInternal) {
+        this.prohibitionInternal = prohibitionInternal;
     }
 
     public String getNameOfGroup() {
@@ -123,14 +149,6 @@ public class ProductGroup extends DistributedObject implements IConfigProvider {
 
     public void setClassificationCode(String classificationCode) {
         this.classificationCode = classificationCode;
-    }
-
-    public Long getIdOfConfigurationProvider() {
-        return idOfConfigurationProvider;
-    }
-
-    public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
-        this.idOfConfigurationProvider = idOfConfigurationProvider;
     }
 
 }

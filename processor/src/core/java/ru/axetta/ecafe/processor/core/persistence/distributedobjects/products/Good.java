@@ -4,17 +4,28 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
 import ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket;
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConfigurationProviderDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.ActOfWayBillDifferencePosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalDisposingDocumentPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocumentPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.WayBillPosition;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
+import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -27,18 +38,92 @@ import java.util.Set;
  * Time: 16:33
  * To change this template use File | Settings | File Templates.
  */
-public class Good extends DistributedObject {
+public class Good extends ConfigurationProviderDistributedObject {
+
+    private String nameOfGood;
+    private String fullName;
+    private String goodsCode;
+    private Long netWeight;
+    private Long lifeTime;
+    private Long margin;
+    private GoodGroup goodGroup;
+    private String guidOfGG;
+    private Product product;
+    private String guidOfP;
+    private TechnologicalMap technologicalMap;
+    private String guidOfTM;
+    private GoodsBasicBasket basicGood;
+    private String guidOfBasicGood;
+    private User userCreate;
+    private User userEdit;
+    private User userDelete;
+    private UnitScale unitsScale;
+    private String pathPart1;
+    private String pathPart2;
+    private String pathPart3;
+    private String pathPart4;
+    private Set<TradeMaterialGood> tradeMaterialGoodInternal;
+    private Set<ProhibitionExclusion> prohibitionExclusionInternal;
+    private Set<Prohibition> prohibitionInternal;
+    private Set<GoodComplaintBook> goodComplaintBookInternal;
+    private Set<GoodBasicBasketPrice> goodBasicBasketPriceInternal;
+    private Set<WayBillPosition> wayBillPositionInternal;
+    private Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal;
+    private Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal;
+    private Set<GoodRequestPosition> goodRequestPositionInternal;
+
+    private Set<ActOfWayBillDifferencePosition> actOfWayBillDifferencePositionInternal;
 
     @Override
-    public void preProcess(Session session) throws DistributedObjectException {
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        criteria.createAlias("goodGroup", "gg", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("product", "p", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("technologicalMap", "tm", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("basicGood", "bg", JoinType.LEFT_OUTER_JOIN);
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+
+        projectionList.add(Projections.property("nameOfGood"), "nameOfGood");
+        projectionList.add(Projections.property("fullName"), "fullName");
+
+        projectionList.add(Projections.property("goodsCode"), "goodsCode");
+        projectionList.add(Projections.property("unitsScale"), "unitsScale");
+        projectionList.add(Projections.property("netWeight"), "netWeight");
+        projectionList.add(Projections.property("margin"), "margin");
+        projectionList.add(Projections.property("gg.guid"), "guidOfGG");
+        projectionList.add(Projections.property("p.guid"), "guidOfP");
+        projectionList.add(Projections.property("tm.guid"), "guidOfTM");
+        projectionList.add(Projections.property("bg.guid"), "guidOfBasicGood");
+        criteria.setProjection(projectionList);
+
+    }
+
+    @Override
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
+        try {
+            idOfConfigurationProvider = ConfigurationProviderService.extractIdOfConfigurationProviderByIdOfOrg(session, idOfOrg);
+        } catch (Exception e) {
+            throw new DistributedObjectException(e.getMessage());
+        }
         GoodGroup gg = DAOUtils.findDistributedObjectByRefGUID(GoodGroup.class, session, guidOfGG);
-        if(gg == null) throw new DistributedObjectException("GoodGroup NOT_FOUND_VALUE");
+        if (gg == null) {
+            throw new DistributedObjectException("GoodGroup NOT_FOUND_VALUE");
+        }
         setGoodGroup(gg);
         Product p = DAOUtils.findDistributedObjectByRefGUID(Product.class, session, guidOfP);
         TechnologicalMap tm = DAOUtils.findDistributedObjectByRefGUID(TechnologicalMap.class, session, guidOfTM);
-        if(p == null && tm == null) throw new DistributedObjectException("Product or TechnologicalMap NOT_FOUND_VALUE");
-        if(p != null) setProduct(p);
-        if(tm != null) setTechnologicalMap(tm);
+        if (p == null && tm == null) {
+            throw new DistributedObjectException("Product or TechnologicalMap NOT_FOUND_VALUE");
+        }
+        if (p != null) {
+            setProduct(p);
+        }
+        if (tm != null) {
+            setTechnologicalMap(tm);
+        }
 
         GoodsBasicBasket basicGood = DAOUtils.findBasicGood(session, guidOfBasicGood);
         if (basicGood != null) {
@@ -56,13 +141,20 @@ public class Good extends DistributedObject {
         XMLUtils.setAttributeIfNotNull(element, "NetWeight", netWeight);
         XMLUtils.setAttributeIfNotNull(element, "LifeTime", lifeTime);
         XMLUtils.setAttributeIfNotNull(element, "Margin", margin);
-        XMLUtils.setAttributeIfNotNull(element, "GuidOfGroup", goodGroup.getGuid());
-        if (product != null)
-            XMLUtils.setAttributeIfNotNull(element, "GuidOfBaseProduct", product.getGuid());
-        if (technologicalMap != null)
-            XMLUtils.setAttributeIfNotNull(element, "GuidOfTechMap", technologicalMap.getGuid());
-        if (basicGood != null)
-            XMLUtils.setAttributeIfNotNull(element, "GuidOfBasicGood", basicGood.getGuid());
+        //XMLUtils.setAttributeIfNotNull(element, "GuidOfGroup", goodGroup.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfGroup", guidOfGG);
+        if (StringUtils.isNotEmpty(guidOfP)) {
+            //XMLUtils.setAttributeIfNotNull(element, "GuidOfBaseProduct", product.getGuid());
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfBaseProduct", guidOfP);
+        }
+        if (StringUtils.isNotEmpty(guidOfTM)) {
+            //XMLUtils.setAttributeIfNotNull(element, "GuidOfTechMap", technologicalMap.getGuid());
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfTechMap", guidOfTM);
+        }
+        if (StringUtils.isNotEmpty(guidOfBasicGood)) {
+            //XMLUtils.setAttributeIfNotNull(element, "GuidOfBasicGood", basicGood.getGuid());
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfBasicGood", guidOfBasicGood);
+        }
     }
 
     @Override
@@ -74,8 +166,9 @@ public class Good extends DistributedObject {
             throw new DistributedObjectException("OrgOwner is empty");
         }
         String stringNameOfGood = XMLUtils.getStringAttributeValue(node, "Name", 512);
-        if (stringNameOfGood != null)
+        if (stringNameOfGood != null) {
             setNameOfGood(stringNameOfGood);
+        }
         String stringFullName = XMLUtils.getStringAttributeValue(node, "FullName", 1024);
         if (stringFullName != null) {
             String[] tmp = stringFullName.split("/");
@@ -91,20 +184,25 @@ public class Good extends DistributedObject {
             }
         }
         String stringGoodsCode = XMLUtils.getStringAttributeValue(node, "GoodsCode", 32);
-        if (stringGoodsCode != null)
+        if (stringGoodsCode != null) {
             setGoodsCode(stringGoodsCode);
+        }
         Integer integerUnitsScale = XMLUtils.getIntegerAttributeValue(node, "UnitsScale");
-        if (integerUnitsScale != null)
+        if (integerUnitsScale != null) {
             setUnitsScale(UnitScale.fromInteger(integerUnitsScale));
+        }
         Long longNetWeight = XMLUtils.getLongAttributeValue(node, "NetWeight");
-        if (longNetWeight != null)
+        if (longNetWeight != null) {
             setNetWeight(longNetWeight);
+        }
         Long longLifeTime = XMLUtils.getLongAttributeValue(node, "LifeTime");
-        if (longLifeTime != null)
+        if (longLifeTime != null) {
             setLifeTime(longLifeTime);
+        }
         Long longMargin = XMLUtils.getLongAttributeValue(node, "Margin");
-        if (longMargin != null)
+        if (longMargin != null) {
             setMargin(longMargin);
+        }
         guidOfGG = XMLUtils.getStringAttributeValue(node, "GuidOfGroup", 36);
         guidOfP = XMLUtils.getStringAttributeValue(node, "GuidOfBaseProduct", 36);
         guidOfTM = XMLUtils.getStringAttributeValue(node, "GuidOfTechMap", 36);
@@ -118,15 +216,15 @@ public class Good extends DistributedObject {
         setOrgOwner(((Good) distributedObject).getOrgOwner());
         setNameOfGood(((Good) distributedObject).getNameOfGood());
         String stringFullName = ((Good) distributedObject).getFullName();
-        if(stringFullName!=null) {
+        if (stringFullName != null) {
             String[] tmp = stringFullName.split("/");
-            if(tmp.length>0){
+            if (tmp.length > 0) {
                 StringBuilder sb = new StringBuilder();
-                for (String s: tmp){
+                for (String s : tmp) {
                     sb.append(s.trim()).append("/");
                 }
                 String s = sb.toString();
-                setFullName(s.substring(0,s.length()-1));
+                setFullName(s.substring(0, s.length() - 1));
             } else {
                 setFullName(stringFullName);
             }
@@ -135,27 +233,15 @@ public class Good extends DistributedObject {
         setNetWeight(((Good) distributedObject).getNetWeight());
         setLifeTime(((Good) distributedObject).getLifeTime());
         setMargin(((Good) distributedObject).getMargin());
-        setUnitsScale(((Good)distributedObject).getUnitsScale());
+        setUnitsScale(((Good) distributedObject).getUnitsScale());
+        setIdOfConfigurationProvider(((Good) distributedObject).getIdOfConfigurationProvider());
     }
-
-    private Set<TradeMaterialGood> tradeMaterialGoodInternal;
-    private Set<ProhibitionExclusion> prohibitionExclusionInternal;
-    private Set<Prohibition> prohibitionInternal;
-    private Set<GoodComplaintBook> goodComplaintBookInternal;
-    private Set<GoodBasicBasketPrice> goodBasicBasketPriceInternal;
-    private Set<WayBillPosition> wayBillPositionInternal;
-    private Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal;
-    private Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal;
-    private Set<GoodRequestPosition> goodRequestPositionInternal;
-
-    private Set<ActOfWayBillDifferencePosition> actOfWayBillDifferencePositionInternal;
 
     public Set<ActOfWayBillDifferencePosition> getActOfWayBillDifferencePositionInternal() {
         return actOfWayBillDifferencePositionInternal;
     }
 
-    public void setActOfWayBillDifferencePositionInternal(
-            Set<ActOfWayBillDifferencePosition> actOfWayBillDifferencePositionInternal) {
+    public void setActOfWayBillDifferencePositionInternal(Set<ActOfWayBillDifferencePosition> actOfWayBillDifferencePositionInternal) {
         this.actOfWayBillDifferencePositionInternal = actOfWayBillDifferencePositionInternal;
     }
 
@@ -171,8 +257,7 @@ public class Good extends DistributedObject {
         return internalDisposingDocumentPositionInternal;
     }
 
-    public void setInternalDisposingDocumentPositionInternal(
-            Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal) {
+    public void setInternalDisposingDocumentPositionInternal(Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal) {
         this.internalDisposingDocumentPositionInternal = internalDisposingDocumentPositionInternal;
     }
 
@@ -180,8 +265,7 @@ public class Good extends DistributedObject {
         return internalIncomingDocumentPositionInternal;
     }
 
-    public void setInternalIncomingDocumentPositionInternal(
-            Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal) {
+    public void setInternalIncomingDocumentPositionInternal(Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal) {
         this.internalIncomingDocumentPositionInternal = internalIncomingDocumentPositionInternal;
     }
 
@@ -232,29 +316,6 @@ public class Good extends DistributedObject {
     public void setTradeMaterialGoodInternal(Set<TradeMaterialGood> tradeMaterialGoodInternal) {
         this.tradeMaterialGoodInternal = tradeMaterialGoodInternal;
     }
-
-    private String nameOfGood;
-    private String fullName;
-    private String goodsCode;
-    private Long netWeight;
-    private Long lifeTime;
-    private Long margin;
-    private GoodGroup goodGroup;
-    private String guidOfGG;
-    private Product product;
-    private String guidOfP;
-    private TechnologicalMap technologicalMap;
-    private String guidOfTM;
-    private GoodsBasicBasket basicGood;
-    private String guidOfBasicGood;
-    private User userCreate;
-    private User userEdit;
-    private User userDelete;
-    private UnitScale unitsScale;
-    private String pathPart1;
-    private String pathPart2;
-    private String pathPart3;
-    private String pathPart4;
 
     public UnitScale getUnitsScale() {
         return unitsScale;

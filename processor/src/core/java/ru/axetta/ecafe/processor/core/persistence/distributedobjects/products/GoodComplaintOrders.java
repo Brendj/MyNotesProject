@@ -13,14 +13,52 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
+import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.List;
+
 public class GoodComplaintOrders extends DistributedObject {
 
+    private GoodComplaintIterations complaintIteration;
+    private String guidOfComplaintIteration;
+    private Org orderOrg;
+    private Long idOfOrderOrg;
+    private OrderDetail orderDetail;
+    private Long idOfOrderDetail;
+
     @Override
-    public void preProcess(Session session) throws DistributedObjectException {
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        criteria.createAlias("guidOfComplaintIteration","ci", JoinType.LEFT_OUTER_JOIN);
+
+        criteria.createAlias("orderDetail","od", JoinType.LEFT_OUTER_JOIN);
+
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+
+        projectionList.add(Projections.property("ci.guid"), "guidOfComplaintIteration");
+
+        projectionList.add(Projections.property("od.compositeIdOfOrderDetail.idOfOrg"), "idOfOrderOrg");
+        projectionList.add(Projections.property("od.compositeIdOfOrderDetail.idOfOrderDetail"), "idOfOrderDetail");
+        criteria.setProjection(projectionList);
+    }
+
+    @Override
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
+        return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid);
+    }
+
+    @Override
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         GoodComplaintIterations gci = DAOUtils.findDistributedObjectByRefGUID(GoodComplaintIterations.class, session, guidOfComplaintIteration);
         if (gci == null) throw new DistributedObjectException("Complaint iteration NOT_FOUND_VALUE");
         setComplaintIteration(gci);
@@ -52,9 +90,15 @@ public class GoodComplaintOrders extends DistributedObject {
     @Override
     protected void appendAttributes(Element element) {
         XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
-        XMLUtils.setAttributeIfNotNull(element, "GuidOfComplaintIteration", complaintIteration.getGuid());
-        XMLUtils.setAttributeIfNotNull(element, "IdOfOrg", orderOrg.getIdOfOrg());
-        XMLUtils.setAttributeIfNotNull(element, "IdOfOrderDetail", orderDetail.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
+        if(StringUtils.isNotEmpty(guidOfComplaintIteration)){
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfComplaintIteration", guidOfComplaintIteration);
+        }
+        if(idOfOrderOrg!=null){
+            XMLUtils.setAttributeIfNotNull(element, "IdOfOrg", idOfOrderOrg);
+        }
+        if(idOfOrderDetail!=null){
+            XMLUtils.setAttributeIfNotNull(element, "IdOfOrderDetail", idOfOrderDetail);
+        }
     }
 
     @Override
@@ -66,7 +110,7 @@ public class GoodComplaintOrders extends DistributedObject {
             throw new DistributedObjectException("OrgOwner is empty");
         }
         guidOfComplaintIteration = XMLUtils.getStringAttributeValue(node, "GuidOfComplaintIteration", 36);
-        idOfOrderDetail = XMLUtils.getLongAttributeValue(node, "IdOfOrg");
+        idOfOrderOrg = XMLUtils.getLongAttributeValue(node, "IdOfOrg");
         idOfOrderDetail = XMLUtils.getLongAttributeValue(node, "IdOfOrderDetail");
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
@@ -75,14 +119,10 @@ public class GoodComplaintOrders extends DistributedObject {
     @Override
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(distributedObject.getOrgOwner());
+        setComplaintIteration(((GoodComplaintOrders) distributedObject).getComplaintIteration());
+        setOrderDetail(((GoodComplaintOrders) distributedObject).getOrderDetail());
+        setOrderOrg(((GoodComplaintOrders) distributedObject).getOrderOrg());
     }
-
-    private GoodComplaintIterations complaintIteration;
-    private String guidOfComplaintIteration;
-    private Org orderOrg;
-    private Long idOfOrderOrg;
-    private OrderDetail orderDetail;
-    private Long idOfOrderDetail;
 
     public GoodComplaintIterations getComplaintIteration() {
         return complaintIteration;

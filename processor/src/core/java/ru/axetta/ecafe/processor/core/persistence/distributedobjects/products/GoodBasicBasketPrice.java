@@ -4,14 +4,21 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
 import ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConfigurationProviderDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
+import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -22,26 +29,43 @@ import org.w3c.dom.Node;
  * Time: 16:33
  * To change this template use File | Settings | File Templates.
  */
-public class GoodBasicBasketPrice extends DistributedObject {
+public class GoodBasicBasketPrice extends ConfigurationProviderDistributedObject {
+
+    private String guidOfGood;
+    private Good good;
+    private String guidOfGoodsBasicBasket;
+    private GoodsBasicBasket goodsBasicBasket;
+    private Long price;
 
     @Override
-    public void preProcess(Session session) throws DistributedObjectException {
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        criteria.createAlias("good","g", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("goodsBasicBasket","bg", JoinType.LEFT_OUTER_JOIN);
+
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+
+        projectionList.add(Projections.property("price"), "price");
+
+        projectionList.add(Projections.property("g.guid"), "guidOfGood");
+        projectionList.add(Projections.property("bg.guid"), "guidOfGoodsBasicBasket");
+        criteria.setProjection(projectionList);
+    }
+
+    @Override
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
+        try {
+            idOfConfigurationProvider = ConfigurationProviderService.extractIdOfConfigurationProviderByIdOfOrg(session, idOfOrg);
+        } catch (Exception e) {
+            throw new DistributedObjectException(e.getMessage());
+        }
         Good g = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfGood);
-        //if(g == null) throw new DistributedObjectException("Good NOT_FOUND_VALUE");
-        //setGood(g);
         if(g != null){
             setGood(g);
         }
-        //DistributedObjectException distributedObjectException = new DistributedObjectException("BasicGood NOT_FOUND_VALUE");
-        //distributedObjectException.setData(guidOfGoodsBasicBasket);
-        //GoodsBasicBasket basicGood;
-        //try {
-        //    basicGood = DAOUtils.findBasicGood(session, guidOfGoodsBasicBasket);
-        //} catch (Exception e) {
-        //    throw distributedObjectException;
-        //}
-        //if (basicGood == null) throw distributedObjectException;
-        //setGoodsBasicBasket(basicGood);
         GoodsBasicBasket basicGood = DAOUtils.findBasicGood(session, guidOfGoodsBasicBasket);
         if (basicGood != null) {
             setGoodsBasicBasket(basicGood);
@@ -52,10 +76,12 @@ public class GoodBasicBasketPrice extends DistributedObject {
     protected void appendAttributes(Element element) {
         XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
         XMLUtils.setAttributeIfNotNull(element, "Price", price);
-        if (good != null)
-            XMLUtils.setAttributeIfNotNull(element, "GuidOfGood", good.getGuid());
-        if (goodsBasicBasket != null)
-            XMLUtils.setAttributeIfNotNull(element, "GuidOfBasicGood", goodsBasicBasket.getGuid());
+        if(StringUtils.isNotEmpty(guidOfGood)){
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfGood", guidOfGood);
+        }
+        if(StringUtils.isNotEmpty(guidOfGoodsBasicBasket)){
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfBasicGood", guidOfGoodsBasicBasket);
+        }
     }
 
     @Override
@@ -82,12 +108,6 @@ public class GoodBasicBasketPrice extends DistributedObject {
         setGoodsBasicBasket(((GoodBasicBasketPrice) distributedObject).getGoodsBasicBasket());
         setGood(((GoodBasicBasketPrice) distributedObject).getGood());
     }
-
-    private String guidOfGood;
-    private Good good;
-    private String guidOfGoodsBasicBasket;
-    private GoodsBasicBasket goodsBasicBasket;
-    private Long price;
 
     public Long getPrice() {
         return price;

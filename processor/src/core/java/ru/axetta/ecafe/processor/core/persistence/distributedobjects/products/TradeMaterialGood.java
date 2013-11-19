@@ -4,17 +4,23 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConfigurationProviderDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalDisposingDocumentPosition;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalIncomingDocumentPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalDisposingDocumentPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocumentPosition;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
+import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -28,35 +34,40 @@ import java.util.Set;
  * Time: 17:29
  * To change this template use File | Settings | File Templates.
  */
-public class TradeMaterialGood extends DistributedObject {
+public class TradeMaterialGood extends ConfigurationProviderDistributedObject {
 
-    //public static final String[] UNIT_SCALES = {"граммы", "миллиметры", "порции", "единицы"};
-    private Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal;
-    private Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal;
+    @Override
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        criteria.createAlias("good","g", JoinType.LEFT_OUTER_JOIN);
 
-    public Set<InternalDisposingDocumentPosition> getInternalDisposingDocumentPositionInternal() {
-        return internalDisposingDocumentPositionInternal;
-    }
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
 
-    public void setInternalDisposingDocumentPositionInternal(
-            Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal) {
-        this.internalDisposingDocumentPositionInternal = internalDisposingDocumentPositionInternal;
-    }
+        projectionList.add(Projections.property("goodsCreationDate"), "goodsCreationDate");
+        projectionList.add(Projections.property("lifeTime"), "lifeTime");
+        projectionList.add(Projections.property("unitScale"), "unitScale");
+        projectionList.add(Projections.property("totalCount"), "totalCount");
+        projectionList.add(Projections.property("netWeight"), "netWeight");
+        projectionList.add(Projections.property("nds"), "nds");
 
-    public Set<InternalIncomingDocumentPosition> getInternalIncomingDocumentPositionInternal() {
-        return internalIncomingDocumentPositionInternal;
-    }
+        projectionList.add(Projections.property("g.guid"), "guidOfG");
 
-    public void setInternalIncomingDocumentPositionInternal(
-            Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal) {
-        this.internalIncomingDocumentPositionInternal = internalIncomingDocumentPositionInternal;
+        criteria.setProjection(projectionList);
     }
 
     @Override
-    public void preProcess(Session session) throws DistributedObjectException {
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         Good g  = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfG);
         if(g==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setGood(g);
+        try {
+            idOfConfigurationProvider = ConfigurationProviderService.extractIdOfConfigurationProviderByIdOfOrg(session, idOfOrg);
+        } catch (Exception e) {
+            throw new DistributedObjectException(e.getMessage());
+        }
     }
 
     @Override
@@ -70,7 +81,7 @@ public class TradeMaterialGood extends DistributedObject {
         XMLUtils.setAttributeIfNotNull(element, "NetWeight", netWeight);
         XMLUtils.setAttributeIfNotNull(element, "SelfPrice", selfPrice);
         XMLUtils.setAttributeIfNotNull(element, "NDS", nds);
-        XMLUtils.setAttributeIfNotNull(element, "GuidOfGoods", good.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfGoods", guidOfG);
     }
 
     @Override
@@ -117,6 +128,7 @@ public class TradeMaterialGood extends DistributedObject {
         setNetWeight(((TradeMaterialGood) distributedObject).getNetWeight());
         setSelfPrice(((TradeMaterialGood) distributedObject).getSelfPrice());
         setNds(((TradeMaterialGood) distributedObject).getNds());
+        setIdOfConfigurationProvider(((TradeMaterialGood) distributedObject).getIdOfConfigurationProvider());
     }
 
     private Good good;
@@ -128,6 +140,27 @@ public class TradeMaterialGood extends DistributedObject {
     private Long netWeight;
     private Long selfPrice;
     private Long nds;
+    private Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal;
+    private Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal;
+
+    public Set<InternalDisposingDocumentPosition> getInternalDisposingDocumentPositionInternal() {
+        return internalDisposingDocumentPositionInternal;
+    }
+
+    public void setInternalDisposingDocumentPositionInternal(
+            Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal) {
+        this.internalDisposingDocumentPositionInternal = internalDisposingDocumentPositionInternal;
+    }
+
+    public Set<InternalIncomingDocumentPosition> getInternalIncomingDocumentPositionInternal() {
+        return internalIncomingDocumentPositionInternal;
+    }
+
+    public void setInternalIncomingDocumentPositionInternal(
+            Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal) {
+        this.internalIncomingDocumentPositionInternal = internalIncomingDocumentPositionInternal;
+    }
+
 
     public String getGuidOfG() {
         return guidOfG;

@@ -7,16 +7,51 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
+import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.List;
 import java.util.Set;
 
 public class GoodComplaintBook extends DistributedObject {
 
+    private Client client;
+    private Long idOfClient;
+    private Good good;
+    private String guidOfGood;
+    private Set<GoodComplaintIterations> GoodComplaintIterationsInternal;
+
     @Override
-    public void preProcess(Session session) throws DistributedObjectException {
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        criteria.createAlias("client","cl", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("good","g", JoinType.LEFT_OUTER_JOIN);
+
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+
+        projectionList.add(Projections.property("price"), "price");
+
+        projectionList.add(Projections.property("cl.id"), "idOfClient");
+        projectionList.add(Projections.property("g.guid"), "guidOfGood");
+        criteria.setProjection(projectionList);
+    }
+
+    @Override
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
+        return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid);
+    }
+
+    @Override
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         DistributedObjectException distributedObjectException = new DistributedObjectException("Client NOT_FOUND_VALUE");
         distributedObjectException.setData(String.valueOf(idOfClient));
         Client c;
@@ -37,7 +72,9 @@ public class GoodComplaintBook extends DistributedObject {
     protected void appendAttributes(Element element) {
         XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
         XMLUtils.setAttributeIfNotNull(element, "IdOfClient", client.getIdOfClient());
-        XMLUtils.setAttributeIfNotNull(element, "GuidOfGoods", good.getGuid());
+        if(StringUtils.isNotEmpty(guidOfGood)){
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfGoods", guidOfGood);
+        }
     }
 
     @Override
@@ -57,13 +94,9 @@ public class GoodComplaintBook extends DistributedObject {
     @Override
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(distributedObject.getOrgOwner());
+        setClient(((GoodComplaintBook) distributedObject).getClient());
+        setGood(((GoodComplaintBook) distributedObject).getGood());
     }
-
-    private Client client;
-    private Long idOfClient;
-    private Good good;
-    private String guidOfGood;
-    private Set<GoodComplaintIterations> GoodComplaintIterationsInternal;
 
     public Client getClient() {
         return client;

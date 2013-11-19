@@ -4,12 +4,17 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConfigurationProviderDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.IConfigProvider;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -25,18 +30,31 @@ import java.util.Set;
  * Time: 14:45
  * To change this template use File | Settings | File Templates.
  */
-public class TechnologicalMapGroup extends DistributedObject implements IConfigProvider {
+public class TechnologicalMapGroup extends ConfigurationProviderDistributedObject {
 
     private String nameOfGroup;
     private Set<TechnologicalMap> technologicalMapInternal;
-    private Long idOfConfigurationProvider;
 
-    public Long getIdOfConfigurationProvider() {
-        return idOfConfigurationProvider;
+    @Override
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+        projectionList.add(Projections.property("nameOfGroup"), "nameOfGroup");
+
+        criteria.setProjection(projectionList);
     }
 
-    public void setIdOfConfigurationProvider(Long idOfConfigurationProvider) {
-        this.idOfConfigurationProvider = idOfConfigurationProvider;
+    @Override
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
+        try {
+            idOfConfigurationProvider = ConfigurationProviderService.extractIdOfConfigurationProviderByIdOfOrg(session, idOfOrg);
+        } catch (Exception e) {
+            throw new DistributedObjectException(e.getMessage());
+        }
     }
 
     @Override
@@ -64,6 +82,7 @@ public class TechnologicalMapGroup extends DistributedObject implements IConfigP
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(distributedObject.getOrgOwner());
         setNameOfGroup(((TechnologicalMapGroup) distributedObject).getNameOfGroup());
+        setIdOfConfigurationProvider(((TechnologicalMapGroup) distributedObject).getIdOfConfigurationProvider());
     }
 
     public String getNameOfGroup() {

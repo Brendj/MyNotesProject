@@ -31,9 +31,9 @@
         <!-- End Global params -->
 
         <property name="orgOwner" column="OrgOwner" type="long"/>
+        <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
         <property name="goodsCreationDate" column="GoodsCreationDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="lifeTime" column="LifeTime" type="long" not-null="true"/>
-        <!--<property name="unitsScale" column="UnitsScale" type="integer" not-null="true"/>-->
         <property name="unitScale" column="UnitsScale">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale</param>
@@ -53,14 +53,14 @@
             <key>
                 <column name="IdOfTradeMaterialGood"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalIncomingDocumentPosition" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocumentPosition" />
         </set>
 
         <set name="internalDisposingDocumentPositionInternal" lazy="true" inverse="true">
             <key>
                 <column name="IdOfTradeMaterialGood"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalDisposingDocumentPosition" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalDisposingDocumentPosition" />
         </set>
 
     </class>

@@ -6,14 +6,48 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
+import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.List;
+
 public class GoodComplaintCauses extends DistributedObject {
 
+    private GoodComplaintIterations complaintIteration;
+    private String guidOfComplaintIteration;
+    private GoodComplaintPossibleCauses cause;
+    private Integer causeNumber;
+
     @Override
-    public void preProcess(Session session) throws DistributedObjectException {
+    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+        criteria.createAlias("complaintIteration","ci", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("cause","c", JoinType.LEFT_OUTER_JOIN);
+
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+
+        projectionList.add(Projections.property("c.causeNumber"), "causeNumber");
+
+        projectionList.add(Projections.property("ci.guid"), "guidOfComplaintIteration");
+        criteria.setProjection(projectionList);
+    }
+
+    @Override
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
+        return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid);
+    }
+
+    @Override
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         GoodComplaintIterations gci = DAOUtils.findDistributedObjectByRefGUID(GoodComplaintIterations.class, session, guidOfComplaintIteration);
         if (gci == null) throw new DistributedObjectException("Complaint iteration NOT_FOUND_VALUE");
         setComplaintIteration(gci);
@@ -30,8 +64,12 @@ public class GoodComplaintCauses extends DistributedObject {
     @Override
     protected void appendAttributes(Element element) {
         XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
-        XMLUtils.setAttributeIfNotNull(element, "GuidOfComplaintIteration", complaintIteration.getGuid());
-        XMLUtils.setAttributeIfNotNull(element, "Cause", cause.getCauseNumber());
+        if(causeNumber!=null){
+            XMLUtils.setAttributeIfNotNull(element, "Cause", causeNumber);
+        }
+        if(StringUtils.isNotEmpty(guidOfComplaintIteration)){
+            XMLUtils.setAttributeIfNotNull(element, "GuidOfComplaintIteration", guidOfComplaintIteration);
+        }
     }
 
     @Override
@@ -51,12 +89,9 @@ public class GoodComplaintCauses extends DistributedObject {
     @Override
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(distributedObject.getOrgOwner());
+        setCause(((GoodComplaintCauses) distributedObject).getCause());
+        setComplaintIteration(((GoodComplaintCauses) distributedObject).getComplaintIteration());
     }
-
-    private GoodComplaintIterations complaintIteration;
-    private String guidOfComplaintIteration;
-    private GoodComplaintPossibleCauses cause;
-    private Integer causeNumber;
 
     public GoodComplaintIterations getComplaintIteration() {
         return complaintIteration;
