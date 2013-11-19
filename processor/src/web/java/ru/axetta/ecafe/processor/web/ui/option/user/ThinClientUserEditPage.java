@@ -58,7 +58,7 @@ public class ThinClientUserEditPage extends BasicWorkspacePage implements Client
 
 
     public String getPageTitle() {
-        return super.getPageTitle() + username;
+        return super.getPageTitle() + " " + username;
     }
 
     public String getPageFilename() {
@@ -66,7 +66,7 @@ public class ThinClientUserEditPage extends BasicWorkspacePage implements Client
     }
 
     public void setIdOfClient(Long idOfClient) {
-        this.idOfClient = idOfClient;
+        this.idOfClient = idOfClient < 1 ? null : idOfClient;
     }
 
     public Long getIdOfClient() {
@@ -102,8 +102,8 @@ public class ThinClientUserEditPage extends BasicWorkspacePage implements Client
     }
 
     public boolean isChangePassword() {
-        changePassword = idOfClient == null ? true : false;
-        return idOfClient == null ? true : changePassword;
+        changePassword = idOfClient == null ? true : changePassword;
+        return changePassword;
     }
 
     public void setChangePassword(boolean changePassword) {
@@ -195,8 +195,8 @@ public class ThinClientUserEditPage extends BasicWorkspacePage implements Client
                 //  Иначе - редактируем
                 modifyUser(session, encPassword);
                 idOfClient = cl.getIdOfClient();
+                fill(session);
             }
-            fill(session);
             infoMessages = "Изменения успешно внесены";
         } catch (Exception e) {
             logger.error("Failed to load thin client users", e);

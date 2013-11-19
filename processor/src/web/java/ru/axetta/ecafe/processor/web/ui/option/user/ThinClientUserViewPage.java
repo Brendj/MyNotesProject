@@ -35,7 +35,7 @@ import java.util.List;
 @Component
 @Scope("session")
 public class ThinClientUserViewPage extends BasicWorkspacePage {
-    private long idOfClient;
+    private Long idOfClient;
     private String username;
     private String roleName;
     private Person person;
@@ -54,12 +54,12 @@ public class ThinClientUserViewPage extends BasicWorkspacePage {
         return "option/user/thin_client/view";
     }
 
-    public long getIdOfClient() {
+    public Long getIdOfClient() {
         return idOfClient;
     }
 
-    public void setIdOfClient(long idOfClient) {
-        this.idOfClient = idOfClient;
+    public void setIdOfClient(Long idOfClient) {
+        this.idOfClient = idOfClient < 1 ? null : idOfClient;
     }
 
     public String getRoleName() {
@@ -95,6 +95,9 @@ public class ThinClientUserViewPage extends BasicWorkspacePage {
     public void fill() throws Exception {
         Session session = null;
         try {
+            if (idOfClient == null) {
+                return;
+            }
             session = (Session) entityManager.getDelegate();
             fill(session);
         } catch (Exception e) {
@@ -104,6 +107,9 @@ public class ThinClientUserViewPage extends BasicWorkspacePage {
     }
 
     public void fill(Session session) throws Exception {
+        if (idOfClient == null) {
+            return;
+        }
         Query q = session.createSQLQuery("select cf_thin_client_users.idofclient, cf_clients.idoforg, "
                                         + "cf_thin_client_users.role, cf_thin_client_users.username "
                                         + "from cf_thin_client_users "

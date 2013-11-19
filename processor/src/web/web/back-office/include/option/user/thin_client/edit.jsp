@@ -42,5 +42,5 @@
     </h:panelGrid>
 
     <a4j:commandButton value="Применить" action="#{thinClientUserEditPage.doSave}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                       reRender="mainMenu, workspaceTogglePanel, messages" styleClass="command-button" />
 </h:panelGrid>
