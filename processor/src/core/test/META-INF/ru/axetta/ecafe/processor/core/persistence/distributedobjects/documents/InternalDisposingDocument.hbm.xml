@@ -7,7 +7,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalDisposingDocument" table="cf_internal_disposing_documents">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalDisposingDocument" table="cf_internal_disposing_documents">
         <id name="globalId" column="IdOfInternalDisposingDocument" type="long">
             <generator class="identity"/>
         </id>
@@ -35,17 +35,17 @@
         <property name="date" column="DateOfInternalDisposingDocument" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="state" column="State">
             <type name="org.hibernate.type.EnumType">
-                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.DocumentState</param>
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState</param>
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
             </type>
         </property>
         <property name="comments" column="Comments" type="string" length="1024" not-null="true"/>
 
-        <many-to-one name="staff" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.Staff">
+        <many-to-one name="staff" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
             <column name="IdOfStaff" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="actOfInventarization" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfInventarization">
+        <many-to-one name="actOfInventorization" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.ActOfInventorization">
             <column name="IdOfActOfInventarization" not-null="false" />
         </many-to-one>
 
@@ -53,21 +53,21 @@
             <key>
                 <column name="IdOfInternalDisposingDocument"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.StateChange" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.StateChange" />
         </set>
 
         <set name="internalIncomingDocumentInternal" lazy="true" inverse="true">
             <key>
                 <column name="IdOfInternalDisposingDocument"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalIncomingDocument" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocument" />
         </set>
 
         <set name="internalDisposingDocumentPositionInternal" lazy="true" inverse="true">
             <key>
                 <column name="IdOfInternalDisposingDocument"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalDisposingDocumentPosition" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalDisposingDocumentPosition" />
         </set>
 
 

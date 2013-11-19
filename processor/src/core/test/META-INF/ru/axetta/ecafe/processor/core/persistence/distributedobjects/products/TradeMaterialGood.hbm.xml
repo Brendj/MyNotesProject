@@ -53,14 +53,14 @@
             <key>
                 <column name="IdOfTradeMaterialGood"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalIncomingDocumentPosition" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocumentPosition" />
         </set>
 
         <set name="internalDisposingDocumentPositionInternal" lazy="true" inverse="true">
             <key>
                 <column name="IdOfTradeMaterialGood"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalDisposingDocumentPosition" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalDisposingDocumentPosition" />
         </set>
 
     </class>

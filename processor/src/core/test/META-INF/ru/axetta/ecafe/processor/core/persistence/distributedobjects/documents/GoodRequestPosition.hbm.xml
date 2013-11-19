@@ -6,7 +6,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequestPosition" table="cf_goods_requests_positions">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition" table="cf_goods_requests_positions">
         <id name="globalId" column="IdOfGoodsRequestPosition" type="long">
             <generator class="identity"/>
         </id>
@@ -41,7 +41,7 @@
         <property name="totalCount" column="TotalCount" type="long"/>
         <property name="netWeight" column="NetWeight" type="long"/>
 
-        <many-to-one name="goodRequest" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequest">
+        <many-to-one name="goodRequest" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest">
             <column name="IdOfGoodsRequest" not-null="false" />
         </many-to-one>
 

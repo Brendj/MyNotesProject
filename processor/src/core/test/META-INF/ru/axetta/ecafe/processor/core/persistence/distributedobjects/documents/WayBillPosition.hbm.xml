@@ -7,7 +7,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.WayBillPosition" table="cf_waybills_positions">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.WayBillPosition" table="cf_waybills_positions">
         <id name="globalId" column="IdOfWayBillPosition" type="long">
             <generator class="identity"/>
         </id>
@@ -50,7 +50,7 @@
             <column name="IdOfGood" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="wayBill" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.WayBill">
+        <many-to-one name="wayBill" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.WayBill">
             <column name="IdOfWayBill" not-null="false" />
         </many-to-one>
 

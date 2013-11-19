@@ -7,7 +7,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequest" table="cf_goods_requests">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest" table="cf_goods_requests">
         <id name="globalId" column="IdOfGoodsRequest" type="long">
             <generator class="identity"/>
         </id>
@@ -35,14 +35,14 @@
         <property name="number" column="NumberOfGoodsRequest" type="string" length="128" not-null="true"/>
         <property name="state" column="State">
             <type name="org.hibernate.type.EnumType">
-                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.DocumentState</param>
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState</param>
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
             </type>
         </property>
         <property name="doneDate" column="DoneDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="comment" column="Comment" type="string" length="512"/>
 
-        <many-to-one name="staff" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.Staff">
+        <many-to-one name="staff" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
             <column name="IdOfStaff" not-null="false" />
         </many-to-one>
 
@@ -50,14 +50,14 @@
             <key>
                 <column name="IdOfGoodsRequest"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.StateChange" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.StateChange" />
         </set>
 
         <set name="goodRequestPositionInternal" lazy="true" inverse="true">
             <key>
                 <column name="IdOfGoodsRequest"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequestPosition" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition" />
         </set>
 
     </class>

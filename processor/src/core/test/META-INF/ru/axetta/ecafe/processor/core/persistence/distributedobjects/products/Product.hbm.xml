@@ -74,7 +74,7 @@
             <key>
                 <column name="idOfProducts"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequestPosition" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition" />
         </set>
 
     </class>

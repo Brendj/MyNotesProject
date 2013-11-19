@@ -6,7 +6,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfInventarization" table="cf_acts_of_inventarization">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.ActOfInventorization" table="cf_acts_of_inventarization">
         <id name="globalId" column="IdOfActOfInventarization" type="long">
             <generator class="identity"/>
         </id>
@@ -38,14 +38,14 @@
             <key>
                 <column name="IdOfActOfInventarization"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalIncomingDocument" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocument" />
         </set>
 
         <set name="InternalDisposingDocumentInternal" lazy="true" inverse="true">
             <key>
                 <column name="IdOfActOfInventarization"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalDisposingDocument" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalDisposingDocument" />
         </set>
 
     </class>

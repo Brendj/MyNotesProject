@@ -6,7 +6,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalDisposingDocumentPosition" table="cf_internal_disposing_document_positions">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalDisposingDocumentPosition" table="cf_internal_disposing_document_positions">
         <id name="globalId" column="IdOfInternalDisposingDocumentPositions" type="long">
             <generator class="identity"/>
         </id>
@@ -46,7 +46,7 @@
         <property name="disposePrice" column="DisposePrice" type="long" not-null="true"/>
         <property name="nds" column="NDS" type="long" not-null="true"/>
 
-        <many-to-one name="internalDisposingDocument" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalDisposingDocument">
+        <many-to-one name="internalDisposingDocument" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalDisposingDocument">
             <column name="IdOfInternalDisposingDocument" not-null="false" />
         </many-to-one>
 

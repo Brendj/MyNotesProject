@@ -110,35 +110,35 @@
             <key>
                 <column name="IdOfGood"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.WayBillPosition" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.WayBillPosition" />
         </set>
 
         <set name="internalIncomingDocumentPositionInternal" lazy="true" inverse="true">
             <key>
                 <column name="IdOfGood"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalIncomingDocumentPosition" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocumentPosition" />
         </set>
 
         <set name="internalDisposingDocumentPositionInternal" lazy="true" inverse="true">
             <key>
                 <column name="IdOfGood"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.InternalDisposingDocumentPosition" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalDisposingDocumentPosition" />
         </set>
 
         <set name="goodRequestPositionInternal" lazy="true" inverse="true">
             <key>
                 <column name="IdOfGood"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequestPosition" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition" />
         </set>
 
         <set name="actOfWayBillDifferencePositionInternal" lazy="true" inverse="true">
             <key>
                 <column name="IdOfGood"/>
             </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.ActOfWayBillDifferencePosition" />
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.ActOfWayBillDifferencePosition" />
         </set>
 
     </class>
