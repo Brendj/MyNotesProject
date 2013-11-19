@@ -979,6 +979,18 @@
     <rich:panelMenuItem id="createUserMenuItem" binding="#{mainPage.userCreatePage.mainMenuComponent}" label="Создание"
                         action="#{mainPage.showUserCreatePage}" reRender="workspaceForm" />
 
+    <rich:panelMenuGroup id="thinClientUsersGroupMenu" label="Тонкий клиент" binding="#{mainPage.thinClientUserGroupPage.mainMenuComponent}"
+                         rendered="#{mainPage.eligibleToViewUsers}">
+        <a4j:support event="onclick" action="#{mainPage.showThinClientUsersGroupPage}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="thinClientUserListPageMenuItem" binding="#{thinClientUserListPage.mainMenuComponent}" label="Список"
+                            action="#{thinClientUserListPage.show}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="thinClientUserCreatePageMenuItem" binding="#{thinClientUserEditPage.mainMenuComponent}" label="Создание"
+                            action="#{thinClientUserEditPage.show}" reRender="workspaceForm" >
+            <f:setPropertyActionListener value="#{null}" target="#{thinClientUserEditPage.idOfClient}" />
+        </rich:panelMenuItem>
+    </rich:panelMenuGroup>
+
 </rich:panelMenuGroup>
 
 <%--@elvariable id="employeesGroupPage" type="ru.axetta.ecafe.processor.web.ui.option.employees.EmployeesGroupPage"--%>

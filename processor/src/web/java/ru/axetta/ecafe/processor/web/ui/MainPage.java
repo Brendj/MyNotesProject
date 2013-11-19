@@ -116,6 +116,7 @@ public class MainPage {
     private final MenuViewPage menuViewPage = new MenuViewPage();
     private final MenuDetailsPage menuDetailsPage = new MenuDetailsPage();
     private final MenuExchangePage menuExchangePage = new MenuExchangePage();
+
     private Long selectedIdOfMenu;
     private String selectedMenuDataXML;
 
@@ -153,6 +154,8 @@ public class MainPage {
     private final ClientLimitBatchEditPage clientLimitBatchEditPage = new ClientLimitBatchEditPage();
     private final ClientSmsListPage clientSmsListPage = new ClientSmsListPage();
     private final ClientOperationListPage clientOperationListPage = new ClientOperationListPage();
+
+    private final BasicWorkspacePage thinClientUserGroupPage = new BasicWorkspacePage();
 
     // Card manipulation
     private final BasicWorkspacePage cardGroupPage = new BasicWorkspacePage();
@@ -2401,6 +2404,16 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
 
     public Object showClientGroupPage() {
         currentWorkspacePage = clientGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public BasicWorkspacePage getThinClientUserGroupPage() {
+        return thinClientUserGroupPage;
+    }
+
+    public Object showThinClientUsersGroupPage() {
+        currentWorkspacePage = thinClientUserGroupPage;
         updateSelectedMainMenu();
         return null;
     }
