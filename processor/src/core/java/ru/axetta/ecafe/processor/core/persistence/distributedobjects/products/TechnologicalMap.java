@@ -259,15 +259,10 @@ public class TechnologicalMap extends ConfigurationProviderDistributedObject {
     }
 
     @Override
-    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
+    protected void beforeProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         TechnologicalMapGroup tmg = DAOUtils.findDistributedObjectByRefGUID(TechnologicalMapGroup.class, session, guidOfTMG);
         if(tmg==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setTechnologicalMapGroup(tmg);
-        try {
-            idOfConfigurationProvider = ConfigurationProviderService.extractIdOfConfigurationProviderByIdOfOrg(session, idOfOrg);
-        } catch (Exception e) {
-            throw new DistributedObjectException(e.getMessage());
-        }
     }
 
     public Set<Good> getGoodInternal() {
@@ -522,7 +517,7 @@ public class TechnologicalMap extends ConfigurationProviderDistributedObject {
         sb.append(", vitaminC=").append(vitaminC);
         sb.append(", vitaminE=").append(vitaminE);
         sb.append(", technologicalMapGroup=").append(technologicalMapGroup);
-        sb.append(", idOfConfigurationProvider=").append(idOfConfigurationProvider);
+        sb.append(", idOfConfigurationProvider=").append(getIdOfConfigurationProvider());
         sb.append(", technologicalMapProductInternal=").append(technologicalMapProductInternal);
         sb.append(", userCreate=").append(userCreate);
         sb.append(", userDelete=").append(userDelete);

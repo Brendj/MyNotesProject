@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.utils;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -17,17 +19,34 @@ import java.util.*;
  */
 public class CalendarUtils {
 
-    private static TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
-    private static TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-    private static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-    private static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-    private static SimpleDateFormat dateShortFormat = new SimpleDateFormat("dd.MM.yy");
-    private static SimpleDateFormat dayInWeekFormat = new SimpleDateFormat("EE", new Locale("ru"));
+    private final static TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
+    private final static TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
+    private final static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+    private final static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    private final static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+    private final static SimpleDateFormat dateShortFormat = new SimpleDateFormat("dd.MM.yy");
+    private final static SimpleDateFormat dayInWeekFormat = new SimpleDateFormat("EE", new Locale("ru"));
+    public final static Date AFTER_DATE = getAfterDate();
 
-    public static Date parseFullDateTimeWithLocalTimeZone(String s) throws ParseException {
+    private static Date getAfterDate(){
+        Calendar date = new GregorianCalendar();
+        // reset hour, minutes, seconds and millis
+        date.set(Calendar.YEAR, 2200);
+        // next day
+        return date.getTime();
+    }
+
+    public static Date parseFullDateTimeWithLocalTimeZone(String s) throws Exception {
         dateTimeFormat.setTimeZone(localTimeZone);
-        return (s == null || s.isEmpty()) ? null : dateTimeFormat.parse(s);
+        if(StringUtils.isEmpty(s)){
+            return null;
+        } else {
+            Date date = dateTimeFormat.parse(s);
+            if(date.after(AFTER_DATE)) {
+                throw new Exception("Не верно введена дата");
+            }
+            return date;
+        }
     }
 
     public static String toStringFullDateTimeWithLocalTimeZone(Date dateTime) {
@@ -69,24 +88,45 @@ public class CalendarUtils {
         return c.getTime();
     }
 
-    public static Date parseDate(String s) throws ParseException {
+    public static Date parseDate(String s) throws Exception {
         dateFormat.setTimeZone(utcTimeZone);
-        if (s == null || s.isEmpty())
+        if(StringUtils.isEmpty(s)){
             return null;
-        else
-            return dateFormat.parse(s);
+        } else {
+            Date date = dateFormat.parse(s);
+            if(date.after(AFTER_DATE)) {
+                throw new Exception("Не верно введена дата");
+            }
+            return date;
+        }
     }
 
     public static String dateToString(Date date) {
         return dateFormat.format(date);
     }
 
-    public static Date parseShortDate(String validTime) throws ParseException {
-        return dateShortFormat.parse(validTime);
+    public static Date parseShortDate(String s) throws Exception {
+        if(StringUtils.isEmpty(s)){
+            return null;
+        } else {
+            Date date = dateShortFormat.parse(s);
+            if(date.after(AFTER_DATE)) {
+                throw new Exception("Не верно введена дата");
+            }
+            return date;
+        }
     }
 
-    public static Date parseTime(String validTime) throws ParseException {
-        return timeFormat.parse(validTime);
+    public static Date parseTime(String s) throws Exception {
+        if(StringUtils.isEmpty(s)){
+            return null;
+        } else {
+            Date date = timeFormat.parse(s);
+            if(date.after(AFTER_DATE)) {
+                throw new Exception("Не верно введена дата");
+            }
+            return date;
+        }
     }
 
     public static String timeToString(Date date) {

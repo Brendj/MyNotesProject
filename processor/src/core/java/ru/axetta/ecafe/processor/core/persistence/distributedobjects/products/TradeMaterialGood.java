@@ -59,15 +59,10 @@ public class TradeMaterialGood extends ConfigurationProviderDistributedObject {
     }
 
     @Override
-    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
+    protected void beforeProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         Good g  = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfG);
         if(g==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setGood(g);
-        try {
-            idOfConfigurationProvider = ConfigurationProviderService.extractIdOfConfigurationProviderByIdOfOrg(session, idOfOrg);
-        } catch (Exception e) {
-            throw new DistributedObjectException(e.getMessage());
-        }
     }
 
     @Override

@@ -134,15 +134,10 @@ public class Product extends ConfigurationProviderDistributedObject {
     }
 
     @Override
-    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
+    protected void beforeProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         ProductGroup pg = DAOUtils.findDistributedObjectByRefGUID(ProductGroup.class, session, productGroupGuid);
         if(pg==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setProductGroup(pg);
-        try {
-            idOfConfigurationProvider = ConfigurationProviderService.extractIdOfConfigurationProviderByIdOfOrg(session, idOfOrg);
-        } catch (Exception e) {
-            throw new DistributedObjectException(e.getMessage());
-        }
     }
 
     public String getProductGroupGuid() {

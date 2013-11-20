@@ -56,12 +56,7 @@ public class GoodBasicBasketPrice extends ConfigurationProviderDistributedObject
     }
 
     @Override
-    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
-        try {
-            idOfConfigurationProvider = ConfigurationProviderService.extractIdOfConfigurationProviderByIdOfOrg(session, idOfOrg);
-        } catch (Exception e) {
-            throw new DistributedObjectException(e.getMessage());
-        }
+    protected void beforeProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         Good g = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfGood);
         if(g != null){
             setGood(g);

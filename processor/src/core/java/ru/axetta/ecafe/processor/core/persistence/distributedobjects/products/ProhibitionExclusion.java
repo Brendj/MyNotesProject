@@ -25,7 +25,7 @@ public class ProhibitionExclusion extends DistributedObject {
     @Override
     public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
         criteria.createAlias("prohibition","p", JoinType.LEFT_OUTER_JOIN);
-        criteria.createAlias("goodGroup","gg", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("goodsGroup","gg", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("good","g", JoinType.LEFT_OUTER_JOIN);
 
         ProjectionList projectionList = Projections.projectionList();

@@ -49,13 +49,7 @@ public class GoodGroup extends ConfigurationProviderDistributedObject {
     }
 
     @Override
-    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
-        try {
-            idOfConfigurationProvider = ConfigurationProviderService.extractIdOfConfigurationProviderByIdOfOrg(session, idOfOrg);
-        } catch (Exception e) {
-            throw new DistributedObjectException(e.getMessage());
-        }
-    }
+    protected void beforeProcess(Session session, Long idOfOrg) throws DistributedObjectException {}
 
     @Override
     protected void appendAttributes(Element element) {

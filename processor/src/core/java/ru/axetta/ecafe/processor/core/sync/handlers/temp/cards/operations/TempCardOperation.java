@@ -92,16 +92,16 @@ public class TempCardOperation {
         if(StringUtils.isNotEmpty(strIssueExpiryDate)){
             try {
                 issueExpiryDate = CalendarUtils.parseFullDateTimeWithLocalTimeZone(strIssueExpiryDate);
-            } catch (ParseException e){
-                return new TempCardOperation(idOfOperation, "ParseException IssueExpiryDate");
+            } catch (Exception e){
+                return new TempCardOperation(idOfOperation, "Exception IssueExpiryDate");
             }
         }
         String strOperationDate = XMLUtils.getAttributeValue(itemNode,"OperationDate");
         if(StringUtils.isNotEmpty(strOperationDate)){
             try {
                 operationDate = CalendarUtils.parseFullDateTimeWithLocalTimeZone(strOperationDate);
-            } catch (ParseException e){
-                return new TempCardOperation(idOfOperation, "ParseException OperationDate");
+            } catch (Exception e){
+                return new TempCardOperation(idOfOperation, "Exception OperationDate");
             }
         } else {
             return new TempCardOperation(idOfOperation, "Attribute OperationDate not found");

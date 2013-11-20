@@ -20,8 +20,21 @@ import java.util.List;
  */
 public abstract class ConfigurationProviderDistributedObject extends DistributedObject {
 
-    protected Long idOfConfigurationProvider;
-    private ConfigurationProvider configurationProvider;
+    private Long idOfConfigurationProvider;
+
+    @Override
+    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
+        try {
+            idOfConfigurationProvider = ConfigurationProviderService.extractIdOfConfigurationProviderByIdOfOrg(session, idOfOrg);
+        } catch (Exception e) {
+            throw new DistributedObjectException(e.getMessage());
+        }
+        if(idOfConfigurationProvider==null){
+            throw new DistributedObjectException("ConfigurationProvider NOT_FOUND_VALUE");
+        }
+    }
+
+    protected abstract void beforeProcess(Session session, Long idOfOrg) throws DistributedObjectException;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -49,11 +62,4 @@ public abstract class ConfigurationProviderDistributedObject extends Distributed
         this.idOfConfigurationProvider = idOfConfigurationProvider;
     }
 
-    private ConfigurationProvider getConfigurationProvider() {
-        return configurationProvider;
-    }
-
-    private void setConfigurationProvider(ConfigurationProvider configurationProvider) {
-        this.configurationProvider = configurationProvider;
-    }
 }

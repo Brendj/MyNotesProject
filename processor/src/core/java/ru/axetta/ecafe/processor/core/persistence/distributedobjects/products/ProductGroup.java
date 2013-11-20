@@ -45,12 +45,8 @@ public class ProductGroup extends ConfigurationProviderDistributedObject {
     }
 
     @Override
-    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
-        try {
-            idOfConfigurationProvider = ConfigurationProviderService.extractIdOfConfigurationProviderByIdOfOrg(session, idOfOrg);
-        } catch (Exception e) {
-            throw new DistributedObjectException(e.getMessage());
-        }
+    protected void beforeProcess(Session session, Long idOfOrg) throws DistributedObjectException {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override

@@ -41,7 +41,6 @@ public class TechnologicalMapProduct extends ConfigurationProviderDistributedObj
 
     private String guidOfP;
     private String guidOfTM;
-    //private Long idOfConfigurationProvider;
     private Integer numberGroupReplace;
 
     @Override
@@ -113,7 +112,7 @@ public class TechnologicalMapProduct extends ConfigurationProviderDistributedObj
     }
 
     @Override
-    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
+    protected void beforeProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         Product p = DAOUtils.findDistributedObjectByRefGUID(Product.class, session, guidOfP);
         TechnologicalMap tm = DAOUtils.findDistributedObjectByRefGUID(TechnologicalMap.class, session, guidOfTM);
         if (tm == null || p == null) {
@@ -121,11 +120,6 @@ public class TechnologicalMapProduct extends ConfigurationProviderDistributedObj
         }
         setProduct(p);
         setTechnologicalMap(tm);
-        try {
-            idOfConfigurationProvider = ConfigurationProviderService.extractIdOfConfigurationProviderByIdOfOrg(session, idOfOrg);
-        } catch (Exception e) {
-            throw new DistributedObjectException(e.getMessage());
-        }
     }
 
     public Integer getNumberGroupReplace() {

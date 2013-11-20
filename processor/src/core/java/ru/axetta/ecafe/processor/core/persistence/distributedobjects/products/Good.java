@@ -102,12 +102,7 @@ public class Good extends ConfigurationProviderDistributedObject {
     }
 
     @Override
-    public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
-        try {
-            idOfConfigurationProvider = ConfigurationProviderService.extractIdOfConfigurationProviderByIdOfOrg(session, idOfOrg);
-        } catch (Exception e) {
-            throw new DistributedObjectException(e.getMessage());
-        }
+    protected void beforeProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         GoodGroup gg = DAOUtils.findDistributedObjectByRefGUID(GoodGroup.class, session, guidOfGG);
         if (gg == null) {
             throw new DistributedObjectException("GoodGroup NOT_FOUND_VALUE");

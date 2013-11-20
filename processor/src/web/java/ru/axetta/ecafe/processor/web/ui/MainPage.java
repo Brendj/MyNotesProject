@@ -3616,7 +3616,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to create card", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации карты", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации карты: " +e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);

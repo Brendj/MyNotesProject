@@ -385,7 +385,7 @@ public class RuntimeContext implements ApplicationContextAware {
 
     static SessionFactory sessionFactory;
 
-    private static SessionFactory reportsSessionFactory;
+    public static SessionFactory reportsSessionFactory;
 
     public static void setSessionFactory(SessionFactory sessionFactory) {
         RuntimeContext.sessionFactory = sessionFactory;

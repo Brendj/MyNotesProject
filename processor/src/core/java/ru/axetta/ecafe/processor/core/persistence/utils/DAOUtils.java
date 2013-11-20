@@ -25,6 +25,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1181,7 +1182,8 @@ public class DAOUtils {
             refDistributedObject = clazz.newInstance();
             Criteria criteria = session.createCriteria(clazz);
             criteria.add(Restrictions.eq("guid",guid));
-            refDistributedObject.createProjections(criteria, 0,"");
+            refDistributedObject.createProjections(criteria, 0, "");
+            criteria.setResultTransformer(Transformers.aliasToBean(clazz));
             criteria.setMaxResults(1);
             return (T) criteria.uniqueResult();
         } catch (Exception e) {
@@ -1549,7 +1551,7 @@ public class DAOUtils {
         if(!StringUtils.isEmpty(nameFilter)){
             goodGroupCriteria.add(Restrictions.ilike("nameOfGoodsGroup", nameFilter, MatchMode.ANYWHERE));
         }
-        if(orgOwners!=null){
+        if(orgOwners!=null && !orgOwners.isEmpty()){
             goodGroupCriteria.add(Restrictions.in("orgOwner", orgOwners));
         }
         if(deletedStatusSelected!=null && !deletedStatusSelected){

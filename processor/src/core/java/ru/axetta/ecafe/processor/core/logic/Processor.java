@@ -441,6 +441,15 @@ public class Processor implements SyncProcessor,
             int cardType, int state, Date validTime, int lifeState, String lockReason, Date issueTime,
             Long cardPrintedNo) throws Exception {
 
+
+        if(validTime.after(CalendarUtils.AFTER_DATE)) {
+            throw new Exception("Не верно введена дата");
+        }
+
+        if(issueTime!=null && validTime.before(issueTime)) {
+            throw new Exception("Не верно введена дата");
+        }
+
         Client client = DAOUtils.getClientReference(persistenceSession, idOfClient);
         if (client == null) {
             throw new Exception("Клиент не найден: " + idOfClient);
@@ -2112,7 +2121,6 @@ public class Processor implements SyncProcessor,
             //    }
             //}
             List<Card> cards = DAOUtils.getClientsAndCardsForOrgs(persistenceSession, idOfOrgSet, clientIds);
-            logger.debug("card counts " + cards.size());
             for (Card card : cards) {
                 Client client = card.getClient();
                 if (client.getClientGroup() == null || (!client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()
