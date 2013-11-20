@@ -7,11 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service.msk;
 import generated.registry.manual_synch.FrontController;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.documents.GoodRequestPosition;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
-import ru.axetta.ecafe.processor.web.ui.MainPage;
-//import ru.axetta.ecafe.processor.web.ui.auth.LoginBean;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
