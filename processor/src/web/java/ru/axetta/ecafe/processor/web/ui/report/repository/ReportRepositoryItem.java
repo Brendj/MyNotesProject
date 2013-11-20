@@ -17,10 +17,10 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.type.ListType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +32,7 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
         List<Long> idOfOrgList;
         private Long idOfContragentReceiver;
         private Long idOfContragentPayer;
+        private static Logger logger = LoggerFactory.getLogger(Filter.class);
 
         @Override
         public boolean isEmpty() {
@@ -52,6 +53,7 @@ public class ReportRepositoryItem extends AbstractEntityItem<ReportInfo>  {
                 ContextDAOServices.getInstance().buildOrgOrContragentRestriction(idOfUser, "idOfOrg",
                                         ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID, crit);
             } catch (Exception e) {
+                logger.error(e.getMessage());
             }
             if (idOfOrgList != null && idOfOrgList.size() > 0) {
                 crit.add(Restrictions.in("idOfOrg", idOfOrgList));
