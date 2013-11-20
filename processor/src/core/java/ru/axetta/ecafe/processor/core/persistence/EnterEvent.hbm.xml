@@ -31,5 +31,6 @@
                   not-null="false"/>
         <property name="visitDateTime" column="VisitDateTime" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="false"/>
+        <property name="guardianId" column="GuardianId" type="long" not-null="false"/>
     </class>
 </hibernate-mapping>

@@ -35,6 +35,7 @@ public class EventNotificationService {
     public static String MESSAGE_LINKING_TOKEN_GENERATED = "linkingToken";
     public static String MESSAGE_RESTORE_PASSWORD = "restorePassword";
     public static String MESSAGE_PAYMENT = "payment";
+    public static String NOTIFICATION_PASS_WITH_GUARDIAN = "passWithGuardian";
     public static String NOTIFICATION_SMS_SUBSCRIPTION_FEE = "smsSubscriptionFee";
     public static String NOTIFICATION_SMS_SUB_FEE_WITHDRAW_SUCCESS = "smsSubFeeWithdrawSuccessful";
     public static String NOTIFICATION_SMS_SUB_FEE_WITHDRAW_NOT_SUCCESS = "smsSubFeeWithdrawNotSuccessful";
@@ -97,8 +98,7 @@ public class EventNotificationService {
             "Списание [date] Л/с: [contractId] Сервис SMS: [smsSubscriptionFee] р.",
             NOTIFICATION_SMS_SUB_FEE_WITHDRAW_NOT_SUCCESS + "." + TYPE_SMS,
             "Л/с: [contractId] Сервис SMS отключен. Причина: недостаточный баланс.",
-
-
+            /////
             NOTIFICATION_SUBSCRIPTION_FEEDING + "." + TYPE_SMS,
             "Л/с: [contractId] Сервис АП: не забудьте пополнить баланс до [withdrawDate]",
             NOTIFICATION_SUBSCRIPTION_FEEDING + "." + TYPE_EMAIL_SUBJECT,
@@ -110,10 +110,20 @@ public class EventNotificationService {
                     + "<br/>\n<br/>\nС уважением,<br/>\nСлужба поддержки клиентов\n<br/><br/>\n"
                     + "<p style=\"color:#cccccc;font-size:xx-small;font-weight:bold\">Вы можете отключить данные уведомления в своем личном кабинете</p>\n"
                     + "</body>\n</html>",
-
-
             NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS + "." + TYPE_SMS,
-            "Л/с: [contractId] Сервис АП отключен. Причина: недостаточный баланс."
+            "Л/с: [contractId] Сервис АП отключен. Причина: недостаточный баланс.",
+            /////
+            NOTIFICATION_PASS_WITH_GUARDIAN + "." + TYPE_SMS,
+            "[eventName] [eventTime] [surname] [firstName] ([guardian])",
+            NOTIFICATION_PASS_WITH_GUARDIAN + "." + TYPE_EMAIL_TEXT,
+            "<html>\n<body>\nУважаемый клиент, <br/><br/>\n\n"
+                    + "[eventName] [eventTime] [surname] [firstName] с представителем [guardian]. <br/>\n"
+                    + "С уважением,<br/>\n"
+                    + "Служба поддержки клиентов\n<br/><br/>\n"
+                    + "<p style=\"color:#cccccc;font-size:xx-small;font-weight:bold\">Вы можете отключить данные уведомления в своем личном кабинете</p>\n"
+                    + "</body>\n" + "</html>",
+            NOTIFICATION_PASS_WITH_GUARDIAN + "." + TYPE_EMAIL_SUBJECT,
+            "Уведомление о времени прихода и ухода"
     };
 
     String getDefaultText(String name) {
@@ -271,7 +281,7 @@ public class EventNotificationService {
         boolean result;
         try {
             int clientSMSType;
-            if (type.equals(NOTIFICATION_ENTER_EVENT)) {
+            if (type.equals(NOTIFICATION_ENTER_EVENT) || type.equals(NOTIFICATION_PASS_WITH_GUARDIAN)) {
                 clientSMSType = ClientSms.TYPE_ENTER_EVENT_NOTIFY;
             } else if (type.equals(NOTIFICATION_BALANCE_TOPUP)) {
                 clientSMSType = ClientSms.TYPE_PAYMENT_REGISTERED;
@@ -304,7 +314,7 @@ public class EventNotificationService {
     }
 
     private boolean isSMSNotificationEnabledForType(String type) {
-        if (type.equals(NOTIFICATION_ENTER_EVENT)) {
+        if (type.equals(NOTIFICATION_ENTER_EVENT) || type.equals(NOTIFICATION_PASS_WITH_GUARDIAN)) {
             if (notifyBySMSAboutEnterEvent == null) {
                 notifyBySMSAboutEnterEvent = RuntimeContext.getInstance()
                         .getOptionValueBool(Option.OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT);

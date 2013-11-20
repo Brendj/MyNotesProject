@@ -87,6 +87,23 @@
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>
+        <rich:tab label="SMS уведомление о посещении с представителем" id="passWithGuardian-SMS">
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Текст:" styleClass="output-text" />
+                <h:inputTextarea rows="10" cols="40" value="#{messageConfigurePage.passWithGuardianSMSMessageText}"
+                                 styleClass="input-text" />
+                <h:outputText escape="true" value="Ключевые слова:" styleClass="output-text" />
+                <h:panelGrid>
+                    <h:outputText value="[balance] - текущий баланс лицевого счета" styleClass="output-text" />
+                    <h:outputText value="[contractId] - номер лицевого счета" styleClass="output-text" />
+                    <h:outputText value="[surname] - фамилия клиента" styleClass="output-text" />
+                    <h:outputText value="[firstName] - имя клиента" styleClass="output-text" />
+                    <h:outputText value="[eventName] - название события" styleClass="output-text" />
+                    <h:outputText value="[eventTime] - время события" styleClass="output-text" />
+                    <h:outputText value="[guardian] - фамилия и имя представителя" styleClass="output-text"/>
+                </h:panelGrid>
+            </h:panelGrid>
+        </rich:tab>
         <rich:tab label="E-mail уведомления о пополнении баланса" id="balance-Email">
             <h:panelGrid styleClass="borderless-grid" columns="2">
                 <h:outputText escape="true" value="Тема:" styleClass="output-text" />
@@ -159,6 +176,26 @@
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>
+        <rich:tab label="E-mail уведомление о посещении с представителем" id="passWithGuardian-Email">
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Тема:" styleClass="output-text" />
+                <h:inputText value="#{messageConfigurePage.passWithGuardianEmailSubject}" size="80" maxlength="128"
+                             styleClass="input-text" />
+                <h:outputText escape="true" value="Текст:" styleClass="output-text" />
+                <h:inputTextarea rows="15" cols="80" value="#{messageConfigurePage.passWithGuardianEmailMessageText}"
+                                 styleClass="input-text" />
+                <h:outputText escape="true" value="Ключевые слова:" styleClass="output-text" />
+                <h:panelGrid>
+                    <h:outputText value="[balance] - текущий баланс лицевого счета" styleClass="output-text" />
+                    <h:outputText value="[contractId] - номер лицевого счета" styleClass="output-text" />
+                    <h:outputText value="[surname] - фамилия клиента" styleClass="output-text" />
+                    <h:outputText value="[firstName] - имя клиента" styleClass="output-text" />
+                    <h:outputText value="[eventName] - название события" styleClass="output-text" />
+                    <h:outputText value="[eventTime] - время события" styleClass="output-text" />
+                    <h:outputText value="[guardian] - фамилия и имя представителя" styleClass="output-text" />
+                </h:panelGrid>
+            </h:panelGrid>
+        </rich:tab>
     </rich:tabPanel>
 
     <h:panelGroup style="margin-top: 10px">
@@ -171,4 +208,27 @@
     </h:panelGroup>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
+
+    <%--Скрипт по выраниванию высоты заголовков у табов.--%>
+    <script type="text/javascript">
+        jQuery(document).ready(function () {
+            jQuery("table.rich-tabpanel").each(function () {
+                var tabPanelContainer = jQuery('table:first', this);
+                // Locate the tallest TD
+                var max_height = 0;
+                jQuery("td.rich-tabhdr-side-cell", tabPanelContainer).each(function () {
+                    var td_height = jQuery(this).height();
+                    if (max_height < td_height) {
+                        max_height = td_height;
+                    }
+                });
+                // Set explicit heights on all other TDs
+                if (max_height > 0) {
+                    jQuery("td.rich-tabhdr-side-cell", tabPanelContainer).each(function () {
+                        jQuery(this).height(max_height);
+                    });
+                }
+            });
+        });
+    </script>
 </h:panelGrid>

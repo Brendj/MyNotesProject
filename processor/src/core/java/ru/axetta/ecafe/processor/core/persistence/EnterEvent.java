@@ -32,6 +32,7 @@ public class EnterEvent {
     //Kadyrov (21.12.2011)
     private Client client;
     private Org org;
+    private Long guardianId;
 
     public static final int ENTRY = 0; // вход
     public static final int EXIT = 1; // выход
@@ -189,6 +190,14 @@ public class EnterEvent {
         this.client = client;
     }
 
+    public Long getGuardianId() {
+        return guardianId;
+    }
+
+    public void setGuardianId(Long guardianId) {
+        this.guardianId = guardianId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -219,6 +228,7 @@ public class EnterEvent {
                 + eventCode + ", idOfCard=" + idOfCard  + ", client=" + client + ", idOfTempCard=" + idOfTempCard
                 + ", evtDateTime=" + evtDateTime + ", idOfVisitor=" + idOfVisitor + ", visitorFullName='"
                 + visitorFullName + '\'' + ", docType=" + docType + ", docSerialNum='" + docSerialNum + '\''
-                + ", issueDocDate=" + issueDocDate + ", visitDateTime=" + visitDateTime + '}';
+                + ", issueDocDate=" + issueDocDate + ", visitDateTime=" + visitDateTime + ", guardianId=" + guardianId
+                + '}';
     }
 }

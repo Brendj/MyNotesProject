@@ -46,6 +46,10 @@ public class MessageConfigurePage extends BasicWorkspacePage {
     private String smsSubFeeWithdrawSuccessfulSMSText;
     private String smsSubFeeWithdrawNotSuccessfulSMSText;
 
+    private String passWithGuardianSMSMessageText;
+    private String passWithGuardianEmailMessageText;
+    private String passWithGuardianEmailSubject;
+
     @Resource
     EventNotificationService eventNotificationService;
 
@@ -91,6 +95,15 @@ public class MessageConfigurePage extends BasicWorkspacePage {
         smsSubFeeWithdrawNotSuccessfulSMSText = eventNotificationService
                 .getNotificationText(EventNotificationService.NOTIFICATION_SMS_SUB_FEE_WITHDRAW_NOT_SUCCESS,
                         EventNotificationService.TYPE_SMS);
+        passWithGuardianSMSMessageText = eventNotificationService
+                .getNotificationText(EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN,
+                        EventNotificationService.TYPE_SMS);
+        passWithGuardianEmailMessageText = eventNotificationService
+                .getNotificationText(EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN,
+                        EventNotificationService.TYPE_EMAIL_TEXT);
+        passWithGuardianEmailSubject = eventNotificationService
+                .getNotificationText(EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN,
+                        EventNotificationService.TYPE_EMAIL_SUBJECT);
     }
 
     public Object save() throws Exception {
@@ -133,7 +146,14 @@ public class MessageConfigurePage extends BasicWorkspacePage {
                     EventNotificationService.NOTIFICATION_SMS_SUB_FEE_WITHDRAW_SUCCESS,
                     EventNotificationService.TYPE_SMS, smsSubFeeWithdrawSuccessfulSMSText,
                     EventNotificationService.NOTIFICATION_SMS_SUB_FEE_WITHDRAW_NOT_SUCCESS,
-                    EventNotificationService.TYPE_SMS, smsSubFeeWithdrawNotSuccessfulSMSText
+                    EventNotificationService.TYPE_SMS, smsSubFeeWithdrawNotSuccessfulSMSText,
+                    ////
+                    EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, EventNotificationService.TYPE_EMAIL_TEXT,
+                    passWithGuardianEmailMessageText,
+                    EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, EventNotificationService.TYPE_EMAIL_SUBJECT,
+                    passWithGuardianEmailSubject,
+                    EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, EventNotificationService.TYPE_SMS,
+                    passWithGuardianSMSMessageText
             });
 
             printMessage("Настройки сохранены.");
@@ -284,5 +304,29 @@ public class MessageConfigurePage extends BasicWorkspacePage {
 
     public void setSmsSubFeeWithdrawNotSuccessfulSMSText(String smsSubFeeWithdrawNotSuccessfulSMSText) {
         this.smsSubFeeWithdrawNotSuccessfulSMSText = smsSubFeeWithdrawNotSuccessfulSMSText;
+    }
+
+    public String getPassWithGuardianSMSMessageText() {
+        return passWithGuardianSMSMessageText;
+    }
+
+    public void setPassWithGuardianSMSMessageText(String passWithGuardianSMSMessageText) {
+        this.passWithGuardianSMSMessageText = passWithGuardianSMSMessageText;
+    }
+
+    public String getPassWithGuardianEmailMessageText() {
+        return passWithGuardianEmailMessageText;
+    }
+
+    public void setPassWithGuardianEmailMessageText(String passWithGuardianEmailMessageText) {
+        this.passWithGuardianEmailMessageText = passWithGuardianEmailMessageText;
+    }
+
+    public String getPassWithGuardianEmailSubject() {
+        return passWithGuardianEmailSubject;
+    }
+
+    public void setPassWithGuardianEmailSubject(String passWithGuardianEmailSubject) {
+        this.passWithGuardianEmailSubject = passWithGuardianEmailSubject;
     }
 }

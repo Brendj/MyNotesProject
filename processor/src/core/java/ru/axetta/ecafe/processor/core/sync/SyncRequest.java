@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.sync;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.ClientRequestBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.ClientRequests;
@@ -2262,7 +2261,7 @@ NamedNodeMap namedNodeMap = itemNode.getAttributes();
             public EnterEvent(long idOfEnterEvent, long idOfOrg, String enterName, String turnstileAddr,
                     int passDirection, int eventCode, Long idOfCard, Long idOfClient, Long idOfTempCard,
                     Date evtDateTime, Long idOfVisitor, String visitorFullName, Integer docType, String docSerialNum,
-                    Date issueDocDate, Date visitDateTime) {
+                    Date issueDocDate, Date visitDateTime, Long guardianId) {
                 this.idOfEnterEvent = idOfEnterEvent;
                 this.idOfOrg = idOfOrg;
                 this.enterName = enterName;
@@ -2279,6 +2278,7 @@ NamedNodeMap namedNodeMap = itemNode.getAttributes();
                 this.docSerialNum = docSerialNum;
                 this.issueDocDate = issueDocDate;
                 this.visitDateTime = visitDateTime;
+                this.guardianId = guardianId;
             }
 
             public static class Builder {
@@ -2342,9 +2342,14 @@ NamedNodeMap namedNodeMap = itemNode.getAttributes();
                         visitDateTime = timeFormat
                                 .parse(enterEventNode.getAttributes().getNamedItem("VisitDateTime").getTextContent());
                     }
+                    Long guardianId = null;
+                    if (enterEventNode.getAttributes().getNamedItem("PassWithGuardian") != null) {
+                        guardianId = Long.parseLong(
+                                enterEventNode.getAttributes().getNamedItem("PassWithGuardian").getTextContent());
+                    }
                     return new EnterEvent(idOfEnterEvent, idOfOrg, enterName, turnstileAddr, passDirection, eventCode,
                             idOfCard, idOfClient, idOfTempCard, evtDateTime, idOfVisitor, visitorFullName, docType,
-                            docSerialNum, issueDocDate, visitDateTime);
+                            docSerialNum, issueDocDate, visitDateTime, guardianId);
                 }
             }
 
@@ -2364,6 +2369,7 @@ NamedNodeMap namedNodeMap = itemNode.getAttributes();
             private final String docSerialNum;
             private final Date issueDocDate;
             private final Date visitDateTime;
+            private final Long guardianId;
 
             public long getIdOfEnterEvent() {
                 return idOfEnterEvent;
@@ -2429,13 +2435,17 @@ NamedNodeMap namedNodeMap = itemNode.getAttributes();
                 return visitDateTime;
             }
 
+            public Long getGuardianId() {
+                return guardianId;
+            }
+
             @Override
             public String toString() {
                 return String
-                        .format("EnterEvent{idOfEnterEvent=%d, idOfOrg=%d, enterName='%s', turnstileAddr='%s', passDirection=%d, eventCode=%d, idOfCard=%d, idOfClient=%d, idOfTempCard=%d, evtDateTime=%s, idOfVisitor=%d, visitorFullName='%s', docType=%d, docSerialNum='%s', issueDocDate=%s, visitDateTime=%s}",
+                        .format("EnterEvent{idOfEnterEvent=%d, idOfOrg=%d, enterName='%s', turnstileAddr='%s', passDirection=%d, eventCode=%d, idOfCard=%d, idOfClient=%d, idOfTempCard=%d, evtDateTime=%s, idOfVisitor=%d, visitorFullName='%s', docType=%d, docSerialNum='%s', issueDocDate=%s, visitDateTime=%s, guardianId=%s}",
                                 idOfEnterEvent, idOfOrg, enterName, turnstileAddr, passDirection, eventCode, idOfCard,
                                 idOfClient, idOfTempCard, evtDateTime, idOfVisitor, visitorFullName, docType,
-                                docSerialNum, issueDocDate, visitDateTime);
+                                docSerialNum, issueDocDate, visitDateTime, guardianId);
             }
         }
 

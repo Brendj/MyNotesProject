@@ -132,4 +132,6 @@ CREATE TABLE CF_SubAccount_Transfers (
 -- Поправка ошибки ECAFE-1256 по существовании ключа
 SELECT setval('public.cf_clientsnotificationsettings_idofsetting_seq', (SELECT max(idofsetting)+1 FROM cf_clientsnotificationsettings), true);
 
+-- ECAFE-1388 Поправить шаблон оповещений о проходе для ДОУ
+ALTER TABLE Cf_EnterEvents ADD COLUMN GuardianId BIGINT;
 

@@ -2715,6 +2715,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                     enterEvent.setDocSerialNum(e.getDocSerialNum());
                     enterEvent.setIssueDocDate(e.getIssueDocDate());
                     enterEvent.setVisitDateTime(e.getVisitDateTime());
+                    enterEvent.setGuardianId(e.getGuardianId());
                     persistenceSession.save(enterEvent);
 
 
@@ -2727,9 +2728,13 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                             (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT ||
                                     e.getPassDirection() == EnterEvent.RE_ENTRY
                                     || e.getPassDirection() == EnterEvent.RE_EXIT)) {
-   final EventNotificationService notificationService = RuntimeContext.getAppContext().getBean(EventNotificationService.class);
-   final String[] values = generateNotificationParams(persistenceSession, client, e.getPassDirection(), e.getEvtDateTime());
-     notificationService.sendNotificationAsync(client,EventNotificationService.NOTIFICATION_ENTER_EVENT, values);
+                        final EventNotificationService notificationService = RuntimeContext.getAppContext()
+                                .getBean(EventNotificationService.class);
+                        final String[] values = generateNotificationParams(persistenceSession, client,
+                                e.getPassDirection(), e.getEvtDateTime(), e.getGuardianId());
+                        notificationService.sendNotificationAsync(client,
+                                e.getGuardianId() == null ? EventNotificationService.NOTIFICATION_ENTER_EVENT
+                                        : EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values);
                     }
 
                     /// Формирование журнала транзакции
@@ -3098,17 +3103,24 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
     }
 
 
-    private String[] generateNotificationParams(Session session, Client client, int passDirection, Date eventDate)
-            throws Exception {
+    private String[] generateNotificationParams(Session session, Client client, int passDirection, Date eventDate,
+            Long guardianId) throws Exception {
         String eventName = "";
         if (passDirection == EnterEvent.ENTRY) {
-            eventName = "Вход в школу";
+            eventName = "Вход";
         } else if (passDirection == EnterEvent.EXIT) {
-            eventName = "Выход из школы";
+            eventName = "Выход";
         } else if (passDirection == EnterEvent.RE_ENTRY) {
-            eventName = "Вход в школу";
+            eventName = "Вход";
         } else if (passDirection == EnterEvent.RE_EXIT) {
-            eventName = "Выход из школы";
+            eventName = "Выход";
+        }
+        // Если представитель не пуст, то значит вход/выход в детский сад. Иначе - в школу.
+        eventName = eventName + (guardianId == null ? " в школу" : "");
+        String guardianName = "";
+        if (guardianId != null) {
+            Person guardPerson = ((Client) session.load(Client.class, guardianId)).getPerson();
+            guardianName = StringUtils.join(new Object[]{guardPerson.getSurname(), guardPerson.getFirstName()}, ' ');
         }
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(eventDate);
@@ -3119,7 +3131,8 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
         return new String[]{
                 "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()), "contractId",
                 ContractIdFormat.format(client.getContractId()), "surname", client.getPerson().getSurname(),
-                "firstName", client.getPerson().getFirstName(), "eventName", eventName, "eventTime", time};
+                "firstName", client.getPerson().getFirstName(), "eventName", eventName, "eventTime", time, "guardian",
+                guardianName};
     }
 
     private String[] generatePaymentNotificationParams(Session session, Client client, Payment payment) {
