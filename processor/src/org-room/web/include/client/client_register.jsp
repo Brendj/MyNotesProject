@@ -71,7 +71,7 @@
                         <h:outputText value="Фамилия"/>
                     </f:facet>
                     <h:inputText value="#{client.surname}" style="width:150px;" disabled="#{client.added}">
-                        <a4j:support event="onchange" reRender="" actionListener="#{clientRegisterPage.doModifyClient}" />
+                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" />
                     </h:inputText>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};">
@@ -79,6 +79,7 @@
                         <h:outputText value="Имя"/>
                     </f:facet>
                     <h:inputText value="#{client.firstName}" style="width:150px;" disabled="#{client.added}">
+                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" />
                     </h:inputText>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};">
@@ -86,6 +87,7 @@
                         <h:outputText value="Отчество"/>
                     </f:facet>
                     <h:inputText value="#{client.secondName}" style="width:150px;" disabled="#{client.added}">
+                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" />
                     </h:inputText>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};">
@@ -94,6 +96,7 @@
                     </f:facet>
                     <h:selectOneMenu id="clientGroup" value="#{client.clientGroup}" style="width:150px;" disabled="#{client.added}" >
                         <f:selectItems value="#{clientRegisterPage.groups}"/>
+                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" />
                     </h:selectOneMenu>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};" rendered="#{clientRegisterPage.showAddress}">

@@ -4,6 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.feed;
 
+import generated.payments.processing.POSPaymentController;
+import generated.payments.processing.POSPaymentControllerWSService;
+import generated.payments.processing.PosPayment;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestService;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -15,6 +19,9 @@ import ru.axetta.ecafe.processor.web.ui.modal.YesNoEvent;
 import ru.axetta.ecafe.processor.web.ui.modal.YesNoListener;
 import ru.axetta.ecafe.processor.web.ui.modal.feed_plan.*;
 
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +33,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.faces.event.ValueChangeEvent;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.xml.namespace.QName;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -406,12 +415,16 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             if (client.getActionType() != PAY_CLIENT || client.getSaved()) {
                 continue;
             }
-            //  Ошибка, для теста
+            /*//  Ошибка, для теста
             if(!hasError) {
                 result.put(client, "Не удалось добавить заказ, здесь указывается причина ошибки");
                 hasError = true;
                 continue;
-            }
+            }*/
+            //  Вызов веб-службы и добавление заказа
+            Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);
+            POSPaymentController service = createController(logger);
+           //service.createOrder(org.getIdOfOrg(), new PosPayment());
 
 
             Random rand = new Random();
@@ -429,6 +442,27 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             result.put(client, "Заказ успешно составлен");
         }
         return result;
+    }
+
+
+    public static POSPaymentController createController(Logger logger) {
+        /*POSPaymentController controller = null;
+        try {
+            POSPaymentControllerWSService service = new POSPaymentControllerWSService(new URL("http://localhost:8080/processor/soap/front?wsdl"),
+                    new QName("http://ru.axetta.ecafe", "FrontControllerService"));
+            controller = service.getPOSPaymentControllerWSPort();
+
+            Client client = ClientProxy.getClient(controller);
+            HTTPConduit conduit = (HTTPConduit) client.getConduit();
+            HTTPClientPolicy policy = conduit.getClient();
+            policy.setReceiveTimeout(10 * 60 * 1000);
+            policy.setConnectionTimeout(10 * 60 * 1000);
+            return controller;
+        } catch (Exception e) {
+            logger.error("Failed to intialize FrontControllerService", e);
+            return null;
+        }*/
+        return null;
     }
 
     public void clear() {
