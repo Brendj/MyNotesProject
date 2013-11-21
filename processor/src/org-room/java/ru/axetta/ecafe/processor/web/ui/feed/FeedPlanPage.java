@@ -415,16 +415,16 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             if (client.getActionType() != PAY_CLIENT || client.getSaved()) {
                 continue;
             }
-            /*//  Ошибка, для теста
+            //  Ошибка, для теста
             if(!hasError) {
                 result.put(client, "Не удалось добавить заказ, здесь указывается причина ошибки");
                 hasError = true;
                 continue;
-            }*/
+            }
             //  Вызов веб-службы и добавление заказа
-            Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);
+            /*Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);
             POSPaymentController service = createController(logger);
-           //service.createOrder(org.getIdOfOrg(), new PosPayment());
+            service.createOrder(org.getIdOfOrg(), new PosPayment());*/
 
 
             Random rand = new Random();
