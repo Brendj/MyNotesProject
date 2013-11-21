@@ -135,3 +135,7 @@ SELECT setval('public.cf_clientsnotificationsettings_idofsetting_seq', (SELECT m
 -- ECAFE-1388 Поправить шаблон оповещений о проходе для ДОУ
 ALTER TABLE Cf_EnterEvents ADD COLUMN GuardianId BIGINT;
 
+-- Уникальность
+ALTER TABLE cf_do_confirms ADD CONSTRAINT cf_do_confirms_uk UNIQUE (distributedobjectclassname, guid, orgowner);
+
+

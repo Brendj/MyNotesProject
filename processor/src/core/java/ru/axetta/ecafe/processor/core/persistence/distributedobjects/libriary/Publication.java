@@ -33,7 +33,7 @@ import java.util.Set;
  * Time: 23:10
  * To change this template use File | Settings | File Templates.
  */
-public class Publication extends /*LibraryDistributedObject*/ DistributedObject {
+public class Publication extends LibraryDistributedObject /*DistributedObject*/ {
 
     private static final int AUTHOR = 2;
     private static final int TITLE = 0;
@@ -53,25 +53,28 @@ public class Publication extends /*LibraryDistributedObject*/ DistributedObject 
     private Set<Journal> journalInternal;
     private Set<Instance> instanceInternal;
 
-    @Override
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit,
-            String currentLastGuid) throws Exception {
-
-        DetachedCriteria subCriteria = DetachedCriteria.forClass(Publication.class);
-        subCriteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
-        subCriteria.setProjection(Projections.min("globalVersion"));
-
-        Criteria criteria = session.createCriteria(Publication.class);
-        criteria.add(Restrictions.eq("globalVersion", currentMaxVersion + 1));
-        createProjections(criteria, currentLimit, currentLastGuid);
-        criteria.setCacheable(false);
-        criteria.setReadOnly(true);
-        criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
-        return criteria.list();
-    }
+    //@Override
+    //public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit,
+    //        String currentLastGuid) throws Exception {
+    //
+    //    DetachedCriteria subCriteria = DetachedCriteria.forClass(Publication.class);
+    //    subCriteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
+    //    subCriteria.setProjection(Projections.min("globalVersion"));
+    //
+    //    Criteria criteria = session.createCriteria(Publication.class);
+    //    //criteria.add(Restrictions.eq("globalVersion", currentMaxVersion + 1));
+    //    criteria.add(Property.forName("globalVersion").eq(subCriteria));
+    //
+    //    createProjections(criteria, currentLimit, currentLastGuid);
+    //    criteria.setCacheable(false);
+    //    criteria.setReadOnly(true);
+    //    criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
+    //    return criteria.list();
+    //}
 
     @Override
     public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+
         ProjectionList projectionList = Projections.projectionList();
         projectionList.add(Projections.property("guid"), "guid");
         projectionList.add(Projections.property("globalVersion"), "globalVersion");
