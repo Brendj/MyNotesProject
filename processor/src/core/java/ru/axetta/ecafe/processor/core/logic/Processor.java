@@ -111,7 +111,7 @@ public class Processor implements SyncProcessor,
         this.eventNotificator = eventNotificator;
     }
 
-    public synchronized PaymentResponse.ResPaymentRegistry.Item processPayPaymentRegistryPayment(Long idOfContragent,
+    public PaymentResponse.ResPaymentRegistry.Item processPayPaymentRegistryPayment(Long idOfContragent,
             PaymentRequest.PaymentRegistry.Payment payment) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
