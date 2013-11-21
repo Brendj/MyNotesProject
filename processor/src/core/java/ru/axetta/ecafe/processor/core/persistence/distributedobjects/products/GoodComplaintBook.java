@@ -28,7 +28,7 @@ public class GoodComplaintBook extends DistributedObject {
     private Set<GoodComplaintIterations> GoodComplaintIterationsInternal;
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
         criteria.createAlias("client","cl", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("good","g", JoinType.LEFT_OUTER_JOIN);
 
@@ -46,8 +46,8 @@ public class GoodComplaintBook extends DistributedObject {
     }
 
     @Override
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
-        return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid);
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception {
+        return toSelfProcess(session, idOfOrg, currentMaxVersion);
     }
 
     @Override

@@ -25,7 +25,7 @@ public abstract class ConsumerRequestDistributedObject extends DistributedObject
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception {
         Boolean isSupplier = DAOUtils.isSupplierByOrg(session, idOfOrg);
         if(isSupplier){
             /* Собираем всех потребителей Организации источника меню */
@@ -34,14 +34,14 @@ public abstract class ConsumerRequestDistributedObject extends DistributedObject
             List<Long> orgOwners = query.list();
             Criteria criteria = session.createCriteria(getClass());
             criteria.add(Restrictions.in("orgOwner", orgOwners));
-            createProjections(criteria, currentLimit, currentLastGuid);
+            createProjections(criteria);
             criteria.setCacheable(false);
             criteria.setReadOnly(true);
             criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
             return criteria.list();
         } else {
             // На тот случай если востанавливают базу
-            return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid);
+            return toSelfProcess(session, idOfOrg, currentMaxVersion);
         }
 
     }

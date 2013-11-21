@@ -23,7 +23,7 @@ import static org.apache.commons.lang.StringUtils.isNotEmpty;
 public class ProhibitionExclusion extends DistributedObject {
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
         criteria.createAlias("prohibition","p", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("goodsGroup","gg", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("good","g", JoinType.LEFT_OUTER_JOIN);
@@ -41,7 +41,7 @@ public class ProhibitionExclusion extends DistributedObject {
     }
 
     @Override
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception {
         return null; //toSelfProcess(session, idOfOrg, currentMaxVersion);
     }
 

@@ -43,7 +43,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
     private String guidOfG;
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
         criteria.createAlias("goodRequest","gr", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("good","g", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("product","p", JoinType.LEFT_OUTER_JOIN);

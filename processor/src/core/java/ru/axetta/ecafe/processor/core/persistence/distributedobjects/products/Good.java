@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
-import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
 import ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConfigurationProviderDistributedObject;
@@ -75,7 +74,7 @@ public class Good extends ConfigurationProviderDistributedObject {
     private Set<ActOfWayBillDifferencePosition> actOfWayBillDifferencePositionInternal;
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
         criteria.createAlias("goodGroup", "gg", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("product", "p", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("technologicalMap", "tm", JoinType.LEFT_OUTER_JOIN);

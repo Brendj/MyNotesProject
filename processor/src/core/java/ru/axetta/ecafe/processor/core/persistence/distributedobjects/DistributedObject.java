@@ -9,6 +9,8 @@ import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.w3c.dom.Element;
@@ -48,7 +50,7 @@ public abstract class DistributedObject{
     protected Long orgOwner;
     protected SendToAssociatedOrgs sendAll;
 
-   // private DistributedObjectException.ErrorType errorType;
+    // private DistributedObjectException.ErrorType errorType;
     private DistributedObjectException distributedObjectException;
 
     public DistributedObjectException getDistributedObjectException() {
@@ -115,16 +117,27 @@ public abstract class DistributedObject{
 
     public abstract void fill(DistributedObject distributedObject);
 
-    public abstract List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
-            int currentLimit, String currentLastGuid) throws Exception;
+    public abstract List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception;
 
-    public abstract void createProjections(Criteria criteria, int currentLimit, String currentLastGuid);
+    public abstract void createProjections(Criteria criteria);
 
-    //public abstract DistributedObject findByGuid(Session persistenceSession, boolean isCreate);
+    public void createProjectionByID(Criteria criteria){
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("globalId"), "globalId");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("globalVersionOnCreate"), "globalVersionOnCreate");
+        projectionList.add(Projections.property("createdDate"), "createdDate");
+        projectionList.add(Projections.property("lastUpdate"), "lastUpdate");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+        criteria.setProjection(projectionList);
+    }
 
     /**
      * Метод для выборки объектов которые уходят от создателя к создателю без логики
      * правил распределения, например: натройки ECafeSettings
+     *
      * @param session
      * @param idOfOrg
      * @param currentMaxVersion
@@ -132,74 +145,14 @@ public abstract class DistributedObject{
      * @throws DistributedObjectException
      */
     @SuppressWarnings("unchecked")
-    protected List<DistributedObject> toSelfProcess(Session session, Long idOfOrg, Long currentMaxVersion, String currentLastGuid) throws DistributedObjectException{
+    protected List<DistributedObject> toSelfProcess(Session session, Long idOfOrg, Long currentMaxVersion) throws DistributedObjectException{
         Criteria criteria = session.createCriteria(getClass());
         criteria.add(Restrictions.eq("orgOwner",idOfOrg));
         criteria.add(Restrictions.gt("globalVersion",currentMaxVersion));
-        createProjections(criteria, 0, currentLastGuid);
+        createProjections(criteria);
         criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
         return criteria.list();
     }
-
-    /*
-    protected List<DistributedObject> defaultProcess(Session session, Long idOfOrg, Long currentMaxVersion) throws DistributedObjectException{
-        Criteria criteria = session.createCriteria(getClass());
-
-        List<Long> menuExchangeRuleList = DAOUtils.getListIdOfOrgList(session, idOfOrg);
-
-        Criterion sendToAnyAllRestriction = Restrictions.conjunction();
-        sendToAnyAllRestriction = ((Conjunction)sendToAnyAllRestriction)
-                .add(Restrictions.isNull("orgOwner"))
-                .add(Restrictions.eq("sendAll",SendToAssociatedOrgs.SendToAll));
-
-        Criterion sendToAllRestriction = Restrictions.conjunction();
-        Set<Long> allOrg = new TreeSet<Long>();
-        allOrg.addAll(menuExchangeRuleList);
-        if(!menuExchangeRuleList.isEmpty()){
-            allOrg.addAll(DAOUtils.getListIdOfOrgList(session, menuExchangeRuleList.get(0)));
-        } else {
-            throw new DistributedObjectException("The organization has no source menu");
-        }
-        sendToAllRestriction = ((Conjunction)sendToAllRestriction)
-                .add(Restrictions.in("orgOwner",allOrg))
-                .add(Restrictions.eq("sendAll",SendToAssociatedOrgs.SendToAll));
-
-        Criterion sendToMainRestriction = Restrictions.conjunction();
-        Set<Long> mainOrg = new TreeSet<Long>();
-        mainOrg.addAll(menuExchangeRuleList);
-        mainOrg.add(idOfOrg);
-        sendToMainRestriction = ((Conjunction)sendToMainRestriction)
-                .add(Restrictions.in("orgOwner",mainOrg))
-                .add(Restrictions.eq("sendAll",SendToAssociatedOrgs.SendToMain));
-
-        Criterion sendToSelfRestriction = Restrictions.conjunction();
-        sendToSelfRestriction = ((Conjunction)sendToSelfRestriction)
-                .add(Restrictions.eq("orgOwner",idOfOrg))
-                .add(Restrictions.eq("sendAll",SendToAssociatedOrgs.SendToSelf));
-
-                */
-/* собираем все условия в дизюнкцию */    /*
-
-        Criterion sendToAndOrgRestriction = Restrictions.disjunction()
-                .add(sendToAnyAllRestriction)
-                .add(sendToAllRestriction)
-                .add(sendToMainRestriction)
-                .add(sendToSelfRestriction);
-
-        Criterion resultCriterion =  Restrictions.conjunction().add(sendToAndOrgRestriction);
-
-        Criterion restrictionCurrentMaxVersion = null;
-        if(currentMaxVersion != null){
-            restrictionCurrentMaxVersion = Restrictions.gt("globalVersion",currentMaxVersion);
-            ((Conjunction)resultCriterion).add(restrictionCurrentMaxVersion);
-            // TODO: where = (where.equals("")?"": where + " and ") + " globalVersion>"+currentMaxVersion+ " and not (createVersion>"+currentMaxVersion+" and deletedState)";
-        }
-
-        criteria.add(resultCriterion);
-
-        return criteria.list();
-    }
-    */
 
     /* идентификатор синхронизируемой организации*/
     private Long idOfSyncOrg;

@@ -56,7 +56,7 @@ public class Staff extends DistributedObject {
     private Set<GoodRequest> goodRequestInternal;
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
         ProjectionList projectionList = Projections.projectionList();
         projectionList.add(Projections.property("guid"), "guid");
         projectionList.add(Projections.property("globalVersion"), "globalVersion");
@@ -79,7 +79,7 @@ public class Staff extends DistributedObject {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception {
         Boolean isSupplier = DAOUtils.isSupplierByOrg(session, idOfOrg);
         List<Long> orgOwners = new ArrayList<Long>();
         if(isSupplier){
@@ -98,7 +98,7 @@ public class Staff extends DistributedObject {
         Criteria criteria = session.createCriteria(getClass());
         criteria.add(Restrictions.in("orgOwner", orgOwners));
         criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
-        createProjections(criteria, currentLimit, currentLastGuid);
+        createProjections(criteria);
         criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
         return criteria.list();
     }

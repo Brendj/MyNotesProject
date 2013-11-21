@@ -38,7 +38,7 @@ public class SubscriptionFeeding extends DistributedObject{
     private Boolean wasSuspended;
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
         criteria.createAlias("client", "cl", JoinType.LEFT_OUTER_JOIN);
 
         ProjectionList projectionList = Projections.projectionList();
@@ -67,8 +67,8 @@ public class SubscriptionFeeding extends DistributedObject{
     }
 
     @Override
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
-        return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid);
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception {
+        return toSelfProcess(session, idOfOrg, currentMaxVersion);
     }
 
     @Override

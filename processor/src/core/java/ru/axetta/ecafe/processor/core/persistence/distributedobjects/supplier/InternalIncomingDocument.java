@@ -57,7 +57,7 @@ public class InternalIncomingDocument extends SupplierRequestDistributedObject {
     }
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
         criteria.createAlias("wayBill","w", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("internalDisposingDocument","idd", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("actOfInventorization","ai", JoinType.LEFT_OUTER_JOIN);

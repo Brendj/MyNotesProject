@@ -37,7 +37,7 @@ public class LibVisit extends LibraryDistributedObject {
     private Long idOfClient;
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
         //criteria.createAlias("client", "c", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();
         projectionList.add(Projections.property("guid"), "guid");
@@ -54,7 +54,7 @@ public class LibVisit extends LibraryDistributedObject {
     }
 
     @Override
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws DistributedObjectException {
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws DistributedObjectException {
         return null;//toSelfProcess(session, idOfOrg, currentMaxVersion);
     }
 

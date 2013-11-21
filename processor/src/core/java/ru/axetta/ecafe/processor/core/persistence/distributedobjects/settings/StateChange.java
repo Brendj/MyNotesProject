@@ -52,7 +52,7 @@ public class StateChange extends DistributedObject {
     private String guidOfWB;
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
         criteria.createAlias("wayBill","w", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("internalDisposingDocument","idd", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("goodRequest","g", JoinType.LEFT_OUTER_JOIN);
@@ -79,8 +79,8 @@ public class StateChange extends DistributedObject {
     }
 
     @Override
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
-        return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid);
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception {
+        return toSelfProcess(session, idOfOrg, currentMaxVersion);
     }
 
     @Override

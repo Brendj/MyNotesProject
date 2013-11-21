@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
-import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConfigurationProviderDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
@@ -36,7 +35,7 @@ public class TechnologicalMapGroup extends ConfigurationProviderDistributedObjec
     private Set<TechnologicalMap> technologicalMapInternal;
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
 
         ProjectionList projectionList = Projections.projectionList();
         projectionList.add(Projections.property("guid"), "guid");

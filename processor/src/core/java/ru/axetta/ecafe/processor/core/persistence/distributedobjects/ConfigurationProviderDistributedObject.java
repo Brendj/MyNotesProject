@@ -1,7 +1,6 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
 import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
-import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
 import org.hibernate.Criteria;
@@ -32,13 +31,14 @@ public abstract class ConfigurationProviderDistributedObject extends Distributed
         if(idOfConfigurationProvider==null){
             throw new DistributedObjectException("ConfigurationProvider NOT_FOUND_VALUE");
         }
+        beforeProcess(session, idOfOrg);
     }
 
     protected abstract void beforeProcess(Session session, Long idOfOrg) throws DistributedObjectException;
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception {
         try {
             idOfConfigurationProvider = ConfigurationProviderService.extractIdOfConfigurationProviderByIdOfOrg(session, idOfOrg);
         } catch (Exception e) {
@@ -47,7 +47,7 @@ public abstract class ConfigurationProviderDistributedObject extends Distributed
         Criteria criteria = session.createCriteria(getClass());
         criteria.add(Restrictions.eq("idOfConfigurationProvider", idOfConfigurationProvider));
         criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
-        createProjections(criteria, currentLimit, currentLastGuid);
+        createProjections(criteria);
         criteria.setCacheable(false);
         criteria.setReadOnly(true);
         criteria.setResultTransformer(Transformers.aliasToBean(getClass()));

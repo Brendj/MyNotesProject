@@ -49,7 +49,7 @@ public class Circulation extends LibraryDistributedObject {
     private Set<Circulation> circulationInternal;
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
         criteria.createAlias("parentCirculation","pc", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("issuable","i", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("client","c", JoinType.LEFT_OUTER_JOIN);
@@ -72,7 +72,7 @@ public class Circulation extends LibraryDistributedObject {
     }
 
     @Override
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception {
         return null;
     }
 

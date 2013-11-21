@@ -34,7 +34,7 @@ import java.util.List;
 @Repository("doDAO")
 public class DistributedObjectDAO {
 
-    @PersistenceContext(unitName = "reportsPU")
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
     public <T extends DistributedObject> T findByGuid(Class<T> doClass, String guid) {
@@ -46,28 +46,12 @@ public class DistributedObjectDAO {
         return res.isEmpty() ? null : res.get(0);
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends DistributedObject> List<T> findDOByGuids(Class<T> doClass, List<String> guids, int currentLimit,
-            String currentLastGuid) throws Exception {
-        DistributedObject distributedObject = doClass.newInstance();
-        Session session = entityManager.unwrap(Session.class);
-        Criteria criteria = session.createCriteria(doClass);
-        criteria.add(Restrictions.in("guid", guids));
-        distributedObject.createProjections(criteria, currentLimit, currentLastGuid);
-        criteria.setResultTransformer(Transformers.aliasToBean(doClass));
-        return criteria.list();
-    }
-
     public void saveDOConflict(DOConflict doConflict) {
         entityManager.persist(doConflict);
     }
 
     public <T extends DistributedObject> T updateDO(T distributedObject) {
         return entityManager.merge(distributedObject);
-    }
-
-    public <T extends DistributedObject> void saveDO(T distributedObject) {
-        entityManager.persist(distributedObject);
     }
 
     public <T extends DistributedObject> DOVersion getDOVersion(String className) {
@@ -82,45 +66,4 @@ public class DistributedObjectDAO {
         return entityManager.merge(doVersion);
     }
 
-    public List<DOConfirm> getDOConfirms(Long orgOwner, String doClassName, String guid, int currentLimit, String currentLastGuid) {
-        TypedQuery<DOConfirm> query;
-        if(StringUtils.isEmpty(currentLastGuid)){
-            query= entityManager.createQuery("select distinct d from DOConfirm as d where orgOwner = :fp and guid = :tp",DOConfirm.class);
-        } else {
-            query= entityManager.createQuery("select distinct d from DOConfirm as d where orgOwner = :fp and guid = :tp and guid>=:guid order by guid",DOConfirm.class);
-            query.setParameter("guid", currentLastGuid);
-        }
-        query.setParameter("fp", orgOwner).setParameter("tp", guid);
-        if(currentLimit>0) query.setMaxResults(currentLimit);
-        return query.getResultList();
-    }
-
-    public void removeDOConfirm(DOConfirm doConfirm) {
-        entityManager.remove(doConfirm);
-    }
-
-    public void saveDOConfirm(DOConfirm doConfirm) {
-        entityManager.persist(doConfirm);
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<String> findConfirmedGuids(Long orgOwner, String className, int currentLimit, String currentLastGuid) {
-        Query query;
-        if(StringUtils.isEmpty(currentLastGuid)){
-            query= entityManager.createQuery(
-                    "select distinct d.guid from DOConfirm as d where orgOwner = :orgOwner and distributedObjectClassName = :className")
-                    .setParameter("orgOwner", orgOwner).setParameter("className", className);
-        } else {
-            query = entityManager.createQuery(
-                    "select distinct d.guid from DOConfirm as d where orgOwner = :orgOwner and distributedObjectClassName = :className and guid>=:guid order by guid")
-                    .setParameter("orgOwner", orgOwner).setParameter("className", className).setParameter("guid", currentLastGuid);
-        }
-        if(currentLimit>0) query.setMaxResults(currentLimit);
-        return (List<String>) query.getResultList();
-    }
-
-    @Transactional(readOnly = true)
-    public boolean isCommodityAccountingByOrg(Long idOfOrg){
-        return DAOUtils.isCommodityAccountingByOrg(entityManager.unwrap(Session.class), idOfOrg);
-    }
 }

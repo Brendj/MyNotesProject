@@ -33,7 +33,7 @@ public class InventoryBook extends LibraryDistributedObject {
     private Set<Instance> instanceInternal;
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
         ProjectionList projectionList = Projections.projectionList();
         projectionList.add(Projections.property("guid"), "guid");
         projectionList.add(Projections.property("globalVersion"), "globalVersion");
@@ -46,7 +46,7 @@ public class InventoryBook extends LibraryDistributedObject {
     }
 
     @Override
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception {
         return null; //toSelfProcess(session, idOfOrg, currentMaxVersion);
     }
 

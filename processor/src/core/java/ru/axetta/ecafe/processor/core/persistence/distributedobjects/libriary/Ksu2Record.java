@@ -43,7 +43,7 @@ public class Ksu2Record extends LibraryDistributedObject {
     private Set<Instance> instanceInternal;
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
         //criteria.createAlias("fund", "f", JoinType.LEFT_OUTER_JOIN);
         //criteria.createAlias("retirementReason","r", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();
@@ -62,8 +62,8 @@ public class Ksu2Record extends LibraryDistributedObject {
     }
 
     @Override
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion, int currentLimit, String currentLastGuid) throws Exception {
-        return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid);
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception {
+        return toSelfProcess(session, idOfOrg, currentMaxVersion);
     }
 
     @Override

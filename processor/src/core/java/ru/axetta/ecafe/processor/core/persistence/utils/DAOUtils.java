@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import java.lang.InstantiationException;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.*;
@@ -1182,45 +1181,17 @@ public class DAOUtils {
             refDistributedObject = clazz.newInstance();
             Criteria criteria = session.createCriteria(clazz);
             criteria.add(Restrictions.eq("guid",guid));
-            refDistributedObject.createProjections(criteria, 0, "");
+            refDistributedObject.createProjectionByID(criteria);
             criteria.setResultTransformer(Transformers.aliasToBean(clazz));
             criteria.setMaxResults(1);
             return (T) criteria.uniqueResult();
         } catch (Exception e) {
             throw new DistributedObjectException(e.getMessage());
         }
-        //return (DistributedObject) criteria.uniqueResult();
-        //String sql = "from "+clazz.getClass()+" where guid=:guid";
-        //Query query = session.createQuery(sql);
-        //query.setParameter("guid", guid);
-        //List list = query.list();
-        //List list = criteria.list();
-        //if(list==null || list.isEmpty()){
-        //    return null;
-        //} else {
-        //    return (T) list.get(0);
-        //}
     }
 
     @SuppressWarnings("unchecked")
     public static List<Long> getListIdOfOrgList(Session session, Long idOfOrg){
-        //List<Long> resultList = new ArrayList<Long>();
-        //Query query = session.createQuery("select idOfDestOrg from MenuExchangeRule where idOfSourceOrg=:idOfOrg");
-        //query.setParameter("idOfOrg",idOfOrg);
-        //List list = query.list();
-        //if(!(list==null || list.isEmpty())){
-        //    for (Object object: list){
-        //        resultList.add((Long) object);
-        //    }
-        //}
-        //query = session.createQuery("select idOfSourceOrg from MenuExchangeRule where idOfDestOrg=:idOfOrg");
-        //query.setParameter("idOfOrg",idOfOrg);
-        //list = query.list();
-        //if(!(list==null || list.isEmpty())){
-        //    for (Object object: list){
-        //        resultList.add((Long) object);
-        //    }
-        //}
         List<Long> resultList = new ArrayList<Long>();
         Query query = session.createQuery("select idOfDestOrg from MenuExchangeRule where idOfSourceOrg = :idOfOrg");
         query.setParameter("idOfOrg", idOfOrg);

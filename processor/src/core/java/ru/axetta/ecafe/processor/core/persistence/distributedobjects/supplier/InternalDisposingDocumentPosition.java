@@ -67,7 +67,7 @@ public class InternalDisposingDocumentPosition extends SupplierRequestDistribute
     }
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
         criteria.createAlias("internalDisposingDocument","idd", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("tradeMaterialGood","tmg", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("good","g", JoinType.LEFT_OUTER_JOIN);

@@ -51,7 +51,7 @@ public class WayBillPosition extends SupplierRequestDistributedObject {
     }
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
         criteria.createAlias("good","g", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("wayBill","w", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();

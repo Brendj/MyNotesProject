@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
-import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
 import ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConfigurationProviderDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
@@ -38,7 +37,7 @@ public class GoodBasicBasketPrice extends ConfigurationProviderDistributedObject
     private Long price;
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
         criteria.createAlias("good","g", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("goodsBasicBasket","bg", JoinType.LEFT_OUTER_JOIN);
 

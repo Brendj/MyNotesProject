@@ -34,7 +34,7 @@ public class Source extends LibraryDistributedObject {
     private Set<AccompanyingDocument> accompanyingDocumentInternal;
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
         ProjectionList projectionList = Projections.projectionList();
         projectionList.add(Projections.property("guid"), "guid");
         projectionList.add(Projections.property("globalVersion"), "globalVersion");

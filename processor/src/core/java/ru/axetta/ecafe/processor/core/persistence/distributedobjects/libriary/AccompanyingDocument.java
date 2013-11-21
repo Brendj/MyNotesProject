@@ -39,7 +39,7 @@ public class AccompanyingDocument extends LibraryDistributedObject {
     private Set<Ksu1Record> ksu1RecordInternal;
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
         criteria.createAlias("source","s", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("typeOfAccompanyingDocument","t", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();

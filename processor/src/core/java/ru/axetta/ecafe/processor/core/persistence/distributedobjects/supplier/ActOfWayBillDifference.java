@@ -59,7 +59,7 @@ public class ActOfWayBillDifference extends SupplierRequestDistributedObject {
     }
 
     @Override
-    public void createProjections(Criteria criteria, int currentLimit, String currentLastGuid) {
+    public void createProjections(Criteria criteria) {
         criteria.createAlias("staff","s", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();
         projectionList.add(Projections.property("guid"), "guid");
