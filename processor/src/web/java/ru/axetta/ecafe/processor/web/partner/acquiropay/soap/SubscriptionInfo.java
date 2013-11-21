@@ -42,6 +42,9 @@ public class SubscriptionInfo {
     @XmlElement(name = "ValidityDate")
     @XmlSchemaType(name = "dateTime")
     private Date validityDate;
+    @XmlElement(name = "DeactivationDate")
+    @XmlSchemaType(name = "dateTime")
+    private Date deactivationDate;
     @XmlElement(name = "Status")
     private String status;
     @XmlElement(name = "LastPaymentDate")
@@ -49,6 +52,14 @@ public class SubscriptionInfo {
     private Date lastPaymentDate;
     @XmlElement(name = "LastPaymentStatus")
     private String lastPaymentStatus;
+    @XmlElement(name = "CardNumber")
+    private String cardNumber;
+    @XmlElement(name = "CardHolder")
+    private String cardHolder;
+    @XmlElement(name = "CardExpMonth")
+    private Integer expMonth;
+    @XmlElement(name = "CardExpYear")
+    private Integer expYear;
 
     public Long getIdOfSubscription() {
         return idOfSubscription;
@@ -138,6 +149,14 @@ public class SubscriptionInfo {
         this.validityDate = validityDate;
     }
 
+    public Date getDeactivationDate() {
+        return deactivationDate;
+    }
+
+    public void setDeactivationDate(Date deactivationDate) {
+        this.deactivationDate = deactivationDate;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -160,5 +179,37 @@ public class SubscriptionInfo {
 
     public void setLastPaymentStatus(String lastPaymentStatus) {
         this.lastPaymentStatus = lastPaymentStatus;
+    }
+
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
+    }
+
+    public String getCardHolder() {
+        return cardHolder;
+    }
+
+    public void setCardHolder(String cardHolder) {
+        this.cardHolder = cardHolder;
+    }
+
+    public Integer getExpMonth() {
+        return expMonth;
+    }
+
+    public void setExpMonth(Integer expMonth) {
+        this.expMonth = expMonth;
+    }
+
+    public Integer getExpYear() {
+        return expYear;
+    }
+
+    public void setExpYear(Integer expYear) {
+        this.expYear = expYear;
     }
 }

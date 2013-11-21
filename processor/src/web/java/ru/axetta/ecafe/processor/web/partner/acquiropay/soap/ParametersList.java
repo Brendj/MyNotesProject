@@ -32,9 +32,9 @@ public class ParametersList {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class Parameter {
 
-        @XmlElement(name = "name")
+        @XmlElement(name = "Name")
         private String name;
-        @XmlElement(name = "value")
+        @XmlElement(name = "Value")
         private String value;
 
         public Parameter() {

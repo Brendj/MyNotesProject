@@ -299,11 +299,16 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
         si.setSubscriptionPeriodOfValidity(bs.getMonthsCount());
         si.setRegistrationDate(bs.getActivationDate());
         si.setValidityDate(bs.getValidToDate());
+        si.setDeactivationDate(bs.getDeactivationDate());
         si.setStatus(bs.getStatus());
         si.setLastPaymentStatus(bs.getLastPaymentStatus());
         si.setLastPaymentDate(
                 MfrRequest.PAYMENT_SUCCESSFUL.equals(bs.getLastPaymentStatus()) ? bs.getLastSuccessfulPaymentDate()
                         : bs.getLastUnsuccessfulPaymentDate());
+        si.setCardNumber(bs.getMaskedCardNumber());
+        si.setCardHolder(bs.getCardHolder());
+        si.setExpMonth(bs.getExpMonth());
+        si.setExpYear(bs.getExpYear());
         return si;
     }
 
