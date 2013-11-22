@@ -532,8 +532,8 @@ public class DAOService {
             Long generationTime, Date startDate, Date endDate, String reportFile, String orgNum, Long idOfOrg,
             String tag, Long idOfContragentReceiver, String contragentReceiver, Long idOfContragent, String contragent) {
         ReportInfo ri = new ReportInfo(ruleName, documentFormat, reportName, createdDate, generationTime, startDate,
-                endDate, reportFile, orgNum, idOfOrg, tag, idOfContragentReceiver, contragentReceiver,
-                idOfContragent, contragent);
+                endDate, reportFile, orgNum, idOfOrg, tag,idOfContragent, contragent, idOfContragentReceiver,
+                contragentReceiver);
         entityManager.persist(ri);
         return ri;
     }
