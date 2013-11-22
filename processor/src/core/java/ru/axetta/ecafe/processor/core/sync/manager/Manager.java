@@ -269,7 +269,6 @@ public class Manager {
 
             } else {
                 LOGGER.debug("init findConfirmedDO");
-                sessionFactory = RuntimeContext.reportsSessionFactory;
                 List<DistributedObject> currentResultDOList = findConfirmedDO(sessionFactory, doClass);
                 LOGGER.debug("end findConfirmedDO");
                 final int newLimit = currentLimit - currentResultDOList.size();
@@ -616,10 +615,10 @@ public class Manager {
     }
 
     private DistributedObject updateDeleteState(Session persistenceSession, DistributedObject distributedObject, Long currentMaxVersion) throws Exception {
-        //DistributedObject currentDO = doService.findByGuid(distributedObject.getClass(), distributedObject.getGuid());
         Criteria currentDOCriteria = persistenceSession.createCriteria(distributedObject.getClass());
         currentDOCriteria.add(Restrictions.eq("guid", distributedObject.getGuid()));
         distributedObject.createProjections(currentDOCriteria);
+        currentDOCriteria.setResultTransformer(Transformers.aliasToBean(distributedObject.getClass()));
         currentDOCriteria.setMaxResults(1);
         DistributedObject currentDO = (DistributedObject) currentDOCriteria.uniqueResult();
         if (currentDO == null) {
@@ -629,13 +628,16 @@ public class Manager {
         //String sql = "update "+distributedObject.getClass().getSimpleName()+" set deletedState=:state where globalId=:id";
         //Query query = persistenceSession.createQuery(sql);
         //query.executeUpdate();
-        persistenceSession.merge(currentDO);
+        currentDO.setLastUpdate(new Date());
+        currentDO.setDeleteDate(new Date());
+        currentDO.setGlobalVersion(currentMaxVersion);
+        currentDO.setDeletedState(true);
+        persistenceSession.update(currentDO);
         return currentDO;
         //return doService.update(currentDO);
     }
 
     private DistributedObject processDistributedObject(Session persistenceSession, DistributedObject distributedObject, Long currentMaxVersion) throws Exception {
-        //DistributedObject currentDO = doService.findByGuid(distributedObject.getClass(), distributedObject.getGuid());
         final Class<? extends DistributedObject> aClass = distributedObject.getClass();
         Criteria currentDOCriteria = persistenceSession.createCriteria(aClass);
         currentDOCriteria.add(Restrictions.eq("guid", distributedObject.getGuid()));
@@ -652,10 +654,8 @@ public class Manager {
             }
             distributedObject.setGlobalVersion(currentMaxVersion);
             distributedObject.setGlobalVersionOnCreate(currentMaxVersion);
-            //distributedObject = doService.createDO(distributedObject);
             distributedObject.setCreatedDate(new Date());
-            //persistenceSession.save(distributedObject);
-            persistenceSession.save(distributedObject);
+            persistenceSession.persist(distributedObject);
             distributedObject.setTagName("C");
         }
         // Изменение существующего в БД экземпляра РО.
@@ -676,8 +676,8 @@ public class Manager {
                 doConflict = createConflict(distributedObject, currentDO);
                 persistenceSession.persist(doConflict);
             }
-            //distributedObject = doService.mergeDO(currentDO, doConflict);
-            persistenceSession.saveOrUpdate(distributedObject);
+            persistenceSession.update(currentDO);
+            distributedObject.setGlobalVersion(currentMaxVersion);
             distributedObject.setTagName("M");
         }
         return distributedObject;
