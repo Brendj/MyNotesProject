@@ -5,11 +5,8 @@
 package ru.axetta.ecafe.processor.web.partner.sberbank_kgd;
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
-import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.core.partner.stdpay.StdPayConfig;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
-import ru.axetta.ecafe.processor.core.utils.Base64;
-import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.web.partner.OnlinePaymentRequestParser;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,9 +15,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-
-import static ru.axetta.ecafe.processor.core.logic.Processor.PaymentProcessResult.CLIENT_NOT_FOUND;
-import static ru.axetta.ecafe.processor.core.logic.Processor.PaymentProcessResult.OK;
 
 /**
  * Created with IntelliJ IDEA.

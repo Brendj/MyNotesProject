@@ -2,6 +2,7 @@ package ru.axetta.ecafe.processor.web.partner;
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.PaymentProcessResult;
 import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.web.partner.paystd.StdOnlinePaymentServlet;
 
@@ -49,7 +50,7 @@ abstract public class OnlinePaymentServlet extends HttpServlet {
             try {
                 payRequest = requestParser.parsePayRequest(contragentId, httpRequest);
             } catch (OnlinePaymentRequestParser.CardNotFoundException e) {
-                response = OnlinePaymentProcessor.generateErrorResponse(Processor.PaymentProcessResult.CARD_NOT_FOUND);
+                response = OnlinePaymentProcessor.generateErrorResponse(PaymentProcessResult.CARD_NOT_FOUND);
                 getLogger().error("Card not found for request", e);
             } catch (Exception e) {
                 getLogger().error("Failed to parse request", e);

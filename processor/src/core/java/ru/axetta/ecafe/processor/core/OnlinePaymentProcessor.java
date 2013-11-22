@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.core;
 
+import ru.axetta.ecafe.processor.core.logic.PaymentProcessResult;
 import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.payment.PaymentResponse;
@@ -59,8 +60,8 @@ public class OnlinePaymentProcessor {
                     getCardPrintedNo(processResult.getCard()), processResult.getAddInfo());
         } catch (Exception e) {
             logger.error(String.format("Failed to process request: %s", request), e);
-            return new PayResponse(request.protoVersion, request.isCheckOnly(), Processor.PaymentProcessResult.UNKNOWN_ERROR.getCode(),
-                    Processor.PaymentProcessResult.UNKNOWN_ERROR.getDescription(), request.getTspContragentId(), clientId, request.getPaymentId(), null,
+            return new PayResponse(request.protoVersion, request.isCheckOnly(), PaymentProcessResult.UNKNOWN_ERROR.getCode(),
+                    PaymentProcessResult.UNKNOWN_ERROR.getDescription(), request.getTspContragentId(), clientId, request.getPaymentId(), null,
                     null, null, null, null, null, null);
         }
     }
@@ -70,7 +71,7 @@ public class OnlinePaymentProcessor {
         return card.getCardPrintedNo();
     }
 
-    public static PayResponse generateErrorResponse(Processor.PaymentProcessResult result) {
+    public static PayResponse generateErrorResponse(PaymentProcessResult result) {
         return new OnlinePaymentProcessor.PayResponse(0, true, result.getCode(),
             result.getDescription(), null, null, null, null, null, null, null, null, null, null);
     }

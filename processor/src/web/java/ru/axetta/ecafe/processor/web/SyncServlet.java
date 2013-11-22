@@ -116,7 +116,7 @@ public class SyncServlet extends HttpServlet {
                 return;
             }
             /* Must be FALSE for testing!!!  */
-            boolean verifySignature = true;
+            boolean verifySignature = false;
             try {
                 if (verifySignature && !DigitalSignatureUtils.verify(publicKey, requestData.document)) {
                     final String message = String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg);

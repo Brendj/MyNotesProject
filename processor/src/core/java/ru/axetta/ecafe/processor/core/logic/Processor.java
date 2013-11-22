@@ -77,35 +77,6 @@ public class Processor implements SyncProcessor,
     private final SessionFactory persistenceSessionFactory;
     private final EventNotificator eventNotificator;
 
-    public enum PaymentProcessResult {
-
-        OK(0, "Ok"),
-        UNKNOWN_ERROR(100, "Unknown error"),
-        CLIENT_NOT_FOUND(105, "Client not found"),
-        SUB_BALANCE_NOT_FOUND(106, "Client sub balance not found"),
-        CARD_NOT_FOUND(120, "Card acceptable for transfer not found"),
-        CONTRAGENT_NOT_FOUND(130, "Contragent not found"),
-        PAYMENT_ALREADY_REGISTERED(140, "Payment is already registered"),
-        TSP_CONTRAGENT_IS_PROHIBITED(150, "Merchant (TSP) contragent is prohibited for this client"),
-        PAYMENT_NOT_FOUND(300, "Payment not found"),;
-
-        private final int code;
-        private final String description;
-
-        private PaymentProcessResult(int code, String description) {
-            this.code = code;
-            this.description = description;
-        }
-
-        public int getCode() {
-            return code;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-    }
-
     public Processor(SessionFactory persistenceSessionFactory, EventNotificator eventNotificator) {
         this.persistenceSessionFactory = persistenceSessionFactory;
         this.eventNotificator = eventNotificator;

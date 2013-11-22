@@ -8,6 +8,7 @@ package ru.axetta.ecafe.processor.web.partner.way4;
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
+import ru.axetta.ecafe.processor.core.logic.PaymentProcessResult;
 import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.core.partner.stdpay.StdPayConfig;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
@@ -77,7 +78,7 @@ public class Way4PaymentRequestParser extends OnlinePaymentRequestParser {
         String rspCode = translateResultCode(response.getResultCode());
         String infoSection="";
         if (!bPayRequest) {
-            if (response.getResultCode()==Processor.PaymentProcessResult.OK.getCode()) {
+            if (response.getResultCode() == PaymentProcessResult.OK.getCode()) {
 
                 int subBalanceNum = 0;
                 String contractIdstr = String.valueOf(response.getClientId());
@@ -117,7 +118,7 @@ public class Way4PaymentRequestParser extends OnlinePaymentRequestParser {
             }
         } else {
 
-            if (response.getResultCode()==Processor.PaymentProcessResult.OK.getCode()) {
+            if (response.getResultCode()==PaymentProcessResult.OK.getCode()) {
                 infoSection=String.format("<Payment><RRN>%s</RRN><Date>%s</Date><Time>%s</Time><Phone>%d</Phone><Account>%d</Account><Amount>%s</Amount><Currency>RUR</Currency></Payment>",
                         rrn, parseResult.getParam("DATE"), parseResult.getParam("TIME"), response.getClientId(),
                         response.getClientId(), parseResult.getParam("AMOUNT"));
@@ -137,10 +138,10 @@ public class Way4PaymentRequestParser extends OnlinePaymentRequestParser {
     }
 
     private String translateResultCode(int resultCode) {
-        if (resultCode== Processor.PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getCode()) return "ERROR";
-        if (resultCode== Processor.PaymentProcessResult.CLIENT_NOT_FOUND.getCode()) return "ERR_PHONE";
-        if (resultCode==Processor.PaymentProcessResult.CARD_NOT_FOUND.getCode()) return "ERR_PHONE";
-        if (resultCode==Processor.PaymentProcessResult.OK.getCode()) return "OK";
+        if (resultCode== PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getCode()) return "ERROR";
+        if (resultCode== PaymentProcessResult.CLIENT_NOT_FOUND.getCode()) return "ERR_PHONE";
+        if (resultCode==PaymentProcessResult.CARD_NOT_FOUND.getCode()) return "ERR_PHONE";
+        if (resultCode==PaymentProcessResult.OK.getCode()) return "OK";
         return "ERROR";
     }
 

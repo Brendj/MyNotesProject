@@ -1,6 +1,7 @@
 package ru.axetta.ecafe.processor.web.partner.elecsnet;
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
+import ru.axetta.ecafe.processor.core.logic.PaymentProcessResult;
 import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.util.ConversionUtils;
@@ -85,10 +86,10 @@ public class ElecsnetOnlinePaymentRequestParser extends OnlinePaymentRequestPars
 
     final static String RC_INTERNAL_ERROR="62";
     private String translateResultCode(int resultCode) {
-        if (resultCode==Processor.PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getCode()) return "01";
-        if (resultCode== Processor.PaymentProcessResult.CLIENT_NOT_FOUND.getCode()) return "48";
-        if (resultCode==Processor.PaymentProcessResult.CARD_NOT_FOUND.getCode()) return "42";
-        if (resultCode==Processor.PaymentProcessResult.OK.getCode()) return "00";
+        if (resultCode==PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getCode()) return "01";
+        if (resultCode== PaymentProcessResult.CLIENT_NOT_FOUND.getCode()) return "48";
+        if (resultCode== PaymentProcessResult.CARD_NOT_FOUND.getCode()) return "42";
+        if (resultCode==PaymentProcessResult.OK.getCode()) return "00";
         return RC_INTERNAL_ERROR; // Произвольная ошибка. При получении этого кода на терминале отображается сообщение, содержащееся в первом подполе ansid. Далее происходит выход из платёжного сценария (возврат в главное меню).
     }
 
