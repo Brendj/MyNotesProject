@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<bindings
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-    wsdlLocation="http://193.47.154.34:7002/uec-service-war/TransactionService?wsdl"
-    xmlns="http://java.sun.com/xml/ns/jaxws">
-        <package name="generated.nfp">
-        </package>
-</bindings>

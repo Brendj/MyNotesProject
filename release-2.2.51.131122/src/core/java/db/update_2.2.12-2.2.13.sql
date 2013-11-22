@@ -1,1 +1,0 @@
-alter table cf_reporthandlerules add TemplateFileName character varying(64);
