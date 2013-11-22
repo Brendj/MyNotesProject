@@ -1,0 +1,13 @@
+1) необходимые настройик на процесинге во вкладке Настройки / Настройки / Конфигурация
+	ecafe.processor.ws.crypto.keystore.type=PKCS12
+	ecafe.processor.ws.crypto.keystore.password=1
+	ecafe.processor.ws.crypto.file=/processor/certs/ispp.pfx
+	ecafe.processor.ws.crypto.truststore.type=PKCS12
+	ecafe.processor.ws.crypto.truststore.password=1
+	ecafe.processor.ws.crypto.truststore.file=/processor/certs/ispp.pfx
+2) присутстиве фалов ispp.jks и ispp.pfx в папке /home/jbosser/processor/certs на сервере
+3) настройки jboss в файле standalone.xml 
+ <connector name="https" protocol="HTTP/1.1" scheme="https" socket-binding="https" secure="true">
+    <ssl name="https" password="changeit" certificate-key-file="/home/jbosser/7.1.0/standalone/configuration/novayashkola.keystore" 
+	verify-client="want" ca-certificate-file="/home/jbosser/processor/certs/ispp.jks"/>
+  </connector>

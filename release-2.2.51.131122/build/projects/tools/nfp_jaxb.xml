@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bindings xmlns="http://java.sun.com/xml/ns/jaxb"
+        version="2.1">
+    <bindings schemaLocation="http://193.47.154.34:7002/uec-service-war/TransactionService?xsd=1">
+        <schemaBindings>
+            <package name="generated.nfp.iso_001_001_03"/>
+        </schemaBindings>
+    </bindings>
+    <bindings schemaLocation="http://193.47.154.34:7002/uec-service-war/TransactionService?xsd=2">
+        <schemaBindings>
+            <package name="generated.nfp.iso_008_001_02"/>
+        </schemaBindings>
+    </bindings>
+    <bindings schemaLocation="http://193.47.154.34:7002/uec-service-war/TransactionService?xsd=3">
+        <schemaBindings>
+            <package name="generated.nfp.x3"/>
+        </schemaBindings>
+    </bindings>
+    <bindings schemaLocation="http://193.47.154.34:7002/uec-service-war/TransactionService?xsd=4">
+        <schemaBindings>
+            <package name="generated.nfp"/>
+        </schemaBindings>
+    </bindings>
+    <bindings schemaLocation="http://193.47.154.34:7002/uec-service-war/TransactionService?xsd=5">
+        <schemaBindings>
+            <package name="generated.nfp"/>
+        </schemaBindings>
+    </bindings>
+    <bindings schemaLocation="http://193.47.154.34:7002/uec-service-war/TransactionService?xsd=6">
+        <schemaBindings>
+            <package name="generated.nfp"/>
+        </schemaBindings>
+    </bindings>
+    <bindings schemaLocation="http://193.47.154.34:7002/uec-service-war/TransactionService?xsd=7">
+        <schemaBindings>
+            <package name="generated.nfp"/>
+        </schemaBindings>
+    </bindings>
+</bindings>

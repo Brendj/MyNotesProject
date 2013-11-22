@@ -1,0 +1,4 @@
+C:\ecafe\ecafe-pay-tools> ecafe-synctest.bat https://novayashkola.ru/processor/pay "C:\ecafe\Котрагенты по приему платежей\Свободная касса\pays\20101216.xml" "C:\ecafe\Котрагенты по приему платежей\Свободная касса\privateKey.txt" "C:\ecafe\Котрагенты по приему платежей\Свободная касса\pays\20101216-out.xml" C:\ecafe\publicKey.txt kalugina password
+ ,где novayashkola.ru – куда проводим платеж
+C:\ecafe\Котрагенты по приему платежей\Свободная касса\pays\20101216.xml" – преобразованный ранее xml реестр
+privateKey.txt – приватный ключ (для каждого контрагента свой)

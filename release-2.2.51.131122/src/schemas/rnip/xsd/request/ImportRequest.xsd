@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2007 (http://www.altova.com) by KloAV (EMBRACE) -->
+<xsd:schema xmlns:hdr="http://roskazna.ru/xsd/PostBlock" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:chg="http://roskazna.ru/xsd/Charge" xmlns:pi="http://roskazna.ru/xsd/PaymentInfo" xmlns:pirs="http://roskazna.ru/xsd/PGU_ImportRequest" xmlns:ns1="http://www.bssys.com/xsd/Catalog" targetNamespace="http://roskazna.ru/xsd/PGU_ImportRequest">
+	<xsd:import namespace="http://roskazna.ru/xsd/PostBlock" schemaLocation="../entity/directory/PostBlock.xsd"/>
+	<xsd:import namespace="http://roskazna.ru/xsd/Charge" schemaLocation="../entity/document/Charge.xsd"/>
+	<xsd:import namespace="http://roskazna.ru/xsd/PaymentInfo" schemaLocation="../entity/document/Payment.xsd"/>
+	<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
+	<xsd:import namespace="http://www.bssys.com/xsd/Catalog" schemaLocation="../entity/document/Catalog.xsd"/>
+	<xsd:complexType name="ImportRequest">
+		<xsd:annotation>
+			<xsd:documentation>Запрос на импорт в ИС РНиП</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PostBlock" type="hdr:PostBlock"/>
+			<xsd:choice>
+				<xsd:element name="Charge" type="chg:ChargeType">
+					<xsd:annotation>
+						<xsd:documentation>Данные начисления</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="FinalPayment" type="pi:PaymentInfoType">
+					<xsd:annotation>
+						<xsd:documentation>Платеж</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="Income" type="pi:IncomeInfoType">
+					<xsd:annotation>
+						<xsd:documentation>Зачисление</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+				<xsd:element name="Catalog">
+					<xsd:annotation>
+						<xsd:documentation>Данные Каталога услуг поставщика</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:choice>
+							<xsd:element name="Changes" type="ns1:ServiceCatalog_Type" nillable="true">
+								<xsd:annotation>
+									<xsd:documentation>Изменения в Каталоге услуг поставщика</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+							<xsd:element name="ServiceCatalog" type="ns1:ServiceCatalog_Type">
+								<xsd:annotation>
+									<xsd:documentation>Каталог услуг поставщика</xsd:documentation>
+								</xsd:annotation>
+							</xsd:element>
+						</xsd:choice>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:element name="ImportRequest" type="pirs:ImportRequest"/>
+</xsd:schema>

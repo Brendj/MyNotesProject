@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SalesReport" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="aac8b8f8-0b88-48ef-bc1c-c75a8f107ea0">
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.2" value="rowGroup"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
+	<property name="ireport.zoom" value="1.331000000000004"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<subDataset name="Table Dataset 1" uuid="d5ac4a13-a330-4d0c-9305-498695edc1e0"/>
+	<parameter name="idOfOrg" class="java.lang.Long"/>
+	<parameter name="orgName" class="java.lang.String"/>
+	<parameter name="monthName" class="java.lang.String"/>
+	<parameter name="month" class="java.lang.Integer"/>
+	<parameter name="year" class="java.lang.Integer"/>
+	<parameter name="day" class="java.lang.Integer"/>
+	<parameter name="startTime" class="java.lang.Long"/>
+	<parameter name="endTime" class="java.lang.Long"/>
+	<parameter name="complexCount_0" class="java.lang.Long"/>
+	<parameter name="complexSum_0" class="java.lang.Long"/>
+	<parameter name="freeComplexCount" class="java.lang.Long"/>
+	<parameter name="freeComplexSum" class="java.lang.Long"/>
+	<parameter name="totalCount" class="java.lang.Long"/>
+	<parameter name="totalSum" class="java.lang.Long"/>
+	<parameter name="complexCount_1" class="java.lang.Long"/>
+	<parameter name="complexSum_1" class="java.lang.Long"/>
+	<parameter name="totalDiscount" class="java.lang.Long"/>
+	<parameter name="complexDiscount_0" class="java.lang.Long"/>
+	<parameter name="complexDiscount_1" class="java.lang.Long"/>
+	<parameter name="freeComplexDiscount" class="java.lang.Long"/>
+	<parameter name="buffetCount" class="java.lang.Long"/>
+	<parameter name="buffetSum" class="java.lang.Long"/>
+	<parameter name="buffetDiscount" class="java.lang.Long"/>
+	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["C:\\Work\\Work.dev\\SVN\\ecafe-jb7\\processor\\src\\report\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="totalsData" class="java.lang.Object" isForPrompting="false"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="count" class="java.lang.Long"/>
+	<field name="price" class="java.lang.Long"/>
+	<field name="sum" class="java.lang.Long"/>
+	<field name="originName" class="java.lang.String"/>
+	<variable name="mealCountGroupTotal" class="java.lang.Long" resetType="Group" resetGroup="origin" calculation="Sum">
+		<variableExpression><![CDATA[$F{count}]]></variableExpression>
+		<initialValueExpression><![CDATA[0L]]></initialValueExpression>
+	</variable>
+	<variable name="mealSumGroupTotal" class="java.lang.Long" resetType="Group" resetGroup="origin" calculation="Sum">
+		<variableExpression><![CDATA[$F{sum}]]></variableExpression>
+	</variable>
+	<variable name="startDateStr" class="java.lang.String">
+		<initialValueExpression><![CDATA[new java.text.SimpleDateFormat("dd.MM.yyyy").format($P{startDate})]]></initialValueExpression>
+	</variable>
+	<variable name="endDateStr" class="java.lang.String">
+		<initialValueExpression><![CDATA[new java.text.SimpleDateFormat("dd.MM.yyyy").format($P{endDate})]]></initialValueExpression>
+	</variable>
+	<group name="origin">
+		<groupExpression><![CDATA[$F{originName}]]></groupExpression>
+		<groupHeader>
+			<band height="46">
+				<staticText>
+					<reportElement uuid="f7201376-805b-4acd-994a-2187079b46ad" style="table" stretchType="RelativeToTallestObject" x="0" y="20" width="408" height="26"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Наименование блюд]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="7af5cec6-6818-43b4-89e9-12c124e7cdbd" style="table" stretchType="RelativeToTallestObject" x="408" y="20" width="79" height="26"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Количество]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="a58cef43-0a83-4da2-9f71-ffe954eade3f" style="table" stretchType="RelativeToTallestObject" x="487" y="20" width="93" height="26"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Цена]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="956f0465-ecc5-4c9c-abfd-465e40660207" style="table" stretchType="RelativeToTallestObject" x="580" y="20" width="100" height="26"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Сумма]]></text>
+				</staticText>
+				<textField>
+					<reportElement uuid="f23efa2f-2010-402a-984e-9ca1b619fded" style="table" x="0" y="0" width="680" height="20"/>
+					<textElement verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Справка о реализации блюд: "+$F{originName}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="144">
+				<staticText>
+					<reportElement uuid="ad11f738-72ac-43ff-b77a-8a6dc3591529" style="table" x="0" y="0" width="408" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[ИТОГО:]]></text>
+				</staticText>
+				<textField evaluationTime="Band">
+					<reportElement uuid="1894ae74-8a99-4bde-ab70-aeb7e4958ab1" style="table" x="408" y="0" width="79" height="20"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{mealCountGroupTotal}]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Band" pattern="0.00">
+					<reportElement uuid="30971ebd-7b0f-4c50-bf7e-2927c4943a17" style="table" x="580" y="0" width="100" height="20"/>
+					<textElement textAlignment="Center">
+						<font isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{mealSumGroupTotal}).movePointLeft(2)]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="2f5ea605-67d8-4b52-9cef-9d720cc96d02" style="table" x="487" y="0" width="93" height="20"/>
+					<textElement/>
+					<text><![CDATA[]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="0f8c6492-1264-4d32-9bdf-8da9c2378e78" x="0" y="20" width="100" height="15"/>
+					<textElement/>
+					<text><![CDATA[]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="104" splitType="Stretch">
+			<textField>
+				<reportElement uuid="b8e43dc2-2988-4a07-b18e-f711ae62dcfc" x="0" y="30" width="802" height="24"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Учреждение: "+$P{orgName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="df99d7d5-eb36-453d-88ec-eb89178a3987" x="0" y="0" width="802" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[String.format("Отчет по реализации за: %s %s", $V{startDateStr},
+    $V{startDateStr}.equals($V{endDateStr})?"":("- "+ $V{endDateStr}))]]></textFieldExpression>
+			</textField>
+			<elementGroup/>
+			<subreport>
+				<reportElement uuid="5e29ba83-c40d-4bc4-a4bb-f03c67599a7d" x="0" y="74" width="802" height="29"/>
+				<dataSourceExpression><![CDATA[$P{totalsData}]]></dataSourceExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "DailySalesByGroupsReport_subreport_totals.jasper"]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement uuid="dcdc0da8-4ad0-496b-b000-592ca1d39e11" x="0" y="54" width="802" height="20"/>
+				<textElement/>
+				<text><![CDATA[ ]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<detail>
+		<band height="20">
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="b2761fd8-75d1-4533-9c2d-2a25ab8185a3" style="table" stretchType="RelativeToBandHeight" x="0" y="0" width="408" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="b84ce31b-17d8-4146-b402-9ffd8c8f09e4" style="table" stretchType="RelativeToBandHeight" x="408" y="0" width="79" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{count}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="0.00">
+				<reportElement uuid="afbc2a88-c9f7-459b-b637-6a321a1044e0" style="table" stretchType="RelativeToBandHeight" x="487" y="0" width="93" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{price}).movePointLeft(2)]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="0.00">
+				<reportElement uuid="9e616dba-3c71-4375-960b-da6fd6d7128a" style="table" stretchType="RelativeToBandHeight" x="580" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{sum}).movePointLeft(2)]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="20"/>
+	</summary>
+</jasperReport>

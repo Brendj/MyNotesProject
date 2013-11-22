@@ -1,0 +1,318 @@
+/*
+ * Copyright (c) 2013. Axetta LLC. All Rights Reserved.
+ */
+
+package ru.axetta.ecafe.processor.core.report;
+
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.JRHtmlExporter;
+import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
+
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentCompletionReportItem;
+import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentDAOService;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.Contract;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+
+import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: chirikov
+ * Date: 25.10.13
+ * Time: 11:20
+ * To change this template use File | Settings | File Templates.
+ */
+public class ActiveClientsReport extends BasicReportForAllOrgJob {
+
+    public static final int TOTAL_COUNT_VALUE = 1;
+    public static final int DISCOUNT_COUNT_VALUE = 2;
+    public static final int PAYMENT_COUNT_VALUE = 3;
+
+    private final static Logger logger = LoggerFactory.getLogger(ActiveClientsReport.class);
+
+    private List<ActiveClientsItem> items;
+    private Date startDate;
+    private Date endDate;
+    private String htmlReport;
+
+
+    public List<ActiveClientsItem> getItems() {
+        return items;
+    }
+
+
+    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
+
+    }
+
+
+    public static class Builder extends BasicReportForAllOrgJob.Builder {
+        private final String templateFilename;
+        private boolean exportToHTML = false;
+
+        public Builder(String templateFilename) {
+            this.templateFilename = templateFilename;
+        }
+
+        public Builder() {
+            templateFilename = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath() + ActiveClientsReport.class.getSimpleName() + ".jasper";
+            exportToHTML = true;
+        }
+
+        @Override
+        public ActiveClientsReport build(Session session, Date startTime, Date endTime, Calendar calendar)
+                throws Exception {
+            Date generateTime = new Date();
+
+
+            /* Строим параметры для передачи в jasper */
+            Map<String, Object> parameterMap = new HashMap<String, Object>();
+            calendar.setTime(startTime);
+            int month = calendar.get(Calendar.MONTH);
+            parameterMap.put("day", calendar.get(Calendar.DAY_OF_MONTH));
+            parameterMap.put("month", month + 1);
+            parameterMap.put("monthName", new DateFormatSymbols().getMonths()[month]);
+            parameterMap.put("year", calendar.get(Calendar.YEAR));
+            parameterMap.put("startDate", startTime);
+            parameterMap.put("endDate", endTime);
+
+
+            Date generateEndTime = new Date();
+            List<ActiveClientsItem> items = findActiveClients(session, startTime, endTime);
+            JasperPrint jasperPrint = JasperFillManager.fillReport
+                                                (templateFilename, parameterMap, createDataSource(items));
+            //  Если имя шаблона присутствует, значит строится для джаспера
+            if (!exportToHTML) {
+                return new ActiveClientsReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
+                        jasperPrint, startTime, endTime, null);
+            } else {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                JRHtmlExporter exporter = new JRHtmlExporter();
+                exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+                exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
+                exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
+                exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
+                exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
+                exporter.exportReport();
+                return new ActiveClientsReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
+                        startTime, endTime, items).setHtmlReport(os.toString("UTF-8"));
+            }
+        }
+
+        private JRDataSource createDataSource(List<ActiveClientsItem> items) throws Exception {
+            return new JRBeanCollectionDataSource(items);
+        }
+
+        public List<ActiveClientsItem> findActiveClients(Session session, Date start, Date end) {
+            Calendar startCal = new GregorianCalendar();
+            Calendar endCal = new GregorianCalendar();
+            startCal.setTimeInMillis(start.getTime());
+            endCal.setTimeInMillis(end.getTime());
+            startCal.set(Calendar.HOUR_OF_DAY, 0);
+            startCal.set(Calendar.MINUTE, 0);
+            startCal.set(Calendar.SECOND, 0);
+            endCal.set(Calendar.HOUR_OF_DAY, 0);
+            endCal.set(Calendar.MINUTE, 0);
+            endCal.set(Calendar.SECOND, 0);
+            DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+
+            
+            List<ActiveClientsItem> result = new ArrayList<ActiveClientsItem>();
+            String sql =
+                  "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
+                + "       cf_orgs.district, count(totalClients.idofclient), " + TOTAL_COUNT_VALUE + " as valType "
+                + "from cf_orgs "
+                + "left join cf_clients as totalClients on cf_orgs.idoforg=totalClients.idoforg "
+                + "where cf_orgs.district is not null and cf_orgs.district<>'' "
+                          + getClientsClause("totalClients")
+                + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
+                + "union all "
+                + "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
+                + "       cf_orgs.district, count(discountClients.idofclient), " + DISCOUNT_COUNT_VALUE + " as valType "
+                + "from cf_orgs "
+                + "left join cf_clients as discountClients on cf_orgs.idoforg=discountClients.idoforg and discountClients.discountmode<>0 "
+                + "where cf_orgs.district is not null and cf_orgs.district<>'' "
+                          + getClientsClause("discountClients")
+                + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
+                + "union all "
+                + "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
+                + "       cf_orgs.district, count(distinct orders.idofclient), " + PAYMENT_COUNT_VALUE + " as valType "
+                + "from cf_orgs "
+                + "join cf_orders as orders on cf_orgs.idoforg=orders.idoforg and "
+                + "                       orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startCal.getTime()) + "') * 1000 AND "
+                + "                                                  EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endCal.getTime()) + "') * 1000 "
+                + "join cf_clients as ordclients on orders.idofclient=ordclients.idofclient "
+                + "where cf_orgs.district is not null and cf_orgs.district<>'' "
+                        + getClientsClause("ordclients")
+                + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
+                + "order by district, shortname, valType";
+            Query query = session.createSQLQuery(sql);
+            List res = query.list();
+            ActiveClientsItem prevItem = null;
+            ActiveClientsItem prevRegionItem = null;
+            long prevOrg = -1L;
+            long localIdOfOrg = 0;
+            String prevRegion = null;
+            ActiveClientsItem overallItem = new ActiveClientsItem(localIdOfOrg, "ИТОГО", "", "",
+                                                                  ActiveClientsItem.OVERALL_STYLE);
+            for (Object entry : res) {
+                Object e[]       = (Object[]) entry;
+                long idOfOrg     = ((BigInteger) e[0]).longValue();
+                String shortName = ("" + (String) e[1]).trim();
+                String num       = (String) e[2];
+                String district  = (String) e[3];
+                long count       = ((BigInteger) e[4]).longValue();
+                int valueType    = ((Integer) e[5]).intValue();
+
+                num = num == null ? "" : num.trim();
+                district = district == null ? "" : district.trim();
+
+                //  Если регион изменен, то добавляем предыдущий и создаем запись о новом
+                if (prevRegionItem == null) {
+                    prevRegionItem = new ActiveClientsItem(localIdOfOrg, "Итого по " + district,
+                                                           "", "", ActiveClientsItem.REGION_STYLE);
+                }
+                if (prevRegion != null && !prevRegion.equals(district)) {
+                    if (prevRegion != null) {
+                        prevRegionItem.setIdOfOrg(localIdOfOrg++);
+                        result.add(prevRegionItem);
+                    }
+                    prevRegionItem = new ActiveClientsItem(localIdOfOrg, "Итого по " + district,
+                                                           "", "", ActiveClientsItem.REGION_STYLE);
+                }
+                //  Создаем запись о новой организации, если его id отличается
+                if (prevOrg != idOfOrg) {
+                    prevItem = new ActiveClientsItem(localIdOfOrg++, shortName, num,
+                                                     district, ActiveClientsItem.DEFAULT_STYLE);
+                    prevItem.setValue(0);
+                    result.add(prevItem);
+                    prevOrg = idOfOrg;
+                }
+                //  Устанавлиаем значения для орга, а так же увеличиваем значение для региона
+                switch (valueType) {
+                    case TOTAL_COUNT_VALUE:
+                        overallItem.setTotalCount(overallItem.getTotalCount() + count);
+                        prevRegionItem.setTotalCount(prevRegionItem.getTotalCount() + count);
+                        prevItem.setTotalCount(count);
+                        break;
+                    case DISCOUNT_COUNT_VALUE:
+                        overallItem.setDiscountCount(overallItem.getDiscountCount() + count);
+                        prevRegionItem.setDiscountCount(prevRegionItem.getDiscountCount() + count);
+                        prevItem.setDiscountCount(count);
+                        break;
+                    case PAYMENT_COUNT_VALUE:
+                        overallItem.setPaymentCount(overallItem.getPaymentCount() + count);
+                        prevRegionItem.setPaymentCount(prevRegionItem.getPaymentCount() + count);
+                        prevItem.setPaymentCount(count);
+                        break;
+                }
+                prevRegion = district;
+            }
+            //  Добавляем последний регион
+            if (prevRegionItem != null) {
+                prevRegionItem.setIdOfOrg(localIdOfOrg++);
+                result.add(prevRegionItem);
+            }
+            //  Добавляем ИТОГО по всем регионам
+            overallItem.setIdOfOrg(localIdOfOrg);
+            result.add(overallItem);
+
+            for (ActiveClientsItem i : result) {
+                i.setActive(i.getTotalCount() == 0 ? 0 : (double)i.getPaymentCount() / (double)i.getTotalCount() * 100D);
+            }
+
+            return result;
+        }
+    }
+    
+    private static String getClientsClause(String table) {
+        String onlyActiveClients = " AND " + table + ".idOfClientGroup>=" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() +
+                                   " AND " + table + ".idOfClientGroup<" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() + " ";
+        return onlyActiveClients;
+    }
+
+
+    public ActiveClientsReport() {
+    }
+
+
+    public ActiveClientsReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
+            Date endTime, List<ActiveClientsItem> items) {
+        super(generateTime, generateDuration, print, startTime, endTime);
+        this.items = items;
+    }
+
+    public String getHtmlReport() {
+        return htmlReport;
+    }
+
+    public ActiveClientsReport setHtmlReport(String htmlReport) {
+        this.htmlReport = htmlReport;
+        return this;
+    }
+
+    public ActiveClientsReport(Date generateTime, long generateDuration, Date startTime, Date endTime,
+            List<ActiveClientsItem> items) {
+        this.items = items;
+    }
+
+
+    @Override
+    public BasicReportForAllOrgJob createInstance() {
+        return new ActiveClientsReport();  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public BasicReportForAllOrgJob.Builder createBuilder(String templateFilename) {
+        return new Builder(templateFilename);
+    }
+
+    @Override
+    public Logger getLogger() {
+        return logger;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public int getDefaultReportPeriod() {
+        return REPORT_PERIOD_PREV_MONTH;
+    }
+
+    public class JasperStringOutputStream extends OutputStream {
+
+        private StringBuilder string = new StringBuilder();
+
+        @Override
+        public void write(int b) throws IOException {
+            this.string.append((char) b);
+        }
+
+        //Netbeans IDE automatically overrides this toString()
+        public String toString() {
+            return this.string.toString();
+        }
+    }
+}

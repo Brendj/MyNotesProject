@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.Contract" table="cf_contracts">
+        <id name="idOfContract" column="IdOfContract" type="long">
+            <generator class="identity"/>
+        </id>
+
+        <property name="contractNumber" column="ContractNumber" type="string" length="50" not-null="true"/>
+        <property name="performer" column="Performer" type="string" length="128" not-null="true"/>
+        <property name="customer" column="Customer" type="string" length="128" not-null="true"/>
+
+        <property name="contractState" column="ContractState" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+
+        <property name="dateOfConclusion" column="DateOfConclusion" type="timestamp"/>
+        <property name="dateOfClosing" column="DateOfClosing" type="timestamp"/>
+
+        <many-to-one name="contragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent" column="IdOfContragent"
+                     not-null="true"/>
+    </class>
+</hibernate-mapping>
+
+

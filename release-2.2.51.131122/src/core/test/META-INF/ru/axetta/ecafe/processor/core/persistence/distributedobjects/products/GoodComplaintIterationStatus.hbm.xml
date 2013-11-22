@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2013. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterationStatus" table="cf_possible_complaint_iteration_states">
+        <id name="statusNumber" column="StateNumber" type="integer"/>
+        <property name="title" column="Description" type="string"/>
+    </class>
+</hibernate-mapping>

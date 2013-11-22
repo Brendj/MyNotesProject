@@ -1,0 +1,1 @@
+UPDATE cf_waybills_positions SET orgowner=(select w.orgowner from cf_waybills w where w.idofwaybill = idofwaybill and w.orgowner <> orgowner ) ;

@@ -1,0 +1,1407 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions name="ClientRoomControllerWSService" targetNamespace="http://soap.integra.partner.web.processor.ecafe.axetta.ru/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://soap.integra.partner.web.processor.ecafe.axetta.ru/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+<xs:schema elementFormDefault="unqualified" targetNamespace="http://soap.integra.partner.web.processor.ecafe.axetta.ru/" version="1.0" xmlns:tns="http://soap.integra.partner.web.processor.ecafe.axetta.ru/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:element name="Data">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ClientSummary" type="tns:ClientSummary"/>
+        <xs:element minOccurs="0" name="ClientSummaryExt" type="tns:ClientSummaryExt"/>
+        <xs:element minOccurs="0" name="PurchaseList" type="tns:PurchaseList"/>
+        <xs:element minOccurs="0" name="PurchaseListExt" type="tns:PurchaseListExt"/>
+        <xs:element minOccurs="0" name="PaymentList" type="tns:PaymentList"/>
+        <xs:element minOccurs="0" name="MenuList" type="tns:MenuList"/>
+        <xs:element minOccurs="0" name="MenuListExt" type="tns:MenuListExt"/>
+        <xs:element minOccurs="0" name="CardList" type="tns:CardList"/>
+        <xs:element minOccurs="0" name="EnterEventList" type="tns:EnterEventList"/>
+        <xs:element minOccurs="0" name="CirculationItemList" type="tns:CirculationItemList"/>
+      </xs:sequence>
+      <xs:attribute name="IdOfContract" type="xs:long"/>
+      <xs:attribute name="ResultCode" type="xs:long"/>
+      <xs:attribute name="Description" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+<xs:element name="attachGuardSan" type="tns:attachGuardSan"/>
+<xs:element name="attachGuardSanBySan" type="tns:attachGuardSanBySan"/>
+<xs:element name="attachGuardSanBySanResponse" type="tns:attachGuardSanBySanResponse"/>
+<xs:element name="attachGuardSanResponse" type="tns:attachGuardSanResponse"/>
+<xs:element name="authorizeClient" type="tns:authorizeClient"/>
+<xs:element name="authorizeClientResponse" type="tns:authorizeClientResponse"/>
+<xs:element name="changeEmail" type="tns:changeEmail"/>
+<xs:element name="changeEmailResponse" type="tns:changeEmailResponse"/>
+<xs:element name="changeExpenditureLimit" type="tns:changeExpenditureLimit"/>
+<xs:element name="changeExpenditureLimitResponse" type="tns:changeExpenditureLimitResponse"/>
+<xs:element name="changeMobilePhone" type="tns:changeMobilePhone"/>
+<xs:element name="changeMobilePhoneResponse" type="tns:changeMobilePhoneResponse"/>
+<xs:element name="detachGuardSan" type="tns:detachGuardSan"/>
+<xs:element name="detachGuardSanBySan" type="tns:detachGuardSanBySan"/>
+<xs:element name="detachGuardSanBySanResponse" type="tns:detachGuardSanBySanResponse"/>
+<xs:element name="detachGuardSanResponse" type="tns:detachGuardSanResponse"/>
+<xs:element name="enableNotificationByEmail" type="tns:enableNotificationByEmail"/>
+<xs:element name="enableNotificationByEmailResponse" type="tns:enableNotificationByEmailResponse"/>
+<xs:element name="enableNotificationBySMS" type="tns:enableNotificationBySMS"/>
+<xs:element name="enableNotificationBySMSResponse" type="tns:enableNotificationBySMSResponse"/>
+<xs:element name="getCardList" type="tns:getCardList"/>
+<xs:element name="getCardListBySan" type="tns:getCardListBySan"/>
+<xs:element name="getCardListBySanResponse" type="tns:getCardListBySanResponse"/>
+<xs:element name="getCardListResponse" type="tns:getCardListResponse"/>
+<xs:element name="getCirculationList" type="tns:getCirculationList"/>
+<xs:element name="getCirculationListResponse" type="tns:getCirculationListResponse"/>
+<xs:element name="getClientsByGuardSan" type="tns:getClientsByGuardSan"/>
+<xs:element name="getClientsByGuardSanResponse" type="tns:getClientsByGuardSanResponse"/>
+<xs:element name="getContractIdByCardNo" type="tns:getContractIdByCardNo"/>
+<xs:element name="getContractIdByCardNoResponse" type="tns:getContractIdByCardNoResponse"/>
+<xs:element name="getEnterEventList" type="tns:getEnterEventList"/>
+<xs:element name="getEnterEventListBySan" type="tns:getEnterEventListBySan"/>
+<xs:element name="getEnterEventListBySanResponse" type="tns:getEnterEventListBySanResponse"/>
+<xs:element name="getEnterEventListResponse" type="tns:getEnterEventListResponse"/>
+<xs:element name="getGroupListByOrg" type="tns:getGroupListByOrg"/>
+<xs:element name="getGroupListByOrgResponse" type="tns:getGroupListByOrgResponse"/>
+<xs:element name="getMenuList" type="tns:getMenuList"/>
+<xs:element name="getMenuListByOrg" type="tns:getMenuListByOrg"/>
+<xs:element name="getMenuListByOrgResponse" type="tns:getMenuListByOrgResponse"/>
+<xs:element name="getMenuListBySan" type="tns:getMenuListBySan"/>
+<xs:element name="getMenuListBySanResponse" type="tns:getMenuListBySanResponse"/>
+<xs:element name="getMenuListResponse" type="tns:getMenuListResponse"/>
+<xs:element name="getPaymentList" type="tns:getPaymentList"/>
+<xs:element name="getPaymentListBySan" type="tns:getPaymentListBySan"/>
+<xs:element name="getPaymentListBySanResponse" type="tns:getPaymentListBySanResponse"/>
+<xs:element name="getPaymentListResponse" type="tns:getPaymentListResponse"/>
+<xs:element name="getPurchaseList" type="tns:getPurchaseList"/>
+<xs:element name="getPurchaseListBySan" type="tns:getPurchaseListBySan"/>
+<xs:element name="getPurchaseListBySanResponse" type="tns:getPurchaseListBySanResponse"/>
+<xs:element name="getPurchaseListResponse" type="tns:getPurchaseListResponse"/>
+<xs:element name="getStudentListByIdOfClientGroup" type="tns:getStudentListByIdOfClientGroup"/>
+<xs:element name="getStudentListByIdOfClientGroupResponse" type="tns:getStudentListByIdOfClientGroupResponse"/>
+<xs:element name="getSummary" type="tns:getSummary"/>
+<xs:element name="getSummaryByGuardSan" type="tns:getSummaryByGuardSan"/>
+<xs:element name="getSummaryByGuardSanResponse" type="tns:getSummaryByGuardSanResponse"/>
+<xs:element name="getSummaryBySan" type="tns:getSummaryBySan"/>
+<xs:element name="getSummaryBySanResponse" type="tns:getSummaryBySanResponse"/>
+<xs:element name="getSummaryByTypedId" type="tns:getSummaryByTypedId"/>
+<xs:element name="getSummaryByTypedIdResponse" type="tns:getSummaryByTypedIdResponse"/>
+<xs:element name="getSummaryResponse" type="tns:getSummaryResponse"/>
+<xs:complexType name="getSummary">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="contractId" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getSummaryResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:clientSummaryResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="clientSummaryResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="clientSummary" type="tns:ClientSummaryExt"/>
+      <xs:element minOccurs="0" name="resultCode" type="xs:long"/>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="ClientSummaryExt">
+    <xs:sequence/>
+    <xs:attribute name="ContractId" type="xs:long"/>
+    <xs:attribute name="DateOfContract" type="xs:date"/>
+    <xs:attribute name="StateOfContract" type="xs:string"/>
+    <xs:attribute name="Balance" type="xs:long"/>
+    <xs:attribute name="OverdraftLimit" type="xs:long"/>
+    <xs:attribute name="ExpenditureLimit" type="xs:long"/>
+    <xs:attribute name="FirstName" type="xs:string"/>
+    <xs:attribute name="LastName" type="xs:string"/>
+    <xs:attribute name="MiddleName" type="xs:string"/>
+    <xs:attribute name="Grade" type="xs:string"/>
+    <xs:attribute name="OfficialName" type="xs:string"/>
+    <xs:attribute name="LastEnterEventCode" type="xs:int"/>
+    <xs:attribute name="LastEnterEventTime" type="xs:dateTime"/>
+    <xs:attribute name="NotifyViaSMS" type="xs:boolean"/>
+    <xs:attribute name="NotifyViaEmail" type="xs:boolean"/>
+    <xs:attribute name="MobilePhone" type="xs:string"/>
+    <xs:attribute name="Email" type="xs:string"/>
+    <xs:attribute name="DefaultMerchantId" type="xs:long"/>
+    <xs:attribute name="DefaultMerchantInfo" type="xs:string"/>
+  </xs:complexType>
+<xs:complexType name="changeMobilePhone">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="contractId" type="xs:long"/>
+      <xs:element minOccurs="0" name="mobilePhone" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="changeMobilePhoneResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:result"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="result">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="resultCode" type="xs:long"/>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getCardListBySan">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="san" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getCardListBySanResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:cardListResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="cardListResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="cardList" type="tns:CardList"/>
+      <xs:element minOccurs="0" name="resultCode" type="xs:long"/>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="CardList">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="C" type="tns:CardItem"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="CardItem">
+    <xs:sequence/>
+    <xs:attribute name="IdOfCard" type="xs:long"/>
+    <xs:attribute name="CrystalId" type="xs:long"/>
+    <xs:attribute name="Type" type="xs:int"/>
+    <xs:attribute name="State" type="xs:int"/>
+    <xs:attribute name="LifeState" type="xs:int"/>
+    <xs:attribute name="ExpiryDate" type="xs:date"/>
+    <xs:attribute name="ChangeDate" type="xs:dateTime"/>
+  </xs:complexType>
+<xs:complexType name="getPaymentList">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="contractId" type="xs:long"/>
+      <xs:element minOccurs="0" name="startDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="endDate" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getPaymentListResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:paymentListResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="paymentListResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="paymentList" type="tns:PaymentList"/>
+      <xs:element minOccurs="0" name="resultCode" type="xs:long"/>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="PaymentList">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="P" type="tns:Payment"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="Payment">
+    <xs:sequence/>
+    <xs:attribute name="Time" type="xs:dateTime"/>
+    <xs:attribute name="Sum" type="xs:long"/>
+    <xs:attribute name="Origin" type="xs:string"/>
+  </xs:complexType>
+<xs:complexType name="getCardList">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="contractId" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getCardListResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:cardListResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="detachGuardSan">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="contractId" type="xs:long"/>
+      <xs:element minOccurs="0" name="guardSan" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="detachGuardSanResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:detachGuardSanResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="detachGuardSanResult">
+    <xs:complexContent>
+      <xs:extension base="tns:result">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+<xs:complexType name="enableNotificationBySMS">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="contractId" type="xs:long"/>
+      <xs:element name="state" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="enableNotificationBySMSResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:result"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="changeEmail">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="contractId" type="xs:long"/>
+      <xs:element minOccurs="0" name="email" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="changeEmailResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:result"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="enableNotificationByEmail">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="contractId" type="xs:long"/>
+      <xs:element name="state" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="enableNotificationByEmailResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:result"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="attachGuardSan">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="contractId" type="xs:long"/>
+      <xs:element minOccurs="0" name="guardSan" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="attachGuardSanResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:attachGuardSanResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="attachGuardSanResult">
+    <xs:complexContent>
+      <xs:extension base="tns:result">
+        <xs:sequence/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+<xs:complexType name="getStudentListByIdOfClientGroup">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="idOfClientGroup" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getStudentListByIdOfClientGroupResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:classStudentListResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="classStudentListResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="classStudentList" type="tns:ClassStudentList"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="ClassStudentList">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="C" type="tns:ClientSummaryExt"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getPaymentListBySan">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="san" type="xs:string"/>
+      <xs:element minOccurs="0" name="startDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="endDate" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getPaymentListBySanResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:paymentListResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getClientsByGuardSan">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="san" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getClientsByGuardSanResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:clientsData"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="clientsData">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="clientList" type="tns:clientList"/>
+      <xs:element minOccurs="0" name="resultCode" type="xs:long"/>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="clientList">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="Client" type="tns:ClientItem"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="ClientItem">
+    <xs:sequence/>
+    <xs:attribute name="ContractId" type="xs:long"/>
+    <xs:attribute name="San" type="xs:string"/>
+  </xs:complexType>
+<xs:complexType name="getGroupListByOrg">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="idOfOrg" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getGroupListByOrgResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:clientGroupListResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="clientGroupListResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="clientGroupList" type="tns:ClientGroupList"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="ClientGroupList">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="G" type="tns:ClientGroupItem"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="ClientGroupItem">
+    <xs:sequence/>
+    <xs:attribute name="idOfClientGroup" type="xs:long"/>
+    <xs:attribute name="GroupName" type="xs:string"/>
+  </xs:complexType>
+<xs:complexType name="getSummaryBySan">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="san" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getSummaryBySanResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:clientSummaryResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getEnterEventList">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="contractId" type="xs:long"/>
+      <xs:element minOccurs="0" name="startDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="endDate" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getEnterEventListResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:enterEventListResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="enterEventListResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="enterEventList" type="tns:EnterEventList"/>
+      <xs:element minOccurs="0" name="resultCode" type="xs:long"/>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="EnterEventList">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="E" type="tns:EnterEventItem"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="EnterEventItem">
+    <xs:sequence/>
+    <xs:attribute name="DateTime" type="xs:dateTime"/>
+    <xs:attribute name="Day" type="xs:int"/>
+    <xs:attribute name="EnterName" type="xs:string"/>
+    <xs:attribute name="Direction" type="xs:int"/>
+    <xs:attribute name="TemporaryCard" type="xs:int"/>
+  </xs:complexType>
+<xs:complexType name="getMenuListBySan">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="san" type="xs:string"/>
+      <xs:element minOccurs="0" name="startDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="endDate" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getMenuListBySanResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:menuListResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="menuListResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="menuList" type="tns:MenuListExt"/>
+      <xs:element minOccurs="0" name="resultCode" type="xs:long"/>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="MenuListExt">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="M" type="tns:MenuDateItemExt"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="MenuDateItemExt">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="E" type="tns:MenuItemExt"/>
+    </xs:sequence>
+    <xs:attribute name="Date" type="xs:date"/>
+  </xs:complexType>
+<xs:complexType name="MenuItemExt">
+    <xs:sequence/>
+    <xs:attribute name="Group" type="xs:string"/>
+    <xs:attribute name="Name" type="xs:string"/>
+    <xs:attribute name="Price" type="xs:long"/>
+    <xs:attribute name="Calories" type="xs:double"/>
+    <xs:attribute name="VitB1" type="xs:double"/>
+    <xs:attribute name="VitC" type="xs:double"/>
+    <xs:attribute name="VitA" type="xs:double"/>
+    <xs:attribute name="VitE" type="xs:double"/>
+    <xs:attribute name="MinCa" type="xs:double"/>
+    <xs:attribute name="MinP" type="xs:double"/>
+    <xs:attribute name="MinMg" type="xs:double"/>
+    <xs:attribute name="MinFe" type="xs:double"/>
+  </xs:complexType>
+<xs:complexType name="getContractIdByCardNo">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="cardId" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getContractIdByCardNoResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getSummaryByTypedId">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="id" type="xs:string"/>
+      <xs:element name="idType" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getSummaryByTypedIdResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:clientSummaryResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getSummaryByGuardSan">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="guardSan" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getSummaryByGuardSanResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="return" type="tns:ClientSummaryExt"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getPurchaseListBySan">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="san" type="xs:string"/>
+      <xs:element minOccurs="0" name="startDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="endDate" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getPurchaseListBySanResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:purchaseListResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="purchaseListResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="purchaseList" type="tns:PurchaseListExt"/>
+      <xs:element minOccurs="0" name="resultCode" type="xs:long"/>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="PurchaseListExt">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="P" type="tns:PurchaseExt"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="PurchaseExt">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="E" type="tns:PurchaseElementExt"/>
+    </xs:sequence>
+    <xs:attribute name="Time" type="xs:dateTime"/>
+    <xs:attribute name="Sum" type="xs:long"/>
+    <xs:attribute name="SocDiscount" type="xs:long"/>
+    <xs:attribute name="TrdDiscount" type="xs:long"/>
+    <xs:attribute name="Donation" type="xs:long"/>
+    <xs:attribute name="ByCash" type="xs:long"/>
+    <xs:attribute name="ByCard" type="xs:long"/>
+    <xs:attribute name="IdOfCard" type="xs:long"/>
+  </xs:complexType>
+<xs:complexType name="PurchaseElementExt">
+    <xs:sequence/>
+    <xs:attribute name="Name" type="xs:string"/>
+    <xs:attribute name="Sum" type="xs:long"/>
+    <xs:attribute name="Amount" type="xs:long"/>
+    <xs:attribute name="Type" type="xs:int"/>
+  </xs:complexType>
+<xs:complexType name="getMenuList">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="contractId" type="xs:long"/>
+      <xs:element minOccurs="0" name="startDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="endDate" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getMenuListResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:menuListResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="authorizeClient">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="contractId" type="xs:long"/>
+      <xs:element minOccurs="0" name="base64passwordHash" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="authorizeClientResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:result"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getCirculationList">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="contractId" type="xs:long"/>
+      <xs:element name="state" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getCirculationListResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:circulationListResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="circulationListResult">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="circulationList" type="tns:CirculationItemList"/>
+      <xs:element minOccurs="0" name="resultCode" type="xs:long"/>
+      <xs:element minOccurs="0" name="description" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="CirculationItemList">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="C" type="tns:CirculationItem"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="CirculationItem">
+    <xs:sequence>
+      <xs:element name="Publication" type="tns:PublicationItem"/>
+    </xs:sequence>
+    <xs:attribute name="IssuanceDate" type="xs:date"/>
+    <xs:attribute name="RefundDate" type="xs:date"/>
+    <xs:attribute name="RealRefundDate" type="xs:date"/>
+    <xs:attribute name="Status" type="xs:int"/>
+  </xs:complexType>
+<xs:complexType name="PublicationItem">
+    <xs:sequence/>
+    <xs:attribute name="Author" type="xs:string"/>
+    <xs:attribute name="Title" type="xs:string"/>
+    <xs:attribute name="Title2" type="xs:string"/>
+    <xs:attribute name="PublicationDate" type="xs:string"/>
+    <xs:attribute name="Publisher" type="xs:string"/>
+  </xs:complexType>
+<xs:complexType name="changeExpenditureLimit">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="contractId" type="xs:long"/>
+      <xs:element name="limit" type="xs:long"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="changeExpenditureLimitResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:result"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getPurchaseList">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="contractId" type="xs:long"/>
+      <xs:element minOccurs="0" name="startDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="endDate" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getPurchaseListResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:purchaseListResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getMenuListByOrg">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="orgId" type="xs:long"/>
+      <xs:element minOccurs="0" name="startDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="endDate" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getMenuListByOrgResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:menuListResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="detachGuardSanBySan">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="san" type="xs:string"/>
+      <xs:element minOccurs="0" name="guardSan" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="detachGuardSanBySanResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:detachGuardSanResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="attachGuardSanBySan">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="san" type="xs:string"/>
+      <xs:element minOccurs="0" name="guardSan" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="attachGuardSanBySanResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:attachGuardSanResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getEnterEventListBySan">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="san" type="xs:string"/>
+      <xs:element minOccurs="0" name="startDate" type="xs:dateTime"/>
+      <xs:element minOccurs="0" name="endDate" type="xs:dateTime"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="getEnterEventListBySanResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="tns:enterEventListResult"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="ClientSummary">
+    <xs:sequence/>
+    <xs:attribute name="DateOfContract" type="xs:date"/>
+    <xs:attribute name="StateOfContract" type="xs:string"/>
+    <xs:attribute name="Balance" type="xs:long"/>
+    <xs:attribute name="OverdraftLimit" type="xs:long"/>
+  </xs:complexType>
+<xs:complexType name="PurchaseList">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="P" type="tns:Purchase"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="Purchase">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="E" type="tns:PurchaseElement"/>
+    </xs:sequence>
+    <xs:attribute name="Time" type="xs:dateTime"/>
+    <xs:attribute name="Sum" type="xs:long"/>
+    <xs:attribute name="Discount" type="xs:long"/>
+    <xs:attribute name="Donation" type="xs:long"/>
+    <xs:attribute name="ByCash" type="xs:long"/>
+    <xs:attribute name="ByCard" type="xs:long"/>
+    <xs:attribute name="IdOfCard" type="xs:long"/>
+  </xs:complexType>
+<xs:complexType name="PurchaseElement">
+    <xs:sequence/>
+    <xs:attribute name="Name" type="xs:string"/>
+    <xs:attribute name="Sum" type="xs:long"/>
+    <xs:attribute name="Amount" type="xs:long"/>
+  </xs:complexType>
+<xs:complexType name="MenuList">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="M" type="tns:MenuDateItem"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="MenuDateItem">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="E" type="tns:MenuItem"/>
+    </xs:sequence>
+    <xs:attribute name="Date" type="xs:date"/>
+  </xs:complexType>
+<xs:complexType name="MenuItem">
+    <xs:sequence/>
+    <xs:attribute name="Group" type="xs:string"/>
+    <xs:attribute name="Name" type="xs:string"/>
+    <xs:attribute name="Price" type="xs:long"/>
+  </xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="authorizeClientResponse">
+    <wsdl:part element="tns:authorizeClientResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="detachGuardSan">
+    <wsdl:part element="tns:detachGuardSan" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSummaryByTypedIdResponse">
+    <wsdl:part element="tns:getSummaryByTypedIdResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getEnterEventListBySan">
+    <wsdl:part element="tns:getEnterEventListBySan" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getMenuListByOrgResponse">
+    <wsdl:part element="tns:getMenuListByOrgResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="changeMobilePhone">
+    <wsdl:part element="tns:changeMobilePhone" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSummaryByGuardSan">
+    <wsdl:part element="tns:getSummaryByGuardSan" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getMenuListBySan">
+    <wsdl:part element="tns:getMenuListBySan" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCirculationList">
+    <wsdl:part element="tns:getCirculationList" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCardList">
+    <wsdl:part element="tns:getCardList" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSummaryBySan">
+    <wsdl:part element="tns:getSummaryBySan" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getClientsByGuardSanResponse">
+    <wsdl:part element="tns:getClientsByGuardSanResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getEnterEventListResponse">
+    <wsdl:part element="tns:getEnterEventListResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSummaryByTypedId">
+    <wsdl:part element="tns:getSummaryByTypedId" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCardListResponse">
+    <wsdl:part element="tns:getCardListResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getMenuListResponse">
+    <wsdl:part element="tns:getMenuListResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getGroupListByOrg">
+    <wsdl:part element="tns:getGroupListByOrg" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPurchaseListBySan">
+    <wsdl:part element="tns:getPurchaseListBySan" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getStudentListByIdOfClientGroupResponse">
+    <wsdl:part element="tns:getStudentListByIdOfClientGroupResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getMenuListBySanResponse">
+    <wsdl:part element="tns:getMenuListBySanResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="attachGuardSanBySanResponse">
+    <wsdl:part element="tns:attachGuardSanBySanResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSummaryByGuardSanResponse">
+    <wsdl:part element="tns:getSummaryByGuardSanResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getMenuList">
+    <wsdl:part element="tns:getMenuList" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSummary">
+    <wsdl:part element="tns:getSummary" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getContractIdByCardNoResponse">
+    <wsdl:part element="tns:getContractIdByCardNoResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getStudentListByIdOfClientGroup">
+    <wsdl:part element="tns:getStudentListByIdOfClientGroup" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="attachGuardSan">
+    <wsdl:part element="tns:attachGuardSan" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPaymentListBySan">
+    <wsdl:part element="tns:getPaymentListBySan" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="changeEmail">
+    <wsdl:part element="tns:changeEmail" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPaymentListResponse">
+    <wsdl:part element="tns:getPaymentListResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSummaryBySanResponse">
+    <wsdl:part element="tns:getSummaryBySanResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="attachGuardSanResponse">
+    <wsdl:part element="tns:attachGuardSanResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="authorizeClient">
+    <wsdl:part element="tns:authorizeClient" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="detachGuardSanBySanResponse">
+    <wsdl:part element="tns:detachGuardSanBySanResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCardListBySanResponse">
+    <wsdl:part element="tns:getCardListBySanResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPaymentList">
+    <wsdl:part element="tns:getPaymentList" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="changeMobilePhoneResponse">
+    <wsdl:part element="tns:changeMobilePhoneResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getSummaryResponse">
+    <wsdl:part element="tns:getSummaryResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="attachGuardSanBySan">
+    <wsdl:part element="tns:attachGuardSanBySan" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="detachGuardSanResponse">
+    <wsdl:part element="tns:detachGuardSanResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPaymentListBySanResponse">
+    <wsdl:part element="tns:getPaymentListBySanResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="changeExpenditureLimit">
+    <wsdl:part element="tns:changeExpenditureLimit" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getClientsByGuardSan">
+    <wsdl:part element="tns:getClientsByGuardSan" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="changeEmailResponse">
+    <wsdl:part element="tns:changeEmailResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="enableNotificationBySMSResponse">
+    <wsdl:part element="tns:enableNotificationBySMSResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getEnterEventListBySanResponse">
+    <wsdl:part element="tns:getEnterEventListBySanResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPurchaseListBySanResponse">
+    <wsdl:part element="tns:getPurchaseListBySanResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCardListBySan">
+    <wsdl:part element="tns:getCardListBySan" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCirculationListResponse">
+    <wsdl:part element="tns:getCirculationListResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPurchaseList">
+    <wsdl:part element="tns:getPurchaseList" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getMenuListByOrg">
+    <wsdl:part element="tns:getMenuListByOrg" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="detachGuardSanBySan">
+    <wsdl:part element="tns:detachGuardSanBySan" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="enableNotificationByEmail">
+    <wsdl:part element="tns:enableNotificationByEmail" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPurchaseListResponse">
+    <wsdl:part element="tns:getPurchaseListResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getContractIdByCardNo">
+    <wsdl:part element="tns:getContractIdByCardNo" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getEnterEventList">
+    <wsdl:part element="tns:getEnterEventList" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="enableNotificationBySMS">
+    <wsdl:part element="tns:enableNotificationBySMS" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="changeExpenditureLimitResponse">
+    <wsdl:part element="tns:changeExpenditureLimitResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="enableNotificationByEmailResponse">
+    <wsdl:part element="tns:enableNotificationByEmailResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getGroupListByOrgResponse">
+    <wsdl:part element="tns:getGroupListByOrgResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="ClientRoomController">
+    <wsdl:operation name="getSummary">
+      <wsdl:input message="tns:getSummary" name="getSummary">
+    </wsdl:input>
+      <wsdl:output message="tns:getSummaryResponse" name="getSummaryResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="changeMobilePhone">
+      <wsdl:input message="tns:changeMobilePhone" name="changeMobilePhone">
+    </wsdl:input>
+      <wsdl:output message="tns:changeMobilePhoneResponse" name="changeMobilePhoneResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCardListBySan">
+      <wsdl:input message="tns:getCardListBySan" name="getCardListBySan">
+    </wsdl:input>
+      <wsdl:output message="tns:getCardListBySanResponse" name="getCardListBySanResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getPaymentList">
+      <wsdl:input message="tns:getPaymentList" name="getPaymentList">
+    </wsdl:input>
+      <wsdl:output message="tns:getPaymentListResponse" name="getPaymentListResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCardList">
+      <wsdl:input message="tns:getCardList" name="getCardList">
+    </wsdl:input>
+      <wsdl:output message="tns:getCardListResponse" name="getCardListResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="detachGuardSan">
+      <wsdl:input message="tns:detachGuardSan" name="detachGuardSan">
+    </wsdl:input>
+      <wsdl:output message="tns:detachGuardSanResponse" name="detachGuardSanResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="enableNotificationBySMS">
+      <wsdl:input message="tns:enableNotificationBySMS" name="enableNotificationBySMS">
+    </wsdl:input>
+      <wsdl:output message="tns:enableNotificationBySMSResponse" name="enableNotificationBySMSResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="changeEmail">
+      <wsdl:input message="tns:changeEmail" name="changeEmail">
+    </wsdl:input>
+      <wsdl:output message="tns:changeEmailResponse" name="changeEmailResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="enableNotificationByEmail">
+      <wsdl:input message="tns:enableNotificationByEmail" name="enableNotificationByEmail">
+    </wsdl:input>
+      <wsdl:output message="tns:enableNotificationByEmailResponse" name="enableNotificationByEmailResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="attachGuardSan">
+      <wsdl:input message="tns:attachGuardSan" name="attachGuardSan">
+    </wsdl:input>
+      <wsdl:output message="tns:attachGuardSanResponse" name="attachGuardSanResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getStudentListByIdOfClientGroup">
+      <wsdl:input message="tns:getStudentListByIdOfClientGroup" name="getStudentListByIdOfClientGroup">
+    </wsdl:input>
+      <wsdl:output message="tns:getStudentListByIdOfClientGroupResponse" name="getStudentListByIdOfClientGroupResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getPaymentListBySan">
+      <wsdl:input message="tns:getPaymentListBySan" name="getPaymentListBySan">
+    </wsdl:input>
+      <wsdl:output message="tns:getPaymentListBySanResponse" name="getPaymentListBySanResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getClientsByGuardSan">
+      <wsdl:input message="tns:getClientsByGuardSan" name="getClientsByGuardSan">
+    </wsdl:input>
+      <wsdl:output message="tns:getClientsByGuardSanResponse" name="getClientsByGuardSanResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getGroupListByOrg">
+      <wsdl:input message="tns:getGroupListByOrg" name="getGroupListByOrg">
+    </wsdl:input>
+      <wsdl:output message="tns:getGroupListByOrgResponse" name="getGroupListByOrgResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSummaryBySan">
+      <wsdl:input message="tns:getSummaryBySan" name="getSummaryBySan">
+    </wsdl:input>
+      <wsdl:output message="tns:getSummaryBySanResponse" name="getSummaryBySanResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getEnterEventList">
+      <wsdl:input message="tns:getEnterEventList" name="getEnterEventList">
+    </wsdl:input>
+      <wsdl:output message="tns:getEnterEventListResponse" name="getEnterEventListResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getMenuListBySan">
+      <wsdl:input message="tns:getMenuListBySan" name="getMenuListBySan">
+    </wsdl:input>
+      <wsdl:output message="tns:getMenuListBySanResponse" name="getMenuListBySanResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getContractIdByCardNo">
+      <wsdl:input message="tns:getContractIdByCardNo" name="getContractIdByCardNo">
+    </wsdl:input>
+      <wsdl:output message="tns:getContractIdByCardNoResponse" name="getContractIdByCardNoResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSummaryByTypedId">
+      <wsdl:input message="tns:getSummaryByTypedId" name="getSummaryByTypedId">
+    </wsdl:input>
+      <wsdl:output message="tns:getSummaryByTypedIdResponse" name="getSummaryByTypedIdResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSummaryByGuardSan">
+      <wsdl:input message="tns:getSummaryByGuardSan" name="getSummaryByGuardSan">
+    </wsdl:input>
+      <wsdl:output message="tns:getSummaryByGuardSanResponse" name="getSummaryByGuardSanResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getPurchaseListBySan">
+      <wsdl:input message="tns:getPurchaseListBySan" name="getPurchaseListBySan">
+    </wsdl:input>
+      <wsdl:output message="tns:getPurchaseListBySanResponse" name="getPurchaseListBySanResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getMenuList">
+      <wsdl:input message="tns:getMenuList" name="getMenuList">
+    </wsdl:input>
+      <wsdl:output message="tns:getMenuListResponse" name="getMenuListResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="authorizeClient">
+      <wsdl:input message="tns:authorizeClient" name="authorizeClient">
+    </wsdl:input>
+      <wsdl:output message="tns:authorizeClientResponse" name="authorizeClientResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCirculationList">
+      <wsdl:input message="tns:getCirculationList" name="getCirculationList">
+    </wsdl:input>
+      <wsdl:output message="tns:getCirculationListResponse" name="getCirculationListResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="changeExpenditureLimit">
+      <wsdl:input message="tns:changeExpenditureLimit" name="changeExpenditureLimit">
+    </wsdl:input>
+      <wsdl:output message="tns:changeExpenditureLimitResponse" name="changeExpenditureLimitResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getPurchaseList">
+      <wsdl:input message="tns:getPurchaseList" name="getPurchaseList">
+    </wsdl:input>
+      <wsdl:output message="tns:getPurchaseListResponse" name="getPurchaseListResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getMenuListByOrg">
+      <wsdl:input message="tns:getMenuListByOrg" name="getMenuListByOrg">
+    </wsdl:input>
+      <wsdl:output message="tns:getMenuListByOrgResponse" name="getMenuListByOrgResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="detachGuardSanBySan">
+      <wsdl:input message="tns:detachGuardSanBySan" name="detachGuardSanBySan">
+    </wsdl:input>
+      <wsdl:output message="tns:detachGuardSanBySanResponse" name="detachGuardSanBySanResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="attachGuardSanBySan">
+      <wsdl:input message="tns:attachGuardSanBySan" name="attachGuardSanBySan">
+    </wsdl:input>
+      <wsdl:output message="tns:attachGuardSanBySanResponse" name="attachGuardSanBySanResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getEnterEventListBySan">
+      <wsdl:input message="tns:getEnterEventListBySan" name="getEnterEventListBySan">
+    </wsdl:input>
+      <wsdl:output message="tns:getEnterEventListBySanResponse" name="getEnterEventListBySanResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ClientRoomControllerWSServiceSoapBinding" type="tns:ClientRoomController">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="changeMobilePhone">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="changeMobilePhone">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="changeMobilePhoneResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSummary">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getSummary">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getSummaryResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCardListBySan">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getCardListBySan">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getCardListBySanResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getPaymentList">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getPaymentList">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getPaymentListResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="detachGuardSan">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="detachGuardSan">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="detachGuardSanResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCardList">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getCardList">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getCardListResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="changeEmail">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="changeEmail">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="changeEmailResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="enableNotificationBySMS">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="enableNotificationBySMS">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="enableNotificationBySMSResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="enableNotificationByEmail">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="enableNotificationByEmail">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="enableNotificationByEmailResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="attachGuardSan">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="attachGuardSan">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="attachGuardSanResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getPaymentListBySan">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getPaymentListBySan">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getPaymentListBySanResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getStudentListByIdOfClientGroup">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getStudentListByIdOfClientGroup">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getStudentListByIdOfClientGroupResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getClientsByGuardSan">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getClientsByGuardSan">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getClientsByGuardSanResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getGroupListByOrg">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getGroupListByOrg">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getGroupListByOrgResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getEnterEventList">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getEnterEventList">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getEnterEventListResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSummaryBySan">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getSummaryBySan">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getSummaryBySanResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getMenuListBySan">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getMenuListBySan">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getMenuListBySanResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getContractIdByCardNo">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getContractIdByCardNo">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getContractIdByCardNoResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSummaryByTypedId">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getSummaryByTypedId">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getSummaryByTypedIdResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSummaryByGuardSan">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getSummaryByGuardSan">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getSummaryByGuardSanResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getMenuList">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getMenuList">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getMenuListResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getPurchaseListBySan">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getPurchaseListBySan">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getPurchaseListBySanResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="authorizeClient">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="authorizeClient">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="authorizeClientResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCirculationList">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getCirculationList">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getCirculationListResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="changeExpenditureLimit">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="changeExpenditureLimit">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="changeExpenditureLimitResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getPurchaseList">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getPurchaseList">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getPurchaseListResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getMenuListByOrg">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getMenuListByOrg">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getMenuListByOrgResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="detachGuardSanBySan">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="detachGuardSanBySan">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="detachGuardSanBySanResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="attachGuardSanBySan">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="attachGuardSanBySan">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="attachGuardSanBySanResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getEnterEventListBySan">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getEnterEventListBySan">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getEnterEventListBySanResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ClientRoomControllerWSService">
+    <wsdl:port binding="tns:ClientRoomControllerWSServiceSoapBinding" name="ClientRoomControllerWSPort">
+      <soap:address location="http://localhost:8080/processor/soap/client"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SalesReport" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true">
+	<property name="ireport.zoom" value="1.210000000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table" isDefault="false">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<parameter name="month" class="java.lang.Integer"/>
+	<parameter name="year" class="java.lang.Integer"/>
+	<parameter name="day" class="java.lang.Integer"/>
+	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date"/>
+	<parameter name="idOfOrg" class="java.lang.Long"/>
+	<parameter name="orgName" class="java.lang.String"/>
+	<parameter name="monthName" class="java.lang.String"/>
+	<parameter name="startTime" class="java.lang.Long"/>
+	<parameter name="endTime" class="java.lang.Long"/>
+	<field name="questionary" class="java.lang.String"/>
+	<field name="answer" class="java.lang.String"/>
+	<field name="contractId" class="java.lang.Long"/>
+	<field name="clientFullName" class="java.lang.String"/>
+	<field name="answerDate" class="java.util.Date"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<textField>
+				<reportElement x="10" y="10" width="792" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[String.format("Отчет по анкетированию за: %02d.%02d.%d", $P{day}, $P{month}, $P{year})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="40" width="802" height="24"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Учреждение: "+$P{orgName}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="52" splitType="Stretch">
+			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
+				<reportElement style="table" mode="Opaque" x="200" y="10" width="92" height="20"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$P{endDate}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
+				<reportElement style="table" mode="Opaque" x="93" y="10" width="94" height="20"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[$P{startDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="table" mode="Opaque" x="10" y="10" width="83" height="20"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Период отчета:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Opaque" x="187" y="10" width="13" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[-]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="36" splitType="Stretch">
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="508" y="10" width="143" height="26"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Вариант ответа анкеты]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="347" y="10" width="161" height="26"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Наименование анкетировния]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="0" y="10" width="117" height="26"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Номер дорговора]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="651" y="10" width="151" height="26"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Дата регистрации ответа]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="117" y="10" width="230" height="26"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Полное ФИО клиента]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="107" splitType="Stretch">
+			<textField>
+				<reportElement style="table" x="508" y="0" width="143" height="22"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{answer}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table" x="347" y="0" width="161" height="22"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{questionary}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table" x="0" y="0" width="117" height="22"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{contractId}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table" x="117" y="0" width="230" height="22"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{clientFullName}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEE, d MMM yyyy HH:mm">
+				<reportElement style="table" x="651" y="0" width="151" height="22"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{answerDate}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

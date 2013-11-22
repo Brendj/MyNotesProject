@@ -1,0 +1,177 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	version="1.0"
+	elementFormDefault="qualified">
+    <xsd:element name="Data">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element minOccurs="0" maxOccurs="1" name="ClientSummary" type="ClientSummary"/>
+                <xsd:element minOccurs="0" maxOccurs="1" name="ClientSummaryExt" type="ClientSummaryExt"/>
+                <xsd:element minOccurs="0" maxOccurs="1" name="PurchaseList" type="PurchaseList"/>
+                <xsd:element minOccurs="0" maxOccurs="1" name="PurchaseListExt" type="PurchaseListExt"/>
+                <xsd:element minOccurs="0" maxOccurs="1" name="PaymentList" type="PaymentList"/>
+                <xsd:element minOccurs="0" maxOccurs="1" name="MenuList" type="MenuList"/>
+                <xsd:element minOccurs="0" maxOccurs="1" name="MenuListExt" type="MenuListExt"/>
+                <xsd:element minOccurs="0" maxOccurs="1" name="CardList" type="CardList"/>
+                <xsd:element minOccurs="0" maxOccurs="1" name="EnterEventList" type="EnterEventList"/>
+            </xsd:sequence>
+            <xsd:attribute name="IdOfContract" type="xsd:long"/>
+            <xsd:attribute name="ResultCode" type="xsd:long"/>
+            <xsd:attribute name="Description" type="xsd:string"/>
+        </xsd:complexType>
+
+    </xsd:element>
+
+    <xsd:complexType name="ClientSummary">
+        <xsd:attribute name="DateOfContract" type="xsd:date"/>
+        <xsd:attribute name="StateOfContract" type="xsd:string"/>
+        <xsd:attribute name="Balance" type="xsd:long"/>
+        <xsd:attribute name="OverdraftLimit" type="xsd:long"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="ClientSummaryExt">
+        <xsd:attribute name="ContractId" type="xsd:long"/>
+        <xsd:attribute name="DateOfContract" type="xsd:date"/>
+        <xsd:attribute name="StateOfContract" type="xsd:string"/>
+        <xsd:attribute name="Balance" type="xsd:long"/>
+        <xsd:attribute name="OverdraftLimit" type="xsd:long"/>
+        <xsd:attribute name="ExpenditureLimit" type="xsd:long"/>
+        <xsd:attribute name="FirstName" type="xsd:string"/>
+        <xsd:attribute name="Grade" type="xsd:string"/>
+        <xsd:attribute name="OfficialName" type="xsd:string"/>
+        <xsd:attribute name="LastEnterEventCode" type="xsd:int"/>
+        <xsd:attribute name="LastEnterEventTime" type="xsd:dateTime" />
+        <xsd:attribute name="NotifyViaSMS" type="xsd:boolean"/>
+        <xsd:attribute name="NotifyViaEmail" type="xsd:boolean"/>
+        <xsd:attribute name="MobilePhone" type="xsd:string"/>
+        <xsd:attribute name="Email" type="xsd:string"/>
+    </xsd:complexType>
+    
+    <xsd:complexType name="PurchaseList">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="unbounded" name="P" type="Purchase"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="Purchase">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="unbounded" name="E" type="PurchaseElement"/>
+        </xsd:sequence>
+        <xsd:attribute name="Time" type="xsd:dateTime"/>
+        <xsd:attribute name="Sum" type="xsd:long"/>
+        <xsd:attribute name="Discount" type="xsd:long"/>
+        <xsd:attribute name="Donation" type="xsd:long"/>
+        <xsd:attribute name="ByCash" type="xsd:long"/>
+        <xsd:attribute name="ByCard" type="xsd:long"/>
+        <xsd:attribute name="IdOfCard" type="xsd:long"/>
+    </xsd:complexType>
+    <xsd:complexType name="PurchaseElement">
+        <xsd:attribute name="Name" type="xsd:string"/>
+        <xsd:attribute name="Sum" type="xsd:long"/>
+        <xsd:attribute name="Amount" type="xsd:long"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="PurchaseListExt">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="unbounded" name="P" type="PurchaseExt"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="PurchaseExt">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="unbounded" name="E" type="PurchaseElementExt"/>
+        </xsd:sequence>
+        <xsd:attribute name="Time" type="xsd:dateTime"/>
+        <xsd:attribute name="Sum" type="xsd:long"/>
+        <xsd:attribute name="SocDiscount" type="xsd:long"/>
+        <xsd:attribute name="TrdDiscount" type="xsd:long"/>
+        <xsd:attribute name="Donation" type="xsd:long"/>
+        <xsd:attribute name="ByCash" type="xsd:long"/>
+        <xsd:attribute name="ByCard" type="xsd:long"/>
+        <xsd:attribute name="IdOfCard" type="xsd:long"/>
+    </xsd:complexType>
+    <xsd:complexType name="PurchaseElementExt">
+        <xsd:attribute name="Name" type="xsd:string"/>
+        <xsd:attribute name="Sum" type="xsd:long"/>
+        <xsd:attribute name="Amount" type="xsd:long"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="PaymentList">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="unbounded" name="P" type="Payment"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="Payment">
+        <xsd:attribute name="Time" type="xsd:dateTime"/>
+        <xsd:attribute name="Sum" type="xsd:long"/>
+        <xsd:attribute name="Origin" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="MenuList">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="unbounded" name="M" type="MenuDateItem"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="MenuDateItem">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="unbounded" name="E" type="MenuItem"/>
+        </xsd:sequence>
+        <xsd:attribute name="Date" type="xsd:date"/>
+    </xsd:complexType>
+    <xsd:complexType name="MenuItem">
+        <xsd:attribute name="Group" type="xsd:string"/>
+        <xsd:attribute name="Name" type="xsd:string"/>
+        <xsd:attribute name="Price" type="xsd:long"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="MenuListExt">
+            <xsd:sequence>
+                <xsd:element minOccurs="0" maxOccurs="unbounded" name="M" type="MenuDateItemExt"/>
+            </xsd:sequence>
+        </xsd:complexType>
+        <xsd:complexType name="MenuDateItemExt">
+            <xsd:sequence>
+                <xsd:element minOccurs="0" maxOccurs="unbounded" name="E" type="MenuItemExt"/>
+            </xsd:sequence>
+            <xsd:attribute name="Date" type="xsd:date"/>
+        </xsd:complexType>
+        <xsd:complexType name="MenuItemExt">
+            <xsd:attribute name="Group" type="xsd:string"/>
+            <xsd:attribute name="Name" type="xsd:string"/>
+            <xsd:attribute name="Price" type="xsd:long"/>
+            <xsd:attribute name="Calories" type="xsd:double"/>
+            <xsd:attribute name="VitB1" type="xsd:double"/>
+            <xsd:attribute name="VitC" type="xsd:double"/>
+            <xsd:attribute name="VitA" type="xsd:double"/>
+            <xsd:attribute name="VitE" type="xsd:double"/>
+            <xsd:attribute name="MinCa" type="xsd:double"/>
+            <xsd:attribute name="MinP" type="xsd:double"/>
+            <xsd:attribute name="MinMg" type="xsd:double"/>
+            <xsd:attribute name="MinFe" type="xsd:double"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="CardList">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="unbounded" name="C" type="CardItem"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="CardItem">
+        <xsd:attribute name="IdOfCard" type="xsd:long"/>
+        <xsd:attribute name="CrystalId" type="xsd:long"/>
+        <xsd:attribute name="Type" type="xsd:int"/>
+        <xsd:attribute name="State" type="xsd:int"/>
+        <xsd:attribute name="LifeState" type="xsd:int"/>
+        <xsd:attribute name="ExpiryDate" type="xsd:date"/>
+        <xsd:attribute name="ChangeDate" type="xsd:dateTime"/>
+    </xsd:complexType>
+    <xsd:complexType name="EnterEventList">
+        <xsd:sequence>
+            <xsd:element minOccurs="0" maxOccurs="unbounded" name="E" type="EnterEventItem"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="EnterEventItem">
+        <xsd:attribute name="DateTime" type="xsd:dateTime"/>
+        <xsd:attribute name="Day" type="xsd:int"/>
+        <xsd:attribute name="EnterName" type="xsd:string"/>
+        <xsd:attribute name="Direction" type="xsd:int"/>
+        <xsd:attribute name="TemporaryCard" type="xsd:int"/>
+    </xsd:complexType>
+</xsd:schema>

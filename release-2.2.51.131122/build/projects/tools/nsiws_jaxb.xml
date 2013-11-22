@@ -1,0 +1,7 @@
+<bindings version="2.0" xmlns="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <bindings schemaLocation="http://10.126.216.2:2000/nsiws/services/NSIService?wsdl#types?schema2">
+    <bindings node="//xs:element[@name='Reference']">
+      <class name="SmevReference" />
+    </bindings>
+  </bindings>
+</bindings>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="OrgBalanceReport" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true">
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.2" value="rowGroup"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
+	<property name="ireport.zoom" value="1.331000000000004"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<parameter name="monthName" class="java.lang.String"/>
+	<parameter name="month" class="java.lang.Integer"/>
+	<parameter name="year" class="java.lang.Integer"/>
+	<field name="orgName" class="java.lang.String"/>
+	<field name="firstName" class="java.lang.String"/>
+	<field name="surname" class="java.lang.String"/>
+	<field name="secondName" class="java.lang.String"/>
+	<field name="nameAbbreviation" class="java.lang.String"/>
+	<field name="clientAccount" class="java.lang.Long"/>
+	<field name="orderCategory" class="java.lang.String"/>
+	<field name="sum" class="java.lang.Long"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="40" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="802" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[String.format("Отчет по реализации за месяц: %d, %d", $P{month}, $P{year})]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<summary>
+		<band height="104">
+			<crosstab>
+				<reportElement x="0" y="0" width="802" height="104" forecolor="#FFFFFF"/>
+				<crosstabDataset isDataPreSorted="true"/>
+				<crosstabHeaderCell>
+					<cellContents>
+						<staticText>
+							<reportElement style="table" x="0" y="0" width="183" height="30"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="DejaVu Sans" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+							</textElement>
+							<text><![CDATA[Школа]]></text>
+						</staticText>
+					</cellContents>
+				</crosstabHeaderCell>
+				<rowGroup name="orgName" width="0" totalPosition="End">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[$F{orgName}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents mode="Opaque"/>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents mode="Opaque">
+							<staticText>
+								<reportElement style="table" x="0" y="0" width="183" height="25" forecolor="#000000"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="DejaVu Sans" size="8" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251"/>
+								</textElement>
+								<text><![CDATA[Итого]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="clientAccount" width="183" totalPosition="End">
+					<bucket>
+						<bucketExpression class="java.lang.Long"><![CDATA[$F{clientAccount}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents mode="Opaque"/>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents>
+							<textField isBlankWhenNull="true">
+								<reportElement style="table" x="0" y="0" width="183" height="25"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="DejaVu Sans" size="8" isBold="true" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{orgName}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="orderCategory" height="30">
+					<bucket>
+						<bucketExpression class="java.lang.String"><![CDATA[$F{orderCategory}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents mode="Opaque">
+							<textField isBlankWhenNull="true">
+								<reportElement style="table" x="0" y="0" width="64" height="30"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="DejaVu Sans" size="8" isBold="true" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression class="java.lang.String"><![CDATA[$V{orderCategory}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="sumMeasure" class="java.lang.Long" calculation="Sum">
+					<measureExpression><![CDATA[$F{sum}]]></measureExpression>
+				</measure>
+				<crosstabCell width="64" height="0">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell width="64" height="25" rowTotalGroup="orgName">
+					<cellContents mode="Opaque">
+						<textField pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="table" x="0" y="0" width="64" height="25" forecolor="#000000"/>
+							<textElement textAlignment="Right" verticalAlignment="Middle">
+								<font fontName="DejaVu Sans" size="8" isBold="true" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+							</textElement>
+							<textFieldExpression class="java.lang.Double"><![CDATA[((double)$V{sumMeasure})/100]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="50" columnTotalGroup="orderCategory">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="orgName" columnTotalGroup="orderCategory">
+					<cellContents mode="Opaque">
+						<textField>
+							<reportElement style="Crosstab Data Text" x="0" y="0" width="50" height="25" forecolor="#FFFFFF"/>
+							<textElement/>
+							<textFieldExpression class="java.lang.Long"><![CDATA[$V{sumMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="64" height="25" rowTotalGroup="clientAccount">
+					<cellContents>
+						<textField pattern="#,##0.00" isBlankWhenNull="true">
+							<reportElement style="table" x="0" y="0" width="64" height="25" forecolor="#000000"/>
+							<textElement textAlignment="Right" verticalAlignment="Middle">
+								<font fontName="DejaVu Sans" size="8" isBold="true" isStrikeThrough="false" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+							</textElement>
+							<textFieldExpression class="java.lang.Double"><![CDATA[((double)$V{sumMeasure})/100]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="clientAccount" columnTotalGroup="orderCategory">
+					<cellContents/>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,145 @@
+.output-text {
+    font-size: 8pt;
+}
+
+.menu-date {
+    font-size: 8pt;
+    font-weight: bold; 
+    color: #003399;
+}
+
+.menu-group-name {
+    font-size: 8pt;
+    color: #666666;
+}
+
+.error-output-text {
+    font-family: Tahoma, Arial, Sans-Serif;
+    font-size: 10pt;
+    color: #FF0000;
+}
+
+.command-link {
+    font-size: 8pt;
+}
+
+.disabled-command-link {
+    font-size: 8pt;
+    color: gray;
+}
+.active-command-link {
+    font-size: 8pt;
+    color: green;
+}
+
+.input-text {
+    font-size: 8pt;
+}
+
+.command-button {
+    font-size: 8pt;
+}
+
+.login-panel-body {    
+}
+
+.borderless-form-login {
+    border-style: none;
+  /*  margin: 0 auto;*/
+   /* width: 20%;*/
+    padding: 0 0 0 0;
+    /*text-align: center;*/
+}
+
+.borderless-form {
+    border-style: none;    
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+}
+
+.borderless-div {
+    border-style: none;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+}
+
+.page-header-text {
+    font-weight: bold;
+}
+
+#main td.active-tab {
+    background-color: #ddddec;
+}
+
+#startCalendar td {
+    padding: 0px;
+}
+
+#startCalendar th {
+    width: 0em;
+    padding-right: 10px;
+}
+
+#endCalendar td {
+    padding: 0px;
+}
+
+#endCalendar th {
+    width: 0em;
+    padding-right: 10px;
+}
+
+.low-balance-warn {
+    font-size: 14pt;
+    font-weight: bold;
+    color: #FF0000;
+}
+
+.green {
+    color: green;
+}
+
+.red {
+    color: red;
+}
+
+.table-header {
+    text-align: center;
+    font-family: Segoe UI, Tahoma, Arial, Sans-Serif;
+    font-size: 12pt;
+    font-weight: normal;
+}
+
+.column-header {
+    font-size: 10pt;
+    font-weight: bold;
+    color: #003399;
+}
+
+.tab{
+   text-align: center !important;
+}
+
+.borderless-form-login {
+    width: 100%;
+    text-align: center;
+}
+
+#login-form {
+    width: 350px;
+    border-radius: 4px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.login-form-button-tr {
+    text-align: center !important;
+}
+.login-form-button-tr td {
+    background-color: #ffeeaa !important;
+    text-align:center !important;
+}
+
+.login-form-input-tr {
+    vertical-align: middle !important;
+}

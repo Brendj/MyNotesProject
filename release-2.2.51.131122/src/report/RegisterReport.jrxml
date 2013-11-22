@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SalesReport" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true">
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.2" value="rowGroup"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="302"/>
+	<property name="ireport.y" value="13"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<parameter name="orgName" class="java.lang.String"/>
+	<field name="date" class="java.lang.String"/>
+	<field name="breakfastCount" class="java.util.List"/>
+	<field name="breakfastCost" class="java.util.List"/>
+	<field name="breakfastSum" class="java.util.List"/>
+	<field name="lunchCount" class="java.util.List"/>
+	<field name="lunchCost" class="java.util.List"/>
+	<field name="lunchSum" class="java.util.List"/>
+	<field name="afternoonSnackCount" class="java.util.List"/>
+	<field name="afternoonSnackCost" class="java.util.List"/>
+	<field name="afternoonSnackSum" class="java.util.List"/>
+	<group name="origin">
+		<groupExpression><![CDATA[]]></groupExpression>
+		<groupHeader>
+			<band height="96">
+				<staticText>
+					<reportElement style="table" x="53" y="56" width="69" height="40"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Вид рациона]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table" x="122" y="56" width="680" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Количество человек и сумма]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table" x="122" y="76" width="85" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[1-4 класс]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table" x="0" y="56" width="53" height="40"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[Дата]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table" x="632" y="76" width="85" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[итого]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table" x="292" y="76" width="85" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[сумма]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table" x="377" y="76" width="85" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[5-11 класс]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table" x="547" y="76" width="85" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[сумма]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table" x="462" y="76" width="85" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[стоимость]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table" x="207" y="76" width="85" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[стоимость]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table" x="717" y="76" width="85" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font isBold="true"/>
+					</textElement>
+					<text><![CDATA[всего по дню]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="0" y="37" width="69" height="19"/>
+					<textElement/>
+					<text><![CDATA[]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="144">
+				<staticText>
+					<reportElement x="0" y="0" width="100" height="15"/>
+					<textElement/>
+					<text><![CDATA[]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="66" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="42" width="802" height="24"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["льготное питание столовая-доготовочная ("+$P{orgName} + ")"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="802" height="42"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[РЕЕСТР
+талонов льготного питания.]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<detail>
+		<band height="60">
+			<textField>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="0" y="0" width="53" height="60"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{date}==null?"Итого":$F{date}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="53" y="0" width="69" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[завтрак]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="53" y="20" width="69" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[обед]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="53" y="40" width="69" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[полдник]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="377" y="20" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{lunchCount}.get(1)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="122" y="0" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{breakfastCount}.get(0)]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="207" y="20" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{lunchCost}.get(0).toString())))/100]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="462" y="0" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{breakfastCost}.get(1).toString())))/100]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="547" y="20" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{lunchSum}.get(1).toString())))/100]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="717" y="0" width="85" height="60"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{breakfastSum}.get(0).toString()) + Long.valueOf($F{breakfastSum}.get(1).toString()) +
+Long.valueOf($F{lunchSum}.get(0).toString()) + Long.valueOf($F{lunchSum}.get(1).toString()) +
+Long.valueOf($F{afternoonSnackSum}.get(0).toString()) + Long.valueOf($F{afternoonSnackSum}.get(1).toString())))/100]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="547" y="40" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{afternoonSnackSum}.get(1).toString())))/100]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="122" y="40" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{afternoonSnackCount}.get(0)]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="462" y="40" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{afternoonSnackCost}.get(1).toString())))/100]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="377" y="0" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{breakfastCount}.get(1)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="122" y="20" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{lunchCount}.get(0)]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="292" y="40" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{afternoonSnackSum}.get(0).toString())))/100]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="207" y="40" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{afternoonSnackCost}.get(0).toString())))/100]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="632" y="0" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{breakfastSum}.get(0).toString()) + Long.valueOf($F{breakfastSum}.get(1).toString())))/100]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="207" y="0" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{breakfastCost}.get(0).toString())))/100]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="292" y="20" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{lunchSum}.get(0).toString())))/100]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="632" y="20" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{lunchSum}.get(0).toString()) + Long.valueOf($F{lunchSum}.get(1).toString())))/100]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="292" y="0" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{breakfastSum}.get(0).toString())))/100]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="632" y="40" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{afternoonSnackSum}.get(0).toString()) + Long.valueOf($F{afternoonSnackSum}.get(1).toString())))/100]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="547" y="0" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{breakfastSum}.get(1).toString())))/100]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="377" y="40" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{afternoonSnackCount}.get(1)]]></textFieldExpression>
+			</textField>
+			<textField pattern="###0.00;-###0.00">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="462" y="20" width="85" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Double"><![CDATA[((double)(Long.valueOf($F{lunchCost}.get(1).toString())))/100]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="20"/>
+	</summary>
+</jasperReport>

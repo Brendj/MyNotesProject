@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="1.0">
+    <persistence-unit name="processorPU" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <jta-data-source>java:jboss/PostgresDS</jta-data-source>
+        <properties>
+            <property name="hibernate.dialect"
+                      value="org.hibernate.dialect.PostgreSQLDialect"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="jboss.entity.manager.jndi.name" value="java:/org-room_processorPU"/>
+            <property name="jboss.entity.manager.factory.jndi.name" value="java:/org-room_processorPUFactory"/>
+        </properties>
+    </persistence-unit>
+    <persistence-unit name="reportsPU" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <jta-data-source>java:jboss/PostgresDS</jta-data-source>
+        <properties>
+            <property name="hibernate.dialect"
+                      value="org.hibernate.dialect.PostgreSQLDialect"/>
+            <property name="hibernate.show_sql" value="false"/>
+            <property name="jboss.entity.manager.jndi.name" value="java:/org-room_reportsPU"/>
+            <property name="jboss.entity.manager.factory.jndi.name" value="java:/org-room_reportsPUFactory"/>
+        </properties>
+    </persistence-unit>
+</persistence>

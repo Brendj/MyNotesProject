@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2007 (http://www.altova.com) by KloAV (EMBRACE) -->
+<xsd:schema xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pb="http://roskazna.ru/xsd/PostBlock" targetNamespace="http://roskazna.ru/xsd/RequestTemplate">
+	<xsd:import namespace="http://roskazna.ru/xsd/PostBlock" schemaLocation="../entity/directory/PostBlock.xsd"/>
+	<xsd:complexType name="RequestTemplate">
+		<xsd:annotation>
+			<xsd:documentation>Шаблон запроса к ИС РНиП</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PostBlock" type="pb:PostBlock">
+				<xsd:annotation>
+					<xsd:documentation>Блок почтовой информации</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="StartDate" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Начальная дата временного интервала запроса</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="EndDate" type="xsd:dateTime" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Конечная дата временного интервала запроса</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="kind">
+			<xsd:annotation>
+				<xsd:documentation>Тип запрашиваемых объектов:
+PAYMENT - платежи,
+PAYMENTMAINCHARGE - платежи по связанным начислениям, 
+INCOME - зачисления, 
+CHARGE - начисления, 
+CHARGESTATUS - начисления и статусы квитирования,
+QUITTANCE - результат квитирования,
+ALLQUITTANCE - все результаты квитирования, включая аннулированные, CATALOG - Каталог услуг ОПУ</xsd:documentation>
+			</xsd:annotation>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="PAYMENT"/>
+					<xsd:enumeration value="PAYMENTMAINCHARGE"/>
+					<xsd:enumeration value="CHARGE"/>
+					<xsd:enumeration value="INCOME"/>
+					<xsd:enumeration value="ALLQUITTANCE"/>
+					<xsd:enumeration value="QUITTANCE"/>
+					<xsd:enumeration value="CHARGESTATUS"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2007 (http://www.altova.com) by KloAV (EMBRACE) -->
+<xsd:schema xmlns:rqt="http://roskazna.ru/xsd/RequestTemplate" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:pb="http://roskazna.ru/xsd/PostBlock" xmlns:pgudrq="http://roskazna.ru/xsd/PGU_DataRequest" xmlns:pi="http://roskazna.ru/xsd/PayerIdentifiers" xmlns:com="http://roskazna.ru/xsd/Common" xmlns:ns1="http://www.bssys.com/xsd/Catalog" targetNamespace="http://roskazna.ru/xsd/PGU_DataRequest">
+	<xsd:import namespace="http://roskazna.ru/xsd/RequestTemplate" schemaLocation="RequestTemplate.xsd"/>
+	<xsd:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
+	<xsd:import namespace="http://www.bssys.com/xsd/Catalog" schemaLocation="../entity/document/Catalog.xsd"/>
+	<xsd:import namespace="http://roskazna.ru/xsd/Common" schemaLocation="../entity/directory/Common.xsd"/>
+	<xsd:complexType name="DataRequest">
+		<xsd:complexContent>
+			<xsd:extension base="rqt:RequestTemplate">
+				<xsd:sequence>
+					<xsd:choice minOccurs="0">
+						<xsd:element name="SupplierBillIDs">
+							<xsd:annotation>
+								<xsd:documentation>Список УИН, по которым запрашиваются начисления</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="SupplierBillID" type="xsd:string" maxOccurs="unbounded"/>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="Payers">
+							<xsd:annotation>
+								<xsd:documentation>Список идентификаторов плательщика, по которым запрашиваются начисления</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:choice maxOccurs="unbounded">
+									<xsd:element name="PayerIdentifier" type="xsd:string">
+										<xsd:annotation>
+											<xsd:documentation>УИП по которому запрашиваются начисления</xsd:documentation>
+										</xsd:annotation>
+									</xsd:element>
+									<xsd:element ref="com:PayerIdentification"/>
+								</xsd:choice>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="ApplicationIDs">
+							<xsd:annotation>
+								<xsd:documentation>Список заявок, по которым запрашиваются начисления</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:sequence>
+									<xsd:element name="ApplicationID" type="xsd:string" maxOccurs="unbounded"/>
+								</xsd:sequence>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:choice>
+					<xsd:element ref="ds:Signature" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="DataRequest" type="pgudrq:DataRequest"/>
+</xsd:schema>

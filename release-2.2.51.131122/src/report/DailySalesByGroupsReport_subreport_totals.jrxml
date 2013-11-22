@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DailySalesByGroupsReport_subreport_totals" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="d8eb3592-fcdb-4dc9-8ddf-235c4e643d9e">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<field name="totalOriginName" class="java.lang.String"/>
+	<field name="totalSum" class="java.lang.Long"/>
+	<field name="totalCount" class="java.lang.Long"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="50">
+			<textField>
+				<reportElement uuid="0bebb727-4a33-40d9-bcde-e6bcc4d33ad4" style="table" x="0" y="4" width="680" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Сводная справка о реализации блюд"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="8f99f1ef-28d3-409a-996a-7672844f0686" style="table" stretchType="RelativeToTallestObject" x="501" y="24" width="79" height="26"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Количество]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f1ea8869-f7b1-4a92-9548-4729e341e910" style="table" stretchType="RelativeToTallestObject" x="0" y="24" width="501" height="26"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Наименование категории блюд]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f7e2d50c-7605-4c86-afc8-9d195d0a5ca6" style="table" stretchType="RelativeToTallestObject" x="580" y="24" width="100" height="26"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Сумма]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="ebc97cdd-1fbd-40cd-abab-8eb5ab29dbb7" style="table" stretchType="RelativeToBandHeight" x="501" y="0" width="79" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{totalCount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="0.00">
+				<reportElement uuid="9ae051a9-b909-4bd0-b701-408773e8d601" style="table" stretchType="RelativeToBandHeight" x="580" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{totalSum}).movePointLeft(2)]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement uuid="46b1f1ad-cbd5-4230-a737-b6658ae76f7b" style="table" stretchType="RelativeToBandHeight" x="0" y="0" width="501" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{totalOriginName}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="32">
+			<staticText>
+				<reportElement uuid="a36214ea-8df3-4d4f-97d4-7223f226393b" x="0" y="0" width="501" height="20"/>
+				<textElement/>
+				<text><![CDATA[    ]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

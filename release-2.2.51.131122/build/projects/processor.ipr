@@ -1,0 +1,1711 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AntConfiguration">
+    <buildFile url="file://$PROJECT_DIR$/processor.xml" />
+  </component>
+  <component name="ArtifactManager">
+    <artifact build-on-make="true" name="payconv:jar">
+      <output-path>$PROJECT_DIR$/../../target/out</output-path>
+      <root id="root">
+        <element id="archive" name="ecafe-payconv.jar">
+          <element id="module-output" name="payconv" />
+        </element>
+      </root>
+    </artifact>
+    <artifact build-on-make="true" name="pubkey:jar">
+      <output-path>$PROJECT_DIR$/../../target/out</output-path>
+      <root id="root">
+        <element id="archive" name="ecafe-pubkey.jar">
+          <element id="module-output" name="pubkey" />
+          <element id="module-output" name="util" />
+        </element>
+      </root>
+    </artifact>
+    <artifact build-on-make="true" name="synctest:jar">
+      <output-path>$PROJECT_DIR$/../../target/out</output-path>
+      <root id="root">
+        <element id="archive" name="ecafe-synctest.jar">
+          <element id="module-output" name="util" />
+          <element id="module-output" name="synctest" />
+        </element>
+      </root>
+    </artifact>
+    <artifact type="exploded-ear" name="j2ee:j2ee exploded">
+      <output-path>$PROJECT_DIR$/../../target/out/ecafe-processor.ear</output-path>
+      <root id="root">
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/jbossjta-properties.xml" />
+          <element id="file-copy" path="$PROJECT_DIR$/../../src/j2ee/j2ee/META-INF/application.xml" />
+          <element id="file-copy" path="$PROJECT_DIR$/../../src/j2ee/j2ee/META-INF/MANIFEST.MF" />
+          <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/classes/META-INF/persistence.xml" />
+          <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/jboss-web.xml" />
+          <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/jboss-deployment-structure.xml" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="archive" name="ecafe-processor-core.jar">
+            <element id="module-output" name="core" />
+          </element>
+          <element id="archive" name="ecafe-processor-j2ee.jar">
+            <element id="module-output" name="j2ee" />
+          </element>
+          <element id="archive" name="ecafe-util.jar">
+            <element id="module-output" name="util" />
+          </element>
+          <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.transaction-3.0.5.RELEASE.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.asm-3.0.5.RELEASE.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.beans-3.0.5.RELEASE.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.context-3.0.5.RELEASE.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.context.support-3.0.5.RELEASE.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.core-3.0.5.RELEASE.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.expression-3.0.5.RELEASE.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.orm-3.0.5.RELEASE.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/../lib/org.springframework.oxm-3.0.5.RELEASE.jar" />
+        </element>
+        <element id="directory" name="ecafe-processor-web.war">
+          <element id="artifact" artifact-name="web:web exploded" />
+        </element>
+        <element id="javaee-facet-resources" facet="j2ee/javaeeApplication/j2ee" />
+      </root>
+    </artifact>
+    <artifact type="exploded-war" build-on-make="true" name="web:web exploded">
+      <output-path>$PROJECT_DIR$/../../target/exploded/ecafe-processor.war</output-path>
+      <root id="root">
+        <element id="directory" name="WEB-INF">
+          <element id="directory" name="classes">
+            <element id="module-output" name="web" />
+            <element id="module-output" name="core" />
+            <element id="module-output" name="util" />
+          </element>
+          <element id="directory" name="lib">
+            <element id="library" level="project" name="javamelody-monitoring" />
+            <element id="library" level="project" name="axetta_smpp" />
+            <element id="library" level="project" name="richfaces-api-3.3.1.GA" />
+          </element>
+          <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/faces-config.xml" />
+          <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/context.xml" />
+          <element id="file-copy" path="$PROJECT_DIR$/../../src/web/web/WEB-INF/web.xml" />
+        </element>
+        <element id="dir-copy" path="$PROJECT_DIR$/../../src/web/web" />
+        <element id="javaee-facet-resources" facet="web/web/web" />
+        <element id="artifact" artifact-name="registry-import:war exploded" />
+      </root>
+    </artifact>
+    <artifact type="ear" name="j2ee:j2ee ecafe-processor.ear">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/ecafe_processor_ear</output-path>
+      <root id="archive" name="ecafe_processor_ear.ear">
+        <element id="artifact" artifact-name="j2ee:j2ee exploded" />
+      </root>
+    </artifact>
+    <artifact type="war" build-on-make="true" name="web:web">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/ecafe_proccesor.war</output-path>
+      <root id="archive" name="ecafe_processor.war">
+        <element id="artifact" artifact-name="web:web exploded" />
+      </root>
+    </artifact>
+    <artifact type="exploded-ejb" name="dashboard:ejb exploded">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/dashboard_ejb_exploded</output-path>
+      <root id="root">
+        <element id="javaee-facet-resources" facet="dashboard/ejb/EJB" />
+        <element id="module-output" name="dashboard" />
+      </root>
+    </artifact>
+    <artifact type="exploded-war" name="client-room:war exploded">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/client_room_war_exploded</output-path>
+      <root id="root">
+        <element id="directory" name="WEB-INF">
+          <element id="directory" name="classes">
+            <element id="module-output" name="client-room" />
+            <element id="jpa-descriptors" facet="client-room/jpa/JPA" />
+          </element>
+          <element id="directory" name="lib">
+            <element id="library" level="project" name="client-room" />
+            <element id="library" level="project" name="richfaces-api-3.3.1.GA" />
+          </element>
+        </element>
+        <element id="javaee-facet-resources" facet="client-room/web/Web" />
+      </root>
+    </artifact>
+    <artifact type="war" name="client-room:war">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/client_room_war</output-path>
+      <root id="archive" name="client-room_war.war">
+        <element id="artifact" artifact-name="client-room:war exploded" />
+      </root>
+    </artifact>
+    <artifact type="jar" name="axetta_smpp">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/axetta_smpp</output-path>
+      <root id="archive" name="axetta_smpp.jar">
+        <element id="module-output" name="smpp" />
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/smpp/java/META-INF/MANIFEST.MF" />
+        </element>
+      </root>
+    </artifact>
+    <artifact name="datatest:jar">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/datatest_jar</output-path>
+      <root id="root">
+        <element id="archive" name="datatest.jar">
+          <element id="directory" name="META-INF">
+            <element id="file-copy" path="$PROJECT_DIR$/../../src/testmodule/datatest/java/META-INF/MANIFEST.MF" />
+          </element>
+          <element id="module-output" name="datatest" />
+          <element id="module-output" name="core" />
+          <element id="module-output" name="util" />
+        </element>
+        <element id="library" level="project" name="axetta_smpp" />
+        <element id="file-copy" path="$PROJECT_DIR$/../lib/xmlsec.jar" />
+        <element id="file-copy" path="$PROJECT_DIR$/../lib/xmldsig.jar" />
+        <element id="library" level="project" name="axetta_charset" />
+        <element id="library" level="project" name="junit" />
+        <element id="library" level="project" name="hibernate-4.0.1" />
+        <element id="file-copy" path="$PROJECT_DIR$/../lib/visualization-datasource-1.1.1.jar" />
+        <element id="library" level="project" name="spring305" />
+        <element id="file-copy" path="$PROJECT_DIR$/../lib/icu4j-4_0_1.jar" />
+        <element id="library" level="project" name="jasperlib" />
+        <element id="library" level="project" name="commons" />
+        <element id="library" level="project" name="org.aopalliance:com.springsource.org.aopalliance:1.0.0" />
+        <element id="library" level="project" name="postgresql-9.1-901.jdbc4" />
+      </root>
+    </artifact>
+    <artifact type="exploded-war" name="org-room:war exploded">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/org_room_war_exploded</output-path>
+      <root id="root">
+        <element id="directory" name="WEB-INF">
+          <element id="directory" name="classes">
+            <element id="module-output" name="core" />
+            <element id="module-output" name="util" />
+            <element id="module-output" name="org-room" />
+          </element>
+          <element id="directory" name="lib">
+            <element id="library" level="project" name="richfaces-api-3.3.1.GA" />
+            <element id="library" level="project" name="junit" />
+            <element id="library" level="project" name="axetta_charset" />
+            <element id="library" level="project" name="axetta_smpp" />
+          </element>
+        </element>
+        <element id="javaee-facet-resources" facet="org-room/web/Web" />
+        <element id="artifact" artifact-name="registry-import:war exploded" />
+      </root>
+    </artifact>
+    <artifact type="war" name="org-room:war">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/org_room_war</output-path>
+      <root id="archive" name="org-room_war.war">
+        <element id="artifact" artifact-name="org-room:war exploded" />
+      </root>
+    </artifact>
+    <artifact type="exploded-war" name="registry-import:war exploded">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/registry_import_war_exploded</output-path>
+      <root id="root">
+        <element id="javaee-facet-resources" facet="registry-import/web/Web" />
+        <element id="directory" name="WEB-INF">
+          <element id="directory" name="classes">
+            <element id="module-output" name="registry-import" />
+          </element>
+          <element id="directory" name="lib" />
+        </element>
+      </root>
+    </artifact>
+  </component>
+  <component name="ClearCaseSharedConfig">
+    <option name="myUseUcmModel" value="true" />
+  </component>
+  <component name="CodeStyleSettingsManager">
+    <option name="PER_PROJECT_SETTINGS">
+      <value>
+        <option name="IMPORT_LAYOUT_TABLE">
+          <value>
+            <package name="" withSubpackages="true" static="false" />
+            <emptyLine />
+            <package name="ru.axetta" withSubpackages="true" static="false" />
+            <emptyLine />
+            <package name="org" withSubpackages="true" static="false" />
+            <emptyLine />
+            <package name="javax" withSubpackages="true" static="false" />
+            <package name="java" withSubpackages="true" static="false" />
+            <emptyLine />
+            <package name="" withSubpackages="true" static="true" />
+          </value>
+        </option>
+        <option name="HTML_KEEP_LINE_BREAKS" value="false" />
+        <option name="HTML_SPACE_INSIDE_EMPTY_TAG" value="true" />
+        <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
+        <option name="BLOCK_COMMENT_AT_FIRST_COLUMN" value="false" />
+        <option name="KEEP_LINE_BREAKS" value="false" />
+        <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+        <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
+        <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
+        <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+        <option name="ALIGN_MULTILINE_FOR" value="false" />
+        <option name="ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION" value="true" />
+        <option name="CALL_PARAMETERS_WRAP" value="1" />
+        <option name="METHOD_PARAMETERS_WRAP" value="1" />
+        <option name="EXTENDS_LIST_WRAP" value="5" />
+        <option name="THROWS_LIST_WRAP" value="1" />
+        <option name="EXTENDS_KEYWORD_WRAP" value="1" />
+        <option name="THROWS_KEYWORD_WRAP" value="1" />
+        <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
+        <option name="BINARY_OPERATION_WRAP" value="1" />
+        <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
+        <option name="TERNARY_OPERATION_WRAP" value="1" />
+        <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
+        <option name="ARRAY_INITIALIZER_WRAP" value="1" />
+        <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
+        <option name="ASSERT_STATEMENT_COLON_ON_NEXT_LINE" value="true" />
+        <option name="IF_BRACE_FORCE" value="3" />
+        <option name="DOWHILE_BRACE_FORCE" value="3" />
+        <option name="WHILE_BRACE_FORCE" value="3" />
+        <option name="FOR_BRACE_FORCE" value="3" />
+        <option name="ENUM_CONSTANTS_WRAP" value="2" />
+        <ADDITIONAL_INDENT_OPTIONS fileType="css">
+          <option name="INDENT_SIZE" value="4" />
+          <option name="CONTINUATION_INDENT_SIZE" value="8" />
+          <option name="TAB_SIZE" value="4" />
+          <option name="USE_TAB_CHARACTER" value="false" />
+          <option name="SMART_TABS" value="false" />
+          <option name="LABEL_INDENT_SIZE" value="0" />
+          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="groovy">
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="8" />
+          <option name="TAB_SIZE" value="4" />
+          <option name="USE_TAB_CHARACTER" value="false" />
+          <option name="SMART_TABS" value="false" />
+          <option name="LABEL_INDENT_SIZE" value="0" />
+          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="gsp">
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="8" />
+          <option name="TAB_SIZE" value="4" />
+          <option name="USE_TAB_CHARACTER" value="false" />
+          <option name="SMART_TABS" value="false" />
+          <option name="LABEL_INDENT_SIZE" value="0" />
+          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="haml">
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="8" />
+          <option name="TAB_SIZE" value="4" />
+          <option name="USE_TAB_CHARACTER" value="false" />
+          <option name="SMART_TABS" value="false" />
+          <option name="LABEL_INDENT_SIZE" value="0" />
+          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="java">
+          <option name="INDENT_SIZE" value="4" />
+          <option name="CONTINUATION_INDENT_SIZE" value="8" />
+          <option name="TAB_SIZE" value="4" />
+          <option name="USE_TAB_CHARACTER" value="false" />
+          <option name="SMART_TABS" value="false" />
+          <option name="LABEL_INDENT_SIZE" value="0" />
+          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="js">
+          <option name="INDENT_SIZE" value="4" />
+          <option name="CONTINUATION_INDENT_SIZE" value="8" />
+          <option name="TAB_SIZE" value="4" />
+          <option name="USE_TAB_CHARACTER" value="false" />
+          <option name="SMART_TABS" value="false" />
+          <option name="LABEL_INDENT_SIZE" value="0" />
+          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="jsp">
+          <option name="INDENT_SIZE" value="4" />
+          <option name="CONTINUATION_INDENT_SIZE" value="8" />
+          <option name="TAB_SIZE" value="4" />
+          <option name="USE_TAB_CHARACTER" value="false" />
+          <option name="SMART_TABS" value="false" />
+          <option name="LABEL_INDENT_SIZE" value="0" />
+          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="php">
+          <option name="INDENT_SIZE" value="4" />
+          <option name="CONTINUATION_INDENT_SIZE" value="8" />
+          <option name="TAB_SIZE" value="4" />
+          <option name="USE_TAB_CHARACTER" value="false" />
+          <option name="SMART_TABS" value="false" />
+          <option name="LABEL_INDENT_SIZE" value="0" />
+          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="sass">
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="8" />
+          <option name="TAB_SIZE" value="4" />
+          <option name="USE_TAB_CHARACTER" value="false" />
+          <option name="SMART_TABS" value="false" />
+          <option name="LABEL_INDENT_SIZE" value="0" />
+          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="sql">
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="8" />
+          <option name="TAB_SIZE" value="4" />
+          <option name="USE_TAB_CHARACTER" value="false" />
+          <option name="SMART_TABS" value="false" />
+          <option name="LABEL_INDENT_SIZE" value="0" />
+          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="xml">
+          <option name="INDENT_SIZE" value="4" />
+          <option name="CONTINUATION_INDENT_SIZE" value="8" />
+          <option name="TAB_SIZE" value="4" />
+          <option name="USE_TAB_CHARACTER" value="false" />
+          <option name="SMART_TABS" value="false" />
+          <option name="LABEL_INDENT_SIZE" value="0" />
+          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <ADDITIONAL_INDENT_OPTIONS fileType="yml">
+          <option name="INDENT_SIZE" value="2" />
+          <option name="CONTINUATION_INDENT_SIZE" value="8" />
+          <option name="TAB_SIZE" value="4" />
+          <option name="USE_TAB_CHARACTER" value="false" />
+          <option name="SMART_TABS" value="false" />
+          <option name="LABEL_INDENT_SIZE" value="0" />
+          <option name="LABEL_INDENT_ABSOLUTE" value="false" />
+          <option name="USE_RELATIVE_INDENTS" value="false" />
+        </ADDITIONAL_INDENT_OPTIONS>
+        <codeStyleSettings language="ECMA Script Level 4">
+          <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
+          <option name="BLOCK_COMMENT_AT_FIRST_COLUMN" value="false" />
+          <option name="KEEP_LINE_BREAKS" value="false" />
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+          <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
+          <option name="BLANK_LINES_AFTER_PACKAGE" value="1" />
+          <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
+          <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+          <option name="ALIGN_MULTILINE_FOR" value="false" />
+          <option name="ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION" value="true" />
+          <option name="CALL_PARAMETERS_WRAP" value="1" />
+          <option name="METHOD_PARAMETERS_WRAP" value="1" />
+          <option name="EXTENDS_LIST_WRAP" value="5" />
+          <option name="THROWS_LIST_WRAP" value="1" />
+          <option name="EXTENDS_KEYWORD_WRAP" value="1" />
+          <option name="THROWS_KEYWORD_WRAP" value="1" />
+          <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
+          <option name="BINARY_OPERATION_WRAP" value="1" />
+          <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
+          <option name="TERNARY_OPERATION_WRAP" value="1" />
+          <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
+          <option name="ARRAY_INITIALIZER_WRAP" value="1" />
+          <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
+          <option name="ASSERT_STATEMENT_COLON_ON_NEXT_LINE" value="true" />
+          <option name="IF_BRACE_FORCE" value="3" />
+          <option name="DOWHILE_BRACE_FORCE" value="3" />
+          <option name="WHILE_BRACE_FORCE" value="3" />
+          <option name="FOR_BRACE_FORCE" value="3" />
+          <option name="ENUM_CONSTANTS_WRAP" value="2" />
+        </codeStyleSettings>
+        <codeStyleSettings language="JavaScript">
+          <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
+          <option name="BLOCK_COMMENT_AT_FIRST_COLUMN" value="false" />
+          <option name="KEEP_LINE_BREAKS" value="false" />
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+          <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
+          <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
+          <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+          <option name="ALIGN_MULTILINE_FOR" value="false" />
+          <option name="ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION" value="true" />
+          <option name="CALL_PARAMETERS_WRAP" value="1" />
+          <option name="METHOD_PARAMETERS_WRAP" value="1" />
+          <option name="EXTENDS_LIST_WRAP" value="5" />
+          <option name="THROWS_LIST_WRAP" value="1" />
+          <option name="EXTENDS_KEYWORD_WRAP" value="1" />
+          <option name="THROWS_KEYWORD_WRAP" value="1" />
+          <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
+          <option name="BINARY_OPERATION_WRAP" value="1" />
+          <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
+          <option name="TERNARY_OPERATION_WRAP" value="1" />
+          <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
+          <option name="ARRAY_INITIALIZER_WRAP" value="1" />
+          <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
+          <option name="ASSERT_STATEMENT_COLON_ON_NEXT_LINE" value="true" />
+          <option name="IF_BRACE_FORCE" value="3" />
+          <option name="DOWHILE_BRACE_FORCE" value="3" />
+          <option name="WHILE_BRACE_FORCE" value="3" />
+          <option name="FOR_BRACE_FORCE" value="3" />
+          <option name="ENUM_CONSTANTS_WRAP" value="2" />
+        </codeStyleSettings>
+        <codeStyleSettings language="PHP">
+          <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
+          <option name="BLOCK_COMMENT_AT_FIRST_COLUMN" value="false" />
+          <option name="KEEP_LINE_BREAKS" value="false" />
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+          <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
+          <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
+          <option name="CALL_PARAMETERS_WRAP" value="1" />
+          <option name="METHOD_PARAMETERS_WRAP" value="1" />
+          <option name="EXTENDS_LIST_WRAP" value="5" />
+          <option name="THROWS_LIST_WRAP" value="1" />
+          <option name="EXTENDS_KEYWORD_WRAP" value="1" />
+          <option name="THROWS_KEYWORD_WRAP" value="1" />
+          <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
+          <option name="BINARY_OPERATION_WRAP" value="1" />
+          <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
+          <option name="TERNARY_OPERATION_WRAP" value="1" />
+          <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
+          <option name="ARRAY_INITIALIZER_WRAP" value="1" />
+          <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
+          <option name="ASSERT_STATEMENT_COLON_ON_NEXT_LINE" value="true" />
+          <option name="IF_BRACE_FORCE" value="3" />
+          <option name="DOWHILE_BRACE_FORCE" value="3" />
+          <option name="WHILE_BRACE_FORCE" value="3" />
+          <option name="FOR_BRACE_FORCE" value="3" />
+          <option name="ENUM_CONSTANTS_WRAP" value="2" />
+        </codeStyleSettings>
+      </value>
+    </option>
+    <option name="USE_PER_PROJECT_SETTINGS" value="true" />
+  </component>
+  <component name="CompilerConfiguration">
+    <option name="DEFAULT_COMPILER" value="Javac" />
+    <excludeFromCompile>
+      <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/batch_expire_edit.jsp" />
+      <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/registerstamp_report.jsp" />
+    </excludeFromCompile>
+    <resourceExtensions>
+      <entry name=".+\.(properties|xml|html|dtd|tld)" />
+      <entry name=".+\.(gif|png|jpeg|jpg)" />
+    </resourceExtensions>
+    <wildcardResourcePatterns>
+      <entry name="?*.properties" />
+      <entry name="?*.xml" />
+      <entry name="?*.gif" />
+      <entry name="?*.png" />
+      <entry name="?*.jpeg" />
+      <entry name="?*.jpg" />
+      <entry name="?*.html" />
+      <entry name="?*.dtd" />
+      <entry name="?*.tld" />
+      <entry name="?*.ftl" />
+      <entry name="*.sql" />
+      <entry name="*.CharsetProvider" />
+    </wildcardResourcePatterns>
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="false">
+        <processorPath useClasspath="true" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="CopyrightManager" default="ecafe">
+    <copyright>
+      <option name="notice" value="Copyright (c) &amp;#36;today.year. Axetta LLC. All Rights Reserved." />
+      <option name="keyword" value="Copyright" />
+      <option name="allowReplaceKeyword" value="" />
+      <option name="myName" value="ecafe" />
+      <option name="myLocal" value="true" />
+    </copyright>
+    <module2copyright />
+  </component>
+  <component name="DataSourceManagerImpl" format="xml" hash="3165194431">
+    <data-source source="LOCAL" name="Moscow Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
+      <identifier-quote-string>&quot;</identifier-quote-string>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://172.18.16.14:5432/amoscow</jdbc-url>
+      <user-name>postgres</user-name>
+      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+      <schema-pattern>amoscow.public</schema-pattern>
+      <default-schemas>amoscow.public</default-schemas>
+      <libraries>
+        <library>
+          <url>jar://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar!/</url>
+        </library>
+      </libraries>
+    </data-source>
+    <data-source source="LOCAL" name="Kazan Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="f29aa7e6-4670-495a-8741-1713d2cee403">
+      <identifier-quote-string>&quot;</identifier-quote-string>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://192.168.15.158:5432/akazan</jdbc-url>
+      <user-name>postgres</user-name>
+      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+      <schema-pattern>akazan.public</schema-pattern>
+      <default-schemas>akazan.public</default-schemas>
+      <libraries>
+        <library>
+          <url>jar://D:/home/java/testing/report/lib/postgresql-9.1-901.jdbc4.jar!/</url>
+        </library>
+      </libraries>
+    </data-source>
+    <data-source source="LOCAL" name="Local MoscowDB" product="PostgreSQL" version="9.1.1" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="cedfba61-0f44-4ced-9708-18045311d229">
+      <identifier-quote-string>&quot;</identifier-quote-string>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/moscow</jdbc-url>
+      <user-name>postgres</user-name>
+      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+      <schema-pattern>moscow.public</schema-pattern>
+      <default-schemas>moscow.public</default-schemas>
+      <libraries>
+        <library>
+          <url>jar://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar!/</url>
+        </library>
+      </libraries>
+    </data-source>
+  </component>
+  <component name="DependencyValidationManager">
+    <option name="SKIP_IMPORT_STATEMENTS" value="false" />
+  </component>
+  <component name="EclipseCompilerSettings">
+    <option name="GENERATE_NO_WARNINGS" value="true" />
+    <option name="DEPRECATION" value="false" />
+  </component>
+  <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
+  <component name="EntryPointsManager">
+    <entry_points version="2.0" />
+  </component>
+  <component name="ExcludeFromValidation">
+    <file url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodComplaintPossibleCauses.java" />
+    <file url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodComplaintIterationStatus.java" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/menu/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/menu/details.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/menu/exchange.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/menu/load_menu.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/settings/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/settings/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/settings/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/settings/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/good_request/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/good_request/positions.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/question_edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/question_view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/questions_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/questions_load.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/questionaries/question_confirm.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/select_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/order_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/balance_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/distribution_rules.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/load_file.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/operation_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/batch_expire_edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/refund.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/sms_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/load_file.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/select_group.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/contract_build.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/operation_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/balance_transfer.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/batch_limit_edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/client_migration.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/load_update_file.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/confirm_client_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/user/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/user/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/user/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/user/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/option.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/categoryorg/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/categoryorg/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/categoryorg/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/categoryorg/select_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/licinfo.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/MainPage.java" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/discountrule/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/discountrule/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/discountrule/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/discountrule/select_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/categorydiscount/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/categorydiscount/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/categorydiscount/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/categorydiscount/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/categorydiscount/select_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/configuration.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/crypto_info_page.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/message_configure.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/confirm_delete_bank.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/reportTemplateManager.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/job/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/job/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/job/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/job/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/job/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/rule/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/rule/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/rule/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/rule/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/rule/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/paystats.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/commonstats.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/sales_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/client_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/complex_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/total_srvc_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/all_complex_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/enter_event_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/pay_complex_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/free_complex_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/good_requests_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/org_discounts_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/registerstamp_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/orgs_discounts_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/client_payments_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/clients_benefits_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/current_positions_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/delivered_services_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/contragent_completion_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/aggregate_good_request_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/repository/report_repository_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/journal/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/msk/stop_list_update.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/msk/send_block_request.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/online/manual_report_runner.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/msk/org_catalog_find_page.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/jbossws-cxf_1.xml" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/jbossws-cxf.xml" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/msk/pupil_catalog_find_page.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/test.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/test_log.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/sign_keys.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/support_sms.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/remove_order.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/other_actions.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/service/support_email.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contract/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/pos/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/pos/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/pos/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/pos/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/contract/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/contract/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/ccaccount/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/ccaccount/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/ccaccount/load_file.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/ccaccount/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/addpayment/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/addpayment/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/addpayment/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/addpayment/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/settlement/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/settlement/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/settlement/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/settlement/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/select_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/reconciliation.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/client_payment_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/monitoring/dashboard.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/monitoring/sync_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/monitoring/sync_monitor.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/monitoring/status_sync_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/monitoring/aggregate_costs_and_sales_report.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/default.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/abstractpage/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/workspace.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/user_setting.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/event_notification/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/event_notification/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/event_notification/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/event_notification/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/event_notification/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/acts/tradematrialgoods.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/acts/inventarization_acts.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/acts/waybilldifferenceposition_acts.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/waybill/waybill.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/waybill/waybillposition.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/group/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/group/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/group/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/group/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/group/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/group/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/load_file.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/good/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/group/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/group/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/group/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/group/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/group/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/group/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/load_file.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/product/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/basicGood/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/basicGood/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/basicGood/basicgood.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/basicGood/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/group/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/group/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/group/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/group/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/group/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/group/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/product/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/edit.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/view.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/create.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/select.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/technologicalMap/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/commodity_accounting/configuration_provider/confirm_delete.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/index.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/login.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/pos_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/card_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/menu_data_xml.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/sale_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/client_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/ccaccount_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/addpayment_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/client_org_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/settlement_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/all_complex_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/enter_event_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/pay_complex_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/free_complex_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/currentposition_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/card_load_result_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/menu_load_result_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/client_load_result_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/client_update_load_result_csv_list.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/client-room/mos/uec.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/org/settings.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/option/discountrule/complex_roles.jsp" />
+    <file url="file://$PROJECT_DIR$/../../src/web/web/back-office/include/monitoring/sync_errors_window.jsp" />
+  </component>
+  <component name="FacetAutodetectingManager">
+    <autodetection-disabled>
+      <facet-type id="Spring">
+        <modules>
+          <module name="j2ee">
+            <files>
+              <file url="file://$PROJECT_DIR$/../../src/j2ee/j2ee/META-INF/ctx-app.xml" />
+              <file url="file://$PROJECT_DIR$/../../src/j2ee/j2ee/META-INF/services.xml" />
+            </files>
+          </module>
+        </modules>
+      </facet-type>
+    </autodetection-disabled>
+  </component>
+  <component name="IdProvider" IDEtalkID="18F2146BFFA68BDCCC8665BD3D587E9B" />
+  <component name="InspectionProjectProfileManager">
+    <profiles>
+      <profile version="1.0" is_locked="false">
+        <option name="myName" value="Project Default" />
+        <option name="myLocal" value="false" />
+        <inspection_tool class="HibernateMappingDomInspection" enabled="false" level="ERROR" enabled_by_default="false" />
+        <inspection_tool class="JpaAttributeMemberSignatureInspection" enabled="false" level="ERROR" enabled_by_default="false" />
+        <inspection_tool class="JpaAttributeTypeInspection" enabled="false" level="ERROR" enabled_by_default="false" />
+      </profile>
+    </profiles>
+    <option name="PROJECT_PROFILE" value="Project Default" />
+    <option name="USE_PROJECT_PROFILE" value="true" />
+    <version value="1.0" />
+    <list size="6">
+      <item index="0" class="java.lang.String" itemvalue="SERVER PROBLEM" />
+      <item index="1" class="java.lang.String" itemvalue="WEAK WARNING" />
+      <item index="2" class="java.lang.String" itemvalue="INFO" />
+      <item index="3" class="java.lang.String" itemvalue="TYPO" />
+      <item index="4" class="java.lang.String" itemvalue="WARNING" />
+      <item index="5" class="java.lang.String" itemvalue="ERROR" />
+    </list>
+  </component>
+  <component name="IssueNavigationConfiguration">
+    <option name="links">
+      <list>
+        <IssueNavigationLink>
+          <option name="issueRegexp" value="[A-Z]+\-\d+" />
+          <option name="linkRegexp" value="https://bugtracker.axetta.ru:9901/browse/ECAFE/issue/$0" />
+        </IssueNavigationLink>
+      </list>
+    </option>
+  </component>
+  <component name="JavadocGenerationManager">
+    <option name="OUTPUT_DIRECTORY" />
+    <option name="OPTION_SCOPE" value="protected" />
+    <option name="OPTION_HIERARCHY" value="true" />
+    <option name="OPTION_NAVIGATOR" value="true" />
+    <option name="OPTION_INDEX" value="true" />
+    <option name="OPTION_SEPARATE_INDEX" value="true" />
+    <option name="OPTION_DOCUMENT_TAG_USE" value="false" />
+    <option name="OPTION_DOCUMENT_TAG_AUTHOR" value="false" />
+    <option name="OPTION_DOCUMENT_TAG_VERSION" value="false" />
+    <option name="OPTION_DOCUMENT_TAG_DEPRECATED" value="true" />
+    <option name="OPTION_DEPRECATED_LIST" value="true" />
+    <option name="OTHER_OPTIONS" value="" />
+    <option name="HEAP_SIZE" />
+    <option name="LOCALE" />
+    <option name="OPEN_IN_BROWSER" value="true" />
+  </component>
+  <component name="Palette2">
+    <group name="Swing">
+      <item class="com.intellij.uiDesigner.HSpacer" tooltip-text="Horizontal Spacer" icon="/com/intellij/uiDesigner/icons/hspacer.png" removable="false" auto-create-binding="false" can-attach-label="false">
+        <default-constraints vsize-policy="1" hsize-policy="6" anchor="0" fill="1" />
+      </item>
+      <item class="com.intellij.uiDesigner.VSpacer" tooltip-text="Vertical Spacer" icon="/com/intellij/uiDesigner/icons/vspacer.png" removable="false" auto-create-binding="false" can-attach-label="false">
+        <default-constraints vsize-policy="6" hsize-policy="1" anchor="0" fill="2" />
+      </item>
+      <item class="javax.swing.JPanel" icon="/com/intellij/uiDesigner/icons/panel.png" removable="false" auto-create-binding="false" can-attach-label="false">
+        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="3" />
+      </item>
+      <item class="javax.swing.JScrollPane" icon="/com/intellij/uiDesigner/icons/scrollPane.png" removable="false" auto-create-binding="false" can-attach-label="true">
+        <default-constraints vsize-policy="7" hsize-policy="7" anchor="0" fill="3" />
+      </item>
+      <item class="javax.swing.JButton" icon="/com/intellij/uiDesigner/icons/button.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="0" hsize-policy="3" anchor="0" fill="1" />
+        <initial-values>
+          <property name="text" value="Button" />
+        </initial-values>
+      </item>
+      <item class="javax.swing.JRadioButton" icon="/com/intellij/uiDesigner/icons/radioButton.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="0" hsize-policy="3" anchor="8" fill="0" />
+        <initial-values>
+          <property name="text" value="RadioButton" />
+        </initial-values>
+      </item>
+      <item class="javax.swing.JCheckBox" icon="/com/intellij/uiDesigner/icons/checkBox.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="0" hsize-policy="3" anchor="8" fill="0" />
+        <initial-values>
+          <property name="text" value="CheckBox" />
+        </initial-values>
+      </item>
+      <item class="javax.swing.JLabel" icon="/com/intellij/uiDesigner/icons/label.png" removable="false" auto-create-binding="false" can-attach-label="false">
+        <default-constraints vsize-policy="0" hsize-policy="0" anchor="8" fill="0" />
+        <initial-values>
+          <property name="text" value="Label" />
+        </initial-values>
+      </item>
+      <item class="javax.swing.JTextField" icon="/com/intellij/uiDesigner/icons/textField.png" removable="false" auto-create-binding="true" can-attach-label="true">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
+          <preferred-size width="150" height="-1" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JPasswordField" icon="/com/intellij/uiDesigner/icons/passwordField.png" removable="false" auto-create-binding="true" can-attach-label="true">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
+          <preferred-size width="150" height="-1" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JFormattedTextField" icon="/com/intellij/uiDesigner/icons/formattedTextField.png" removable="false" auto-create-binding="true" can-attach-label="true">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1">
+          <preferred-size width="150" height="-1" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JTextArea" icon="/com/intellij/uiDesigner/icons/textArea.png" removable="false" auto-create-binding="true" can-attach-label="true">
+        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
+          <preferred-size width="150" height="50" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JTextPane" icon="/com/intellij/uiDesigner/icons/textPane.png" removable="false" auto-create-binding="true" can-attach-label="true">
+        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
+          <preferred-size width="150" height="50" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JEditorPane" icon="/com/intellij/uiDesigner/icons/editorPane.png" removable="false" auto-create-binding="true" can-attach-label="true">
+        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
+          <preferred-size width="150" height="50" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JComboBox" icon="/com/intellij/uiDesigner/icons/comboBox.png" removable="false" auto-create-binding="true" can-attach-label="true">
+        <default-constraints vsize-policy="0" hsize-policy="2" anchor="8" fill="1" />
+      </item>
+      <item class="javax.swing.JTable" icon="/com/intellij/uiDesigner/icons/table.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
+          <preferred-size width="150" height="50" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JList" icon="/com/intellij/uiDesigner/icons/list.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="6" hsize-policy="2" anchor="0" fill="3">
+          <preferred-size width="150" height="50" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JTree" icon="/com/intellij/uiDesigner/icons/tree.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3">
+          <preferred-size width="150" height="50" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JTabbedPane" icon="/com/intellij/uiDesigner/icons/tabbedPane.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="3">
+          <preferred-size width="200" height="200" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JSplitPane" icon="/com/intellij/uiDesigner/icons/splitPane.png" removable="false" auto-create-binding="false" can-attach-label="false">
+        <default-constraints vsize-policy="3" hsize-policy="3" anchor="0" fill="3">
+          <preferred-size width="200" height="200" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JSpinner" icon="/com/intellij/uiDesigner/icons/spinner.png" removable="false" auto-create-binding="true" can-attach-label="true">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1" />
+      </item>
+      <item class="javax.swing.JSlider" icon="/com/intellij/uiDesigner/icons/slider.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="8" fill="1" />
+      </item>
+      <item class="javax.swing.JSeparator" icon="/com/intellij/uiDesigner/icons/separator.png" removable="false" auto-create-binding="false" can-attach-label="false">
+        <default-constraints vsize-policy="6" hsize-policy="6" anchor="0" fill="3" />
+      </item>
+      <item class="javax.swing.JProgressBar" icon="/com/intellij/uiDesigner/icons/progressbar.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="0" fill="1" />
+      </item>
+      <item class="javax.swing.JToolBar" icon="/com/intellij/uiDesigner/icons/toolbar.png" removable="false" auto-create-binding="false" can-attach-label="false">
+        <default-constraints vsize-policy="0" hsize-policy="6" anchor="0" fill="1">
+          <preferred-size width="-1" height="20" />
+        </default-constraints>
+      </item>
+      <item class="javax.swing.JToolBar$Separator" icon="/com/intellij/uiDesigner/icons/toolbarSeparator.png" removable="false" auto-create-binding="false" can-attach-label="false">
+        <default-constraints vsize-policy="0" hsize-policy="0" anchor="0" fill="1" />
+      </item>
+      <item class="javax.swing.JScrollBar" icon="/com/intellij/uiDesigner/icons/scrollbar.png" removable="false" auto-create-binding="true" can-attach-label="false">
+        <default-constraints vsize-policy="6" hsize-policy="0" anchor="0" fill="2" />
+      </item>
+    </group>
+  </component>
+  <component name="ProjectCodeStyleSettingsManager">
+    <option name="PER_PROJECT_SETTINGS">
+      <value>
+        <option name="IMPORT_LAYOUT_TABLE">
+          <value>
+            <package name="" withSubpackages="true" static="false" />
+            <emptyLine />
+            <package name="ru.axetta" withSubpackages="true" static="false" />
+            <emptyLine />
+            <package name="org" withSubpackages="true" static="false" />
+            <emptyLine />
+            <package name="javax" withSubpackages="true" static="false" />
+            <package name="java" withSubpackages="true" static="false" />
+            <emptyLine />
+            <package name="" withSubpackages="true" static="true" />
+          </value>
+        </option>
+        <option name="HTML_KEEP_LINE_BREAKS" value="false" />
+        <option name="HTML_SPACE_INSIDE_EMPTY_TAG" value="true" />
+        <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
+        <option name="BLOCK_COMMENT_AT_FIRST_COLUMN" value="false" />
+        <option name="KEEP_LINE_BREAKS" value="false" />
+        <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+        <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
+        <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
+        <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+        <option name="ALIGN_MULTILINE_FOR" value="false" />
+        <option name="ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION" value="true" />
+        <option name="CALL_PARAMETERS_WRAP" value="1" />
+        <option name="METHOD_PARAMETERS_WRAP" value="1" />
+        <option name="EXTENDS_LIST_WRAP" value="5" />
+        <option name="THROWS_LIST_WRAP" value="1" />
+        <option name="EXTENDS_KEYWORD_WRAP" value="1" />
+        <option name="THROWS_KEYWORD_WRAP" value="1" />
+        <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
+        <option name="BINARY_OPERATION_WRAP" value="1" />
+        <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
+        <option name="TERNARY_OPERATION_WRAP" value="1" />
+        <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
+        <option name="ARRAY_INITIALIZER_WRAP" value="1" />
+        <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
+        <option name="ASSERT_STATEMENT_COLON_ON_NEXT_LINE" value="true" />
+        <option name="IF_BRACE_FORCE" value="3" />
+        <option name="DOWHILE_BRACE_FORCE" value="3" />
+        <option name="WHILE_BRACE_FORCE" value="3" />
+        <option name="FOR_BRACE_FORCE" value="3" />
+        <option name="ENUM_CONSTANTS_WRAP" value="2" />
+        <XML>
+          <option name="XML_LEGACY_SETTINGS_IMPORTED" value="true" />
+        </XML>
+        <codeStyleSettings language="CFML">
+          <option name="KEEP_LINE_BREAKS" value="false" />
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+          <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+          <option name="ALIGN_MULTILINE_FOR" value="false" />
+          <option name="CALL_PARAMETERS_WRAP" value="1" />
+          <option name="METHOD_PARAMETERS_WRAP" value="1" />
+          <option name="BINARY_OPERATION_WRAP" value="1" />
+          <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
+          <option name="TERNARY_OPERATION_WRAP" value="1" />
+          <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
+          <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+        </codeStyleSettings>
+        <codeStyleSettings language="CoffeeScript">
+          <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+        </codeStyleSettings>
+        <codeStyleSettings language="ECMA Script Level 4">
+          <option name="KEEP_LINE_BREAKS" value="false" />
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+          <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+          <option name="ALIGN_MULTILINE_FOR" value="false" />
+          <option name="ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION" value="true" />
+          <option name="CALL_PARAMETERS_WRAP" value="1" />
+          <option name="METHOD_PARAMETERS_WRAP" value="1" />
+          <option name="EXTENDS_LIST_WRAP" value="5" />
+          <option name="EXTENDS_KEYWORD_WRAP" value="1" />
+          <option name="BINARY_OPERATION_WRAP" value="1" />
+          <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
+          <option name="TERNARY_OPERATION_WRAP" value="1" />
+          <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
+          <option name="ARRAY_INITIALIZER_WRAP" value="1" />
+          <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
+          <option name="IF_BRACE_FORCE" value="3" />
+          <option name="DOWHILE_BRACE_FORCE" value="3" />
+          <option name="WHILE_BRACE_FORCE" value="3" />
+          <option name="FOR_BRACE_FORCE" value="3" />
+          <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+        </codeStyleSettings>
+        <codeStyleSettings language="GSP">
+          <indentOptions>
+            <option name="INDENT_SIZE" value="2" />
+          </indentOptions>
+        </codeStyleSettings>
+        <codeStyleSettings language="Groovy">
+          <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
+          <option name="BLOCK_COMMENT_AT_FIRST_COLUMN" value="false" />
+          <option name="KEEP_LINE_BREAKS" value="false" />
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+          <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
+          <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
+          <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+          <option name="ALIGN_MULTILINE_FOR" value="false" />
+          <option name="ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION" value="true" />
+          <option name="CALL_PARAMETERS_WRAP" value="1" />
+          <option name="METHOD_PARAMETERS_WRAP" value="1" />
+          <option name="EXTENDS_LIST_WRAP" value="5" />
+          <option name="THROWS_LIST_WRAP" value="1" />
+          <option name="EXTENDS_KEYWORD_WRAP" value="1" />
+          <option name="THROWS_KEYWORD_WRAP" value="1" />
+          <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
+          <option name="BINARY_OPERATION_WRAP" value="1" />
+          <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
+          <option name="TERNARY_OPERATION_WRAP" value="1" />
+          <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
+          <option name="ARRAY_INITIALIZER_WRAP" value="1" />
+          <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
+          <option name="ASSERT_STATEMENT_COLON_ON_NEXT_LINE" value="true" />
+          <option name="IF_BRACE_FORCE" value="3" />
+          <option name="DOWHILE_BRACE_FORCE" value="3" />
+          <option name="WHILE_BRACE_FORCE" value="3" />
+          <option name="FOR_BRACE_FORCE" value="3" />
+          <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+          <indentOptions>
+            <option name="INDENT_SIZE" value="2" />
+          </indentOptions>
+        </codeStyleSettings>
+        <codeStyleSettings language="JAVA">
+          <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
+          <option name="BLOCK_COMMENT_AT_FIRST_COLUMN" value="false" />
+          <option name="KEEP_LINE_BREAKS" value="false" />
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+          <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
+          <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
+          <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+          <option name="ALIGN_MULTILINE_FOR" value="false" />
+          <option name="ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION" value="true" />
+          <option name="CALL_PARAMETERS_WRAP" value="1" />
+          <option name="METHOD_PARAMETERS_WRAP" value="1" />
+          <option name="EXTENDS_LIST_WRAP" value="5" />
+          <option name="THROWS_LIST_WRAP" value="1" />
+          <option name="EXTENDS_KEYWORD_WRAP" value="1" />
+          <option name="THROWS_KEYWORD_WRAP" value="1" />
+          <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
+          <option name="BINARY_OPERATION_WRAP" value="1" />
+          <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
+          <option name="TERNARY_OPERATION_WRAP" value="1" />
+          <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
+          <option name="ARRAY_INITIALIZER_WRAP" value="1" />
+          <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
+          <option name="ASSERT_STATEMENT_COLON_ON_NEXT_LINE" value="true" />
+          <option name="IF_BRACE_FORCE" value="3" />
+          <option name="DOWHILE_BRACE_FORCE" value="3" />
+          <option name="WHILE_BRACE_FORCE" value="3" />
+          <option name="FOR_BRACE_FORCE" value="3" />
+          <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+        </codeStyleSettings>
+        <codeStyleSettings language="JavaScript">
+          <option name="KEEP_LINE_BREAKS" value="false" />
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+          <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+          <option name="ALIGN_MULTILINE_FOR" value="false" />
+          <option name="ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION" value="true" />
+          <option name="CALL_PARAMETERS_WRAP" value="1" />
+          <option name="METHOD_PARAMETERS_WRAP" value="1" />
+          <option name="BINARY_OPERATION_WRAP" value="1" />
+          <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
+          <option name="TERNARY_OPERATION_WRAP" value="1" />
+          <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
+          <option name="ARRAY_INITIALIZER_WRAP" value="1" />
+          <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
+          <option name="IF_BRACE_FORCE" value="3" />
+          <option name="DOWHILE_BRACE_FORCE" value="3" />
+          <option name="WHILE_BRACE_FORCE" value="3" />
+          <option name="FOR_BRACE_FORCE" value="3" />
+          <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+          <indentOptions>
+            <option name="CONTINUATION_INDENT_SIZE" value="8" />
+          </indentOptions>
+        </codeStyleSettings>
+        <codeStyleSettings language="PHP">
+          <option name="LINE_COMMENT_AT_FIRST_COLUMN" value="false" />
+          <option name="BLOCK_COMMENT_AT_FIRST_COLUMN" value="false" />
+          <option name="KEEP_LINE_BREAKS" value="false" />
+          <option name="KEEP_FIRST_COLUMN_COMMENT" value="false" />
+          <option name="KEEP_CONTROL_STATEMENT_IN_ONE_LINE" value="false" />
+          <option name="BLANK_LINES_AFTER_CLASS_HEADER" value="1" />
+          <option name="CALL_PARAMETERS_WRAP" value="1" />
+          <option name="METHOD_PARAMETERS_WRAP" value="1" />
+          <option name="EXTENDS_LIST_WRAP" value="5" />
+          <option name="THROWS_LIST_WRAP" value="1" />
+          <option name="EXTENDS_KEYWORD_WRAP" value="1" />
+          <option name="THROWS_KEYWORD_WRAP" value="1" />
+          <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
+          <option name="BINARY_OPERATION_WRAP" value="1" />
+          <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
+          <option name="TERNARY_OPERATION_WRAP" value="1" />
+          <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
+          <option name="ARRAY_INITIALIZER_WRAP" value="1" />
+          <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
+          <option name="ASSERT_STATEMENT_COLON_ON_NEXT_LINE" value="true" />
+          <option name="IF_BRACE_FORCE" value="3" />
+          <option name="DOWHILE_BRACE_FORCE" value="3" />
+          <option name="WHILE_BRACE_FORCE" value="3" />
+          <option name="FOR_BRACE_FORCE" value="3" />
+          <option name="ENUM_CONSTANTS_WRAP" value="2" />
+          <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+        </codeStyleSettings>
+        <codeStyleSettings language="SQL">
+          <option name="PARENT_SETTINGS_INSTALLED" value="true" />
+        </codeStyleSettings>
+      </value>
+    </option>
+    <option name="USE_PER_PROJECT_SETTINGS" value="true" />
+  </component>
+  <component name="ProjectDetails">
+    <option name="projectName" value="processor" />
+  </component>
+  <component name="ProjectDictionaryState">
+    <dictionary name="damir" />
+    <dictionary name="Developer">
+      <words>
+        <w>contragent</w>
+        <w>ecafe</w>
+        <w>jaas</w>
+        <w>javaee</w>
+        <w>jboss</w>
+        <w>jdbc</w>
+        <w>login</w>
+        <w>param</w>
+        <w>requeired</w>
+        <w>sochi</w>
+        <w>timestamp</w>
+      </words>
+    </dictionary>
+    <dictionary name="rumil" />
+  </component>
+  <component name="ProjectFacetManager">
+    <default-configurations>
+      <entry facet-type="jsf">
+        <default-facet-configuration>
+          <configuration>
+            <option name="faceletsDetection" value="ENABLE" />
+          </configuration>
+        </default-facet-configuration>
+      </entry>
+    </default-configurations>
+  </component>
+  <component name="ProjectKey">
+    <option name="state" value="project://D:\work\java\ecafe\processor\build\projects\processor.ipr" />
+  </component>
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/client-room/client-room.iml" filepath="$PROJECT_DIR$/client-room/client-room.iml" />
+      <module fileurl="file://$PROJECT_DIR$/core.iml" filepath="$PROJECT_DIR$/core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dashboard-ws-client.iml" filepath="$PROJECT_DIR$/dashboard-ws-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../src/testmodule/datatest/datatest.iml" filepath="$PROJECT_DIR$/../../src/testmodule/datatest/datatest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/j2ee.iml" filepath="$PROJECT_DIR$/j2ee.iml" />
+      <module fileurl="file://$PROJECT_DIR$/org-room.iml" filepath="$PROJECT_DIR$/org-room.iml" />
+      <module fileurl="file://$PROJECT_DIR$/payconv.iml" filepath="$PROJECT_DIR$/payconv.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pubkey.iml" filepath="$PROJECT_DIR$/pubkey.iml" />
+      <module fileurl="file://$PROJECT_DIR$/registry-import.iml" filepath="$PROJECT_DIR$/registry-import.iml" />
+      <module fileurl="file://$PROJECT_DIR$/smpp/smpp.iml" filepath="$PROJECT_DIR$/smpp/smpp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/synctest.iml" filepath="$PROJECT_DIR$/synctest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/testmodule/testmodule.iml" filepath="$PROJECT_DIR$/testmodule/testmodule.iml" />
+      <module fileurl="file://$PROJECT_DIR$/util.iml" filepath="$PROJECT_DIR$/util.iml" />
+      <module fileurl="file://$PROJECT_DIR$/web.iml" filepath="$PROJECT_DIR$/web.iml" />
+    </modules>
+  </component>
+  <component name="ProjectResources">
+    <default-html-doctype>http://www.w3.org/1999/xhtml</default-html-doctype>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/../../target/out" />
+  </component>
+  <component name="ResourceManagerContainer">
+    <option name="myResourceBundles">
+      <value>
+        <list size="0" />
+      </value>
+    </option>
+  </component>
+  <component name="SqlDataSourceStorage">
+    <option name="dataSources">
+      <list>
+        <State>
+          <option name="id" value="675cc7d7-470a-4806-b8d4-13d87d189397" />
+          <option name="name" value="DDL DS" />
+          <option name="urls">
+            <array>
+              <option value="file://$PROJECT_DIR$/../../src/core/database/derby/ecafe_processor_derby_postgre.sql" />
+            </array>
+          </option>
+        </State>
+      </list>
+    </option>
+  </component>
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/smpp" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/core" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/dashboard-ws-client" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/j2ee" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/payconv" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/pubkey" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/synctest" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/testmodule" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/util" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/../../src/web" dialect="PostgreSQL" />
+  </component>
+  <component name="SvnBranchConfigurationManager">
+    <option name="myConfigurationMap">
+      <map>
+        <entry key="$PROJECT_DIR$">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="svn://freexter.com/dwc/ecafe/processor/build/projects" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../src/core">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="svn://freexter.com/dwc/ecafe/processor/src/core" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../src/dashboard-ws-client">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../src/j2ee">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="svn://freexter.com/dwc/ecafe/processor/src/j2ee" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../src/payconv">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../src/pubkey">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../src/synctest">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../src/testmodule">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../src/util">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../../src/web">
+          <value>
+            <SvnBranchConfiguration>
+              <option name="trunkUrl" value="svn://freexter.com/dwc/ecafe/processor/src/web" />
+            </SvnBranchConfiguration>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="mySupportsUserInfoFilter" value="true" />
+  </component>
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../../src/client-room" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../../src/org-room" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../../src/testmodule" vcs="svn" />
+  </component>
+  <component name="WebServicesPlugin" addRequiredLibraries="true" />
+  <component name="com.sixrr.metrics.MetricsReloaded">
+    <option name="selectedProfile" value="Default" />
+    <option name="autoscroll" value="false" />
+    <option name="calculateMetrics" value="true" />
+    <option name="includeTestClasses" value="false" />
+    <option name="flattenInnerClasses" value="true" />
+    <option name="cycleTableSpecificationString" value="" />
+    <option name="shortCycleTableSpecificationString" value="" />
+  </component>
+  <component name="ideadoc.IdeaDocConfigurationGUI">
+    <doccer class="nl.piraya.ideadoc.doccer.DoccerForOverridingMethod" enabled="true">
+      <template>/**$s${@inheritDoc}$s$*/</template>
+    </doccer>
+    <doccer class="nl.piraya.ideadoc.doccer.DoccerForGetter" enabled="true">
+      <template>/**$n$$s$*$s$Getter$s$for$s$property$s$'${PROPERTY_NAME}'.$n$$s$*$n$$s$*$s$@return$s$Value$s$for$s$property$s$'${PROPERTY_NAME}'.$n$$s$*/</template>
+    </doccer>
+    <doccer class="nl.piraya.ideadoc.doccer.DoccerForSetter" enabled="true">
+      <template>/**$n$$s$*$s$Setter$s$for$s$property$s$'${PROPERTY_NAME}'.$n$$s$*$n$$s$*$s$@param$s$${PARAM_NAME}$s$Value$s$to$s$set$s$for$s$property$s$'${PROPERTY_NAME}'.$n$$s$*/</template>
+    </doccer>
+    <doccer class="nl.piraya.ideadoc.doccer.DoccerForDefaultConstructor" enabled="true">
+      <template>/**$s$Constructs$s$a$s$new$s$${CLASS_NAME}.$s$*/</template>
+    </doccer>
+    <doccer class="nl.piraya.ideadoc.doccer.DoccerForPrivateDefaultConstructor" enabled="true">
+      <template>/**$s$Do$s$not$s$instantiate$s$${CLASS_NAME}.$s$*/</template>
+    </doccer>
+  </component>
+  <component name="ideajad">
+    <property name="annotate" value="false" />
+    <property name="annotateFully" value="false" />
+    <property name="braces" value="false" />
+    <property name="clear" value="false" />
+    <property name="confirmNavigationTriggeredDecompile" value="true" />
+    <property name="dead" value="true" />
+    <property name="defaultInitializers" value="false" />
+    <property name="dissassemblerOnly" value="false" />
+    <property name="fieldsFirst" value="true" />
+    <property name="fileExtension" value="java" />
+    <property name="fullyQualifiedNames" value="false" />
+    <property name="indentation" value="4" />
+    <property name="intRadix" value="10" />
+    <property name="lineNumbersAsComments" value="true" />
+    <property name="longRadix" value="10" />
+    <property name="maxStringLength" value="64" />
+    <property name="nocast" value="false" />
+    <property name="noclass" value="false" />
+    <property name="nocode" value="false" />
+    <property name="noconv" value="false" />
+    <property name="noctor" value="false" />
+    <property name="nodos" value="false" />
+    <property name="nofd" value="false" />
+    <property name="noinner" value="false" />
+    <property name="nolvt" value="false" />
+    <property name="nonlb" value="false" />
+    <property name="outputDirectory" value="" />
+    <property name="packFields" value="3" />
+    <property name="packImports" value="7" />
+    <property name="prefixNumericalClasses" value="_cls" />
+    <property name="prefixNumericalFields" value="_fld" />
+    <property name="prefixNumericalLocals" value="_lcl" />
+    <property name="prefixNumericalMethods" value="_mth" />
+    <property name="prefixNumericalParameters" value="_prm" />
+    <property name="prefixUnusedExceptions" value="_ex" />
+    <property name="readonly" value="false" />
+    <property name="safe" value="false" />
+    <property name="sort" value="false" />
+    <property name="spaceAfterKeyword" value="false" />
+    <property name="splitStringsAtNewline" value="false" />
+    <property name="useTabs" value="false" />
+  </component>
+  <component name="libraryTable">
+    <library name="axetta_charset">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/smpp/axetta_charset.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/smpp/smpp.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/smpp/axetta_smpp.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="axetta_smpp">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/smpp/axetta_smpp.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/smpp/smpp.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/smpp/opentoolsutil.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/smpp/myOTA.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/smpp/exprescd.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="barcode4j">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/barcode/javase.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/barcode/core.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="client-room">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/activation.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/FastInfoset.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/http.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jaxb-api.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jaxb-impl.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jaxws-api.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jaxws-rt.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jaxws-tools.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jsr173_api.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jsr181-api.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jsr250-api.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/resolver.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/saaj-api.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/saaj-impl.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/sjsxp.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/stax-ex.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/streambuffer.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jaxb-xjc.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/jaxb-xjc.jar!/1.0" />
+      </SOURCES>
+    </library>
+    <library name="commons">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/apache/commons/commons-beanutils-1.8.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/commons/commons-codec-1.3.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/commons/commons-collections-3.2.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/commons/commons-digester-2.0.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/commons/commons-httpclient-3.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/commons/commons-io-1.4.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/commons/commons-lang-2.4.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/commons/commons-logging-1.1.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/commons/commons-logging-adapters-1.1.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/commons/commons-logging-api-1.1.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/commons/commons-net-3.1.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$USER_HOME$/.ideaLibSources/commons-lang-2.4-sources.jar!/" />
+        <root url="jar://$USER_HOME$/.ideaLibSources/commons-io-1.4-sources.jar!/" />
+        <root url="jar://$USER_HOME$/.ideaLibSources/commons-httpclient-3.1-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="cryptopro">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/asn1rt.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/AsnLite.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/forms_rt.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/JCP.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/JCP_ASN.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/JCPinst.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/JCPRequest.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/JCPRevCheck.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/JCPRevTools.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/JCPxml.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/cryptopro/JCryptoP.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/XMLDSigRI.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="cxf">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/apache/cxf/cxf-api-2.4.4.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/cxf/cxf-common-utilities-2.4.4.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/cxf/cxf-rt-bindings-soap-2.4.4.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/cxf/cxf-rt-core-2.4.4.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/cxf/cxf-rt-frontend-simple-2.4.4.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/cxf/cxf-rt-ws-policy-2.4.4.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/cxf/cxf-rt-ws-security-2.4.4.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/cxf/cxf-rt-transports-http-2.4.4.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="guava">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/icu4j-4_0_1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/visualization-datasource-1.1.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/guava-10.0.1.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="h2-1.3.161">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/h2-1.3.161.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="hibernate-4.0.1">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/hibernate/hibernate-commons-annotations-4.0.1.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/hibernate/hibernate-jpa-2.0-api-1.0.1.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/hibernate/hibernate-core-4.0.1.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/hibernate/hibernate-entitymanager-4.0.1.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/hibernate/jboss-logging-3.1.0.GA.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/hibernate/dom4j-1.6.1.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/hibernate/javassist-3.15.0-GA.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/hibernate/antlr-2.7.7.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/hibernate/hibernate-envers-4.0.1.Final.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$USER_HOME$/.ideaLibSources/hibernate-core-4.0.1.Final-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="jasperlib">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/jasper/iText-2.1.7.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jasper/jasperreports-4.7.1.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://D:/lib/ireport/src/jasperreports-4.7.1-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="javamelody-monitoring">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/jrobin-1.5.9.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/javamelody-1.33.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="jboss_J2EE">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-annotations-api_1.1_spec-1.0.0.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-connector-api_1.6_spec-1.0.0.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-ejb-api_3.1_spec-1.0.1.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-el-api_2.2_spec-1.0.0.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-jms-api_1.1_spec-1.0.0.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-jsp-api_2.2_spec-1.0.0.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-jstl-api_1.2_spec-1.0.1.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-servlet-api_3.0_spec-1.0.0.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-transaction-api_1.1_spec-1.0.0.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jboss-as-web-7.1.0.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jbossweb-7.0.10.Final.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="jar://$USER_HOME$/.ideaLibSources/jboss-servlet-api_3.0_spec-1.0.0.Final-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="jsf-impl-1.2_15-jbossorg-2">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/jsf12/jsf-impl-1.2_15-jbossorg-2.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jsf12/jsf-api-1.2_15-jbossorg-2.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/jsf12/jboss-jstl-api_1.2_spec-1.0.2.Final.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="junit">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/junit-4.10.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="org.aopalliance:com.springsource.org.aopalliance:1.0.0" type="repository">
+      <properties maven-id="org.aopalliance:com.springsource.org.aopalliance:1.0.0" />
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/com.springsource.org.aopalliance-1.0.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="postgresql-9.1-901.jdbc4">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="richfaces-api-3.3.1.GA">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/richfaces-331/richfaces-api-3.3.1.GA.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/richfaces-331/richfaces-impl-3.3.1.GA.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/richfaces-331/richfaces-ui-3.3.1.GA.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/richfaces-331/darkX-3.3.1.GA.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="slf4j-api-1.5.6">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/slf4j-api-1.5.6.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/slf4j-log4j12-1.5.5.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="spring305">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/asm.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/cglib-nodep-2.2.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.aop-3.0.5.RELEASE.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.asm-3.0.5.RELEASE.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.beans-3.0.5.RELEASE.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.context-3.0.5.RELEASE.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.context.support-3.0.5.RELEASE.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.core-3.0.5.RELEASE.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.expression-3.0.5.RELEASE.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.jdbc-3.0.5.RELEASE.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.orm-3.0.5.RELEASE.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.oxm-3.0.5.RELEASE.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.transaction-3.0.5.RELEASE.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.web-3.0.5.RELEASE.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.web.servlet-3.0.5.RELEASE.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/org.springframework.test-3.0.5.RELEASE.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/com.springsource.org.aopalliance-1.0.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+  </component>
+</project>
+

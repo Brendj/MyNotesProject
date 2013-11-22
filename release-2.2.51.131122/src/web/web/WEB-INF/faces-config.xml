@@ -1,0 +1,355 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+  ~ Copyright (c) 2010. Axetta LLC. All Rights Reserved.
+  -->
+
+<faces-config xmlns="http://java.sun.com/xml/ns/javaee"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_1_2.xsd"
+              version="1.2">
+
+    <application>
+        <locale-config>
+            <default-locale>ru</default-locale>
+        </locale-config>
+    </application>
+
+    <application>
+        <el-resolver>org.springframework.web.jsf.el.SpringBeanFacesELResolver</el-resolver>
+    </application>
+    <application>
+        <variable-resolver>
+            org.springframework.web.jsf.DelegatingVariableResolver
+        </variable-resolver>
+    </application>
+
+
+    <managed-bean>
+        <display-name>mainPage</display-name>
+        <managed-bean-name>mainPage</managed-bean-name>
+        <managed-bean-class>ru.axetta.ecafe.processor.web.ui.MainPage</managed-bean-class>
+        <managed-bean-scope>session</managed-bean-scope>
+    </managed-bean>
+
+    <converter>
+        <description>Org state converter</description>
+        <converter-id>orgStateConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.org.OrgStateConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Timestamp converter with second accuracy</description>
+        <converter-id>timeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.TimeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Timestamp converter with minute accuracy</description>
+        <converter-id>timeMinuteConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.TimeMinuteConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Date to time converter</description>
+        <converter-id>dateConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.DateConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Phone converter</description>
+        <converter-id>phoneConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.PhoneConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>User functions converter</description>
+        <converter-id>functionSetConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.option.user.FunctionSetConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Client contract state converter</description>
+        <converter-id>clientContractStateConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.client.ClientContractStateConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Client pay for SMS converter</description>
+        <converter-id>clientPayForSMSConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.client.ClientPayForSMSConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Card type converter</description>
+        <converter-id>cardTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.card.CardTypeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Card state converter</description>
+        <converter-id>cardStateConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.card.CardStateConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Card life state converter</description>
+        <converter-id>cardLifeStateConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.card.CardLifeStateConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Contragent class converter</description>
+        <converter-id>contragentClassConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.contragent.ContragentClassConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Copeck sum converter</description>
+        <converter-id>copeckSumConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.CopeckSumConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Client discount mode converter</description>
+        <converter-id>clientDiscountModeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.client.ClientDiscountModeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Address list converter</description>
+        <converter-id>addressListConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.report.rule.AddressListConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Report format converter</description>
+        <converter-id>reportFormatConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.ReportFormatConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Client contract ID converter</description>
+        <converter-id>contractIdConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.client.ContractIdConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Card number converter</description>
+        <converter-id>cardNoConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.card.CardNoConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Card printed number converter</description>
+        <converter-id>cardPrintedNoConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.card.CardPrintedNoConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Sms contents type converter</description>
+        <converter-id>smsContentsTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.client.SmsContentsTypeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Sms delivery status converter</description>
+        <converter-id>smsDeliveryStatusConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.client.SmsDeliveryStatusConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Unit Scale Converter</description>
+        <converter-id>unitScaleConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.UnitScaleConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Card Station Converter</description>
+        <converter-id>cardStationConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.CardStationConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Organization Type Converter</description>
+        <converter-id>organizationTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.OrganizationTypeConverter</converter-class>
+    </converter>
+
+		<converter>
+        <converter-id>rublesStringConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.RublesStringConverter</converter-class>
+    </converter>
+    
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>logout</from-outcome>
+            <to-view-id>/back-office/index.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showClientCSVList</from-outcome>
+            <to-view-id>/back-office/client_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <!--Kadyrov Damir (21.12.2011)-->
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showEnterEventCSVList</from-outcome>
+            <to-view-id>/back-office/enter_event_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showClientLoadResultCSVList</from-outcome>
+            <to-view-id>/back-office/client_load_result_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showClientUpdateLoadResultCSVList</from-outcome>
+            <to-view-id>/back-office/client_update_load_result_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showCardCSVList</from-outcome>
+            <to-view-id>/back-office/card_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showCardLoadResultCSVList</from-outcome>
+            <to-view-id>/back-office/card_load_result_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showCCAccountCSVList</from-outcome>
+            <to-view-id>/back-office/ccaccount_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showFreeComplexCSVList</from-outcome>
+            <to-view-id>/back-office/free_complex_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showPayComplexCSVList</from-outcome>
+            <to-view-id>/back-office/pay_complex_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showAllComplexCSVList</from-outcome>
+            <to-view-id>/back-office/all_complex_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showSaleCSVList</from-outcome>
+            <to-view-id>/back-office/sale_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showClientOrgCSVList</from-outcome>
+            <to-view-id>/back-office/client_org_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showPosCSVList</from-outcome>
+            <to-view-id>/back-office/pos_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showSettlementCSVList</from-outcome>
+            <to-view-id>/back-office/settlement_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showAddPaymentCSVList</from-outcome>
+            <to-view-id>/back-office/addpayment_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showCurrentPositionCSVList</from-outcome>
+            <to-view-id>/back-office/currentposition_csv_list.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showMenuDataXML</from-outcome>
+            <to-view-id>/back-office/menu_data_xml.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>downloadReportFile</from-outcome>
+            <to-view-id>/repository/download</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+</faces-config>

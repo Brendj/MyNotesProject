@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2009. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.DiaryClass" table="CF_DiaryClasses">
+        <composite-id name="compositeIdOfDiaryClass"
+                      class="ru.axetta.ecafe.processor.core.persistence.CompositeIdOfDiaryClass">
+            <key-property name="idOfOrg" type="long" column="IdOfOrg"/>
+            <key-property name="idOfClass" type="long" column="IdOfClass"/>
+        </composite-id>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
+                     insert="false" update="false"/>
+        <property name="className" column="ClassName" type="string" not-null="true" length="64"/>
+        <set name="diaryTimesheets0Internal" inverse="true" cascade="all">
+            <key>
+                <column name="IdOfOrg"/>
+                <column name="C0"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiaryTimesheet"/>
+        </set>
+        <set name="diaryTimesheets1Internal" inverse="true" cascade="all">
+            <key>
+                <column name="IdOfOrg"/>
+                <column name="C1"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiaryTimesheet"/>
+        </set>
+        <set name="diaryTimesheets2Internal" inverse="true" cascade="all">
+            <key>
+                <column name="IdOfOrg"/>
+                <column name="C2"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiaryTimesheet"/>
+        </set>
+        <set name="diaryTimesheets3Internal" inverse="true" cascade="all">
+            <key>
+                <column name="IdOfOrg"/>
+                <column name="C3"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiaryTimesheet"/>
+        </set>
+        <set name="diaryTimesheets4Internal" inverse="true" cascade="all">
+            <key>
+                <column name="IdOfOrg"/>
+                <column name="C4"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiaryTimesheet"/>
+        </set>
+        <set name="diaryTimesheets5Internal" inverse="true" cascade="all">
+            <key>
+                <column name="IdOfOrg"/>
+                <column name="C5"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiaryTimesheet"/>
+        </set>
+        <set name="diaryTimesheets6Internal" inverse="true" cascade="all">
+            <key>
+                <column name="IdOfOrg"/>
+                <column name="C6"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiaryTimesheet"/>
+        </set>
+        <set name="diaryTimesheets7Internal" inverse="true" cascade="all">
+            <key>
+                <column name="IdOfOrg"/>
+                <column name="C7"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiaryTimesheet"/>
+        </set>
+        <set name="diaryTimesheets8Internal" inverse="true" cascade="all">
+            <key>
+                <column name="IdOfOrg"/>
+                <column name="C8"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiaryTimesheet"/>
+        </set>
+        <set name="diaryTimesheets9Internal" inverse="true" cascade="all">
+            <key>
+                <column name="IdOfOrg"/>
+                <column name="C9"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiaryTimesheet"/>
+        </set>
+        <set name="diaryValuesInternal" inverse="true" cascade="all">
+            <key>
+                <column name="IdOfOrg"/>
+                <column name="IdOfClass"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.DiaryValue"/>
+        </set>
+    </class>
+</hibernate-mapping>
+
+

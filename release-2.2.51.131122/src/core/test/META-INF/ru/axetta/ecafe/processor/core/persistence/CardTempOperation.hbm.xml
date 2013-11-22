@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2013. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.CardTempOperation" table="Cf_Card_Temp_Operations"
+             mutable="false">
+        <id name="idOfCardTempOperation" column="IdOfCardTempOperation" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="localId" column="localIdOperation" not-null="true" type="long" />
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"
+                     not-null="true"/>
+        <many-to-one name="cardTemp" class="ru.axetta.ecafe.processor.core.persistence.CardTemp" column="idOfCartTemp"
+                     not-null="true"/>
+        <property name="operationType" column="OperationType">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.CardOperationStation</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
+        <property name="operationDate" column="OperationDate" not-null="true" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idOfClient" not-null="true"/>
+        <many-to-one name="visitor" class="ru.axetta.ecafe.processor.core.persistence.Visitor" column="idOfVisitor" not-null="true"/>
+
+    </class>
+</hibernate-mapping>
