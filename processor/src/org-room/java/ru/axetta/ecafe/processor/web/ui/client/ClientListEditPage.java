@@ -107,6 +107,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
     }
 
     public void fill(Session session, boolean reset) throws Exception {
+        categoryDiscounts = loadDiscounts(session);
         if (reset) {
             reset();
         }
@@ -172,7 +173,6 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
 
         loadGroups(session);
         buildGroupsTree(clients);
-        categoryDiscounts = loadDiscounts(session);
     }
 
     @Transactional
@@ -305,6 +305,9 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
                                            SelectedClient selectedClient,
                                            List<CategoryDiscount> categoryDiscounts) {
         selectedClient.initDiscounts(categoryDiscounts);
+        if (selectedClient.getIdOfClient() == null || session == null) {
+            return;
+        }
         org.hibernate.Query q = session.createSQLQuery("select idofcategorydiscount "
                                                         + "from cf_clients_categorydiscounts "
                                                         + "where idofclient=:idofclient");
@@ -811,6 +814,8 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
             TreeState state = (TreeState) treeComponent.getComponentState();
             state.setSelected(null);
         }
+
+        ClientListEditPage.loadClientDiscounts (null, selectedClient, categoryDiscounts);
     }
 
     public void resetMessages() {

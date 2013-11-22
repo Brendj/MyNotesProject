@@ -67,6 +67,9 @@ public class ThinClientUserEditPage extends BasicWorkspacePage implements Client
 
     public void setIdOfClient(Long idOfClient) {
         this.idOfClient = idOfClient < 1 ? null : idOfClient;
+        if (this.idOfClient == null) {
+            clearClient();
+        }
     }
 
     public Long getIdOfClient() {
@@ -102,7 +105,6 @@ public class ThinClientUserEditPage extends BasicWorkspacePage implements Client
     }
 
     public boolean isChangePassword() {
-        changePassword = idOfClient == null ? true : changePassword;
         return changePassword;
     }
 
@@ -231,6 +233,10 @@ public class ThinClientUserEditPage extends BasicWorkspacePage implements Client
 
     @Override
     public void onShow() throws Exception {
+        changePassword = false;
+        if (idOfClient == null) {
+            changePassword = true;
+        }
         RuntimeContext.getAppContext().getBean(ThinClientUserEditPage.class).fill();
     }
 
@@ -286,5 +292,18 @@ public class ThinClientUserEditPage extends BasicWorkspacePage implements Client
     public void clearMessages() {
         errorMessages = "";
         infoMessages = "";
+    }
+
+    public void clearClient () {
+        idOfClient = null;
+        username = null;
+        roleName = null;
+        person = null;
+        cl = null;
+        org = null;
+        orgName = null;
+        role = 0;
+        password = null;
+        passwordRepeat = null;
     }
 }

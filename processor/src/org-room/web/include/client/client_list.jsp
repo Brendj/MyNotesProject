@@ -90,9 +90,9 @@
                 <h:panelGrid id="classEditPanel" rendered="#{clientListEditPage.showClassEditPanel}">
                     <h:panelGrid styleClass="borderless-grid" columns="2" style="vertical-align: top;">
                         <h:outputText escape="true" value="Классный руководитель" styleClass="output-text-mod" />
-                        <h:selectOneMenu id="classTeacher" style="width:370px;" >
+                        <%--<h:selectOneMenu id="classTeacher" style="width:370px;" >
                             <f:selectItems value="#{clientListEditPage.teachers}"/>
-                        </h:selectOneMenu>
+                        </h:selectOneMenu>--%>
                     </h:panelGrid>
                 </h:panelGrid>
                 <h:panelGrid id="clientEditPanel" rendered="#{clientListEditPage.showClientEditPanel}">
@@ -240,12 +240,12 @@
                         <h:inputText value="#{clientListEditPage.selectedClient.lastUpdateDate}" styleClass="output-text" style="width: 420px;" disabled="true"  />
                     </h:panelGrid>
 
-                    <h:panelGrid styleClass="borderless-grid" columns="2" style="vertical-align: top;">
+                    <%--<h:panelGrid styleClass="borderless-grid" columns="2" style="vertical-align: top;">
                         <h:outputText escape="true" value="Классный руководитель" styleClass="output-text-mod" />
                         <h:selectOneMenu id="clientClassTearcher" style="width:345px;" disabled="true" >
                             <f:selectItems value="#{clientListEditPage.teachers}"/>
                         </h:selectOneMenu>
-                    </h:panelGrid>
+                    </h:panelGrid>--%>
 
                     <h:panelGrid styleClass="borderless-grid" columns="2" style="vertical-align: top; align: right;">
                             <a4j:commandButton value="#{clientListEditPage.submitButtonLabel}" action="#{clientListEditPage.doApplyChanges}" reRender="clientTree, editPanels, clientCardPanel" />
