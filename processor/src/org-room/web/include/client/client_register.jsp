@@ -104,6 +104,7 @@
                         <h:outputText value="Адрес"/>
                     </f:facet>
                     <h:inputText value="#{client.address}" style="width:150px;" disabled="#{client.added}">
+                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" />
                     </h:inputText>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};" rendered="#{clientRegisterPage.showPhone}">
@@ -112,6 +113,7 @@
                     </f:facet>
                     <rich:jQuery selector="#phoneInput" query="mask('(999) 999-9999')" timing="immediate"/>
                     <h:inputText value="#{client.phone}" style="width:150px;" disabled="#{client.added}" id="phoneInput">
+                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" />
                     </h:inputText>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};" rendered="#{clientRegisterPage.showMobile}">
@@ -127,6 +129,7 @@
                         <h:outputText value="Уведомлять по СМС"/>
                     </f:facet>
                     <h:selectBooleanCheckbox value="#{client.notifyViaSMS}" styleClass="output-text" disabled="#{client.added}" >
+                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" />
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};" rendered="#{clientRegisterPage.showFax}">
@@ -135,6 +138,7 @@
                     </f:facet>
                     <rich:jQuery selector="#faxInput" query="mask('(999) 999-9999')" timing="immediate"/>
                     <h:inputText id="faxInput" value="#{client.fax}" style="width:150px;" disabled="#{client.added}">
+                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" />
                     </h:inputText>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};" rendered="#{clientRegisterPage.showEmail}">
@@ -142,6 +146,7 @@
                         <h:outputText value="E-mail"/>
                     </f:facet>
                     <h:inputText value="#{client.email}" style="width:150px;" disabled="#{client.added}">
+                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" />
                     </h:inputText>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};" rendered="#{clientRegisterPage.showEmail}">
@@ -149,6 +154,7 @@
                         <h:outputText value="Уведомлять по E-mail"/>
                     </f:facet>
                     <h:selectBooleanCheckbox value="#{client.notifyViaEmail}" disabled="#{client.added}" styleClass="output-text" >
+                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" />
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};" rendered="#{clientRegisterPage.showRemarks}">
@@ -156,6 +162,7 @@
                         <h:outputText value="Примечание"/>
                     </f:facet>
                     <h:inputText value="#{client.remarks}" style="width:150px;" disabled="#{client.added}">
+                        <a4j:support event="onchange" actionListener="#{clientRegisterPage.doModifyClient}" />
                     </h:inputText>
                 </rich:column>
 

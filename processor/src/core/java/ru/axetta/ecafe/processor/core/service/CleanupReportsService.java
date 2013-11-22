@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -39,9 +40,9 @@ public class CleanupReportsService {
 
 
         try {
-            List<Long> idOfReportInfoList = DAOService.getInstance().getCleanupRepositoryReportsByDate();
-            for (long idOfReportInfo : idOfReportInfoList) {
-                ReportInfo ri = DAOService.getInstance().findReportInfoById(idOfReportInfo);
+            List<BigInteger> idOfReportInfoList = DAOService.getInstance().getCleanupRepositoryReportsByDate();
+            for (BigInteger idOfReportInfo : idOfReportInfoList) {
+                ReportInfo ri = DAOService.getInstance().findReportInfoById(idOfReportInfo.longValue());
 
             }
         } catch (Exception e) {

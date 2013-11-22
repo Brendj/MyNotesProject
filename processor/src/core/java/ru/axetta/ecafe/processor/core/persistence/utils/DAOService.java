@@ -1579,7 +1579,7 @@ public class DAOService {
         q.executeUpdate();
     }
 
-    public List<Long> getCleanupRepositoryReportsByDate() throws Exception{
+    public List<BigInteger> getCleanupRepositoryReportsByDate() throws Exception{
         Session session = (Session) entityManager.getDelegate();
         org.hibernate.Query q = session.createSQLQuery(
                 "select idofreportinfo "
@@ -1588,7 +1588,7 @@ public class DAOService {
                         + "where cf_reporthandlerules.storageperiod<>-1 and "
                         + "      (cf_reporthandlerules.storageperiod=0 or "
                         + "       createddate<EXTRACT(EPOCH FROM now())*1000-cf_reporthandlerules.storageperiod)");
-        List <Long> list = (List <Long>) q.list();
+        List <BigInteger> list = (List <BigInteger>) q.list();
         return list;
     }
 
