@@ -515,11 +515,9 @@ public class ECafeSettings extends DistributedObject{
 
     public static class SubscriberFeedingSettingSettingValue extends AbstractParserBySettingValue{
 
-        private int dayActivae; // Количество дней, отводимое на активизацию услуги
         private int dayRequest; // Количество дней, на которые оформляются заявки на поставку
-        private int maxDayRequest; // Максимальное количество дней, на котороые сформированные заявки запрещено редактировать
-        private int dayDeActivae;   // Количество дней, пропустив которые, клиент приостанавливает свою подписку
-
+        private int dayDeActivate;   // Количество дней, пропустив которые, клиент приостанавливает свою подписку
+        private boolean enableFeeding;   // Включить автоматическую приостановку/возобновление подписок на услугу АП в зависимости от посещения учреждения
 
         public SubscriberFeedingSettingSettingValue(String[] values) throws ParseException {
             super(values);
@@ -527,23 +525,14 @@ public class ECafeSettings extends DistributedObject{
 
         @Override
         protected void parse(String[] values) throws ParseException {
-            this.dayActivae = Integer.parseInt(values[0]);
-            this.dayRequest = Integer.parseInt(values[1]);
-            this.maxDayRequest = Integer.parseInt(values[2]);
-            this.dayDeActivae = Integer.parseInt(values[3]);
+            this.dayRequest = Integer.parseInt(values[0]);
+            this.dayDeActivate = Integer.parseInt(values[1]);
+            this.enableFeeding = values[2].equals("1");
         }
 
         @Override
         public String build() {
-            return dayActivae+";"+dayRequest+";"+maxDayRequest+";"+dayDeActivae+";";
-        }
-
-        public int getDayActivae() {
-            return dayActivae;
-        }
-
-        public void setDayActivae(int dayActivae) {
-            this.dayActivae = dayActivae;
+            return dayRequest+";"+ dayDeActivate +";"+(enableFeeding?1:0)+";";
         }
 
         public int getDayRequest() {
@@ -554,20 +543,20 @@ public class ECafeSettings extends DistributedObject{
             this.dayRequest = dayRequest;
         }
 
-        public int getMaxDayRequest() {
-            return maxDayRequest;
+        public int getDayDeActivate() {
+            return dayDeActivate;
         }
 
-        public void setMaxDayRequest(int maxDayRequest) {
-            this.maxDayRequest = maxDayRequest;
+        public void setDayDeActivate(int dayDeActivate) {
+            this.dayDeActivate = dayDeActivate;
         }
 
-        public int getDayDeActivae() {
-            return dayDeActivae;
+        public boolean isEnableFeeding() {
+            return enableFeeding;
         }
 
-        public void setDayDeActivae(int dayDeActivae) {
-            this.dayDeActivae = dayDeActivae;
+        public void setEnableFeeding(boolean enableFeeding) {
+            this.enableFeeding = enableFeeding;
         }
     }
 

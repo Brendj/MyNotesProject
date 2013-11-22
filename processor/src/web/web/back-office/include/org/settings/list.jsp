@@ -86,7 +86,7 @@
         </rich:column>
         <rich:column>
             <f:facet name="header">
-                <h:outputText value="Параметры принтера (формат чека)"/>
+                <h:outputText value="#{settingsListPage.settingsHeadText}"/>
             </f:facet>
             <h:outputText value="#{setting.settingValue}"/>
         </rich:column>

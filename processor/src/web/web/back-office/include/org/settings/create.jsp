@@ -272,17 +272,17 @@
         <h:panelGrid columns="2" id="settingsCreateSubscriberFeedingPanelGrid"
                      rendered="#{settingCreatePage.settingsIds==4}">
 
-            <h:outputText escape="true" value="Количество дней, отводимое на активизацию услуги" styleClass="output-text" />
-            <h:inputText value="#{settingCreatePage.parserBySettingValue.dayActivae}" styleClass="input-text" style="width: 207px"/>
-
             <h:outputText escape="true" value="Количество дней, на которые оформляются заявки на поставку" styleClass="output-text" />
             <h:inputText value="#{settingCreatePage.parserBySettingValue.dayRequest}" styleClass="input-text" style="width: 207px"/>
 
-            <h:outputText escape="true" value="Максимальное количество дней, на котороые сформированные заявки запрещено редактировать" styleClass="output-text" />
-            <h:inputText value="#{settingCreatePage.parserBySettingValue.maxDayRequest}" styleClass="input-text" style="width: 207px"/>
-
             <h:outputText escape="true" value="Количество дней, пропустив которые, клиент приостанавливает свою подписку" styleClass="output-text" />
-            <h:inputText value="#{settingCreatePage.parserBySettingValue.dayDeActivae}" styleClass="input-text" style="width: 207px"/>
+            <h:inputText value="#{settingCreatePage.parserBySettingValue.dayDeActivate}" styleClass="input-text" style="width: 207px"/>
+
+            <h:outputText escape="true" value="Включить/Выключить автоматическую приостановку/возобновление подписок на услугу АП в зависимости от посещения учреждения" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{settingCreatePage.parserBySettingValue.enableFeeding}">
+                <f:selectItem itemValue="true"/>
+                <f:selectItem itemValue="false"/>
+            </h:selectBooleanCheckbox>
 
         </h:panelGrid>
 

@@ -151,6 +151,13 @@ public class SettingsListPage extends BasicWorkspacePage implements OrgSelectPag
         return settingsIds;
     }
 
+    public String getSettingsHeadText() {
+        if(settingsIds!=null && settingsIds==4){
+            return "Параметры";
+        }
+        return "Параметры принтера (формат чека)";
+    }
+
     public void setSettingsIds(Integer settingsIds) {
         this.settingsIds = settingsIds;
     }

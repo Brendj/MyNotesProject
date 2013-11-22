@@ -21,11 +21,11 @@
 <%--@elvariable id="configurationProviderViewPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderViewPage"--%>
 <%--@elvariable id="configurationProviderDeletePage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.ConfigurationProviderDeletePage"--%>
 <%--@elvariable id="selectedConfigurationProviderGroupPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.SelectedConfigurationProviderGroupPage"--%>
-<h:panelGrid id="configurationProviderEditPage" binding="#{configurationProviderListPage.pageComponent}"
+<h:panelGrid id="configurationProviderListPage" binding="#{configurationProviderListPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
 
     <rich:dataTable id="configurationProviderListTable" value="#{configurationProviderListPage.configurationProviderList}" var="configurationProvider"
-                    columnClasses="left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column" width="400px" rowKeyVar="row">
+                    columnClasses="left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column" width="400px" rowKeyVar="row" rows="15">
         <rich:column  headerClass="column-header">
             <f:facet name="header">
                 <h:outputText value="№" styleClass="output-text" escape="true"/>
@@ -66,6 +66,18 @@
             </a4j:commandLink>
 
         </rich:column>
+
+        <f:facet name="footer">
+            <rich:datascroller for="configurationProviderListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                               stepControls="auto" boundaryControls="hide">
+                <f:facet name="previous">
+                    <h:graphicImage value="/images/16x16/left-arrow.png" />
+                </f:facet>
+                <f:facet name="next">
+                    <h:graphicImage value="/images/16x16/right-arrow.png" />
+                </f:facet>
+            </rich:datascroller>
+        </f:facet>
 
     </rich:dataTable>
 
