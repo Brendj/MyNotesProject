@@ -46,6 +46,7 @@ public class Journal extends LibraryDistributedObject {
         //criteria.createAlias("publication", "p", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();
         projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalId"), "globalId");
         projectionList.add(Projections.property("globalVersion"), "globalVersion");
         projectionList.add(Projections.property("deletedState"), "deletedState");
         projectionList.add(Projections.property("orgOwner"), "orgOwner");

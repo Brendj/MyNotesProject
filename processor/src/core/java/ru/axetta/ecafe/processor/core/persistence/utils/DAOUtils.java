@@ -1181,7 +1181,8 @@ public class DAOUtils {
             refDistributedObject = clazz.newInstance();
             Criteria criteria = session.createCriteria(clazz);
             criteria.add(Restrictions.eq("guid",guid));
-            refDistributedObject.createProjectionByID(criteria);
+            //refDistributedObject.createProjectionByID(criteria);
+            refDistributedObject.createProjections(criteria);
             criteria.setResultTransformer(Transformers.aliasToBean(clazz));
             criteria.setMaxResults(1);
             return (T) criteria.uniqueResult();

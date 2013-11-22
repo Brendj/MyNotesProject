@@ -41,6 +41,7 @@ public class Fund extends LibraryDistributedObject {
     public void createProjections(Criteria criteria) {
         ProjectionList projectionList = Projections.projectionList();
         projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalId"), "globalId");
         projectionList.add(Projections.property("globalVersion"), "globalVersion");
         projectionList.add(Projections.property("deletedState"), "deletedState");
         projectionList.add(Projections.property("orgOwner"), "orgOwner");

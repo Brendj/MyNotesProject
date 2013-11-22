@@ -50,27 +50,12 @@ public class Instance extends LibraryDistributedObject {
 
     @Override
     public void createProjections(Criteria criteria) {
-        //criteria.createAlias("publication","p", JoinType.LEFT_OUTER_JOIN);
-        //criteria.createAlias("fund", "f", JoinType.LEFT_OUTER_JOIN);
-        //criteria.createAlias("inventoryBook", "i", JoinType.LEFT_OUTER_JOIN);
-        //criteria.createAlias("ksu1Record", "k1", JoinType.LEFT_OUTER_JOIN);
-        //criteria.createAlias("ksu2Record", "k2", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();
         projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalId"), "globalId");
         projectionList.add(Projections.property("globalVersion"), "globalVersion");
         projectionList.add(Projections.property("deletedState"), "deletedState");
         projectionList.add(Projections.property("orgOwner"), "orgOwner");
-
-        //projectionList.add(Projections.property("inGroup"), "inGroup");
-        //projectionList.add(Projections.property("invNumber"), "invNumber");
-        //projectionList.add(Projections.property("cost"), "cost");
-
-        //projectionList.add(Projections.property("p.guid"), "guidPublication");
-        //projectionList.add(Projections.property("f.guid"), "guidFund");
-        //projectionList.add(Projections.property("i.guid"), "guidInventaryBook");
-        //projectionList.add(Projections.property("k1.guid"), "guidKsu1Record");
-        //projectionList.add(Projections.property("k2.guid"), "guidKsu2Record");
-
         criteria.setProjection(projectionList);
     }
 

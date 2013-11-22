@@ -74,6 +74,7 @@ public class InternalDisposingDocumentPosition extends SupplierRequestDistribute
 
         ProjectionList projectionList = Projections.projectionList();
         projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("globalId"), "globalId");
         projectionList.add(Projections.property("globalVersion"), "globalVersion");
         projectionList.add(Projections.property("deletedState"), "deletedState");
         projectionList.add(Projections.property("orgOwner"), "orgOwner");

@@ -121,18 +121,18 @@ public abstract class DistributedObject{
 
     public abstract void createProjections(Criteria criteria);
 
-    public void createProjectionByID(Criteria criteria){
-        ProjectionList projectionList = Projections.projectionList();
-        projectionList.add(Projections.property("globalId"), "globalId");
-        projectionList.add(Projections.property("globalVersion"), "globalVersion");
-        projectionList.add(Projections.property("globalVersionOnCreate"), "globalVersionOnCreate");
-        projectionList.add(Projections.property("createdDate"), "createdDate");
-        projectionList.add(Projections.property("lastUpdate"), "lastUpdate");
-        projectionList.add(Projections.property("deletedState"), "deletedState");
-        projectionList.add(Projections.property("guid"), "guid");
-        projectionList.add(Projections.property("orgOwner"), "orgOwner");
-        criteria.setProjection(projectionList);
-    }
+    //public void createProjectionByID(Criteria criteria){
+    //    ProjectionList projectionList = Projections.projectionList();
+    //    projectionList.add(Projections.property("globalId"), "globalId");
+    //    projectionList.add(Projections.property("globalVersion"), "globalVersion");
+    //    projectionList.add(Projections.property("globalVersionOnCreate"), "globalVersionOnCreate");
+    //    projectionList.add(Projections.property("createdDate"), "createdDate");
+    //    projectionList.add(Projections.property("lastUpdate"), "lastUpdate");
+    //    projectionList.add(Projections.property("deletedState"), "deletedState");
+    //    projectionList.add(Projections.property("guid"), "guid");
+    //    projectionList.add(Projections.property("orgOwner"), "orgOwner");
+    //    criteria.setProjection(projectionList);
+    //}
 
     /**
      * Метод для выборки объектов которые уходят от создателя к создателю без логики
@@ -154,7 +154,7 @@ public abstract class DistributedObject{
         return criteria.list();
     }
 
-    /* идентификатор синхронизируемой организации*/
+    ///* идентификатор синхронизируемой организации*/
     private Long idOfSyncOrg;
 
     public Long getIdOfSyncOrg() {
