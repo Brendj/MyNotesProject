@@ -47,7 +47,7 @@ public class ThinClientUserViewPage extends BasicWorkspacePage {
     private EntityManager entityManager;
 
     public String getPageTitle() {
-        return super.getPageTitle() + username;
+        return super.getPageTitle() + " " + username;
     }
 
     public String getPageFilename() {
@@ -130,5 +130,15 @@ public class ThinClientUserViewPage extends BasicWorkspacePage {
             org = DAOService.getInstance().getOrg(idOfOrg);
             roleName = ThinClientUserListPage.DEFAULT_ROLE;
         }
+    }
+
+    public void clearClient () {
+        idOfClient = null;
+        username = null;
+        roleName = null;
+        person = null;
+        cl = null;
+        org = null;
+        role = 0;
     }
 }

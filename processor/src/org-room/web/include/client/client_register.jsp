@@ -134,7 +134,7 @@
                         <h:outputText value="Факс"/>
                     </f:facet>
                     <rich:jQuery selector="#faxInput" query="mask('(999) 999-9999')" timing="immediate"/>
-                    <h:inputText id="faxInput" value="#{client.fax}" style="width:150px;" disabled="true">
+                    <h:inputText id="faxInput" value="#{client.fax}" style="width:150px;" disabled="#{client.added}">
                     </h:inputText>
                 </rich:column>
                 <rich:column style="text-align: center; background-color: #{client.color};" rendered="#{clientRegisterPage.showEmail}">

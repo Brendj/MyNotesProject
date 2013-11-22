@@ -151,7 +151,17 @@ public class ThinClientUserListPage extends BasicWorkspacePage {
     }
 
     public void doRemoveUser(Long idOfClient) throws Exception {
+        boolean clearView = false;
+        ThinClientUserViewPage view = RuntimeContext.getAppContext().getBean(ThinClientUserViewPage.class);
+        if (view != null && view.getIdOfClient() != null &&
+            idOfClient == view.getIdOfClient()) {
+            clearView = true;
+        }
+
         RuntimeContext.getAppContext().getBean(ThinClientUserListPage.class).removeUser(idOfClient);
+        if (clearView) {
+            view.clearClient();
+        }
     }
 
     @Transactional

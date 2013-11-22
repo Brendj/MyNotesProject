@@ -58,7 +58,7 @@ public class ThinClientUserEditPage extends BasicWorkspacePage implements Client
 
 
     public String getPageTitle() {
-        return super.getPageTitle() + " " + username;
+        return super.getPageTitle() + " " + username == null ? "" : username;
     }
 
     public String getPageFilename() {
