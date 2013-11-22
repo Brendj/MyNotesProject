@@ -9,10 +9,10 @@ import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.logic.PaymentProcessResult;
-import ru.axetta.ecafe.processor.core.logic.Processor;
 import ru.axetta.ecafe.processor.core.partner.stdpay.StdPayConfig;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
-import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.Base64;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.web.partner.OnlinePaymentRequestParser;
@@ -35,6 +35,14 @@ public class Way4PaymentRequestParser extends OnlinePaymentRequestParser {
         String function = parseResult.getParam("function");
         String opId = rrn = parseResult.getParam("RRN");
         long clientId = parseResult.getReqLongParam("PHONE");
+        String bmId = parseResult.getParam("PCODE");
+        if (bmId != null) {
+            Contragent c = RuntimeContext.getAppContext().getBean(DAOService.class).findContragentByClient(clientId);
+            if (c != null && !bmId.equals(c.getBMID())) {
+                throw new Exception(
+                        String.format("Некорректный код поставщика, необходимо использовать %s", c.getBMID()));
+            }
+        }
         long sum=CurrencyStringUtils.rublesToCopecks(parseResult.getReqParam("AMOUNT"));
         String currency = parseResult.getParam("CURRENCY");
         if (!currency.equals("RUR") && !currency.equals("RUB")) throw new Exception("Invalid currency: "+currency);
@@ -51,14 +59,14 @@ public class Way4PaymentRequestParser extends OnlinePaymentRequestParser {
         if (function.equals("bank_account")) {
             return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, true,
                     linkConfig.idOfContragent, null, paymentMethod, clientId,
-                    ""+opId, null, 0L, false);
+                    ""+opId, null, 0L, false, bmId);
 
         } else if (function.equals("bank_payment")) {
             bPayRequest = true;
             String date=parseResult.getReqParam("DATE")+parseResult.getReqParam("TIME");
             return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, false,
                     linkConfig.idOfContragent, null, paymentMethod, clientId,
-                    opId, date+"/"+termId+"/"+opId, sum, false);
+                    opId, date+"/"+termId+"/"+opId, sum, false, bmId);
         } else {
             throw new Exception("Invalid function requested: "+function);
         }

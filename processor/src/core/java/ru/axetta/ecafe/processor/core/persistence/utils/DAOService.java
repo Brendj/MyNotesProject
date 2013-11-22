@@ -1591,4 +1591,13 @@ public class DAOService {
         List <Long> list = (List <Long>) q.list();
         return list;
     }
+
+    public Contragent findContragentByClient(Long clientContractId) {
+        TypedQuery<Contragent> query = entityManager.createQuery(
+                "select c from Contragent c join c.orgsInternal o join o.clientsInternal cl \n"
+                        + "where cl.contractId = :contractId", Contragent.class)
+                .setParameter("contractId", clientContractId);
+        List<Contragent> res = query.getResultList();
+        return res.isEmpty() ? null : res.get(0);
+    }
 }

@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -508,6 +510,10 @@ public class Contragent {
 
     public void setOkato(String okato) {
         this.okato = okato;
+    }
+
+    public String getBMID() {
+        return StringUtils.substringBetween(remarks, "{BMID=", "}");
     }
 
     @Override

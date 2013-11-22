@@ -91,6 +91,15 @@ public class OnlinePaymentProcessor {
 
         private final boolean bCheckOnly;
         private Date payDate = null;
+        private String bmId;
+
+        public PayRequest(int protoVersion, boolean bCheckOnly, long contragentId, Long tspContragentId,
+                int paymentMethod, long clientId, String paymentId, String paymentAdditionalId, long sum,
+                boolean bNegativeSum, String bmId) throws Exception {
+            this(protoVersion, bCheckOnly, contragentId, tspContragentId, paymentMethod, clientId, paymentId,
+                    paymentAdditionalId, sum, bNegativeSum);
+            this.bmId = bmId;
+        }
 
         public PayRequest(int protoVersion, boolean bCheckOnly, long contragentId, Long tspContragentId, int paymentMethod, long clientId, String paymentId, String paymentAdditionalId, long sum, boolean bNegativeSum)
                 throws Exception {
@@ -158,7 +167,7 @@ public class OnlinePaymentProcessor {
         public String toString() {
             return "PayRequest{" + "contragentId=" + contragentId + ", paymentMethod=" + paymentMethod + ", clientId="
                     + clientId + ", paymentId='" + paymentId + '\'' + ", paymentAdditionalId='" + paymentAdditionalId
-                    + '\'' + ", sum=" + sum + ", bCheckOnly=" + bCheckOnly + '}';
+                    + '\'' + ", sum=" + sum + ", bCheckOnly=" + bCheckOnly + ", BMID=" + bmId + '}';
         }
     }
 
