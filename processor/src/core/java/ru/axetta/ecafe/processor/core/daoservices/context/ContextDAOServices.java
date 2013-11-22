@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.User;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -75,15 +76,30 @@ public class ContextDAOServices {
             Criteria criteria) {
         List<Long> orgIds = findOrgOwnersByContragentSet(idOfUser);
         Set<Contragent> contragents = getRestictedContragents(idOfUser);
-        if (orgIds.isEmpty() && contragents.isEmpty()) {
+        if ((orgIds == null || orgIds.isEmpty()) &&
+            (contragents == null || contragents.isEmpty())) {
             return;
         }
         List<Long> contragentIds = new ArrayList<Long>();
         for (Contragent c : contragents) {
             contragentIds.add(c.getIdOfContragent());
         }
-        criteria.add(
-                Restrictions.or(Restrictions.in(fieldOrg, orgIds), Restrictions.in(fieldContragent, contragentIds)));
+        Criterion inOrgsRestriction = null;
+        if (orgIds != null && orgIds.size() > 0) {
+            inOrgsRestriction = Restrictions.in(fieldOrg, orgIds);
+        }
+        Criterion inContragentsRestriction = null;
+        if (contragentIds != null && contragentIds.size() > 0) {
+            inContragentsRestriction = Restrictions.in(fieldContragent, contragentIds);
+        }
+
+        Restrictions mainRestriction = null;
+        if (inOrgsRestriction != null && inContragentsRestriction != null) {
+            criteria.add(Restrictions.or(inOrgsRestriction, inContragentsRestriction));
+        }
+        else {
+            criteria.add(inOrgsRestriction == null ? inContragentsRestriction : inOrgsRestriction);
+        }
     }
 
     public void buildOrgRestriction(long idOfUser, String field, Criteria criteria) {
