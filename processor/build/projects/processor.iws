@@ -23,11 +23,60 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.ids" afterPath="$PROJECT_DIR$/processor.ids" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/AccompanyingDocument.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/AccompanyingDocument.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/ActOfInventorization.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/ActOfInventorization.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/ActOfWayBillDifference.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/ActOfWayBillDifference.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/ActOfWayBillDifferencePosition.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/ActOfWayBillDifferencePosition.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Circulation.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Circulation.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/feeding/CycleDiagram.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/feeding/CycleDiagram.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/DistributedObject.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/DistributedObject.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/settings/ECafeSettings.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/settings/ECafeSettings.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Fund.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Fund.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/Good.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/Good.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodBasicBasketPrice.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodBasicBasketPrice.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodComplaintBook.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodComplaintBook.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodComplaintCauses.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodComplaintCauses.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodComplaintIterations.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodComplaintIterations.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodComplaintOrders.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodComplaintOrders.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodGroup.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodGroup.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/consumer/GoodRequest.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/consumer/GoodRequest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/consumer/GoodRequestPosition.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/consumer/GoodRequestPosition.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Instance.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Instance.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/InternalDisposingDocument.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/InternalDisposingDocument.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/InternalDisposingDocumentPosition.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/InternalDisposingDocumentPosition.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/InternalIncomingDocument.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/InternalIncomingDocument.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/InternalIncomingDocumentPosition.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/InternalIncomingDocumentPosition.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/InventoryBook.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/InventoryBook.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Issuable.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Issuable.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Journal.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Journal.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/JournalItem.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/JournalItem.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Ksu1Record.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Ksu1Record.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Ksu2Record.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Ksu2Record.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/LibVisit.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/LibVisit.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/LimitFilter.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/LimitFilter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/manager/Manager.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/manager/Manager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/Product.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/Product.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/ProductGroup.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/ProductGroup.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/Prohibition.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/Prohibition.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/ProhibitionExclusion.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/ProhibitionExclusion.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Publication.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Publication.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/RetirementReason.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/RetirementReason.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Source.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/Source.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/settings/Staff.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/settings/Staff.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/settings/StateChange.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/settings/StateChange.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/feeding/SubscriptionFeeding.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/feeding/SubscriptionFeeding.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/TechnologicalMap.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/TechnologicalMap.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/TechnologicalMapGroup.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/TechnologicalMapGroup.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/TechnologicalMapProduct.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/TechnologicalMapProduct.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/TradeMaterialGood.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/TradeMaterialGood.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/TypeOfAccompanyingDocument.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/TypeOfAccompanyingDocument.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/WayBill.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/WayBill.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/WayBillPosition.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/WayBillPosition.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.ipr" afterPath="$PROJECT_DIR$/processor.ipr" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.iws" afterPath="$PROJECT_DIR$/processor.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/db/update.properties" afterPath="$PROJECT_DIR$/../../src/core/java/db/update.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/db/update_2.2.49-2.2.50.sql" afterPath="$PROJECT_DIR$/../../src/core/java/db/update_2.2.49-2.2.50.sql" />
     </list>
     <list id="e1ee075d-5eee-4550-8974-bf9883a857e2" name="Failed commit: Default" comment="В процессинге в таблице публикаций создан составной первичный ключ, изменены cущности и изменена логика синхронизации в связи с этим;" />
     <list id="5b6999d5-a6c7-470d-8a7d-cf1ed7c67d95" name="Failed commit: Failed commit: Default" comment="Добавлена обработка журнала посещений, во всех отчетах таймаут проставляется правильно. Удален неиспользуемый data dource embed-derby-ds. В config.properties изменен почтовый сервер на smtp.gmail.com и включен starttls." />
@@ -51,17 +100,17 @@
     <file path="/TransactionTest.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355830368186" ignored="false" />
     <file path="/main_menu.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1377676161186" ignored="false" />
     <file path="/CommodityAccountingGroupPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1356006147159" ignored="false" />
-    <file path="/fragment.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384506189676" ignored="false" />
+    <file path="/fragment.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1385035571709" ignored="false" />
     <file path="/ActOfInventarizationListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355842278615" ignored="false" />
     <file path="/inventarization_acts.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366269686473" ignored="false" />
-    <file path="/a.dummy" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384520344574" ignored="false" />
+    <file path="/a.dummy" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1385038273934" ignored="false" />
     <file path="/index.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1376311940786" ignored="false" />
     <file path="/ActOfInventarizationFilter.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355840015218" ignored="false" />
     <file path="/ActOfInventarizationItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1356017496503" ignored="false" />
     <file path="/ActOfWayBillDifferencePositionItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369050602933" ignored="false" />
     <file path="/ActOfWayBillDifferencePositionListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355918761293" ignored="false" />
     <file path="/waybilldifferenceposition_acts.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369038040784" ignored="false" />
-    <file path="/SyncServlet.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384511472128" ignored="false" />
+    <file path="/SyncServlet.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1385040749912" ignored="false" />
     <file path="/Dummy.txt" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1377610451726" ignored="false" />
     <file path="/TradeMaterialGoodListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355996963925" ignored="false" />
     <file path="/TradeMaterialGoodItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369810114317" ignored="false" />
@@ -73,15 +122,15 @@
     <file path="/WayBillPosition.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1375787226367" ignored="false" />
     <file path="/waybill.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366269904726" ignored="false" />
     <file path="/Function.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366714093196" ignored="false" />
-    <file path="/MainPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1376302937093" ignored="false" />
+    <file path="/MainPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384939479717" ignored="false" />
     <file path="/WayBillPListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1356008089568" ignored="false" />
     <file path="/WayBillPositionItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369050631073" ignored="false" />
     <file path="/WayBill.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1375787258851" ignored="false" />
     <file path="/waybillposition.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1356016668871" ignored="false" />
     <file path="/WayBillPositionListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1356016645427" ignored="false" />
     <file path="/WayBillPositionFilter.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1356015719590" ignored="false" />
-    <file path="/DAOUtils.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1376037956519" ignored="false" />
-    <file path="/Processor.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384510858256" ignored="false" />
+    <file path="/DAOUtils.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1385106389172" ignored="false" />
+    <file path="/Processor.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384940782293" ignored="false" />
     <file path="/CfOrgs.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1358764124293" ignored="false" />
     <file path="/CfOrgs.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1358764216281" ignored="false" />
     <file path="/hibernate.cfg.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1359470773211" ignored="false" />
@@ -139,7 +188,7 @@
     <file path="/BasicReportForContragentJob.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1359645592997" ignored="false" />
     <file path="D:/home/java/reportserver/src/web/web/WEB-INF/web.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1359706950980" ignored="false" />
     <file path="/BasicGoodListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1373630865495" ignored="false" />
-    <file path="/persistence.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1383917026393" ignored="false" />
+    <file path="/persistence.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1385108996639" ignored="false" />
     <file path="$PROJECT_DIR$/../../../processor_moscow_relis/src/core/database/derby/ecafe_processor_derby_postgre.sql" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1359966653342" ignored="false" />
     <file path="/TotalStatisticsIndicatorsReportPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1359975059991" ignored="false" />
     <file path="/CommonStatsPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1359975524453" ignored="false" />
@@ -636,7 +685,7 @@
     <file path="/GoodsBasicBasketDataItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1360746867075" ignored="false" />
     <file path="/OrgOwnerData.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1375779480875" ignored="false" />
     <file path="/GoodsBasicBasketDataElement.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369050496784" ignored="false" />
-    <file path="/Good.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1375785839545" ignored="false" />
+    <file path="/Good.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384943738282" ignored="false" />
     <file path="/SyncResponse.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1383914400473" ignored="false" />
     <file path="/GoodBasicBasketPrice.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1375785770700" ignored="false" />
     <file path="/DistributedObjectsEnum.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369290947650" ignored="false" />
@@ -950,7 +999,7 @@
     <file path="/Answer.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366717284870" ignored="false" />
     <file path="/QuestionaryElement.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361448614887" ignored="false" />
     <file path="/update_2.2.35-2.2.36.sql" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361546288704" ignored="false" />
-    <file path="/Manager.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384511325211" ignored="false" />
+    <file path="/Manager.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1385108467352" ignored="false" />
     <file path="/show-orders-and-payments.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1375772235519" ignored="false" />
     <file path="/GroupPaymentConfirm.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361526354316" ignored="false" />
     <file path="/GroupPaymentConfirm.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361526337196" ignored="false" />
@@ -991,7 +1040,7 @@
     <file path="/PhoneNumberCanonicalizator.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363352475483" ignored="false" />
     <file path="/PhoneNumberCanonicalizatorTest.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369724606445" ignored="false" />
     <file path="/MSRStopListLoader.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363354875458" ignored="false" />
-    <file path="/RuntimeContext.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1376316345166" ignored="false" />
+    <file path="/RuntimeContext.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1385037736082" ignored="false" />
     <file path="/ClientPaymentList.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363361348029" ignored="false" />
     <file path="/update.properties" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363592411125" ignored="false" />
     <file path="C:/updater/2013/03/updater-server-11-03/update-server/src/core/java/db/create.sql" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1363594317572" ignored="false" />
@@ -1031,7 +1080,7 @@
     <file path="/GoodComplaintOrders.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1364210360650" ignored="false" />
     <file path="/GoodComplaintIterations.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1364210391266" ignored="false" />
     <file path="/Client.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1375699931605" ignored="false" />
-    <file path="/WayBill.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1364208141421" ignored="false" />
+    <file path="/WayBill.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384933719723" ignored="false" />
     <file path="/InternalDisposingDocument.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1364208035890" ignored="false" />
     <file path="/GoodRequest.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366872439382" ignored="false" />
     <file path="/ActOfWayBillDifference.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366709135528" ignored="false" />
@@ -1119,7 +1168,7 @@
     <file path="C:/updater/2013/04/update-server-08/src/update-server-web/web/WEB-INF/pages/events/list.xhtml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1370435198701" ignored="false" />
     <file path="/ConfigurationProviderService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366798788842" ignored="false" />
     <file path="/update_2.2.39-2.2.40.sql" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369170620079" ignored="false" />
-    <file path="/GoodRequest.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1376313003455" ignored="false" />
+    <file path="/GoodRequest.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1385108611614" ignored="false" />
     <file path="/GoodRequestListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1372321065649" ignored="false" />
     <file path="/GoodRequestService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1376315823821" ignored="false" />
     <file path="C:/updater/2013/04/update-server-08/src/update-server-web/java/ru/axetta/updater/web/servlets/GetApplicationStatusNotificationsAndEventsServlet.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1368695278314" ignored="false" />
@@ -1240,7 +1289,7 @@
     <file path="/AggregateGoodRequestReport.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369037576934" ignored="false" />
     <file path="/positions.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369132204790" ignored="false" />
     <file path="/update_2.2.40-2.2.41.sql" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369039889488" ignored="false" />
-    <file path="/TechnologicalMap.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1375785436980" ignored="false" />
+    <file path="/TechnologicalMap.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384944126010" ignored="false" />
     <file path="/UnitScale.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1373545713001" ignored="false" />
     <file path="/ActOfWayBillDifferencePosition.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1375787581447" ignored="false" />
     <file path="/InternalIncomingDocumentPosition.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1375787366221" ignored="false" />
@@ -1249,7 +1298,7 @@
     <file path="/AggregateGoodRequestReportPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1372325233033" ignored="false" />
     <file path="/AggregateGoodRequestReportService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369299765282" ignored="false" />
     <file path="/good_requests_report.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369641817551" ignored="false" />
-    <file path="/DistributedObject.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384511047480" ignored="false" />
+    <file path="/DistributedObject.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1385037342417" ignored="false" />
     <file path="/StateChange.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1375787306078" ignored="false" />
     <file path="/OnlineReportPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369639038475" ignored="false" />
     <file path="/client_csv_list.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369300575837" ignored="false" />
@@ -1385,7 +1434,7 @@
     <file path="C:/updater/2013/04/update-server-08/src/dashboard/java/monitoring/MonitorParamConstraint.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1370868720420" ignored="false" />
     <file path="C:/updater/2013/04/update-server-08/src/dashboard/java/monitoring/MonitorParam.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1370868720420" ignored="false" />
     <file path="C:/updater/2013/04/update-server-08/src/dashboard/java/monitoring/Server.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1370868720420" ignored="false" />
-    <file path="/Publication.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1370868893536" ignored="false" />
+    <file path="/Publication.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384947381272" ignored="false" />
     <file path="C:/updater/2013/06/update-server-10/src/newweb/web/WEB-INF/updater-server-security.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374761289166" ignored="false" />
     <file path="C:/updater/2013/06/update-server-10/src/newweb/web/WEB-INF/web.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374491948301" ignored="false" />
     <file path="C:/updater/2013/06/update-server-10/src/newweb/web/login.xhtml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1375425426931" ignored="false" />
@@ -1545,7 +1594,7 @@
     <file path="C:/updater/2013/06/update-server-10/src/newweb/java/ru/axetta/updater/web/pages/events/EventController.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1375269869836" ignored="false" />
     <file path="/EventController.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1375268146347" ignored="false" />
     <file path="C:/updater/2013/06/update-server-10/src/core/java/ru/axetta/updater/core/utils/CalendarUtil.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1372169889785" ignored="false" />
-    <file path="/CalendarUtils.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1375693212915" ignored="false" />
+    <file path="/CalendarUtils.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384940974423" ignored="false" />
     <file path="$USER_HOME$/IdeaProjects/gwt4jboss/web/src/com/mySampleApplication/server/MySampleApplicationServiceImpl.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1372414195813" ignored="false" />
     <file path="$USER_HOME$/IdeaProjects/gwt4jboss/web/src/com/mySampleApplication/MySampleApplication.gwt.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1372414208941" ignored="false" />
     <file path="$USER_HOME$/IdeaProjects/gwt4jboss/web/web/MySampleApplication.html" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1372403696426" ignored="false" />
@@ -1812,7 +1861,6 @@
     <file path="/AbstractEntityItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384160031182" ignored="false" />
     <file path="/ContractItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384160183157" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../../school-kiosk-2/school-kiosk-2/src/ru/axetta/istk/school/MainPageContext.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384333482859" ignored="false" />
-    <file path="$PROJECT_DIR$/../../src/web/web/WEB-INF/classes/META-INF/persistence.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384419690118" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../10/processor-moscow-relise/src/web/java/ru/axetta/ecafe/processor/web/partner/way4/Way4PaymentRequestParser.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384507700074" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../10/processor-moscow-relise/src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/feeding/CycleDiagram.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384506615141" ignored="false" />
     <file path="/CycleDiagram.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384505932073" ignored="false" />
@@ -1824,8 +1872,15 @@
     <file path="$PROJECT_DIR$/../../../../10/processor-moscow-relise/src/core/java/ru/axetta/ecafe/processor/core/persistence/Option.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384508014515" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../10/processor-moscow-relise/src/web/java/ru/axetta/ecafe/processor/web/partner/integra/soap/ClientRoomControllerWS.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384508014515" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../10/processor-moscow-relise/src/web/java/ru/axetta/ecafe/processor/web/ui/option/OptionPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384507682769" ignored="false" />
-    <file path="/Way4PaymentRequestParser.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384507700074" ignored="false" />
+    <file path="/Way4PaymentRequestParser.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384948323989" ignored="false" />
     <file path="/ReportRepositoryItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384518176250" ignored="false" />
+    <file path="/CardCreatePage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384939454326" ignored="false" />
+    <file path="/ConfigurationProviderDistributedObject.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1385017628819" ignored="false" />
+    <file path="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/option/MessageConfigurePage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384946246187" ignored="false" />
+    <file path="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/service/EventNotificationService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384946246187" ignored="false" />
+    <file path="/update_2.2.50-2.2.51.sql" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1384959670504" ignored="false" />
+    <file path="/LibraryDistributedObject.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1385031739007" ignored="false" />
+    <file path="/DistributedObjectDAO.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1385037394583" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -1891,21 +1946,6 @@
       </breakpoint>
     </breakpoint_any>
     <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true">
-      <breakpoint url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/handlers/temp/cards/operations/TempCardsOperationBuilder.java" line="18" class="ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperationBuilder" package="ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations">
-        <option name="ENABLED" value="true" />
-        <option name="LOG_ENABLED" value="false" />
-        <option name="LOG_EXPRESSION_ENABLED" value="false" />
-        <option name="REMOVE_AFTER_HIT" value="false" />
-        <option name="SUSPEND_POLICY" value="SuspendAll" />
-        <option name="SUSPEND" value="true" />
-        <option name="COUNT_FILTER_ENABLED" value="false" />
-        <option name="COUNT_FILTER" value="0" />
-        <option name="CONDITION_ENABLED" value="true" />
-        <option name="CLASS_FILTERS_ENABLED" value="false" />
-        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
-        <option name="CONDITION" value="" />
-        <option name="LOG_MESSAGE" value="" />
-      </breakpoint>
       <breakpoint url="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/commodity/accounting/configurationProvider/good/group/GoodGroupListPage.java" line="57" class="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.GoodGroupListPage" package="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
@@ -2146,7 +2186,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file://$PROJECT_DIR$/../../src/org-room/java/ru/axetta/ecafe/processor/web/ui/claim/ClaimCalendarEditPage.java" line="519" class="ru.axetta.ecafe.processor.web.ui.claim.ClaimCalendarEditPage" package="ru.axetta.ecafe.processor.web.ui.claim">
+      <breakpoint url="file://$PROJECT_DIR$/../../src/org-room/java/ru/axetta/ecafe/processor/web/ui/claim/ClaimCalendarEditPage.java" line="519" class="ru.axetta.ecafe.processor.web.ui.claim.ClaimCalendarEditPage.Entry" package="ru.axetta.ecafe.processor.web.ui.claim">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -2266,6 +2306,51 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/manager/Manager.java" line="307" class="ru.axetta.ecafe.processor.core.sync.manager.Manager" package="ru.axetta.ecafe.processor.core.sync.manager">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/manager/Manager.java" line="617" class="ru.axetta.ecafe.processor.core.sync.manager.Manager" package="ru.axetta.ecafe.processor.core.sync.manager">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/manager/Manager.java" line="640" class="ru.axetta.ecafe.processor.core.sync.manager.Manager" package="ru.axetta.ecafe.processor.core.sync.manager">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
     </line_breakpoints>
     <breakpoint_rules />
     <ui_properties />
@@ -2292,157 +2377,7 @@
     </favorites_list>
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="update_2.2.48-2.2.49.sql" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.48-2.2.49.sql">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="142" column="16" selection-start="6009" selection-end="6009" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="update_2.2.49-2.2.50.sql" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.49-2.2.50.sql">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="19" column="57" selection-start="933" selection-end="933" vertical-scroll-proportion="0.5862069">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AutoReportGenerator.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/AutoReportGenerator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="267" column="36" selection-start="16245" selection-end="16246" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ReportDAOService.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/ReportDAOService.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="525" column="22" selection-start="20933" selection-end="20933" vertical-scroll-proportion="0.0">
-              <folding>
-                <marker date="1384419375051" expanded="true" signature="9381:9451" placeholder="DELETE FROM ..." />
-                <marker date="1384419375051" expanded="true" signature="9564:9625" placeholder="DELETE FROM ..." />
-                <marker date="1384419375051" expanded="true" signature="22577:22608" placeholder="SELECT COUNT..cf_clients..." />
-                <marker date="1384419375051" expanded="true" signature="22772:22843" placeholder="SELECT COUNT..cf_clients..." />
-                <marker date="1384419375051" expanded="true" signature="23006:23075" placeholder="SELECT COUNT..cf_clients..." />
-                <marker date="1384419375051" expanded="true" signature="23257:23378" placeholder="select count..cf_clientpayments..." />
-                <marker date="1384419375051" expanded="true" signature="23552:23605" placeholder="SELECT COUNT..cf_enterevents..." />
-                <marker date="1384419375051" expanded="true" signature="23771:23809" placeholder="SELECT COUNT..cf_clientpayments..." />
-                <marker date="1384419375051" expanded="true" signature="23967:23997" placeholder="SELECT COUNT..cf_orders..." />
-                <marker date="1384419375051" expanded="true" signature="24156:24191" placeholder="SELECT COUNT..cf_enterevents..." />
-                <marker date="1384419375051" expanded="true" signature="24348:24381" placeholder="SELECT COUNT..cf_clientsms..." />
-                <marker date="1384419375051" expanded="true" signature="24578:24704" placeholder="select count..cf_orders..." />
-                <marker date="1384419375051" expanded="true" signature="24882:25027" placeholder="select count..cf_orders..." />
-                <marker date="1384419375051" expanded="true" signature="25194:25338" placeholder="select count..cf_orders..." />
-                <marker date="1384419375051" expanded="true" signature="25594:25892" placeholder="SELECT contr..cf_clientpayments..." />
-                <marker date="1384419375051" expanded="true" signature="26232:26446" placeholder="SELECT cp.id..cf_clientpayments..." />
-                <marker date="1384419375051" expanded="true" signature="26706:26966" placeholder="SELECT cp.id..cf_clientpayments..." />
-                <marker date="1384419375051" expanded="true" signature="27264:27341" placeholder="UPDATE cf_ca..." />
-                <marker date="1384419375051" expanded="true" signature="27739:28222" placeholder="SELECT cf_en..cf_enterevents..." />
-                <marker date="1384419375051" expanded="true" signature="28261:28796" placeholder="SELECT cf_en..cf_enterevents..." />
-                <marker date="1384419375051" expanded="true" signature="30109:30561" placeholder="SELECT cf_or..cf_orders..." />
-                <marker date="1384419375051" expanded="true" signature="30600:31104" placeholder="SELECT cf_or..cf_orders..." />
-                <marker date="1384419375051" expanded="true" signature="32421:32995" placeholder="SELECT idofo..cf_clients..." />
-                <marker date="1384419375051" expanded="true" signature="33034:33732" placeholder="SELECT idofo..cf_clients..." />
-                <marker date="1384419375051" expanded="true" signature="35064:35484" placeholder="SELECT cf_or..cf_orders..." />
-                <marker date="1384419375051" expanded="true" signature="35523:36015" placeholder="SELECT cf_or..cf_orders..." />
-                <marker date="1384419375051" expanded="true" signature="37339:37573" placeholder="SELECT cf_or..cf_orders..." />
-                <marker date="1384419375051" expanded="true" signature="38363:38468" placeholder="UPDATE cf_cl..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RuleProcessor.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuleProcessor.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="616" column="22" selection-start="28898" selection-end="28898" vertical-scroll-proportion="115.52">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DAOService.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="530" column="22" selection-start="21091" selection-end="21091" vertical-scroll-proportion="0.0">
-              <folding>
-                <marker date="1384419373903" expanded="true" signature="9395:9465" placeholder="DELETE FROM ..." />
-                <marker date="1384419373903" expanded="true" signature="9578:9639" placeholder="DELETE FROM ..." />
-                <marker date="1384419373903" expanded="true" signature="23099:23130" placeholder="SELECT COUNT..cf_clients..." />
-                <marker date="1384419373903" expanded="true" signature="23294:23365" placeholder="SELECT COUNT..cf_clients..." />
-                <marker date="1384419373903" expanded="true" signature="23528:23597" placeholder="SELECT COUNT..cf_clients..." />
-                <marker date="1384419373903" expanded="true" signature="23779:23900" placeholder="select count..cf_clientpayments..." />
-                <marker date="1384419373903" expanded="true" signature="24074:24127" placeholder="SELECT COUNT..cf_enterevents..." />
-                <marker date="1384419373903" expanded="true" signature="24293:24331" placeholder="SELECT COUNT..cf_clientpayments..." />
-                <marker date="1384419373903" expanded="true" signature="24489:24519" placeholder="SELECT COUNT..cf_orders..." />
-                <marker date="1384419373903" expanded="true" signature="24678:24713" placeholder="SELECT COUNT..cf_enterevents..." />
-                <marker date="1384419373903" expanded="true" signature="24870:24903" placeholder="SELECT COUNT..cf_clientsms..." />
-                <marker date="1384419373903" expanded="true" signature="25100:25226" placeholder="select count..cf_orders..." />
-                <marker date="1384419373903" expanded="true" signature="25404:25549" placeholder="select count..cf_orders..." />
-                <marker date="1384419373903" expanded="true" signature="25716:25860" placeholder="select count..cf_orders..." />
-                <marker date="1384419373903" expanded="true" signature="26116:26414" placeholder="SELECT contr..cf_clientpayments..." />
-                <marker date="1384419373903" expanded="true" signature="26754:26968" placeholder="SELECT cp.id..cf_clientpayments..." />
-                <marker date="1384419373903" expanded="true" signature="27228:27488" placeholder="SELECT cp.id..cf_clientpayments..." />
-                <marker date="1384419373903" expanded="true" signature="27786:27863" placeholder="UPDATE cf_ca..." />
-                <marker date="1384419373903" expanded="true" signature="28261:28744" placeholder="SELECT cf_en..cf_enterevents..." />
-                <marker date="1384419373903" expanded="true" signature="28783:29318" placeholder="SELECT cf_en..cf_enterevents..." />
-                <marker date="1384419373903" expanded="true" signature="30631:31083" placeholder="SELECT cf_or..cf_orders..." />
-                <marker date="1384419373903" expanded="true" signature="31122:31626" placeholder="SELECT cf_or..cf_orders..." />
-                <marker date="1384419373903" expanded="true" signature="32937:33511" placeholder="SELECT idofo..cf_clients..." />
-                <marker date="1384419373903" expanded="true" signature="33550:34248" placeholder="SELECT idofo..cf_clients..." />
-                <marker date="1384419373903" expanded="true" signature="35568:35988" placeholder="SELECT cf_or..cf_orders..." />
-                <marker date="1384419373903" expanded="true" signature="36027:36519" placeholder="SELECT cf_or..cf_orders..." />
-                <marker date="1384419373903" expanded="true" signature="37837:38071" placeholder="SELECT cf_or..cf_orders..." />
-                <marker date="1384419373903" expanded="true" signature="38865:38970" placeholder="UPDATE cf_cl..." />
-                <marker date="1384419373903" expanded="true" signature="70953:71021" placeholder="SELECT max(c..cf_RegistryChange..." />
-                <marker date="1384419373903" expanded="true" signature="73819:73890" placeholder="update cf_re..." />
-                <marker date="1384419373903" expanded="true" signature="74248:74702" placeholder="select idofr..cf_reportinfo..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="update.properties" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update.properties">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="42" column="20" selection-start="893" selection-end="899" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="report_repository_list.jsp" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/repository/report_repository_list.jsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="98" column="81" selection-start="7127" selection-end="7127" vertical-scroll-proportion="-11.115385">
-              <folding>
-                <marker date="1384419378847" expanded="true" signature="1789:1815" placeholder="{...}" />
-                <marker date="1384419378847" expanded="true" signature="3159:3171" placeholder="{...}" />
-                <marker date="1384419378847" expanded="true" signature="3904:3922" placeholder="{...}" />
-                <marker date="1384419378847" expanded="true" signature="4355:4367" placeholder="{...}" />
-                <marker date="1384419378847" expanded="true" signature="11264:11281" placeholder="{...}" />
-                <marker date="1384419378847" expanded="true" signature="11811:11821" placeholder="{...}" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AbstractListPage.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/abstractpage/AbstractListPage.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="90" column="19" selection-start="2839" selection-end="2839" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf />
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -2507,22 +2442,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/contragent/contract/ContractItem.java" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/abstractpage/AbstractEntityItem.java" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/commodity/accounting/configurationProvider/basic/good/BasicGoodEditPage.java" />
-        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/contract/edit.jsp" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/abstractpage/AbstractEditPage.java" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/contragent/contract/ContractEditPage.java" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/MainPage.java" />
-        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp" />
-        <option value="$PROJECT_DIR$/../../src/core/database/derby/update_0.2.2.7-0.2.2.8/ecafe_postgres_0.2.2.8.sql" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/settings/StateChange.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/feeding/SubscriptionFeeding.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/TechnologicalMap.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/TechnologicalMapGroup.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/TechnologicalMapProduct.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/TradeMaterialGood.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/TypeOfAccompanyingDocument.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/WayBill.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/supplier/WayBillPosition.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodGroup.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/consumer/GoodRequest.java" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/DistributedObject.java" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/manager/Manager.java" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/repository/ReportRepositoryItem.java" />
-        <option value="$PROJECT_DIR$/../../src/core/java/db/update.properties" />
-        <option value="$PROJECT_DIR$/../../src/core/java/db/update_2.2.49-2.2.50.sql" />
+        <option value="$PROJECT_DIR$/../../src/web/web/WEB-INF/classes/META-INF/persistence.xml" />
       </list>
     </option>
   </component>
@@ -2620,10 +2555,10 @@
     <option name="ENABLED" value="false" />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1272" />
-    <option name="y" value="-34" />
-    <option name="width" value="1696" />
-    <option name="height" value="1026" />
+    <option name="x" value="1281" />
+    <option name="y" value="-26" />
+    <option name="width" value="1678" />
+    <option name="height" value="1010" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -2777,7 +2712,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
@@ -2810,26 +2744,12 @@
               <option name="myItemId" value="web" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="web" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="web" />
+              <option name="myItemId" value="WEB-INF" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -2843,19 +2763,19 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="web" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="internal" />
+              <option name="myItemId" value="WEB-INF" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="classes" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="META-INF" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -2866,61 +2786,12 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="web" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="processor" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="java" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="Favorites" />
     </panes>
   </component>
@@ -3002,13 +2873,13 @@
     </servers>
   </component>
   <component name="RecentsManager">
-    <key name="CreateTestDialog.Recents.Supers">
-      <recent name="" />
-    </key>
     <key name="CreateTestDialog.RecentsKey">
       <recent name="ru.axetta.ecafe.processor.core.sms" />
       <recent name="ru.axetta.ecafe.processor.web.partner.integra.soap" />
       <recent name="ru.axetta.ecafe.processor.core.sync.manager" />
+    </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="ru.axetta.ecafe.processor.core.persistence" />
@@ -3017,15 +2888,15 @@
       <recent name="ru.axetta.ecafe.processor.web.partner.integra.dataflow" />
       <recent name="ru.axetta.ecafe.processor.core.sync.handlers.complex.roles" />
     </key>
-    <key name="OPEN_URL_DIALOG">
-      <recent name="https://github.com/SpringSource/spring-data-jpa-examples.git" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\workspace\ecafe\prom\processor\src\core\java\db" />
       <recent name="D:\workspace\ecafe\prom\processor\src\core\java\ru\axetta\ecafe\processor\core\persistence" />
       <recent name="D:\workspace\ecafe\2013\08\processor-moscow-relise\src\core\database\derby" />
       <recent name="D:\workspace\ecafe\2013\04\processor1504\src\core\java\ru\axetta\ecafe\processor\core\persistence" />
       <recent name="D:\workspace\ecafe\2013\04\processor1504\src\core\java\db" />
+    </key>
+    <key name="OPEN_URL_DIALOG">
+      <recent name="https://github.com/SpringSource/spring-data-jpa-examples.git" />
     </key>
     <key name="MoveMembersDialog.RECENTS_KEY">
       <recent name="ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils" />
@@ -3037,10 +2908,12 @@
     <key name="CreateClassDialog.RecentsKey">
       <recent name="ru.axetta.ecafe.processor.core.sync.handlers.client.request" />
     </key>
-    <key name="ImportMappingsDialog.RecentPackages">
-      <recent name="ru.axetta.ecafe.processor.core.persistence" />
-      <recent name="ru.axetta.ecafe.processor.core.persistence.test" />
-      <recent name="" />
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="ru.axetta.ecafe.processor.web.ui.service.msk" />
+      <recent name="ru.axetta.ecafe.processor.core.report" />
+      <recent name="ru.axetta.ecafe.processor.web" />
+      <recent name="ru.axetta.ecafe.processor.core.partner" />
+      <recent name="ru.axetta.ecafe.processor.core.model" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\workspace\ecafe\2013\04\processor1504\src\web\web\back-office\include\report\online" />
@@ -3049,15 +2922,13 @@
       <recent name="D:\workspace\ecafe\12\ecafe_18\processor\src\web\web\back-office\include\commodity_accounting\acts" />
       <recent name="D:\workspace\ecafe\12\ecafe_18\processor\src\web\web\back-office\include\commodity_accounting" />
     </key>
-    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
-      <recent name="ru.axetta.ecafe.processor.web.ui.service.msk" />
-      <recent name="ru.axetta.ecafe.processor.core.report" />
-      <recent name="ru.axetta.ecafe.processor.web" />
-      <recent name="ru.axetta.ecafe.processor.core.partner" />
-      <recent name="ru.axetta.ecafe.processor.core.model" />
+    <key name="ImportMappingsDialog.RecentPackages">
+      <recent name="ru.axetta.ecafe.processor.core.persistence" />
+      <recent name="ru.axetta.ecafe.processor.core.persistence.test" />
+      <recent name="" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.RNIPTest">
+  <component name="RunManager" selected="Remote.Remote">
     <configuration default="false" name="IntegraTest" type="JUnit" factoryName="JUnit" temporary="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="emma">
         <pattern>
@@ -4099,112 +3970,112 @@
     <option name="myMappingRoots">
       <list>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\build\projects" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\build\projects" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\build\projects" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\build\projects" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\build\projects\smpp" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\build\projects\smpp" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\build\projects\smpp" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\build\projects\smpp" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\core" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\core" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\core" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\core" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\dashboard-ws-client" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\dashboard-ws-client" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\dashboard-ws-client" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\dashboard-ws-client" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\j2ee" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\j2ee" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\j2ee" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\j2ee" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\org-room" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\org-room" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\org-room" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\org-room" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\payconv" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\payconv" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\payconv" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\payconv" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\pubkey" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\pubkey" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\pubkey" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\pubkey" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\registry-import" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\registry-import" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\registry-import" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\registry-import" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\synctest" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\synctest" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\synctest" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\synctest" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\testmodule" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\testmodule" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\testmodule" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\testmodule" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\testmodule\datatest" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\testmodule\datatest" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\testmodule\datatest" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\testmodule\datatest" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\util" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\util" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\util" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\util" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\web" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\web" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\web" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\web" />
         </SvnCopyRootSimple>
       </list>
     </option>
     <option name="myMoreRealMappingRoots">
       <list>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\build\projects" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\build\projects" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\build\projects" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\build\projects" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\core" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\core" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\core" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\core" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\dashboard-ws-client" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\dashboard-ws-client" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\dashboard-ws-client" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\dashboard-ws-client" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\j2ee" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\j2ee" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\j2ee" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\j2ee" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\org-room" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\org-room" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\org-room" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\org-room" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\payconv" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\payconv" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\payconv" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\payconv" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\pubkey" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\pubkey" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\pubkey" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\pubkey" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\registry-import" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\registry-import" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\registry-import" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\registry-import" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\synctest" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\synctest" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\synctest" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\synctest" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\testmodule" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\testmodule" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\testmodule" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\testmodule" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\util" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\util" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\util" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\util" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\prom\processor\src\web" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\prom\processor\src\web" />
+          <option name="myVcsRoot" value="D:\workspace\ecafe\test_relise\processor\src\web" />
+          <option name="myCopyRoot" value="D:\workspace\ecafe\test_relise\processor\src\web" />
         </SvnCopyRootSimple>
       </list>
     </option>
@@ -4393,12 +4264,12 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="1272" y="-34" width="1696" height="1026" extended-state="0" />
-    <editor active="true" />
+    <frame x="1281" y="-26" width="1678" height="1010" extended-state="0" />
+    <editor active="false" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30831409" sideWeight="0.16872682" order="30" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.334873" sideWeight="0.16872682" order="30" side_tool="false" content_ui="tabs" />
       <window_info id="JavaEE:App" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2613219" sideWeight="0.1565601" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32925338" sideWeight="0.15104741" order="6" side_tool="true" content_ui="tabs" />
+      <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32925338" sideWeight="0.7729412" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24837662" sideWeight="0.67814726" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.15667075" sideWeight="0.6893764" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30997625" sideWeight="0.5064935" order="7" side_tool="true" content_ui="tabs" />
@@ -4409,14 +4280,14 @@
       <window_info id="CDI" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32986537" sideWeight="0.98039216" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.31947744" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32745314" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22888617" sideWeight="0.6905312" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23143564" sideWeight="0.69058824" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32714286" sideWeight="0.4853121" order="32" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32986537" sideWeight="0.70893055" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.31062356" sideWeight="0.48782468" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.43285716" sideWeight="0.0" order="31" side_tool="false" content_ui="tabs" x="100" y="294" width="710" height="371" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3096624" sideWeight="0.48782468" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4482353" sideWeight="0.0" order="31" side_tool="false" content_ui="tabs" x="100" y="294" width="710" height="371" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23081683" sideWeight="0.13377193" order="5" side_tool="true" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.30946884" sideWeight="0.57037944" order="27" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.30941176" sideWeight="0.57037944" order="27" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21604279" sideWeight="0.27534685" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22215347" sideWeight="0.58662283" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32802936" sideWeight="0.6893764" order="7" side_tool="false" content_ui="tabs" />
@@ -4652,187 +4523,189 @@
     </option>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/main_menu.jsp">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/libriary/TypeOfAccompanyingDocument.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="892" column="119" selection-start="63938" selection-end="63938" vertical-scroll-proportion="-4.4117646">
+        <state line="40" column="73" selection-start="1531" selection-end="1531" vertical-scroll-proportion="0.305">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/repository/ReportRepositoryListPage.java">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/TradeMaterialGood.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="31" column="29" selection-start="1256" selection-end="1256" vertical-scroll-proportion="0.0">
+        <state line="43" column="73" selection-start="1864" selection-end="1864" vertical-scroll-proportion="0.2949527">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/repository/ReportRepositoryItem.java">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/TechnologicalMapProduct.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="48" column="65" selection-start="1906" selection-end="1906" vertical-scroll-proportion="0.0">
+        <state line="51" column="73" selection-start="1830" selection-end="1830" vertical-scroll-proportion="0.5362776">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/daoservices/context/ContextDAOServices.java">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/TechnologicalMapGroup.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="74" column="16" selection-start="2141" selection-end="2141" vertical-scroll-proportion="0.0">
+        <state line="41" column="73" selection-start="1486" selection-end="1486" vertical-scroll-proportion="0.5899054">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/TechnologicalMap.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="87" column="73" selection-start="2829" selection-end="2829" vertical-scroll-proportion="0.61671925">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/feeding/SubscriptionFeeding.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="45" column="73" selection-start="1717" selection-end="1717" vertical-scroll-proportion="0.6971609">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/settings/StateChange.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="63" column="73" selection-start="2645" selection-end="2645" vertical-scroll-proportion="0.77760255">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOUtils.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1202" column="40" selection-start="62910" selection-end="62910" vertical-scroll-proportion="0.0">
           <folding>
-            <marker date="1383218898555" expanded="true" signature="-1:-1" placeholder="select idofo..cf_orgs..." />
+            <element signature="e#4990#5020#0" expanded="true" />
+            <element signature="e#6198#6228#0" expanded="true" />
+            <element signature="e#6904#6934#0" expanded="true" />
+            <element signature="e#17750#17780#0" expanded="true" />
+            <element signature="e#20601#20631#0" expanded="true" />
+            <element signature="e#23684#23714#0" expanded="true" />
+            <element signature="e#29620#29650#0" expanded="true" />
+            <element signature="e#30861#30891#0" expanded="true" />
+            <element signature="e#37258#37288#0" expanded="true" />
+            <element signature="e#38104#38134#0" expanded="true" />
+            <element signature="e#39169#39199#0" expanded="true" />
+            <element signature="e#44014#44044#0" expanded="true" />
+            <element signature="e#46561#46591#0" expanded="true" />
+            <element signature="e#49217#49247#0" expanded="true" />
+            <element signature="e#57804#57834#0" expanded="true" />
+            <element signature="e#60056#60086#0" expanded="true" />
+            <element signature="e#60647#60677#0" expanded="true" />
+            <element signature="e#61444#61474#0" expanded="true" />
+            <element signature="e#62292#62322#0" expanded="true" />
+            <element signature="e#72935#72965#0" expanded="true" />
+            <element signature="e#73563#73593#0" expanded="true" />
+            <element signature="e#75929#75959#0" expanded="true" />
+            <element signature="e#78062#78092#0" expanded="true" />
+            <element signature="e#78802#78832#0" expanded="true" />
+            <element signature="e#79758#79788#0" expanded="true" />
+            <marker date="1385106395554" expanded="true" signature="-1:-1" placeholder="select CF_Cl..CF_Clients..." />
+            <marker date="1385106395554" expanded="true" signature="-1:-1" placeholder="select CF_Cl..CF_Clients..." />
+            <marker date="1385106395554" expanded="true" signature="-1:-1" placeholder="(cf_clients...." />
+            <marker date="1385106395554" expanded="true" signature="-1:-1" placeholder="select cf_cl..cf_clients..." />
+            <marker date="1385106395554" expanded="true" signature="-1:-1" placeholder="select cf_fr..cf_friendly_organization..." />
+            <marker date="1385106395554" expanded="true" signature="-1:-1" placeholder="(cf_clients...." />
+            <marker date="1385106395554" expanded="true" signature="-1:-1" placeholder="select cf_cl..cf_clients..." />
+            <marker date="1385106395554" expanded="true" signature="-1:-1" placeholder="select cf_fr..cf_friendly_organization..." />
+            <marker date="1385106395554" expanded="true" signature="-1:-1" placeholder="SELECT nextv..." />
+            <marker date="1385106395554" expanded="true" signature="-1:-1" placeholder="delete from ..." />
+            <marker date="1385106395554" expanded="true" signature="-1:-1" placeholder="delete from ..." />
+            <marker date="1385106395554" expanded="true" signature="-1:-1" placeholder="select idofc..CF_Clients..." />
+            <marker date="1385106395554" expanded="true" signature="-1:-1" placeholder="DELETE FROM ..." />
+            <marker date="1385106395554" expanded="true" signature="-1:-1" placeholder="select date_..cf_enterevents..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/report/repository/report_repository_list.jsp">
+    <entry file="jar://$USER_HOME$/.ideaLibSources/hibernate-core-4.0.1.Final-sources.jar!/org/hibernate/Session.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="98" column="81" selection-start="7127" selection-end="7127" vertical-scroll-proportion="-11.115385">
+        <state line="468" column="44" selection-start="18066" selection-end="18573" vertical-scroll-proportion="1.1104101">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/consumer/GoodRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="89" column="50" selection-start="4132" selection-end="4132" vertical-scroll-proportion="0.37135923">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodGroup.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="41" column="45" selection-start="1478" selection-end="1478" vertical-scroll-proportion="0.3919903">
           <folding>
-            <marker date="1384419378847" expanded="true" signature="1789:1815" placeholder="{...}" />
-            <marker date="1384419378847" expanded="true" signature="3159:3171" placeholder="{...}" />
-            <marker date="1384419378847" expanded="true" signature="3904:3922" placeholder="{...}" />
-            <marker date="1384419378847" expanded="true" signature="4355:4367" placeholder="{...}" />
-            <marker date="1384419378847" expanded="true" signature="11264:11281" placeholder="{...}" />
-            <marker date="1384419378847" expanded="true" signature="11811:11821" placeholder="{...}" />
+            <element signature="e#0#4449#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/abstractpage/AbstractListPage.java">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/DistributedObject.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="90" column="19" selection-start="2839" selection-end="2839" vertical-scroll-proportion="0.0">
+        <state line="161" column="5" selection-start="6149" selection-end="6149" vertical-scroll-proportion="0.4180225">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/ReportInfo.java">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/distributedobjects/products/GoodGroup.hbm.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="21" selection-start="655" selection-end="665" vertical-scroll-proportion="0.7267552">
+        <state line="9" column="21" selection-start="419" selection-end="419" vertical-scroll-proportion="0.18567961">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update.properties">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="42" column="20" selection-start="893" selection-end="899" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/internal/FrontController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="41" column="13" selection-start="1751" selection-end="1751" vertical-scroll-proportion="-7.2757254">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/ReportDAOService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="525" column="22" selection-start="20933" selection-end="20933" vertical-scroll-proportion="0.0">
+        <state line="387" column="3" selection-start="14384" selection-end="14384" vertical-scroll-proportion="0.33291614">
           <folding>
-            <marker date="1384419375051" expanded="true" signature="9381:9451" placeholder="DELETE FROM ..." />
-            <marker date="1384419375051" expanded="true" signature="9564:9625" placeholder="DELETE FROM ..." />
-            <marker date="1384419375051" expanded="true" signature="22577:22608" placeholder="SELECT COUNT..cf_clients..." />
-            <marker date="1384419375051" expanded="true" signature="22772:22843" placeholder="SELECT COUNT..cf_clients..." />
-            <marker date="1384419375051" expanded="true" signature="23006:23075" placeholder="SELECT COUNT..cf_clients..." />
-            <marker date="1384419375051" expanded="true" signature="23257:23378" placeholder="select count..cf_clientpayments..." />
-            <marker date="1384419375051" expanded="true" signature="23552:23605" placeholder="SELECT COUNT..cf_enterevents..." />
-            <marker date="1384419375051" expanded="true" signature="23771:23809" placeholder="SELECT COUNT..cf_clientpayments..." />
-            <marker date="1384419375051" expanded="true" signature="23967:23997" placeholder="SELECT COUNT..cf_orders..." />
-            <marker date="1384419375051" expanded="true" signature="24156:24191" placeholder="SELECT COUNT..cf_enterevents..." />
-            <marker date="1384419375051" expanded="true" signature="24348:24381" placeholder="SELECT COUNT..cf_clientsms..." />
-            <marker date="1384419375051" expanded="true" signature="24578:24704" placeholder="select count..cf_orders..." />
-            <marker date="1384419375051" expanded="true" signature="24882:25027" placeholder="select count..cf_orders..." />
-            <marker date="1384419375051" expanded="true" signature="25194:25338" placeholder="select count..cf_orders..." />
-            <marker date="1384419375051" expanded="true" signature="25594:25892" placeholder="SELECT contr..cf_clientpayments..." />
-            <marker date="1384419375051" expanded="true" signature="26232:26446" placeholder="SELECT cp.id..cf_clientpayments..." />
-            <marker date="1384419375051" expanded="true" signature="26706:26966" placeholder="SELECT cp.id..cf_clientpayments..." />
-            <marker date="1384419375051" expanded="true" signature="27264:27341" placeholder="UPDATE cf_ca..." />
-            <marker date="1384419375051" expanded="true" signature="27739:28222" placeholder="SELECT cf_en..cf_enterevents..." />
-            <marker date="1384419375051" expanded="true" signature="28261:28796" placeholder="SELECT cf_en..cf_enterevents..." />
-            <marker date="1384419375051" expanded="true" signature="30109:30561" placeholder="SELECT cf_or..cf_orders..." />
-            <marker date="1384419375051" expanded="true" signature="30600:31104" placeholder="SELECT cf_or..cf_orders..." />
-            <marker date="1384419375051" expanded="true" signature="32421:32995" placeholder="SELECT idofo..cf_clients..." />
-            <marker date="1384419375051" expanded="true" signature="33034:33732" placeholder="SELECT idofo..cf_clients..." />
-            <marker date="1384419375051" expanded="true" signature="35064:35484" placeholder="SELECT cf_or..cf_orders..." />
-            <marker date="1384419375051" expanded="true" signature="35523:36015" placeholder="SELECT cf_or..cf_orders..." />
-            <marker date="1384419375051" expanded="true" signature="37339:37573" placeholder="SELECT cf_or..cf_orders..." />
-            <marker date="1384419375051" expanded="true" signature="38363:38468" placeholder="UPDATE cf_cl..." />
+            <element signature="e#0#61432#0" expanded="true" />
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/RegisterReport.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/WEB-INF/classes/META-INF/persistence.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="262" column="11" selection-start="11375" selection-end="11375" vertical-scroll-proportion="5.5171504">
+        <state line="19" column="60" selection-start="1177" selection-end="1177" vertical-scroll-proportion="0.57575756">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/sync/manager/Manager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="552" column="35" selection-start="28187" selection-end="28187" vertical-scroll-proportion="0.3030303">
           <folding>
-            <marker date="1383218901139" expanded="true" signature="-1:-1" placeholder="SELECT count..CF_ORDERS..." />
+            <element signature="e#0#36716#0" expanded="true" />
+            <element signature="docComment;class#Manager#0" expanded="false" />
+            <element signature="docComment;field#LOGGER#0;class#Manager#0" expanded="false" />
+            <element signature="docComment;field#currentMaxVersions#0;class#Manager#0" expanded="false" />
+            <element signature="docComment;field#incomeDOMap#0;class#Manager#0" expanded="false" />
+            <element signature="method#setSyncHistory#0;class#Manager#0" expanded="false" />
+            <element signature="method#Manager#0;class#Manager#0" expanded="false" />
+            <element signature="docComment;method#buildRO#0;class#Manager#0" expanded="false" />
+            <element signature="method#buildRO#0;class#Manager#0" expanded="false" />
+            <element signature="e#3553#3608#0" expanded="false" />
+            <element signature="method#buildOneGroup#0;class#Manager#0" expanded="false" />
+            <element signature="method#clearConfirm#0;class#Manager#0" expanded="false" />
+            <element signature="e#10068#10101#0" expanded="false" />
+            <element signature="method#findResponseResult#0;class#Manager#0" expanded="false" />
+            <element signature="e#15546#15592#0" expanded="false" />
+            <element signature="method#findConfirmedDO#0;class#Manager#0" expanded="false" />
+            <element signature="e#19057#19103#0" expanded="false" />
+            <element signature="method#buildConfirmNode#0;class#Manager#0" expanded="false" />
+            <element signature="method#addConfirms#0;class#Manager#0" expanded="false" />
+            <element signature="e#24876#24909#0" expanded="false" />
+            <element signature="method#createConfirm#0;class#Manager#0" expanded="false" />
+            <element signature="e#25925#25958#0" expanded="false" />
+            <element signature="e#29639#29731#0" expanded="false" />
+            <element signature="e#30050#30083#0" expanded="false" />
+            <element signature="method#saveException#0;class#Manager#0" expanded="false" />
+            <element signature="e#32493#32609#0" expanded="false" />
+            <element signature="method#createConflict#0;class#Manager#0" expanded="false" />
+            <element signature="method#createStringElement#0;class#Manager#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/AutoReportGenerator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="267" column="36" selection-start="16245" selection-end="16246" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/utils/DAOService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="530" column="22" selection-start="21091" selection-end="21091" vertical-scroll-proportion="0.0">
-          <folding>
-            <marker date="1384419373903" expanded="true" signature="9395:9465" placeholder="DELETE FROM ..." />
-            <marker date="1384419373903" expanded="true" signature="9578:9639" placeholder="DELETE FROM ..." />
-            <marker date="1384419373903" expanded="true" signature="23099:23130" placeholder="SELECT COUNT..cf_clients..." />
-            <marker date="1384419373903" expanded="true" signature="23294:23365" placeholder="SELECT COUNT..cf_clients..." />
-            <marker date="1384419373903" expanded="true" signature="23528:23597" placeholder="SELECT COUNT..cf_clients..." />
-            <marker date="1384419373903" expanded="true" signature="23779:23900" placeholder="select count..cf_clientpayments..." />
-            <marker date="1384419373903" expanded="true" signature="24074:24127" placeholder="SELECT COUNT..cf_enterevents..." />
-            <marker date="1384419373903" expanded="true" signature="24293:24331" placeholder="SELECT COUNT..cf_clientpayments..." />
-            <marker date="1384419373903" expanded="true" signature="24489:24519" placeholder="SELECT COUNT..cf_orders..." />
-            <marker date="1384419373903" expanded="true" signature="24678:24713" placeholder="SELECT COUNT..cf_enterevents..." />
-            <marker date="1384419373903" expanded="true" signature="24870:24903" placeholder="SELECT COUNT..cf_clientsms..." />
-            <marker date="1384419373903" expanded="true" signature="25100:25226" placeholder="select count..cf_orders..." />
-            <marker date="1384419373903" expanded="true" signature="25404:25549" placeholder="select count..cf_orders..." />
-            <marker date="1384419373903" expanded="true" signature="25716:25860" placeholder="select count..cf_orders..." />
-            <marker date="1384419373903" expanded="true" signature="26116:26414" placeholder="SELECT contr..cf_clientpayments..." />
-            <marker date="1384419373903" expanded="true" signature="26754:26968" placeholder="SELECT cp.id..cf_clientpayments..." />
-            <marker date="1384419373903" expanded="true" signature="27228:27488" placeholder="SELECT cp.id..cf_clientpayments..." />
-            <marker date="1384419373903" expanded="true" signature="27786:27863" placeholder="UPDATE cf_ca..." />
-            <marker date="1384419373903" expanded="true" signature="28261:28744" placeholder="SELECT cf_en..cf_enterevents..." />
-            <marker date="1384419373903" expanded="true" signature="28783:29318" placeholder="SELECT cf_en..cf_enterevents..." />
-            <marker date="1384419373903" expanded="true" signature="30631:31083" placeholder="SELECT cf_or..cf_orders..." />
-            <marker date="1384419373903" expanded="true" signature="31122:31626" placeholder="SELECT cf_or..cf_orders..." />
-            <marker date="1384419373903" expanded="true" signature="32937:33511" placeholder="SELECT idofo..cf_clients..." />
-            <marker date="1384419373903" expanded="true" signature="33550:34248" placeholder="SELECT idofo..cf_clients..." />
-            <marker date="1384419373903" expanded="true" signature="35568:35988" placeholder="SELECT cf_or..cf_orders..." />
-            <marker date="1384419373903" expanded="true" signature="36027:36519" placeholder="SELECT cf_or..cf_orders..." />
-            <marker date="1384419373903" expanded="true" signature="37837:38071" placeholder="SELECT cf_or..cf_orders..." />
-            <marker date="1384419373903" expanded="true" signature="38865:38970" placeholder="UPDATE cf_cl..." />
-            <marker date="1384419373903" expanded="true" signature="70953:71021" placeholder="SELECT max(c..cf_RegistryChange..." />
-            <marker date="1384419373903" expanded="true" signature="73819:73890" placeholder="update cf_re..." />
-            <marker date="1384419373903" expanded="true" signature="74248:74702" placeholder="select idofr..cf_reportinfo..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuleProcessor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="616" column="22" selection-start="28898" selection-end="28898" vertical-scroll-proportion="115.52">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.48-2.2.49.sql">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="142" column="16" selection-start="6009" selection-end="6009" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/db/update_2.2.49-2.2.50.sql">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="57" selection-start="933" selection-end="933" vertical-scroll-proportion="0.5862069">
-          <folding />
         </state>
       </provider>
     </entry>
@@ -4896,12 +4769,11 @@
       </state>
       <state key="ModuleStructureConfigurable.UI">
         <settings>
-          <last-edited>core</last-edited>
+          <last-edited>web</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
                 <option value="0.2705448" />
-                <option value="0.5" />
               </list>
             </option>
           </splitter-proportions>
