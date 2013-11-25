@@ -29,6 +29,7 @@ CREATE TABLE CF_Contragents (
   INN                     VARCHAR(90),
   Bank                    VARCHAR(90),
   BIC                     CHAR(15),
+  OKATO                   VARCHAR(11)       DEFAULT '',
   CorrAccount             VARCHAR(20),
   Account                 VARCHAR(20),
   CreatedDate             BIGINT            NOT NULL,
@@ -115,6 +116,7 @@ CREATE TABLE CF_Orgs (
   ClientVersion           VARCHAR(16)     , -- v31
   RemoteAddress           VARCHAR(20)     , -- v31
   FullSyncParam INTEGER NOT NULL default 0, -- v42
+  CommodityAccounting integer NOT NULL DEFAULT 0, --v51
   CONSTRAINT CF_Orgs_pk PRIMARY KEY (IdOfOrg),
   CONSTRAINT CF_Orgs_ShortName UNIQUE (ShortName),
   CONSTRAINT CF_Orgs_IdOfOfficialPerson_fk FOREIGN KEY (IdOfOfficialPerson) REFERENCES CF_Persons (IdOfPerson),
@@ -159,6 +161,7 @@ CREATE TABLE CF_Clients (
   LastFreePayTime         BIGINT,
   DiscountMode            INTEGER           NOT NULL,
   Balance                 BIGINT            NOT NULL,
+  SubBalance1             BIGINT            ,  --v51
   Limits                  BIGINT            NOT NULL,
   ExpenditureLimit        BIGINT            NOT NULL DEFAULT 0,
   CategoriesDiscounts     VARCHAR(60)       NOT NULL DEFAULT '',
@@ -218,6 +221,9 @@ CREATE TABLE CF_Transactions (
   TransactionDate         BIGINT            NOT NULL,
   BalanceBefore           BIGINT,
   IdOfOrg                 BIGINT, --v37
+  TransactionSubBalance1Sum bigint, --v51
+  SubBalance1BeforeTransaction bigint, --v51
+  SourceBalanceNumber bigint, --v51
   CONSTRAINT CF_Transactions_pk PRIMARY KEY (IdOfTransaction),
   CONSTRAINT CF_Transactions_IdOfClient_fk FOREIGN KEY (IdOfClient) REFERENCES CF_Clients (IdOfClient),
   CONSTRAINT CF_Transactions_IdOfCard_fk FOREIGN KEY (IdOfCard) REFERENCES CF_Cards (IdOfCard)
@@ -277,6 +283,7 @@ CREATE TABLE  cf_goods_groups (
   GlobalVersion BIGINT DEFAULT NULL,
   globalversiononcreate BIGINT DEFAULT NULL,
   OrgOwner bigint,
+  IdOfConfigurationProvider bigint, --v51
   CreatedDate bigint NOT NULL,
   LastUpDate bigint,
   DeleteDate bigint,
@@ -320,6 +327,7 @@ CREATE TABLE Cf_Good_Basic_Basket_Price
   CreatedDate bigint NOT NULL,
   SendAll integer DEFAULT 1,
   OrgOwner bigint,
+  IdOfConfigurationProvider bigint, --v51
   Price bigint,
   CONSTRAINT Cf_Good_Basic_Basket_Price_PK                  PRIMARY KEY (IdOfGoodBasicBasketPrice),
   CONSTRAINT Cf_Good_Basic_Basket_Price_BasicGoodNumber_Key UNIQUE      (Guid)
@@ -337,6 +345,7 @@ CREATE TABLE  CF_Goods (
   GlobalVersion BIGINT DEFAULT NULL,
   globalversiononcreate BIGINT DEFAULT NULL,
   OrgOwner bigint,
+  IdOfConfigurationProvider bigint, --v51
   CreatedDate bigint NOT NULL,
   LastUpDate bigint,
   DeleteDate bigint,
@@ -367,6 +376,7 @@ CREATE TABLE CF_Menu (
   CreatedDate   BIGINT        NOT NULL,
   MenuSource    INTEGER       NOT NULL,
   Flags         INTEGER       NOT NULL,
+  DetailsHashCode INTEGER, --v51
   CONSTRAINT CF_Menu_pk PRIMARY KEY (IdOfMenu),
   CONSTRAINT CF_Menu_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg)
 );
@@ -420,7 +430,8 @@ CREATE TABLE CF_ComplexInfo (
   ModeFree                INT               NOT NULL,
   ModeGrant               INT               NOT NULL,
   ModeOfAdd               INT               NOT NULL,
-  UseTrDiscount           INT               DEFAULT 0,
+  UsedSubscriptionFeeding integer,
+  UseTrDiscount           INT               DEFAULT 0, --v51
   CurrentPrice            BIGINT,
   CONSTRAINT CF_ComplexInfo_pk PRIMARY KEY (IdOfComplexInfo),
   CONSTRAINT CF_ComplexInfo_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg),
@@ -432,6 +443,7 @@ CREATE TABLE CF_ComplexInfoDetail (
   IdOfComplexInfoDetail   BIGINT            NOT NULL,
   IdOfComplexInfo         BIGINT            NOT NULL,
   IdOfMenuDetail          BIGINT            NOT NULL,
+  IdOfItem                BIGINT,
   Count                   INT,
   CONSTRAINT CF_ComplexInfoDetail_pk PRIMARY KEY (IdOfComplexInfoDetail),
   CONSTRAINT CF_ComplexInfoDetail_IdOfMenuDetail_fk FOREIGN KEY (IdOfMenuDetail) REFERENCES CF_MenuDetails (IdOfMenuDetail)
@@ -665,7 +677,7 @@ CREATE TABLE CF_Registry (
   IdOfRegistry            BIGINT          NOT NULL,
   Version                 BIGINT          NOT NULL,
   ClientRegistryVersion   BIGINT          NOT NULL,
---  SmsId                   CHAR(16)        NOT NULL,
+  SmsId                   CHAR(16)        NOT NULL,
   CONSTRAINT CF_ClientRegistry_pk PRIMARY KEY (IdOfRegistry)
 );
 
@@ -692,8 +704,9 @@ CREATE TABLE CF_ReportHandleRules (
   Route8                  VARCHAR(128),
   Route9                  VARCHAR(128),
   Remarks                 VARCHAR(1024),
+  StoragePeriod           BIGINT          DEFAULT -1, --v49
   Enabled                 INTEGER         NOT NULL,
-  templatefilename        VARCHAR(256),
+  TemplateFilename        VARCHAR(256),
   Tag varchar(12), --v23
   City varchar(128), --v23
   District varchar(128), --v23
@@ -732,9 +745,9 @@ CREATE TABLE CF_ClientSms (
   CONSTRAINT CF_ClientSms_IdOfTransaction_fk FOREIGN KEY (IdOfTransaction) REFERENCES CF_Transactions (IdOfTransaction)
 );
 
-create index cf_clientsms_idofclient_idx on cf_clientsms(idofclient); --v25
-create index CF_ClientSms_Price_idx on CF_ClientSms(Price); --v42
-CREATE INDEX cf_clientsms_servicesenddate_idx ON cf_clientsms (servicesenddate ASC NULLS LAST); --v48
+CREATE INDEX CF_ClientSms_IdOfClient_idx on CF_ClientSms(IdOfClient); --v25
+CREATE INDEX CF_ClientSms_Price_idx on CF_ClientSms(Price); --v42
+CREATE INDEX CF_ClientSms_ServiceSendDate_idx ON CF_ClientSms (ServiceSendDate ASC NULLS LAST); --v48
 
 CREATE TABLE CF_SchedulerJobs (
   IdOfSchedulerJob        BIGINT          NOT NULL,
@@ -901,6 +914,7 @@ CREATE TABLE CF_EnterEvents (
   DocSerialNum            varchar(45),
   IssueDocDate            BIGINT,
   VisitDateTime           BIGINT,
+  GuardianId              BIGINT, --v51
   CONSTRAINT CF_EnterEvents_pk PRIMARY KEY (IdOfEnterEvent, IdOfOrg)
 );
 
@@ -1183,8 +1197,11 @@ CREATE TABLE cf_do_confirms
   distributedobjectclassname character varying(64) NOT NULL,
   GUID character varying(36) NOT NULL,
   OrgOwner BIGINT DEFAULT NULL,
-  CONSTRAINT cf_do_confirm_pk PRIMARY KEY (idofdoconfirm )
+  CONSTRAINT cf_do_confirm_pk PRIMARY KEY (idofdoconfirm ),
+  CONSTRAINT cf_do_confirms_uk UNIQUE (distributedobjectclassname, guid, orgowner)  --v51
 );
+
+CREATE INDEX cf_do_confirm_all_fields_idx ON cf_do_confirms USING btree (distributedobjectclassname, guid, orgowner); --v51
 
 CREATE TABLE cf_product_groups
 (
@@ -1411,6 +1428,10 @@ CREATE TABLE CF_ReportInfo (
   OrgNum varchar(12),
   IdOfOrg bigint,
   Tag varchar(12),
+  IdOfContragentReceiver BIGINT DEFAULT NULL,   --v50
+  ContragentReceiver varchar(128) DEFAULT NULL, --v50
+  IdOfContragentPayer BIGINT DEFAULT NULL,      --v51
+  ContragentPayer varchar(128) DEFAULT NULL,    --v51
   CONSTRAINT cf_report_info_pk PRIMARY KEY (IdOfReportInfo)
 );
 
@@ -1429,6 +1450,7 @@ CREATE TABLE  cf_trade_material_goods (
   GlobalVersion BIGINT DEFAULT NULL,
   globalversiononcreate BIGINT DEFAULT NULL,
   OrgOwner bigint,
+  IdOfConfigurationProvider bigint, --v51
   DeletedState boolean NOT NULL DEFAULT false,
   CreatedDate bigint NOT NULL,
   LastUpDate bigint,
@@ -1586,6 +1608,7 @@ CREATE TABLE  cf_waybills (
   State integer NOT NULL,
   Shipper  character varying(128) NOT NULL,
   Receiver  character varying(128) NOT NULL,
+  INN character varying(32),
   SendAll integer DEFAULT 0,
   CONSTRAINT cf_waybills_pk PRIMARY KEY (IdOfWayBill ),
   CONSTRAINT cf_waybills_staff_fk FOREIGN KEY (IdOfStaff)
@@ -2547,7 +2570,8 @@ CREATE TABLE cf_visitors(
   WarTicketDate BIGINT,                          --  Дата выдачи ВУ 
   DriverLicenceNumber varchar(50),               --  Серийный номер военного билета (ВБ) 
   DriverLicenceDate BIGINT,                      --  Дата выдачи ВБ 
-  VisitorType integer NOT NULL DEFAULT 0,        --  Добавлен тип постетителя (DEFAULT 0 обычный, EMPLOYEE 1 инженер) 
+  VisitorType INTEGER NOT NULL DEFAULT 0,        --  Добавлен тип постетителя (DEFAULT 0 обычный, EMPLOYEE 1 инженер)
+  IsDeleted INTEGER NOT NULL DEFAULT 0,          -- v50
   CONSTRAINT cf_visitors_pk PRIMARY KEY (IdOfVisitor),
   CONSTRAINT cf_visitors_IdOfPerson_fk FOREIGN KEY (IdOfPerson) REFERENCES CF_Persons (IdOfPerson)
 );
@@ -2584,6 +2608,7 @@ create table CF_ComplexRoles(
 );
 
 -- Добавлена таблица "Правила распределения клиентов".
+-- v45
 CREATE TABLE CF_ClientAllocationRule (
   IdOfClientAllocationRule bigserial,
   IdOfSourceOrg bigint not null,
@@ -2596,8 +2621,8 @@ CREATE TABLE CF_ClientAllocationRule (
   CONSTRAINT CF_ClientAllocationRule_DOrg_FK FOREIGN KEY (IdOfDestinationOrg) REFERENCES cf_orgs (IdOfOrg)
 );
 
-
-CREATE TABLE cf_temporary_orders ( --v47
+--v47
+CREATE TABLE cf_temporary_orders (
   IdOfOrg bigint not null,
   IdOfClient bigInt not null,
   IdOfComplex int not null,
@@ -2613,7 +2638,8 @@ CREATE TABLE cf_temporary_orders ( --v47
   CONSTRAINT cf_temporary_orders_client FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
 );
 
-CREATE TABLE cf_thin_client_users ( --v47
+--v47
+CREATE TABLE cf_thin_client_users (
   IdOfClient bigint not null,
   UserName varchar(64) not null,
   Password varchar(128) not null,
@@ -2625,7 +2651,8 @@ CREATE TABLE cf_thin_client_users ( --v47
 );
 
 -- Таблица для хранения поступивших из Реестров изменений
-create table CF_RegistryChange ( --v47
+--v47
+create table CF_RegistryChange (
   IdOfRegistryChange bigserial not null,
   IdOfOrg bigint not null,
   CreateDate bigint not null,
@@ -2653,6 +2680,7 @@ create table CF_RegistryChange_Errors (  --v47
   IdOfOrg bigint not null,
   RevisionCreateDate bigint not null,
   Error varchar(256) not null,
+  ErrorDetails varchar(256) default '', --v49
   Comment varchar(256) default '',
   CommentAuthor VARCHAR(64) default '',
   CreateDate bigint not null,
@@ -2660,7 +2688,201 @@ create table CF_RegistryChange_Errors (  --v47
   CONSTRAINT CF_RegistryChange_Errors_pk PRIMARY KEY (IdOfRegistryChangeError)
 );
 
+--! ECAFE-1188 - Реализовать функцию авто-пополнения счета по банковской карте через Банк Москвы - Acquiropay
+-- Информация о подписках клиентов на автопополнение баланса с банк. карты.
+-- уникальный идентификатор подписки на услугу в ИС ПП */
+-- сумма пополнения */
+-- пороговое значение баланса, при достижении ко/го баланс автопополняется */
+-- срок действия подписки (число месяцев c даты подключения) */
+-- дата, до ко\ой подписка активна (вычисляется относит-но даты подключения) */
+-- дата подключения подписки */
+-- дата отключения подписки */
+-- флаг активности подписки */
+-- статус подписки */
+-- id подписки в системе МФР */
+-- клиент */
+-- СНИЛС клиента */
+-- идентификатор системы, через ко/ую происходит автопополнение баланса */
+-- дата последнего успешного платежа */
+-- дата последнего неуспешного платежа */
+-- количество неуспешных платежей подряд */
+-- статус последнего платежа по подписке */
+-- маскированный номер карты Плательщика, вида 400000|0002 */
+-- имя держателя карты */
+-- срок действия карты, месяц */
+-- срок действия, год */
+CREATE TABLE cf_bank_subscriptions (
+  IdOfSubscription BIGSERIAL,
+  PaymentAmount BIGINT NOT NULL,
+  ThresholdAmount BIGINT NOT NULL,
+  MonthsCount INTEGER NOT NULL,
+  ValidToDate BIGINT,
+  ActivationDate BIGINT,
+  DeactivationDate BIGINT,
+  IsActive INTEGER,
+  Status VARCHAR(255),
+  PaymentId VARCHAR(32),
+  IdOfClient BIGINT NOT NULL,
+  San VARCHAR(11),
+  PaySystem INTEGER NOT NULL,
+  LastSuccessfulPaymentDate BIGINT,
+  LastUnsuccessfulPaymentDate BIGINT,
+  UnsuccessfulPaymentsCount INTEGER,
+  LastPaymentStatus VARCHAR(255),
+  MaskedCardNumber VARCHAR(11),
+  CardHolder VARCHAR(255),
+  ExpMonth INTEGER,
+  ExpYear INTEGER,
+  CONSTRAINT cf_bank_subscriptions_pk PRIMARY KEY (IdOfSubscription),
+  CONSTRAINT cf_bank_subscriptions_client_fk FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
+);
+
+-- Пакет обновлений 2.2.49
+--!  Таблица отправленных запросов ИС ПП в МФР (на подключение подписки, ее отключение, списание средств).
+-- уникальный идентификатор запроса ИС ПП в МФР */
+-- уникальный идентификатор подписки на услугу в ИС ПП */
+-- идентификатор системы, через ко/ую проходят платежи */
+-- тип запроса (подключение, отключение, списание средств) */
+-- URL запроса */
+-- дата и время запроса */
+-- флаг успешности запроса: 1 - на запрос пришел ответ, 0 - иначе */
+-- статус ответа на запрос */
+-- обрабатываемый клиент */
+-- СНИЛС клиента */
+-- описание ошибки в случае неудачного запроса */
+CREATE TABLE cf_mfr_requests (
+  IdOfRequest BIGSERIAL,
+  IdOfSubscription BIGINT NOT NULL,
+  PaySystem INTEGER NOT NULL,
+  RequestType INTEGER NOT NULL,
+  RequestURL VARCHAR(255) NOT NULL,
+  RequestTime BIGINT NOT NULL,
+  IsSuccess INTEGER NOT NULL,
+  ResponseStatus VARCHAR(255),
+  IdOfClient BIGINT NOT NULL,
+  San VARCHAR(11),
+  ErrorDescription VARCHAR(255),
+  CONSTRAINT cf_mfr_requests_subscription_fk FOREIGN KEY (IdOfSubscription) REFERENCES cf_bank_subscriptions (IdOfSubscription),
+  CONSTRAINT cf_mfr_requests_pk PRIMARY KEY (IdOfRequest),
+  CONSTRAINT cf_mfr_requests_client_fk FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
+);
+
+CREATE TABLE CF_RegistrySms (
+  IdOfRegistrySMS            BIGINT          NOT NULL,
+  Version                 BIGINT          NOT NULL,
+  SmsId                   CHAR(16)        NOT NULL,
+  CONSTRAINT CF_RegistrySms_pk PRIMARY KEY (IdOfRegistrySMS)
+);
+
+--! Таблица ежемесячных платежей, осуществляемых по банковской подписке.
+-- id платежа */
+-- уникальный идентификатор подписки на услугу в ИС ПП, по ко/ой совершается платеж */
+-- уникальный идентификатор запроса ИС ПП в МФР */
+-- сумма платежа */
+-- дата и время платежа */
+-- клиент */
+-- баланс клиента на момент запуска платежа */
+-- установленное у подписки пороговое значение баланса на момент запуска */
+-- результат платежа (осуществлен или нет) */
+-- статус платежа */
+-- код авторизации */
+-- RRN транзакции */
+CREATE TABLE cf_regular_payments (
+  IdOfPayment BIGSERIAL,
+  IdOfSubscription BIGINT NOT NULL,
+  IdOfRequest BIGINT NOT NULL,
+  PaymentAmount BIGINT NOT NULL,
+  PaymentDate BIGINT,
+  IdOfClient BIGINT NOT NULL,
+  ClientBalance BIGINT NOT NULL,
+  ThresholdAmount BIGINT NOT NULL,
+  IsSuccess INTEGER NOT NULL,
+  Status VARCHAR(255),
+  AuthCode VARCHAR(6),
+  RRN BIGINT,
+  CONSTRAINT cf_regular_payments_pk PRIMARY KEY (IdOfPayment),
+  CONSTRAINT cf_regular_payments_subscription_fk FOREIGN KEY (IdOfSubscription) REFERENCES cf_bank_subscriptions (IdOfSubscription),
+  CONSTRAINT cf_regular_payments_request_fk FOREIGN KEY (IdOfRequest) REFERENCES cf_mfr_requests (IdOfRequest),
+  CONSTRAINT cf_regular_payments_client_fk FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
+);
+
+-- Пакет обновлений 2.2.51
+-- Добавлены "Клиентские циклограммы" в обработку распределенных объектов
+CREATE TABLE cf_clients_cycle_diagrams
+(
+  IdOfCycleDiagram BigSerial NOT NULL,
+  IdOfClient bigint NOT NULL,
+  OrgOwner bigint,
+  GUID character varying(36) NOT NULL,
+  DeletedState boolean NOT NULL DEFAULT false,
+  GlobalVersion bigint,
+  GlobalVersionOnCreate BIGINT DEFAULT NULL,
+  CreatedDate bigint NOT NULL,
+  LastUpDate bigint,
+  DeleteDate bigint,
+  SendAll integer NOT NULL DEFAULT 0,
+
+  DateActivationDiagram bigint NOT NULL,
+  StateDiagram integer NOT NULL DEFAULT 0,
+  Monday character varying(255),
+  MondayPrice bigint NOT NULL,
+  Tuesday character varying(255),
+  TuesdayPrice bigint NOT NULL,
+  Wednesday character varying(255),
+  WednesdayPrice bigint NOT NULL,
+  Thursday character varying(255),
+  ThursdayPrice bigint NOT NULL,
+  Friday character varying(255),
+  FridayPrice bigint NOT NULL,
+  Saturday character varying(255),
+  SaturdayPrice bigint NOT NULL,
+  Sunday character varying(255),
+  SundayPrice bigint NOT NULL,
+  CONSTRAINT cf_clients_cycle_diagrams_pk PRIMARY KEY (IdOfCycleDiagram),
+  CONSTRAINT cf_clients_cycle_diagrams_clients_fk FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
+);
+-- Добавлены "Подписки на услугу абонементного питания" в обработку распределенных объектов
+CREATE TABLE cf_subscriber_feeding
+(
+  IdOfServiceSubscriberFeeding BigSerial NOT NULL,
+  IdOfClient bigint NOT NULL,
+  OrgOwner bigint,
+  GUID character varying(36) NOT NULL,
+  DeletedState boolean NOT NULL DEFAULT false,
+  GlobalVersion bigint,
+  GlobalVersionOnCreate BIGINT DEFAULT NULL,
+  CreatedDate bigint NOT NULL,
+  LastUpDate bigint,
+  DeleteDate bigint,
+  SendAll integer NOT NULL DEFAULT 0,
+
+  DateActivateService bigint NOT NULL,
+  LastDatePauseService bigint,
+  DateDeactivateService bigint,
+  ServiceState integer NOT NULL DEFAULT 0,
+  wassuspended boolean NOT NULL DEFAULT false,
+  CONSTRAINT cf_service_subscriber_feeding_pk PRIMARY KEY (IdOfServiceSubscriberFeeding),
+  CONSTRAINT cf_service_subscriber_feeding_clients_fk FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
+);
+
+-- Регистрация переводов средств между субсчетами
+CREATE TABLE CF_SubAccount_Transfers (
+  IdOfSubAccountTransfer BigSerial NOT NULL,
+  CreatedDate bigint NOT NULL,
+  IdOfClientTransfer bigint NOT NULL,
+  balanceBenefactor bigint NOT NULL,
+  balanceBeneficiary bigint NOT NULL,
+  Reason VARCHAR(256),
+  IdOfTransactionOnBenefactor bigint NOT NULL,
+  IdOfTransactionOnBeneficiary bigint NOT NULL,
+  TransferSum bigint NOT NULL,
+  CONSTRAINT cf_subaccount_transfer_pk PRIMARY KEY (IdOfSubAccountTransfer),
+  CONSTRAINT cf_subaccount_transfer_c_ctr_fk FOREIGN KEY (IdOfClientTransfer) REFERENCES cf_clients (IdOfClient),
+  CONSTRAINT cf_subaccount_transfer_t_bctr_fk FOREIGN KEY (IdOfTransactionOnBenefactor) REFERENCES cf_transactions (IdOfTransaction),
+  CONSTRAINT cf_subaccount_transfer_t_bcry_fk FOREIGN KEY (IdOfTransactionOnBeneficiary) REFERENCES cf_transactions (IdOfTransaction)
+);
+
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
-  VALUES(2, 2, 48, 131031, 0, '');
+  VALUES(2, 2, 51, 131122, 0, '');
 
