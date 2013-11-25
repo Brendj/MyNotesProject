@@ -17,7 +17,7 @@ import java.util.*;
 public class ConfigurationProvider {
     private Long idOfConfigurationProvider;
     private String name;
-    private Set products;
+    //private Set products;
     /* Пользователь бэк-оффиса котрый создал изменил конфигурацию */
     private User userCreate;
     private User userEdit;
@@ -71,13 +71,13 @@ public class ConfigurationProvider {
         this.name = name;
     }
 
-    public Set getProducts() {
-        return products;
-    }
-
-    public void setProducts(Set products) {
-        this.products = products;
-    }
+    //public Set getProducts() {
+    //    return products;
+    //}
+    //
+    //public void setProducts(Set products) {
+    //    this.products = products;
+    //}
 
     public Date getCreatedDate() {
         return createdDate;

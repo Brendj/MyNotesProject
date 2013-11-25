@@ -11,7 +11,6 @@
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true" update="false"/>
         <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true" update="false"/>
         <property name="nameOfGood" column="NameOfGood" type="string" not-null="true" update="false" length="512"/>
-        <!--<property name="unitsScale" column="UnitsScale" type="int" not-null="true" update="false"/>-->
         <property name="unitsScale" column="UnitsScale">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale</param>

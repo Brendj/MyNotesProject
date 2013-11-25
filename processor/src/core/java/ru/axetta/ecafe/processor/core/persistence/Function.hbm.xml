@@ -7,7 +7,9 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.Function" table="CF_Functions">
-        <id name="idOfFunction" column="IdOfFunction" type="long"/>
+        <id name="idOfFunction" column="IdOfFunction" type="long">
+            <generator class="identity"/>
+        </id>
 <!--            <generator class="hilo">
                 <param name="table">CF_Generators</param>
                 <param name="column">IdOfFunction</param>

@@ -110,7 +110,6 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.AccountTransaction"/>
         </set>
 
-        <!-- Kadirov D (21.12.2011) -->
         <set name="enterEventsInternal" inverse="true" cascade="all">
             <key column="IdOfClient"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.EnterEvent"/>
@@ -158,9 +157,6 @@
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation" />
         </set>
-
-
-
 
         <set name="guardSan" table="CF_GuardSAN" lazy="true">
             <key column="IdOfClient"/>

@@ -35,30 +35,25 @@
         <property name="stateFrom" column="StateFrom" type="long" not-null="true"/>
         <property name="stateTo" column="StateTo" type="long" not-null="true"/>
 
-        <many-to-one name="wayBill" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.WayBill">
+        <many-to-one name="wayBill" fetch="select" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.WayBill">
             <column name="IdOfWayBill" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="staff" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
+        <many-to-one name="staff" fetch="select" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
             <column name="IdOfStaff" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="internalDisposingDocument" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalDisposingDocument">
+        <many-to-one name="internalDisposingDocument" fetch="select" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalDisposingDocument">
             <column name="IdOfInternalDisposingDocument" not-null="false" />
         </many-to-one>
 
-        <!-- TODO: дает ошибку при синхроизации необходим  -->
-        <many-to-one name="internalIncomingDocument" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocument">
+        <many-to-one name="internalIncomingDocument" fetch="select" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocument">
             <column name="IdOfInternalIncomingDocument" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="goodRequest" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest">
+        <many-to-one name="goodRequest" fetch="select" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest">
             <column name="IdOfGoodsRequest" not-null="false" />
         </many-to-one>
-
-
-
-
 
     </class>
 </hibernate-mapping>

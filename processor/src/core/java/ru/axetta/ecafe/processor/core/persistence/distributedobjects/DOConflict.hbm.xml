@@ -19,6 +19,5 @@
         <property name="gVersionResult" column="gVersion_result" type="long"/>
         <property name="valueInc" column="val_inc" type="string" length="16548"/>
         <property name="valueCur" column="val_cur" type="string" length="16548"/>
-       <!-- <property name="editTime" column="edit_date" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>-->
     </class>
 </hibernate-mapping>

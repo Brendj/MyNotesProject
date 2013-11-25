@@ -7,7 +7,7 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider" table="cf_provider_configurations">
-        <id name="idOfConfigurationProvider" column="idofconfigurationprovider" type="long">
+        <id name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long">
             <generator class="identity"/>
         </id>
 
@@ -21,12 +21,12 @@
         <many-to-one name="userEdit" column="IdOfUserEdit" class="ru.axetta.ecafe.processor.core.persistence.User" />
 
 
-        <set name="products" lazy="true" cascade="all">
+       <!-- <set name="products" lazy="true" cascade="all">
             <key>
                 <column name="idofconfigurationprovider"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product"/>
-        </set>
+        </set>-->
 
         <set name="orgInternal" lazy="true" cascade="all">
             <key>
