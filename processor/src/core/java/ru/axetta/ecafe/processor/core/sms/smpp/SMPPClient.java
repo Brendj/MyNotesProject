@@ -5,8 +5,6 @@
 package ru.axetta.ecafe.processor.core.sms.smpp;
 
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.sms.DeliveryResponse;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.SendResponse;
@@ -18,8 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PreDestroy;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Properties;
 
 /**
@@ -31,6 +27,8 @@ import java.util.Properties;
  */
 public class SMPPClient extends ISmsService {
 
+    private String sourceAddressNpi;
+    private String sourceAddressTon;
     private String smscIPAddress;
     private int smscPort;
     private String systemId;
@@ -38,24 +36,24 @@ public class SMPPClient extends ISmsService {
     private String systemType;
     private String serviceType;
     private String sourceAddress;
-    private Boolean serviceStatus;
+    //private Boolean serviceStatus;
     private Client client;
-    private final static Logger logger = LoggerFactory.getLogger(SMPPClient.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(SMPPClient.class);
     private final SMPPListener smppListener;
 
 
     @Override
     public SendResponse sendTextMessage(String sender, String phoneNumber, String text) throws Exception {
-        logger.info("start sending: " + text);
+        LOGGER.info("start sending: " + text);
         long destination = Long.parseLong(phoneNumber);
         SendResult sr;
-        if(client.getStatus()==2){
+        if(client.getStatus()==  Client.STATE_ONLINE){
             sr = client.send(text, destination);
         } else {
             int count =0;
             int err = -1;
             while (count<5){
-                err = client.start(sourceAddress, smscIPAddress, smscPort, systemId, systemType, serviceType, password);
+                err = client.start(sourceAddress, smscIPAddress, smscPort, systemId, systemType, serviceType, password, sourceAddressTon, sourceAddressNpi);
                 if(err==0) break;
                 count++;
             }
@@ -68,7 +66,7 @@ public class SMPPClient extends ISmsService {
         if (sr.err != 0) {
             throw new Exception("sending error");
         } else {
-            logger.info("message sent="+sr.id);
+            LOGGER.info("message sent=" + sr.id);
         }
         return new SendResponse(translateSendStatus(sr.err), sr.err != 0?null:"message sent="+sr.id, sr.id);
     }
@@ -98,36 +96,39 @@ public class SMPPClient extends ISmsService {
         serviceType = properties.getProperty(PATH+"service-type", "");
         systemType = properties.getProperty(PATH+"system-type", "test");
         sourceAddress = properties.getProperty(PATH + "source-address", "5223");
-        serviceStatus =  properties.getProperty(PATH+"service-status", "0").equals("1");
+        sourceAddressTon = properties.getProperty(PATH + "source-address-ton", "5");
+        sourceAddressNpi = properties.getProperty(PATH + "source-address-npi", "0");
+
+        //serviceStatus =  properties.getProperty(PATH+"service-status", "0").equals("1");
         //serviceStatus = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_SMPP_CLIENT_STATUS);
         this.config = new Config(smscIPAddress, systemId, password, "","");
         startService();
     }
 
     public void startService(){
-        if(serviceStatus){
-            int err = client.start(sourceAddress, smscIPAddress, smscPort, systemId, systemType, serviceType, password);
-            if (err != 0) {
-                logger.error("SMPP Client connecting error "+err);
-            } else {
-                logger.info("SMPP Client connected");
-            }
+        int err = client.start(sourceAddress, smscIPAddress, smscPort, systemId, systemType, serviceType, password, sourceAddressTon, sourceAddressNpi);
+        if (err != 0) {
+            LOGGER.error("SMPP Client connecting error " + err);
         } else {
-            logger.info("SMPP Client does not connect");
+            LOGGER.info("SMPP Client connected");
         }
+        //if(serviceStatus){
+        //} else {
+        //    LOGGER.info("SMPP Client does not connect");
+        //}
     }
 
     @PreDestroy
     public void stopService(){
-        if(serviceStatus){
-            if (client.getStatus() != Client.STATE_OFFLINE) {
-                client.stop();
-            } else {
-                logger.info("Client already stopped");
-            }
+        if (client.getStatus() != Client.STATE_OFFLINE) {
+            client.stop();
         } else {
-            logger.error("connecting error");
+            LOGGER.info("Client already stopped");
         }
+        //if(serviceStatus){
+        //} else {
+        //    LOGGER.error("connecting error");
+        //}
     }
 
     /**

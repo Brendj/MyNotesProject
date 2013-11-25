@@ -504,7 +504,8 @@ public class Client implements SMPPClient {
      * @param password пароль
      * @return 0 или код ошибки
      */
-    public synchronized int start(String sourceAddress, String smscIPAddress, int smscPort, String systemId, String systemType, String serviceType, String password) {
+    public synchronized int start(String sourceAddress, String smscIPAddress, int smscPort, String systemId, String systemType, String serviceType, String password,
+            String sourceAddressTon, String sourceAddressNpi) {
         logger.info(name + " starting smpp client...");
         if (state != STATE_OFFLINE) {
             logger.info(name + " cannot start smpp client: wrong state");
@@ -512,9 +513,10 @@ public class Client implements SMPPClient {
         }
         sessionListener.client = this;
         state = STATE_CONNECT;
-        config = new Session.Config(sessionListener, (byte)0, (byte)1, sourceAddress);
+        //config = new Session.Config(sessionListener, (byte)0, (byte)1, sourceAddress);
+        config = new Session.Config(sessionListener, Byte.valueOf(sourceAddressTon), Byte.valueOf(sourceAddressNpi), sourceAddress);
         session = new Session(config);
-        startParams = new Session.StartParams(smscIPAddress, smscPort, systemId, systemType, serviceType, password, pingDelay, (byte)0, (byte)0, "", ussd_mapping);
+        startParams = new Session.StartParams(smscIPAddress, smscPort, systemId, systemType, serviceType, password, pingDelay, Byte.valueOf(sourceAddressTon), Byte.valueOf(sourceAddressNpi), "", ussd_mapping);
 
         startParams.SLA_timeout = SLA_timeout;
         startParams.SLA_timeout2 = SLA_timeout2;

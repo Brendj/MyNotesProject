@@ -17,8 +17,8 @@ interface SMPPClient extends Error {
 
     public int getStatus();
 
-    public int start(String sourceAddress, String smscIPAddress, int smscPort, String systemId, String systemType,
-            String serviceType, String password);
+    public int start(String sourceAddress, String smscIPAddress, int smscPort, String systemId, String systemType, String serviceType, String password,
+            String sourceAddressTon, String sourceAddressNpi);
 
     public int stop();
 
