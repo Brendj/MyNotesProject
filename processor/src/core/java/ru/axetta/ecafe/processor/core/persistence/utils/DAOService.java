@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -306,7 +307,9 @@ public class DAOService {
 
     public Long getContractIdByTempCardNoAndCheckValidDate(long lCardId) throws Exception {
         /* так как в поле хранится дата на 00:00 ночи текущего дня вычтем из текущего дня 24 часа в милисекудах */
-        Long currentDay = System.currentTimeMillis() - 86400000L;
+        //Long currentDay = System.currentTimeMillis() - 86400000L;
+        Date currentDay = CalendarUtils.truncateToDayOfMonth(new Date());
+        currentDay = CalendarUtils.addDays(currentDay, -1);
         TypedQuery<Long> query = entityManager.createQuery("select cl.contractId from CardTemp card left join card.client cl where card.cardNo=:cardNo and card.validDate>:currentDay", Long.class);
         query.setParameter("cardNo", lCardId);
         query.setParameter("currentDay", currentDay);

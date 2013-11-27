@@ -9,13 +9,12 @@ alter table CF_ReportInfo add column IdOfContragentPayer bigint default null;
 alter table CF_ReportInfo add column ContragentPayer varchar(128) default null;
 
 -- Добавлено поле ИНН в накладной
-ALTER TABLE CF_WayBills ADD COLUMN inn character varying(32);
+ALTER TABLE CF_WayBills ADD COLUMN inn character varying(32) default null;
 
 -- Добавлен хэшкод для сранения меню при синхронизации
-ALTER TABLE CF_Menu ADD COLUMN DetailsHashCode int;
+ALTER TABLE CF_Menu ADD COLUMN DetailsHashCode int default null;
 
-ALTER TABLE cf_complexinfo ADD COLUMN usedsubscriptionfeeding integer;
-
+ALTER TABLE CF_ComplexInfo ADD COLUMN UsedSubscriptionFeeding integer default null;
 
 -- Добавлен флаг включения товарной конфигурации выбранной организации
 ALTER TABLE cf_orgs ADD COLUMN CommodityAccounting integer NOT NULL DEFAULT 0;
@@ -94,8 +93,7 @@ WHERE g1.idofconfigurationprovider is null;
 
 -- группы товаров добавлены в конфигурацию провайдера
 ALTER TABLE cf_goods_groups ADD COLUMN idofconfigurationprovider bigint;
-ALTER TABLE cf_goods_groups ADD CONSTRAINT cf_goods_groups_configurationprovider_fk
-FOREIGN KEY (idofconfigurationprovider) REFERENCES cf_provider_configurations (idofconfigurationprovider);
+ALTER TABLE cf_goods_groups ADD CONSTRAINT cf_goods_groups_configurationprovider_fk FOREIGN KEY (idofconfigurationprovider) REFERENCES cf_provider_configurations (idofconfigurationprovider);
 
 --! Востанавливаем конфигурацию у предыдущих
 UPDATE cf_goods_groups g1 SET idofconfigurationprovider=(SELECT idofconfigurationprovider
@@ -106,8 +104,7 @@ WHERE g1.idofconfigurationprovider is null;
 
 -- товаро-материальные ценности добавлены в конфигурацию провайдера
 ALTER TABLE cf_trade_material_goods ADD COLUMN idofconfigurationprovider bigint;
-ALTER TABLE cf_trade_material_goods ADD CONSTRAINT cf_trade_material_goods_configurationprovider_fk
-FOREIGN KEY (idofconfigurationprovider) REFERENCES cf_provider_configurations (idofconfigurationprovider);
+ALTER TABLE cf_trade_material_goods ADD CONSTRAINT cf_trade_material_goods_configurationprovider_fk FOREIGN KEY (idofconfigurationprovider) REFERENCES cf_provider_configurations (idofconfigurationprovider);
 
 --! Востанавливаем конфигурацию у предыдущих
 UPDATE cf_trade_material_goods g1 SET idofconfigurationprovider=(SELECT idofconfigurationprovider
@@ -118,8 +115,7 @@ WHERE g1.idofconfigurationprovider is null;
 
 -- Элементы базовой корзины с ценой добавлены в конфигурацию провайдера
 ALTER TABLE cf_good_basic_basket_price ADD COLUMN idofconfigurationprovider bigint;
-ALTER TABLE cf_good_basic_basket_price ADD CONSTRAINT cf_good_basic_basket_price_configurationprovider_fk
-FOREIGN KEY (idofconfigurationprovider) REFERENCES cf_provider_configurations (idofconfigurationprovider);
+ALTER TABLE cf_good_basic_basket_price ADD CONSTRAINT cf_good_basic_basket_price_configurationprovider_fk FOREIGN KEY (idofconfigurationprovider) REFERENCES cf_provider_configurations (idofconfigurationprovider);
 
 --! Востанавливаем конфигурацию у предыдущих
 UPDATE cf_good_basic_basket_price g1 SET idofconfigurationprovider=(SELECT idofconfigurationprovider
@@ -166,6 +162,6 @@ ALTER TABLE Cf_EnterEvents ADD COLUMN GuardianId BIGINT;
 ALTER TABLE cf_do_confirms ADD CONSTRAINT cf_do_confirms_uk UNIQUE (distributedobjectclassname, guid, orgowner);
 
 --! Попрапвка ошибки по старым отчтам SSTSReport
---! update cf_reportinfo c set idofcontragentreceiver = (SELECT cast((regexp_matches(reportfile, 'SSTSReport\-\d+\-(\d+)\-*')::text[])[1] as integer) from cf_reportinfo c2 where c2.idofreportinfo = c.idofreportinfo);
+update cf_reportinfo c set idofcontragentreceiver = (SELECT cast((regexp_matches(reportfile, 'SSTSReport\-\d+\-(\d+)\-*')::text[])[1] as integer) from cf_reportinfo c2 where c2.idofreportinfo = c.idofreportinfo);
 
 --! ФИНАЛИЗИРОВАН (Кадыров, 131122) НЕ МЕНЯТЬ

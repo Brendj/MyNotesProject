@@ -18,7 +18,7 @@ public class Registry {
     private long version;
     private Long idOfRegistry;
     private Long clientRegistryVersion;
-    private String smsId;
+    //private String smsId;
 
     protected Registry() {
         // For Hibernate only
@@ -51,13 +51,13 @@ public class Registry {
         this.clientRegistryVersion = clientRegistryVersion;
     }
 
-    private String getSmsId() {
-        return smsId;
-    }
-
-    private void setSmsId(String smsId) {
-        this.smsId = smsId;
-    }
+    //private String getSmsId() {
+    //    return smsId;
+    //}
+    //
+    //private void setSmsId(String smsId) {
+    //    this.smsId = smsId;
+    //}
 
     @Override
     public String toString() {

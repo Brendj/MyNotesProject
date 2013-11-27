@@ -1339,13 +1339,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         final static int CLIENT_ID_INTERNALID = 0, CLIENT_ID_SAN = 1, CLIENT_ID_EXTERNAL_ID = 2, CLIENT_ID_GUID = 3, CLIENT_SUB_ID = 4;
 
         public Data process(Long contractId, Processor processor) {
-            String contractIdStr = String.valueOf(contractId);
-            int len = contractIdStr.length();
-            if(len>2 && ContractIdGenerator.luhnTest(contractIdStr.substring(0, len - 2))){
-                return process(contractId, CLIENT_SUB_ID, processor);
-            } else {
-                return process(contractId, CLIENT_ID_INTERNALID, processor);
-            }
+            return process(contractId, CLIENT_ID_INTERNALID, processor);
+            //String contractIdStr = String.valueOf(contractId);
+            //int len = contractIdStr.length();
+            //if(len>2 && ContractIdGenerator.luhnTest(contractIdStr.substring(0, len - 2))){
+            //
+            //} else {
+            //    return process(contractId, CLIENT_SUB_ID, processor);
+            //}
         }
 
         public Data process(Object id, int clientIdType, Processor processor) {
@@ -1368,7 +1369,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 } else if (clientIdType == CLIENT_ID_GUID) {
                     clientCriteria.add(Restrictions.eq("clientGUID", (String) id));
                 } else if (clientIdType == CLIENT_SUB_ID) {
-                    String subBalanceNumber = (String) id;
+                    String subBalanceNumber = String.valueOf(id);
                     int len = subBalanceNumber.length();
                     subBalanceNum = Integer.parseInt(subBalanceNumber.substring(len-2));
                     clientCriteria.add(Restrictions.eq("contractId", Long.parseLong(subBalanceNumber.substring(0, len-2))));

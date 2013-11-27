@@ -45,9 +45,9 @@
         <property name="publicKeyGOSTAlias" column="PublicKeyGOSTAlias" type="string" length="64" />
         <property name="needAccountTranslate" column="NeedAccountTranslate"
                   type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
-        <set name="usersInternal" inverse="true" cascade="all">
-            <key column="IdOfUser"/>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.User"/>
+        <set name="usersInternal" table="CF_UserContragents">
+            <key column="IdOfContragent"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.User" column="idofuser"/>
         </set>
         <set name="contragentPaymentsInternal" inverse="true" cascade="all">
             <key column="IdOfContragent"/>

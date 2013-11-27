@@ -99,7 +99,9 @@ public class SyncServlet extends HttpServlet {
 
             // Save requestDocument by means of SyncLogger as IdOfOrg-IdOfSync-in.xml
             SyncLogger syncLogger = runtimeContext.getSyncLogger();
-            if (bLogPackets) syncLogger.registerSyncRequest(requestData.document, idOfOrg, idOfSync);
+             /* Must be FALSE for testing!!!  */
+            boolean verifySignature = true;
+            if (!verifySignature || bLogPackets) syncLogger.registerSyncRequest(requestData.document, idOfOrg, idOfSync);
             else {
                 final String message = "Synchronization with %s - type: %s - packets not logged";
                 logger.info(String.format(message, request.getRemoteAddr(), syncType.toString()));
@@ -115,8 +117,7 @@ public class SyncServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
-            /* Must be FALSE for testing!!!  */
-            boolean verifySignature = true;
+
             try {
                 if (verifySignature && !DigitalSignatureUtils.verify(publicKey, requestData.document)) {
                     final String message = String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg);
