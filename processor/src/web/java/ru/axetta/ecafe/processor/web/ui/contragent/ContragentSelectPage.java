@@ -144,7 +144,7 @@ public class ContragentSelectPage extends BasicPage {
         if (StringUtils.isNotEmpty(filter)) {
             criteria.add(Restrictions.like("contragentName", filter, MatchMode.ANYWHERE));
         }
-        if(!classTypesString.isEmpty()) {
+        if(StringUtils.isNotEmpty(classTypesString)) {
             String[] classTypes = classTypesString.split(",");
             Criterion exp = Restrictions.eq("classId", Integer.parseInt(classTypes[0]));
             for (int i = 1; i < classTypes.length; i++) {

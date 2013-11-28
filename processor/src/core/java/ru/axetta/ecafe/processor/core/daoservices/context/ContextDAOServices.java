@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.User;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -38,6 +39,7 @@ import java.util.*;
 public class ContextDAOServices {
 
     @PersistenceContext(unitName = "processorPU")
+    //@PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
 
 
@@ -146,7 +148,10 @@ public class ContextDAOServices {
         for (Contragent c : contragents) {
             orgIds.add(c.getIdOfContragent());
         }
-        criteria.add(Restrictions.in(field, orgIds));
+        Disjunction disjunction = Restrictions.disjunction();
+        disjunction.add(Restrictions.in(field, orgIds));
+        disjunction.add(Restrictions.eq("classId", Contragent.PAY_AGENT));
+        criteria.add(disjunction);
     }
 
 

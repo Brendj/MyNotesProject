@@ -47,10 +47,7 @@ import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
 import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -2269,18 +2266,28 @@ public class Processor implements SyncProcessor,
                         detailsHashCode = menu.getDetailsHashCode();
                         // обновляем занчение хеша в случае если оно пусто (меню возможно уже есть но не имееет хеша)
                         // или в случае если меню изменилось
+
                         if(detailsHashCode==null || !detailsHashCode.equals(detailsHashCode1)){
-                            menu.setDetailsHashCode(detailsHashCode1);
-                            persistenceSession.save(menu);
-                    }
+                            //menu.setDetailsHashCode(detailsHashCode1);
+                            //persistenceSession.persist(menu);
+                            String sql = "update Menu set detailsHashCode=:detailsHashCode where org=:org and menuSource=:menuSource and menuDate=:menuDate";
+                            Query query = persistenceSession.createQuery(sql);
+                            query.setParameter("detailsHashCode", detailsHashCode1);
+                            query.setParameter("org", organization);
+                            query.setParameter("menuSource", Menu.ORG_MENU_SOURCE);
+                            query.setParameter("menuDate", menuDate);
+                            query.executeUpdate();
+                        }
                     }
                     // проверяем спомощью хеш-кода изменилось ли меню, в случае если изменилось то перезаписываем
                     HashMap<Long, MenuDetail> localIdsToMenuDetailMap = new HashMap<Long, MenuDetail>();
                     if(detailsHashCode==null || !detailsHashCode.equals(detailsHashCode1)){
-                    processReqAssortment(persistenceSession, organization, menuDate, item.getReqAssortments());
-                processReqMenuDetails(persistenceSession, menu, item, item.getReqMenuDetails(),
-                            localIdsToMenuDetailMap);
-                    processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos(),
+
+                        processReqAssortment(persistenceSession, organization, menuDate, item.getReqAssortments());
+
+                        processReqMenuDetails(persistenceSession, menu, item, item.getReqMenuDetails(),localIdsToMenuDetailMap);
+
+                        processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos(),
                             localIdsToMenuDetailMap);
                     } else {
                         processLocalIdsToMenuDetailMap(menu, item, item.getReqMenuDetails(), localIdsToMenuDetailMap);

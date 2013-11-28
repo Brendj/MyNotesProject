@@ -304,7 +304,20 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("org", organization));
         criteria.add(Restrictions.eq("menuSource", menuSource));
         criteria.add(Restrictions.eq("menuDate", menuDate));
-        return (Menu) criteria.uniqueResult();
+        //return (Menu) criteria.uniqueResult();
+        List list = criteria.list();
+        if(list==null || list.isEmpty()){
+            return null;
+        } else {
+            Menu returnMenu = null;
+            Long max = -1L;
+            for (Object obj: list){
+                Menu menu = (Menu) obj;
+                if(menu.getIdOfMenu()>max) returnMenu = menu;
+            }
+            return returnMenu;
+        }
+
     }
 
     public static MenuDetail findMenuDetail(Session persistenceSession, Menu menu, String menuDetailName)

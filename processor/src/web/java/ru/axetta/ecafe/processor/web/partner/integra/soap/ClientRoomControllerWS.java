@@ -1339,14 +1339,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         final static int CLIENT_ID_INTERNALID = 0, CLIENT_ID_SAN = 1, CLIENT_ID_EXTERNAL_ID = 2, CLIENT_ID_GUID = 3, CLIENT_SUB_ID = 4;
 
         public Data process(Long contractId, Processor processor) {
-            return process(contractId, CLIENT_ID_INTERNALID, processor);
-            //String contractIdStr = String.valueOf(contractId);
-            //int len = contractIdStr.length();
-            //if(len>2 && ContractIdGenerator.luhnTest(contractIdStr.substring(0, len - 2))){
-            //
-            //} else {
-            //    return process(contractId, CLIENT_SUB_ID, processor);
-            //}
+
+            Boolean enableSubBalanceOperation = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_SUB_BALANCE_OPERATION);
+            if(enableSubBalanceOperation){
+                String contractIdStr = String.valueOf(contractId);
+                int len = contractIdStr.length();
+                if(ContractIdGenerator.luhnTest(contractIdStr) || len<2){
+                    return process(contractId, CLIENT_ID_INTERNALID, processor);
+                } else {
+                    return process(contractId, CLIENT_SUB_ID, processor);
+                }
+            } else {
+                return process(contractId, CLIENT_ID_INTERNALID, processor);
+            }
         }
 
         public Data process(Object id, int clientIdType, Processor processor) {
@@ -1369,10 +1374,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 } else if (clientIdType == CLIENT_ID_GUID) {
                     clientCriteria.add(Restrictions.eq("clientGUID", (String) id));
                 } else if (clientIdType == CLIENT_SUB_ID) {
-                    String subBalanceNumber = String.valueOf(id);
+                    String subBalanceNumber = id.toString();
                     int len = subBalanceNumber.length();
-                    subBalanceNum = Integer.parseInt(subBalanceNumber.substring(len-2));
-                    clientCriteria.add(Restrictions.eq("contractId", Long.parseLong(subBalanceNumber.substring(0, len-2))));
+                    if(ContractIdGenerator.luhnTest(subBalanceNumber.substring(0, len - 2))){
+                        subBalanceNum = Integer.parseInt(subBalanceNumber.substring(len-2));
+                        clientCriteria.add(Restrictions.eq("contractId", Long.parseLong(subBalanceNumber.substring(0, len-2))));
+                    } else {
+                        clientCriteria.add(Restrictions.eq("contractId", (Long) id));
+                    }
                 }
 
                 List<Client> clients = clientCriteria.list();
@@ -2616,7 +2625,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             contractId = DAOService.getInstance().getContractIdByCardNo(lCardId);
             if (contractId == null) {
-                contractId = DAOService.getInstance().getContractIdByTempCardNoAndCheckValidDate(lCardId);
+                int days = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_TEMP_CARD_VALID_DAYS);
+                contractId = DAOService.getInstance().getContractIdByTempCardNoAndCheckValidDate(lCardId, days);
             }
         } catch (Exception e) {
             logger.error("ClientRoomController failed", e);

@@ -146,7 +146,7 @@ public class ConfigurationProviderService {
     public static List<ConfigurationProvider> findConfigurationProvider(Session session, String name){
         Criteria criteria = session.createCriteria(ConfigurationProvider.class);
         if(StringUtils.isNotEmpty(name)) criteria.add(Restrictions.ilike("name", name, MatchMode.ANYWHERE));
-        //criteria.addOrder(Order.asc("idOfConfigurationProvider"));
+        criteria.addOrder(Order.asc("idOfConfigurationProvider"));
         return criteria.list();
     }
 

@@ -17,10 +17,8 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Conjunction;
-import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -305,20 +303,20 @@ public class DAOService {
     }
 
 
-    public Long getContractIdByTempCardNoAndCheckValidDate(long lCardId) throws Exception {
+    public Long getContractIdByTempCardNoAndCheckValidDate(long lCardId, int days) throws Exception {
         /* так как в поле хранится дата на 00:00 ночи текущего дня вычтем из текущего дня 24 часа в милисекудах */
-        //Long currentDay = System.currentTimeMillis() - 86400000L;
-        Date currentDay = CalendarUtils.truncateToDayOfMonth(new Date());
-        currentDay = CalendarUtils.addDays(currentDay, -1);
-        TypedQuery<Long> query = entityManager.createQuery("select cl.contractId from CardTemp card left join card.client cl where card.cardNo=:cardNo and card.validDate>:currentDay", Long.class);
-        query.setParameter("cardNo", lCardId);
-        query.setParameter("currentDay", currentDay);
-        List<Long> list = query.getResultList();
-        if(list==null || list.isEmpty()){
-            return null;
-        } else {
-            return list.get(0);
+        Session session = entityManager.unwrap(Session.class);
+        Criteria criteria = session.createCriteria(CardTemp.class);
+        criteria.createAlias("client", "cl");
+        criteria.add(Restrictions.eq("cardNo", lCardId));
+        if(days>0){
+            Date currentDay = CalendarUtils.truncateToDayOfMonth(new Date());
+            currentDay = CalendarUtils.addDays(currentDay, -days);
+            criteria.add(Restrictions.ge("validDate", currentDay));
         }
+        criteria.setProjection(Projections.property("cl.contractId"));
+        criteria.setMaxResults(1);
+        return (Long) criteria.uniqueResult();
     }
 
 

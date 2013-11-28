@@ -17,39 +17,12 @@ import ru.axetta.ecafe.processor.core.service.SMSSubscriptionFeeService;
  */
 public class Option {
 
-    /* TODO: Предпологается применить множество? */
-    public enum Options{
-        OPERATOR(2),
-        NOTIFY_BY_SMS_ABOUT_ENTER_EVENT(3),
-        CLEAN_MENU(4),
-        MENU_DAYS_FOR_DELETION(5),
-        JOURNAL_TRANSACTIONS(6),
-        SEND_JOURNAL_TRANSACTIONS_TO_NFP(7),
-        NFP_SERVICE_ADDRESS(8),
-        PASSWORD_RESTORE_SEED(9),
-        NOTIFICATION_TEXT(10),
-        CHRONOPAY_SECTION(1000),
-        CHRONOPAY_RATE(1001),
-        RBK_SECTION(1002),
-        RBK_RATE(1003),
-        SRC_ORG_MENU_DAYS_FOR_DELETION(1004),
-        SMS_PAYMENT_TYPE(1005),
-        SMS_DEFAULT_SUBSCRIPTION_FEE(1006);
-        private int value;
-
-        private Options(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-    }
-
     public final static int OPTION_WITH_OPERATOR=2,
-            OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT=3, OPTION_CLEAN_MENU=4,
-            OPTION_MENU_DAYS_FOR_DELETION=5, OPTION_JOURNAL_TRANSACTIONS=6, OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP=7,
+            OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT=3,
+            OPTION_CLEAN_MENU=4,
+            OPTION_MENU_DAYS_FOR_DELETION=5,
+            OPTION_JOURNAL_TRANSACTIONS=6,
+            OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP=7,
             OPTION_NFP_SERVICE_ADDRESS=8,
             OPTION_PASSWORD_RESTORE_SEED =9,
             OPTION_NOTIFICATION_TEXT = 10,
@@ -59,6 +32,7 @@ public class Option {
             OPTION_DISABLE_SMSNOTIFY_EDIT_IN_CLIENT_ROOM=14,
             OPTION_REQUEST_SYNC_LIMITS=15,
             OPTION_REQUEST_SYNC_RETRY_AFTER=16,
+
             OPTION_CHRONOPAY_SECTION=1000,
             OPTION_CHRONOPAY_RATE=1001,
             OPTION_RBK_SECTION=1002,
@@ -71,6 +45,8 @@ public class Option {
             OPTION_ENABLE_SUBSCRIPTION_FEEDING =1009,
             OPTION_ENABLE_SUB_BALANCE_OPERATION =1010,
             OPTION_THRESHOLD_VALUES=1010,
+            OPTION_TEMP_CARD_VALID_DAYS=1011,
+
             OPTION_NSI_LAST_SYNC_TIME=10001,
             OPTION_STOP_LIST_LAST_UPDATE=10010,
             OPTION_MSR_STOPLIST_UPD_TIME=10011,
@@ -135,6 +111,7 @@ public class Option {
             OPTION_ENABLE_SUBSCRIPTION_FEEDING, "0",
             OPTION_ENABLE_SUB_BALANCE_OPERATION, "0",
             OPTION_THRESHOLD_VALUES, "",
+            OPTION_TEMP_CARD_VALID_DAYS, "0",
             OPTION_NSI_LAST_SYNC_TIME, null,
             OPTION_STOP_LIST_LAST_UPDATE, null,
             OPTION_MSR_STOPLIST_ON, "0",

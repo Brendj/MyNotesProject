@@ -89,6 +89,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean cleanupRepositoryReports;
     private Boolean enableSubscriptionFeeding;
     private Boolean enableSubBalanceOperation;
+    private Integer tempCardValidDays;
 
     private List<BankOptionItem> banks;
 
@@ -493,6 +494,15 @@ public class OptionPage extends BasicWorkspacePage {
         this.thresholdValues = thresholdValues;
     }
 
+
+    public Integer getTempCardValidDays() {
+        return tempCardValidDays;
+    }
+
+    public void setTempCardValidDays(Integer tempCardValidDays) {
+        this.tempCardValidDays = tempCardValidDays;
+    }
+
     public Integer getSyncRegisterDaysTimeout() {
         return syncRegisterDaysTimeout;
     }
@@ -555,6 +565,9 @@ public class OptionPage extends BasicWorkspacePage {
         enableBalanceAutoRefill = runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_BALANCE_AUTOREFILL);
         autoRefillValues = runtimeContext.getOptionValueString(Option.OPTION_AUTOREFILL_VALUES);
         thresholdValues = runtimeContext.getOptionValueString(Option.OPTION_THRESHOLD_VALUES);
+
+        tempCardValidDays = runtimeContext.getOptionValueInt(Option.OPTION_TEMP_CARD_VALID_DAYS);
+
         journalTransactions = runtimeContext.getOptionValueBool(Option.OPTION_JOURNAL_TRANSACTIONS);
         sendJournalTransactionsToNFP = runtimeContext.getOptionValueBool(Option.OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP);
         nfpServiceAddress = runtimeContext.getOptionValueString(Option.OPTION_NFP_SERVICE_ADDRESS);
@@ -652,6 +665,9 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_ENABLE_BALANCE_AUTOREFILL, enableBalanceAutoRefill);
             runtimeContext.setOptionValue(Option.OPTION_AUTOREFILL_VALUES, autoRefillValues);
             runtimeContext.setOptionValue(Option.OPTION_THRESHOLD_VALUES, thresholdValues);
+
+            runtimeContext.setOptionValue(Option.OPTION_TEMP_CARD_VALID_DAYS, tempCardValidDays);
+            //tempCardValidDays = runtimeContext.getOptionValueInt(Option.OPTION_TEMP_CARD_VALID_DAYS);
             runtimeContext.setOptionValue(Option.OPTION_JOURNAL_TRANSACTIONS, journalTransactions);
             runtimeContext.setOptionValue(Option.OPTION_SEND_JOURNAL_TRANSACTIONS_TO_NFP, sendJournalTransactionsToNFP);
             runtimeContext.setOptionValue(Option.OPTION_NFP_SERVICE_ADDRESS, nfpServiceAddress);

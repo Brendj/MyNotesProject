@@ -74,6 +74,11 @@
             <h:selectBooleanCheckbox value="#{optionPage.enableSubBalanceOperation}" styleClass="output-text" />
         </h:panelGrid>
 
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Оставшийся период действия временной карты клиента (при нулевом значении проверка не проводится):" styleClass="output-text" />
+            <rich:inputNumberSpinner value="#{optionPage.tempCardValidDays}" minValue="0" maxValue="60"/>
+        </h:panelGrid>
+
     </rich:tab>
     <rich:tab label="Платежные системы">
         <h:outputText escape="true" value="Выводить в личный кабинет" styleClass="output-text" />

@@ -93,6 +93,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
     private ReportDAOService proxy;
 
     @PersistenceContext(unitName = "reportsPU")
+    //@PersistenceContext(unitName = "processorPU")
     private EntityManager em;
 
 
@@ -222,10 +223,14 @@ public class ManualReportRunnerPage extends OnlineReportPage
 
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes)
             throws Exception {
-        if (classTypes.equals(Contragent.PAY_AGENT + "")) {
-            contragentPayAgentFilter.completeContragentSelection(session, idOfContragent);
-        } else if (classTypes.equals(Contragent.TSP + "")) {
-            contragentReceiverFilter.completeContragentSelection(session, idOfContragent);
+        if(StringUtils.isNotEmpty(classTypes)){
+            if (classTypes.equals(Contragent.PAY_AGENT + "")) {
+                contragentPayAgentFilter.completeContragentSelection(session, idOfContragent);
+            } else if (classTypes.equals(Contragent.TSP + "")) {
+                contragentReceiverFilter.completeContragentSelection(session, idOfContragent);
+            } else {
+                contragentFilter.completeContragentSelection(session, idOfContragent);
+            }
         } else {
             contragentFilter.completeContragentSelection(session, idOfContragent);
         }

@@ -240,8 +240,8 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                 item.setLevel3(level3);
                 item.setLevel4(level4);
                 item.setCount(count);
-                item.setPrice(price / 1000);
-                item.setSummary(summary / 1000);
+                item.setPrice(price);
+                item.setSummary(summary);
                 item.setOrgnum(orgNum);
                 item.setAddress(address);
                 item.setIdoforg(idoforg);
