@@ -1558,7 +1558,7 @@ public class DAOUtils {
         if(!StringUtils.isEmpty(nameFilter)){
             productCriteria.add(Restrictions.ilike("productName", nameFilter, MatchMode.ANYWHERE));
         }
-        if(orgOwners!=null){
+        if(!(orgOwners==null || orgOwners.isEmpty())){
             productCriteria.add(Restrictions.in("orgOwner", orgOwners));
         }
         if(deletedStatusSelected!=null && !deletedStatusSelected){

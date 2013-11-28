@@ -40,7 +40,142 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
     private FunctionSelector functionSelector = new FunctionSelector();
     private String contragentFilter;
     private String contragentIds;
+    private Boolean blocked;
 
+    public void setFunctionSelector(FunctionSelector functionSelector) {
+        this.functionSelector = functionSelector;
+    }
+
+    public void fill(Session session, Long idOfUser) throws Exception {
+        User user = (User) session.load(User.class, idOfUser);
+        fill(session, user);
+    }
+
+    public void updateUser(Session session, Long idOfUser) throws Exception {
+        if (StringUtils.isEmpty(userName)) {
+            this.printError("Заполните имя пользователя");
+            throw new RuntimeException("Username field is null");
+        }
+        User user = (User) session.load(User.class, idOfUser);
+        user.setUserName(userName);
+        if (changePassword) {
+            user.setPassword(plainPassword);
+        }
+        user.setPhone(phone);
+        user.setEmail(email);
+        user.setUpdateTime(new Date());
+        user.setBlocked(blocked);
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        user.setIdOfRole(role.getIdentification());
+        if (User.DefaultRole.SUPPLIER.equals(role)) {
+            user.setFunctions(functionSelector.getSupplierFunctions(session));
+            user.setRoleName(role.toString());
+            if (contragentItems.isEmpty()) {
+                this.printError("Список контрагентов пуст.");
+                throw new RuntimeException("Contragent list is empty");
+            }
+        }
+        user.getContragents().clear();
+        for (ContragentItem it : this.contragentItems) {
+            Contragent contragent = (Contragent) session.load(Contragent.class, it.getIdOfContragent());
+            user.getContragents().add(contragent);
+        }
+        if(role.equals(User.DefaultRole.MONITORING)){
+            user.setFunctions(functionSelector.getMonitoringFunctions(session));
+            user.setRoleName(role.toString());
+        }
+        if(role.equals(User.DefaultRole.ADMIN)){
+            user.setFunctions(functionSelector.getAdminFunctions(session));
+            user.setRoleName(role.toString());
+        }
+        if (User.DefaultRole.DEFAULT.equals(role)) {
+            if (StringUtils.isEmpty(roleName)) {
+                this.printError("Заполните имя роли");
+                throw new RuntimeException("Role name fields is null");
+            }
+            user.setFunctions(functionSelector.getSelected(session));
+            user.setRoleName(this.roleName);
+        }
+        session.update(user);
+        fill(session, user);
+    }
+
+
+    public Boolean getIsDefault(){
+        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
+        return role.equals(User.DefaultRole.DEFAULT);
+    }
+
+    @Override
+    public void completeContragentListSelection(Session session, List<Long> idOfContragentList, int multiContrFlag,
+            String classTypes) throws Exception {
+        contragentItems.clear();
+        for (Long idOfContragent : idOfContragentList) {
+            Contragent currentContragent = (Contragent) session.load(Contragent.class, idOfContragent);
+            ContragentItem contragentItem = new ContragentItem(currentContragent);
+            contragentItems.add(contragentItem);
+        }
+        setContragentFilterInfo(contragentItems);
+    }
+
+
+    private void setContragentFilterInfo(List<ContragentItem> contragentItems) {
+        StringBuilder str = new StringBuilder();
+        StringBuilder ids = new StringBuilder();
+        for (ContragentItem it : contragentItems) {
+            if (str.length() > 0) {
+                str.append("; ");
+                ids.append(",");
+            }
+            str.append(it.getContragentName());
+            ids.append(it.getIdOfContragent());
+        }
+        contragentFilter = str.toString();
+        contragentIds = ids.toString();
+    }
+
+    private void fill(Session session, User user) throws Exception {
+        this.contragentItems.clear();
+        this.idOfUser = user.getIdOfUser();
+        this.userName = user.getUserName();
+        this.phone = user.getPhone();
+        this.email = user.getEmail();
+        this.functionSelector.fill(session, user.getFunctions());
+        for (Contragent c : user.getContragents()) {
+            this.contragentItems.add(new ContragentItem(c));
+        }
+        setContragentFilterInfo(contragentItems);
+        this.idOfRole = user.getIdOfRole();
+        this.roleName = user.getRoleName();
+        this.blocked = user.isBlocked();
+    }
+
+    public static class ContragentItem {
+
+        private final Long idOfContragent;
+
+        private final String contragentName;
+        public ContragentItem(Contragent contragent) {
+            this.idOfContragent = contragent.getIdOfContragent();
+            this.contragentName = contragent.getContragentName();
+        }
+
+        public ContragentItem() {
+            this.idOfContragent = null;
+            this.contragentName = null;
+        }
+
+        public Long getIdOfContragent() {
+            return idOfContragent;
+        }
+
+        public String getContragentName() {
+            return contragentName;
+        }
+
+    }
+
+    /* getters and setters */
     public UserRoleEnumTypeMenu getUserRoleEnumTypeMenu() {
         return userRoleEnumTypeMenu;
     }
@@ -103,15 +238,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
 
     public void setEmail(String email) {
         this.email = email;
-    }/*
-
-    public ContragentItem getContragentItem() {
-        return contragentItems;
     }
-
-    public void setContragentItem(ContragentItem contragentItem) {
-        this.contragentItem = contragentItem;
-    }*/
 
     public String getContragentFilter() {
         return contragentFilter;
@@ -127,21 +254,6 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
 
     public void setContragentIds(String contragentIds) {
         this.contragentIds = contragentIds;
-    }
-
-    private void setContragentFilterInfo(List<ContragentItem> contragentItems) {
-        StringBuilder str = new StringBuilder();
-        StringBuilder ids = new StringBuilder();
-        for (ContragentItem it : contragentItems) {
-            if (str.length() > 0) {
-                str.append("; ");
-                ids.append(",");
-            }
-            str.append(it.getContragentName());
-            ids.append(it.getIdOfContragent());
-        }
-        contragentFilter = str.toString();
-        contragentIds = ids.toString();
     }
 
     public Integer getIdOfRole() {
@@ -164,117 +276,11 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         return functionSelector;
     }
 
-    public void setFunctionSelector(FunctionSelector functionSelector) {
-        this.functionSelector = functionSelector;
+    public Boolean getBlocked() {
+        return blocked;
     }
 
-    public void fill(Session session, Long idOfUser) throws Exception {
-        User user = (User) session.load(User.class, idOfUser);
-        fill(session, user);
+    public void setBlocked(Boolean blocked) {
+        this.blocked = blocked;
     }
-
-    public void updateUser(Session session, Long idOfUser) throws Exception {
-        if (StringUtils.isEmpty(userName)) {
-            this.printError("Заполните имя пользователя");
-            throw new RuntimeException("Username field is null");
-        }
-        User user = (User) session.load(User.class, idOfUser);
-        user.setUserName(userName);
-        if (changePassword) {
-            user.setPassword(plainPassword);
-        }
-        user.setPhone(phone);
-        user.setEmail(email);
-        user.setUpdateTime(new Date());
-        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
-        user.setIdOfRole(role.getIdentification());
-        if (User.DefaultRole.SUPPLIER.equals(role)) {
-            user.setFunctions(functionSelector.getSupplierFunctions(session));
-            user.setRoleName(role.toString());
-            if (contragentItems.isEmpty()) {
-                this.printError("Список контрагентов пуст.");
-                throw new RuntimeException("Contragent list is empty");
-            }
-        }
-        user.getContragents().clear();
-        for (ContragentItem it : this.contragentItems) {
-            Contragent contragent = (Contragent) session.load(Contragent.class, it.getIdOfContragent());
-            user.getContragents().add(contragent);
-        }
-        if(role.equals(User.DefaultRole.MONITORING)){
-            user.setFunctions(functionSelector.getMonitoringFunctions(session));
-            user.setRoleName(role.toString());
-        }
-        if(role.equals(User.DefaultRole.ADMIN)){
-            user.setFunctions(functionSelector.getAdminFunctions(session));
-            user.setRoleName(role.toString());
-        }
-        if (User.DefaultRole.DEFAULT.equals(role)) {
-            if (StringUtils.isEmpty(roleName)) {
-                this.printError("Заполните имя роли");
-                throw new RuntimeException("Role name fields is null");
-            }
-            user.setFunctions(functionSelector.getSelected(session));
-            user.setRoleName(this.roleName);
-        }
-        session.update(user);
-        fill(session, user);
-    }
-
-    private void fill(Session session, User user) throws Exception {
-        this.contragentItems.clear();
-        this.idOfUser = user.getIdOfUser();
-        this.userName = user.getUserName();
-        this.phone = user.getPhone();
-        this.email = user.getEmail();
-        this.functionSelector.fill(session, user.getFunctions());
-        for (Contragent c : user.getContragents()) {
-            this.contragentItems.add(new ContragentItem(c));
-        }
-        setContragentFilterInfo(contragentItems);
-        this.idOfRole = user.getIdOfRole();
-        this.roleName = user.getRoleName();
-    }
-
-    public Boolean getIsDefault(){
-        User.DefaultRole role = User.DefaultRole.parse(idOfRole);
-        return role.equals(User.DefaultRole.DEFAULT);
-    }
-
-    @Override
-    public void completeContragentListSelection(Session session, List<Long> idOfContragentList, int multiContrFlag,
-            String classTypes) throws Exception {
-        contragentItems.clear();
-        for (Long idOfContragent : idOfContragentList) {
-            Contragent currentContragent = (Contragent) session.load(Contragent.class, idOfContragent);
-            ContragentItem contragentItem = new ContragentItem(currentContragent);
-            contragentItems.add(contragentItem);
-        }
-        setContragentFilterInfo(contragentItems);
-    }
-
-    public static class ContragentItem {
-
-        private final Long idOfContragent;
-        private final String contragentName;
-
-        public ContragentItem(Contragent contragent) {
-            this.idOfContragent = contragent.getIdOfContragent();
-            this.contragentName = contragent.getContragentName();
-        }
-
-        public ContragentItem() {
-            this.idOfContragent = null;
-            this.contragentName = null;
-        }
-
-        public Long getIdOfContragent() {
-            return idOfContragent;
-        }
-
-        public String getContragentName() {
-            return contragentName;
-        }
-    }
-
 }

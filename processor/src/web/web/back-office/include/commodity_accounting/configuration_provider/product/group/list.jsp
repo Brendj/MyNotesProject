@@ -15,7 +15,7 @@
 <h:panelGrid id="productGroupListPanelGrid" binding="#{productGroupListPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
 
-    <h:column>
+    <h:panelGrid id="productGroupListPanelFilter" styleClass="borderless-grid" columns="1">
 
         <rich:simpleTogglePanel label="Фильтр" switchType="client"
                                 eventsQueue="mainFormEventsQueue" opened="true" headerClass="filter-panel-header">
@@ -45,25 +45,24 @@
                                    reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
             </h:panelGrid>
         </rich:simpleTogglePanel>
-    </h:column>
+    </h:panelGrid>
 
 
-    <a4j:status id="sReportGenerateStatus">
+    <a4j:status id="productGroupListTableStatus">
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
         </f:facet>
     </a4j:status>
 
-    <rich:dataTable id="productGroupListTable" width="700" value="#{productGroupListPage.productGroupList}" var="productGroup"
-                    rows="10" rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer"
-                    rendered="#{!productGroupListPage.emptyProductGroupList}">
+    <rich:dataTable id="productGroupListTable" value="#{productGroupListPage.productGroupList}" var="productGroup"
+                    rows="10" rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer">
         <rich:column  headerClass="column-header">
             <f:facet name="header">
                 <h:outputText value="Идентификатор" styleClass="output-text" escape="true"/>
             </f:facet>
             <h:outputText styleClass="output-text" value="#{productGroup.globalId}" />
         </rich:column>
-        <rich:column  headerClass="column-header">
+        <rich:column  headerClass="column-header" width="200">
             <f:facet name="header">
                 <h:outputText value="GUID" styleClass="output-text" escape="true"/>
             </f:facet>
@@ -120,9 +119,9 @@
             </rich:datascroller>
         </f:facet>
     </rich:dataTable>
+    <h:panelGrid styleClass="borderless-grid">
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+    </h:panelGrid>
 </h:panelGrid>
 
-<h:panelGrid styleClass="borderless-grid">
-    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                   warnClass="warn-messages" />
-</h:panelGrid>

@@ -16,43 +16,52 @@
   Список ТМЦ
 --%>
 <%--@elvariable id="tradeMaterialGoodListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.TradeMaterialGoodListPage"--%>
-<h:panelGrid id="ctOfWayBillDifferencePositionListPage" binding="#{tradeMaterialGoodListPage.pageComponent}"
+<h:panelGrid id="tradeMaterialGoodListPage" binding="#{tradeMaterialGoodListPage.pageComponent}"
              styleClass="borderless-grid">
 
-    <rich:simpleTogglePanel label="Фильтр (#{tradeMaterialGoodListPage.filter.status})" switchType="client" opened="true"
-                            headerClass="filter-panel-header">
+    <h:panelGrid id="tradeMaterialGoodListFilter" styleClass="borderless-grid">
+        <rich:simpleTogglePanel label="Фильтр (#{tradeMaterialGoodListPage.filter.status})" switchType="client" opened="true"
+                                headerClass="filter-panel-header">
 
-        <h:panelGrid columns="2" styleClass="borderless-grid">
-            <h:outputText escape="true" value="Организация" styleClass="output-text" />
-            <h:panelGroup styleClass="borderless-div">
-                <h:inputText value="#{tradeMaterialGoodListPage.shortName}" readonly="true" styleClass="input-text long-field"
-                             style="margin-right: 2px;" />
-                <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
-                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
-                                   styleClass="command-link" style="width: 25px;" />
-            </h:panelGroup>
-            <h:outputText escape="true" value="Удаленные акты" styleClass="output-text" />
-            <h:selectOneMenu id="selectDeletedStatus" value="#{tradeMaterialGoodListPage.filter.deletedState}" styleClass="input-text">
-                <f:selectItem itemLabel="Скрыть" itemValue="true"/>
-                <f:selectItem itemLabel="Показать" itemValue="false"/>
-            </h:selectOneMenu>
-            <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
-            <rich:calendar value="#{tradeMaterialGoodListPage.filter.startDate}" datePattern="dd.MM.yyyy"
-                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
-            <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
-            <rich:calendar value="#{tradeMaterialGoodListPage.filter.endDate}" datePattern="dd.MM.yyyy"
-                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
-        </h:panelGrid>
+            <h:panelGrid columns="2" styleClass="borderless-grid">
+                <h:outputText escape="true" value="Организация" styleClass="output-text" />
+                <h:panelGroup styleClass="borderless-div">
+                    <h:inputText value="#{tradeMaterialGoodListPage.shortName}" readonly="true" styleClass="input-text long-field"
+                                 style="margin-right: 2px;" />
+                    <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                       styleClass="command-link" style="width: 25px;" />
+                </h:panelGroup>
+                <h:outputText escape="true" value="Удаленные акты" styleClass="output-text" />
+                <h:selectOneMenu id="selectDeletedStatus" value="#{tradeMaterialGoodListPage.filter.deletedState}" styleClass="input-text">
+                    <f:selectItem itemLabel="Скрыть" itemValue="true"/>
+                    <f:selectItem itemLabel="Показать" itemValue="false"/>
+                </h:selectOneMenu>
+                <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
+                <rich:calendar value="#{tradeMaterialGoodListPage.filter.startDate}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+                <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
+                <rich:calendar value="#{tradeMaterialGoodListPage.filter.endDate}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+            </h:panelGrid>
 
-        <h:panelGrid columns="2" styleClass="borderless-grid">
-            <a4j:commandButton value="Применить" action="#{tradeMaterialGoodListPage.reload}"
-                               reRender="workspaceTogglePanel" styleClass="command-button" />
-            <a4j:commandButton value="Очистить" action="#{tradeMaterialGoodListPage.resetFilter}"
-                               reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button"/>
-        </h:panelGrid>
-    </rich:simpleTogglePanel>
+            <h:panelGrid columns="2" styleClass="borderless-grid">
+                <a4j:commandButton value="Применить" action="#{tradeMaterialGoodListPage.reload}"
+                                   reRender="workspaceTogglePanel" styleClass="command-button" />
+                <a4j:commandButton value="Очистить" action="#{tradeMaterialGoodListPage.resetFilter}"
+                                   reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button"/>
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+    </h:panelGrid>
 
-    <rich:dataTable value="#{tradeMaterialGoodListPage.itemList}" var="tradeMaterialGood" rowKeyVar="row">
+
+    <a4j:status id="tradeMaterialGoodListPageStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+        </f:facet>
+    </a4j:status>
+
+    <rich:dataTable value="#{tradeMaterialGoodListPage.itemList}" var="tradeMaterialGood" rowKeyVar="row" rows="10">
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="№" />
@@ -131,16 +140,21 @@
             </f:facet>
             <h:outputText escape="true" value="#{tradeMaterialGood.deletedState}" styleClass="output-text" />
         </rich:column>
+        <f:facet name="footer">
+            <rich:datascroller for="tradeMaterialGoodListPage" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                               stepControls="auto" boundaryControls="hide">
+                <f:facet name="previous">
+                    <h:graphicImage value="/images/16x16/left-arrow.png" />
+                </f:facet>
+                <f:facet name="next">
+                    <h:graphicImage value="/images/16x16/right-arrow.png" />
+                </f:facet>
+            </rich:datascroller>
+        </f:facet>
     </rich:dataTable>
-</h:panelGrid>
 
-<a4j:status id="sctOfWayBillDifferencePositionListGenerateStatus">
-    <f:facet name="start">
-        <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
-    </f:facet>
-</a4j:status>
-
-<h:panelGrid styleClass="borderless-grid">
-    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                   warnClass="warn-messages" />
+    <h:panelGrid styleClass="borderless-grid">
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+    </h:panelGrid>
 </h:panelGrid>

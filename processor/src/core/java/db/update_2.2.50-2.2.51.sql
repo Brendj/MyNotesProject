@@ -85,44 +85,44 @@
 -- ALTER TABLE cf_goods ADD CONSTRAINT cf_goods_configurationprovider_fk FOREIGN KEY (idofconfigurationprovider) REFERENCES cf_provider_configurations (idofconfigurationprovider);
 --
 -- --! Востанавливаем конфигурацию у предыдущих
--- UPDATE cf_goods g1 SET idofconfigurationprovider=(SELECT idofconfigurationprovider
---                                                   FROM cf_orgs
---                                                   where idoforg = (SELECT distinct orgowner FROM cf_goods g2
---                                                   where orgowner=idoforg and g2.idofgood = g1.idofgood))
--- WHERE g1.idofconfigurationprovider is null;
+UPDATE cf_goods g1 SET idofconfigurationprovider=(SELECT idofconfigurationprovider
+                                                  FROM cf_orgs
+                                                  where idoforg = (SELECT distinct orgowner FROM cf_goods g2
+                                                  where orgowner=idoforg and g2.idofgood = g1.idofgood))
+WHERE g1.idofconfigurationprovider is null;
 --
 -- -- группы товаров добавлены в конфигурацию провайдера
 -- ALTER TABLE cf_goods_groups ADD COLUMN idofconfigurationprovider bigint;
 -- ALTER TABLE cf_goods_groups ADD CONSTRAINT cf_goods_groups_configurationprovider_fk FOREIGN KEY (idofconfigurationprovider) REFERENCES cf_provider_configurations (idofconfigurationprovider);
 --
 -- --! Востанавливаем конфигурацию у предыдущих
--- UPDATE cf_goods_groups g1 SET idofconfigurationprovider=(SELECT idofconfigurationprovider
---                                                   FROM cf_orgs
---                                                   where idoforg = (SELECT distinct orgowner FROM cf_goods_groups g2
---                                                   where orgowner=idoforg and g2.idofgoodsgroup = g1.idofgoodsgroup))
--- WHERE g1.idofconfigurationprovider is null;
+UPDATE cf_goods_groups g1 SET idofconfigurationprovider=(SELECT idofconfigurationprovider
+                                                  FROM cf_orgs
+                                                  where idoforg = (SELECT distinct orgowner FROM cf_goods_groups g2
+                                                  where orgowner=idoforg and g2.idofgoodsgroup = g1.idofgoodsgroup))
+WHERE g1.idofconfigurationprovider is null;
 --
 -- -- товаро-материальные ценности добавлены в конфигурацию провайдера
 -- ALTER TABLE cf_trade_material_goods ADD COLUMN idofconfigurationprovider bigint;
 -- ALTER TABLE cf_trade_material_goods ADD CONSTRAINT cf_trade_material_goods_configurationprovider_fk FOREIGN KEY (idofconfigurationprovider) REFERENCES cf_provider_configurations (idofconfigurationprovider);
 --
 -- --! Востанавливаем конфигурацию у предыдущих
--- UPDATE cf_trade_material_goods g1 SET idofconfigurationprovider=(SELECT idofconfigurationprovider
---                                                          FROM cf_orgs
---                                                          where idoforg = (SELECT distinct orgowner FROM cf_trade_material_goods g2
---                                                          where orgowner=idoforg and g2.idoftradematerialgood = g1.idoftradematerialgood))
--- WHERE g1.idofconfigurationprovider is null;
+UPDATE cf_trade_material_goods g1 SET idofconfigurationprovider=(SELECT idofconfigurationprovider
+                                                         FROM cf_orgs
+                                                         where idoforg = (SELECT distinct orgowner FROM cf_trade_material_goods g2
+                                                         where orgowner=idoforg and g2.idoftradematerialgood = g1.idoftradematerialgood))
+WHERE g1.idofconfigurationprovider is null;
 --
 -- -- Элементы базовой корзины с ценой добавлены в конфигурацию провайдера
 -- ALTER TABLE cf_good_basic_basket_price ADD COLUMN idofconfigurationprovider bigint;
 -- ALTER TABLE cf_good_basic_basket_price ADD CONSTRAINT cf_good_basic_basket_price_configurationprovider_fk FOREIGN KEY (idofconfigurationprovider) REFERENCES cf_provider_configurations (idofconfigurationprovider);
 --
 -- --! Востанавливаем конфигурацию у предыдущих
--- UPDATE cf_good_basic_basket_price g1 SET idofconfigurationprovider=(SELECT idofconfigurationprovider
---                                                                  FROM cf_orgs
---                                                                  where idoforg = (SELECT distinct orgowner FROM cf_good_basic_basket_price g2
---                                                                  where orgowner=idoforg and g2.idofgoodbasicbasketprice = g1.idofgoodbasicbasketprice))
--- WHERE g1.idofconfigurationprovider is null;
+UPDATE cf_good_basic_basket_price g1 SET idofconfigurationprovider=(SELECT idofconfigurationprovider
+                                                                 FROM cf_orgs
+                                                                 where idoforg = (SELECT distinct orgowner FROM cf_good_basic_basket_price g2
+                                                                 where orgowner=idoforg and g2.idofgoodbasicbasketprice = g1.idofgoodbasicbasketprice))
+WHERE g1.idofconfigurationprovider is null;
 --
 -- -- Добавлен компазитный индекс на часто используемые поля в таблице подтверждения
 -- CREATE INDEX cf_do_confirm_all_fields_idx ON cf_do_confirms USING btree (distributedobjectclassname, guid, orgowner);

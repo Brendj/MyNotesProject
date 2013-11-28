@@ -15,8 +15,7 @@
 <%--@elvariable id="selectedGoodGroupGroupPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvider.good.group.SelectedGoodGroupGroupPage"--%>
 <h:panelGrid id="goodGroupListPanelGrid" binding="#{goodGroupListPage.pageComponent}" styleClass="borderless-grid" columns="1">
 
-    <h:column>
-
+    <h:panelGrid id="goodGroupListPanelFilter" styleClass="borderless-grid" columns="1">
         <rich:simpleTogglePanel label="Фильтр" switchType="client" eventsQueue="mainFormEventsQueue" opened="true" headerClass="filter-panel-header">
             <h:panelGrid columns="2" styleClass="borderless-grid">
 
@@ -47,17 +46,17 @@
                                    styleClass="command-button" />
             </h:panelGrid>
         </rich:simpleTogglePanel>
-    </h:column>
+    </h:panelGrid>
 
 
-    <a4j:status id="sReportGenerateStatus">
+    <a4j:status id="oodGroupListTableStatus">
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
         </f:facet>
     </a4j:status>
 
-    <rich:dataTable id="goodGroupListTable" width="700" value="#{goodGroupListPage.goodGroupList}" var="goodGroup" rows="10" rowKeyVar="row"
-                    columnClasses="center-aligned-column" footerClass="data-table-footer" rendered="#{!goodGroupListPage.emptyGoodGroupList}">
+    <rich:dataTable id="goodGroupListTable" value="#{goodGroupListPage.goodGroupList}" var="goodGroup" rows="10"
+                    rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer">
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText value="Идентификатор" styleClass="output-text" escape="true" />

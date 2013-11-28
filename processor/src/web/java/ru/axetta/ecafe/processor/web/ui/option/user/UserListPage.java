@@ -11,6 +11,8 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Restrictions;
 
 import java.util.*;
 
@@ -28,32 +30,24 @@ public class UserListPage extends BasicWorkspacePage {
         private final Long idOfUser;
         private final String userName;
         private final Set<Long> functions;
+        private final Date lastEntryTime;
         private final Date updateTime;
         private final String roleName;
-        private final String contragents;
+        private final List<Contragent> contragentList;
 
         public Item(User user) {
             this.idOfUser = user.getIdOfUser();
             this.userName = user.getUserName();
             this.updateTime = user.getUpdateTime();
             this.roleName = user.getRoleName();
+            this.lastEntryTime = user.getLastEntryTime();
             Set<Long> itemFunctions = new HashSet<Long>();
             Set<Function> userFunctions = user.getFunctions();
             for (Function function : userFunctions) {
                 itemFunctions.add(function.getIdOfFunction());
             }
             this.functions = itemFunctions;
-            this.contragents = getUserContragents(user.getContragents());
-        }
-
-        private String getUserContragents(Set<Contragent> cSet) {
-            StringBuilder sb = new StringBuilder();
-            int i = 0;
-            for (Contragent c : cSet) {
-                i++;
-                sb.append(c.getContragentName()).append(i == cSet.size() ? "" : "; ");
-            }
-            return sb.toString();
+            this.contragentList = new ArrayList<Contragent>(user.getContragents());
         }
 
         public Long getIdOfUser() {
@@ -76,28 +70,23 @@ public class UserListPage extends BasicWorkspacePage {
             return roleName;
         }
 
-        public String getContragents() {
-            return contragents;
+        public Date getLastEntryTime() {
+            return lastEntryTime;
+        }
+
+        public List<Contragent> getContragentList() {
+            return contragentList;
         }
     }
 
     private List<Item> items = Collections.emptyList();
 
-    public String getPageFilename() {
-        return "option/user/list";
-    }
-
-    public String getPageTitle() {
-        return super.getPageTitle() + String.format(" (%d)", items.size());
-    }
-
-    public List<Item> getItems() {
-        return items;
-    }
+    private final UserFilter userFilter = new UserFilter();
 
     public void fill(Session session) throws Exception {
         List<Item> items = new LinkedList<Item>();
         Criteria criteria = session.createCriteria(User.class);
+        userFilter.addFilter(criteria);
         List users = criteria.list();
         for (Object object : users) {
             User user = (User) object;
@@ -110,5 +99,21 @@ public class UserListPage extends BasicWorkspacePage {
         User user = (User) session.load(User.class, idOfUser);
         session.delete(user);
         fill(session);
+    }
+
+    public UserFilter getUserFilter() {
+        return userFilter;
+    }
+
+    public String getPageFilename() {
+        return "option/user/list";
+    }
+
+    public String getPageTitle() {
+        return super.getPageTitle() + String.format(" (%d)", items.size());
+    }
+
+    public List<Item> getItems() {
+        return items;
     }
 }

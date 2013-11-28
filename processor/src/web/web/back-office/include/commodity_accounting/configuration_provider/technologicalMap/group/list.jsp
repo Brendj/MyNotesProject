@@ -16,9 +16,9 @@
 <h:panelGrid id="technologicalMapGroupListPanelGrid" binding="#{technologicalMapGroupListPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
 
-    <h:column>
-        <rich:simpleTogglePanel label="Фильтр" switchType="client"
-                                eventsQueue="mainFormEventsQueue" opened="true" headerClass="filter-panel-header">
+    <h:panelGrid id="technologicalMapGroupListPanelFilter" styleClass="borderless-grid" columns="1">
+        <rich:simpleTogglePanel label="Фильтр" switchType="client" eventsQueue="mainFormEventsQueue"
+                                opened="true" headerClass="filter-panel-header">
             <h:panelGrid columns="2" styleClass="borderless-grid">
 
                 <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text required-field" />
@@ -45,25 +45,23 @@
                                    reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
             </h:panelGrid>
         </rich:simpleTogglePanel>
-    </h:column>
+    </h:panelGrid>
 
-
-    <a4j:status id="sReportGenerateStatus">
+    <a4j:status id="technologicalMapGroupListTableStatus">
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
         </f:facet>
     </a4j:status>
 
-    <rich:dataTable id="technologicalMapGroupListTable" width="700" value="#{technologicalMapGroupListPage.technologicalMapGroupList}" var="technologicalMapGroup"
-                    rows="10" rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer"
-            rendered="#{!technologicalMapGroupListPage.emptyTechnologicalMapGroup}">
+    <rich:dataTable id="technologicalMapGroupListTable" value="#{technologicalMapGroupListPage.technologicalMapGroupList}" var="technologicalMapGroup"
+                    rows="10" rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer">
         <rich:column  headerClass="column-header">
             <f:facet name="header">
                 <h:outputText value="Идентификатор" styleClass="output-text" escape="true"/>
             </f:facet>
             <h:outputText styleClass="output-text" value="#{technologicalMapGroup.globalId}" />
         </rich:column>
-        <rich:column  headerClass="column-header">
+        <rich:column  headerClass="column-header" width="200">
             <f:facet name="header">
                 <h:outputText value="GUID" styleClass="output-text" escape="true"/>
             </f:facet>
@@ -114,9 +112,9 @@
             </rich:datascroller>
         </f:facet>
     </rich:dataTable>
+    <h:panelGrid styleClass="borderless-grid">
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+    </h:panelGrid>
 </h:panelGrid>
 
-<h:panelGrid styleClass="borderless-grid">
-    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                   warnClass="warn-messages" />
-</h:panelGrid>

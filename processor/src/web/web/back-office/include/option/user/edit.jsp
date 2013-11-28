@@ -36,6 +36,9 @@
     <h:outputText escape="true" value="Электронная почта" styleClass="output-text" />
     <h:inputText value="#{mainPage.userEditPage.email}" maxlength="128" styleClass="input-text"/>
 
+    <h:outputText escape="true" value="Заблокировать пользователя" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.userEditPage.blocked}" />
+
     <h:outputText escape="true" value="Роль" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.userEditPage.idOfRole}" styleClass="input-text">
         <a4j:support event="onchange" reRender="userEditGrid" ajaxSingle="true" />

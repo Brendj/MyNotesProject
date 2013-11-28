@@ -11,38 +11,47 @@
 <h:panelGrid id="basicGoodListPage" binding="#{basicGoodListPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
 
-    <rich:simpleTogglePanel label="Фильтр (#{basicGoodListPage.filter.status})" switchType="client"
-                            opened="false" headerClass="filter-panel-header">
+    <h:panelGrid id="basicGoodListPageFilter" styleClass="borderless-grid" columns="1">
+        <rich:simpleTogglePanel label="Фильтр (#{basicGoodListPage.filter.status})" switchType="client"
+                                opened="false" headerClass="filter-panel-header">
 
-        <h:panelGrid columns="2" styleClass="borderless-grid">
-            <h:outputText escape="true" value="Наименование продукта" styleClass="output-text" />
-            <h:inputText value="#{basicGoodListPage.filter.nameOfGood}" styleClass="input-text" />
-            <%--<h:outputText escape="true" value="Масса нетто (грамм)" styleClass="output-text" />
-            <h:inputText value="#{basicGoodListPage.filter.netWeight}" styleClass="input-text" />--%>
-            <h:outputText escape="true" value="Единица измерения" styleClass="output-text"/>
-            <h:selectOneListbox id="unitsScaleFilterValue" value="#{basicGoodListPage.filter.unitsScale}">
-                <f:selectItems value="#{basicGoodListPage.filter.unitsScaleSelectItemList}"/>
-                <f:converter converterId="unitScaleConverter" />
-                <a4j:support event="valueChange" reRender="unitsScaleFilterValue" />
-            </h:selectOneListbox>
-            <h:outputText styleClass="output-text" escape="true" value="Начальная дата создания" />
-            <rich:calendar value="#{basicGoodListPage.filter.createdDateBegin}" datePattern="dd.MM.yyyy"
-                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
-            <h:outputText styleClass="output-text" escape="true" value="Конечная дата создания" />
-            <rich:calendar value="#{basicGoodListPage.filter.createdDateEnd}" datePattern="dd.MM.yyyy"
-                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
-        </h:panelGrid>
+            <h:panelGrid columns="2" styleClass="borderless-grid">
+                <h:outputText escape="true" value="Наименование продукта" styleClass="output-text" />
+                <h:inputText value="#{basicGoodListPage.filter.nameOfGood}" styleClass="input-text" />
+                <%--<h:outputText escape="true" value="Масса нетто (грамм)" styleClass="output-text" />
+                <h:inputText value="#{basicGoodListPage.filter.netWeight}" styleClass="input-text" />--%>
+                <h:outputText escape="true" value="Единица измерения" styleClass="output-text"/>
+                <h:selectOneListbox id="unitsScaleFilterValue" value="#{basicGoodListPage.filter.unitsScale}">
+                    <f:selectItems value="#{basicGoodListPage.filter.unitsScaleSelectItemList}"/>
+                    <f:converter converterId="unitScaleConverter" />
+                    <a4j:support event="valueChange" reRender="unitsScaleFilterValue" />
+                </h:selectOneListbox>
+                <h:outputText styleClass="output-text" escape="true" value="Начальная дата создания" />
+                <rich:calendar value="#{basicGoodListPage.filter.createdDateBegin}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+                <h:outputText styleClass="output-text" escape="true" value="Конечная дата создания" />
+                <rich:calendar value="#{basicGoodListPage.filter.createdDateEnd}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+            </h:panelGrid>
 
-        <h:panelGrid columns="2" styleClass="borderless-grid">
-            <a4j:commandButton value="Применить" action="#{basicGoodListPage.reload}"
-                               reRender="workspaceTogglePanel" styleClass="command-button" />
-            <a4j:commandButton value="Очистить" action="#{basicGoodListPage.resetFilter}"
-                               reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
-        </h:panelGrid>
-    </rich:simpleTogglePanel>
+            <h:panelGrid columns="2" styleClass="borderless-grid">
+                <a4j:commandButton value="Применить" action="#{basicGoodListPage.reload}"
+                                   reRender="workspaceTogglePanel" styleClass="command-button" />
+                <a4j:commandButton value="Очистить" action="#{basicGoodListPage.resetFilter}"
+                                   reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
+            </h:panelGrid>
+        </rich:simpleTogglePanel>
+    </h:panelGrid>
 
-    <rich:dataTable id="basicGoodListTable" width="700" var="good" value="#{basicGoodListPage.itemList}"
-                    rows="20" rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer">
+
+    <a4j:status id="basicGoodListPageStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+        </f:facet>
+    </a4j:status>
+
+    <rich:dataTable id="basicGoodListTable" var="good" value="#{basicGoodListPage.itemList}"
+                    rows="10" rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer">
         <rich:column  headerClass="column-header">
             <f:facet name="header">
                 <h:outputText value="№" styleClass="output-text" escape="true"/>
@@ -121,11 +130,5 @@
             </rich:datascroller>
         </f:facet>
     </rich:dataTable>
-
-    <a4j:status id="sReportGenerateStatus">
-        <f:facet name="start">
-            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
-        </f:facet>
-    </a4j:status>
 
 </h:panelGrid>

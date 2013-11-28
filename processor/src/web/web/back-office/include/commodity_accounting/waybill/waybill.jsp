@@ -18,7 +18,7 @@
 <%--@elvariable id="wayBillListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.waybill.WayBillListPage"--%>
 <%--@elvariable id="wayBillPositionListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.waybill.WayBillPositionListPage"--%>
 <%--@elvariable id="actOfWayBillDifferencePositionListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.ActOfWayBillDifferencePositionListPage"--%>
-<h:panelGrid id="ctOfWayBillDifferencePositionListPage" binding="#{wayBillListPage.pageComponent}"
+<h:panelGrid id="wayBillListPage" binding="#{wayBillListPage.pageComponent}"
              styleClass="borderless-grid">
 
     <rich:simpleTogglePanel label="Фильтр (#{wayBillListPage.filter.status})" switchType="client" opened="true"
@@ -56,7 +56,13 @@
         </h:panelGrid>
     </rich:simpleTogglePanel>
 
-    <rich:dataTable value="#{wayBillListPage.itemList}" var="wayBill" rowKeyVar="row">
+    <a4j:status id="wayBillListPageStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+        </f:facet>
+    </a4j:status>
+
+    <rich:dataTable value="#{wayBillListPage.itemList}" var="wayBill" rowKeyVar="row" rows="20">
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="№" />
@@ -114,16 +120,22 @@
             </f:facet>
             <h:outputText escape="true" value="#{wayBill.deletedState}" styleClass="output-text" />
         </rich:column>
+        <f:facet name="footer">
+            <rich:datascroller for="wayBillListPage" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                               stepControls="auto" boundaryControls="hide">
+                <f:facet name="previous">
+                    <h:graphicImage value="/images/16x16/left-arrow.png" />
+                </f:facet>
+                <f:facet name="next">
+                    <h:graphicImage value="/images/16x16/right-arrow.png" />
+                </f:facet>
+            </rich:datascroller>
+        </f:facet>
     </rich:dataTable>
+
+    <h:panelGrid styleClass="borderless-grid">
+        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                       warnClass="warn-messages" />
+    </h:panelGrid>
 </h:panelGrid>
 
-<a4j:status id="sctOfWayBillDifferencePositionListGenerateStatus">
-    <f:facet name="start">
-        <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
-    </f:facet>
-</a4j:status>
-
-<h:panelGrid styleClass="borderless-grid">
-    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                   warnClass="warn-messages" />
-</h:panelGrid>

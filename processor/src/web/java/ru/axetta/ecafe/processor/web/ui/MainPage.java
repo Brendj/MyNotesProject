@@ -664,6 +664,33 @@ private Long selectedIdOfMenu;
         return null;
     }
 
+    public Object clearUserListPageFilter() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            userListPage.getUserFilter().clear();
+            userListPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to clear filter for user list page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка пользователей",
+                            null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
+    }
+
     public Object removeUser() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
