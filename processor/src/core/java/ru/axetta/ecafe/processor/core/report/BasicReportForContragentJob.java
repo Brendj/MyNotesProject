@@ -29,6 +29,9 @@ import java.util.*;
  */
 public abstract class BasicReportForContragentJob extends BasicReportJob {
 
+    public final static String PARAM_CONTRAGENT_RECEIVER_ID = "idOfContragentReceiver"; // ищем контргентов ТСП
+    public final static String PARAM_CONTRAGENT_PAYER_ID = "idOfContragentPayer";   // ищем контргентов агента по платежам
+
     protected Class getMyClass() { return getClass(); }
     public abstract BasicReportForContragentJob createInstance();
     //protected abstract Builder createBuilder(String templateFilename);

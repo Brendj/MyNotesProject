@@ -16,7 +16,7 @@
     <h:outputText value="#{manualReportRunnerPage.errorMessage}" style="color: #FF0000" styleClass="messages" rendered="#{not empty manualReportRunnerPage.errorMessage}"/>
     <h:outputText value="#{manualReportRunnerPage.infoMessage}" styleClass="messages" rendered="#{not empty manualReportRunnerPage.infoMessage}"/>
     <rich:simpleTogglePanel label="Настройки ручного запуска" switchType="client" style="width: 800px; max-width: 800px"
-                            opened="#{manualReportRunnerPage.displaySettings}" headerClass="filter-panel-header">
+                            opened="true" headerClass="filter-panel-header">
 
         <f:verbatim>
             <style type="text/css">

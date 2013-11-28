@@ -55,7 +55,7 @@ public class ReportRuleCreatePage  extends OnlineReportPage
     private boolean manualReportRun = false;
     private long storagePeriod;
 
-    private List<ReportRuleEditPage.Hint> hints = new ArrayList<ReportRuleEditPage.Hint>();
+    private List<Hint> hints = new ArrayList<Hint>();
     private final CCAccountFilter contragentFilter = new CCAccountFilter();
     private final ContractFilter contractFilter= new ContractFilter();
 
@@ -213,16 +213,16 @@ public class ReportRuleCreatePage  extends OnlineReportPage
         clear();
         List <ReportRuleConstants.ParamHintWrapper> hints = ReportRuleConstants.getParamHintsForReportType(reportType);
         for (ReportRuleConstants.ParamHintWrapper h : hints) {
-            this.hints.add(new ReportRuleEditPage.Hint (h));
+            this.hints.add(new Hint (h));
         }
 
 
-        for (ReportRuleEditPage.Hint hint : this.hints) {
+        for (Hint hint : this.hints) {
             RuleConditionItem defRule = null;
             try {
                 defRule = new RuleConditionItem (hint.getHint().getParamHint().getName() + hint.getHint().getParamHint().getDefaultRule());
             } catch (Exception e) {
-                if (ReportRuleEditPage.Hint.isSuperType(ReportRuleEditPage.Hint.getType(hint.getHint().getParamHint().getName()))) {
+                if (Hint.isSuperType(Hint.getType(hint.getHint().getParamHint().getName()))) {
                     continue;
                 }
                 try {
@@ -260,7 +260,7 @@ public class ReportRuleCreatePage  extends OnlineReportPage
 
         // Собираем строку с условием
         StringBuilder newCondition = new StringBuilder("");
-        for (ReportRuleEditPage.Hint hint : hints) {
+        for (Hint hint : hints) {
             //  Проверяем выбранные значения, если пустые, то пропускаем этот параметр
             if (!hint.getHint().isRequired() &&
                 (hint.getValueItems() == null || hint.getValueItems().size() < 1) &&
@@ -270,21 +270,21 @@ public class ReportRuleCreatePage  extends OnlineReportPage
             }
             //  Проверка контрагента
             if (!hint.getHint().isRequired() &&
-                hint.getType().equals(ReportRuleEditPage.Hint.CONTRAGENT) &&
+                hint.getType().equals(Hint.CONTRAGENT) &&
                 (contragentFilter.getContragent() == null ||
                 contragentFilter.getContragent().getIdOfContragent() == null)) {
                 continue;
             }
             //  Проверка контракта
             if (!hint.getHint().isRequired() &&
-                hint.getType().equals(ReportRuleEditPage.Hint.CONTRACT) &&
+                hint.getType().equals(Hint.CONTRACT) &&
                 (contractFilter.getContract() == null ||
                 contractFilter.getContract().getIdOfContract() == null)) {
                 continue;
             }
             //  Проверка орга
             if (!hint.getHint().isRequired() &&
-                hint.getType().equals(ReportRuleEditPage.Hint.ORG) &&
+                hint.getType().equals(Hint.ORG) &&
                 (idOfOrgList == null || idOfOrgList.size() < 1)) {
                 continue;
             }
@@ -302,21 +302,21 @@ public class ReportRuleCreatePage  extends OnlineReportPage
                 }
             } else if (hint.getValue() != null && hint.getValue().length() > 0) {
                 newValue.append(hint.getValue());
-            } else if (hint.getType().equals(ReportRuleEditPage.Hint.CONTRAGENT) &&
+            } else if (hint.getType().equals(Hint.CONTRAGENT) &&
                        contragentFilter.getContragent().getIdOfContragent() != null) {
                 newValue.append(contragentFilter.getContragent().getIdOfContragent());
-            } else if (hint.getType().equals(ReportRuleEditPage.Hint.CONTRACT) &&
+            } else if (hint.getType().equals(Hint.CONTRACT) &&
                        contractFilter.getContract().getIdOfContract() != null) {
                 newValue.append(contractFilter.getContract().getIdOfContract());
-            } else if (hint.getType().equals(ReportRuleEditPage.Hint.ORG)) {
+            } else if (hint.getType().equals(Hint.ORG)) {
                 for (int i=0; i<idOfOrgList.size(); i++) {
                     if (i != 0) {
                         newValue.append(",");
                     }
                     newValue.append(idOfOrgList.get(i));
                 }
-            } else if (hint.getType().equals(ReportRuleEditPage.Hint.CLIENT)) {
-                //  Добавить!
+            } else if (hint.getType().equals(Hint.CLIENT)) {
+                //  TODO: Добавить!
             }
 
             if (hint.getHint().isRequired() && newValue.length() < 1) {
@@ -364,7 +364,7 @@ public class ReportRuleCreatePage  extends OnlineReportPage
         return tag;
     }
 
-    public List<ReportRuleEditPage.Hint> getParamHints() {
+    public List<Hint> getParamHints() {
         return hints;
     }
 

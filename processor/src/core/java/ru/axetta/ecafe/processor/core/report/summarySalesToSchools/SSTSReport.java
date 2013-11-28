@@ -9,6 +9,7 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.report.BasicReportForContragentJob;
@@ -88,7 +89,7 @@ public class SSTSReport extends BasicReportForContragentJob {
 
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
-            String idOfContragent = getReportProperties().getProperty("idOfContragent");
+            String idOfContragent = getReportProperties().getProperty(PARAM_CONTRAGENT_RECEIVER_ID); // ищем контргентов ТСП
             Long validId = null;
             Contragent contragent = null;
             if (idOfContragent != null) {

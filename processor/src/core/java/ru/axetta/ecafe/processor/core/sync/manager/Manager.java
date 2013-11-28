@@ -632,6 +632,7 @@ public class Manager {
         currentDO.setDeleteDate(new Date());
         currentDO.setGlobalVersion(currentMaxVersion);
         currentDO.setDeletedState(true);
+        currentDO.preProcess(persistenceSession, idOfOrg);
         persistenceSession.update(currentDO);
         return currentDO;
         //return doService.update(currentDO);
@@ -676,6 +677,7 @@ public class Manager {
                 doConflict = createConflict(distributedObject, currentDO);
                 persistenceSession.persist(doConflict);
             }
+            currentDO.preProcess(persistenceSession, idOfOrg);
             persistenceSession.update(currentDO);
             distributedObject.setGlobalVersion(currentMaxVersion);
             distributedObject.setTagName("M");

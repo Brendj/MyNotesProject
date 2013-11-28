@@ -150,8 +150,8 @@ public class ReportRuleConstants {
             new ParamHint(DailySalesByGroupsReport.PARAM_INCLUDE_COMPLEX, "Включать комплексы"),
             new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD, "Количество дней в выборке").setHideOnSetup(true),     //  Период отображать не надо, он устанавливается автоматически
             new ParamHint(ReportPropertiesUtils.P_JOB_NAME, "Название задачи"),
-            new ParamHint(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID, "Контрагент-получатель").setDefaultRule("= contragent-receiver:"), //30,
-            new ParamHint(ContragentPaymentReport.PARAM_CONTRAGENT_PAYER_ID, "Агент по приему платежей").setDefaultRule("= contragent-payagent:"),
+            new ParamHint(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID, "Контрагент-получатель").setDefaultRule("= contragent-receiver:"), //30,
+            new ParamHint(BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID, "Агент по приему платежей").setDefaultRule("= contragent-payagent:"),
             new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE, "Период").setHideOnSetup(true).setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION +
                     "{"+BasicReportJob.REPORT_PERIOD_PREV_MONTH+"}месяц,"+
                     "{"+BasicReportJob.REPORT_PERIOD_LAST_WEEK+"}неделя,"+
@@ -203,7 +203,7 @@ public class ReportRuleConstants {
             new ReportHint(BeneficiarySummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(DeliveredServicesReport.class.getCanonicalName(), new int[]{3, -20/*, 31, 32, 33, 34, 35, 36, 37*/}),
             new ReportHint(CWOACReport.class.getCanonicalName(), new int[]{}),
-            new ReportHint(SSTSReport.class.getCanonicalName(), new int[]{20}),
+            new ReportHint(SSTSReport.class.getCanonicalName(), new int[]{30}),
             new ReportHint(BudgetMealsShippingReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(ActiveClientsReport.class.getCanonicalName(), new int[]{})
             // отрицательное значение - обязательное

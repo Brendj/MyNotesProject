@@ -34,8 +34,7 @@ import java.util.*;
  */
 public class ContragentPaymentReport extends BasicReportForContragentJob {
 
-    public final static String PARAM_CONTRAGENT_RECEIVER_ID = "idOfContragentReceiver";
-    public final static String PARAM_CONTRAGENT_PAYER_ID = "idOfContragentPayer";
+
     public final static String PARAM_PERIOD_TYPE = "periodType";
     
 

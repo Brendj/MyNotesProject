@@ -261,7 +261,7 @@ public class TechnologicalMap extends ConfigurationProviderDistributedObject {
     @Override
     protected void beforeProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         TechnologicalMapGroup tmg = DAOUtils.findDistributedObjectByRefGUID(TechnologicalMapGroup.class, session, guidOfTMG);
-        if(tmg==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(tmg==null) throw new DistributedObjectException("TechnologicalMapGroup NOT_FOUND_VALUE");
         setTechnologicalMapGroup(tmg);
     }
 
