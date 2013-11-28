@@ -4,9 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.feed;
 
-import generated.payments.processing.POSPaymentController;
-import generated.payments.processing.POSPaymentControllerWSService;
-import generated.payments.processing.PosPayment;
+//import generated.payments.processing.POSPaymentController;
+//import generated.payments.processing.POSPaymentControllerWSService;
+//import generated.payments.processing.PosPayment;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestService;
@@ -19,9 +19,9 @@ import ru.axetta.ecafe.processor.web.ui.modal.YesNoEvent;
 import ru.axetta.ecafe.processor.web.ui.modal.YesNoListener;
 import ru.axetta.ecafe.processor.web.ui.modal.feed_plan.*;
 
-import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+//import org.apache.cxf.frontend.ClientProxy;
+//import org.apache.cxf.transport.http.HTTPConduit;
+//import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -445,25 +445,25 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
     }
 
 
-    public static POSPaymentController createController(Logger logger) {
-        /*POSPaymentController controller = null;
-        try {
-            POSPaymentControllerWSService service = new POSPaymentControllerWSService(new URL("http://localhost:8080/processor/soap/front?wsdl"),
-                    new QName("http://ru.axetta.ecafe", "FrontControllerService"));
-            controller = service.getPOSPaymentControllerWSPort();
-
-            Client client = ClientProxy.getClient(controller);
-            HTTPConduit conduit = (HTTPConduit) client.getConduit();
-            HTTPClientPolicy policy = conduit.getClient();
-            policy.setReceiveTimeout(10 * 60 * 1000);
-            policy.setConnectionTimeout(10 * 60 * 1000);
-            return controller;
-        } catch (Exception e) {
-            logger.error("Failed to intialize FrontControllerService", e);
-            return null;
-        }*/
-        return null;
-    }
+    //public static POSPaymentController createController(Logger logger) {
+    //    /*POSPaymentController controller = null;
+    //    try {
+    //        POSPaymentControllerWSService service = new POSPaymentControllerWSService(new URL("http://localhost:8080/processor/soap/front?wsdl"),
+    //                new QName("http://ru.axetta.ecafe", "FrontControllerService"));
+    //        controller = service.getPOSPaymentControllerWSPort();
+    //
+    //        Client client = ClientProxy.getClient(controller);
+    //        HTTPConduit conduit = (HTTPConduit) client.getConduit();
+    //        HTTPClientPolicy policy = conduit.getClient();
+    //        policy.setReceiveTimeout(10 * 60 * 1000);
+    //        policy.setConnectionTimeout(10 * 60 * 1000);
+    //        return controller;
+    //    } catch (Exception e) {
+    //        logger.error("Failed to intialize FrontControllerService", e);
+    //        return null;
+    //    }*/
+    //    return null;
+    //}
 
     public void clear() {
         RuntimeContext.getAppContext().getBean(FeedPlanPage.class).clear(Collections.EMPTY_LIST);
