@@ -1,0 +1,51 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%--
+  ~ Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+  --%>
+
+<%@ page import="ru.axetta.ecafe.processor.web.ClientAuthToken" %>
+<%@ page import="ru.axetta.ecafe.processor.web.ServletUtils" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
+
+<%ClientAuthToken clientAuthToken = ClientAuthToken.loadFrom(session);
+
+    application.setAttribute("indexResponse",response);
+
+    Cookie[] cks=request.getCookies();
+    Long cityIdFromCookie =null;
+    if(cks!=null)
+        for(int i=0;i<cks.length;i++){
+            if(cks[i].getName().equals("cityId")){
+            cityIdFromCookie =Long.parseLong(cks[i].getValue());
+            }
+        }
+
+       if(cityIdFromCookie==null){
+
+    Cookie ck=new Cookie("cityId","1");
+    ck.setMaxAge(60*60*24*183);
+    response.addCookie(ck); }
+
+
+%>
+
+<html>
+<head>
+    <title>ECafe: Личный кабинет клиента<%=null == clientAuthToken ? ""
+            : StringEscapeUtils.escapeHtml(String.format(" (договор %s)", ContractIdFormat.format(clientAuthToken.getContractId())))%>
+    </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Language" content="ru">
+    <link rel="icon"
+          href="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "images/ecafe-favicon.png"))%>"
+          type="image/x-icon">
+    <link rel="shortcut icon"
+          href="<%=StringEscapeUtils.escapeHtml(ServletUtils.getHostRelativeResourceUri(request, "images/ecafe-favicon.png"))%>"
+          type="image/x-icon">    
+</head>
+<body>
+<jsp:include page="inlinecabinet.jsp"/>
+
+</body>
+</html>
