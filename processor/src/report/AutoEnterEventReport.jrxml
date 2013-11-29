@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SalesReport" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SalesReport" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="d3711793-d537-4ee3-8081-ac334b64fee4">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
@@ -9,7 +9,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.2100000000000006"/>
-	<property name="ireport.x" value="36"/>
+	<property name="ireport.x" value="66"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
@@ -31,72 +31,72 @@
 		<groupHeader>
 			<band height="96">
 				<staticText>
-					<reportElement style="table" x="46" y="62" width="186" height="34"/>
+					<reportElement uuid="a3fc19b1-84b9-4276-8b21-1f67ba81bade" style="table" x="46" y="62" width="186" height="34"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 						<font isBold="true"/>
 					</textElement>
 					<text><![CDATA[ФИО]]></text>
 				</staticText>
 				<staticText>
-					<reportElement style="table" x="0" y="62" width="46" height="34"/>
+					<reportElement uuid="47ecf419-9244-4e9b-919b-ebd30216f30e" style="table" x="0" y="62" width="46" height="34"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 						<font isBold="true"/>
 					</textElement>
 					<text><![CDATA[№ п/п]]></text>
 				</staticText>
 				<staticText>
-					<reportElement x="0" y="23" width="69" height="19"/>
+					<reportElement uuid="55d11825-8ad1-4acd-84d5-502c6bc9f3cd" x="0" y="23" width="69" height="19"/>
 					<textElement/>
 					<text><![CDATA[]]></text>
 				</staticText>
 				<staticText>
-					<reportElement style="table" x="232" y="62" width="97" height="34"/>
+					<reportElement uuid="621a0b36-7eb9-4e28-bd82-3ed319dc38b9" style="table" x="232" y="62" width="97" height="34"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 						<font isBold="true"/>
 					</textElement>
 					<text><![CDATA[Дата]]></text>
 				</staticText>
 				<staticText>
-					<reportElement style="table" x="329" y="62" width="81" height="34"/>
+					<reportElement uuid="d9e0af1f-8803-4d68-950a-e6a9ea4835ff" style="table" x="329" y="62" width="81" height="34"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 						<font isBold="true"/>
 					</textElement>
 					<text><![CDATA[Время прихода]]></text>
 				</staticText>
 				<staticText>
-					<reportElement style="table" x="410" y="62" width="69" height="34"/>
+					<reportElement uuid="03464f41-43ca-4ec2-b620-c20fe515190f" style="table" x="410" y="62" width="69" height="34"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 						<font isBold="true"/>
 					</textElement>
 					<text><![CDATA[Время ухода]]></text>
 				</staticText>
 				<staticText>
-					<reportElement style="table" x="479" y="62" width="97" height="34"/>
+					<reportElement uuid="2c4c768c-6a8e-4a6a-b6e6-3ce0fb68e261" style="table" x="479" y="62" width="97" height="34"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 						<font isBold="true"/>
 					</textElement>
 					<text><![CDATA[Отсутствие в течение дня]]></text>
 				</staticText>
 				<staticText>
-					<reportElement style="table" stretchType="RelativeToTallestObject" x="576" y="62" width="224" height="34"/>
+					<reportElement uuid="f9f9047b-9db9-4fc9-a329-77972bfe1d05" style="table" stretchType="RelativeToTallestObject" x="576" y="62" width="224" height="34"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 						<font isBold="true"/>
 					</textElement>
 					<text><![CDATA[Входы/Выходы]]></text>
 				</staticText>
-				<textField>
-					<reportElement style="table" x="0" y="42" width="800" height="20"/>
+				<textField isBlankWhenNull="true">
+					<reportElement uuid="0dfbf752-d551-4388-9557-8a4e658cd178" style="table" x="0" y="42" width="800" height="20"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 						<font isBold="true"/>
 					</textElement>
-					<textFieldExpression class="java.lang.String"><![CDATA[$F{groupName}]]></textFieldExpression>
+					<textFieldExpression><![CDATA[$F{groupName}]]></textFieldExpression>
 				</textField>
 			</band>
 		</groupHeader>
 		<groupFooter>
 			<band height="144">
 				<staticText>
-					<reportElement x="0" y="0" width="69" height="19"/>
+					<reportElement uuid="4ad0b11c-0245-4740-ae1e-dc323b661d56" x="0" y="0" width="69" height="19"/>
 					<textElement/>
 					<text><![CDATA[]]></text>
 				</staticText>
@@ -109,14 +109,14 @@
 	<title>
 		<band height="66" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="42" width="802" height="24"/>
+				<reportElement uuid="eba91467-d688-4c73-953d-cace7d160e6f" x="0" y="42" width="802" height="24"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["Детализированный отчет по посещению " + $P{orgName}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Детализированный отчет по посещению " + $P{orgName}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="0" width="802" height="42"/>
+				<reportElement uuid="d147f7c2-905c-4d16-b23f-eb44ba583697" x="0" y="0" width="802" height="42"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
@@ -130,39 +130,39 @@
 	<detail>
 		<band height="21">
 			<textField isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="0" y="0" width="46" height="20"/>
+				<reportElement uuid="df528ab0-5610-443d-a9c1-79e5bbc2ef22" style="table" stretchType="RelativeToTallestObject" x="0" y="0" width="46" height="20"/>
 				<textElement verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{id}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{id}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="46" y="0" width="186" height="20"/>
+				<reportElement uuid="bb22eeab-341c-4603-bbb4-d2418abc1153" style="table" stretchType="RelativeToTallestObject" x="46" y="0" width="186" height="20"/>
 				<textElement verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{fio}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{fio}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="232" y="0" width="97" height="20"/>
+				<reportElement uuid="bd4d0b4c-ec1f-4d76-88bc-fae28055d019" style="table" stretchType="RelativeToTallestObject" x="232" y="0" width="97" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{date}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{date}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="329" y="0" width="81" height="20"/>
+				<reportElement uuid="39d4535f-09a1-4aaa-8903-e057770f7ee9" style="table" stretchType="RelativeToTallestObject" x="329" y="0" width="81" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{timeEnter}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{timeEnter}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="410" y="0" width="69" height="20"/>
+				<reportElement uuid="3f7d36e9-05c2-42af-a122-7ba6b407a33a" style="table" stretchType="RelativeToTallestObject" x="410" y="0" width="69" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{timeExit}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{timeExit}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="576" y="0" width="224" height="20"/>
+				<reportElement uuid="d0677f31-fe61-4a83-be78-a41be5e00543" style="table" stretchType="RelativeToTallestObject" x="576" y="0" width="224" height="20"/>
 				<textElement verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{timeEnterExit}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{timeEnterExit}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="479" y="0" width="97" height="20"/>
+				<reportElement uuid="70d100a0-5381-4476-886a-95c9a70d3978" style="table" stretchType="RelativeToTallestObject" x="479" y="0" width="97" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{absenceOfDay}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{absenceOfDay}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
