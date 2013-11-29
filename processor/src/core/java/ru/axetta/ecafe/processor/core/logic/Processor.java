@@ -409,23 +409,27 @@ public class Processor implements SyncProcessor,
             int cardType, int state, Date validTime, int lifeState, String lockReason, Date issueTime,
             Long cardPrintedNo) throws Exception {
 
-
+        logger.debug("check valid date");
         if(validTime.after(CalendarUtils.AFTER_DATE)) {
             throw new Exception("Не верно введена дата");
         }
 
+        logger.debug("check issue date");
         if(issueTime!=null && validTime.before(issueTime)) {
             throw new Exception("Не верно введена дата");
         }
 
+        logger.debug("check exist client");
         Client client = DAOUtils.getClientReference(persistenceSession, idOfClient);
         if (client == null) {
             throw new Exception("Клиент не найден: " + idOfClient);
         }
+        logger.debug("check exist card");
         Card c = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
         if (c != null) {
             throw new Exception("Карта уже зарегистрирована на клиента: " + c.getClient().getIdOfClient());
         }
+        logger.debug("check exist temp card");
         CardTemp ct = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
         if (ct != null) {
             if(ct.getClient()!=null){
@@ -439,10 +443,13 @@ public class Processor implements SyncProcessor,
                         ct.getVisitor().getIdOfVisitor(), ct.getCardStation()));
             }
         }
+
+        logger.debug("clear active card");
         if (state == Card.ACTIVE_STATE) {
             lockActiveCards(persistenceSession, client.getCards());
         }
 
+        logger.debug("create card");
         Card card = new Card(client, cardNo, cardType, state, validTime, lifeState, cardPrintedNo);
         card.setIssueTime(issueTime);
         card.setLockReason(lockReason);

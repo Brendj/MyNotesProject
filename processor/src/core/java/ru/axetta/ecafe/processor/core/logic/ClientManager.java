@@ -517,6 +517,7 @@ public class ClientManager {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
         try {
+            logger.debug("exist organization");
             Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
             if (null == organization) {
                 throw new Exception("Организация не найдена: " + idOfOrg);
@@ -526,31 +527,37 @@ public class ClientManager {
             String surname = fieldConfig.getValue(ClientManager.FieldId.SURNAME); //tokens[8];
             String secondName = fieldConfig.getValue(ClientManager.FieldId.SECONDNAME); //tokens[10];
 
+            logger.debug("exist client");
             if (checkFullNameUnique && existClient(persistenceSession, organization, firstName, surname, secondName)) {
                 throw new Exception(
                         "Клиент с данными ФИО уже зарегистрирован в организации: " + surname + " " + firstName + " "
                                 + secondName, null);
             }
 
+            logger.debug("update version");
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
             String contractIdText = fieldConfig.getValue(ClientManager.FieldId.CONTRACT_ID); //tokens[0];
             long contractId;
             if (StringUtils.equals(contractIdText, "AUTO")) {
+                logger.debug("generate ContractId");
                 contractId = runtimeContext.getClientContractIdGenerator().generateTransactionFree(
                         organization.getIdOfOrg(), persistenceSession);
             } else {
                 contractId = Long.parseLong(contractIdText);
             }
 
+            logger.debug("create contractPerson");
             Person contractPerson = new Person(fieldConfig.getValue(ClientManager.FieldId.CONTRACT_NAME),
                     fieldConfig.getValue(ClientManager.FieldId.CONTRACT_SURNAME), fieldConfig.getValue(
                     ClientManager.FieldId.CONTRACT_SECONDNAME)); //new Person(tokens[5], tokens[4], tokens[6]);
             contractPerson.setIdDocument(fieldConfig.getValue(ClientManager.FieldId.CONTRACT_DOC));
             persistenceSession.save(contractPerson);
+            logger.debug("create person");
             Person person = new Person(firstName, surname, secondName);
             person.setIdDocument(fieldConfig.getValue(ClientManager.FieldId.DOC));//tokens[11]);
             persistenceSession.save(person);
 
+            logger.debug("set OVERDRAFT LIMIT");
             long limit = organization.getCardLimit();
             if (limit == 0) {
                 limit = RuntimeContext.getInstance().getOptionValueLong(Option.OPTION_DEFAULT_OVERDRAFT_LIMIT);
@@ -576,12 +583,14 @@ public class ClientManager {
                                 + contractState);
             }
             int payForSms = fieldConfig.getValueInt(ClientManager.FieldId.PAY_FOR_SMS);
+            logger.debug("set EXPENDITURE LIMIT");
             long expenditureLimit = RuntimeContext.getInstance()
                     .getOptionValueLong(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT);
             if (fieldConfig.getValue(ClientManager.FieldId.EXPENDITURE_LIMIT) != null) {
                 expenditureLimit = CurrencyStringUtils
                         .rublesToCopecks(fieldConfig.getValue(ClientManager.FieldId.EXPENDITURE_LIMIT));//tokens[19]);
             }
+            logger.debug("create client");
             Client client = new Client(organization, person, contractPerson, 0, notifyByEmail, notifyBySms, contractId,
                     contractDate, contractState, password, payForSms, clientRegistryVersion, limit, expenditureLimit,
                     "");
@@ -604,6 +613,7 @@ public class ClientManager {
             //}
 
             /* проверяется есть ли в загрузочном файле параметр для группы клиента (класс для ученика)*/
+            logger.debug("set client Group");
             if (fieldConfig.getValue(ClientManager.FieldId.GROUP) != null) {
                 //if (tokens.length >=22){
                 String clientGroupName = fieldConfig.getValue(ClientManager.FieldId.GROUP);//tokens[21];
@@ -623,17 +633,21 @@ public class ClientManager {
                 }
             }
 
+            logger.debug("save client");
             persistenceSession.save(client);
             Long idOfClient = client.getIdOfClient();
             ///
+            logger.debug("register client card");
             if (fieldConfig.getValue(ClientManager.FieldId.CARD_ID) != null && persistenceTransaction != null) {
                 registerCardForClient(runtimeContext, persistenceSession, persistenceTransaction, fieldConfig,
                         idOfClient);
             }
             ///
 
+            logger.debug("save clientMigration");
             ClientMigration clientMigration = new ClientMigration(client, organization, contractDate);
             persistenceSession.save(clientMigration);
+            logger.debug("return");
             return idOfClient;
         } catch (Exception e) {
             throw e;
@@ -643,6 +657,7 @@ public class ClientManager {
 
     public static long registerClient(long idOfOrg, ClientFieldConfig fieldConfig, boolean checkFullNameUnique)
             throws Exception {
+        logger.debug("checkRequiredFields");
         fieldConfig.checkRequiredFields();
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -652,6 +667,7 @@ public class ClientManager {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
+            logger.debug("registerClientTransactionFree");
             long idOfClient = registerClientTransactionFree(idOfOrg, fieldConfig, checkFullNameUnique,
                     persistenceSession, persistenceTransaction);
 

@@ -478,13 +478,16 @@ public class FrontController extends HttpServlet {
     public List<RegisterClientResult> registerClients(@WebParam(name = "orgId")Long orgId,
             @WebParam(name = "clientDescList") List<ClientDesc> clientDescList, @WebParam(name = "checkFullNameUniqueness") boolean checkFullNameUniqueness)
             throws FrontControllerException {
+        logger.debug("checkRequestValidity");
         checkRequestValidity(orgId);
 
         LinkedList<RegisterClientResult> results = new LinkedList<RegisterClientResult>();
         for (ClientDesc cd : clientDescList) {
             try {
                 //ClientManager.ClientFieldConfig fc = ClientDesc.buildClientFieldConfig(cd);
+                logger.debug("create FieldConfig");
                 ClientManager.ClientFieldConfig fc = new ClientManager.ClientFieldConfig();
+                logger.debug("check client params");
                 if (cd.contractSurname!=null) {
                     fc.setValue(ClientManager.FieldId.CONTRACT_SURNAME, cd.contractSurname);
                 }  else {
@@ -511,6 +514,7 @@ public class FrontController extends HttpServlet {
                 if (cd.cardExpiry!=null) fc.setValue(ClientManager.FieldId.CARD_EXPIRY, cd.cardExpiry);
                 if (cd.cardIssued!=null) fc.setValue(ClientManager.FieldId.CARD_ISSUED, cd.cardIssued);
                 if (cd.snils!=null) fc.setValue(ClientManager.FieldId.SAN, cd.snils);
+                logger.debug("register client");
                 long idOfClient = ClientManager.registerClient(orgId, fc, checkFullNameUniqueness);
                 results.add(new RegisterClientResult(idOfClient, cd.recId, true, null));
             } catch (Exception e) {
