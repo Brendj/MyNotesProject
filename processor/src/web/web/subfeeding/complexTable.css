@@ -1,0 +1,78 @@
+table {
+    margin-top: 20px;
+    text-align: left;
+    border: 3px solid white;
+    border-collapse: collapse;
+    color: white;
+}
+
+td {
+    width: 100px;
+    padding: 5px; /* Поля вокруг содержимого ячеек */
+    border: 2px solid white;
+}
+
+th {
+    border: 2px solid white;
+    background-color: #4f81bd;
+    border-bottom: 4px solid white;
+    vertical-align: top;
+    padding: 5px; /* Поля вокруг содержимого ячеек */
+    width: 100px;
+    text-align: center;
+}
+
+.complexNameHeader {
+    text-align: right;
+    width: 200px;
+    border-bottom-width: 0;
+}
+
+.dayNameHeader {
+    text-align: left;
+    width: 200px;
+    border-top-width: 0;
+}
+
+.complexName {
+    background-color: #4f81bd;
+    text-align: left;
+    font-weight: bold;
+}
+
+.textDiv {
+    margin: 5px 0 5px 0;
+    font-size: 10pt;
+}
+
+body {
+    padding: 20px 0 0 20px;
+    font-size: 10pt;
+    font-family: Tahoma, Arial, sans-serif;
+}
+
+.evenLine {
+    background-color: #d0d8e8;
+    text-align: center;
+    vertical-align: top;
+}
+
+.unevenLine {
+    background-color: #e9edf4;
+    text-align: center;
+    vertical-align: top;
+}
+
+.output-text {
+    font-size: 8pt;
+}
+
+.paymentEvenLine {
+    background-color: #5976A8;
+}
+
+.paymentUnevenLine {
+    background-color: #4C70B8;
+}
+
+

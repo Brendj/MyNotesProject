@@ -18,6 +18,9 @@ import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.StateDiagram;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
@@ -29,11 +32,13 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
+import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.hibernate.Criteria;
@@ -2836,6 +2841,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     }
                 }
             }
+            if (partnerLinkConfig.permissionType == IntegraPartnerConfig.PERMISSION_TYPE_CLIENT_AUTH_BY_MOBILE) {
+                String key = CryptoUtils.MD5(client.getMobile());
+                if (key.equalsIgnoreCase(token)) {
+                    authorized = true;
+                }
+            }
             if (client.hasEncryptedPasswordSHA1(token)) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("hasEncryptedPassword");
@@ -3802,13 +3813,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return studentsConfirmPaymentData;
     }
 
-    public static class ClientStatsResult {
-
-        public long resultCode;
-        public String description;
-        public String stats;
-    }
-
     @Override
     public ClientStatsResult getClientStats(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate,
@@ -3827,10 +3831,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
+            Client client = findClientByContractId(persistenceSession, contractId, r);
             if (client == null) {
-                r.resultCode = RC_CLIENT_NOT_FOUND;
-                r.description = RC_CLIENT_NOT_FOUND_DESC;
                 return r;
             }
             
@@ -3850,5 +3852,176 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return r;
     }
 
+    @Override
+    public Result createSubscriptionFeeding(@WebParam(name = "contractId") Long contractId, @WebParam(
+            name = "cycleDiagram") CycleDiagramIn cycleDiagramIn) {
+        authenticateRequest(contractId);
+        RuntimeContext runtimeContext;
+        Session session = null;
+        Transaction transaction = null;
+        Result res = new Result();
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            session = runtimeContext.createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = findClientByContractId(session, contractId, res);
+            if (client == null) {
+                return res;
+            }
+            Date date = new Date();
+            SubscriptionFeeding sf = new SubscriptionFeeding();
+            sf.setCreatedDate(date);
+            sf.setClient(client);
+            sf.setIdOfClient(client.getIdOfClient());
+            sf.setGuid(UUID.randomUUID().toString());
+            sf.setDateActivateService(date);
+            sf.setDeletedState(false);
+            sf.setSendAll(SendToAssociatedOrgs.SendToSelf);
+            sf.setWasSuspended(false);
+            session.persist(sf);
+            CycleDiagram cd = new CycleDiagram();
+            cd.setCreatedDate(date);
+            cd.setClient(client);
+            cd.setIdOfClient(client.getIdOfClient());
+            cd.setStateDiagram(StateDiagram.ACTIVE);
+            cd.setDateActivationDiagram(date);
+            cd.setGuid(UUID.randomUUID().toString());
+            cd.setDeletedState(false);
+            cd.setSendAll(SendToAssociatedOrgs.SendToSelf);
+            cd.setMonday(cycleDiagramIn.getMonday());
+            cd.setMondayPrice(getPriceOfDay(cd.getMonday(), session, date));
+            cd.setTuesday(cycleDiagramIn.getTuesday());
+            cd.setTuesdayPrice(getPriceOfDay(cd.getTuesday(), session, date));
+            cd.setWednesday(cycleDiagramIn.getWednesday());
+            cd.setWednesdayPrice(getPriceOfDay(cd.getWednesday(), session, date));
+            cd.setThursday(cycleDiagramIn.getThursday());
+            cd.setThursdayPrice(getPriceOfDay(cd.getThursday(), session, date));
+            cd.setFriday(cycleDiagramIn.getFriday());
+            cd.setFridayPrice(getPriceOfDay(cd.getFriday(), session, date));
+            cd.setSaturday(cycleDiagramIn.getSaturday());
+            cd.setSaturdayPrice(getPriceOfDay(cd.getSaturday(), session, date));
+            cd.setSunday(cycleDiagramIn.getSunday());
+            cd.setSundayPrice(getPriceOfDay(cd.getSunday(), session, date));
+            session.persist(cd);
+            transaction.commit();
+            res.resultCode = RC_OK;
+            res.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage(), ex);
+            res.resultCode = RC_INTERNAL_ERROR;
+            res.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        return res;
+    }
 
+    @SuppressWarnings("unchecked")
+    private Long getPriceOfDay(String dayComplexes, Session session, Date today) {
+        if (StringUtils.isEmpty(dayComplexes)) {
+            return 0L;
+        }
+        String[] complexIds = StringUtils.split(dayComplexes, ',');
+        List<Integer> ids = new ArrayList<Integer>();
+        for (String id : complexIds) {
+            ids.add(Integer.valueOf(id));
+        }
+        return DAOUtils.sumComplexesPrice(session, today, ids);
+    }
+
+    private <T extends Result> Client findClientByContractId(Session session, Long contractId, T res) throws Exception {
+        Client client = DAOUtils.findClientByContractId(session, contractId);
+        if (client == null) {
+            res.resultCode = RC_CLIENT_NOT_FOUND;
+            res.description = RC_CLIENT_NOT_FOUND_DESC;
+        }
+        return client;
+    }
+
+    @Override
+    public SubFeedingResult findSubscriptionFeeding(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+        RuntimeContext runtimeContext;
+        Session session = null;
+        Transaction transaction = null;
+        SubFeedingResult res = new SubFeedingResult();
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            session = runtimeContext.createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = findClientByContractId(session, contractId, res);
+            if (client == null) {
+                return res;
+            }
+            SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
+            res.setIdOfSubscriptionFeeding(sf.getGlobalId());
+            res.setDateActivate(sf.getDateActivateService());
+            res.setLastDatePause(sf.getLastDatePauseService());
+            res.setDateDeactivate(sf.getDateDeactivateService());
+            res.setSuspended(sf.getWasSuspended());
+            transaction.commit();
+            res.resultCode = RC_OK;
+            res.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage(), ex);
+            res.resultCode = RC_INTERNAL_ERROR;
+            res.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        return res;
+    }
+
+    @Override
+    public Result suspendSubscriptionFeeding(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+        Session session = null;
+        Transaction transaction = null;
+        Result result = new Result();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
+            sf.setWasSuspended(true);
+            sf.setLastDatePauseService(new Date());
+            transaction.commit();
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage());
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public Result reopenSubscriptionFeeding(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+        Session session = null;
+        Transaction transaction = null;
+        Result result = new Result();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
+            sf.setWasSuspended(false);
+            transaction.commit();
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage());
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
 }

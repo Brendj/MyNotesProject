@@ -1,0 +1,48 @@
+.error-output-text {
+    font-family: Tahoma, Arial, Sans-Serif, 'Times New Roman', Times, serif;
+    font-size: 10pt;
+    color: #FF0000;
+}
+
+.borderless-form-login {
+    border-style: none;
+    padding: 0 0 0 0;
+}
+
+#login-form {
+    width: 350px;
+    border-radius: 4px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: center;
+}
+
+.login-form-input-tr {
+    vertical-align: middle !important;
+}
+
+.output-text {
+    font-size: 8pt;
+}
+
+.login-form-button-tr {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+.login-form-button-tr td {
+    background-color: #ffeeaa !important;
+    text-align:center !important;
+}
+
+.command-button {
+    font-size: 8pt;
+}
+
+.input-text {
+    font-size: 8pt;
+}
+
+.subheader-tr {
+    text-align: center;
+}
+

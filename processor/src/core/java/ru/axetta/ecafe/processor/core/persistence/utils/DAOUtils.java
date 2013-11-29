@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Pr
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
@@ -1565,5 +1566,31 @@ public class DAOUtils {
             productCriteria.add(Restrictions.eq("deletedState",false));
         }
         return productCriteria.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Long sumComplexesPrice(Session session, Date date, List<Integer> complexIds) {
+        Date dayBegin = CalendarUtils.truncateToDayOfMonth(date);
+        Date nextDay = CalendarUtils.addOneDay(date);
+        Criteria criteria = session.createCriteria(ComplexInfo.class).add(Restrictions.eq("usedSubscriptionFeeding", 1))
+                .add(Restrictions.in("idOfComplex", complexIds)).add(Restrictions.ge("menuDate", dayBegin))
+                .add(Restrictions.lt("menuDate", nextDay)).setProjection(Projections.sum("currentPrice"));
+        return (Long) criteria.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<ComplexInfo> findComplexesWithSubFeeding(Session session, Date date) {
+        Date dayBegin = CalendarUtils.truncateToDayOfMonth(date);
+        Date nextDay = CalendarUtils.addOneDay(date);
+        Criteria criteria = session.createCriteria(ComplexInfo.class).add(Restrictions.eq("usedSubscriptionFeeding", 1))
+                .add(Restrictions.ge("menuDate", dayBegin)).add(Restrictions.lt("menuDate", nextDay));
+        return (List<ComplexInfo>) criteria.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static SubscriptionFeeding findClientSubscriptionFeeding(Session session, Long contractId) {
+        Criteria criteria = session.createCriteria(SubscriptionFeeding.class).createAlias("client", "c")
+                .add(Restrictions.eq("c.contractId", contractId));
+        return (SubscriptionFeeding) criteria.uniqueResult();
     }
 }

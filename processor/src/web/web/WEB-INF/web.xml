@@ -257,6 +257,24 @@
         <url-pattern>/regpay-acquiropay</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>SubFeedingServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.subfeeding.SubFeedingServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SubFeedingServlet</servlet-name>
+        <url-pattern>/sub-feeding/*</url-pattern>
+    </servlet-mapping>
+
+    <filter>
+        <filter-name>SubFeedingAuthFilter</filter-name>
+        <filter-class>ru.axetta.ecafe.processor.web.subfeeding.SubFeedingAuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>SubFeedingAuthFilter</filter-name>
+        <url-pattern>/sub-feeding/*</url-pattern>
+    </filter-mapping>
+
     <filter-mapping>
         <filter-name>RichfacesFilter</filter-name>
         <servlet-name>Faces Servlet</servlet-name>
@@ -295,6 +313,7 @@
         <web-resource-collection>
             <web-resource-name>Restrict direct access to include-only JSPs</web-resource-name>
             <url-pattern>/client-room/pages/*</url-pattern>
+            <url-pattern>/subfeeding/pages/*</url-pattern>
         </web-resource-collection>
         <auth-constraint/>
     </security-constraint>
@@ -373,6 +392,7 @@
             <url-pattern>/client-room/inlinecabinet.jsp</url-pattern>
             <url-pattern>/client-room/no-styles-inlinecabinet.jsp</url-pattern>
             <url-pattern>/client-room/sso.jsp</url-pattern>
+            <url-pattern>/sub-feeding/*</url-pattern>
         </web-resource-collection>
         <user-data-constraint>
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>

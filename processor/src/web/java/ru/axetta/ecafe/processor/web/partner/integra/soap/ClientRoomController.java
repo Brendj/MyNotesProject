@@ -198,11 +198,24 @@ public interface ClientRoomController {
     ClientConfirmPaymentData getStudentsByCanNotConfirmPayment(@WebParam(name = "contractId") Long contractId);
 
     @WebMethod(operationName="getClientStats")
-    ClientRoomControllerWS.ClientStatsResult getClientStats(@WebParam(name = "contractId") Long contractId,
+    ClientStatsResult getClientStats(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate,
             @WebParam(name = "type") int type);
 
     @WebMethod(operationName = "transferBalance")
     Result transferBalance(@WebParam(name = "contractId") Long contractId, @WebParam(name = "fromSub") Integer fromSub,
             @WebParam(name = "toSub") Integer toSub, @WebParam(name = "amount") Long amount);
+
+    @WebMethod(operationName = "createSubscriptionFeeding")
+    Result createSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn);
+
+    @WebMethod(operationName = "findSubscriptionFeeding")
+    SubFeedingResult findSubscriptionFeeding(@WebParam(name = "contractId") Long contractId);
+
+    @WebMethod(operationName = "suspendSubscriptionFeeding")
+    Result suspendSubscriptionFeeding(@WebParam(name = "contractId") Long contractId);
+
+    @WebMethod(operationName = "reopenSubscriptionFeeding")
+    Result reopenSubscriptionFeeding(@WebParam(name = "contractId") Long contractId);
 }

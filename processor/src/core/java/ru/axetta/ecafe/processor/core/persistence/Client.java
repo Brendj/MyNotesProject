@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
-import ru.axetta.ecafe.processor.core.client.ContractIdGenerator;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.LibVisit;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBook;
@@ -268,15 +267,19 @@ public class Client {
         return subBalance1;
     }
 
-    public Long getSubBalance(Integer num) throws Exception{
-        Long subBalance = null;
-        switch (num){
-            case 0: subBalance = getBalance(); break; // вносим сумму в основной счет
-            case 1: subBalance = getSubBalance1()==null?0L:getSubBalance1(); break; // вносим сумму в субсчет №1
+    public Long getSubBalance(int num) {
+        Long subBalance;
+        switch (num) {
+            case 0:
+                subBalance = getBalance();
+                break; // вносим сумму в основной счет
+            case 1:
+                subBalance = getSubBalance1() == null ? 0L : getSubBalance1();
+                break; // вносим сумму в субсчет №1
             default: {
                 // в других случаях выбрасывать исключение об отсутсвии такого субсчета
                 final long subBalanceNum = contractId * 100 + num;
-                throw new NullPointerException(String.format("Sub balance not found %d", subBalanceNum));
+                throw new RuntimeException(String.format("Sub balance not found %d", subBalanceNum));
             }
         }
         return subBalance;
