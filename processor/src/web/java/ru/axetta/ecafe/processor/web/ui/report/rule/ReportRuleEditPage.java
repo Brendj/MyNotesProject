@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.ReportRuleConstants;
 import ru.axetta.ecafe.processor.core.report.RuleConditionItem;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ReportFormatMenu;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
@@ -54,6 +55,8 @@ public class ReportRuleEditPage  extends OnlineReportPage
 
     private final CCAccountFilter contragentFilter = new CCAccountFilter();
     private final CCAccountFilter contragentPayAgentFilter = new CCAccountFilter();
+    private final CCAccountFilter contragentReceiverFilter = new CCAccountFilter();
+    private int receiverSelection; // 0-все контрагенты, 1-Агент по приему платежей, 2-ТСП
     private final ContractFilter contractFilter= new ContractFilter();
 
     private long idOfReportHandleRule;
@@ -83,17 +86,45 @@ public class ReportRuleEditPage  extends OnlineReportPage
         return contragentPayAgentFilter;
     }
 
+    public CCAccountFilter getContragentReceiverFilter() {
+        return contragentReceiverFilter;
+    }
+
     public ContractFilter getContractFilter() {
         return contractFilter;
     }
 
-    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
-        if (classTypes.equals(Contragent.PAY_AGENT+"")) {
-            contragentPayAgentFilter.completeContragentSelection(session, idOfContragent);
-        } else {
-            contragentFilter.completeContragentSelection(session, idOfContragent);
-        }
+    public Object showContragentSelectPage(){
+        receiverSelection=0;
+        return MainPage.getSessionInstance().showContragentSelectPage();
     }
+
+    public Object showContragentPayAgentSelectPage(){
+        receiverSelection=1;
+        return MainPage.getSessionInstance().showContragentSelectPage();
+    }
+
+    public Object showContragentReceiverSelectPage(){
+        receiverSelection=2;
+        return MainPage.getSessionInstance().showContragentSelectPage();
+    }
+
+    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
+        switch (receiverSelection){
+            case 0: contragentFilter.completeContragentSelection(session, idOfContragent); break;
+            case 1: contragentPayAgentFilter.completeContragentSelection(session, idOfContragent);break;
+            case 2: contragentReceiverFilter.completeContragentSelection(session, idOfContragent);break;
+        }
+        //contragentFilter.completeContragentSelection(session, idOfContragent);
+    }
+
+    //public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
+    //    if (classTypes.equals(Contragent.PAY_AGENT+"")) {
+    //        contragentPayAgentFilter.completeContragentSelection(session, idOfContragent);
+    //    } else {
+    //        contragentFilter.completeContragentSelection(session, idOfContragent);
+    //    }
+    //}
 
     public void completeContractSelection(Session session, Long idOfContract, int multiContrFlag, String classTypes) throws Exception {
         this.contractFilter.completeContractSelection(session, idOfContract, multiContrFlag, classTypes);
@@ -285,13 +316,22 @@ public class ReportRuleEditPage  extends OnlineReportPage
                 contragentFilter.getContragent().getIdOfContragent() == null)) {
                 continue;
             }
-            //  Проверка контрагента
+
+            //  Проверка контрагента "Агент по приему платежей"
             if (!hint.getHint().isRequired() &&
-                hint.getType().equals(Hint.CONTRAGENT_PAYAGENT) &&
-                (contragentPayAgentFilter.getContragent() == null ||
-                        contragentPayAgentFilter.getContragent().getIdOfContragent() == null)) {
+                    hint.getType().equals(Hint.CONTRAGENT_PAYAGENT) &&
+                    (contragentPayAgentFilter.getContragent() == null ||
+                            contragentPayAgentFilter.getContragent().getIdOfContragent() == null)) {
                 continue;
             }
+            //  Проверка контрагента "ТСП"
+            if (!hint.getHint().isRequired() &&
+                    hint.getType().equals(Hint.CONTRAGENT_RECEIVER) &&
+                    (contragentReceiverFilter.getContragent() == null ||
+                            contragentReceiverFilter.getContragent().getIdOfContragent() == null)) {
+                continue;
+            }
+
             //  Проверка контракта
             if (!hint.getHint().isRequired() &&
                 hint.getType().equals(Hint.CONTRACT) &&
@@ -325,6 +365,9 @@ public class ReportRuleEditPage  extends OnlineReportPage
             } else if (hint.getType().equals(Hint.CONTRAGENT_PAYAGENT) &&
                     contragentPayAgentFilter.getContragent().getIdOfContragent() != null) {
                 newValue.append(contragentPayAgentFilter.getContragent().getIdOfContragent());
+            } if (hint.getType().equals(Hint.CONTRAGENT_RECEIVER) &&
+                    contragentReceiverFilter.getContragent().getIdOfContragent() != null) {
+                newValue.append(contragentReceiverFilter.getContragent().getIdOfContragent());
             } else if (hint.getType().equals(Hint.CONTRACT) &&
                     contractFilter.getContract().getIdOfContract() != null) {
                 newValue.append(contractFilter.getContract().getIdOfContract());
@@ -436,6 +479,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
         hints.clear();
         contragentFilter.clear();
         contragentPayAgentFilter.clear();
+        contragentPayAgentFilter.clear();
         contractFilter.clear();
         filter = "";
         idOfOrgList = Collections.EMPTY_LIST;
@@ -460,6 +504,8 @@ public class ReportRuleEditPage  extends OnlineReportPage
             try {
                 if (hint.getHint().getParamHint().getDefaultRule().contains(RuleProcessor.CONTRAGENT_PAYAGENT_EXPRESSION)) {
                     fillContragentPayAgentHint(getActualHintByName(hint.getHint().getParamHint().getName(), actualRules));
+                } else if (hint.getHint().getParamHint().getDefaultRule().contains(RuleProcessor.CONTRAGENT_RECEIVER_EXPRESSION)) {
+                    fillContragentReceiverHint(getActualHintByName(hint.getHint().getParamHint().getName(), actualRules));
                 } else if (hint.getHint().getParamHint().getDefaultRule().contains(RuleProcessor.CONTRAGENT_EXPRESSION)) {
                     fillContragentHint(getActualHintByName(hint.getHint().getParamHint().getName(), actualRules));
                 } else if (hint.getHint().getParamHint().getName().equals("idOfContragent")) {
@@ -529,6 +575,19 @@ public class ReportRuleEditPage  extends OnlineReportPage
             long idOfContragent = Long.parseLong(hint.getConditionConstant());
             Contragent contragent = DAOService.getInstance().getContragentById(idOfContragent);
             contragentPayAgentFilter.completeContragentSelection(contragent);
+        } catch (Exception e) {
+            logger.error("Failed to parse contragent hint " + hint.getConditionConstant(), e);
+        }
+    }
+
+    public void fillContragentReceiverHint (RuleCondition hint) {
+        if (hint == null || hint.getConditionConstant() == null || hint.getConditionConstant().length() < 1) {
+            return;
+        }
+        try {
+            long idOfContragent = Long.parseLong(hint.getConditionConstant());
+            Contragent contragent = DAOService.getInstance().getContragentById(idOfContragent);
+            contragentReceiverFilter.completeContragentSelection(contragent);
         } catch (Exception e) {
             logger.error("Failed to parse contragent hint " + hint.getConditionConstant(), e);
         }
