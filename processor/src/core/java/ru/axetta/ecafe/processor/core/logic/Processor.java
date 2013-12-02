@@ -3098,18 +3098,21 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
 
     private String[] generateNotificationParams(Session session, Client client, int passDirection, Date eventDate,
             Long guardianId) throws Exception {
+        final String enterEvent = "Вход";
+        final String exitEvent = "Выход";
         String eventName = "";
         if (passDirection == EnterEvent.ENTRY) {
-            eventName = "Вход";
+            eventName = enterEvent;
         } else if (passDirection == EnterEvent.EXIT) {
-            eventName = "Выход";
+            eventName = exitEvent;
         } else if (passDirection == EnterEvent.RE_ENTRY) {
-            eventName = "Вход";
+            eventName = enterEvent;
         } else if (passDirection == EnterEvent.RE_EXIT) {
-            eventName = "Выход";
+            eventName = exitEvent;
         }
         // Если представитель не пуст, то значит вход/выход в детский сад. Иначе - в школу.
-        eventName = eventName + (guardianId == null ? " в школу" : "");
+        eventName = eventName + (guardianId == null ? (eventName.equals(enterEvent) ? " в школу"
+                : eventName.equals(exitEvent) ? " из школы" : "") : "");
         String guardianName = "";
         if (guardianId != null) {
             Person guardPerson = ((Client) session.load(Client.class, guardianId)).getPerson();
