@@ -13,12 +13,12 @@
   User: damir
   Date: 18.12.12
   Time: 16:33
-  Список Актов инвентаризации
+  Список накладных
 --%>
 <%--@elvariable id="wayBillListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.waybill.WayBillListPage"--%>
 <%--@elvariable id="wayBillPositionListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.waybill.WayBillPositionListPage"--%>
 <%--@elvariable id="actOfWayBillDifferencePositionListPage" type="ru.axetta.ecafe.processor.web.ui.commodity.accounting.act.ActOfWayBillDifferencePositionListPage"--%>
-<h:panelGrid id="wayBillListPage" binding="#{wayBillListPage.pageComponent}"
+<h:panelGrid id="wayBillListPageGrid" binding="#{wayBillListPage.pageComponent}"
              styleClass="borderless-grid">
 
     <rich:simpleTogglePanel label="Фильтр (#{wayBillListPage.filter.status})" switchType="client" opened="true"
@@ -62,7 +62,7 @@
         </f:facet>
     </a4j:status>
 
-    <rich:dataTable value="#{wayBillListPage.itemList}" var="wayBill" rowKeyVar="row" rows="20">
+    <rich:dataTable id="wayBillListPageTable" value="#{wayBillListPage.itemList}" var="wayBill" rowKeyVar="row" rows="20">
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="№" />
@@ -89,6 +89,12 @@
                 <h:outputText escape="true" value="Состояние" />
             </f:facet>
             <h:outputText escape="true" value="#{wayBill.state}" styleClass="output-text"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="ИНН контрагента" />
+            </f:facet>
+            <h:outputText escape="true" value="#{wayBill.inn}" styleClass="output-text"/>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -121,7 +127,7 @@
             <h:outputText escape="true" value="#{wayBill.deletedState}" styleClass="output-text" />
         </rich:column>
         <f:facet name="footer">
-            <rich:datascroller for="wayBillListPage" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+            <rich:datascroller for="wayBillListPageTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                                stepControls="auto" boundaryControls="hide">
                 <f:facet name="previous">
                     <h:graphicImage value="/images/16x16/left-arrow.png" />

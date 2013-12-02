@@ -24,6 +24,7 @@ public class WayBillItem extends AbstractEntityItem<WayBill> {
     private Long idOfWayBill;
 
     private String number;
+    private String inn;
     private Date dateOfWayBill;
     private String state;
     private Org shipperOrg;
@@ -40,6 +41,7 @@ public class WayBillItem extends AbstractEntityItem<WayBill> {
         dateOfWayBill = entity.getDateOfWayBill();
         //state = WayBill.STATES[entity.getState()];
         state = entity.getState().toString();
+        inn = entity.getInn();
         if(entity.getShipper()!=null){
             shipperOrg = entityManager.find(Org.class, Long.parseLong(entity.getShipper()));
         }
@@ -110,4 +112,9 @@ public class WayBillItem extends AbstractEntityItem<WayBill> {
     public String getDeletedState() {
         return deletedState;
     }
+
+    public String getInn() {
+        return inn;
+    }
+
 }
