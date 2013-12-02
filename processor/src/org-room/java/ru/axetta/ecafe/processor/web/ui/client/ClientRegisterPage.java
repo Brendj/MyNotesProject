@@ -330,6 +330,10 @@ public class ClientRegisterPage extends BasicWorkspacePage {
                 cl == null ? null : cl.getEmail(), updateRequired);
         updateRequired = doClientUpdate(fieldConfig, ClientManager.FieldId.COMMENTS, client.getRemarks(),
                 cl == null ? null : cl.getRemarks(), updateRequired);
+        updateRequired = doClientUpdate(fieldConfig, ClientManager.FieldId.NOTIFY_BY_EMAIL, client.getNotifyViaEmail() ? "1" : "0",
+                cl == null ? null : (cl.isNotifyViaEmail() ? "1" : "0"), updateRequired);
+        updateRequired = doClientUpdate(fieldConfig, ClientManager.FieldId.NOTIFY_BY_SMS, client.getNotifyViaSMS() ? "1" : "0",
+                cl == null ? null : (cl.isNotifyViaSMS() ? "1" : "0"), updateRequired);
 
         Long newIdOfClient = null;
         try {
