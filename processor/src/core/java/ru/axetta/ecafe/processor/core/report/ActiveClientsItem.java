@@ -25,6 +25,7 @@ public class ActiveClientsItem {
     private long totalCount;
     private long paymentCount;
     private long discountCount;
+    private long employeesCount;
     private String active;
     private String style;
 
@@ -37,6 +38,7 @@ public class ActiveClientsItem {
         this.totalCount = 0;
         this.paymentCount = 0;
         this.discountCount = 0;
+        this.employeesCount = 0;
         this.style = style;
     }
 
@@ -86,6 +88,14 @@ public class ActiveClientsItem {
 
     public void setDiscountCount(long discountCount) {
         this.discountCount = discountCount;
+    }
+
+    public long getEmployeesCount() {
+        return employeesCount;
+    }
+
+    public void setEmployeesCount(long employeesCount) {
+        this.employeesCount = employeesCount;
     }
 
     public long getIdOfOrg() {

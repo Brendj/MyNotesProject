@@ -48,6 +48,7 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
     public static final int TOTAL_COUNT_VALUE = 1;
     public static final int DISCOUNT_COUNT_VALUE = 2;
     public static final int PAYMENT_COUNT_VALUE = 3;
+    public static final int EMPLOYEE_COUNT_VALUE = 4;
 
     private final static Logger logger = LoggerFactory.getLogger(ActiveClientsReport.class);
 
@@ -143,6 +144,7 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
             
             List<ActiveClientsItem> result = new ArrayList<ActiveClientsItem>();
             String sql =
+                /* Все */
                   "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
                 + "       cf_orgs.district, count(totalClients.idofclient), " + TOTAL_COUNT_VALUE + " as valType "
                 + "from cf_orgs "
@@ -151,6 +153,7 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
                           + getClientsClause("totalClients")
                 + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
                 + "union all "
+                /* Бесплатники */
                 + "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
                 + "       cf_orgs.district, count(discountClients.idofclient), " + DISCOUNT_COUNT_VALUE + " as valType "
                 + "from cf_orgs "
@@ -159,6 +162,7 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
                           + getClientsClause("discountClients")
                 + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
                 + "union all "
+                /* Осуществившие платежи */
                 + "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
                 + "       cf_orgs.district, count(distinct orders.idofclient), " + PAYMENT_COUNT_VALUE + " as valType "
                 + "from cf_orgs "
@@ -168,6 +172,16 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
                 + "join cf_clients as ordclients on orders.idofclient=ordclients.idofclient "
                 + "where cf_orgs.district is not null and cf_orgs.district<>'' "
                         + getClientsClause("ordclients")
+                + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
+                + "union all "
+                /* Сотрудники */
+                + "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
+                + "       cf_orgs.district, count(employeeClients.idofclient), " + EMPLOYEE_COUNT_VALUE + " as valType "
+                + "from cf_orgs "
+                + "left join cf_clients as employeeClients on cf_orgs.idoforg=employeeClients.idoforg "
+                + "where cf_orgs.district is not null and cf_orgs.district<>'' "
+                + "      AND employeeClients.idOfClientGroup>=" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                + "      AND employeeClients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() + " "
                 + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
                 + "order by district, shortname, valType";
             Query query = session.createSQLQuery(sql);
@@ -229,6 +243,11 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
                         prevRegionItem.setPaymentCount(prevRegionItem.getPaymentCount() + count);
                         prevItem.setPaymentCount(count);
                         break;
+                    case EMPLOYEE_COUNT_VALUE:
+                        overallItem.setEmployeesCount(overallItem.getEmployeesCount() + count);
+                        prevRegionItem.setEmployeesCount(prevRegionItem.getEmployeesCount() + count);
+                        prevItem.setEmployeesCount(count);
+                        break;
                 }
                 prevRegion = district;
             }
@@ -250,7 +269,7 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
     }
     
     private static String getClientsClause(String table) {
-        String onlyActiveClients = " AND " + table + ".idOfClientGroup>=" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() +
+        String onlyActiveClients = " AND " + table + ".idOfClientGroup>=" + ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue() +
                                    " AND " + table + ".idOfClientGroup<" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() + " ";
         return onlyActiveClients;
     }
