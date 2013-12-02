@@ -621,6 +621,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
                     buildReport(values, org);
                 } catch (Exception e) {
                     errorMessage = String.format("Во время выполнения отчета, возникла ошибка: %s", e.getMessage());
+                    logger.error("Failed to build report", e);
                     return;
                 }
                 //  .. но прерываем выполнение, если тип отчета не "В репозиторий" - для всех оргов выполнение только
