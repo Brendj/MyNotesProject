@@ -197,7 +197,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         String sql =
                 "select groupname, contractid, address, phone, mobile, email, notifyviaemail, notifyviasms, fax, cf_clients.lastupdate, "
                         + "contractdate, cardno, cardtype, cf_cards.createddate, validdate, state, balance, expenditurelimit, limits, lockreason, "
-                        + "firstname, secondname, surname, passdirection, evtdatetime "
+                        + "firstname, secondname, surname, passdirection, evtdatetime, remarks "
                         + "from cf_clients "
                         + "left join cf_cards on cf_clients.idofclient=cf_cards.idofclient and cf_cards.state=" + Card.ACTIVE_STATE + " "
                         + "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "
@@ -219,7 +219,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
             String email = HibernateUtils.getDbString(o[5]);
             Boolean notifyviaemail = HibernateUtils.getDbBoolean(o[6]);
             Boolean notifyviasms = HibernateUtils.getDbBoolean(o[7]);
-            String fax = HibernateUtils.getDbString(o[6]);
+            String fax = HibernateUtils.getDbString(o[8]);
             Long lastupdate = HibernateUtils.getDbLong(o[9]);
             Long contractdate = HibernateUtils.getDbLong(o[10]);
             Long cardNo = HibernateUtils.getDbLong(o[11]);
@@ -236,6 +236,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
             String surname = HibernateUtils.getDbString(o[22]);
             Integer passDirection = HibernateUtils.getDbInt(o[23]);
             passDirection = passDirection == null ? EnterEvent.EXIT : passDirection;
+            String remarks = HibernateUtils.getDbString(o[25]);
 
             if (phone.length() > 0 && phone.startsWith("7")) {
                 phone = phone.substring(1);
@@ -261,6 +262,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
             selectedClient.setNotifyViaSMS(notifyviasms);
             selectedClient.setCreatedDate(df.format(new Date(contractdate)));
             selectedClient.setLastUpdateDate(df.format(new Date(lastupdate)));
+            selectedClient.setRemarks(remarks);
             selectedClient.getCard().setCardNo(cardNo);
             selectedClient.getCard().setCardType(cardType);
             selectedClient.getCard().setCreatedDate(cardCreatedDate);

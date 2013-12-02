@@ -57,7 +57,8 @@ public class ClientManager {
         GROUP,
         SAN,
         EXTERNAL_ID,
-        CLIENT_GUID
+        CLIENT_GUID,
+        FAX
     }
 
     static FieldProcessor.Def[] fieldInfo = {
@@ -92,6 +93,7 @@ public class ClientManager {
             new FieldProcessor.Def(28, false, false, "Карта-срок", "#5", FieldId.CARD_EXPIRY, false),
             new FieldProcessor.Def(29, false, false, "Внешний идентификатор", null, FieldId.EXTERNAL_ID, true),
             new FieldProcessor.Def(30, false, false, "GUID", null, FieldId.CLIENT_GUID, true),
+            new FieldProcessor.Def(31, false, false, "Факс", null, FieldId.FAX, true),
             new FieldProcessor.Def(-1, false, false, "#", null, -1, false) // поля которые стоит пропустить в файле
     };
 
@@ -325,6 +327,14 @@ public class ClientManager {
                     throw new Exception("Неправильный формат мобильного телефона");
                 }
                 client.setMobile(mobilePhone);
+            }
+            String fax = fieldConfig.getValue(FieldId.FAX);
+            if (fax != null && StringUtils.isNotEmpty(fax)) {
+                fax = Client.checkAndConvertMobile(fax);
+                if (fax == null) {
+                    throw new Exception("Неправильный формат факса");
+                }
+                client.setFax(fax);
             }
             //tokens[15]);
             if (fieldConfig.getValue(FieldId.EMAIL) != null) {
@@ -598,13 +608,21 @@ public class ClientManager {
             client.setAddress(fieldConfig.getValue(ClientManager.FieldId.ADDRESS)); //tokens[12]);
             client.setPhone(fieldConfig.getValue(ClientManager.FieldId.PHONE));//tokens[13]);
             String mobilePhone = fieldConfig.getValue(ClientManager.FieldId.MOBILE_PHONE);
+            String fax = fieldConfig.getValue(FieldId.FAX);
             if (mobilePhone != null) {
                 mobilePhone = Client.checkAndConvertMobile(mobilePhone);
                 if (mobilePhone == null) {
                     throw new Exception("Неправильный формат мобильного телефона");
                 }
             }
+            if (fax != null) {
+                fax = Client.checkAndConvertMobile(fax);
+                if (fax == null) {
+                    throw new Exception("Неправильный формат факса");
+                }
+            }
             client.setMobile(mobilePhone);//tokens[14]);
+            client.setFax(fax);//tokens[14]);
             client.setEmail(fieldConfig.getValue(ClientManager.FieldId.EMAIL));//tokens[15]);
             client.setRemarks(fieldConfig.getValue(ClientManager.FieldId.COMMENTS));
             client.setSanWithConvert(fieldConfig.getValue(ClientManager.FieldId.SAN));

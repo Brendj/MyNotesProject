@@ -322,6 +322,8 @@ public class ClientRegisterPage extends BasicWorkspacePage {
                 cl == null ? null : cl.getAddress(), updateRequired);
         updateRequired = doClientUpdate(fieldConfig, ClientManager.FieldId.PHONE, client.getPhone(),
                 cl == null ? null : cl.getPhone(), updateRequired);
+        updateRequired = doClientUpdate(fieldConfig, ClientManager.FieldId.FAX, client.getFax(),
+                cl == null ? null : cl.getFax(), updateRequired);
         updateRequired = doClientUpdate(fieldConfig, ClientManager.FieldId.MOBILE_PHONE, client.getMobile(),
                 cl == null ? null : cl.getMobile(), updateRequired);
         updateRequired = doClientUpdate(fieldConfig, ClientManager.FieldId.EMAIL, client.getEmail(),
@@ -349,7 +351,9 @@ public class ClientRegisterPage extends BasicWorkspacePage {
                     .get(ru.axetta.ecafe.processor.core.persistence.Client.class, newIdOfClient);
         }
         List<Long> idOfCategoryList = new ArrayList<Long>();
-        client.initDiscounts(ClientListEditPage.loadDiscounts(session));
+        if (client.getDiscounts() == null || client.getDiscounts().size() < 1) {
+            client.initDiscounts(ClientListEditPage.loadDiscounts(session));
+        }
         for (Long idofcategorydiscount : client.getDiscounts().keySet()) {
             if (client.getDiscounts().get(idofcategorydiscount).equals(Boolean.FALSE)) {
                 continue;
