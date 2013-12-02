@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.subfeeding;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
@@ -31,7 +32,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -134,9 +135,11 @@ public class SubFeedingServlet extends HttpServlet {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
+            Client client = DAOUtils.findClientByContractId(session, contractId);
+            req.setAttribute("client", client);
             req.setAttribute("subscriptionFeeding", sf);
             if (sf == null) {
-                req.setAttribute("complexes", DAOUtils.findComplexesWithSubFeeding(session, new Date()));
+                req.setAttribute("complexes", DAOUtils.findComplexesWithSubFeeding(session, client.getOrg()));
             } else {
                 DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
                 df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
@@ -158,7 +161,6 @@ public class SubFeedingServlet extends HttpServlet {
                     req.setAttribute("endDate", df.format(endDate));
                 }
             }
-            req.setAttribute("client", DAOUtils.findClientByContractId(session, contractId));
             transaction.commit();
             outputPage("view", req, resp);
         } catch (Exception ex) {
@@ -180,7 +182,7 @@ public class SubFeedingServlet extends HttpServlet {
                     String[] ids = StringUtils.split(entry.getValue()[0], '_');
                     String complexId = ids[0];
                     int dayNumber = Integer.parseInt(ids[1]);
-                    addComplexValue(cycle, daysByNumber.get(dayNumber), complexId);
+                    addComplexValue(cycle, StringUtils.capitalize(daysByNumber.get(dayNumber)), complexId);
                 }
             }
             Result res = clientRoomController.createSubscriptionFeeding(contractId, cycle);
@@ -207,14 +209,16 @@ public class SubFeedingServlet extends HttpServlet {
     }
 
     private void addComplexValue(CycleDiagramIn cd, String fieldName, String value) throws Exception {
-        Class cdClass = cd.getClass();
-        Field field = cdClass.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        String fieldValue = (String) field.get(cd);
+        Class<?> cdClass = cd.getClass();
+        String getter = "get" + fieldName;
+        String setter = "set" + fieldName;
+        Method getterMethod = cdClass.getMethod(getter);
+        Method setterMethod = cdClass.getMethod(setter, String.class);
+        String fieldValue = (String) getterMethod.invoke(cd);
         if (fieldValue == null) {
-            field.set(cd, value);
+            setterMethod.invoke(cd, value);
         } else {
-            field.set(cd, StringUtils.join(new Object[]{fieldValue, value}, ','));
+            setterMethod.invoke(cd, StringUtils.join(new Object[]{fieldValue, value}, ','));
         }
     }
 

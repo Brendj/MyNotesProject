@@ -182,7 +182,7 @@
 
 <div class="textDiv" style="margin-top: 30px;">
     <span style="font-weight: bold;">Покупки:</span>
-    <span><%=!purchasesExist ? " по данному субсчету АП не было покупок" : ""%></span>
+    <span><%=!purchasesExist ? " за данный период по субсчету АП покупок не было." : ""%></span>
 </div>
 <%
         if (purchasesExist) {
@@ -205,7 +205,7 @@
             <div class="output-text">По карте</div>
         </th>
         <th>
-            <div class="output-text">Состав</div>
+            <div class="output-text" style="width: 200px;">Состав</div>
         </th>
     </tr>
 <%
@@ -220,7 +220,8 @@
                 StringBuilder consistenceBuilder = new StringBuilder();
                 for (PurchaseElementExt pe : purchase.getE()) {
                     consistenceBuilder.append(pe.getName()).append(" - ")
-                            .append(CurrencyStringUtils.copecksToRubles(pe.getSum())).append("<br/>");
+                            .append(CurrencyStringUtils.copecksToRubles(pe.getSum())).append(" руб.")
+                            .append(pe.getAmount() > 1 ? "x " + pe.getAmount() : "").append("<br/>");
                 }
                 String consistence = consistenceBuilder.length() > 0 ? consistenceBuilder.toString()
                         .substring(0, consistenceBuilder.length() - 5) : "";
@@ -262,7 +263,7 @@
 
 <div class="textDiv" style="margin-top: 20px;">
     <span style="font-weight: bold">Платежи:</span>
-    <span><%=!paymentsExist ? " по данному субсчету АП не было платежей" : ""%></span>
+    <span><%=!paymentsExist ? " за данный период по субсчету АП платежей не было." : ""%></span>
 </div>
 <%
         if (paymentsExist) {
@@ -276,7 +277,7 @@
             <div class="output-text">Сумма</div>
         </th>
         <th>
-            <div class="output-text">Информация о платеже</div>
+            <div class="output-text" style="width: 200px;">Информация о платеже</div>
         </th>
     </tr>
     <%

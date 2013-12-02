@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
@@ -14,17 +15,13 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Pr
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.*;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
@@ -1569,21 +1566,21 @@ public class DAOUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static Long sumComplexesPrice(Session session, Date date, List<Integer> complexIds) {
-        Date dayBegin = CalendarUtils.truncateToDayOfMonth(date);
-        Date nextDay = CalendarUtils.addOneDay(date);
-        Criteria criteria = session.createCriteria(ComplexInfo.class).add(Restrictions.eq("usedSubscriptionFeeding", 1))
-                .add(Restrictions.in("idOfComplex", complexIds)).add(Restrictions.ge("menuDate", dayBegin))
-                .add(Restrictions.lt("menuDate", nextDay)).setProjection(Projections.sum("currentPrice"));
+    public static Long sumComplexesPrice(Session session, List<Integer> complexIds, Org org) {
+        DetachedCriteria subQuery = DetachedCriteria.forClass(ComplexInfo.class).add(Restrictions.eq("org", org))
+                .setProjection(Projections.max("menuDate"));
+        Criteria criteria = session.createCriteria(ComplexInfo.class).add(Restrictions.eq("org", org))
+                .add(Restrictions.eq("usedSubscriptionFeeding", 1)).add(Restrictions.in("idOfComplex", complexIds))
+                .add(Subqueries.propertyEq("menuDate", subQuery)).setProjection(Projections.sum("currentPrice"));
         return (Long) criteria.uniqueResult();
     }
 
     @SuppressWarnings("unchecked")
-    public static List<ComplexInfo> findComplexesWithSubFeeding(Session session, Date date) {
-        Date dayBegin = CalendarUtils.truncateToDayOfMonth(date);
-        Date nextDay = CalendarUtils.addOneDay(date);
+    public static List<ComplexInfo> findComplexesWithSubFeeding(Session session, Org org) {
+        DetachedCriteria subQuery = DetachedCriteria.forClass(ComplexInfo.class).add(Restrictions.eq("org", org))
+                .setProjection(Projections.max("menuDate"));
         Criteria criteria = session.createCriteria(ComplexInfo.class).add(Restrictions.eq("usedSubscriptionFeeding", 1))
-                .add(Restrictions.ge("menuDate", dayBegin)).add(Restrictions.lt("menuDate", nextDay));
+                .add(Restrictions.eq("org", org)).add(Subqueries.propertyEq("menuDate", subQuery));
         return (List<ComplexInfo>) criteria.list();
     }
 

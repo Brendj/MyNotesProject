@@ -24,6 +24,8 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.Sub
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryStatus;
@@ -32,6 +34,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
@@ -3883,25 +3886,35 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             cd.setCreatedDate(date);
             cd.setClient(client);
             cd.setIdOfClient(client.getIdOfClient());
-            cd.setStateDiagram(StateDiagram.ACTIVE);
-            cd.setDateActivationDiagram(date);
+            cd.setStateDiagram(StateDiagram.WAIT);
+            List<ECafeSettings> settings = DAOService.getInstance()
+                    .geteCafeSettingses(client.getOrg().getIdOfOrg(), SettingsIds.SubscriberFeeding, false);
+            if (settings.isEmpty()) {
+                throw new RuntimeException(
+                        String.format("Отсутствуют настройки абонементного питания для организации с IdOfOrg = %s",
+                                client.getOrg().getIdOfOrg()));
+            }
+            ECafeSettings cafeSettings = settings.get(0);
+            ECafeSettings.SubscriberFeedingSettingSettingValue parser = (ECafeSettings.SubscriberFeedingSettingSettingValue) new ECafeSettings.SettingValueParser(
+                    cafeSettings.getSettingValue(), SettingsIds.SubscriberFeeding).getParserBySettingValue();
+            cd.setDateActivationDiagram(CalendarUtils.addDays(date, parser.getDayRequest()));
             cd.setGuid(UUID.randomUUID().toString());
             cd.setDeletedState(false);
             cd.setSendAll(SendToAssociatedOrgs.SendToSelf);
             cd.setMonday(cycleDiagramIn.getMonday());
-            cd.setMondayPrice(getPriceOfDay(cd.getMonday(), session, date));
+            cd.setMondayPrice(getPriceOfDay(cd.getMonday(), session, client.getOrg()));
             cd.setTuesday(cycleDiagramIn.getTuesday());
-            cd.setTuesdayPrice(getPriceOfDay(cd.getTuesday(), session, date));
+            cd.setTuesdayPrice(getPriceOfDay(cd.getTuesday(), session, client.getOrg()));
             cd.setWednesday(cycleDiagramIn.getWednesday());
-            cd.setWednesdayPrice(getPriceOfDay(cd.getWednesday(), session, date));
+            cd.setWednesdayPrice(getPriceOfDay(cd.getWednesday(), session, client.getOrg()));
             cd.setThursday(cycleDiagramIn.getThursday());
-            cd.setThursdayPrice(getPriceOfDay(cd.getThursday(), session, date));
+            cd.setThursdayPrice(getPriceOfDay(cd.getThursday(), session, client.getOrg()));
             cd.setFriday(cycleDiagramIn.getFriday());
-            cd.setFridayPrice(getPriceOfDay(cd.getFriday(), session, date));
+            cd.setFridayPrice(getPriceOfDay(cd.getFriday(), session, client.getOrg()));
             cd.setSaturday(cycleDiagramIn.getSaturday());
-            cd.setSaturdayPrice(getPriceOfDay(cd.getSaturday(), session, date));
+            cd.setSaturdayPrice(getPriceOfDay(cd.getSaturday(), session, client.getOrg()));
             cd.setSunday(cycleDiagramIn.getSunday());
-            cd.setSundayPrice(getPriceOfDay(cd.getSunday(), session, date));
+            cd.setSundayPrice(getPriceOfDay(cd.getSunday(), session, client.getOrg()));
             session.persist(cd);
             transaction.commit();
             res.resultCode = RC_OK;
@@ -3918,7 +3931,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @SuppressWarnings("unchecked")
-    private Long getPriceOfDay(String dayComplexes, Session session, Date today) {
+    private Long getPriceOfDay(String dayComplexes, Session session, Org org) {
         if (StringUtils.isEmpty(dayComplexes)) {
             return 0L;
         }
@@ -3927,7 +3940,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         for (String id : complexIds) {
             ids.add(Integer.valueOf(id));
         }
-        return DAOUtils.sumComplexesPrice(session, today, ids);
+        return DAOUtils.sumComplexesPrice(session, ids, org);
     }
 
     private <T extends Result> Client findClientByContractId(Session session, Long contractId, T res) throws Exception {
