@@ -24,8 +24,10 @@
 <h:panelGrid id="configurationProviderListPage" binding="#{configurationProviderListPage.pageComponent}"
              styleClass="borderless-grid" columns="1">
 
-    <rich:dataTable id="configurationProviderListTable" value="#{configurationProviderListPage.configurationProviderList}" var="configurationProvider"
-                    columnClasses="left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column" width="400px" rowKeyVar="row" rows="15">
+    <rich:dataTable id="configurationProviderListTable" var="configurationProvider"
+                 columnClasses="left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column"
+                 value="#{configurationProviderListPage.configurationProviderList}" width="400px" rowKeyVar="row"
+                 rows="15" footerClass="data-table-footer">
         <rich:column  headerClass="column-header">
             <f:facet name="header">
                 <h:outputText value="№" styleClass="output-text" escape="true"/>

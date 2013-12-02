@@ -61,7 +61,8 @@
         </f:facet>
     </a4j:status>
 
-    <rich:dataTable value="#{tradeMaterialGoodListPage.itemList}" var="tradeMaterialGood" rowKeyVar="row" rows="10">
+    <rich:dataTable id="tradeMaterialGoodListTable" value="#{tradeMaterialGoodListPage.itemList}"
+                    var="tradeMaterialGood" rowKeyVar="row" rows="10" footerClass="data-table-footer">
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="№" />
@@ -141,7 +142,7 @@
             <h:outputText escape="true" value="#{tradeMaterialGood.deletedState}" styleClass="output-text" />
         </rich:column>
         <f:facet name="footer">
-            <rich:datascroller for="tradeMaterialGoodListPage" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+            <rich:datascroller for="tradeMaterialGoodListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                                stepControls="auto" boundaryControls="hide">
                 <f:facet name="previous">
                     <h:graphicImage value="/images/16x16/left-arrow.png" />

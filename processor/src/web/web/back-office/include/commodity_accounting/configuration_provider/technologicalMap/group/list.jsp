@@ -101,8 +101,8 @@
             </a4j:commandLink>
         </rich:column>
         <f:facet name="footer">
-            <rich:datascroller for="technologicalMapGroupListTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
-                               stepControls="auto" boundaryControls="hide">
+            <rich:datascroller for="technologicalMapGroupListTable" renderIfSinglePage="false" maxPages="10"
+                               fastControls="hide" stepControls="auto" boundaryControls="hide">
                 <f:facet name="previous">
                     <h:graphicImage value="/images/16x16/left-arrow.png" />
                 </f:facet>

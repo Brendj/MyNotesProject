@@ -60,7 +60,7 @@
         </f:facet>
     </a4j:status>
 
-    <rich:dataTable value="#{wayBillPositionListPage.wayBillPositionItems}" var="wayBillPosition" rowKeyVar="row" rows="20">
+    <rich:dataTable id="wayBillPositionListTable" value="#{wayBillPositionListPage.wayBillPositionItems}" var="wayBillPosition" rowKeyVar="row" rows="20">
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="№" />
@@ -140,7 +140,7 @@
             <h:outputText escape="true" value="#{(wayBillPosition.deletedState?'Активен':'Удален')}" styleClass="output-text" />
         </rich:column>
         <f:facet name="footer">
-            <rich:datascroller for="wayBillPositionListPage" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+            <rich:datascroller for="wayBillPositionListTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                                stepControls="auto" boundaryControls="hide">
                 <f:facet name="previous">
                     <h:graphicImage value="/images/16x16/left-arrow.png" />

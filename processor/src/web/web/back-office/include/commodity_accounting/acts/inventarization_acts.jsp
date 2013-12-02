@@ -64,7 +64,8 @@
         </f:facet>
     </a4j:status>
 
-    <rich:dataTable value="#{actOfInventorizationListPage.itemList}" var="act" rowKeyVar="row" rows="10">
+    <rich:dataTable id="actOfInventarizationListPageTable" value="#{actOfInventorizationListPage.itemList}" var="act"
+                    rowKeyVar="row" rows="10" footerClass="data-table-footer">
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="№" />
@@ -108,7 +109,7 @@
             <h:outputText escape="true" value="#{act.deletedState}" styleClass="output-text" />
         </rich:column>
         <f:facet name="footer">
-            <rich:datascroller for="actOfInventarizationListPage" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+            <rich:datascroller for="actOfInventarizationListPageTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                                stepControls="auto" boundaryControls="hide">
                 <f:facet name="previous">
                     <h:graphicImage value="/images/16x16/left-arrow.png" />
