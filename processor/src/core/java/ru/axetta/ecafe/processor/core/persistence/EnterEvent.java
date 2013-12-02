@@ -29,7 +29,6 @@ public class EnterEvent {
     private String docSerialNum;
     private Date issueDocDate;
     private Date visitDateTime;
-    //Kadyrov (21.12.2011)
     private Client client;
     private Org org;
     private Long guardianId;
@@ -45,8 +44,6 @@ public class EnterEvent {
     public static final int DIRECTION_ENTER = 0;
     public static final int DIRECTION_EXIT = 1;
     public static final int DETECTED_INSIDE =100; // обнаружен на подносе карты внутри здания
-   // public static final int TwicePassEnter = 6;     //повторный вход
-   // public static final int TwicePassExit = 7;       //повторный выход
    //
 
     public static boolean isEntryOrExitEvent(int passDirection){
@@ -221,11 +218,8 @@ public class EnterEvent {
 
         EnterEvent that = (EnterEvent) o;
 
-        if (!compositeIdOfEnterEvent.equals(that.compositeIdOfEnterEvent)) {
-            return false;
-        }
+        return compositeIdOfEnterEvent.equals(that.compositeIdOfEnterEvent);
 
-        return true;
     }
 
     @Override
