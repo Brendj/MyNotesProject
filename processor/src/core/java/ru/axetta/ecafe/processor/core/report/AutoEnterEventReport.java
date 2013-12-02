@@ -90,24 +90,15 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
             private Integer id = null;
             private String fio = null;
             // события прохода через турникет
-            private ArrayList<Event> eventList = new ArrayList<Event>();
+            private NavigableSet<Event> events = new TreeSet<Event>();
             private String date;
             private String groupName; // группа клиента (класс, сотрудники и т.д.)
-            private boolean isSorted = false; // флаг упорядовенности eventList'a
 
             public ReportItem(Integer id, String fio, String date, String groupName) {
                 this.id = id;
                 this.fio = fio;
                 this.date = date;
                 this.groupName = groupName;
-            }
-
-            public boolean isSorted() {
-                return isSorted;
-            }
-
-            public void setSorted(boolean sorted) {
-                isSorted = sorted;
             }
 
             public String getGroupName() {
@@ -125,21 +116,8 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
                 return fio;
             }
 
-            public ArrayList<Event> getEventList() {
-                return eventList;
-            }
-
-            /**
-             * Метод доступа к eventList. Отличается от getEventList() тем, что проверяет флаг упорядоченности.
-             * Если флан установлен в значение false, выполняет сортировку.
-             * @return
-             */
-            public ArrayList<Event> getSortedEventList() {
-                if (!isSorted() && !this.eventList.isEmpty()) {
-                    Collections.sort(this.eventList);
-                    setSorted(true);
-                }
-                return eventList;
+            public NavigableSet<Event> getEvents() {
+                return events;
             }
 
             public String getDate() {
@@ -148,10 +126,10 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
 
             // время прихода
             public String getTimeEnter() {
-                if (this.getEventList().isEmpty())
+                if (events.isEmpty())
                     return "";
-                for (Event e : getSortedEventList()) {
-                    if (e.getPassdirection() == EnterEvent.ENTRY)
+                for (Event e : events) {
+                    if (EnterEvent.isEntryOrReEntryEvent(e.passdirection))
                         return timeFormat.format(new Date(e.getTime()));
                 }
                 return "-";
@@ -159,25 +137,26 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
 
             // время ухода
             public String getTimeExit() {
-                if (this.getEventList().isEmpty())
+                if (events.isEmpty())
                     return "";
-                for (int i = getSortedEventList().size()-1; i>=0; i--)
-                    if (getEventList().get(i).getPassdirection() == EnterEvent.EXIT)
-                        return timeFormat.format(new Date(getEventList().get(i).getTime()));
+                for (Event e : events.descendingSet()) {
+                    if (EnterEvent.isExitOrReExitEvent(e.passdirection))
+                        return timeFormat.format(new Date(e.getTime()));
+                }
                 return "-";
             }
 
             // время отсутствия
             public Integer getAbsenceOfDay() {
-                if (this.getEventList().isEmpty())
+                if (events.isEmpty())
                     return null;
                 Integer result = 0;
                 Long exitTime = null;
-                for (Event e : this.getSortedEventList()) {
-                    if (e.getPassdirection() == EnterEvent.ENTRY && exitTime!=null) {
+                for (Event e : events) {
+                    if (EnterEvent.isEntryOrExitEvent(e.getPassdirection()) && exitTime!=null) {
                         result += (int)((e.getTime() - exitTime) / (1000 * 60));
                     }
-                    if (e.getPassdirection() == EnterEvent.EXIT)
+                    if (EnterEvent.isExitOrReExitEvent(e.getPassdirection()))
                         exitTime = e.getTime();
                 }
                 return result;
@@ -185,21 +164,21 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
 
             // первый вход - последний выход
             public String getTimeEnterExit() {
-                if (this.getEventList().isEmpty())
+                if (events.isEmpty())
                     return "";
                 StringBuilder sb = new StringBuilder();
-                for (Event e : this.getSortedEventList()) {
-                    if (e.getPassdirection() == EnterEvent.ENTRY || e.getPassdirection() == EnterEvent.EXIT) {
+                for (Event e : events) {
+                    if (EnterEvent.isEntryOrExitEvent(e.getPassdirection())) {
                         if(StringUtils.isNotEmpty(e.getGuardianFIO())){
                             sb.append(e.getGuardianFIO()).append(" ");
                         }
                         sb.append(timeFormat.format(new Date(e.getTime())));
-                        sb.append((e.getPassdirection() == EnterEvent.ENTRY?" (+)":" (-)"));
-                        sb.append(", ");
+                        sb.append((EnterEvent.isEntryOrReEntryEvent(e.getPassdirection())?" (+)":" (-)"));
+                        if(!e.equals(events.last())) sb.append(", ");
                     }
                 }
-                if (sb.length()>2)
-                    return sb.toString().substring(0, sb.length() - 2);
+                if (sb.length()>0)
+                    return sb.toString();
                 else
                     return "-";
 
@@ -244,10 +223,23 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
                     typeCondition = String.format("AND c.idOfClientGroup>=%d ", ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES);
             }
 
+            //Query query = session.createSQLQuery(
+            //        "SELECT p.firstname, p.surname, p.secondname, e.evtdatetime, e.passdirection, c.idOfClient, g.groupname, e.guardianid "
+            //        + " FROM cf_enterevents e, cf_clients c, cf_persons p, cf_clientgroups g "
+            //        + " WHERE e.idofclient=c.idofclient and p.idofperson=c.idofperson AND e.idoforg=:idOfOrg AND g.idofclientgroup=c.idofclientgroup AND g.idoforg=c.idoforg "
+            //        + " where c.idoforg=:idOfOrg"
+            //        + " AND e.evtdatetime>=:startTime AND e.evtdatetime<=:endTime "
+            //        + typeCondition+ " AND c.idOfClientGroup!=1100000060 "
+            //        + " order by g.groupname, e.evtdatetime/(1000*60*60*24), p.surname, p.firstname, p.secondname;");
+
             Query query = session.createSQLQuery(
-                    "SELECT p.firstname, p.surname, p.secondname, e.evtdatetime, e.passdirection, c.idOfClient, g.groupname, e.guardianid "
-                    + " FROM cf_enterevents e, cf_clients c, cf_persons p, cf_clientgroups g "
-                    + " WHERE e.idofclient=c.idofclient and p.idofperson=c.idofperson AND e.idoforg=:idOfOrg AND g.idofclientgroup=c.idofclientgroup AND g.idoforg=c.idoforg "
+                    "SELECT p.firstname, p.surname, p.secondname, e.evtdatetime, e.passdirection, c.idOfClient, g.groupname, e.guardianid"
+                    + " from cf_enterevents e"
+                    + " left join cf_clients c on c.idofclient=e.idofclient "
+                    + " left join cf_persons p on c.idofperson=p.idofperson "
+                    + " left join cf_clientgroups g on "
+                    + " g.idofclientgroup=c.idofclientgroup and g.idoforg=c.idoforg "+ typeCondition+ "  AND c.idOfClientGroup!=1100000060"
+                    + " where c.idoforg=:idOfOrg"
                     + " AND e.evtdatetime>=:startTime AND e.evtdatetime<=:endTime "
                     + typeCondition+ " AND c.idOfClientGroup!=1100000060 "
                     + " order by g.groupname, e.evtdatetime/(1000*60*60*24), p.surname, p.firstname, p.secondname;");
@@ -316,7 +308,7 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
                     tmpMap.put(day, reportItem);
                     resultRows.add(reportItem);
                 }
-                reportItem.getEventList().add(new Event(time, passdirection, guardianFIO));
+                reportItem.getEvents().add(new Event(time, passdirection, guardianFIO));
             }
             return new JRBeanCollectionDataSource(resultRows);
         }

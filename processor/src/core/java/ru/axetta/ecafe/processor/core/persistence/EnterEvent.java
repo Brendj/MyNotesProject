@@ -49,6 +49,18 @@ public class EnterEvent {
    // public static final int TwicePassExit = 7;       //повторный выход
    //
 
+    public static boolean isEntryOrExitEvent(int passDirection){
+        return isEntryOrReEntryEvent(passDirection) || isExitOrReExitEvent(passDirection);
+    }
+
+    public static boolean isEntryOrReEntryEvent(int passDirection){
+        return passDirection==ENTRY || passDirection==RE_ENTRY;
+    }
+
+    public static boolean isExitOrReExitEvent(int passDirection){
+        return passDirection==EXIT || passDirection==RE_EXIT;
+    }
+
     public EnterEvent() {
         // For Hibernate
     }
