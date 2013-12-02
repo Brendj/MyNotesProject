@@ -57,6 +57,9 @@
                         <h:outputText styleClass="column-header" escape="true" value="Количество клиентов-бесплатников" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column">
+                        <h:outputText styleClass="column-header" escape="true" value="Количество сотрудников" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column">
                         <h:outputText styleClass="column-header" escape="true" value="Активных клиентов" />
                     </rich:column>
                 </rich:columnGroup>
@@ -78,6 +81,9 @@
             </rich:column>
             <rich:column styleClass="#{item.style}">
                 <h:outputText styleClass="output-text" value="#{item.discountCount}" />
+            </rich:column>
+            <rich:column styleClass="#{item.style}">
+                <h:outputText styleClass="output-text" value="#{item.employeesCount}" />
             </rich:column>
             <rich:column styleClass="#{item.style}">
                 <h:outputText styleClass="output-text" value="#{item.active}" />
