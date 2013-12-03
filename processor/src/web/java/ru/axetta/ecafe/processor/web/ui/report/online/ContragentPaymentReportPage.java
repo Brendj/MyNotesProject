@@ -14,14 +14,11 @@ import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
-import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ContragentPaymentReport;
-import ru.axetta.ecafe.processor.core.report.DailySalesByGroupsReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
-import ru.axetta.ecafe.processor.web.ui.contragent.contract.ContractFilter;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
