@@ -162,6 +162,6 @@ ALTER TABLE Cf_EnterEvents ADD COLUMN GuardianId BIGINT;
 ALTER TABLE cf_do_confirms ADD CONSTRAINT cf_do_confirms_uk UNIQUE (distributedobjectclassname, guid, orgowner);
 
 --! Попрапвка ошибки по старым отчтам SSTSReport
-update cf_reportinfo c set idofcontragentreceiver = (SELECT cast((regexp_matches(reportfile, 'SSTSReport\-\d+\-(\d+)\-*')::text[])[1] as integer) from cf_reportinfo c2 where c2.idofreportinfo = c.idofreportinfo);
+-- update cf_reportinfo c set idofcontragentreceiver = (SELECT cast((regexp_matches(reportfile, 'SSTSReport\-\d+\-(\d+)\-*')::text[])[1] as integer) from cf_reportinfo c2 where c2.idofreportinfo = c.idofreportinfo);
 
 --! ФИНАЛИЗИРОВАН (Кадыров, 131122) НЕ МЕНЯТЬ
