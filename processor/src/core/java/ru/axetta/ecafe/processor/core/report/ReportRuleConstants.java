@@ -181,7 +181,7 @@ public class ReportRuleConstants {
             new ReportHint(RegisterReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23}),
             new ReportHint(ClientsReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23}),
             new ReportHint(OrgOrderByDaysReport.class.getCanonicalName(), new int[]{28, 29, 3, 22, 23}),
-            new ReportHint(AutoEnterEventReport.class.getCanonicalName(), new int[]{28, 29, -3, 22, 23, 24}),
+            new ReportHint(AutoEnterEventReport.class.getCanonicalName(), new int[]{28, 29, -3, 22, 23, 24, 32}),
             new ReportHint(AutoEnterEventByDaysReport.class.getCanonicalName(), new int[]{28, 29, -3, 22, 23, 24}),
             new ReportHint(DailySalesByGroupsReport.class.getCanonicalName(), new int[]{3, 23, 25, 26, 27, 32}),
             new ReportHint(SubscriptionFeedingJasperReport.class.getCanonicalName(), new int[]{3, 4, 5}),
