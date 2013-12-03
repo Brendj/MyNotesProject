@@ -1695,7 +1695,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         ordersCriteria.add(Restrictions.ge("createTime", startDate));
         ordersCriteria.add(Restrictions.lt("createTime", nextToEndDate));
         if(orderType!=null){
-            ordersCriteria.add(Restrictions.lt("orderType", orderType));
+            ordersCriteria.add(Restrictions.eq("orderType", orderType));
         }
         ordersCriteria.addOrder(org.hibernate.criterion.Order.asc("createTime"));
         List ordersList = ordersCriteria.list();

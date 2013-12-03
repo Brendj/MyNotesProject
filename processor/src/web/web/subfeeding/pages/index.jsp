@@ -9,7 +9,7 @@
 <head>
     <title>Абонементное питание</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/subfeeding/styles.css"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/subfeeding/css/styles.css"/>
 </head>
 <body>
 <form method="post" enctype="application/x-www-form-urlencoded" action="${pageContext.request.contextPath}/sub-feeding/login"

@@ -232,5 +232,18 @@ public class CalendarUtils {
         return (thisDate!=null && System.currentTimeMillis()<=thisDate.getTime());
     }
 
+    public static Date[] getCurrentWeekBeginAndEnd(Date date) {
+        Date[] res = new Date[2];
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.setFirstDayOfWeek(Calendar.MONDAY);
+        c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        res[0] = c.getTime();
+        c = (Calendar) c.clone();
+        c.add(Calendar.DAY_OF_YEAR, 6);
+        res[1] = c.getTime();
+        return res;
+    }
+
     private CalendarUtils() {}
 }

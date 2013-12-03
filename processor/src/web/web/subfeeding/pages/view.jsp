@@ -19,9 +19,24 @@
 <head>
     <title>Абонементное питание</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/subfeeding/complexTable.css"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/subfeeding/css/complexTable.css"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/subfeeding/css/flick/jquery-ui-1.10.3.custom.min.css"/>
+    <script src="${pageContext.request.contextPath}/subfeeding/js/jquery-1.10.2.min.js"></script>
+    <script src="${pageContext.request.contextPath}/subfeeding/js/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="${pageContext.request.contextPath}/subfeeding/js/jquery.ui.datepicker-ru.js"></script>
+    <script>
+        $(function () {
+            $("#datepickerBegin").datepicker();
+            $("#datepickerEnd").datepicker();
+        });
+    </script>
 </head>
 <body>
+<div class="textDiv" style="position: relative; text-align: right; padding-right: 50px;">
+    <form method="post" action="${pageContext.request.contextPath}/sub-feeding/logout">
+        <input type="submit" name="logout" value="Выход" />
+    </form>
+</div>
 <%
     DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
     df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
@@ -62,7 +77,7 @@
 %>
 <form method="post" enctype="application/x-www-form-urlencoded"
       action="${pageContext.request.contextPath}/sub-feeding/activate">
-    <table>
+    <table class="customTable">
         <tr>
             <th class="complexNameHeader">День недели</th>
             <th rowspan="2">ПН</th>
@@ -111,16 +126,14 @@
     }  else {
 %>
 
-<table>
+<table class="customTable">
 <%
         if (sf.getWasSuspended() == null || !sf.getWasSuspended()) {
 %>
     <tr>
         <td align="center" colspan="8">
             <form method="post" action="${pageContext.request.contextPath}/sub-feeding/suspend">
-                <div style="background-color: red; width: 160px;">
-                    <input type="submit" name="deactivate" value="Приостановить услугу" />
-                </div>
+                <input type="submit" name="deactivate" class="deactivateButton" value="Приостановить услугу" />
             </form>
         </td>
     </tr>
@@ -131,7 +144,7 @@
         <td align="center" colspan="8">
             <form method="post" action="${pageContext.request.contextPath}/sub-feeding/reopen">
                 <div>
-                    <input type="submit" name="reopen" value="Возобновить услугу" />
+                    <input type="submit" class="reopenButton" name="reopen" value="Возобновить услугу" />
                 </div>
             </form>
         </td>
@@ -149,22 +162,26 @@
         boolean paymentsExist = payments != null && payments.paymentList != null && !payments.paymentList.getP().isEmpty();
 %>
 
-<div class="textDiv" style="font-weight: bold; margin-top: 50px;">Покупки и платежи</div>
+<div class="textDiv" style="font-weight: bold; margin-top: 50px;">История операций</div>
 <form method="post" enctype="application/x-www-form-urlencoded"
       action="${pageContext.request.contextPath}/sub-feeding/view">
-    <table>
+    <table class="customTable">
         <tr class="paymentEvenLine">
             <td>Начальная дата</td>
             <td>
-                <input type="text" class="textDiv" name="startDate" value="<%=StringEscapeUtils.escapeHtml(startDate)%>"
-                       size="12" maxlength="10" />
+                <div class="textDiv">
+                    <input type="text" name="startDate" value="<%=StringEscapeUtils.escapeHtml(startDate)%>"
+                           id="datepickerBegin" maxlength="10" required />
+                </div>
             </td>
         </tr>
         <tr class="paymentEvenLine">
             <td>Конечная дата</td>
             <td>
-                <input type="text" class="textDiv" name="endDate" value="<%=StringEscapeUtils.escapeHtml(endDate)%>"
-                       size="12" maxlength="10" />
+                <div class="textDiv">
+                    <input type="text" name="endDate" value="<%=StringEscapeUtils.escapeHtml(endDate)%>"
+                           id="datepickerEnd" maxlength="10" required />
+                </div>
             </td>
         </tr>
         <tr class="paymentUnevenLine">
@@ -187,25 +204,15 @@
 <%
         if (purchasesExist) {
 %>
-<table>
+<table class="output-text customTable">
     <tr>
+        <th>Дата</th>
+        <th>Сумма покупки</th>
+        <th>Торговая скидка</th>
+        <th>Наличными</th>
+        <th>По карте</th>
         <th>
-            <div class="output-text">Дата</div>
-        </th>
-        <th>
-            <div class="output-text">Сумма покупки</div>
-        </th>
-        <th>
-            <div class="output-text">Торговая скидка</div>
-        </th>
-        <th>
-            <div class="output-text">Наличными</div>
-        </th>
-        <th>
-            <div class="output-text">По карте</div>
-        </th>
-        <th>
-            <div class="output-text" style="width: 200px;">Состав</div>
+            <div style="width: 200px;">Состав</div>
         </th>
     </tr>
 <%
@@ -227,30 +234,12 @@
                         .substring(0, consistenceBuilder.length() - 5) : "";
 %>
     <tr style="vertical-align: top;" class="<%=even ? "paymentEvenLine" : "paymentUnevenLine"%>">
-        <td>
-            <div class="output-text"><%=date%>
-            </div>
-        </td>
-        <td align="right">
-            <div class="output-text"><%=sum%>
-            </div>
-        </td>
-        <td align="right">
-            <div class="output-text"><%=tradeDiscount%>
-            </div>
-        </td>
-        <td align="right">
-            <div class="output-text"><%=sumByCash%>
-            </div>
-        </td>
-        <td align="right">
-            <div class="output-text"><%=sumByCard%>
-            </div>
-        </td>
-        <td>
-            <div class="output-text"><%=consistence%>
-            </div>
-        </td>
+        <td><%=date%></td>
+        <td align="right"><%=sum%></td>
+        <td align="right">><%=tradeDiscount%></td>
+        <td align="right"><%=sumByCash%></td>
+        <td align="right"><%=sumByCard%></td>
+        <td><%=consistence%></td>
     </tr>
 <%
                 i++;
@@ -268,16 +257,12 @@
 <%
         if (paymentsExist) {
 %>
-<table>
+<table class="output-text customTable">
     <tr>
+        <th>Дата</th>
+        <th>Сумма</th>
         <th>
-            <div class="output-text">Дата</div>
-        </th>
-        <th>
-            <div class="output-text">Сумма</div>
-        </th>
-        <th>
-            <div class="output-text" style="width: 200px;">Информация о платеже</div>
+            <div style="width: 200px;">Информация о платеже</div>
         </th>
     </tr>
     <%
@@ -288,18 +273,9 @@
                 String sum = CurrencyStringUtils.copecksToRubles(payment.getSum());
     %>
     <tr style="vertical-align: top;" class="<%=even ? "paymentEvenLine" : "paymentUnevenLine"%>">
-        <td>
-            <div class="output-text"><%=date%>
-            </div>
-        </td>
-        <td align="right">
-            <div class="output-text"><%=sum%>
-            </div>
-        </td>
-        <td>
-            <div class="output-text"><%=payment.getOrigin()%>
-            </div>
-        </td>
+        <td><%=date%></td>
+        <td align="right"><%=sum%></td>
+        <td><%=payment.getOrigin()%></td>
     </tr>
     <%
                 i++;

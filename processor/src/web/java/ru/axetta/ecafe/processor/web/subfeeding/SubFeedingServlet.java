@@ -96,6 +96,8 @@ public class SubFeedingServlet extends HttpServlet {
                 suspendSubscriptionFeeding(req, resp);
             } else if (path.equals("/reopen")) {
                 reopenSubFeeding(req, resp);
+            } else if (path.equals("/logout")) {
+                logout(req, resp);
             } else {
                 sendRedirect(req, resp, "/index");
             }
@@ -143,23 +145,21 @@ public class SubFeedingServlet extends HttpServlet {
             } else {
                 DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
                 df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
-                Date startDate = StringUtils.isBlank(req.getParameter("startDate")) ? CalendarUtils
-                        .truncateToDayOfMonth(new Date()) : parseDate(req.getParameter("startDate"), df);
-                Date endDate = StringUtils.isBlank(req.getParameter("endDate")) ? new Date()
+                Date startDate = StringUtils.isBlank(req.getParameter("startDate")) ? null
+                        : parseDate(req.getParameter("startDate"), df);
+                Date endDate = StringUtils.isBlank(req.getParameter("endDate")) ? null
                         : parseDate(req.getParameter("endDate"), df);
                 if (startDate == null || endDate == null) {
-                    req.setAttribute(ERROR_MESSAGE, "Введенные даты имеют неправильный формат.");
-                    req.setAttribute("startDate", req.getParameter("startDate"));
-                    req.setAttribute("endDate", req.getParameter("endDate"));
-                } else {
-                    Long subBalanceNumber = Long.parseLong(contractId + "01");
-                    req.setAttribute("payments",
-                            clientRoomController.getPaymentList(subBalanceNumber, startDate, endDate));
-                    req.setAttribute("purchases",
-                            clientRoomController.getPurchaseList(subBalanceNumber, startDate, endDate));
-                    req.setAttribute("startDate", df.format(startDate));
-                    req.setAttribute("endDate", df.format(endDate));
+                    Date[] week = CalendarUtils.getCurrentWeekBeginAndEnd(new Date());
+                    startDate = week[0];
+                    endDate = week[1];
                 }
+                Long subBalanceNumber = Long.parseLong(contractId + "01");
+                req.setAttribute("payments", clientRoomController.getPaymentList(subBalanceNumber, startDate, endDate));
+                req.setAttribute("purchases",
+                        clientRoomController.getPurchaseList(subBalanceNumber, startDate, endDate));
+                req.setAttribute("startDate", df.format(startDate));
+                req.setAttribute("endDate", df.format(endDate));
             }
             transaction.commit();
             outputPage("view", req, resp);
@@ -242,6 +242,11 @@ public class SubFeedingServlet extends HttpServlet {
             req.setAttribute(ERROR_MESSAGE, res.description);
         }
         showSubscriptionFeeding(req, resp);
+    }
+
+    private void logout(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        req.getSession().invalidate();
+        sendRedirect(req, resp, "/index");
     }
 
     private void outputPage(String name, HttpServletRequest req, HttpServletResponse resp)

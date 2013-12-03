@@ -1,4 +1,4 @@
-table {
+.customTable {
     margin-top: 20px;
     text-align: left;
     border: 3px solid white;
@@ -6,13 +6,13 @@ table {
     color: white;
 }
 
-td {
+.customTable td {
     width: 100px;
     padding: 5px; /* Поля вокруг содержимого ячеек */
     border: 2px solid white;
 }
 
-th {
+.customTable th {
     border: 2px solid white;
     background-color: #4f81bd;
     border-bottom: 4px solid white;
@@ -22,13 +22,13 @@ th {
     text-align: center;
 }
 
-.complexNameHeader {
+.customTable .complexNameHeader {
     text-align: right;
     width: 200px;
     border-bottom-width: 0;
 }
 
-.dayNameHeader {
+.customTable .dayNameHeader {
     text-align: left;
     width: 200px;
     border-top-width: 0;
@@ -73,6 +73,18 @@ body {
 
 .paymentUnevenLine {
     background-color: #4C70B8;
+}
+
+.deactivateButton {
+    background: red;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.reopenButton {
+    background: green;
+    font-weight: bold;
+    color: #ffffff;
 }
 
 
