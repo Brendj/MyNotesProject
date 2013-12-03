@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.feed;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.dao.DAOServices;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -242,7 +243,13 @@ public class SetupDiscountPage extends BasicWorkspacePage {
         //  Загружаем клиента из БД
         ru.axetta.ecafe.processor.core.persistence.Client cl = (ru.axetta.ecafe.processor.core.persistence.Client) session
                 .get(ru.axetta.ecafe.processor.core.persistence.Client.class, client.getIdofclient());
-        ClientManager.setCategories(session, cl, idOfCategoryList);
+        if (idOfCategoryList.size() > 0) {
+            //  Если льготы есть, то устанавливаем их и свойство discountmode
+            ClientManager.setCategories(session, cl, idOfCategoryList, ru.axetta.ecafe.processor.core.persistence.Client.DISCOUNT_MODE_BY_CATEGORY);
+        } else {
+            //  Если льгот нет, то скидываем их и меняем свойство discountmode
+            ClientManager.setCategories(session, cl, Collections.EMPTY_LIST, ru.axetta.ecafe.processor.core.persistence.Client.DISCOUNT_MODE_NONE);
+        }
         recalculateOverall();
     }
 

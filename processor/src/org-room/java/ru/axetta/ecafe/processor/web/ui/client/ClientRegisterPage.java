@@ -365,7 +365,11 @@ public class ClientRegisterPage extends BasicWorkspacePage {
             idOfCategoryList.add(idofcategorydiscount);
         }
         if (idOfCategoryList.size() > 0) {
-            ClientManager.setCategories(session, cl, idOfCategoryList);
+            //  Если льготы есть, то устанавливаем их и свойство discountmode
+            ClientManager.setCategories(session, cl, idOfCategoryList, Client.DISCOUNT_MODE_BY_CATEGORY);
+        } else {
+            //  Если льгот нет, то скидываем их и меняем свойство discountmode
+            ClientManager.setCategories(session, cl, Collections.EMPTY_LIST, Client.DISCOUNT_MODE_NONE);
         }
     }
 

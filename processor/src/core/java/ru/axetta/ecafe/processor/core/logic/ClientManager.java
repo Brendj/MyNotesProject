@@ -431,8 +431,13 @@ public class ClientManager {
             throw new Exception(e);
         }
     }
-
+    
     public static boolean setCategories(Session session, Client cl, List<Long> idOfCategoryList) throws Exception {
+        return setCategories(session, cl, idOfCategoryList, null);
+    }
+
+    public static boolean setCategories(Session session, Client cl, List<Long> idOfCategoryList,
+                                        Integer discountMode) throws Exception {
         try {
             Set<CategoryDiscount> categories = new HashSet <CategoryDiscount>();
             if (idOfCategoryList != null && idOfCategoryList.size() > 0) {
@@ -442,6 +447,9 @@ public class ClientManager {
                     CategoryDiscount categoryDiscount = (CategoryDiscount) object;
                     categories.add(categoryDiscount);
                 }
+            }
+            if (discountMode != null) {
+                cl.setDiscountMode(Client.DISCOUNT_MODE_BY_CATEGORY);
             }
             cl.setCategories(categories);
             session.save(cl);
