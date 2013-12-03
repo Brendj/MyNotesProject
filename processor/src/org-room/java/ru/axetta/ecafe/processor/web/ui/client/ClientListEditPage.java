@@ -433,6 +433,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
         groups = DAOServices.getInstance().loadGroups(session, org.getIdOfOrg());
         Collections.sort(groups, new ClientComparator ());
+        groups.add(0, "");
     }
 
     @Transactional
@@ -705,7 +706,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
             loadGroups();
         }
         List<SelectItem> res = new ArrayList<SelectItem>();
-        res.add(new SelectItem("", ""));
+        //res.add(new SelectItem("", ""));
         for (String group : groups) {
             res.add(new SelectItem(group, group));
         }

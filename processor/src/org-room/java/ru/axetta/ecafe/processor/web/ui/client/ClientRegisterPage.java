@@ -314,7 +314,7 @@ public class ClientRegisterPage extends BasicWorkspacePage {
                 cl == null ? null : cl.getPerson().getFirstName(), updateRequired);
         updateRequired = doClientUpdate(fieldConfig, ClientManager.FieldId.SECONDNAME, client.getSecondName(),
                 cl == null ? null : cl.getPerson().getSecondName(), updateRequired);
-        if (client.getClientGroup() != null && client.getClientGroup().length() > 0) {
+        if (client.getClientGroup() != null) {
             updateRequired = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP, client.getClientGroup(),
                     cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(), updateRequired);
         }

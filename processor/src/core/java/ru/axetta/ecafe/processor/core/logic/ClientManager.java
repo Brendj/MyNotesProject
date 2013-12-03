@@ -379,15 +379,19 @@ public class ClientManager {
             /* проверяется есть ли в загрузочном файле параметр для группы клиента (класс для ученика)*/
             if (fieldConfig.getValue(ClientManager.FieldId.GROUP) != null) {
                 //tokens[21];
-                String clientGroupName = fieldConfig.getValue(ClientManager.FieldId.GROUP);
-                ClientGroup clientGroup = DAOUtils
-                        .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, client.getOrg().getIdOfOrg(),
-                                clientGroupName);
-                if (clientGroup == null) {
-                    clientGroup = DAOUtils
-                            .createNewClientGroup(persistenceSession, client.getOrg().getIdOfOrg(), clientGroupName);
+                if (fieldConfig.getValue(ClientManager.FieldId.GROUP).length() > 0) {
+                    String clientGroupName = fieldConfig.getValue(ClientManager.FieldId.GROUP);
+                    ClientGroup clientGroup = DAOUtils
+                            .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, client.getOrg().getIdOfOrg(),
+                                    clientGroupName);
+                    if (clientGroup == null) {
+                        clientGroup = DAOUtils
+                                .createNewClientGroup(persistenceSession, client.getOrg().getIdOfOrg(), clientGroupName);
+                    }
+                    client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                } else {
+                    client.setIdOfClientGroup(null);
                 }
-                client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             }
             //tokens[22])
             if (fieldConfig.getValue(FieldId.SAN) != null) {
@@ -634,13 +638,17 @@ public class ClientManager {
             logger.debug("set client Group");
             if (fieldConfig.getValue(ClientManager.FieldId.GROUP) != null) {
                 //if (tokens.length >=22){
-                String clientGroupName = fieldConfig.getValue(ClientManager.FieldId.GROUP);//tokens[21];
-                ClientGroup clientGroup = DAOUtils
-                        .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, idOfOrg, clientGroupName);
-                if (clientGroup == null) {
-                    clientGroup = DAOUtils.createNewClientGroup(persistenceSession, idOfOrg, clientGroupName);
+                if (fieldConfig.getValue(ClientManager.FieldId.GROUP).length() > 0) {
+                    String clientGroupName = fieldConfig.getValue(ClientManager.FieldId.GROUP);//tokens[21];
+                    ClientGroup clientGroup = DAOUtils
+                            .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, idOfOrg, clientGroupName);
+                    if (clientGroup == null) {
+                        clientGroup = DAOUtils.createNewClientGroup(persistenceSession, idOfOrg, clientGroupName);
+                    }
+                    client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                } else {
+                    client.setIdOfClientGroup(null);
                 }
-                client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             }
             if (fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID) != null) {
                 String clientGUID = fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID);

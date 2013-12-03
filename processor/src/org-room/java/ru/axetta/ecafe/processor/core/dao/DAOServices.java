@@ -40,7 +40,7 @@ public class DAOServices {
      * SQL
      * ****************************************************************************************************************
      */
-    public static final String SQL_LOAD_GROUPS = "select idofclientgroup, groupname from cf_clientgroups where idoforg=:idoforg order by groupname";
+    public static final String SQL_LOAD_GROUPS = "select idofclientgroup, groupname from cf_clientgroups where idoforg=:idoforg and groupname<>'' order by groupname";
 
 
 
