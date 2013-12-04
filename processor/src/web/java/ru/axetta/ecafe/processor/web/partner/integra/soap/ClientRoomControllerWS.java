@@ -3996,6 +3996,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
+            Client client = findClientByContractId(session, contractId, result);
+            if (client == null) {
+                return result;
+            }
             SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
             sf.setWasSuspended(true);
             sf.setLastDatePauseService(new Date());
@@ -4022,8 +4026,55 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
+            Client client = findClientByContractId(session, contractId, result);
+            if (client == null) {
+                return result;
+            }
             SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
             sf.setWasSuspended(false);
+            transaction.commit();
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage());
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public Result editSubscriptionFeedingPlan(@WebParam(name = "contractId") Long contractId, @WebParam(
+            name = "cycleDiagram") CycleDiagramIn cycleDiagramIn) {
+        authenticateRequest(contractId);
+        Session session = null;
+        Transaction transaction = null;
+        Result result = new Result();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = findClientByContractId(session, contractId, result);
+            if (client == null) {
+                return result;
+            }
+            CycleDiagram cd = DAOUtils.findClientCycleDiagram(session, contractId);
+            cd.setMonday(cycleDiagramIn.getMonday());
+            cd.setMondayPrice(getPriceOfDay(cd.getMonday(), session, client.getOrg()));
+            cd.setTuesday(cycleDiagramIn.getTuesday());
+            cd.setTuesdayPrice(getPriceOfDay(cd.getTuesday(), session, client.getOrg()));
+            cd.setWednesday(cycleDiagramIn.getWednesday());
+            cd.setWednesdayPrice(getPriceOfDay(cd.getWednesday(), session, client.getOrg()));
+            cd.setThursday(cycleDiagramIn.getThursday());
+            cd.setThursdayPrice(getPriceOfDay(cd.getThursday(), session, client.getOrg()));
+            cd.setFriday(cycleDiagramIn.getFriday());
+            cd.setFridayPrice(getPriceOfDay(cd.getFriday(), session, client.getOrg()));
+            cd.setSaturday(cycleDiagramIn.getSaturday());
+            cd.setSaturdayPrice(getPriceOfDay(cd.getSaturday(), session, client.getOrg()));
+            cd.setSunday(cycleDiagramIn.getSunday());
+            cd.setSundayPrice(getPriceOfDay(cd.getSunday(), session, client.getOrg()));
             transaction.commit();
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;

@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.subfeeding;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
@@ -36,10 +37,7 @@ import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -56,6 +54,7 @@ public class SubFeedingServlet extends HttpServlet {
     private static final Map<Integer, String> daysByNumber = new HashMap<Integer, String>();
     private static final String SUCCESS_MESSAGE = "subFeedingSuccess";
     private static final String ERROR_MESSAGE = "subFeedingError";
+    private static final String COMPLEX_PARAM_PREFIX = "complex_option_";
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -91,11 +90,15 @@ public class SubFeedingServlet extends HttpServlet {
             } else if (path.equals("/view")) {
                 showSubscriptionFeeding(req, resp);
             } else if (path.equals("/activate")) {
-                activateSubFeeding(req, resp);
+                activateSubscriptionFeeding(req, resp);
             } else if (path.equals("/suspend")) {
                 suspendSubscriptionFeeding(req, resp);
             } else if (path.equals("/reopen")) {
-                reopenSubFeeding(req, resp);
+                reopenSubscriptionFeeding(req, resp);
+            } else if (path.equals("/plan")) {
+                showSubscriptionFeedingPlan(req, resp);
+            } else if (path.equals("/edit")) {
+                editSubscriptionFeedingPlan(req, resp);
             } else if (path.equals("/logout")) {
                 logout(req, resp);
             } else {
@@ -138,10 +141,11 @@ public class SubFeedingServlet extends HttpServlet {
             transaction = session.beginTransaction();
             SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
             Client client = DAOUtils.findClientByContractId(session, contractId);
+            transaction.commit();
             req.setAttribute("client", client);
             req.setAttribute("subscriptionFeeding", sf);
             if (sf == null) {
-                req.setAttribute("complexes", DAOUtils.findComplexesWithSubFeeding(session, client.getOrg()));
+                sendRedirect(req, resp, "/plan");
             } else {
                 DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
                 df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
@@ -160,9 +164,8 @@ public class SubFeedingServlet extends HttpServlet {
                         clientRoomController.getPurchaseList(subBalanceNumber, startDate, endDate));
                 req.setAttribute("startDate", df.format(startDate));
                 req.setAttribute("endDate", df.format(endDate));
+                outputPage("view", req, resp);
             }
-            transaction.commit();
-            outputPage("view", req, resp);
         } catch (Exception ex) {
             HibernateUtils.rollback(transaction, logger);
             logger.error(ex.getMessage());
@@ -172,35 +175,99 @@ public class SubFeedingServlet extends HttpServlet {
         }
     }
 
-    private void activateSubFeeding(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    private void activateSubscriptionFeeding(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
-        String complexParamPrefix = "complex_option_";
-        if (checkRequest(req, complexParamPrefix)) {
-            CycleDiagramIn cycle = new CycleDiagramIn();
-            for (Map.Entry<String, String[]> entry : req.getParameterMap().entrySet()) {
-                if (entry.getKey().contains(complexParamPrefix)) {
-                    String[] ids = StringUtils.split(entry.getValue()[0], '_');
-                    String complexId = ids[0];
-                    int dayNumber = Integer.parseInt(ids[1]);
-                    addComplexValue(cycle, StringUtils.capitalize(daysByNumber.get(dayNumber)), complexId);
-                }
-            }
+        if (checkComplexesChecked(req)) {
+            CycleDiagramIn cycle = getSubFeedingPlan(req);
             Result res = clientRoomController.createSubscriptionFeeding(contractId, cycle);
             if (res.resultCode == 0) {
                 req.setAttribute(SUCCESS_MESSAGE, "Подписка успешно активирована.");
+                showSubscriptionFeeding(req, resp);
+            } else {
+                req.setAttribute(ERROR_MESSAGE, res.description);
+                showSubscriptionFeedingPlan(req, resp);
+            }
+        } else {
+            req.setAttribute(ERROR_MESSAGE, "Для активации подписки АП необходимо заполнить циклограмму.");
+            showSubscriptionFeedingPlan(req, resp);
+        }
+    }
+
+    private void editSubscriptionFeedingPlan(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
+        if (checkComplexesChecked(req)) {
+            CycleDiagramIn cycle = getSubFeedingPlan(req);
+            Result res = clientRoomController.editSubscriptionFeedingPlan(contractId, cycle);
+            if (res.resultCode == 0) {
+                req.setAttribute(SUCCESS_MESSAGE, "Изменения плана питания успешно сохранены.");
             } else {
                 req.setAttribute(ERROR_MESSAGE, res.description);
             }
         } else {
-            req.setAttribute(ERROR_MESSAGE, "Для активации подписки АП необходимо заполнить циклограмму.");
+            req.setAttribute(ERROR_MESSAGE, "Для сохранения плана АП необходимо заполнить циклограмму.");
         }
-        showSubscriptionFeeding(req, resp);
+        showSubscriptionFeedingPlan(req, resp);
     }
 
-    private boolean checkRequest(HttpServletRequest request, String complexParamPrefix) {
+    private void showSubscriptionFeedingPlan(HttpServletRequest req, HttpServletResponse resp) {
+        Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = DAOUtils.findClientByContractId(session, contractId);
+            SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
+            req.setAttribute("client", client);
+            req.setAttribute("subscriptionFeeding", sf);
+            req.setAttribute("complexes", DAOUtils.findComplexesWithSubFeeding(session, client.getOrg()));
+            CycleDiagram cd = DAOUtils.findClientCycleDiagram(session, contractId);
+            transaction.commit();
+            if (sf != null && cd != null) {
+                Map<Integer, List<String>> activeComplexes = new HashMap<Integer, List<String>>();
+                activeComplexes
+                        .put(1, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getMonday()), ',')));
+                activeComplexes
+                        .put(2, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getTuesday()), ',')));
+                activeComplexes
+                        .put(3, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getWednesday()), ',')));
+                activeComplexes
+                        .put(4, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getThursday()), ',')));
+                activeComplexes
+                        .put(5, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getFriday()), ',')));
+                activeComplexes
+                        .put(6, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getSaturday()), ',')));
+                activeComplexes
+                        .put(7, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getSunday()), ',')));
+                req.setAttribute("activeComplexes", activeComplexes);
+            }
+            outputPage("plan", req, resp);
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage());
+            throw new RuntimeException(ex.getMessage());
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    private CycleDiagramIn getSubFeedingPlan(HttpServletRequest req) throws Exception {
+        CycleDiagramIn cycle = new CycleDiagramIn();
+        for (Map.Entry<String, String[]> entry : req.getParameterMap().entrySet()) {
+            if (entry.getKey().contains(COMPLEX_PARAM_PREFIX)) {
+                String[] ids = StringUtils.split(entry.getValue()[0], '_');
+                String complexId = ids[0];
+                int dayNumber = Integer.parseInt(ids[1]);
+                addComplexValue(cycle, StringUtils.capitalize(daysByNumber.get(dayNumber)), complexId);
+            }
+        }
+        return cycle;
+    }
+
+    private boolean checkComplexesChecked(HttpServletRequest request) {
         boolean flag = false;
         for (String key : request.getParameterMap().keySet()) {
-            if (key.contains(complexParamPrefix)) {
+            if (key.contains(COMPLEX_PARAM_PREFIX)) {
                 flag = true;
                 break;
             }
@@ -226,14 +293,14 @@ public class SubFeedingServlet extends HttpServlet {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
         Result res = clientRoomController.suspendSubscriptionFeeding(contractId);
         if (res.resultCode == 0) {
-            req.setAttribute(SUCCESS_MESSAGE, "Подписка успешно приостановлена.");
+            sendRedirect(req, resp, "/view");
         } else {
             req.setAttribute(ERROR_MESSAGE, res.description);
+            showSubscriptionFeeding(req, resp);
         }
-        showSubscriptionFeeding(req, resp);
     }
 
-    private void reopenSubFeeding(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+    private void reopenSubscriptionFeeding(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
         Result res = clientRoomController.reopenSubscriptionFeeding(contractId);
         if (res.resultCode == 0) {

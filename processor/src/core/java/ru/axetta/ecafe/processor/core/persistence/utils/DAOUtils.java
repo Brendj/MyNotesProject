@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup;
@@ -1589,5 +1590,12 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(SubscriptionFeeding.class).createAlias("client", "c")
                 .add(Restrictions.eq("c.contractId", contractId));
         return (SubscriptionFeeding) criteria.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static CycleDiagram findClientCycleDiagram(Session session, Long contractId) {
+        Criteria criteria = session.createCriteria(CycleDiagram.class).createAlias("client", "c")
+                .add(Restrictions.eq("c.contractId", contractId));
+        return (CycleDiagram) criteria.uniqueResult();
     }
 }

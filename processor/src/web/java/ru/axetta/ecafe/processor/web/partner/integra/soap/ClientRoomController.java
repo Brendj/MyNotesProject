@@ -218,4 +218,8 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "reopenSubscriptionFeeding")
     Result reopenSubscriptionFeeding(@WebParam(name = "contractId") Long contractId);
+
+    @WebMethod(operationName = "editSubscriptionFeedingPlan")
+    Result editSubscriptionFeedingPlan(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn);
 }
