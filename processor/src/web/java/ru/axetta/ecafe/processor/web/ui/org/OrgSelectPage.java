@@ -55,6 +55,9 @@ public class OrgSelectPage extends BasicPage {
     private boolean schoolFilterDisabled = false;
     private boolean supplierFilterDisabled = false;
 
+    private Long idOfContragent;
+    private Long idOfContract;
+
     public void pushCompleteHandler(CompleteHandler handler) {
         completeHandlers.push(handler);
     }
@@ -79,6 +82,14 @@ public class OrgSelectPage extends BasicPage {
     //action="#{}"
 
     public void fill(Session session) throws Exception {
+        this.idOfContragent = null;
+        this.idOfContract = null;
+        this.items = retrieveOrgs(session);
+    }
+
+    public void fill(Long idOfContragent, Long idOfContract, Session session) throws Exception {
+        this.idOfContragent = idOfContragent;
+        this.idOfContract = idOfContract;
         this.items = retrieveOrgs(session);
     }
 
@@ -120,6 +131,13 @@ public class OrgSelectPage extends BasicPage {
             criteria.add(Restrictions.like("shortName", tagFilter, MatchMode.ANYWHERE));
         }
 
+        if (idOfContract != null) {
+            criteria.add(Restrictions.eq("contractId", ""+idOfContract));
+        }
+        else if (idOfContragent != null) {
+            criteria.add(Restrictions.eq("defaultSupplier.idOfContragent", idOfContragent));
+        }
+
         if (supplierFilter != 0) {
             Criterion criterion = Restrictions.eq("refectoryType", Org.REFECTORY_TYPE_FOOD_FACTORY);
             if (supplierFilter == 1) {
@@ -132,6 +150,7 @@ public class OrgSelectPage extends BasicPage {
                 .add(Projections.distinct(Projections.property("idOfOrg")),"idOfOrg")
                 .add(Projections.property("shortName"),"shortName")
                 .add(Projections.property("officialName"),"officialName")
+                .add(Projections.property("address"),"address")
         );
 
         criteria.setResultTransformer(Transformers.aliasToBean(OrgShortItem.class));

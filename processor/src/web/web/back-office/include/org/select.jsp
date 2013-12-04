@@ -8,7 +8,7 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<rich:modalPanel id="modalOrgSelectorPanel" autosized="true" headerClass="modal-panel-header">
+<rich:modalPanel id="modalOrgSelectorPanel" autosized="true" width="700" headerClass="modal-panel-header">
     <rich:hotKey key="esc" handler="#{rich:component('modalOrgSelectorPanel')}.hide();return false;"/>
     <f:facet name="header">
         <h:outputText escape="true" value="Выбор организации" />
@@ -67,6 +67,10 @@
                         </rich:column>
                         <rich:column headerClass="column-header">
                             <h:outputText escape="true" value="#{item.shortName} (#{item.officialName})"
+                                          styleClass="output-text" />
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="#{item.address}"
                                           styleClass="output-text" />
                         </rich:column>
                         <f:facet name="footer">
