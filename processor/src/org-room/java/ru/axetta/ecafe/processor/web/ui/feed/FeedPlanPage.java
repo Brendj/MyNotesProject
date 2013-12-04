@@ -603,6 +603,9 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
     private void doChangeAllClientsAction(int action) {
         List<Client> clients = getClients();
         for (Client cl : clients) {
+            if (cl.getSaved()){
+                continue;
+            }
             cl.setActionType(action);
         }
         RuntimeContext.getAppContext().getBean(FeedPlanPage.class).saveClient(clients);
