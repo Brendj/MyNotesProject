@@ -30,7 +30,10 @@ public class PaymentReconciliationManager {
         
         public String getDifferencesAsString(PaymentItem pi) {
             String info="";
-            if (pi.sum!=sum) {
+            if (pi == null) {
+                return info;
+            }
+            if (sum != null && pi.sum!=sum) {
                 info= String.format("%sОтличаются суммы: %d/%d;", info, pi.sum, sum);
             }
             if (pi.contractId!=contractId) {
