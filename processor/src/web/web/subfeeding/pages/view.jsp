@@ -176,7 +176,7 @@
     <tr style="vertical-align: top;" class="<%=even ? "paymentEvenLine" : "paymentUnevenLine"%>">
         <td><%=date%></td>
         <td align="right"><%=sum%></td>
-        <td align="right">><%=tradeDiscount%></td>
+        <td align="right"><%=tradeDiscount%></td>
         <td align="right"><%=sumByCash%></td>
         <td align="right"><%=sumByCard%></td>
         <td><%=consistence%></td>
