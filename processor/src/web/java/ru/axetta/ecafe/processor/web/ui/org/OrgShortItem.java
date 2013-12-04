@@ -16,16 +16,18 @@ public class OrgShortItem {
     private Long idOfOrg;
     private String shortName;
     private String officialName;
+    private String address;
     private Boolean selected = false;
 
     public OrgShortItem() {
         selected = false;
     }
 
-    public OrgShortItem(Long idOfOrg, String shortName, String officialName) {
+    public OrgShortItem(Long idOfOrg, String shortName, String officialName, String address) {
         this.idOfOrg = idOfOrg;
         this.shortName = shortName;
         this.officialName = officialName;
+        this.address = address;
     }
 
     public Long getIdOfOrg() {
@@ -58,5 +60,13 @@ public class OrgShortItem {
 
     public void setSelected(Boolean selected) {
         this.selected = selected;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

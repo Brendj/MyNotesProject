@@ -68,7 +68,22 @@ public class DeliveredServicesReportPage extends OnlineReportPage
     }
 
     public void showContractSelectPage () {
-        MainPage.getSessionInstance().showContractSelectPage  (this.contragentFilter.getContragent().getContragentName());
+        MainPage.getSessionInstance().showContractSelectPage (this.contragentFilter.getContragent().getContragentName(),
+                                                              this.contragentFilter.getContragent().getIdOfContragent());
+    }
+
+    public void showOrgSelectPage () {
+        Long idOfContragent = null;
+        try {
+            idOfContragent = this.contragentFilter.getContragent().getIdOfContragent();
+        } catch (Exception e) {
+        }
+        Long idOfContract = null;
+        try {
+            idOfContract = this.contractFilter.getContract().getIdOfContract();
+        } catch (Exception e) {
+        }
+        MainPage.getSessionInstance().showOrgSelectPage (idOfContragent,idOfContract);
     }
 
     public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {

@@ -33,8 +33,8 @@ public class AggregateGoodRequestReportService {
     public List<AggregateGoodRequestReportItem> fetchAggregateGoodRequestReportItems(List<Long> idOfSourceOrgList,List<Long> idOfEduList, Date startDate, Date endDate){
         List<AggregateGoodRequestReportItem> aggregateGoodRequestReportItems = new ArrayList<AggregateGoodRequestReportItem>();
         Session session = ((Session) entityManager.getDelegate());
-        String sql = "select org.idOfOrg, org.shortName, org.officialName, "
-                + "sourceMenu.idOfOrg, sourceMenu.shortName, sourceMenu.officialName "
+        String sql = "select org.idOfOrg, org.shortName, org.officialName, org.address "
+                + "sourceMenu.idOfOrg, sourceMenu.shortName, sourceMenu.officialName, sourceMenu.address "
                 + "from Org org join org.sourceMenuOrgs sourceMenu "
                 + "where sourceMenu.idOfOrg in (:idOfSourceOrgList) and org.idOfOrg in (:idOfEduList) "
                 + "order by sourceMenu.idOfOrg , org.idOfOrg";
@@ -46,8 +46,8 @@ public class AggregateGoodRequestReportService {
         /* Строим отображения ключ (Поставшик) -> значения (Образовательные учереждения) */
         for (Object entity: list){
             Object[] row = (Object[]) entity;
-            OrgShortItem educationItem = new OrgShortItem(Long.parseLong(row[0].toString()),row[1].toString(),row[2].toString());
-            OrgShortItem sourceItem = new OrgShortItem(Long.parseLong(row[3].toString()),row[4].toString(),row[5].toString());
+            OrgShortItem educationItem = new OrgShortItem(Long.parseLong(row[0].toString()),row[1].toString(),row[2].toString(),row[3].toString());
+            OrgShortItem sourceItem = new OrgShortItem(Long.parseLong(row[4].toString()),row[5].toString(),row[6].toString(),row[7].toString());
             if(map.keySet().contains(sourceItem)){
                 List<OrgShortItem> l = map.get(sourceItem);
                 if(l==null || l.isEmpty()){
@@ -147,8 +147,8 @@ public class AggregateGoodRequestReportService {
         List<AggregateGoodRequestReportItem> aggregateGoodRequestReportItems = new ArrayList<AggregateGoodRequestReportItem>();
         Random random = new Random(System.currentTimeMillis());
         Session session = ((Session) entityManager.getDelegate());
-        String sql = "select org.idOfOrg, org.shortName, org.officialName, sourceMenu.idOfOrg, "
-                + "sourceMenu.shortName, sourceMenu.officialName "
+        String sql = "select org.idOfOrg, org.shortName, org.officialName, org.address, sourceMenu.idOfOrg,  "
+                + "sourceMenu.shortName, sourceMenu.officialName, sourceMenu.address "
                 + "from Org org "
                 + "join org.sourceMenuOrgs sourceMenu "
                 + "where sourceMenu.idOfOrg in (:idOfSourceOrgList) "
@@ -161,8 +161,8 @@ public class AggregateGoodRequestReportService {
         /* Строим отображения ключ (Поставшик) -> значения (Образовательные учереждения) */
         for (Object entity: list){
             Object[] row = (Object[]) entity;
-            OrgShortItem educationItem = new OrgShortItem(Long.parseLong(row[0].toString()),row[1].toString(),row[2].toString());
-            OrgShortItem sourceItem = new OrgShortItem(Long.parseLong(row[3].toString()),row[4].toString(),row[5].toString());
+            OrgShortItem educationItem = new OrgShortItem(Long.parseLong(row[0].toString()),row[1].toString(),row[2].toString(),row[3].toString());
+            OrgShortItem sourceItem = new OrgShortItem(Long.parseLong(row[4].toString()),row[5].toString(),row[6].toString(),row[7].toString());
             if(map.keySet().contains(sourceItem)){
                 List<OrgShortItem> l = map.get(sourceItem);
                 if(l==null || l.isEmpty()){

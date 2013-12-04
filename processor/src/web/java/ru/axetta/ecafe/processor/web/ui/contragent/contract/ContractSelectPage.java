@@ -112,9 +112,13 @@ public class ContractSelectPage extends BasicPage {
     }
 
     public void fill(Session session, int multiContrFlag, String classTypes, String contragentName) throws Exception {
+        fill(session, multiContrFlag, classTypes, contragentName, null);
+    }
+
+    public void fill(Session session, int multiContrFlag, String classTypes, String contragentName, Long idOfContragent) throws Exception {
         this.multiContrFlag = multiContrFlag;
         List<Item> items = new LinkedList<Item>();
-        List contracts = retrieveContracts(session, classTypes, contragentName);
+        List contracts = retrieveContracts(session, classTypes, contragentName, idOfContragent);
         for (Object object : contracts) {
             Contract contract = (Contract) object;
             Item item = new Item(contract);
@@ -141,6 +145,10 @@ public class ContractSelectPage extends BasicPage {
     }*/
 
     private List retrieveContracts(Session session, String classTypesString, String contragentName) throws HibernateException {
+        return retrieveContracts(session, classTypesString, contragentName, null);
+    }
+
+    private List retrieveContracts(Session session, String classTypesString, String contragentName, Long idOfContragent) throws HibernateException {
         this.classTypesString = classTypesString;
         Criteria criteria = session.createCriteria(Contract.class).addOrder(Order.asc("contractNumber"));
         try {
@@ -156,7 +164,10 @@ public class ContractSelectPage extends BasicPage {
             criteria.add(Restrictions.like("performer", filter, MatchMode.ANYWHERE));
             criteria.add(Restrictions.sqlRestriction("to_char(dateOfConclusion, 'DD.MM.YYYY') like '%" + filter + "%'"));*/
         }
-        if (StringUtils.isNotEmpty(contragentName)) {
+        if (idOfContragent != null) {
+            criteria.add(Restrictions.eq("contragent.idOfContragent", idOfContragent));
+        }
+        else if (StringUtils.isNotEmpty(contragentName)) {
             criteria.add(Restrictions.like("performer", contragentName, MatchMode.ANYWHERE));
         }
         if(!classTypesString.isEmpty()) {

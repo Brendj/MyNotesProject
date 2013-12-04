@@ -21,7 +21,7 @@
         <h:outputText escape="true" value="Контрагент" styleClass="output-text" />
         <h:panelGroup styleClass="borderless-div">
             <h:inputText value="#{mainPage.deliveredServicesReportPage.contragentFilter.contragent.contragentName}" readonly="true"
-                         styleClass="input-text" style="margin-right: 2px;" />
+                         styleClass="input-text long-field" style="margin-right: 2px;" />
             <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
                                reRender="modalContragentSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
@@ -36,7 +36,7 @@
         <h:outputText escape="true" value="Контракт" styleClass="output-text" />
         <h:panelGroup styleClass="borderless-div">
             <h:inputText value="#{mainPage.deliveredServicesReportPage.contractFilter.contract.contractName}" readonly="true"
-                         styleClass="input-text" style="margin-right: 2px;" />
+                         styleClass="input-text long-field" style="margin-right: 2px;" />
             <a4j:commandButton value="..." action="#{mainPage.deliveredServicesReportPage.showContractSelectPage}"
                                reRender="modalContractSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContractSelectorPanel')}.show();"
@@ -50,7 +50,7 @@
 
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
         <h:panelGroup>
-            <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+            <a4j:commandButton value="..." action="#{mainPage.deliveredServicesReportPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" />
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.deliveredServicesReportPage.filter}}" />

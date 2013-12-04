@@ -1586,6 +1586,10 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
     }
 
     public Object showOrgSelectPage() {
+        return showOrgSelectPage (null, null);
+    }
+
+    public Object showOrgSelectPage(Long idOfContragent, Long idOfContract) {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof OrgSelectPage.CompleteHandler) {
             FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -1596,7 +1600,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                orgSelectPage.fill(persistenceSession);
+                orgSelectPage.fill(idOfContragent, idOfContract, persistenceSession);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
                 orgSelectPage.pushCompleteHandler((OrgSelectPage.CompleteHandler) currentTopMostPage);
@@ -2225,10 +2229,18 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
     }
 
     public Object showContractSelectPage () {
-        return showContractSelectPage (null);
+        return showContractSelectPage (null, null);
     }
 
     public Object showContractSelectPage (String contragentName) {
+        return showContractSelectPage(contragentName, null);
+    }
+
+    public Object showContractSelectPage (Long idOfContragent) {
+        return showContractSelectPage (null, idOfContragent);
+    }
+
+    public Object showContractSelectPage (String contragentName, Long idOfContragent) {
 
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof ContractSelectPage.CompleteHandler
@@ -2241,7 +2253,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                contractSelectPage.fill(persistenceSession, multiContrFlag, classTypes, contragentName);
+                contractSelectPage.fill(persistenceSession, multiContrFlag, classTypes, contragentName, idOfContragent);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
                 if (currentTopMostPage instanceof ContractSelectPage.CompleteHandler) {
