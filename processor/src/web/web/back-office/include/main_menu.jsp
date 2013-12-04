@@ -694,6 +694,10 @@
     <rich:panelMenuItem id="fullSyncRequestItem" label="Запрос полной синхронизации"
                         binding="#{fullSyncRequestPage.mainMenuComponent}" action="#{fullSyncRequestPage.show}"
                         reRender="workspaceForm" />
+
+    <rich:panelMenuItem id="repositoryReportsRenameMenuItem" binding="#{repositoryReportsRenamePage.mainMenuComponent}"
+                        label="Переименование отчетов репозитория" action="#{repositoryReportsRenamePage.show}" reRender="workspaceForm" />
+
     <%--@elvariable id="otherActionsPage" type="ru.axetta.ecafe.processor.web.ui.service.OtherActionsPage"--%>
     <rich:panelMenuItem id="otherActionsMenuItem" binding="#{otherActionsPage.mainMenuComponent}" label="Другое"
                         action="#{otherActionsPage.show}" reRender="workspaceForm"
@@ -897,14 +901,6 @@
 
     <rich:panelMenuItem id="reportRepositoryListMenuItem" binding="#{reportRepositoryListPage.mainMenuComponent}"
                         label="Просмотр" action="#{reportRepositoryListPage.show}" reRender="workspaceForm" />
-
-    <rich:panelMenuGroup id="repositoryUtilityGroupMenu" binding="#{mainPage.repositoryUtilityGroupMenu.mainMenuComponent}"
-                         label="Утилиты">
-        <a4j:support event="onclick" action="#{mainPage.showRepositoryUtilityGroupMenu}" reRender="workspaceForm" />
-        <%--@elvariable id="registerStampPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampPage"--%>
-        <rich:panelMenuItem id="repositoryReportsRenameMenuItem" binding="#{repositoryReportsRenamePage.mainMenuComponent}"
-                            label="Переименование отчетов" action="#{repositoryReportsRenamePage.show}" reRender="workspaceForm" />
-    </rich:panelMenuGroup>
 
 </rich:panelMenuGroup>
 
