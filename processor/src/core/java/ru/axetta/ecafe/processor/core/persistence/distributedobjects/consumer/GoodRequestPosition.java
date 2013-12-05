@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
@@ -34,6 +35,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
 
     private UnitScale unitsScale;
     private Long totalCount;
+    private Long dailySampleCount; // суточная проба
     private Long netWeight;
     private Product product;
     private String guidOfP;
@@ -57,6 +59,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
 
         projectionList.add(Projections.property("unitsScale"), "unitsScale");
         projectionList.add(Projections.property("totalCount"), "totalCount");
+        projectionList.add(Projections.property("dailySampleCount"), "dailySampleCount"); // суточная проба
         projectionList.add(Projections.property("netWeight"), "netWeight");
 
         projectionList.add(Projections.property("gr.guid"), "guidOfGR");
@@ -70,6 +73,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
         XMLUtils.setAttributeIfNotNull(element, "UnitsScale", unitsScale.ordinal());
         XMLUtils.setAttributeIfNotNull(element, "TotalCount", totalCount);
+        XMLUtils.setAttributeIfNotNull(element, "DailySampleCount", dailySampleCount);  // суточная проба
         XMLUtils.setAttributeIfNotNull(element, "NetWeight", netWeight);
         if (!StringUtils.isEmpty(guidOfGR))
             XMLUtils.setAttributeIfNotNull(element, "GuidOfGoodsRequest", guidOfGR);
@@ -113,6 +117,9 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         Long longTotalCount = XMLUtils.getLongAttributeValue(node, "TotalCount");
         if (longTotalCount != null)
             setTotalCount(longTotalCount);
+        Long longDailySampleCount = XMLUtils.getLongAttributeValue(node, "DailySampleCount"); // суточная проба
+        if (longDailySampleCount != null)
+            setDailySampleCount(longDailySampleCount);
         Long longNetWeight = XMLUtils.getLongAttributeValue(node, "NetWeight");
         if (longNetWeight != null)
             setNetWeight(longNetWeight);
@@ -129,6 +136,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         setUnitsScale(((GoodRequestPosition) distributedObject).getUnitsScale());
         setNetWeight(((GoodRequestPosition) distributedObject).getNetWeight());
         setTotalCount(((GoodRequestPosition) distributedObject).getTotalCount());
+        setDailySampleCount(((GoodRequestPosition) distributedObject).getDailySampleCount()); // суточная проба
     }
 
     public String getGuidOfP() {
@@ -193,6 +201,14 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
 
     public void setTotalCount(Long totalCount) {
         this.totalCount = totalCount;
+    }
+
+    public Long getDailySampleCount() {
+        return dailySampleCount;
+    }
+
+    public void setDailySampleCount(Long dailySampleCount) {
+        this.dailySampleCount = dailySampleCount;
     }
 
     public UnitScale getUnitsScale() {
