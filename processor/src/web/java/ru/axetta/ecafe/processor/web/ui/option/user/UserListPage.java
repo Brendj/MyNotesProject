@@ -11,8 +11,6 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Restrictions;
 
 import java.util.*;
 
@@ -32,7 +30,9 @@ public class UserListPage extends BasicWorkspacePage {
         private final Set<Long> functions;
         private final Date lastEntryTime;
         private final Date updateTime;
+        private final String lastEntryIP;
         private final String roleName;
+        private final boolean blocked;
         private final List<Contragent> contragentList;
 
         public Item(User user) {
@@ -41,6 +41,8 @@ public class UserListPage extends BasicWorkspacePage {
             this.updateTime = user.getUpdateTime();
             this.roleName = user.getRoleName();
             this.lastEntryTime = user.getLastEntryTime();
+            this.lastEntryIP = user.getLastEntryIP();
+            this.blocked = user.isBlocked() != null && user.isBlocked();
             Set<Long> itemFunctions = new HashSet<Long>();
             Set<Function> userFunctions = user.getFunctions();
             for (Function function : userFunctions) {
@@ -76,6 +78,14 @@ public class UserListPage extends BasicWorkspacePage {
 
         public List<Contragent> getContragentList() {
             return contragentList;
+        }
+
+        public String getLastEntryIP() {
+            return lastEntryIP;
+        }
+
+        public boolean isBlocked() {
+            return blocked;
         }
     }
 

@@ -38,7 +38,7 @@
 
     <rich:dataTable id="userListTable"
                     value="#{mainPage.userListPage.items}" var="item" rows="20"
-                    columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column"
+                    columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column"
                     footerClass="data-table-footer">
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -61,7 +61,7 @@
             </f:facet>
             <h:outputText escape="true" value="#{item.roleName}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" width="250">
             <f:facet name="header">
                 <h:outputText escape="true" value="Контрагент" />
             </f:facet>
@@ -80,10 +80,23 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Время последнего входа" />
+                <h:outputText escape="true" value="Последний вход" />
             </f:facet>
             <h:outputText escape="true" value="#{item.lastEntryTime}" rendered="#{item.lastEntryTime!=null}"
                           converter="timeConverter" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="IP-адрес входа" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.lastEntryIP}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Заблокирован" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.blocked ? 'Да' : 'Нет'}"
+                          styleClass="output-text #{item.blocked ? 'warn-messages' : ''}" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
