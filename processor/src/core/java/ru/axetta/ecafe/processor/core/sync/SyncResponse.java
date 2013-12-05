@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
@@ -35,72 +36,6 @@ import java.util.*;
  */
 public class SyncResponse {
 
-    /*public static class ResPaymentRegistry {
-
-        public static class Item {
-
-            private final long idOfOrder;
-            private final int result;
-            private final String error;
-
-            public Item(long idOfOrder, int result, String error) {
-                this.idOfOrder = idOfOrder;
-                this.result = result;
-                this.error = error;
-            }
-
-            public long getIdOfOrder() {
-                return idOfOrder;
-            }
-
-            public int getResult() {
-                return result;
-            }
-
-            public String getError() {
-                return error;
-            }
-
-            public Element toElement(Document document) throws Exception {
-                Element element = document.createElement("RPT");
-                element.setAttribute("IdOfOrder", Long.toString(this.idOfOrder));
-                element.setAttribute("Result", Integer.toString(this.result));
-                if (null != this.error) {
-                    element.setAttribute("Error", this.error);
-                }
-                return element;
-            }
-
-            @Override
-            public String toString() {
-                return "Item{" + "idOfOrder=" + idOfOrder + ", result=" + result + ", error='" + error + '\'' + '}';
-            }
-        }
-
-        private final List<Item> items = new ArrayList<Item>();
-
-        public void addItem(Item item) throws Exception {
-            this.items.add(item);
-        }
-
-        public Iterator<Item> getItems() {
-            return items.iterator();
-        }
-
-        public Element toElement(Document document) throws Exception {
-            Element element = document.createElement("ResPaymentRegistry");
-            for (Item item : this.items) {
-                element.appendChild(item.toElement(document));
-            }
-            return element;
-        }
-
-        @Override
-        public String toString() {
-            return "ResPaymentRegistry{" + "items=" + items + '}';
-        }
-    }
-*/
     public static class AccRegistry {
 
         public static class Item {
@@ -324,8 +259,8 @@ public class SyncResponse {
             this.date = date;
         }
 
-        public Enumeration<Item> getItems() {
-            return Collections.enumeration(items);
+        public Iterator<Item> getItems() {
+            return items.iterator();
         }
 
         public Element toElement(Document document, DateFormat dateFormat, DateFormat timeFormat) throws Exception {
@@ -645,8 +580,8 @@ public class SyncResponse {
             this.items.add(new Item(menuData));
         }
 
-        public Enumeration<Item> getItems() {
-            return Collections.enumeration(items);
+        public Iterator<Item> getItems() {
+            return items.iterator();
         }
 
         public Element toElement(Document document) throws Exception {
@@ -833,8 +768,8 @@ public class SyncResponse {
                 return date;
             }
 
-            public Enumeration<ResMenuDetail> getMenuDetails() {
-                return Collections.enumeration(resMenuDetails);
+            public Iterator<ResMenuDetail> getMenuDetails() {
+                return resMenuDetails.iterator();
             }
 
             public Element toElement(Document document, DateFormat dateOnlyFormat) throws Exception {
@@ -858,8 +793,8 @@ public class SyncResponse {
             this.items.add(item);
         }
 
-        public Enumeration<Item> getItems() {
-            return Collections.enumeration(items);
+        public Iterator<Item> getItems() {
+            return items.iterator();
         }
 
         public Element toElement(Document document, DateFormat dateOnlyFormat) throws Exception {
@@ -921,7 +856,9 @@ public class SyncResponse {
             private final long idOfEnterEvent;
             private final int resEvent;
             private final String error;
-            public static final int RC_OK = 0, RC_EVENT_EXISTS_WITH_DIFFERENT_ATTRIBUTES=2, RC_CLIENT_NOT_FOUND=3;
+            public static final int RC_OK = 0;
+            public static final int RC_EVENT_EXISTS_WITH_DIFFERENT_ATTRIBUTES=2;
+            public static final int RC_CLIENT_NOT_FOUND=3;
 
             public Item(long idOfEnterEvent, int resEvent, String error) {
                 this.idOfEnterEvent = idOfEnterEvent;
@@ -965,8 +902,8 @@ public class SyncResponse {
             this.items.add(item);
         }
 
-        public Enumeration<Item> getItems() {
-            return Collections.enumeration(items);
+        public Iterator<Item> getItems() {
+            return items.iterator();
         }
 
         public Element toElement(Document document) throws Exception {
@@ -1207,12 +1144,12 @@ public class SyncResponse {
             this.dcris.add(dcri);
         }
 
-        public Enumeration<DCI> getDcis() {
-            return Collections.enumeration(dcis);
+        public Iterator<DCI> getDcis() {
+            return dcis.iterator();
         }
 
-        public Enumeration<DCRI> getDcris() {
-            return Collections.enumeration(dcris);
+        public Iterator<DCRI> getDcris() {
+            return dcris.iterator();
         }
 
         public Element toElement(Document document) throws Exception {
@@ -1310,7 +1247,7 @@ public class SyncResponse {
         DateFormat dateOnlyFormat = new SimpleDateFormat("dd.MM.yyyy");
         dateOnlyFormat.setTimeZone(utcTimeZone);
 
-        TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
+        TimeZone localTimeZone = RuntimeContext.getInstance().getLocalTimeZone(null);//TimeZone.getTimeZone("Europe/Moscow");
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         dateFormat.setTimeZone(localTimeZone);

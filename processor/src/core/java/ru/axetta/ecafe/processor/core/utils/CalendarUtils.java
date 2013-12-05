@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.utils;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+
 import org.apache.commons.lang.StringUtils;
 
 import java.text.ParseException;
@@ -19,7 +21,7 @@ import java.util.*;
  */
 public class CalendarUtils {
 
-    private final static TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
+    //private final static TimeZone localTimeZone = RuntimeContext.getInstance().getLocalTimeZone(null);
     private final static TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
     private final static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
     private final static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
@@ -37,7 +39,7 @@ public class CalendarUtils {
     }
 
     public static Date parseFullDateTimeWithLocalTimeZone(String s) throws Exception {
-        dateTimeFormat.setTimeZone(localTimeZone);
+        dateTimeFormat.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));
         if(StringUtils.isEmpty(s)){
             return null;
         } else {
@@ -50,7 +52,7 @@ public class CalendarUtils {
     }
 
     public static String toStringFullDateTimeWithLocalTimeZone(Date dateTime) {
-        dateTimeFormat.setTimeZone(localTimeZone);
+        try {dateTimeFormat.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));} catch (Exception ignore) {}
         return dateTimeFormat.format(dateTime);
     }
 

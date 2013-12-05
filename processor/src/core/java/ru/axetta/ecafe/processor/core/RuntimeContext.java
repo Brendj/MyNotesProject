@@ -121,6 +121,7 @@ public class RuntimeContext implements ApplicationContextAware {
 
     private static final String PROCESSOR_PARAM_BASE = "ecafe.processor";
     public static final String PARAM_NAME_DB_MAINTANANCE_HOUR = PROCESSOR_PARAM_BASE + ".dbmaintanance.hour";
+    public static final String PARAM_NAME_TIME_ZONE = PROCESSOR_PARAM_BASE + ".time.zone";
     public static final String PARAM_NAME_HIDDEN_PAGES_IN_CLIENT_ROOM = PROCESSOR_PARAM_BASE + ".processor.hiddenPages";
     private static final String AUTO_REPORT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".autoreport";
     private static final String REPORT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".report";
@@ -350,12 +351,13 @@ public class RuntimeContext implements ApplicationContextAware {
         return partnerStdPayConfig;
     }
 
-    public TimeZone getSysTimeZone() throws Exception {
-        return TimeZone.getTimeZone("Europe/Moscow");
-    }
-
     public TimeZone getLocalTimeZone(HttpSession httpSession) throws Exception {
-        return TimeZone.getTimeZone("Europe/Moscow");
+        String timeZone = getPropertiesValue(RuntimeContext.PARAM_NAME_TIME_ZONE, "Europe/Moscow");
+        if(timeZone.equals("default")){
+            return TimeZone.getDefault();
+        } else {
+            return TimeZone.getTimeZone(timeZone);
+        }
     }
 
     public Calendar getLocalCalendar(HttpSession httpSession) throws Exception {
@@ -938,7 +940,7 @@ public class RuntimeContext implements ApplicationContextAware {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating auto report generator.");
         }
-        TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
+        TimeZone localTimeZone = RuntimeContext.getInstance().getLocalTimeZone(null);
         Calendar calendar = Calendar.getInstance(localTimeZone);
         calendar.setFirstDayOfWeek(Calendar.MONDAY);
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
@@ -986,7 +988,7 @@ public class RuntimeContext implements ApplicationContextAware {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating event notificator.");
         }
-        TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
+        TimeZone localTimeZone = RuntimeContext.getInstance().getLocalTimeZone(null);
         Calendar calendar = Calendar.getInstance(localTimeZone);
         calendar.setFirstDayOfWeek(Calendar.MONDAY);
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");

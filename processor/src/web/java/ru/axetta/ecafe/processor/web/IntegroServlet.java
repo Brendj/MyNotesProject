@@ -89,14 +89,12 @@ public class IntegroServlet extends HttpServlet {
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
             DateFormat dateOnlyFormat = new SimpleDateFormat("dd.MM.yyyy");
             dateOnlyFormat.setTimeZone(utcTimeZone);
-
-            TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
-            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-            DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-            dateFormat.setTimeZone(localTimeZone);
-            timeFormat.setTimeZone(localTimeZone);
-
             try{
+                TimeZone localTimeZone = RuntimeContext.getInstance().getLocalTimeZone(null);//TimeZone.getTimeZone("Europe/Moscow");
+                DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+                DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+                dateFormat.setTimeZone(localTimeZone);
+                timeFormat.setTimeZone(localTimeZone);
                 Document requestDocument = requestData.document;
                 dataNode = requestDocument.getFirstChild();
                 NamedNodeMap namedNodeMap=dataNode.getAttributes();
