@@ -520,6 +520,17 @@
         </f:facet>
         <h:outputText escape="true" value="#{pass.direction}" styleClass="output-text" />
     </rich:column>
+    <f:facet name="footer">
+        <rich:datascroller for="clientPassesTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                           stepControls="auto" boundaryControls="hide">
+            <f:facet name="previous">
+                <h:graphicImage value="/images/16x16/left-arrow.png" />
+            </f:facet>
+            <f:facet name="next">
+                <h:graphicImage value="/images/16x16/right-arrow.png" />
+            </f:facet>
+        </rich:datascroller>
+    </f:facet>
 </rich:dataTable>
 
 <h:outputText value="Регулярные платежи:" />
