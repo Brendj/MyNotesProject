@@ -46,6 +46,20 @@
         height: 250px;
         line-height: 0.9;
     }
+
+    .clientsgrid_col1 {
+        width: 21px !important;
+        min-width: 21px !important;
+        max-width: 21px !important;
+    }
+
+    .clientsgrid_col3, .clientsgrid_col4, .clientsgrid_col5, .clientsgrid_col6,
+    .clientsgrid_col7, .clientsgrid_col8, .clientsgrid_col9, .clientsgrid_col10,
+    .clientsgrid_col11, .clientsgrid_col12, .clientsgrid_col13, .clientsgrid_col14{
+        width: 20px !important;
+        min-width: 20px !important;
+        max-width: 20px !important;
+    }
 </style>
 
 <script type="text/javascript">
@@ -58,6 +72,18 @@ function onstoploading(){
     jQuery(".checkboxes").attr('disabled', '');
     jQuery(".groupSelect").attr('disabled', '');
     jQuery(".categorySelect").attr('disabled', '');
+    updateWidth();
+}
+jQuery(document).ready(function(){
+    updateWidth();
+});
+function updateWidth() {
+    var counter = 0;
+    jQuery(".clientsTable tr.rich-table-firstrow td").each(function(){
+        var width = jQuery('.clientsTable tr.rich-table-firstrow td:eq(' + counter + ')').width();
+        jQuery('.clientsTableHead th:eq(' + counter + ')').width(width);
+        counter++;
+    });
 }
 </script>
 
@@ -72,7 +98,7 @@ function onstoploading(){
             <h:panelGrid id="groups" styleClass="borderless-grid">
                 <h:selectOneMenu id="group" value="#{setupDiscountPage.group}" style="width:200px;" styleClass="groupSelect">
                     <f:selectItems value="#{setupDiscountPage.groups}"/>
-                    <a4j:support status="loadingStatus" event="onchange" actionListener="#{setupDiscountPage.doChangeGroup}" reRender="clients"/>
+                    <a4j:support status="loadingStatus" event="onchange" actionListener="#{setupDiscountPage.doChangeGroup}" reRender="clients, emptyClients"/>
                 </h:selectOneMenu>
             </h:panelGrid>
 
@@ -80,31 +106,46 @@ function onstoploading(){
             <h:panelGrid id="categories" styleClass="borderless-grid">
                 <h:selectOneMenu id="category" value="#{setupDiscountPage.category}" style="width:200px;" styleClass="categorySelect">
                     <f:selectItems value="#{setupDiscountPage.categories}"/>
-                    <a4j:support status="loadingStatus" event="onchange" actionListener="#{setupDiscountPage.doChangeCategory}" reRender="clients"/>
+                    <a4j:support status="loadingStatus" event="onchange" actionListener="#{setupDiscountPage.doChangeCategory}" reRender="clients, emptyClients"/>
                 </h:selectOneMenu>
             </h:panelGrid>
         </h:panelGrid>
 
-        <rich:panel id="clients" style="height: 500px; overflow: auto;">
-            <rich:dataTable value="#{setupDiscountPage.clients}" var="cl" id="table" rowKeyVar="row"
-                            columnClasses="clientsgrid_col1,clientsgrid_col2,clientsgrid_col3,clientsgrid_col4,clientsgrid_col5,clientsgrid_col6,clientsgrid_col7,clientsgrid_col8,clientsgrid_col9,clientsgrid_col10">
+        <rich:panel id="emptyClients" style="margin: 0px; padding: 0px; border-bottom: none">
+            <rich:dataTable value="#{setupDiscountPage.emptyClients}" var="cl" id="table_head" rowKeyVar="row"styleClass="clientsTableHead"
+                            headerClass="clientsgrid_col1,clientsgrid_col2,clientsgrid_col3,clientsgrid_col4,clientsgrid_col5,clientsgrid_col6,clientsgrid_col7,clientsgrid_col8,clientsgrid_col9,clientsgrid_col10,clientsgrid_col11,clientsgrid_col12,clientsgrid_col13,clientsgrid_col14"
+                            columnClasses="clientsgrid_col1,clientsgrid_col2,clientsgrid_col3,clientsgrid_col4,clientsgrid_col5,clientsgrid_col6,clientsgrid_col7,clientsgrid_col8,clientsgrid_col9,clientsgrid_col10,clientsgrid_col11,clientsgrid_col12,clientsgrid_col13,clientsgrid_col14">
                 <rich:column headerClass="center-aligned-column">
                     <f:facet name="header">
                         <h:outputText value="№"></h:outputText>
                     </f:facet>
-                    <h:outputText value="#{row+1}" styleClass="output-text"></h:outputText>
                 </rich:column>
                 <rich:column headerClass="center-aligned-column" style="width: 99%;">
                     <f:facet name="header">
                         <h:outputText value="Клиент"></h:outputText>
                     </f:facet>
-                    <h:outputText value="#{cl.fullName}" styleClass="output-text-mod"></h:outputText>
                 </rich:column>
                 <rich:columns value="#{setupDiscountPage.columns}" var="col" styleClass="left-aligned-column"
                               index="ind" headerClass="thin-center-aligned-column" width="1%" style="width: 1%;" >
                     <f:facet name="header">
                         <h:outputText escape="false" value="#{col.title}" />
                     </f:facet>
+                </rich:columns>
+            </rich:dataTable>
+        </rich:panel>
+
+        <rich:panel id="clients" style="height: 500px; overflow: auto;">
+            <rich:dataTable value="#{setupDiscountPage.clients}" var="cl" id="table" rowKeyVar="row" styleClass="clientsTable"
+                            headerClass="clientsgrid_col1,clientsgrid_col2,clientsgrid_col3,clientsgrid_col4,clientsgrid_col5,clientsgrid_col6,clientsgrid_col7,clientsgrid_col8,clientsgrid_col9,clientsgrid_col10,clientsgrid_col11,clientsgrid_col12,clientsgrid_col13,clientsgrid_col14"
+                            columnClasses="clientsgrid_col1,clientsgrid_col2,clientsgrid_col3,clientsgrid_col4,clientsgrid_col5,clientsgrid_col6,clientsgrid_col7,clientsgrid_col8,clientsgrid_col9,clientsgrid_col10,clientsgrid_col11,clientsgrid_col12,clientsgrid_col13,clientsgrid_col14">
+                <rich:column headerClass="center-aligned-column">
+                    <h:outputText value="#{row+1}" styleClass="output-text"></h:outputText>
+                </rich:column>
+                <rich:column headerClass="center-aligned-column" style="width: 99%;">
+                    <h:outputText value="#{cl.fullName}" styleClass="output-text-mod"></h:outputText>
+                </rich:column>
+                <rich:columns value="#{setupDiscountPage.columns}" var="col" styleClass="left-aligned-column"
+                              index="ind" headerClass="thin-center-aligned-column" width="1%" style="width: 1%;" >
                     <h:selectBooleanCheckbox value="#{cl.rules[col.id]}" styleClass="checkboxes" rendered="#{cl.input}" >
                         <a4j:support event="onclick" status="loadingStatus" actionListener="#{setupDiscountPage.doChangeDiscount}" reRender="messages,clients">
                             <!-- use property that uniquely identifies a row -->

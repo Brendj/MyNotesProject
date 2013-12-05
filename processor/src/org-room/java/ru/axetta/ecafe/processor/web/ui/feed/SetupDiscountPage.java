@@ -381,6 +381,10 @@ public class SetupDiscountPage extends BasicWorkspacePage {
         return clients;
     }
 
+    public List<Client> getEmptyClients() {
+        return Collections.EMPTY_LIST;
+    }
+
     public void setClients(List<Client> clients) {
         this.clients = clients;
     }
