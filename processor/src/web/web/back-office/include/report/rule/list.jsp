@@ -23,7 +23,7 @@
                                          target="#{mainPage.selectedIdOfReportRule}" />
         </a4j:commandLink>
     </rich:column>
-    <rich:column headerClass="column-header">
+    <rich:column headerClass="column-header" sortBy="#{item.ruleName}">
         <f:facet name="header">
             <h:outputText escape="true" value="Название" />
         </f:facet>
