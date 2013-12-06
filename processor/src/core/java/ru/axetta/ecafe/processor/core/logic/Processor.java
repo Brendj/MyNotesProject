@@ -320,7 +320,7 @@ public class Processor implements SyncProcessor,
         Long idOfPacket = 0L;
 
         //todo Register sync history
-        //Long idOfSync = addSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime);
+        //Long idOfSync = createSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime);
 
         checkUserPaymentProcessRights(request.getIdOfUser());
         PaymentResponse.ResPaymentRegistry resPaymentRegistry = null;
@@ -612,7 +612,7 @@ public class Processor implements SyncProcessor,
 
         idOfPacket = generateIdOfPacket(request.getIdOfOrg());
         // Register sync history
-        syncHistory = addSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
+        syncHistory = createSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
                 request.getRemoteAddr());
         addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
                 request.getRemoteAddr());
@@ -1081,7 +1081,8 @@ public class Processor implements SyncProcessor,
                                 .isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_P)) {
                             String clientVersion = (request.getClientVersion()==null?"":request.getClientVersion());
                             Long packet = (idOfPacket==null?-1L:idOfPacket);
-                            SyncHistory syncHistory = addSyncHistory(request.getIdOfOrg(), packet, new Date(), clientVersion, request.getRemoteAddr());
+                            SyncHistory syncHistory = createSyncHistory(request.getIdOfOrg(), packet, new Date(),
+                                    clientVersion, request.getRemoteAddr());
                             final String s = String.format("Failed to process PaymentRegistry, IdOfOrg == %s, no license slots available", request.getIdOfOrg());
                             createSyncHistory(request.getIdOfOrg(),syncHistory, s);
                             throw new Exception("no license slots available");
@@ -2023,7 +2024,7 @@ public class Processor implements SyncProcessor,
         }
     }
 
-    private SyncHistory addSyncHistory(Long idOfOrg, Long idOfPacket, Date startTime, String clientVersion,
+    public SyncHistory createSyncHistory(Long idOfOrg, Long idOfPacket, Date startTime, String clientVersion,
             String remoteAddress) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;

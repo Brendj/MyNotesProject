@@ -11,6 +11,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,7 +37,7 @@ public abstract class SupplierRequestDistributedObject extends DistributedObject
             criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
             return criteria.list();
         } else {
-            return null;
+            return new ArrayList<DistributedObject>(0);
         }
     }
 

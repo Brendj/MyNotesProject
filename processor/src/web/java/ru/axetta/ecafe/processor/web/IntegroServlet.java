@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.web;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.SyncHistory;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerProcessor;
@@ -42,6 +42,7 @@ import java.io.OutputStream;
 import java.security.PublicKey;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.TimeZone;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -150,6 +151,9 @@ public class IntegroServlet extends HttpServlet {
                 }
 
                 try {
+                    SyncHistory syncHistory = runtimeContext.getProcessor().createSyncHistory(org.getIdOfOrg(),
+                            org.getIdOfPacket(), new Date(), "1C", request.getRemoteAddr());
+                    manager.setSyncHistory(syncHistory);
                     manager.process(runtimeContext.createPersistenceSession().getSessionFactory());
                 } catch (Exception e) {
                     logger.error("Failed to process request", e);
