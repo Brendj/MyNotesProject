@@ -241,7 +241,7 @@ white-space: nowrap;
                         </f:facet>
                         <a4j:commandLink styleClass="output-text-mod" value="#{feedPlanPage.getGroupName(idoclientgroup)}"
                                          rendered="#{!feedPlanPage.isOrderedComplex(idoclientgroup)}" >
-                            <a4j:support reRender="planTable,messages,groupsGrid,currentTotalString" event="onclick" action="#{feedPlanPage.doChangeGroup(idoclientgroup)}" status="feedPlanStatus" />
+                            <a4j:support reRender="planTable,messages,groupsGrid,currentTotalString,totalMessage" event="onclick" action="#{feedPlanPage.doChangeGroup(idoclientgroup)}" status="feedPlanStatus" />
                         </a4j:commandLink>
                         <h:outputText styleClass="output-text-mod" value="#{feedPlanPage.getGroupName(idoclientgroup)}"
                                       rendered="#{feedPlanPage.isOrderedComplex(idoclientgroup)}"/>
