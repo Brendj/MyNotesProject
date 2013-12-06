@@ -20,7 +20,7 @@ public abstract class LibraryDistributedObject extends DistributedObject {
     @SuppressWarnings("unchecked")
     public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception {
         Criteria criteria = session.createCriteria(getClass());
-        criteria.add(Restrictions.ge("globalVersion", currentMaxVersion));
+        criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
         createProjections(criteria);
         criteria.setCacheable(false);
         criteria.setReadOnly(true);
