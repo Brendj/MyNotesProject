@@ -101,6 +101,10 @@ public class GroupCreatePanel extends BasicWorkspacePage {
         groupName = groupName.replaceAll("-", "");
 
         Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
+        ClientGroup existing = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session, org.getIdOfOrg(), groupName);
+        if (existing != null) {
+            throw new Exception("Группа с названием " + groupName + " уже зарегистрирована");
+        }
         ClientGroup grp = DAOUtils.createClientGroup(session, org.getIdOfOrg(), groupName);
         if (grp == null) {
             throw new Exception("Неудалось создать группу '" + groupName + "', попробуйте повторить попытку позже");

@@ -238,6 +238,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             //  Добавляем клиента
             Client cl = new Client(idofclientgroup, idofclient, firstName, secondname, surname,
                     idofrule, ruleDescription, idofcomplex, priority, price, action, inBuilding);
+            cl.setGroupNum(groupNum);
             if (action != null) {
                 cl.setTemporarySaved(true);
             }
@@ -259,18 +260,8 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
 
             //  Обновляем комплексы
             boolean complexFound = false;
-            long idofsuperclientgroup = -1L;
-            String superclientgroupname = "";
-            if (groupNum < 4) {
-                idofsuperclientgroup = ELEMENTARY_CLASSES_TYPE;
-                superclientgroupname = ELEMENTARY_CLASSES_TYPE_NAME;
-            } else if (groupNum < 10) {
-                idofsuperclientgroup = MIDDLE_CLASSES_TYPE;
-                superclientgroupname = MIDDLE_CLASSES_TYPE_NAME;
-            } else {
-                idofsuperclientgroup = HIGH_CLASSES_TYPE;
-                superclientgroupname = HIGH_CLASSES_TYPE_NAME;
-            }
+            long idofsuperclientgroup = getIdOfSuperClientGroup(groupNum);
+            String superclientgroupname = getNameOfSuperClientGroup(groupNum);
             //  Поиск супер-группы в отдельном массиве
             Complex c = getComplexByComplexIdAndGroup(idofcomplex, idofsuperclientgroup, superComlexGroups);
             if (c != null) {
@@ -330,6 +321,26 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
         disabledComplexes.clear();
         for (Complex c : complexes) {
             disabledComplexes.put(c.getComplex(), false);
+        }
+    }
+
+    private static final Long getIdOfSuperClientGroup (Integer groupNum) {
+        if (groupNum < 4) {
+            return ELEMENTARY_CLASSES_TYPE;
+        } else if (groupNum < 10) {
+            return MIDDLE_CLASSES_TYPE;
+        } else {
+            return HIGH_CLASSES_TYPE;
+        }
+    }
+
+    private static final String getNameOfSuperClientGroup (Integer groupNum) {
+        if (groupNum < 4) {
+            return ELEMENTARY_CLASSES_TYPE_NAME;
+        } else if (groupNum < 10) {
+            return MIDDLE_CLASSES_TYPE_NAME;
+        } else {
+            return HIGH_CLASSES_TYPE_NAME;
         }
     }
 
@@ -754,6 +765,15 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
         Map<Integer, Integer> toPay = new HashMap<Integer, Integer>();
         Map<Integer, Integer> total = new HashMap<Integer, Integer>();
         for (Client cl : clients) {
+            if (selectedIdOfClientGroup >= 0) {
+                if (cl.getIdofclientgroup() != selectedIdOfClientGroup) {
+                    continue;
+                }
+            } else if (selectedIdOfClientGroup != ALL_TYPE) {
+                if (getIdOfSuperClientGroup(cl.getGroupNum()).longValue() != selectedIdOfClientGroup.longValue()) {
+                    continue;
+                }
+            }
             //  Оплаченные
             if (cl.getIdoforder() != null) {
                 Integer now = payed.get(cl.getComplex());
@@ -1070,6 +1090,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
         protected boolean temporarySaved;
         protected Long idoforder;
         protected Long idofReplaceClient;
+        protected Integer groupNum;
 
         public Client() {
 
@@ -1266,6 +1287,14 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
                 return "payed";
             }
             return "";
+        }
+
+        public Integer getGroupNum() {
+            return groupNum;
+        }
+
+        public void setGroupNum(Integer groupNum) {
+            this.groupNum = groupNum;
         }
 
         @Override

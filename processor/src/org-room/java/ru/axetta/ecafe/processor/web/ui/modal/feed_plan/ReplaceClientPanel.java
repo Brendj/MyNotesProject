@@ -137,6 +137,15 @@ public class ReplaceClientPanel extends BasicWorkspacePage {
                            FeedPlanPage.Client targetClient) {
         this.replaceClients = replaceClients;
         this.targetClient = targetClient;
+
+        //Удаляем из списка клиента, который является целевым  клиентом
+        for (int i=0; i<replaceClients.size(); i++) {
+            FeedPlanPage.ReplaceClient cl = replaceClients.get(i);
+            if (cl.getIdofclient() == targetClient.getIdofclient()) {
+                replaceClients.remove(i);
+                break;
+            }
+        }
     }
 
     public String getNameOfTargetClient() {
