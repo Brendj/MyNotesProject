@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -115,10 +116,10 @@ public class GoodRequestsReport extends BasicReport {
                 notCreatedAtConfition = "and (cf_goods_requests.createddate < " + (limit) + ") ";
             }
 
-            String sql = "select requests.org, requests.orgFull, requests.good, requests.d, int8(sum(requests.cnt)) "+
+            String sql = "select requests.org, requests.orgFull, requests.good, requests.d, int8(sum(requests.cnt)), sum(coalesce(requests.ds_cnt, 0)) "+
                          "from (select substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') as org, cf_orgs.officialname as orgFull, "+
                          "             cf_goods.fullname as good , date_trunc('day', to_timestamp(cf_goods_requests.donedate / 1000)) as d, "+
-                         "             cf_goods_requests_positions.totalcount / 1000 as cnt "+
+                         "             cf_goods_requests_positions.totalcount / 1000 as cnt, cf_goods_requests_positions.DailySampleCount / 1000 as ds_cnt "+
                          "      from cf_goods_requests "+
                          "      left join cf_orgs on cf_orgs.idoforg=cf_goods_requests.orgowner "+
                          "      left join cf_goods_requests_positions on cf_goods_requests.idofgoodsrequest=cf_goods_requests_positions.idofgoodsrequest "+
@@ -134,10 +135,6 @@ public class GoodRequestsReport extends BasicReport {
                          "group by requests.org, requests.orgFull, requests.good, requests.d "+
                          "order by requests.org, requests.good, requests.d";
 
-            String prevOrg = "";
-            String prevGood = "";
-            RequestItem item = null;
-
             Map <String, RequestItem> totalItems = new TreeMap <String, RequestItem>();
             RequestItem overallItem = new TotalItem(OVERALL_TITLE, "", OVERALL_ALL_TITLE, report);
 
@@ -150,14 +147,12 @@ public class GoodRequestsReport extends BasicReport {
                 String good     = ((String) entry [2]).trim ();
                 long date       = ((Timestamp) entry [3]).getTime();
                 int value       = ((BigInteger) entry [4]).intValue();
+                int dailySample = ((BigDecimal) entry[5]).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
 
-                if (!prevOrg.equals(org) || !prevGood.equals(good)) {
-                    item = new RequestItem(org, orgFull, good, report);
-                    items.add(item);
-                    prevOrg = org;
-                    prevGood = good;
-                }
+                RequestItem item = new RequestItem(org, orgFull, good, report);
+                items.add(item);
                 item.addValue(date, new RequestValue(value));
+                item.addDailySample(date, new RequestValue(dailySample));
 
                 //  Получаем итоговый элемент по данному товару, чтобы добавить в него количество от текущей записи
                 RequestItem totalItem = totalItems.get(good);
@@ -166,7 +161,9 @@ public class GoodRequestsReport extends BasicReport {
                     totalItems.put(good, totalItem);
                 }
                 totalItem.addValue(date, new RequestValue(value));      //  Добавляем в итог по товару
+                totalItem.addDailySample(date, new RequestValue(dailySample));
                 overallItem.addValue(date, new RequestValue(value));    //  Добавляем в общий итог
+                overallItem.addDailySample(date, new RequestValue(dailySample));
             }
 
             //  Добавляем строки с общими значениями в список товаров
@@ -208,8 +205,7 @@ public class GoodRequestsReport extends BasicReport {
     public Object [] getColumnNames () {
         if (cols != null) {
             return cols.toArray();
-        }
-        if (cols == null) {
+        } else {
             cols = new ArrayList<String>();
         }
         for (ReportColumn c : DEFAULT_COLUMNS) {
@@ -253,30 +249,34 @@ public class GoodRequestsReport extends BasicReport {
             super(org, orgFull, item, report);
         }
 
-
-        public TotalItem (String org, String orgFull, String item,
-                Map<Long, RequestValue> values, GoodRequestsReport report) {
-            super(org, orgFull, item, values, report);
-        }
-
-        public RequestItem addValue (Long ts, RequestValue value) {
-            if (values == null) {
-                values = new TreeMap<Long, RequestValue>();
-            }
-
+        @Override
+        public void addValue(Long ts, RequestValue value) {
             Calendar cal = new GregorianCalendar();
             cal.setTimeInMillis(ts);
-            clearCalendarTime(cal);
+            CalendarUtils.truncateToDayOfMonth(cal);
 
             //  Необходимо переписать подсчет количества товара для итоговых строк - необходимо не
             //  переписывать значения, а складывать с предыдущими
             RequestValue nowVal = values.get(cal.getTimeInMillis());
             if (nowVal != null) {
-                nowVal.setValue (nowVal.getValue() + value.getValue());
+                nowVal.setValue(nowVal.getValue() + value.getValue());
             } else {
                 values.put(cal.getTimeInMillis(), value);
             }
-            return this;
+        }
+
+        @Override
+        public void addDailySample(Long ts, RequestValue value) {
+            Calendar cal = new GregorianCalendar();
+            cal.setTimeInMillis(ts);
+            CalendarUtils.truncateToDayOfMonth(cal);
+            RequestValue nowVal = dailySamples.get(cal.getTimeInMillis());
+            if (nowVal != null) {
+                nowVal.setValue(nowVal.getValue() + value.getValue());
+            } else {
+                dailySamples.put(cal.getTimeInMillis(), value);
+            }
+
         }
     }
 
@@ -286,25 +286,15 @@ public class GoodRequestsReport extends BasicReport {
         protected final String org; // Наименование организации
         protected final String orgFull; // Полное наименование организации
         protected final String good; // Наименование товара
-        protected Map <Long, RequestValue> values;
+        protected Map<Long, RequestValue> values = new TreeMap<Long, RequestValue>();
         protected GoodRequestsReport report;
+        protected Map<Long, RequestValue> dailySamples = new TreeMap<Long, RequestValue>();
 
 
-        public RequestItem (String org, String orgFull, String good, GoodRequestsReport report) {
+        public RequestItem(String org, String orgFull, String good, GoodRequestsReport report) {
             this.org = org;
             this.orgFull = orgFull;
             this.good = good;
-            this.values = new TreeMap<Long, RequestValue>();
-            this.report = report;
-        }
-
-
-        public RequestItem (String org, String orgFull, String good,
-                            Map<Long, RequestValue> values, GoodRequestsReport report) {
-            this.org = org;
-            this.orgFull = orgFull;
-            this.good = good;
-            this.values = values;
             this.report = report;
         }
 
@@ -355,7 +345,7 @@ public class GoodRequestsReport extends BasicReport {
             {
                 Calendar now = new GregorianCalendar();
                 now.setTimeInMillis(System.currentTimeMillis());
-                clearCalendarTime(now);
+                CalendarUtils.truncateToDayOfMonth(now);
                 Calendar cal = getColumnDate (colName);
                 //  Проверяем, является ли текущий столбец сегодняшней датой, и если да, то добавляем задний фон
                 if (now.getTimeInMillis() == cal.getTimeInMillis()) {
@@ -368,6 +358,11 @@ public class GoodRequestsReport extends BasicReport {
             }
         }
 
+        public String getRowValue(String colName, boolean showDailySamples) {
+            String dailySample = getDailySample(colName);
+            return getValue(colName) + (showDailySamples && !dailySample.equals("0") ? ("/" + getDailySample(colName))
+                    : "");
+        }
 
         public String getValue (String colName) {
             //  Если это значение по умолчанию, то не делаем проверку по месяцам
@@ -387,6 +382,15 @@ public class GoodRequestsReport extends BasicReport {
             }
         }
 
+        public String getDailySample(String colName) {
+            try {
+                Calendar cal = getColumnDate(colName);
+                RequestValue rv = dailySamples.get(cal.getTimeInMillis());
+                return rv != null ? String.valueOf(rv.getValue()) : "0";
+            } catch (Exception e) {
+                return "0";
+            }
+        }
 
         public String getDefaultValue (String colName, GoodRequestsReport report) {
             if (colName.equals(ORG_NUM)) {
@@ -434,28 +438,18 @@ public class GoodRequestsReport extends BasicReport {
             cal.set(Calendar.DAY_OF_MONTH, day);
             cal.set(Calendar.MONTH, month);
             cal.set(Calendar.YEAR, firstDate.get(Calendar.YEAR));
-            clearCalendarTime(cal);
+            CalendarUtils.truncateToDayOfMonth(cal);
             return cal;
         }
 
-
-        public static void clearCalendarTime (Calendar cal) {
-            cal.set(Calendar.HOUR_OF_DAY, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
+        public void addValue(Long ts, RequestValue value) {
+            Date date = CalendarUtils.truncateToDayOfMonth(new Date(ts));
+            values.put(date.getTime(), value);
         }
 
-
-        public RequestItem addValue (Long ts, RequestValue value) {
-            if (values == null) {
-                values = new TreeMap<Long, RequestValue>();
-            }
-            Calendar cal = new GregorianCalendar();
-            cal.setTimeInMillis(ts);
-            clearCalendarTime(cal);
-            values.put(cal.getTimeInMillis(), value);
-            return this;
+        public void addDailySample(Long ts, RequestValue value) {
+            Date date = CalendarUtils.truncateToDayOfMonth(new Date(ts));
+            dailySamples.put(date.getTime(), value);
         }
     }
 

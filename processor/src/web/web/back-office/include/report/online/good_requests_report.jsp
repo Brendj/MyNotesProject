@@ -55,6 +55,9 @@
                       styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.goodRequestReportPage.hideMissedColumns}" styleClass="output-text" />
 
+        <h:outputText escape="true" value="Показывать суточную пробу" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.goodRequestReportPage.showDailySamples}" styleClass="output-text" />
+
         <h:outputText escape="true" value="Фильтр по заявкам"
                       styleClass="output-text" />
         <h:selectOneMenu value="#{mainPage.goodRequestReportPage.requestsFilter}" converter="javax.faces.Integer"
@@ -91,15 +94,16 @@
                 <h:outputText value="#{row + 1}" styleClass="output-text" />
             </rich:column>
 
-            <c:if test="${req.values == null}">
-                <rich:columns value="#{mainPage.goodRequestReportPage.goodRequestsReport.columnNames}"
-                              var="columnName" styleClass="left-aligned-column" index="ind" headerClass="center-aligned-column" style="#{req.getBackgoundColor(columnName)}" >
-                    <f:facet name="header" >
-                        <h:outputText escape="true" value="#{columnName}" />
-                    </f:facet>
-                    <h:outputText style="float: left; #{req.getStyle(columnName)}" escape="true" value="#{req.getValue(columnName)}" styleClass="output-text" />
-                </rich:columns>
-            </c:if>
+            <rich:columns value="#{mainPage.goodRequestReportPage.goodRequestsReport.columnNames}" var="columnName"
+                          styleClass="left-aligned-column" index="ind" headerClass="center-aligned-column"
+                          style="#{req.getBackgoundColor(columnName)}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="#{columnName}" />
+                </f:facet>
+                <h:outputText style="float: left; #{req.getStyle(columnName)}" escape="true"
+                              value="#{req.getRowValue(columnName, mainPage.goodRequestReportPage.showDailySamples)}"
+                              styleClass="output-text" />
+            </rich:columns>
 
 
            <%-- ECAFE-961

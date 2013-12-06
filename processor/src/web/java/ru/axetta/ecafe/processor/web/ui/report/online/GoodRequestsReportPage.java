@@ -4,19 +4,16 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.report.GoodRequestsReport;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
-import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
-import ru.axetta.ecafe.processor.web.ui.org.OrgShortItem;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * Created with IntelliJ IDEA.
@@ -39,6 +36,7 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
     private int requestsFilter = 3;
     private String goodName;
     private int daysLimit;
+    private boolean showDailySamples;
 
     public String getPageFilename() {
         return "report/online/good_requests_report";
@@ -108,6 +106,14 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
 
     public void setGoodRequests(GoodRequestsReport goodRequests) {
         this.goodRequests = goodRequests;
+    }
+
+    public boolean isShowDailySamples() {
+        return showDailySamples;
+    }
+
+    public void setShowDailySamples(boolean showDailySamples) {
+        this.showDailySamples = showDailySamples;
     }
 
     public boolean isShowAll() {
