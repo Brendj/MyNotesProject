@@ -3871,6 +3871,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (client == null) {
                 return res;
             }
+            DAOService daoService = DAOService.getInstance();
             Date date = new Date();
             SubscriptionFeeding sf = new SubscriptionFeeding();
             sf.setCreatedDate(date);
@@ -3881,6 +3882,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             sf.setDeletedState(false);
             sf.setSendAll(SendToAssociatedOrgs.SendToSelf);
             sf.setWasSuspended(false);
+            Long version = daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName());
+            sf.setGlobalVersionOnCreate(version);
+            sf.setGlobalVersion(version);
             session.persist(sf);
             CycleDiagram cd = new CycleDiagram();
             cd.setCreatedDate(date);
@@ -3901,6 +3905,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             cd.setGuid(UUID.randomUUID().toString());
             cd.setDeletedState(false);
             cd.setSendAll(SendToAssociatedOrgs.SendToSelf);
+            version = daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
+            cd.setGlobalVersion(version);
+            cd.setGlobalVersionOnCreate(version);
             cd.setMonday(cycleDiagramIn.getMonday());
             cd.setMondayPrice(getPriceOfDay(cd.getMonday(), session, client.getOrg()));
             cd.setTuesday(cycleDiagramIn.getTuesday());
@@ -4003,6 +4010,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
             sf.setWasSuspended(true);
             sf.setLastDatePauseService(new Date());
+            DAOService daoService = DAOService.getInstance();
+            sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
             transaction.commit();
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
@@ -4032,6 +4041,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
             sf.setWasSuspended(false);
+            DAOService daoService = DAOService.getInstance();
+            sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
             transaction.commit();
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
@@ -4075,6 +4086,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             cd.setSaturdayPrice(getPriceOfDay(cd.getSaturday(), session, client.getOrg()));
             cd.setSunday(cycleDiagramIn.getSunday());
             cd.setSundayPrice(getPriceOfDay(cd.getSunday(), session, client.getOrg()));
+            DAOService daoService = DAOService.getInstance();
+            cd.setGlobalVersion(daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName()));
             transaction.commit();
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
