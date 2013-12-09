@@ -36,12 +36,24 @@
         </rich:column>
         <rich:column  headerClass="column-header">
             <f:facet name="header">
-                <h:outputText value="Количество" styleClass="output-text" escape="true"/>
+                <h:outputText value="Общее количество" styleClass="output-text" escape="true"/>
             </f:facet>
             <h:outputText styleClass="output-text" value="#{goodRequestPosition.totalCount/1000}" rendered="#{goodRequestPosition.floatScale}">
                 <f:convertNumber pattern="#0"/>
             </h:outputText>
             <h:outputText styleClass="output-text" value="#{goodRequestPosition.totalCount/1000}" rendered="#{!goodRequestPosition.floatScale}">
+                <f:convertNumber pattern="#0.000"/>
+            </h:outputText>
+        </rich:column>
+        <rich:column  headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Суточная проба" styleClass="output-text" escape="true"/>
+            </f:facet>
+            <h:outputText styleClass="output-text" value="-" rendered="#{goodRequestPosition.dailySampleCount==null}"/>
+            <h:outputText styleClass="output-text" value="#{goodRequestPosition.dailySampleCount/1000}" rendered="#{goodRequestPosition.dailySampleCount!=null && goodRequestPosition.floatScale}">
+                <f:convertNumber pattern="#0"/>
+            </h:outputText>
+            <h:outputText styleClass="output-text" value="#{goodRequestPosition.dailySampleCount/1000}" rendered="#{goodRequestPosition.dailySampleCount!=null && !goodRequestPosition.floatScale}">
                 <f:convertNumber pattern="#0.000"/>
             </h:outputText>
         </rich:column>

@@ -4,25 +4,25 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.ConsumerRequestDistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -37,6 +37,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
     private Long totalCount;
     private Long dailySampleCount; // суточная проба
     private Long netWeight;
+    private String updateHistory;
     private Product product;
     private String guidOfP;
     private GoodRequest goodRequest;
@@ -51,16 +52,13 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         criteria.createAlias("product","p", JoinType.LEFT_OUTER_JOIN);
 
         ProjectionList projectionList = Projections.projectionList();
-        projectionList.add(Projections.property("guid"), "guid");
-        projectionList.add(Projections.property("globalId"), "globalId");
-        projectionList.add(Projections.property("globalVersion"), "globalVersion");
-        projectionList.add(Projections.property("deletedState"), "deletedState");
-        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+        addDistributedObjectProjectionList(projectionList);
 
         projectionList.add(Projections.property("unitsScale"), "unitsScale");
         projectionList.add(Projections.property("totalCount"), "totalCount");
         projectionList.add(Projections.property("dailySampleCount"), "dailySampleCount"); // суточная проба
         projectionList.add(Projections.property("netWeight"), "netWeight");
+        projectionList.add(Projections.property("updateHistory"), "updateHistory");
 
         projectionList.add(Projections.property("gr.guid"), "guidOfGR");
         projectionList.add(Projections.property("g.guid"), "guidOfG");
@@ -75,6 +73,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         XMLUtils.setAttributeIfNotNull(element, "TotalCount", totalCount);
         XMLUtils.setAttributeIfNotNull(element, "DailySampleCount", dailySampleCount);  // суточная проба
         XMLUtils.setAttributeIfNotNull(element, "NetWeight", netWeight);
+        //XMLUtils.setAttributeIfNotNull(element, "UpdateHistory", updateHistory);
         if (!StringUtils.isEmpty(guidOfGR))
             XMLUtils.setAttributeIfNotNull(element, "GuidOfGoodsRequest", guidOfGR);
         else {
@@ -101,6 +100,19 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         if(!gr.getOrgOwner().equals(orgOwner)){
             orgOwner = gr.getOrgOwner();
         }
+    }
+
+    public void updateVersionFromParent(Session session){
+        Criteria criteria = session.createCriteria(DOVersion.class);
+        criteria.add(Restrictions.eq("distributedObjectClassName", "GoodRequest"));
+        criteria.setMaxResults(1);
+        DOVersion version = (DOVersion) criteria.uniqueResult();
+        final long newVersion = version.getCurrentVersion()+1;
+        version.setCurrentVersion(newVersion);
+        session.update(version);
+        goodRequest.setLastUpdate(new Date());
+        goodRequest.setGlobalVersion(newVersion);
+        session.update(goodRequest);
     }
 
     @Override
@@ -135,8 +147,32 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         setOrgOwner(distributedObject.getOrgOwner());
         setUnitsScale(((GoodRequestPosition) distributedObject).getUnitsScale());
         setNetWeight(((GoodRequestPosition) distributedObject).getNetWeight());
+        final Long lastTotalCount = getTotalCount();
         setTotalCount(((GoodRequestPosition) distributedObject).getTotalCount());
+        final Long lastDailySampleCount = getDailySampleCount();
         setDailySampleCount(((GoodRequestPosition) distributedObject).getDailySampleCount()); // суточная проба
+        String lastHistory = getUpdateHistory();
+        Date date = getLastUpdate()!=null? getLastUpdate():getCreatedDate();
+        String newHistory="";
+        final String strDate = CalendarUtils.dateToString(date);
+        if(lastDailySampleCount==null){
+            newHistory= String.format("%s %d;", strDate, lastTotalCount/1000);
+        } else {
+            newHistory= String.format("%s %d %d;", strDate, lastTotalCount/1000, lastDailySampleCount/1000);
+        }
+        if(StringUtils.isEmpty(lastHistory)){
+            setUpdateHistory(newHistory);
+        } else {
+            setUpdateHistory(String.format("%s%s", lastHistory, newHistory));
+        }
+    }
+
+    public String getUpdateHistory() {
+        return updateHistory;
+    }
+
+    public void setUpdateHistory(String updateHistory) {
+        this.updateHistory = updateHistory;
     }
 
     public String getGuidOfP() {
