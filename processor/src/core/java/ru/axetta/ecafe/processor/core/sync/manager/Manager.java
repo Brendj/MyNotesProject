@@ -678,6 +678,7 @@ public class Manager {
                 persistenceSession.persist(doConflict);
             }
             currentDO.preProcess(persistenceSession, idOfOrg);
+            currentDO.updateVersionFromParent(persistenceSession);
             persistenceSession.update(currentDO);
             distributedObject.setGlobalVersion(currentMaxVersion);
             distributedObject.setTagName("M");
