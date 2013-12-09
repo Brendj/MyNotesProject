@@ -37,15 +37,6 @@ public class DistributedObjectDAO {
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
-    public <T extends DistributedObject> T findByGuid(Class<T> doClass, String guid) {
-        StringBuilder sql = new StringBuilder();
-        TypedQuery<T> query = entityManager.createQuery(
-                sql.append("select distinct o from ").append(doClass.getSimpleName()).append(" as o where o.guid = :guid").toString(),
-                doClass).setParameter("guid", guid);
-        List<T> res = query.getResultList();
-        return res.isEmpty() ? null : res.get(0);
-    }
-
     public void saveDOConflict(DOConflict doConflict) {
         entityManager.persist(doConflict);
     }
