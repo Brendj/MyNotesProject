@@ -266,7 +266,7 @@ public class DAOService {
         entityManager.remove(cp);
     }
 
-
+    // не рекомендуется к использованию следует переписать
     public DistributedObject mergeDistributedObject(DistributedObject distributedObject, Long globalVersion) {
         TypedQuery<DistributedObject> query = entityManager.createQuery(
                 "from " + distributedObject.getClass().getSimpleName() + " where guid='" + distributedObject.getGuid()

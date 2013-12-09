@@ -153,7 +153,7 @@ public class DAOUtils {
                         ClientGroup.Predefined.CLIENT_DELETED.getValue()));
         return (List<Long>) query.list();
     }
-    
+
     public static List<String> getRegions(Session session) {
         Query q = session.createSQLQuery("select distinct district from cf_orgs where trim(both ' ' from district)<>''");
         return (List<String>) q.list();
@@ -1198,7 +1198,6 @@ public class DAOUtils {
             refDistributedObject = clazz.newInstance();
             Criteria criteria = session.createCriteria(clazz);
             criteria.add(Restrictions.eq("guid",guid));
-            //refDistributedObject.createProjectionByID(criteria);
             refDistributedObject.createProjections(criteria);
             criteria.setResultTransformer(Transformers.aliasToBean(clazz));
             criteria.setMaxResults(1);
