@@ -50,6 +50,9 @@ public class MessageConfigurePage extends BasicWorkspacePage {
     private String passWithGuardianEmailMessageText;
     private String passWithGuardianEmailSubject;
 
+    private String goodRequestChangeEmailMessageText;
+    private String goodRequestChangeEmailSubject;
+
     @Resource
     EventNotificationService eventNotificationService;
 
@@ -104,6 +107,13 @@ public class MessageConfigurePage extends BasicWorkspacePage {
         passWithGuardianEmailSubject = eventNotificationService
                 .getNotificationText(EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN,
                         EventNotificationService.TYPE_EMAIL_SUBJECT);
+
+        goodRequestChangeEmailSubject = eventNotificationService
+                .getNotificationText(EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE,
+                        EventNotificationService.TYPE_EMAIL_SUBJECT);
+        goodRequestChangeEmailMessageText = eventNotificationService
+                .getNotificationText(EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE,
+                        EventNotificationService.TYPE_EMAIL_TEXT);
     }
 
     public Object save() throws Exception {
@@ -153,7 +163,12 @@ public class MessageConfigurePage extends BasicWorkspacePage {
                     EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, EventNotificationService.TYPE_EMAIL_SUBJECT,
                     passWithGuardianEmailSubject,
                     EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, EventNotificationService.TYPE_SMS,
-                    passWithGuardianSMSMessageText
+                    passWithGuardianSMSMessageText,
+                    ////
+                    EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, EventNotificationService.TYPE_EMAIL_TEXT,
+                    goodRequestChangeEmailMessageText,
+                    EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, EventNotificationService.TYPE_EMAIL_SUBJECT,
+                    goodRequestChangeEmailSubject
             });
 
             printMessage("Настройки сохранены.");
@@ -328,5 +343,21 @@ public class MessageConfigurePage extends BasicWorkspacePage {
 
     public void setPassWithGuardianEmailSubject(String passWithGuardianEmailSubject) {
         this.passWithGuardianEmailSubject = passWithGuardianEmailSubject;
+    }
+
+    public String getGoodRequestChangeEmailMessageText() {
+        return goodRequestChangeEmailMessageText;
+    }
+
+    public void setGoodRequestChangeEmailMessageText(String goodRequestChangeEmailMessageText) {
+        this.goodRequestChangeEmailMessageText = goodRequestChangeEmailMessageText;
+    }
+
+    public String getGoodRequestChangeEmailSubject() {
+        return goodRequestChangeEmailSubject;
+    }
+
+    public void setGoodRequestChangeEmailSubject(String goodRequestChangeEmailSubject) {
+        this.goodRequestChangeEmailSubject = goodRequestChangeEmailSubject;
     }
 }

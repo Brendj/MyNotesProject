@@ -196,6 +196,22 @@
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>
+        <rich:tab label="E-mail уведомление об изменении заявки" id="goodRequestChange-Email">
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Тема:" styleClass="output-text" />
+                <h:inputText value="#{messageConfigurePage.goodRequestChangeEmailSubject}" size="80" maxlength="128"
+                             styleClass="input-text" />
+                <h:outputText escape="true" value="Текст:" styleClass="output-text" />
+                <h:inputTextarea rows="15" cols="80" value="#{messageConfigurePage.goodRequestChangeEmailMessageText}"
+                                 styleClass="input-text" />
+                <h:outputText escape="true" value="Ключевые слова:" styleClass="output-text" />
+                <h:panelGrid>
+                    <h:outputText value="[number] - номер заявки" styleClass="output-text" />
+                    <h:outputText value="[shortName] - короткое наименование организации" styleClass="output-text" />
+                    <h:outputText value="[newValueHistory] - таблица новых значений" styleClass="output-text" />
+                </h:panelGrid>
+            </h:panelGrid>
+        </rich:tab>
     </rich:tabPanel>
 
     <h:panelGroup style="margin-top: 10px">
