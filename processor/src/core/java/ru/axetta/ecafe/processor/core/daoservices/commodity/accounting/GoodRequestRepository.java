@@ -20,11 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -34,18 +33,48 @@ import java.util.UUID;
  * To change this template use File | Settings | File Templates.
  */
 @Service
-@Transactional
-public class GoodRequestService {
+public class GoodRequestRepository {
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
-    
+
+    public void extractEmail(){
+
+    }
+
+    public Map<Long, Long> extractOrgOwnerAndVersion(){
+        String sql = "select orgowner, max(globalversion) from cf_goods_requests group by orgowner order by orgowner;";
+        Query query = entityManager.createNativeQuery(sql);
+        List list = query.getResultList();
+        Map<Long, Long> map = new HashMap<Long, Long>(list.size());
+        for (Object o:list){
+            Object[] vals = (Object[]) o;
+            map.put(Long.valueOf(vals[0].toString()), Long.valueOf(vals[1].toString()));
+        }
+        return map;
+    }
+
+    @Transactional
+    public List<GoodRequest> findByIsNotNullLastUpdateAndGtVersionAndOrgOwner(Long version, Long orgOwner){
+        String sql = "from GoodRequest where globalVersion>:version and lastUpdate is not null and orgOwner=:orgOwner";
+        TypedQuery<GoodRequest> query = entityManager.createQuery(sql, GoodRequest.class);
+        query.setParameter("version", version);
+        query.setParameter("orgOwner", orgOwner);
+        List<GoodRequest> goodRequests = query.getResultList();
+        for (GoodRequest gr:goodRequests){
+            gr.getGoodRequestPosition();
+        }
+        return goodRequests;
+    }
+
     @SuppressWarnings("unchecked")
+    @Transactional
     public List<GoodRequest> findByFilter(Long idOfOrg, List<DocumentState> stateList, Date startDate,Date endDate,  Integer deletedState){
         return findByFilter(idOfOrg, stateList, startDate, endDate, deletedState, null);
     }
 
     @SuppressWarnings("unchecked")
+    @Transactional
     public List<GoodRequest> findByFilter(Long idOfOrg, List<DocumentState> stateList, Date startDate,Date endDate,  Integer deletedState, Long idofgoodsgroup){
         Session session =  (Session) entityManager.getDelegate();
         Criteria criteria = session.createCriteria(GoodRequest.class);
@@ -69,33 +98,6 @@ public class GoodRequestService {
         criteria.addOrder(Order.desc("doneDate"));
         return criteria.list();
     }
-
-    /*@SuppressWarnings("unchecked")
-    public List<GoodRequest> findByFilter(Long idOfOrg, Date startDate,Date endDate, Long idofgoodsgroup){
-        String idofgoodsgroupRest = "";
-        String idofgoodsgroupJoin = "";
-        if (idofgoodsgroup != null) {
-            idofgoodsgroupRest = "and cf_goods.idofgoodsgroup=:idofgoodsgroup ";
-            idofgoodsgroupJoin = "left join cf_goods on cf_goods_requests_positions.idofgood=cf_goods.idofgood ";
-        }
-        String sql = "select distinct(cf_goods_requests.idofgoodsrequest) "
-                + "from cf_goods_requests "
-                + "left join cf_goods_requests_positions on cf_goods_requests.idofgoodsrequest=cf_goods_requests_positions.idofgoodsrequest "
-                + idofgoodsgroupJoin
-                + "where cf_goods_requests.donedate between (:startdate and :enddate) and cf_goods_requests.orgowner=:orgOwner "+ idofgoodsgroupRest
-                + "order by 1";
-        List<Long> query = entityManager.createNativeQuery(sql);
-        query.setParameter("orgOwner", idOfOrg);
-        query.setParameter("startDate", startDate.getTime());
-        query.setParameter("endDate", endDate.getTime());
-        if (idofgoodsgroup != null) {
-            query.setParameter("idofgoodsgroup", idofgoodsgroup);
-        }
-
-        return query.getResultList();
-    }*/
-
-
 
     @Transactional(readOnly = true)
     public List<GoodRequest> findGoodRequestAll(List<Long> idOfOrg){
@@ -139,6 +141,7 @@ public class GoodRequestService {
         return query.getSingleResult();
     }
 
+    @Transactional
     public GoodRequest save(GoodRequest goodRequest){
         TypedQuery<DOVersion> query = entityManager
                 .createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",
@@ -170,6 +173,7 @@ public class GoodRequestService {
         return goodRequest;
     }
 
+    @Transactional
     public GoodRequestPosition save(GoodRequestPosition goodRequestPosition){
         TypedQuery<DOVersion> query = entityManager
                 .createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",
@@ -201,6 +205,7 @@ public class GoodRequestService {
         return goodRequestPosition;
     }
 
+    @Transactional
     public void delete(GoodRequest goodRequest){
         goodRequest = entityManager.merge(goodRequest);
         TypedQuery<DOVersion> query = entityManager
@@ -226,6 +231,7 @@ public class GoodRequestService {
         goodRequest = entityManager.merge(goodRequest);
     }
 
+    @Transactional
     public void delete(GoodRequestPosition goodRequestPosition){
         goodRequestPosition = entityManager.merge(goodRequestPosition);
         TypedQuery<DOVersion> query = entityManager
@@ -252,6 +258,7 @@ public class GoodRequestService {
     }
 
 
+    @Transactional
     public GoodRequest createGoodRequestWithPosition(long idoforg, long idofgood, long time, long totalCount, String comment) {
         //  Формируем номер по маске {idOfOrg}-{yyMMdd}-ЗВК-{countToDay}. countToDay всегда первый
         Date now = new Date(System.currentTimeMillis());
