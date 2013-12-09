@@ -117,10 +117,10 @@
                         <!--cron="0 38 12 * * ?"/>-->
     <!--</task:scheduled-tasks>-->
 
-    <task:scheduler id="regularPaymentSchedule"/>
-    <task:scheduled-tasks scheduler="regularPaymentSchedule">
-        <task:scheduled ref="regularPaymentSubscriptionService" method="checkClientBalances"
-                        cron="0 0-59/5 17 11 * ?"/>
-    </task:scheduled-tasks>
+    <!--<task:scheduler id="regularPaymentSchedule"/>-->
+    <!--<task:scheduled-tasks scheduler="regularPaymentSchedule">-->
+        <!--<task:scheduled ref="regularPaymentSubscriptionService" method="checkClientBalances"-->
+                        <!--cron="0 0-59/5 17 11 * ?"/>-->
+    <!--</task:scheduled-tasks>-->
 
 </beans>
