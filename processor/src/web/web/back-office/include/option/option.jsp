@@ -208,6 +208,8 @@
                     <h:selectBooleanCheckbox value="#{optionPage.exportBIData}" styleClass="output-text" />
                     <h:outputText escape="true" value="Расположение файлов для BI" styleClass="output-text" />
                     <h:inputText value="#{optionPage.exportBIDataDirectory}" styleClass="input-text" size="100" />
+                    <h:outputText escape="true" value="Дата последней выгрузки" styleClass="output-text" />
+                    <h:outputText value="#{optionPage.lastBIDataUpdate}" styleClass="output-text" />
                 </h:panelGrid>
             </rich:panel>
             <rich:panel>

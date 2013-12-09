@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 
 import org.hibernate.Session;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -35,8 +36,6 @@ import java.util.List;
 @Component
 @Scope("singleton")
 public class BIDataExportService {
-
-
 
     private static boolean USE_FTP_AS_STORAGE = false;
     private static final DateFormat FILES_FORMAT = new SimpleDateFormat("yyyyMMdd");
@@ -230,7 +229,12 @@ public class BIDataExportService {
         }
 
 
-        buildFiles(newTypes);
+        Calendar now = new GregorianCalendar();
+        now.setTimeInMillis(System.currentTimeMillis());
+        clearCalendar(now);
+
+        buildFiles(newTypes, now);
+        updateLastDate(now);
     }
 
 
@@ -252,12 +256,12 @@ public class BIDataExportService {
     }
 
 
-    private boolean buildFiles(ExportType exportType) throws IOException {
+    private boolean buildFiles(ExportType exportType, Calendar now) throws IOException {
         List<String> typesToUpdate = new ArrayList<String>();
         Calendar last = getStartDate();
-        Calendar now = new GregorianCalendar();
+        /*Calendar now = new GregorianCalendar();
         now.setTimeInMillis(System.currentTimeMillis());
-        clearCalendar(now);
+        clearCalendar(now);*/
 
         ///last.setTimeInMillis(1377993600000L);
 
@@ -445,12 +449,25 @@ public class BIDataExportService {
     }
 
 
+    public static void updateLastDate (Calendar calendar) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        runtimeContext.setOptionValue(Option.OPTION_EXPORT_BI_DATA_LAST_UPDATE, calendar.getTimeInMillis());
+        runtimeContext.saveOptionValues();
+    }
+
+
     public static Calendar getStartDate() {
-        Calendar cal = new GregorianCalendar();
+        /*Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(System.currentTimeMillis());
         cal.set(Calendar.YEAR, 2012);
         cal.set(Calendar.MONTH, Calendar.SEPTEMBER);
         cal.set(Calendar.DAY_OF_MONTH, 1);
+        clearCalendar(cal);
+        return cal;*/
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        long ts = runtimeContext.getOptionValueLong(Option.OPTION_EXPORT_BI_DATA_LAST_UPDATE);
+        Calendar cal = new GregorianCalendar();
+        cal.setTimeInMillis(ts);
         clearCalendar(cal);
         return cal;
     }

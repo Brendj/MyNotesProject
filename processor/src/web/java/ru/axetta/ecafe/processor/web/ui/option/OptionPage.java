@@ -21,8 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,6 +36,7 @@ import java.util.List;
 @Scope("session")
 public class OptionPage extends BasicWorkspacePage {
 
+    private DateFormat biDataDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     final Logger logger = LoggerFactory.getLogger(BasicWorkspacePage.class);
     private Boolean notifyBySMSAboutEnterEvent;
     private Boolean withOperator;
@@ -90,6 +92,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean enableSubscriptionFeeding;
     private Boolean enableSubBalanceOperation;
     private Integer tempCardValidDays;
+    private String lastBIDataUpdate;
 
     private List<BankOptionItem> banks;
 
@@ -543,6 +546,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.enableSubBalanceOperation = enableSubBalanceOperation;
     }
 
+    public String getLastBIDataUpdate() {
+        return lastBIDataUpdate;
+    }
+
+    public void setLastBIDataUpdate(String lastBIDataUpdate) {
+        this.lastBIDataUpdate = lastBIDataUpdate;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -609,11 +620,11 @@ public class OptionPage extends BasicWorkspacePage {
         cleanupRepositoryReports = runtimeContext.getOptionValueBool(Option.OPTION_MSK_CLEANUP_REPOSITORY_REPORTS);
         enableSubscriptionFeeding = runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_SUBSCRIPTION_FEEDING);
         enableSubBalanceOperation = runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_SUB_BALANCE_OPERATION);
-
-
-
         syncLimits = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS);
         retryAfter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_RETRY_AFTER);
+        Calendar cal = new GregorianCalendar();
+        cal.setTimeInMillis(runtimeContext.getOptionValueLong(Option.OPTION_EXPORT_BI_DATA_LAST_UPDATE));
+        lastBIDataUpdate = biDataDateFormat.format(cal.getTime());
 
         bankListPage.onShow();
 
