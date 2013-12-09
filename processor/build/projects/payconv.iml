@@ -15,7 +15,9 @@
           <root url="jar://$MODULE_DIR$/../lib/apache/commons/commons-lang-2.4.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.ideaLibSources/commons-lang-2.4-sources.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
   </component>
