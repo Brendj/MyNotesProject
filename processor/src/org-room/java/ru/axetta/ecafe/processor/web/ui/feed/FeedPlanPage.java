@@ -33,9 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.faces.event.ValueChangeEvent;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.xml.namespace.QName;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.util.*;
 
 /**
@@ -69,7 +67,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
     @Autowired
-    private GoodRequestService goodRequestService;
+    private GoodRequestRepository goodRequestRepository;
     private Org org;
     private String errorMessages;
     private String infoMessages;

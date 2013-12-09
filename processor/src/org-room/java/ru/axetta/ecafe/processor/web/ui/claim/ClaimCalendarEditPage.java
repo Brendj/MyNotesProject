@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.claim;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestService;
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestRepository;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
@@ -56,7 +56,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
     @Autowired
-    private GoodRequestService goodRequestService;
+    private GoodRequestRepository goodRequestRepository;
 
     private String errorMessages;
     private String infoMessages;
@@ -136,11 +136,11 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
             stateList.add(i);
         }
         Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
-        List<GoodRequest> goodRequestList = goodRequestService.findByFilter(org.getIdOfOrg(),stateList,
+        List<GoodRequest> goodRequestList = goodRequestRepository.findByFilter(org.getIdOfOrg(),stateList,
                                                                             dateFrom.getTime(),dateTo.getTime(),
                                                                             deletedState, goodGroup);
         for (GoodRequest gr : goodRequestList) {
-            List<GoodRequestPosition> positions = goodRequestService.getGoodRequestPositionByGoodRequest(gr);
+            List<GoodRequestPosition> positions = goodRequestRepository.getGoodRequestPositionByGoodRequest(gr);
             for (GoodRequestPosition pos : positions) {
                 pos = entityManager.merge(pos);
 
@@ -245,7 +245,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
                 //  Если списка id не существует, это обозначает что значения добавлены, необходимо создавать заявку
                 if (ids == null) {
                     Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
-                    goodRequestService.createGoodRequestWithPosition(org.getIdOfOrg(),
+                    goodRequestRepository.createGoodRequestWithPosition(org.getIdOfOrg(),
                                                                      e.getIdofgood(), ts, v, NEW_CLAIM_COMMENT);
                 }
                 //  Иначе - скидываем у всех заявок значения в 0, кроме первой
@@ -255,14 +255,14 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
                         if (ids.get(i).longValue() == Long.MIN_VALUE) {
                             continue;
                         }
-                        GoodRequestPosition pos = goodRequestService.findGoodRequestPositionById(ids.get(i));
+                        GoodRequestPosition pos = goodRequestRepository.findGoodRequestPositionById(ids.get(i));
                         if (i == 0) {
                             pos.setTotalCount(v);
                         } else {
                             pos.setTotalCount(0L);
                         }
                         pos.setLastUpdate(new Date(System.currentTimeMillis()));
-                        goodRequestService.save(pos);
+                        goodRequestRepository.save(pos);
                     }
                 }
             }
