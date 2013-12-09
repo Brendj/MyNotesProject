@@ -104,12 +104,18 @@
         <task:scheduled ref="cleanupReportsService" method="run" cron="0 15 0 ? * *" />
     </task:scheduled-tasks>
 
-    <!--<task:scheduler id="clientsSMSSubscriptionFeeSchedule"/>-->
-    <!--<task:scheduled-tasks scheduler="clientsSMSSubscriptionFeeSchedule">-->
-        <!--<task:scheduled ref="smsSubscriptionFeeService" method="notifyClientsAboutSMSSubscriptionFee"-->
-                        <!--cron="0 0 16 26 * ?"/>-->
-        <!--<task:scheduled ref="smsSubscriptionFeeService" method="smsSubscriptionFeeWithdraw" cron="0 0 16 1-4 * ?"/>-->
-    <!--</task:scheduled-tasks>-->
+    <task:scheduler id="clientsSMSSubscriptionFeeSchedule"/>
+    <task:scheduled-tasks scheduler="clientsSMSSubscriptionFeeSchedule">
+       <task:scheduled ref="smsSubscriptionFeeService" method="notifyClientsAboutSMSSubscriptionFee"
+                        cron="0 0 16 26 * ?"/>
+        <task:scheduled ref="smsSubscriptionFeeService" method="smsSubscriptionFeeWithdraw" cron="0 0 16 1-4 * ?"/>
+    </task:scheduled-tasks>
+
+    <!-- Оповещение клиента об недостатке средств в субсчет для оплаты АП, срабатывает каждый день в 16 часов вечера -->
+    <task:scheduler id="subscriptionFeedingSchedule"/>
+    <task:scheduled-tasks scheduler="subscriptionFeedingSchedule">
+        <task:scheduled ref="subscriptionFeedingService" method="notifyClientsAboutSubscriptionFeeding" cron="0 0 16 * * ?"/>
+    </task:scheduled-tasks>
 
     <!--<task:scheduler id="clientBalanceRefillSchedule"/>-->
     <!--<task:scheduled-tasks scheduler="clientBalanceRefillSchedule">-->
@@ -122,5 +128,12 @@
         <!--<task:scheduled ref="regularPaymentSubscriptionService" method="checkClientBalances"-->
                         <!--cron="0 0-59/5 17 11 * ?"/>-->
     <!--</task:scheduled-tasks>-->
+
+    <!-- Оповещение контргента об изменении заявки, срабатывает каждве 20 минут-->
+    <task:scheduler id="goodRequestsSchedule"/>
+    <task:scheduled-tasks scheduler="goodRequestsSchedule">
+        <task:scheduled ref="goodRequestsNotificationService" method="checkModification"
+                        cron="0 0-59/20 * * * ?"/>
+    </task:scheduled-tasks>
 
 </beans>
