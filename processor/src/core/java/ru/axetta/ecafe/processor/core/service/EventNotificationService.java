@@ -5,11 +5,9 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting;
-import ru.axetta.ecafe.processor.core.persistence.ClientSms;
-import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.*;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +39,7 @@ public class EventNotificationService {
     public static String NOTIFICATION_SMS_SUB_FEE_WITHDRAW_NOT_SUCCESS = "smsSubFeeWithdrawNotSuccessful";
     public static String NOTIFICATION_SUBSCRIPTION_FEEDING = "subscriptionFeeding";
     public static String NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS = "subFeeWithdrawNotSuccessful";
+    public static String NOTIFICATION_GOOD_REQUEST_CHANGE = "goodRequestChange";
     public static String TYPE_SMS = "sms", TYPE_EMAIL_TEXT = "email.text", TYPE_EMAIL_SUBJECT = "email.subject";
     Properties notificationText;
     Boolean notifyBySMSAboutEnterEvent;
@@ -123,8 +122,19 @@ public class EventNotificationService {
                     + "<p style=\"color:#cccccc;font-size:xx-small;font-weight:bold\">Вы можете отключить данные уведомления в своем личном кабинете</p>\n"
                     + "</body>\n" + "</html>",
             NOTIFICATION_PASS_WITH_GUARDIAN + "." + TYPE_EMAIL_SUBJECT,
-            "Уведомление о времени прихода и ухода"
-    };
+            "Уведомление о времени прихода и ухода",
+            NOTIFICATION_GOOD_REQUEST_CHANGE + "." + TYPE_EMAIL_TEXT,
+            "<html>\n<body>\nУважаемый клиент, <br/><br/>\n\n"
+                    + "Заявка под номером <b>[number]</b> была изменена организацией <b>[shortName]</b>.<br/>"
+                    + "Новые данные<br/>\n"
+                    + "[newValueHistory]<br/>\n"
+                    + "С уважением,<br/>\n"
+                    + "Служба поддержки клиентов\n<br/><br/>\n"
+                    //+ "<p style=\"color:#cccccc;font-size:xx-small;font-weight:bold\">Вы можете отключить данные уведомления в своем личном кабинете</p>\n"
+                    + "</body>\n</html>",
+            NOTIFICATION_GOOD_REQUEST_CHANGE + "." + TYPE_EMAIL_SUBJECT,
+            "Уведомление об изменении заявки"
+    };                       // короткое имя школы
 
     String getDefaultText(String name) {
         for (int n = 0; n < DEFAULT_MESSAGES.length; n += 2) {
@@ -171,6 +181,28 @@ public class EventNotificationService {
             try {
                 RuntimeContext.getInstance().getPostman()
                         .postNotificationEmail(client.getEmail(), emailSubject, emailText);
+            } catch (Exception e) {
+                logger.error("Failed to send email notification", e);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean sendEmail(String email, String type, String[] values) {
+        if (StringUtils.isEmpty(email)) {
+            return false;
+        }
+        String emailText = getNotificationText(type, TYPE_EMAIL_TEXT), emailSubject = getNotificationText(type,
+                TYPE_EMAIL_SUBJECT);
+        if (emailText == null || emailSubject == null) {
+            logger.warn("No email text is specified for type '" + type + "'. Email is not sent");
+            return false;
+        } else {
+            emailText = formatMessage(emailText, values);
+            emailSubject = formatMessage(emailSubject, values);
+            try {
+                RuntimeContext.getInstance().getPostman().postNotificationEmail(email, emailSubject, emailText);
             } catch (Exception e) {
                 logger.error("Failed to send email notification", e);
                 return false;
