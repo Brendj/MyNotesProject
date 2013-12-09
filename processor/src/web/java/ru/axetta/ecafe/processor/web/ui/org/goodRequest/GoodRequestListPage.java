@@ -1,6 +1,6 @@
 package ru.axetta.ecafe.processor.web.ui.org.goodRequest;
 
-import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestService;
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestRepository;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -29,7 +29,7 @@ public class GoodRequestListPage extends BasicWorkspacePage {
     private static DocumentState[] documentStates = DocumentState.values();
 
     @Autowired
-    private GoodRequestService goodRequestService;
+    private GoodRequestRepository goodRequestRepository;
 
     @Override
     public void onShow() {
@@ -62,7 +62,7 @@ public class GoodRequestListPage extends BasicWorkspacePage {
         localCalendar.setTime(endDate);
         localCalendar.add(Calendar.DAY_OF_MONTH,1);
         Date end = localCalendar.getTime();
-        goodRequestList = goodRequestService.findByFilter(idOfOrg,stateList,baseDate,end,deletedState);
+        goodRequestList = goodRequestRepository.findByFilter(idOfOrg,stateList,baseDate,end,deletedState);
     }
 
     public String getPageTitle() {
