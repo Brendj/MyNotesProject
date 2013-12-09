@@ -262,22 +262,22 @@ public class ReportDAOService {
     }
 
 
-    public DistributedObject mergeDistributedObject(DistributedObject distributedObject, Long globalVersion) {
-        TypedQuery<DistributedObject> query = entityManager.createQuery(
-                "from " + distributedObject.getClass().getSimpleName() + " where guid='" + distributedObject.getGuid()
-                        + "'", DistributedObject.class);
-        List<DistributedObject> distributedObjectList = query.getResultList();
-        if (distributedObjectList.isEmpty()) {
-            return null;
-        }
-        DistributedObject d = entityManager.find(distributedObject.getClass(), distributedObjectList.get(0).getGlobalId());
-        d.fill(distributedObject);
-        d.setGlobalVersion(globalVersion);
-        d.setDeletedState(distributedObject.getDeletedState());
-        d.setLastUpdate(new Date());
-        entityManager.persist(d);
-        return entityManager.find(distributedObject.getClass(), distributedObjectList.get(0).getGlobalId());
-    }
+    //public DistributedObject mergeDistributedObject(DistributedObject distributedObject, Long globalVersion) {
+    //    TypedQuery<DistributedObject> query = entityManager.createQuery(
+    //            "from " + distributedObject.getClass().getSimpleName() + " where guid='" + distributedObject.getGuid()
+    //                    + "'", DistributedObject.class);
+    //    List<DistributedObject> distributedObjectList = query.getResultList();
+    //    if (distributedObjectList.isEmpty()) {
+    //        return null;
+    //    }
+    //    DistributedObject d = entityManager.find(distributedObject.getClass(), distributedObjectList.get(0).getGlobalId());
+    //    d.fill(distributedObject);
+    //    d.setGlobalVersion(globalVersion);
+    //    d.setDeletedState(distributedObject.getDeletedState());
+    //    d.setLastUpdate(new Date());
+    //    entityManager.persist(d);
+    //    return entityManager.find(distributedObject.getClass(), distributedObjectList.get(0).getGlobalId());
+    //}
 
     public void persistEntity(Object entity) throws Exception {
         entityManager.persist(entity);
