@@ -6,6 +6,8 @@
 
 -- суточная проба
 alter table cf_goods_requests_positions add column DailySampleCount bigint default null;
+alter table cf_goods_requests_positions add column UpdateHistory text default null;
+alter table cf_contragents add column RequestNotifyEmailAddress character varying(128) default null;
 
 CREATE TABLE cf_do_org_current_version (
   IdDOOrgCurrentVersion bigserial NOT NULL,

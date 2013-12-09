@@ -39,6 +39,7 @@ CREATE TABLE CF_Contragents (
   NeedAccountTranslate    INTEGER           NOT NULL,
   KPP VARCHAR(10) NOT NULL DEFAULT '',  --v39
   OGRN VARCHAR(15) NOT NULL DEFAULT '', --v39
+  RequestNotifyEmailAddress character varying(128) default null, --v52
   CONSTRAINT CF_Contragents_pk PRIMARY KEY (IdOfContragent),
   CONSTRAINT CF_Contragents_ContragentName UNIQUE (ContragentName),
   CONSTRAINT CF_Contragents_IdOfContactPerson_fk FOREIGN KEY (IdOfContactPerson) REFERENCES CF_Persons (IdOfPerson)
@@ -245,6 +246,7 @@ CREATE TABLE CF_Users (
   LastEntryIP             VARCHAR(15),         --v43
   LastEntryTime           BIGINT,              --v43
   IsBlocked               BOOLEAN NOT NULL,    --v43
+  Region                  VARCHAR(10)       default null, --v52
   CONSTRAINT CF_Users_pk PRIMARY KEY (IdOfUser),
   CONSTRAINT CF_Users_ShortName UNIQUE (UserName)
 --,  CONSTRAINT CF_Users_IdOfContragent_fk FOREIGN KEY (IdOfContragent) REFERENCES CF_Contragents (IdOfContragent) --v42
@@ -1534,6 +1536,8 @@ CREATE TABLE  cf_goods_requests_positions (
   DeleteDate bigint,
   UnitsScale  integer NOT NULL DEFAULT 0,
   TotalCount  bigint NOT NULL,
+  DailySampleCount bigint default null, --v52
+  UpdateHistory text default null,      --v52
   NetWeight  bigint NOT NULL,
   SendAll integer DEFAULT 0,
   CONSTRAINT cf_goods_requests_positions_pk PRIMARY KEY (IdOfGoodsRequestPosition ),
@@ -2880,6 +2884,14 @@ CREATE TABLE CF_SubAccount_Transfers (
   CONSTRAINT cf_subaccount_transfer_c_ctr_fk FOREIGN KEY (IdOfClientTransfer) REFERENCES cf_clients (IdOfClient),
   CONSTRAINT cf_subaccount_transfer_t_bctr_fk FOREIGN KEY (IdOfTransactionOnBenefactor) REFERENCES cf_transactions (IdOfTransaction),
   CONSTRAINT cf_subaccount_transfer_t_bcry_fk FOREIGN KEY (IdOfTransactionOnBeneficiary) REFERENCES cf_transactions (IdOfTransaction)
+);
+
+CREATE TABLE cf_do_org_current_version (
+  IdDOOrgCurrentVersion bigserial NOT NULL,
+  ObjectId integer not null,
+  IdOfOrg bigint not null,
+  LastVersion bigint not null,
+  CONSTRAINT cf_do_org_current_version_pk PRIMARY KEY (IdDOOrgCurrentVersion)
 );
 
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
