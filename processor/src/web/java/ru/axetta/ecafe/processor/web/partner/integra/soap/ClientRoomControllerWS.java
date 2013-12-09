@@ -96,6 +96,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_INVALID_DATA = 150L;
     private static final Long RC_NO_CONTACT_DATA = 160L;
     private static final Long RC_CLIENT_FINANCIAL_OPERATION_ERROR = 170L;
+    private static final Long RC_SETTINGS_NOT_FOUND = 180L;
 
     private static final String RC_OK_DESC = "OK";
     private static final String RC_CLIENT_NOT_FOUND_DESC = "Клиент не найден";
@@ -3872,6 +3873,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return res;
             }
             DAOService daoService = DAOService.getInstance();
+            List<ECafeSettings> settings = daoService
+                    .geteCafeSettingses(client.getOrg().getIdOfOrg(), SettingsIds.SubscriberFeeding, false);
+            if (settings.isEmpty()) {
+                res.resultCode = RC_SETTINGS_NOT_FOUND;
+                res.description = String
+                        .format("Отсутствуют настройки абонементного питания для организации %s (IdOfOrg = %s)",
+                                client.getOrg().getShortName(), client.getOrg().getIdOfOrg());
+                return res;
+            }
+            ECafeSettings cafeSettings = settings.get(0);
+            ECafeSettings.SubscriberFeedingSettingSettingValue parser = (ECafeSettings.SubscriberFeedingSettingSettingValue) new ECafeSettings.SettingValueParser(
+                    cafeSettings.getSettingValue(), SettingsIds.SubscriberFeeding).getParserBySettingValue();
             Date date = new Date();
             SubscriptionFeeding sf = new SubscriptionFeeding();
             sf.setCreatedDate(date);
@@ -3891,16 +3904,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             cd.setClient(client);
             cd.setIdOfClient(client.getIdOfClient());
             cd.setStateDiagram(StateDiagram.WAIT);
-            List<ECafeSettings> settings = DAOService.getInstance()
-                    .geteCafeSettingses(client.getOrg().getIdOfOrg(), SettingsIds.SubscriberFeeding, false);
-            if (settings.isEmpty()) {
-                throw new RuntimeException(
-                        String.format("Отсутствуют настройки абонементного питания для организации с IdOfOrg = %s",
-                                client.getOrg().getIdOfOrg()));
-            }
-            ECafeSettings cafeSettings = settings.get(0);
-            ECafeSettings.SubscriberFeedingSettingSettingValue parser = (ECafeSettings.SubscriberFeedingSettingSettingValue) new ECafeSettings.SettingValueParser(
-                    cafeSettings.getSettingValue(), SettingsIds.SubscriberFeeding).getParserBySettingValue();
             cd.setDateActivationDiagram(CalendarUtils.addDays(date, parser.getDayRequest()));
             cd.setGuid(UUID.randomUUID().toString());
             cd.setDeletedState(false);
