@@ -42,16 +42,26 @@ public abstract class DistributedObject{
     protected Date deleteDate;
     /* статус объекта (активен/удален) */
     protected Boolean deletedState;
-    /* имя узла элемента */
-    protected String tagName;
     /* GUID объекта */
     protected String guid;
     /* Идентификатор организации */
     protected Long orgOwner;
     protected SendToAssociatedOrgs sendAll;
-
-    // private DistributedObjectException.ErrorType errorType;
+    /* имя узла элемента */
+    protected String tagName;
     private DistributedObjectException distributedObjectException;
+
+    protected void addDistributedObjectProjectionList(ProjectionList projectionList) {
+        projectionList.add(Projections.property("globalId"), "globalId");
+        projectionList.add(Projections.property("globalVersion"), "globalVersion");
+        projectionList.add(Projections.property("globalVersionOnCreate"), "globalVersionOnCreate");
+        projectionList.add(Projections.property("createdDate"), "createdDate");
+        projectionList.add(Projections.property("lastUpdate"), "lastUpdate");
+        projectionList.add(Projections.property("deleteDate"), "deleteDate");
+        projectionList.add(Projections.property("guid"), "guid");
+        projectionList.add(Projections.property("deletedState"), "deletedState");
+        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+    }
 
     public DistributedObjectException getDistributedObjectException() {
         return distributedObjectException;
@@ -76,6 +86,7 @@ public abstract class DistributedObject{
         }
         return element;
     }
+
 
     /* метод добавления общих атрибутов в узел */
     public Element toElement(Element element){
@@ -113,6 +124,9 @@ public abstract class DistributedObject{
 
     public abstract void preProcess(Session session, Long idOfOrg) throws DistributedObjectException;
 
+    /* метод обновления версии родительского элемента */
+    public void updateVersionFromParent(Session session){}
+
     protected abstract DistributedObject parseAttributes(Node node) throws Exception;
 
     public abstract void fill(DistributedObject distributedObject);
@@ -120,19 +134,6 @@ public abstract class DistributedObject{
     public abstract List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception;
 
     public abstract void createProjections(Criteria criteria);
-
-    //public void createProjectionByID(Criteria criteria){
-    //    ProjectionList projectionList = Projections.projectionList();
-    //    projectionList.add(Projections.property("globalId"), "globalId");
-    //    projectionList.add(Projections.property("globalVersion"), "globalVersion");
-    //    projectionList.add(Projections.property("globalVersionOnCreate"), "globalVersionOnCreate");
-    //    projectionList.add(Projections.property("createdDate"), "createdDate");
-    //    projectionList.add(Projections.property("lastUpdate"), "lastUpdate");
-    //    projectionList.add(Projections.property("deletedState"), "deletedState");
-    //    projectionList.add(Projections.property("guid"), "guid");
-    //    projectionList.add(Projections.property("orgOwner"), "orgOwner");
-    //    criteria.setProjection(projectionList);
-    //}
 
     /**
      * Метод для выборки объектов которые уходят от создателя к создателю без логики
