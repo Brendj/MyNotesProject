@@ -50,6 +50,7 @@ public class Contragent {
     private String phone;
     private String mobile;
     private String email;
+    private String requestNotifyEmailAddress;
     private String fax;
     private String remarks;
     private String inn;
@@ -199,6 +200,14 @@ public class Contragent {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getRequestNotifyEmailAddress() {
+        return requestNotifyEmailAddress;
+    }
+
+    public void setRequestNotifyEmailAddress(String requestNotifyEmailAddress) {
+        this.requestNotifyEmailAddress = requestNotifyEmailAddress;
     }
 
     public String getFax() {

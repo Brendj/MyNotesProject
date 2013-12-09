@@ -42,6 +42,8 @@
     <h:inputText value="#{mainPage.contragentCreatePage.phone}" maxlength="32" styleClass="input-text" />
     <h:outputText escape="true" value="Электронная почта" styleClass="output-text" />
     <h:inputText value="#{mainPage.contragentCreatePage.email}" maxlength="128" styleClass="input-text" />
+    <h:outputText escape="true" value="Электронная почта для оповещения изменений заявок" styleClass="output-text" />
+    <h:inputText value="#{mainPage.contragentCreatePage.requestNotifyEmailAddress}" maxlength="128" styleClass="input-text" />
     <h:outputText escape="true" value="Факс" styleClass="output-text" />
     <h:inputText value="#{mainPage.contragentCreatePage.fax}" maxlength="32" styleClass="input-text" />
     <h:outputText escape="true" value="ИНН" styleClass="output-text" />
