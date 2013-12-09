@@ -80,6 +80,7 @@ public class User {
     private String lastEntryIP;
     private Date lastEntryTime;
     private Boolean blocked;
+    private String region;
 
     public String getRoleName() {
         return roleName;
@@ -245,6 +246,14 @@ public class User {
             }
         }
         return false;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
     }
 
     @Override

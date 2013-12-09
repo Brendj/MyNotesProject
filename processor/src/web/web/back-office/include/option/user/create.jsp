@@ -64,6 +64,12 @@
         <h:outputText value="#{mainPage.userCreatePage.contragentFilter}" escape="true" styleClass="output-text" />
     </h:panelGroup>
 
+    <h:outputText escape="true" value="Регион" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.userCreatePage.region}" styleClass="input-text">
+        <a4j:support event="onchange" reRender="userEditGrid" ajaxSingle="true" />
+        <f:selectItems value="#{mainPage.userCreatePage.regions}" />
+    </h:selectOneMenu>
+
     <h:outputText escape="true" value="Права пользователя" styleClass="output-text" rendered="#{mainPage.userCreatePage.isDefault}"/>
     <rich:dataTable value="#{mainPage.userCreatePage.functionSelector.items}" var="item" rendered="#{mainPage.userCreatePage.isDefault}">
         <rich:column>

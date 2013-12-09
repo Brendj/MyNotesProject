@@ -7691,6 +7691,14 @@ public User getCurrentUser() throws Exception {
             return "";
         }
     }
+
+    public String getUserRegionsList () {
+        try {
+            return getCurrentUser().getRegion();
+        } catch (Exception e) {
+            return "";
+        }
+    }
 }
 
 

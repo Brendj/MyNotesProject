@@ -34,6 +34,7 @@
             <key column="IdOfUser"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Contragent" column="IdOfContragent"/>
         </set>
+        <property name="region" column="Region" type="string" length="10" not-null="false"/>
         <set name="functionsInternal" table="CF_Permissions">
             <key column="IdOfUser"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Function" column="IdOfFunction"/>

@@ -6,12 +6,14 @@ package ru.axetta.ecafe.processor.web.ui.option.user;
 
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
+import javax.faces.model.SelectItem;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +41,8 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
     //private Contragent currentContragent;
     private String contragentFilter;
     private String contragentIds;
+    private SelectItem[] regions;
+    private String region;
 
     public void setIdOfRole(Integer idOfRole) {
         this.idOfRole = idOfRole;
@@ -136,6 +140,18 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
         this.contragentIds = contragentIds;
     }
 
+    public SelectItem[] getRegions() {
+        return regions;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
     private void setContragentFilterInfo(List<ContragentItem> contragentItems) {
         StringBuilder str = new StringBuilder();
         StringBuilder ids = new StringBuilder();
@@ -158,6 +174,16 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
     public void fill(Session session) throws Exception {
         this.functionSelector.fill(session);
         this.idOfRole = User.DefaultRole.DEFAULT.getIdentification();
+        initRegions(session);
+    }
+
+    private void initRegions (Session session) {
+        List<String> regions = DAOUtils.getRegions(session);
+        regions.add(0, "");
+        this.regions = new SelectItem[regions.size()];
+        for (int i=0; i<regions.size(); i++) {
+            this.regions [i] = new SelectItem(regions.get(i));
+        }
     }
 
     public void createUser(Session session) throws Exception {
@@ -190,6 +216,11 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
         for (ContragentItem it : this.contragentItems) {
             Contragent contragent = (Contragent) session.load(Contragent.class, it.getIdOfContragent());
             user.getContragents().add(contragent);
+        }
+        if (region != null && region.length() > 0) {
+            user.setRegion(region);
+        } else {
+            user.setRegion(null);
         }
         if(role.equals(User.DefaultRole.MONITORING)){
             user.setFunctions(functionSelector.getMonitoringFunctions(session));

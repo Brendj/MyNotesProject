@@ -203,7 +203,9 @@
                             <rich:toolTip for="sysuser" followMouse="true" direction="top-right" showDelay="500" styleClass="tooltip" rendered="#{not empty mainPage.userContragentsList}">
                                 <span  style="white-space:nowrap">
                                     <h:outputText styleClass="output-text" style="font-weight: bold" value="Доступные контрагенты:" /><br />
-                                    <h:outputText escape="false" value="#{mainPage.userContragentsList}" />
+                                    <h:outputText escape="false" value="#{mainPage.userContragentsList}" /><br /><br />
+                                    <h:outputText styleClass="output-text" style="font-weight: bold" value="Доступные регионы:" /><br />
+                                    <h:outputText escape="false" value="#{mainPage.userRegionsList}" />
                                 </span>
                             </rich:toolTip>
                             <h:outputText value=" - " styleClass="output-text"/>

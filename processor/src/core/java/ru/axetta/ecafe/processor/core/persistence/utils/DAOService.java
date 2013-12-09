@@ -68,6 +68,11 @@ public class DAOService {
         return (User) q.getSingleResult();
     }
 
+    public User findUserById(long idOfUser) throws Exception {
+        User user = entityManager.find(User.class, idOfUser);
+        return user;
+    }
+
     public User setUserInfo(User user) {
         return entityManager.merge(user);
     }

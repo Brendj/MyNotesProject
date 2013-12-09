@@ -14,3 +14,6 @@ CREATE TABLE cf_do_org_current_version (
   LastVersion bigint not null,
   CONSTRAINT cf_do_org_current_version_pk PRIMARY KEY (IdDOOrgCurrentVersion)
 );
+
+
+alter table cf_users add column region varchar(10) default null;

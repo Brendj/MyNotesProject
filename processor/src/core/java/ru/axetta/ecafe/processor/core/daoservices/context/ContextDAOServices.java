@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -105,11 +106,11 @@ public class ContextDAOServices {
     }
 
     public void buildOrgRestriction(long idOfUser, String field, Criteria criteria) {
-        List<Long> orgIds = findOrgOwnersByContragentSet(idOfUser);
-        if (orgIds.isEmpty()) {
-            return;
+        List<Long> orgIds = findOrgOwnersByContragentSet(idOfUser);     //  Ограничение по контрагенту
+        if (!orgIds.isEmpty()) {
+            criteria.add(Restrictions.in(field, orgIds));
         }
-        criteria.add(Restrictions.in(field, orgIds));
+        buildRegionsRestriction(idOfUser, "district", criteria);        //  Ограничение по региону
     }
 
     public String buildOrgRestriction(long idOfUser, String field) {
@@ -154,6 +155,25 @@ public class ContextDAOServices {
         criteria.add(disjunction);
     }
 
+
+
+
+
+    /*
+                           ОГРАНИЧЕНИЯ    ПО    РЕГИОНАМ
+     */
+    public void buildRegionsRestriction(long idOfUser, Criteria criteria) {
+        buildRegionsRestriction(idOfUser, "region", criteria);
+    }
+
+    public void buildRegionsRestriction(long idOfUser, String field, Criteria criteria) {
+        try {
+            User user = DAOService.getInstance().findUserById(idOfUser);
+            criteria.add(Restrictions.eq(field, user.getRegion()));
+        } catch (Exception e) {
+
+        }
+    }
 
 
 

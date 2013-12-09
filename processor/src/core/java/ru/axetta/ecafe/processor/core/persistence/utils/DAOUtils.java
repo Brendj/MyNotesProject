@@ -153,6 +153,11 @@ public class DAOUtils {
                         ClientGroup.Predefined.CLIENT_DELETED.getValue()));
         return (List<Long>) query.list();
     }
+    
+    public static List<String> getRegions(Session session) {
+        Query q = session.createSQLQuery("select distinct district from cf_orgs where trim(both ' ' from district)<>''");
+        return (List<String>) q.list();
+    }
 
     public static boolean wasSuspendedLastSubscriptionFeedingByClient(Session session, long idOfClient){
         Query query = session.createQuery("from SubscriptionFeeding where idOfClient=:idOfClient and dateDeactivateService>=:currentDate order by dateDeactivateService desc");

@@ -6,12 +6,15 @@ package ru.axetta.ecafe.processor.web.ui.option.user;
 
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
+import javax.faces.model.SelectItem;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -41,6 +44,8 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
     private String contragentFilter;
     private String contragentIds;
     private Boolean blocked;
+    private SelectItem[] regions;
+    private String region;
 
     public void setFunctionSelector(FunctionSelector functionSelector) {
         this.functionSelector = functionSelector;
@@ -96,10 +101,35 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             user.setFunctions(functionSelector.getSelected(session));
             user.setRoleName(this.roleName);
         }
+        if (region != null && region.length() > 0) {
+            user.setRegion(region);
+        } else {
+            user.setRegion(null);
+        }
         session.update(user);
         fill(session, user);
     }
 
+    private void initRegions (Session session) {
+        List<String> regions = DAOUtils.getRegions(session);
+        regions.add(0, "");
+        this.regions = new SelectItem[regions.size()];
+        for (int i=0; i<regions.size(); i++) {
+            this.regions [i] = new SelectItem(regions.get(i));
+        }
+    }
+    
+    public SelectItem[] getRegions() {
+        return regions;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
 
     public Boolean getIsDefault(){
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
@@ -148,6 +178,8 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         this.idOfRole = user.getIdOfRole();
         this.roleName = user.getRoleName();
         this.blocked = user.isBlocked();
+        this.region = user.getRegion();
+        initRegions(session);
     }
 
     public static class ContragentItem {
