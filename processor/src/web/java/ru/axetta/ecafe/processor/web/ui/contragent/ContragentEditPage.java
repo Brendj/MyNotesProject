@@ -99,6 +99,7 @@ public class ContragentEditPage extends BasicWorkspacePage {
     private String phone;
     private String mobile;
     private String email;
+    private String requestNotifyEmailAddress;
     private String fax;
     private String remarks;
     private String inn;
@@ -205,6 +206,14 @@ public class ContragentEditPage extends BasicWorkspacePage {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getRequestNotifyEmailAddress() {
+        return requestNotifyEmailAddress;
+    }
+
+    public void setRequestNotifyEmailAddress(String requestNotifyEmailAddress) {
+        this.requestNotifyEmailAddress = requestNotifyEmailAddress;
     }
 
     public String getFax() {
@@ -333,6 +342,7 @@ public class ContragentEditPage extends BasicWorkspacePage {
         contragent.setPhone(this.phone);
         contragent.setMobile(this.mobile);
         contragent.setEmail(this.email);
+        contragent.setRequestNotifyEmailAddress(requestNotifyEmailAddress);
         contragent.setFax(this.fax);
         contragent.setRemarks(this.remarks.trim());
         contragent.setInn(this.inn.trim());
@@ -363,6 +373,7 @@ public class ContragentEditPage extends BasicWorkspacePage {
         this.phone = contragent.getPhone();
         this.mobile = contragent.getMobile();
         this.email = contragent.getEmail();
+        this.requestNotifyEmailAddress = contragent.getRequestNotifyEmailAddress();
         this.fax = contragent.getFax();
         this.remarks = contragent.getRemarks();
         this.inn = contragent.getInn();

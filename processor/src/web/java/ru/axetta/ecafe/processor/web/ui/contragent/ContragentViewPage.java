@@ -67,6 +67,7 @@ public class ContragentViewPage extends BasicWorkspacePage {
     private String phone;
     private String mobile;
     private String email;
+    private String requestNotifyEmailAddress;
     private String fax;
     private String remarks;
     private String inn;
@@ -125,6 +126,14 @@ public class ContragentViewPage extends BasicWorkspacePage {
 
     public String getEmail() {
         return email;
+    }
+
+    public void setRequestNotifyEmailAddress(String requestNotifyEmailAddress) {
+        this.requestNotifyEmailAddress = requestNotifyEmailAddress;
+    }
+
+    public Object getRequestNotifyEmailAddress() {
+        return requestNotifyEmailAddress;
     }
 
     public String getFax() {
@@ -195,6 +204,10 @@ public class ContragentViewPage extends BasicWorkspacePage {
         return okato;
     }
 
+    public void setOkato(String okato) {
+        this.okato = okato;
+    }
+
     public void fill(Session session, Long idOfContragent) throws Exception {
         Contragent contragent = (Contragent) session.load(Contragent.class, idOfContragent);
         this.idOfContragent = contragent.getIdOfContragent();
@@ -208,6 +221,7 @@ public class ContragentViewPage extends BasicWorkspacePage {
         this.phone = contragent.getPhone();
         this.mobile = contragent.getMobile();
         this.email = contragent.getEmail();
+        this.requestNotifyEmailAddress = contragent.getRequestNotifyEmailAddress();
         this.fax = contragent.getFax();
         this.remarks = contragent.getRemarks();
         this.inn = contragent.getInn();
