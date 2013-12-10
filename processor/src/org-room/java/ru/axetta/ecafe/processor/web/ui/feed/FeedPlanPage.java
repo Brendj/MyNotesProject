@@ -9,7 +9,8 @@ package ru.axetta.ecafe.processor.web.ui.feed;
 //import generated.payments.processing.PosPayment;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestService;
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestRepository;
+//import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestService;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
