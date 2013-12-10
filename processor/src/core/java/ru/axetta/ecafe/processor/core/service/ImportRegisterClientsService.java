@@ -623,7 +623,7 @@ public class ImportRegisterClientsService {
                 Org newOrg = em.find(Org.class, change.getIdOfMigrateOrgTo());
                 dbClient.setOrg(newOrg);
             case MODIFY_OPERATION:
-                String date = new SimpleDateFormat("dd.mm.yyyy").format(new Date(System.currentTimeMillis()));
+                String date = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
                 FieldProcessor.Config modifyConfig = new ClientManager.ClientFieldConfigForUpdate();
                 modifyConfig.setValue(ClientManager.FieldId.CLIENT_GUID, change.getClientGUID());
                 modifyConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
