@@ -293,7 +293,16 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     }
 
     public void doValueChange (ActionEvent actionEvent) {
-        changesMade = true;
+        Long prevValue = (Long) actionEvent.getComponent().getAttributes().get("prevValue");
+        Long newValue = null;
+        try {
+            newValue = Long.parseLong((String) actionEvent.getComponent().getAttributes().get("newValue"));
+        } catch (Exception e) {
+            newValue = null;
+        }
+        if (newValue != null && ((prevValue == null && newValue != null) || prevValue != newValue)) {
+            changesMade = true;
+        }
     }
 
     public void doApply () {
@@ -521,12 +530,14 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         private long idofgood;
         private String food;
         private Map<Long, Long> data;
+        private Map<Long, Long> sourceData;
         private Map<Long, List<Long>> ids;
 
         public Entry (String food, long idofgood) {
             this.food = food;
             this.idofgood = idofgood;
             data = new HashMap<Long, Long>();
+            sourceData = new HashMap<Long, Long>();
             ids = new HashMap<Long, List<Long>>();
         }
 
@@ -558,12 +569,21 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
             this.data = data;
         }
 
+        public Map<Long, Long> getSourceData() {
+            return sourceData;
+        }
+
+        public void setSourceData(Map<Long, Long> sourceData) {
+            this.sourceData = sourceData;
+        }
+
         public void add(long date, long value, long idofgoodsrequestposition) {
             //  Суммируем значения за одну дату
             if (data.get(date) != null) {
                 value = data.get(date) + value;
             }
             data.put(date, value);
+            sourceData.put(date, value);
 
             //  Сохраняем несколько idofgoodsrequestposition в общем массиве за одну дату
             List<Long> localIds = ids.get(date);

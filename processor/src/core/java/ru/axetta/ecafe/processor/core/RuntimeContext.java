@@ -1172,6 +1172,9 @@ public class RuntimeContext implements ApplicationContextAware {
     }
 
     public String getPropertiesValue(String name, String defaultValue) {
+        if (configProperties == null) {
+            return defaultValue;
+        }
         return configProperties.getProperty(name, defaultValue);
     }
 

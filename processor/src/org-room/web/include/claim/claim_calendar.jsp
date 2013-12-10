@@ -103,7 +103,10 @@
                                        id="inplace" changedHoverClass="hover" viewHoverClass="hover"
                                        viewClass="inplace" changedClass="inplace"
                                        selectOnEdit="true" editEvent="ondblclick">
-                        <a4j:support event="onchange" reRender="controls,months,group,messages" actionListener="#{claimCalendarEditPage.doValueChange}" />
+                        <a4j:support event="onviewactivated" reRender="controls,months,group,messages" actionListener="#{claimCalendarEditPage.doValueChange}" >
+                            <f:attribute name="prevValue" value="#{e.sourceData[col.date]}"/>
+                            <f:attribute name="newValue" value="#{e.data[col.date]}"/>
+                        </a4j:support>
                     </rich:inplaceInput>
                 </rich:columns>
                 <%--<rich:column>
@@ -122,11 +125,11 @@
             <h:outputText escape="true" value="#{claimCalendarEditPage.infoMessages}" rendered="#{not empty claimCalendarEditPage.infoMessages}" styleClass="info-messages" />
             <h:panelGrid columns="2">
                 <h:panelGrid columns="2">
-                    <a4j:commandButton value="Применить" reRender="claimsCalendar,messages,months,group" disabled="#{!claimCalendarEditPage.changesMade}"
+                    <a4j:commandButton value="Применить" reRender="claimsCalendar,messages,months,group,controls" disabled="#{!claimCalendarEditPage.changesMade}"
                                        action="#{claimCalendarEditPage.doApply}">
                     </a4j:commandButton>
 
-                    <a4j:commandButton value="Отменить" reRender="claimsCalendar,messages,months,group" disabled="#{!claimCalendarEditPage.changesMade}"
+                    <a4j:commandButton value="Отменить" reRender="claimsCalendar,messages,months,group,controls" disabled="#{!claimCalendarEditPage.changesMade}"
                                        action="#{claimCalendarEditPage.doCancel}">
                     </a4j:commandButton>
                 </h:panelGrid>
