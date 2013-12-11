@@ -358,10 +358,9 @@ public class GoodRequestsReport extends BasicReport {
             }
         }
 
-        public String getRowValue(String colName, boolean showDailySamples) {
+        public String getRowValue(String colName, int dailySamplesMode) {
             String dailySample = getDailySample(colName);
-            return getValue(colName) + (showDailySamples && !dailySample.equals("0") ? ("/" + getDailySample(colName))
-                    : "");
+            return getValue(colName) + (dailySamplesMode == 1 && !dailySample.equals("0") ? ("/" + dailySample) : "");
         }
 
         public String getValue (String colName) {

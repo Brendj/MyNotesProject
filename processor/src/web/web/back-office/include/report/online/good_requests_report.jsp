@@ -55,8 +55,11 @@
                       styleClass="output-text" />
         <h:selectBooleanCheckbox value="#{mainPage.goodRequestReportPage.hideMissedColumns}" styleClass="output-text" />
 
-        <h:outputText escape="true" value="Показывать суточную пробу" styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{mainPage.goodRequestReportPage.showDailySamples}" styleClass="output-text" />
+        <h:outputText escape="true" value="Суточная проба" styleClass="output-text" />
+        <h:selectOneMenu value="#{mainPage.goodRequestReportPage.dailySamplesMode}" styleClass="output-text">
+            <f:selectItem itemValue="0" itemLabel="Не выводить"/>
+            <f:selectItem itemValue="1" itemLabel="Выводить"/>
+        </h:selectOneMenu>
 
         <h:outputText escape="true" value="Фильтр по заявкам"
                       styleClass="output-text" />
@@ -101,7 +104,7 @@
                     <h:outputText escape="true" value="#{columnName}" />
                 </f:facet>
                 <h:outputText style="float: left; #{req.getStyle(columnName)}" escape="true"
-                              value="#{req.getRowValue(columnName, mainPage.goodRequestReportPage.showDailySamples)}"
+                              value="#{req.getRowValue(columnName, mainPage.goodRequestReportPage.dailySamplesMode)}"
                               styleClass="output-text" />
             </rich:columns>
 

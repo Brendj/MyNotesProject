@@ -36,7 +36,7 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
     private int requestsFilter = 3;
     private String goodName;
     private int daysLimit;
-    private boolean showDailySamples;
+    private int dailySamplesMode;
 
     public String getPageFilename() {
         return "report/online/good_requests_report";
@@ -108,12 +108,12 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
         this.goodRequests = goodRequests;
     }
 
-    public boolean isShowDailySamples() {
-        return showDailySamples;
+    public int getDailySamplesMode() {
+        return dailySamplesMode;
     }
 
-    public void setShowDailySamples(boolean showDailySamples) {
-        this.showDailySamples = showDailySamples;
+    public void setDailySamplesMode(int dailySamplesMode) {
+        this.dailySamplesMode = dailySamplesMode;
     }
 
     public boolean isShowAll() {
