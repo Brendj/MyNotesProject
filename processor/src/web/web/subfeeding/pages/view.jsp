@@ -1,13 +1,17 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page trimDirectiveWhitespaces="true" %>
+<%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
+<%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.web.partner.integra.dataflow.*" %>
+<%@ page import="ru.axetta.ecafe.processor.web.subfeeding.OrderDetailViewInfo" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Date" %>
 <%@ page import="java.util.TimeZone" %>
 <!DOCTYPE html>
 <html>
@@ -23,7 +27,28 @@
         $(function () {
             $("#datepickerBegin").datepicker();
             $("#datepickerEnd").datepicker();
+            $("#errorDialog").dialog({
+                autoOpen: false,
+                modal: true,
+                buttons: {
+                    Ok: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
         });
+
+        function validateDates() {
+            var format = 'dd.mm.yy';
+            var beginDate = $("#datepickerBegin").val();
+            var endDate = $("#datepickerEnd").val();
+            if ($.datepicker.parseDate(format, beginDate).getTime() > $.datepicker.parseDate(format,
+                    endDate).getTime()) {
+                $("#errorDialog").dialog("open");
+                return false;
+            }
+            return true;
+        }
     </script>
 </head>
 <body>
@@ -33,10 +58,11 @@
     </form>
 </div>
 <%
+    TimeZone timeZone = RuntimeContext.getInstance().getLocalTimeZone(null);
     DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-    df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+    df.setTimeZone(timeZone);
     DateFormat tf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-    tf.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+    tf.setTimeZone(timeZone);
     @SuppressWarnings("unchecked")
     SubscriptionFeeding sf = (SubscriptionFeeding) request.getAttribute("subscriptionFeeding");
     Client client = (Client) request.getAttribute("client");
@@ -44,13 +70,17 @@
     String subBalance0 = CurrencyStringUtils.copecksToRubles(client.getBalance() - client.getSubBalance(1));
     boolean wasSuspended = sf.getWasSuspended() != null && sf.getWasSuspended();
 %>
+<div class="textDiv"><%=client.getPerson().getFullName()%></div>
+<div class="textDiv">Номер контракта: <%=ContractIdFormat.format(client.getContractId())%></div>
 <div class="textDiv">Текущий баланс основного счета: <%=subBalance0%> руб.</div>
 <div class="textDiv">Баланс субсчета АП: <%=subBalance1%> руб.</div>
+<div class="textDiv">Дата подключения услуги: <%=tf.format(sf.getDateActivateService())%></div>
 <%
     if (wasSuspended) {
         String suspendDate = df.format(sf.getLastDatePauseService());
+        String status = sf.getLastDatePauseService().before(new Date()) ? "приостановлена" : "будет приостановлена";
 %>
-<div class="textDiv">Услуга приостановлена с <%=suspendDate%></div>
+<div class="textDiv">Услуга <%=status%> с <%=suspendDate%></div>
 <%
     }
 %>
@@ -103,8 +133,9 @@
 %>
 
 <div class="textDiv" style="font-weight: bold; margin-top: 50px;">История операций</div>
+<div class="textDiv" id="errorDialog" hidden="hidden">Начальная дата не может быть больше конечной.</div>
 <form method="post" enctype="application/x-www-form-urlencoded"
-      action="${pageContext.request.contextPath}/sub-feeding/view">
+      action="${pageContext.request.contextPath}/sub-feeding/view" onsubmit="return validateDates();">
     <table class="customTable">
         <tr class="paymentEvenLine">
             <td>Начальная дата</td>
@@ -164,14 +195,23 @@
             String tradeDiscount = CurrencyStringUtils.copecksToRubles(purchase.getTrdDiscount());
             String sumByCash = CurrencyStringUtils.copecksToRubles(purchase.getByCash());
             String sumByCard = CurrencyStringUtils.copecksToRubles(purchase.getByCard());
-            StringBuilder consistenceBuilder = new StringBuilder();
+            OrderDetailViewInfo viewInfo = new OrderDetailViewInfo();
             for (PurchaseElementExt pe : purchase.getE()) {
-                consistenceBuilder.append(pe.getName()).append(" - ")
-                        .append(CurrencyStringUtils.copecksToRubles(pe.getSum())).append(" руб.")
-                        .append(pe.getAmount() > 1 ? "x " + pe.getAmount() : "").append("<br/>");
+                int type = pe.getType();
+                if (type == 1) {
+                    viewInfo.createComplexViewInfo(pe.getMenuType(), pe.getName(), pe.getSum(), true);
+                } else if (type == 2) {
+                    int complexMenuType = pe.getMenuType() - 100;
+                    OrderDetailViewInfo.ComplexViewInfo cvi = viewInfo.complexesByType.get(complexMenuType);
+                    if (cvi == null) {
+                        cvi = viewInfo.createComplexViewInfo(complexMenuType, "", 0L, false);
+                    }
+                    cvi.addComplexDetail(pe.getName());
+                } else if (type == 0) {
+                    viewInfo.createSeparateDish(pe.getName(), pe.getSum(), pe.getAmount());
+                }
             }
-            String consistence = consistenceBuilder.length() > 0 ? consistenceBuilder.toString()
-                    .substring(0, consistenceBuilder.length() - 5) : "";
+            String consistence = viewInfo.toString();
 %>
     <tr style="vertical-align: top;" class="<%=even ? "paymentEvenLine" : "paymentUnevenLine"%>">
         <td><%=date%></td>

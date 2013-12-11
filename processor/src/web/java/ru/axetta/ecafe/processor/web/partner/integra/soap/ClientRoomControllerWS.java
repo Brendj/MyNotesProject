@@ -1728,6 +1728,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 purchaseElementExt.setAmount(od.getQty());
                 purchaseElementExt.setName(od.getMenuDetailName());
                 purchaseElementExt.setSum(od.getRPrice());
+                purchaseElementExt.setMenuType(od.getMenuType());
                 if (od.isComplex()) {
                     purchaseElementExt.setType(1);
                 } else if (od.isComplexItem()) {
@@ -3883,12 +3884,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return res;
             }
             ECafeSettings cafeSettings = settings.get(0);
-            ECafeSettings.SubscriberFeedingSettingSettingValue parser = (ECafeSettings.SubscriberFeedingSettingSettingValue) new ECafeSettings.SettingValueParser(
-                    cafeSettings.getSettingValue(), SettingsIds.SubscriberFeeding).getParserBySettingValue();
+            ECafeSettings.SubscriberFeedingSettingSettingValue parser = (ECafeSettings.SubscriberFeedingSettingSettingValue) cafeSettings
+                    .getSplitSettingValue();
             Date date = new Date();
             SubscriptionFeeding sf = new SubscriptionFeeding();
             sf.setCreatedDate(date);
             sf.setClient(client);
+            sf.setOrgOwner(client.getOrg().getIdOfOrg());
             sf.setIdOfClient(client.getIdOfClient());
             sf.setGuid(UUID.randomUUID().toString());
             sf.setDateActivateService(date);
@@ -3899,32 +3901,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             sf.setGlobalVersionOnCreate(version);
             sf.setGlobalVersion(version);
             session.persist(sf);
-            CycleDiagram cd = new CycleDiagram();
-            cd.setCreatedDate(date);
-            cd.setClient(client);
-            cd.setIdOfClient(client.getIdOfClient());
-            cd.setStateDiagram(StateDiagram.WAIT);
-            cd.setDateActivationDiagram(CalendarUtils.addDays(date, parser.getDayRequest()));
-            cd.setGuid(UUID.randomUUID().toString());
-            cd.setDeletedState(false);
-            cd.setSendAll(SendToAssociatedOrgs.SendToSelf);
-            version = daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
-            cd.setGlobalVersion(version);
-            cd.setGlobalVersionOnCreate(version);
-            cd.setMonday(cycleDiagramIn.getMonday());
-            cd.setMondayPrice(getPriceOfDay(cd.getMonday(), session, client.getOrg()));
-            cd.setTuesday(cycleDiagramIn.getTuesday());
-            cd.setTuesdayPrice(getPriceOfDay(cd.getTuesday(), session, client.getOrg()));
-            cd.setWednesday(cycleDiagramIn.getWednesday());
-            cd.setWednesdayPrice(getPriceOfDay(cd.getWednesday(), session, client.getOrg()));
-            cd.setThursday(cycleDiagramIn.getThursday());
-            cd.setThursdayPrice(getPriceOfDay(cd.getThursday(), session, client.getOrg()));
-            cd.setFriday(cycleDiagramIn.getFriday());
-            cd.setFridayPrice(getPriceOfDay(cd.getFriday(), session, client.getOrg()));
-            cd.setSaturday(cycleDiagramIn.getSaturday());
-            cd.setSaturdayPrice(getPriceOfDay(cd.getSaturday(), session, client.getOrg()));
-            cd.setSunday(cycleDiagramIn.getSunday());
-            cd.setSundayPrice(getPriceOfDay(cd.getSunday(), session, client.getOrg()));
+            CycleDiagram cd = createCycleDiagram(client, cycleDiagramIn, session, parser);
             session.persist(cd);
             transaction.commit();
             res.resultCode = RC_OK;
@@ -4010,11 +3987,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (client == null) {
                 return result;
             }
+            Date date = new Date();
             SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
             sf.setWasSuspended(true);
-            sf.setLastDatePauseService(new Date());
+            sf.setLastDatePauseService(CalendarUtils.truncateToDayOfMonth(CalendarUtils.addDays(date, 2)));
             DAOService daoService = DAOService.getInstance();
             sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
+            sf.setLastUpdate(date);
             transaction.commit();
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
@@ -4046,6 +4025,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             sf.setWasSuspended(false);
             DAOService daoService = DAOService.getInstance();
             sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
+            sf.setLastUpdate(new Date());
             transaction.commit();
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
@@ -4074,23 +4054,21 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (client == null) {
                 return result;
             }
-            CycleDiagram cd = DAOUtils.findClientCycleDiagram(session, contractId);
-            cd.setMonday(cycleDiagramIn.getMonday());
-            cd.setMondayPrice(getPriceOfDay(cd.getMonday(), session, client.getOrg()));
-            cd.setTuesday(cycleDiagramIn.getTuesday());
-            cd.setTuesdayPrice(getPriceOfDay(cd.getTuesday(), session, client.getOrg()));
-            cd.setWednesday(cycleDiagramIn.getWednesday());
-            cd.setWednesdayPrice(getPriceOfDay(cd.getWednesday(), session, client.getOrg()));
-            cd.setThursday(cycleDiagramIn.getThursday());
-            cd.setThursdayPrice(getPriceOfDay(cd.getThursday(), session, client.getOrg()));
-            cd.setFriday(cycleDiagramIn.getFriday());
-            cd.setFridayPrice(getPriceOfDay(cd.getFriday(), session, client.getOrg()));
-            cd.setSaturday(cycleDiagramIn.getSaturday());
-            cd.setSaturdayPrice(getPriceOfDay(cd.getSaturday(), session, client.getOrg()));
-            cd.setSunday(cycleDiagramIn.getSunday());
-            cd.setSundayPrice(getPriceOfDay(cd.getSunday(), session, client.getOrg()));
             DAOService daoService = DAOService.getInstance();
-            cd.setGlobalVersion(daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName()));
+            List<ECafeSettings> settings = daoService
+                    .geteCafeSettingses(client.getOrg().getIdOfOrg(), SettingsIds.SubscriberFeeding, false);
+            if (settings.isEmpty()) {
+                result.resultCode = RC_SETTINGS_NOT_FOUND;
+                result.description = String
+                        .format("Отсутствуют настройки абонементного питания для организации %s (IdOfOrg = %s)",
+                                client.getOrg().getShortName(), client.getOrg().getIdOfOrg());
+                return result;
+            }
+            ECafeSettings cafeSettings = settings.get(0);
+            ECafeSettings.SubscriberFeedingSettingSettingValue parser = (ECafeSettings.SubscriberFeedingSettingSettingValue) cafeSettings
+                    .getSplitSettingValue();
+            CycleDiagram cd = createCycleDiagram(client, cycleDiagramIn, session, parser);
+            session.persist(cd);
             transaction.commit();
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
@@ -4103,5 +4081,40 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.close(session, logger);
         }
         return result;
+    }
+
+    private CycleDiagram createCycleDiagram(Client client, CycleDiagramIn cycleDiagramIn, Session session,
+            ECafeSettings.SubscriberFeedingSettingSettingValue parser) {
+        Date createDate = new Date();
+        Date today = CalendarUtils.truncateToDayOfMonth(createDate);
+        DAOService daoService = DAOService.getInstance();
+        CycleDiagram cd = new CycleDiagram();
+        cd.setCreatedDate(createDate);
+        cd.setClient(client);
+        cd.setOrgOwner(client.getOrg().getIdOfOrg());
+        cd.setIdOfClient(client.getIdOfClient());
+        cd.setDateActivationDiagram(CalendarUtils.addDays(today, parser.getDayRequest()));
+        cd.setStateDiagram(StateDiagram.WAIT);
+        cd.setGuid(UUID.randomUUID().toString());
+        cd.setDeletedState(false);
+        cd.setSendAll(SendToAssociatedOrgs.SendToSelf);
+        Long version = daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
+        cd.setGlobalVersion(version);
+        cd.setGlobalVersionOnCreate(version);
+        cd.setMonday(cycleDiagramIn.getMonday());
+        cd.setMondayPrice(getPriceOfDay(cd.getMonday(), session, client.getOrg()));
+        cd.setTuesday(cycleDiagramIn.getTuesday());
+        cd.setTuesdayPrice(getPriceOfDay(cd.getTuesday(), session, client.getOrg()));
+        cd.setWednesday(cycleDiagramIn.getWednesday());
+        cd.setWednesdayPrice(getPriceOfDay(cd.getWednesday(), session, client.getOrg()));
+        cd.setThursday(cycleDiagramIn.getThursday());
+        cd.setThursdayPrice(getPriceOfDay(cd.getThursday(), session, client.getOrg()));
+        cd.setFriday(cycleDiagramIn.getFriday());
+        cd.setFridayPrice(getPriceOfDay(cd.getFriday(), session, client.getOrg()));
+        cd.setSaturday(cycleDiagramIn.getSaturday());
+        cd.setSaturdayPrice(getPriceOfDay(cd.getSaturday(), session, client.getOrg()));
+        cd.setSunday(cycleDiagramIn.getSunday());
+        cd.setSundayPrice(getPriceOfDay(cd.getSunday(), session, client.getOrg()));
+        return cd;
     }
 }

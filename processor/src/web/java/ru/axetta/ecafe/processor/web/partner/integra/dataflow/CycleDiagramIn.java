@@ -87,4 +87,51 @@ public class CycleDiagramIn implements Serializable {
     public void setSunday(String sunday) {
         this.sunday = sunday;
     }
+
+    public String getDayValue(int dayNumber) {
+        switch (dayNumber) {
+            case 1:
+                return monday;
+            case 2:
+                return tuesday;
+            case 3:
+                return wednesday;
+            case 4:
+                return thursday;
+            case 5:
+                return friday;
+            case 6:
+                return saturday;
+            case 7:
+                return sunday;
+            default:
+                return null;
+        }
+    }
+
+    public void setDayValue(int dayNumber, String value) {
+        switch (dayNumber) {
+            case 1:
+                monday = value;
+                break;
+            case 2:
+                tuesday = value;
+                break;
+            case 3:
+                wednesday = value;
+                break;
+            case 4:
+                thursday = value;
+                break;
+            case 5:
+                friday = value;
+                break;
+            case 6:
+                saturday = value;
+                break;
+            case 7:
+                sunday = value;
+                break;
+        }
+    }
 }

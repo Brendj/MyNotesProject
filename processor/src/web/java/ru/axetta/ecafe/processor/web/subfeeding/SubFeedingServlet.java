@@ -20,6 +20,7 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomController;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWSService;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -33,7 +34,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -49,9 +49,9 @@ import java.util.*;
 public class SubFeedingServlet extends HttpServlet {
 
     private ClientRoomController clientRoomController;
+    private RuntimeContext runtimeContext;
     private static final String root = "/subfeeding/pages/";
     private static final Logger logger = LoggerFactory.getLogger(SubFeedingServlet.class);
-    private static final Map<Integer, String> daysByNumber = new HashMap<Integer, String>();
     private static final String SUCCESS_MESSAGE = "subFeedingSuccess";
     private static final String ERROR_MESSAGE = "subFeedingError";
     private static final String COMPLEX_PARAM_PREFIX = "complex_option_";
@@ -60,13 +60,7 @@ public class SubFeedingServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         clientRoomController = new ClientRoomControllerWSService().getClientRoomControllerWSPort();
-        daysByNumber.put(1, "monday");
-        daysByNumber.put(2, "tuesday");
-        daysByNumber.put(3, "wednesday");
-        daysByNumber.put(4, "thursday");
-        daysByNumber.put(5, "friday");
-        daysByNumber.put(6, "saturday");
-        daysByNumber.put(7, "sunday");
+        runtimeContext = RuntimeContext.getInstance();
     }
 
     @Override
@@ -106,6 +100,8 @@ public class SubFeedingServlet extends HttpServlet {
             }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
+            req.getSession().invalidate();
+            resp.getWriter().print(ex.getMessage());
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
@@ -137,10 +133,11 @@ public class SubFeedingServlet extends HttpServlet {
         Session session = null;
         Transaction transaction = null;
         try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
+            session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
             SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
             Client client = DAOUtils.findClientByContractId(session, contractId);
+            client.getPerson(); // нужно для ФИО.
             transaction.commit();
             req.setAttribute("client", client);
             req.setAttribute("subscriptionFeeding", sf);
@@ -148,7 +145,7 @@ public class SubFeedingServlet extends HttpServlet {
                 sendRedirect(req, resp, "/plan");
             } else {
                 DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-                df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+                df.setTimeZone(runtimeContext.getLocalTimeZone(null));
                 Date startDate = StringUtils.isBlank(req.getParameter("startDate")) ? null
                         : parseDate(req.getParameter("startDate"), df);
                 Date endDate = StringUtils.isBlank(req.getParameter("endDate")) ? null
@@ -197,11 +194,16 @@ public class SubFeedingServlet extends HttpServlet {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
         if (checkComplexesChecked(req)) {
             CycleDiagramIn cycle = getSubFeedingPlan(req);
-            Result res = clientRoomController.editSubscriptionFeedingPlan(contractId, cycle);
-            if (res.resultCode == 0) {
-                req.setAttribute(SUCCESS_MESSAGE, "Изменения плана питания успешно сохранены.");
+            if (isPlanChanged(req, cycle)) {
+                Result res = clientRoomController.editSubscriptionFeedingPlan(contractId, cycle);
+                if (res.resultCode == 0) {
+                    req.setAttribute(SUCCESS_MESSAGE, "Изменения плана питания успешно сохранены.");
+                } else {
+                    req.setAttribute(ERROR_MESSAGE, res.description);
+                }
             } else {
-                req.setAttribute(ERROR_MESSAGE, res.description);
+                sendRedirect(req, resp, "/plan");
+                return;
             }
         } else {
             req.setAttribute(ERROR_MESSAGE, "Для сохранения плана АП необходимо заполнить циклограмму.");
@@ -209,12 +211,41 @@ public class SubFeedingServlet extends HttpServlet {
         showSubscriptionFeedingPlan(req, resp);
     }
 
+    private boolean isPlanChanged(HttpServletRequest req, CycleDiagramIn cycle) {
+        Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = runtimeContext.createPersistenceSession();
+            transaction = session.beginTransaction();
+            CycleDiagram cd = DAOUtils.findClientCycleDiagram(session, contractId);
+            Map<Integer, List<String>> activeComplexes = splitPlanComplexes(cd);
+            for (Map.Entry<Integer, List<String>> entry : activeComplexes.entrySet()) {
+                int dayNumber = entry.getKey();
+                String newValue = cycle.getDayValue(dayNumber);
+                boolean isEqual = CollectionUtils.isEqualCollection(entry.getValue(),
+                        Arrays.asList(StringUtils.split(StringUtils.defaultString(newValue), ',')));
+                if (!isEqual) {
+                    return true;
+                }
+            }
+            transaction.commit();
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage());
+            throw new RuntimeException(ex.getMessage());
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        return false;
+    }
+
     private void showSubscriptionFeedingPlan(HttpServletRequest req, HttpServletResponse resp) {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
         Session session = null;
         Transaction transaction = null;
         try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
+            session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
             Client client = DAOUtils.findClientByContractId(session, contractId);
             SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
@@ -224,22 +255,7 @@ public class SubFeedingServlet extends HttpServlet {
             CycleDiagram cd = DAOUtils.findClientCycleDiagram(session, contractId);
             transaction.commit();
             if (sf != null && cd != null) {
-                Map<Integer, List<String>> activeComplexes = new HashMap<Integer, List<String>>();
-                activeComplexes
-                        .put(1, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getMonday()), ',')));
-                activeComplexes
-                        .put(2, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getTuesday()), ',')));
-                activeComplexes
-                        .put(3, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getWednesday()), ',')));
-                activeComplexes
-                        .put(4, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getThursday()), ',')));
-                activeComplexes
-                        .put(5, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getFriday()), ',')));
-                activeComplexes
-                        .put(6, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getSaturday()), ',')));
-                activeComplexes
-                        .put(7, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getSunday()), ',')));
-                req.setAttribute("activeComplexes", activeComplexes);
+                req.setAttribute("activeComplexes", splitPlanComplexes(cd));
             }
             outputPage("plan", req, resp);
         } catch (Exception ex) {
@@ -251,6 +267,18 @@ public class SubFeedingServlet extends HttpServlet {
         }
     }
 
+    private Map<Integer, List<String>> splitPlanComplexes(CycleDiagram cd) {
+        Map<Integer, List<String>> activeComplexes = new HashMap<Integer, List<String>>();
+        activeComplexes.put(1, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getMonday()), ',')));
+        activeComplexes.put(2, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getTuesday()), ',')));
+        activeComplexes.put(3, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getWednesday()), ',')));
+        activeComplexes.put(4, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getThursday()), ',')));
+        activeComplexes.put(5, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getFriday()), ',')));
+        activeComplexes.put(6, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getSaturday()), ',')));
+        activeComplexes.put(7, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getSunday()), ',')));
+        return activeComplexes;
+    }
+
     private CycleDiagramIn getSubFeedingPlan(HttpServletRequest req) throws Exception {
         CycleDiagramIn cycle = new CycleDiagramIn();
         for (Map.Entry<String, String[]> entry : req.getParameterMap().entrySet()) {
@@ -258,7 +286,8 @@ public class SubFeedingServlet extends HttpServlet {
                 String[] ids = StringUtils.split(entry.getValue()[0], '_');
                 String complexId = ids[0];
                 int dayNumber = Integer.parseInt(ids[1]);
-                addComplexValue(cycle, StringUtils.capitalize(daysByNumber.get(dayNumber)), complexId);
+                cycle.setDayValue(dayNumber,
+                        StringUtils.join(new Object[]{cycle.getDayValue(dayNumber), complexId}, ','));
             }
         }
         return cycle;
@@ -273,20 +302,6 @@ public class SubFeedingServlet extends HttpServlet {
             }
         }
         return flag;
-    }
-
-    private void addComplexValue(CycleDiagramIn cd, String fieldName, String value) throws Exception {
-        Class<?> cdClass = cd.getClass();
-        String getter = "get" + fieldName;
-        String setter = "set" + fieldName;
-        Method getterMethod = cdClass.getMethod(getter);
-        Method setterMethod = cdClass.getMethod(setter, String.class);
-        String fieldValue = (String) getterMethod.invoke(cd);
-        if (fieldValue == null) {
-            setterMethod.invoke(cd, value);
-        } else {
-            setterMethod.invoke(cd, StringUtils.join(new Object[]{fieldValue, value}, ','));
-        }
     }
 
     private void suspendSubscriptionFeeding(HttpServletRequest req, HttpServletResponse resp) throws Exception {
@@ -304,7 +319,10 @@ public class SubFeedingServlet extends HttpServlet {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
         Result res = clientRoomController.reopenSubscriptionFeeding(contractId);
         if (res.resultCode == 0) {
-            req.setAttribute(SUCCESS_MESSAGE, "Подписка возобновлена.");
+            DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+            df.setTimeZone(runtimeContext.getLocalTimeZone(null));
+            String reopenDate = df.format(CalendarUtils.addDays(new Date(), 2));
+            req.setAttribute(SUCCESS_MESSAGE, "Подписка будет возобновлена " + reopenDate);
         } else {
             req.setAttribute(ERROR_MESSAGE, res.description);
         }

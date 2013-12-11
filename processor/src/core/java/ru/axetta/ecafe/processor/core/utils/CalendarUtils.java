@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -104,6 +105,8 @@ public class CalendarUtils {
     }
 
     public static String dateToString(Date date) {
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         return dateFormat.format(date);
     }
 

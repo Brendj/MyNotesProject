@@ -351,9 +351,9 @@ public class RuntimeContext implements ApplicationContextAware {
         return partnerStdPayConfig;
     }
 
-    public TimeZone getLocalTimeZone(HttpSession httpSession) throws Exception {
+    public TimeZone getLocalTimeZone(HttpSession httpSession) {
         String timeZone = getPropertiesValue(RuntimeContext.PARAM_NAME_TIME_ZONE, "Europe/Moscow");
-        if(timeZone.equals("default")){
+        if (timeZone.equals("default")) {
             return TimeZone.getDefault();
         } else {
             return TimeZone.getTimeZone(timeZone);

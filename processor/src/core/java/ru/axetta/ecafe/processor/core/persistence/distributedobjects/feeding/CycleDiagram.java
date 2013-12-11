@@ -59,6 +59,7 @@ public class CycleDiagram extends DistributedObject{
         projectionList.add(Projections.property("globalVersion"), "globalVersion");
         projectionList.add(Projections.property("deletedState"), "deletedState");
         projectionList.add(Projections.property("orgOwner"), "orgOwner");
+        projectionList.add(Projections.property("dateActivationDiagram"), "dateActivationDiagram");
 
         //projectionList.add(Projections.property("idOfClient"), "idOfClient");
         projectionList.add(Projections.property("cl.idOfClient"), "idOfClient");

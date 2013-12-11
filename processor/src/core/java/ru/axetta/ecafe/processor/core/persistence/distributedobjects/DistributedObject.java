@@ -16,7 +16,8 @@ import org.hibernate.transform.Transformers;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -46,7 +47,7 @@ public abstract class DistributedObject{
     protected String guid;
     /* Идентификатор организации */
     protected Long orgOwner;
-    protected SendToAssociatedOrgs sendAll;
+    protected SendToAssociatedOrgs sendAll = SendToAssociatedOrgs.Send;
     /* имя узла элемента */
     protected String tagName;
     private DistributedObjectException distributedObjectException;
