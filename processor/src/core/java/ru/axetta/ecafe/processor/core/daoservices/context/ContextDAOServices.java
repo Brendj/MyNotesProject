@@ -169,7 +169,9 @@ public class ContextDAOServices {
     public void buildRegionsRestriction(long idOfUser, String field, Criteria criteria) {
         try {
             User user = DAOService.getInstance().findUserById(idOfUser);
-            criteria.add(Restrictions.eq(field, user.getRegion()));
+            if (user.getRegion() != null && user.getRegion().length() > 0) {
+                criteria.add(Restrictions.eq(field, user.getRegion()));
+            }
         } catch (Exception e) {
 
         }
