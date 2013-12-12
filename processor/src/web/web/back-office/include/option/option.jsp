@@ -79,6 +79,11 @@
             <rich:inputNumberSpinner value="#{optionPage.tempCardValidDays}" minValue="0" maxValue="60"/>
         </h:panelGrid>
 
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText escape="true" value="Включить оповещение об изменении в заявках:" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{optionPage.enableNotificationGoodRequestChange}" styleClass="output-text" />
+        </h:panelGrid>
+
     </rich:tab>
     <rich:tab label="Платежные системы">
         <h:outputText escape="true" value="Выводить в личный кабинет" styleClass="output-text" />

@@ -93,6 +93,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean enableSubBalanceOperation;
     private Integer tempCardValidDays;
     private String lastBIDataUpdate;
+    private Boolean enableNotificationGoodRequestChange;
 
     private List<BankOptionItem> banks;
 
@@ -554,6 +555,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.lastBIDataUpdate = lastBIDataUpdate;
     }
 
+    public Boolean getEnableNotificationGoodRequestChange() {
+        return enableNotificationGoodRequestChange;
+    }
+
+    public void setEnableNotificationGoodRequestChange(Boolean enableNotificationGoodRequestChange) {
+        this.enableNotificationGoodRequestChange = enableNotificationGoodRequestChange;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -625,6 +634,8 @@ public class OptionPage extends BasicWorkspacePage {
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(runtimeContext.getOptionValueLong(Option.OPTION_EXPORT_BI_DATA_LAST_UPDATE));
         lastBIDataUpdate = biDataDateFormat.format(cal.getTime());
+
+        enableNotificationGoodRequestChange = runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATION_GOOD_REQUEST_CHANGE);
 
         bankListPage.onShow();
 
@@ -737,6 +748,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_MSK_MONITORING_ALLOWED_TAGS, monitoringAllowedTags);
             runtimeContext.setOptionValue(Option.OPTION_MSK_CLEANUP_REPOSITORY_REPORTS, cleanupRepositoryReports);
 
+            runtimeContext.setOptionValue(Option.OPTION_ENABLE_NOTIFICATION_GOOD_REQUEST_CHANGE, enableNotificationGoodRequestChange);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");

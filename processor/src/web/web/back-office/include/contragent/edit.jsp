@@ -44,8 +44,6 @@
     <h:inputText value="#{mainPage.contragentEditPage.phone}" maxlength="32" styleClass="input-text" />
     <h:outputText escape="true" value="Электронная почта" styleClass="output-text" />
     <h:inputText value="#{mainPage.contragentEditPage.email}" maxlength="128" styleClass="input-text" />
-    <h:outputText escape="true" value="Электронная почта для оповещения изменений заявок" styleClass="output-text" />
-    <h:inputText value="#{mainPage.contragentEditPage.requestNotifyEmailAddress}" maxlength="128" styleClass="input-text" />
     <h:outputText escape="true" value="Факс" styleClass="output-text" />
     <h:inputText value="#{mainPage.contragentEditPage.fax}" maxlength="32" styleClass="input-text" />
     <h:outputText escape="true" value="ИНН" styleClass="output-text" />
@@ -70,6 +68,8 @@
     <h:inputText value="#{mainPage.contragentEditPage.publicKeyGOSTAlias}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Переводить номер счета" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.contragentEditPage.needAccountTranslate}" styleClass="output-text" />
+    <h:outputText escape="true" value="Список рассылки сводного отчета по заявкам" styleClass="output-text" />
+    <h:inputText value="#{mainPage.contragentEditPage.requestNotifyMailList}" maxlength="128" styleClass="input-text" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />

@@ -40,8 +40,6 @@
     <h:inputText readonly="true" value="#{mainPage.contragentViewPage.phone}" styleClass="input-text" />
     <h:outputText escape="true" value="Электронная почта" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.contragentViewPage.email}" styleClass="input-text" />
-    <h:outputText escape="true" value="Электронная почта для оповещения изменений заявок" styleClass="output-text" />
-    <h:inputText readonly="true" value="#{mainPage.contragentViewPage.requestNotifyEmailAddress}" styleClass="input-text" />
     <h:outputText escape="true" value="Факс" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.contragentViewPage.fax}" styleClass="input-text" />
     <h:outputText escape="true" value="ИНН" styleClass="output-text" />
@@ -73,6 +71,8 @@
     <h:outputText escape="true" value="Дата последнего изменения" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.contragentViewPage.updateTime}" converter="timeConverter"
                  styleClass="input-text" />
+    <h:outputText escape="true" value="Список рассылки сводного отчета по заявкам" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.contragentViewPage.requestNotifyMailList}" styleClass="input-text" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />
