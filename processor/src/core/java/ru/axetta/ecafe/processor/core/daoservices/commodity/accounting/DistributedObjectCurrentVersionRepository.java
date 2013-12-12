@@ -2,14 +2,12 @@ package ru.axetta.ecafe.processor.core.daoservices.commodity.accounting;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOCurrentOrgVersion;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -64,6 +62,6 @@ public class DistributedObjectCurrentVersionRepository {
         TypedQuery<Org> query = entityManager.createQuery("from Org where idOfOrg=:idOfOrg", Org.class);
         query.setParameter("idOfOrg", orgOwner);
         Org org = query.getSingleResult();
-        return new AbstractMap.SimpleEntry<String, String>(org.getShortName(),org.getDefaultSupplier().getRequestNotifyEmailAddress());
+        return new AbstractMap.SimpleEntry<String, String>(org.getShortName(),org.getDefaultSupplier().getRequestNotifyMailList());
     }
 }

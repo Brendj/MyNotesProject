@@ -5,8 +5,10 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
@@ -52,6 +54,11 @@ public class GoodRequestsReport extends BasicReport {
 
 
     public static class Builder {
+
+        public GoodRequestsReport build(Session session,
+                Date startDate, Date endDate, List <Long> idOfSupplierList) throws Exception{
+             return build(session, false,startDate,endDate, new ArrayList<Long>(0),idOfSupplierList,3, "");
+        }
 
         public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
                                         Date startDate, Date endDate, List<Long> idOfOrgList, List <Long> idOfSupplierList,
@@ -120,7 +127,7 @@ public class GoodRequestsReport extends BasicReport {
                          "from (select substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') as org, cf_orgs.officialname as orgFull, "+
                          "             cf_goods.fullname as good , date_trunc('day', to_timestamp(cf_goods_requests.donedate / 1000)) as d, "+
                          "             cf_goods_requests_positions.totalcount / 1000 as cnt, cf_goods_requests_positions.DailySampleCount / 1000 as ds_cnt "+
-                         "      from cf_goods_requests "+
+                         "       from cf_goods_requests "+
                          "      left join cf_orgs on cf_orgs.idoforg=cf_goods_requests.orgowner "+
                          "      left join cf_goods_requests_positions on cf_goods_requests.idofgoodsrequest=cf_goods_requests_positions.idofgoodsrequest "+
                          "      join cf_goods on cf_goods.idofgood=cf_goods_requests_positions.idofgood "+

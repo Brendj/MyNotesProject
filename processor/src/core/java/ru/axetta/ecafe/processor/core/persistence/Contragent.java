@@ -50,7 +50,7 @@ public class Contragent {
     private String phone;
     private String mobile;
     private String email;
-    private String requestNotifyEmailAddress;
+    private String requestNotifyMailList;
     private String fax;
     private String remarks;
     private String inn;
@@ -202,12 +202,12 @@ public class Contragent {
         this.email = email;
     }
 
-    public String getRequestNotifyEmailAddress() {
-        return requestNotifyEmailAddress;
+    public String getRequestNotifyMailList() {
+        return requestNotifyMailList;
     }
 
-    public void setRequestNotifyEmailAddress(String requestNotifyEmailAddress) {
-        this.requestNotifyEmailAddress = requestNotifyEmailAddress;
+    public void setRequestNotifyMailList(String requestNotifyEmailAddress) {
+        this.requestNotifyMailList = requestNotifyEmailAddress;
     }
 
     public String getFax() {

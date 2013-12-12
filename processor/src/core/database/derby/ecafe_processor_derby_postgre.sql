@@ -39,7 +39,7 @@ CREATE TABLE CF_Contragents (
   NeedAccountTranslate    INTEGER           NOT NULL,
   KPP VARCHAR(10) NOT NULL DEFAULT '',  --v39
   OGRN VARCHAR(15) NOT NULL DEFAULT '', --v39
-  RequestNotifyEmailAddress character varying(128) default null, --v52
+  RequestNotifyMailList character varying(1024) default null, --v52
   CONSTRAINT CF_Contragents_pk PRIMARY KEY (IdOfContragent),
   CONSTRAINT CF_Contragents_ContragentName UNIQUE (ContragentName),
   CONSTRAINT CF_Contragents_IdOfContactPerson_fk FOREIGN KEY (IdOfContactPerson) REFERENCES CF_Persons (IdOfPerson)

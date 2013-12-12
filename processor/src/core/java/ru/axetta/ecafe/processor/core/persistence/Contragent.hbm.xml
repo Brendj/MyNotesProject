@@ -27,7 +27,7 @@
         <property name="phone" column="Phone" type="string" length="32"/>
         <property name="mobile" column="Mobile" type="string" length="32"/>
         <property name="email" column="Email" type="string" length="128"/>
-        <property name="requestNotifyEmailAddress" column="RequestNotifyEmailAddress" type="string" length="128"/>
+        <property name="requestNotifyMailList" column="RequestNotifyMailList" type="string" length="1024"/>
         <property name="fax" column="Fax" type="string" length="32"/>
         <property name="remarks" column="Remarks" type="string" length="1024"/>
         <property name="inn" column="INN" type="string" length="90"/>

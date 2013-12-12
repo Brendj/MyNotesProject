@@ -124,12 +124,10 @@ public class EventNotificationService {
             NOTIFICATION_PASS_WITH_GUARDIAN + "." + TYPE_EMAIL_SUBJECT,
             "Уведомление о времени прихода и ухода",
             NOTIFICATION_GOOD_REQUEST_CHANGE + "." + TYPE_EMAIL_TEXT,
-            "<html>\n<body>\nУважаемый клиент, <br/><br/>\n\n"
-                    + "Заявка под номером <b>[number]</b> была изменена организацией <b>[shortName]</b>.<br/>"
-                    + "Новые данные<br/>\n"
-                    + "[newValueHistory]<br/>\n"
-                    + "С уважением,<br/>\n"
-                    + "Служба поддержки клиентов\n<br/><br/>\n"
+            "<html>\n<body>\nУважаемый(-ая) [contactPerson], <br/><br/>\n\n"
+                    + "[reportValues]<br/>\n"
+                    + "С уважением.<br/>\n"
+                    // + "Служба поддержки клиентов\n<br/><br/>\n"
                     //+ "<p style=\"color:#cccccc;font-size:xx-small;font-weight:bold\">Вы можете отключить данные уведомления в своем личном кабинете</p>\n"
                     + "</body>\n</html>",
             NOTIFICATION_GOOD_REQUEST_CHANGE + "." + TYPE_EMAIL_SUBJECT,
