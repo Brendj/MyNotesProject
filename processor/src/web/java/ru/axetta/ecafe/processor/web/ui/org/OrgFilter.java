@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.*;
@@ -68,21 +69,21 @@ public class OrgFilter {
         }
         if (idOfOrg != null && idOfOrg.compareTo(Long.parseLong("0")) > 0) {
             criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
-        } else if (officialName != null) {
+        } else if (StringUtils.isNotEmpty(officialName)) {
             criteria.add(Restrictions.or(Restrictions.like("shortName", officialName, MatchMode.ANYWHERE).ignoreCase(),
                     Restrictions.like("officialName", officialName, MatchMode.ANYWHERE).ignoreCase()));
         }
-        if (tag != null && tag.length() > 0) {
+        if (StringUtils.isNotEmpty(tag)) {
             criteria.add(Restrictions.like("tag", tag, MatchMode.ANYWHERE).ignoreCase());
         }
-        if (city != null && city.length() > 0) {
-            criteria.add(Restrictions.like("city", tag, MatchMode.ANYWHERE).ignoreCase());
+        if (StringUtils.isNotEmpty(city)) {
+            criteria.add(Restrictions.like("city", city, MatchMode.ANYWHERE).ignoreCase());
         }
-        if (district != null && district.length() > 0) {
-            criteria.add(Restrictions.like("district", tag, MatchMode.ANYWHERE).ignoreCase());
+        if (StringUtils.isNotEmpty(district)) {
+            criteria.add(Restrictions.like("district", district, MatchMode.ANYWHERE).ignoreCase());
         }
-        if (location != null && location.length() > 0) {
-            criteria.add(Restrictions.like("location", tag, MatchMode.ANYWHERE).ignoreCase());
+        if (StringUtils.isNotEmpty(location)) {
+            criteria.add(Restrictions.like("location", location, MatchMode.ANYWHERE).ignoreCase());
         }
         criteria.setProjection(Projections.projectionList()
                 .add(Projections.distinct(Projections.property("idOfOrg")),"idOfOrg")
