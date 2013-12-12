@@ -1143,19 +1143,23 @@ public class DAOUtils {
         q.executeUpdate();
     }
 
-    public static List<Object[]> getClientPaymentsDataForPeriod(EntityManager em, Date dtFrom, Date dtTo, Contragent caReceiver) {
-        if (caReceiver==null) {
-            javax.persistence.TypedQuery<Object[]> q = em.createQuery("select c.contractId, cp.createTime, cp.paySum, cp.idOfPayment from ClientPayment cp, AccountTransaction at, Client c where at=cp.transaction and at.client=c and cp.createTime>=:dtFrom and cp.createTime<:dtTo", Object[].class);
-            q.setParameter("dtFrom", dtFrom);
-            q.setParameter("dtTo", dtTo);
-            return q.getResultList();
-        } else {
-            javax.persistence.TypedQuery<Object[]> q = em.createQuery("select c.contractId, cp.createTime, cp.paySum, cp.idOfPayment from ClientPayment cp, AccountTransaction at, Client c where at=cp.transaction and at.client=c and cp.createTime>=:dtFrom and cp.createTime<:dtTo and cp.contragentReceiver=:caReceiver", Object[].class);
-            q.setParameter("dtFrom", dtFrom);
-            q.setParameter("dtTo", dtTo);
-            q.setParameter("caReceiver", caReceiver);
-            return q.getResultList();
+    @SuppressWarnings("unchecked")
+    public static List<Object[]> getClientPaymentsDataForPeriod(EntityManager em, Date dtFrom, Date dtTo,
+            Contragent caReceiver, Contragent contragent) {
+        Session session = em.unwrap(Session.class);
+        Criteria criteria = session.createCriteria(ClientPayment.class).createAlias("transaction", "at")
+                .createAlias("at.client", "c").add(Restrictions.ge("createTime", dtFrom))
+                .add(Restrictions.lt("createTime", dtTo));
+        if (caReceiver != null) {
+            criteria.add(Restrictions.eq("contragentReceiver", caReceiver));
         }
+        if (contragent != null) {
+            criteria.add(Restrictions.eq("contragent", contragent));
+        }
+        criteria.setProjection(Projections.projectionList().add(Projections.property("c.contractId"))
+                .add(Projections.property("createTime")).add(Projections.property("paySum"))
+                .add(Projections.property("idOfPayment")));
+        return (List<Object[]>) criteria.list();
     }
 
     public static Long getBlockedCardsCount(EntityManager em) {

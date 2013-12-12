@@ -120,7 +120,7 @@ public class PaymentReconciliationManager {
             if (caReceiver==null) throw new Exception(String.format("Контрагент не найден: %d", idOfContragentTsp));
         }
 
-        List<Object[]> clientPayments = DAOUtils.getClientPaymentsDataForPeriod(em, dtFrom, dtTo, caReceiver);
+        List<Object[]> clientPayments = DAOUtils.getClientPaymentsDataForPeriod(em, dtFrom, dtTo, caReceiver, ca);
         SortedMap<String, PaymentItem> clientPaymentsMap = new TreeMap<String, PaymentItem>();
         for (Object[] ci : clientPayments) {
             PaymentItem pi = new PaymentItem();
