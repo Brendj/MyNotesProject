@@ -30,7 +30,7 @@ import java.util.Map;
  * Time: 11:15
  */
 
-@Service("regularPaymentRequest")
+@Service(IRequestOperation.REGULAR_PAYMENT)
 public class RegularPaymentRequest implements IRequestOperation {
 
     @PersistenceContext(unitName = "processorPU")

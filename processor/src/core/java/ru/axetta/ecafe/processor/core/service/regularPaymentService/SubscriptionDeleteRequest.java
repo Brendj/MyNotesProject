@@ -28,7 +28,7 @@ import java.util.Map;
  * Time: 11:42
  */
 
-@Service("subscriptionDeleteRequest")
+@Service(IRequestOperation.SUBSCRIPTION_DELETE)
 public class SubscriptionDeleteRequest implements IRequestOperation {
 
     @PersistenceContext(unitName = "processorPU")

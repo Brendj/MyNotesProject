@@ -7,8 +7,10 @@ package ru.axetta.ecafe.processor.core.service.regularPaymentService;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
@@ -16,6 +18,8 @@ import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,8 +38,10 @@ import java.util.Map;
  * Time: 11:02
  */
 
-@Service("subscriptionRegRequest")
+@Service(IRequestOperation.SUBSCRIPTION_REG)
 public class SubscriptionRegRequest implements IRequestOperation {
+
+    private static final Logger logger = LoggerFactory.getLogger(SubscriptionRegRequest.class);
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
@@ -79,8 +85,13 @@ public class SubscriptionRegRequest implements IRequestOperation {
     @Override
     public Map<String, String> getRequestParams(MfrRequest mfrRequest) {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("action", RuntimeContext.getInstance().getAcquiropaySystemConfig().getLinkingUrl());
-        String productId = String.valueOf(runtimeContext.getAcquiropaySystemConfig().getProductId());
+        params.put("action", runtimeContext.getAcquiropaySystemConfig().getLinkingUrl());
+        Contragent c = DAOService.getInstance().findContragentByClient(mfrRequest.getClient().getContractId());
+        String productId = c.getMfrId();
+        if (StringUtils.isEmpty(productId)) {
+            logger.error("Contragent '{}' with idOfContragent = {} doesn't have specified MFR_ID.",
+                    c.getContragentName(), c.getIdOfContragent());
+        }
         // ID поставщика питания №1 в системе МФР
         params.put("product_id", productId);
         String account = ContractIdFormat.format(mfrRequest.getClient().getContractId());

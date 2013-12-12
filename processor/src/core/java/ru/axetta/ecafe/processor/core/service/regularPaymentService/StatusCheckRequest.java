@@ -28,7 +28,7 @@ import java.util.Map;
  * Time: 11:53
  */
 
-@Service("statusCheckRequest")
+@Service(IRequestOperation.STATUS_CHECK)
 public class StatusCheckRequest implements IRequestOperation {
 
     @PersistenceContext(unitName = "processorPU")

@@ -64,12 +64,12 @@ public class RegularPaymentSubscriptionService {
     private EntityManager em;
 
     private IRequestOperation getOperationBean(String name) {
-        return (IRequestOperation) RuntimeContext.getAppContext().getBean(name + "Request");
+        return (IRequestOperation) RuntimeContext.getAppContext().getBean(name);
     }
 
     public MfrRequest createRequestForSubscriptionReg(Long contractId, Long paymentAmount, Long thresholdAmount,
             int period) throws Exception {
-        return ((SubscriptionRegRequest) getOperationBean("subscriptionReg"))
+        return ((SubscriptionRegRequest) getOperationBean(IRequestOperation.SUBSCRIPTION_REG))
                 .createRequestForSubscriptionReg(contractId, paymentAmount, thresholdAmount, period);
     }
 
@@ -84,9 +84,9 @@ public class RegularPaymentSubscriptionService {
             try {
                 BankSubscription bs = findBankSubscription(id);
                 if (bs.getValidToDate().before(today)) {
-                    makeSubscriptionOperation(id, "subscriptionDelete");
+                    makeSubscriptionOperation(id, IRequestOperation.SUBSCRIPTION_DELETE);
                 } else {
-                    makeSubscriptionOperation(id, "regularPayment");
+                    makeSubscriptionOperation(id, IRequestOperation.REGULAR_PAYMENT);
                 }
             } catch (Exception ex) {
                 logger.error(ex.getMessage());
@@ -101,33 +101,33 @@ public class RegularPaymentSubscriptionService {
         Map<String, String> params = operation.getRequestParams(mfrRequest);
         PaymentResponse paymentResponse = sendRequest(mfrRequest.getRequestUrl(), params);
         operation.processResponse(mfrRequest.getIdOfRequest(), paymentResponse);
-        if (operationName.equals("subscriptionDelete")) {
+        if (operationName.equals(IRequestOperation.SUBSCRIPTION_DELETE)) {
             return operation.postProcessResponse(mfrRequest.getIdOfRequest(), paymentResponse);
         }
         return true;
     }
 
     public void refillOneClientBalance(Long bsId) {
-        makeSubscriptionOperation(bsId, "regularPayment");
+        makeSubscriptionOperation(bsId, IRequestOperation.REGULAR_PAYMENT);
     }
 
     // Обработка callback'а на запрос активации подписки на автопополнение.
     public void processSubscriptionActivated(Long mfrRequestId, PaymentResponse paymentResponse) {
-        getOperationBean("subscriptionReg").postProcessResponse(mfrRequestId, paymentResponse);
+        getOperationBean(IRequestOperation.SUBSCRIPTION_REG).postProcessResponse(mfrRequestId, paymentResponse);
     }
 
     // Обработка callback'а на запрос проведения регулярного пополнения (списания с карты).
     public void processRegularPayment(Long mfrRequestId, PaymentResponse paymentResponse) {
-        getOperationBean("regularPayment").postProcessResponse(mfrRequestId, paymentResponse);
+        getOperationBean(IRequestOperation.REGULAR_PAYMENT).postProcessResponse(mfrRequestId, paymentResponse);
     }
 
     // Возвращает параметры для запроса по активации подписки (привязка карты).
     public Map<String, String> getParamsForRegRequest(MfrRequest mfrRequest) {
-        return getOperationBean("subscriptionReg").getRequestParams(mfrRequest);
+        return getOperationBean(IRequestOperation.SUBSCRIPTION_REG).getRequestParams(mfrRequest);
     }
 
     public boolean deactivateSubscription(Long subscriptionId) {
-        return makeSubscriptionOperation(subscriptionId, "subscriptionDelete");
+        return makeSubscriptionOperation(subscriptionId, IRequestOperation.SUBSCRIPTION_DELETE);
     }
 
     private PaymentResponse sendRequest(String uri, Map<String, String> params) {

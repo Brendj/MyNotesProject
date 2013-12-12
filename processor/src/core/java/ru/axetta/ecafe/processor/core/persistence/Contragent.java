@@ -525,6 +525,10 @@ public class Contragent {
         return StringUtils.substringBetween(remarks, "{BMID=", "}");
     }
 
+    public String getMfrId() {
+        return StringUtils.substringBetween(remarks, "{MFR_ID=", "}");
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

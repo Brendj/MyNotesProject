@@ -1600,7 +1600,7 @@ public class DAOService {
 
     public Contragent findContragentByClient(Long clientContractId) {
         TypedQuery<Contragent> query = entityManager.createQuery(
-                "select c from Contragent c join c.orgsInternal o join o.clientsInternal cl \n"
+                "select o.defaultSupplier from Org o join o.clientsInternal cl \n"
                         + "where cl.contractId = :contractId", Contragent.class)
                 .setParameter("contractId", clientContractId);
         List<Contragent> res = query.getResultList();

@@ -17,6 +17,11 @@ import java.util.Map;
 
 public interface IRequestOperation {
 
+    public static final String SUBSCRIPTION_DELETE = "subscriptionDeleteRequest";
+    public static final String SUBSCRIPTION_REG = "subscriptionRegRequest";
+    public static final String STATUS_CHECK = "statusCheckRequest";
+    public static final String REGULAR_PAYMENT = "regularPaymentRequest";
+
     MfrRequest createRequest(Long subscriptionId);
 
     Map<String, String> getRequestParams(MfrRequest request);
