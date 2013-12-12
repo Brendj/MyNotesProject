@@ -606,8 +606,10 @@ public class DashboardServiceBean {
             //        org.getLastUnSuccessfulBalanceSync(),
             //        runtimeContext.getProcessor().getOrgSyncAddress(org.getIdOfOrg())));
             String tags = parseTags(org.getTag());
-            items.add(new DashboardResponse.OrgSyncStatItem(org.getShortName(), tags, org.getLastSuccessfulBalanceSync(),
-                    org.getLastUnSuccessfulBalanceSync(),org.getRemoteAddress(), org.getClientVersion()));
+            ;
+            items.add(new DashboardResponse.OrgSyncStatItem(org.getIdOfOrg(), org.getShortName(), tags, org.getLastSuccessfulBalanceSync(),
+                    org.getLastUnSuccessfulBalanceSync(),org.getRemoteAddress(), org.getClientVersion(),
+                    daoService.getSynchErrorsCount(org)));
 
         }
         orgSyncStats.setOrgSyncStatItems(items);

@@ -1606,4 +1606,12 @@ public class DAOService {
         List<Contragent> res = query.getResultList();
         return res.isEmpty() ? null : res.get(0);
     }
+    
+    public long getSynchErrorsCount(Org org) {
+        Session session = (Session) entityManager.getDelegate();
+        org.hibernate.Query q = session.createSQLQuery(
+                "select count(idoforg) from cf_synchistory_exceptions where idoforg=:idoforg");
+        q.setLong("idoforg", org.getIdOfOrg());
+        return ((BigInteger) q.uniqueResult()).longValue();
+    }
 }

@@ -354,15 +354,20 @@ public class DashboardResponse {
         private Date lastUnSuccessfulBalanceSync;
         private String remoteAddr;
         private String version;
+        private Long errorsCount;
+        private Long idoforg;
+        
 
-        public OrgSyncStatItem(String orgName, String tags, Date lastSuccessfulBalanceSync, Date lastUnSuccessfulBalanceSync,
-                String remoteAddr, String version) {
+        public OrgSyncStatItem(Long idoforg, String orgName, String tags, Date lastSuccessfulBalanceSync, Date lastUnSuccessfulBalanceSync,
+                String remoteAddr, String version, Long errorsCount) {
+            this.idoforg = idoforg;
             this.orgName = orgName;
             this.tags = tags;
             this.lastSuccessfulBalanceSync = lastSuccessfulBalanceSync;
             this.lastUnSuccessfulBalanceSync = lastUnSuccessfulBalanceSync;
             this.remoteAddr = remoteAddr;
             this.version = version;
+            this.errorsCount = errorsCount;
         }
 
         public String getOrgName() {
@@ -387,6 +392,14 @@ public class DashboardResponse {
         
         public String getTags() {
             return tags;
+        }
+
+        public Long getErrorsCount() {
+            return errorsCount;
+        }
+
+        public Long getIdoforg() {
+            return idoforg;
         }
     }
 

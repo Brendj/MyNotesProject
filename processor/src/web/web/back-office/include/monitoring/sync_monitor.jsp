@@ -73,6 +73,19 @@
 
             <rich:column headerClass="column-header">
                 <f:facet name="header">
+                    <h:outputText escape="false" value="Количество ошибок <br/>при синхронизации" />
+                </f:facet>
+                <a4j:commandLink styleClass="output-text-mod" rendered="#{item.errorsCount > 0}">
+                    <a4j:support event="onclick" action="#{synchErrorsPage.show(item.idoforg)}"
+                                 status="feedPlanStatus" reRender="workspaceForm"/>
+                    <h:outputText value="#{item.errorsCount}" styleClass="output-text"
+                                  style="color: red"/>
+                </a4j:commandLink>
+                <h:outputText value="#{item.errorsCount}" styleClass="output-text" rendered="#{item.errorsCount < 1}"/>
+            </rich:column>
+
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
                     <h:outputText escape="true" value="Версия клиента" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.version}"
