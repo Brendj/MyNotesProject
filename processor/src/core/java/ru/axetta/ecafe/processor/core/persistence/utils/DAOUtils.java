@@ -1604,7 +1604,7 @@ public class DAOUtils {
                 .or(Restrictions.isNull("dateDeactivateService"), Restrictions.gt("dateDeactivateService", now)))
                 .setProjection(Projections.max("dateActivateService"));
         Criteria criteria = session.createCriteria(SubscriptionFeeding.class).createAlias("client", "c")
-                .add(Restrictions.eq("c.contractId", contractId))
+                .add(Restrictions.eq("c.contractId", contractId)).add(Restrictions.eq("deletedState", false))
                 .add(Subqueries.propertyEq("dateActivateService", subQuery));
         return (SubscriptionFeeding) criteria.uniqueResult();
     }
@@ -1613,7 +1613,7 @@ public class DAOUtils {
     // Возвращает циклограмму питания, актуальную на текущий день.
     public static CycleDiagram findClientCycleDiagram(Session session, Long contractId) {
         Criteria criteria = session.createCriteria(CycleDiagram.class).createAlias("client", "c")
-                .add(Restrictions.eq("c.contractId", contractId))
+                .add(Restrictions.eq("c.contractId", contractId)).add(Restrictions.eq("deletedState", false))
                 .add(Restrictions.le("dateActivationDiagram", new Date()))
                 .add(Restrictions.in("stateDiagram", new Object[]{StateDiagram.ACTIVE, StateDiagram.WAIT}));
         return (CycleDiagram) criteria.uniqueResult();

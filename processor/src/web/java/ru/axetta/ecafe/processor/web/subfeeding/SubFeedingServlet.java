@@ -286,8 +286,8 @@ public class SubFeedingServlet extends HttpServlet {
                 String[] ids = StringUtils.split(entry.getValue()[0], '_');
                 String complexId = ids[0];
                 int dayNumber = Integer.parseInt(ids[1]);
-                cycle.setDayValue(dayNumber,
-                        StringUtils.join(new Object[]{cycle.getDayValue(dayNumber), complexId}, ','));
+                String prevValue = cycle.getDayValue(dayNumber);
+                cycle.setDayValue(dayNumber, prevValue == null ? complexId : (prevValue + "," + complexId));
             }
         }
         return cycle;

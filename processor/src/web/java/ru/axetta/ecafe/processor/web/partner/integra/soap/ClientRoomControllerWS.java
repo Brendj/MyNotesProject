@@ -97,6 +97,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_NO_CONTACT_DATA = 160L;
     private static final Long RC_CLIENT_FINANCIAL_OPERATION_ERROR = 170L;
     private static final Long RC_SETTINGS_NOT_FOUND = 180L;
+    private static final Long RC_SUBSCRIPTION_FEEDING_DUPLICATE = 190L;
 
     private static final String RC_OK_DESC = "OK";
     private static final String RC_CLIENT_NOT_FOUND_DESC = "Клиент не найден";
@@ -107,6 +108,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_INTERNAL_ERROR_DESC = "Внутренняя ошибка";
     private static final String RC_NO_CONTACT_DATA_DESC = "У лицевого счета нет контактных данных";
     private static final String RC_DO_NOT_ACCESS_TO_SUB_BALANCE_DESC = "Нет доступа к субсчетам";
+    private static final String RC_SUBSCRIPTION_FEEDING_DUPLICATE_DESC = "У клиента уже есть активная подписка на АП.";
 
     @Resource
     private WebServiceContext context;
@@ -3873,6 +3875,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (client == null) {
                 return res;
             }
+            SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
+            if (sf != null) {
+                res.resultCode = RC_SUBSCRIPTION_FEEDING_DUPLICATE;
+                res.description = RC_SUBSCRIPTION_FEEDING_DUPLICATE_DESC;
+                return res;
+            }
             DAOService daoService = DAOService.getInstance();
             List<ECafeSettings> settings = daoService
                     .geteCafeSettingses(client.getOrg().getIdOfOrg(), SettingsIds.SubscriberFeeding, false);
@@ -3887,7 +3895,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ECafeSettings.SubscriberFeedingSettingSettingValue parser = (ECafeSettings.SubscriberFeedingSettingSettingValue) cafeSettings
                     .getSplitSettingValue();
             Date date = new Date();
-            SubscriptionFeeding sf = new SubscriptionFeeding();
+            sf = new SubscriptionFeeding();
             sf.setCreatedDate(date);
             sf.setClient(client);
             sf.setOrgOwner(client.getOrg().getIdOfOrg());
