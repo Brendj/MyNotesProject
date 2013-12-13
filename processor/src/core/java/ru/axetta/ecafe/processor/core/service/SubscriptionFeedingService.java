@@ -52,69 +52,71 @@ public class SubscriptionFeedingService {
         if(LOGGER.isDebugEnabled()){
             LOGGER.debug("cycleDiagrams count=" + cycleDiagrams.size());
         }
-        for (CycleDiagram cycleDiagram: cycleDiagrams){
-            final Client client = cycleDiagram.getClient();
-            Long subBalance = client.getSubBalance1();
-            Date deactivateDate = null;
-            sql = "from SubscriptionFeeding where wasSuspended=false and client=:client and dateDeactivateService>=:currentDate";
-            TypedQuery<SubscriptionFeeding> subscriptionFeedingQuery = entityManager.createQuery(sql, SubscriptionFeeding.class);
-            subscriptionFeedingQuery.setParameter("client", client);
-            subscriptionFeedingQuery.setParameter("currentDate", currentDate);
-            subscriptionFeedingQuery.setMaxResults(1);
-            List<SubscriptionFeeding> subscriptionFeedings = subscriptionFeedingQuery.getResultList();
-            if(subscriptionFeedings!=null && !subscriptionFeedings.isEmpty()){
-                deactivateDate = subscriptionFeedings.get(0).getDateDeactivateService();
-            }
-            boolean sendNotification = true;
-            if(LOGGER.isDebugEnabled()){
-                LOGGER.debug("SubscriptionFeeding deactivateDate=" + deactivateDate);
-            }
-            if(deactivateDate!=null){
-                sendNotification = deactivateDate.compareTo(withdrawDate)>0;
-            }
-            if(LOGGER.isDebugEnabled()){
-                LOGGER.debug("sendNotification=" + sendNotification);
-            }
-            final String contractId = String.format("%s01", String.valueOf(client.getContractId()));
-            if(sendNotification){
-                if(subBalance==null || subBalance==0L){
-                    withdrawDateStr = CalendarUtils.dateToString(CalendarUtils.addDays(currentDate, 1));
-                    subBalance = 0L;
+        if(!cycleDiagrams.isEmpty()){
+            for (CycleDiagram cycleDiagram: cycleDiagrams){
+                final Client client = cycleDiagram.getClient();
+                Long subBalance = client.getSubBalance1();
+                Date deactivateDate = null;
+                sql = "from SubscriptionFeeding where wasSuspended=false and client=:client and dateDeactivateService>=:currentDate";
+                TypedQuery<SubscriptionFeeding> subscriptionFeedingQuery = entityManager.createQuery(sql, SubscriptionFeeding.class);
+                subscriptionFeedingQuery.setParameter("client", client);
+                subscriptionFeedingQuery.setParameter("currentDate", currentDate);
+                subscriptionFeedingQuery.setMaxResults(1);
+                List<SubscriptionFeeding> subscriptionFeedings = subscriptionFeedingQuery.getResultList();
+                if(subscriptionFeedings!=null && !subscriptionFeedings.isEmpty()){
+                    deactivateDate = subscriptionFeedings.get(0).getDateDeactivateService();
                 }
-                if(subBalance - cycleDiagram.getWeekPrice()<0){
-                    String[] values = {
-                            "contractId", contractId, "withdrawDate", withdrawDateStr,
-                            "balance", CurrencyStringUtils.copecksToRubles(subBalance)};
-                    enService.sendNotification(client, EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING, values);
+                boolean sendNotification = true;
+                if(LOGGER.isDebugEnabled()){
+                    LOGGER.debug("SubscriptionFeeding deactivateDate=" + deactivateDate);
                 }
-            } else {
                 if(deactivateDate!=null){
-                    long[] days = new long[7];
-                    days[0] = cycleDiagram.getSundayPrice();
-                    days[1] = cycleDiagram.getMondayPrice();
-                    days[2] = cycleDiagram.getTuesdayPrice();
-                    days[3] = cycleDiagram.getWednesdayPrice();
-                    days[4] = cycleDiagram.getThursdayPrice();
-                    days[5] = cycleDiagram.getFridayPrice();
-                    days[6] = cycleDiagram.getSaturdayPrice();
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(currentDate);
-                    final long currentBalance = subBalance;
-                    int dayWeek = calendar.get(Calendar.DAY_OF_WEEK);
-                    if(LOGGER.isDebugEnabled()){
-                        LOGGER.debug("Current Day: "+ dayWeek);
+                    sendNotification = deactivateDate.compareTo(withdrawDate)>0;
+                }
+                if(LOGGER.isDebugEnabled()){
+                    LOGGER.debug("sendNotification=" + sendNotification);
+                }
+                final String contractId = String.format("%s01", String.valueOf(client.getContractId()));
+                if(sendNotification){
+                    if(subBalance==null || subBalance==0L){
+                        withdrawDateStr = CalendarUtils.dateToString(CalendarUtils.addDays(currentDate, 1));
+                        subBalance = 0L;
                     }
-                    for (int i=dayWeek; i<dayWeek+7; i++){
-                        subBalance = subBalance-days[i%7];
-                        final Date date = CalendarUtils.addDays(currentDate, i - 5);
-                        if(subBalance-days[i%7]<0 && date.compareTo(deactivateDate)<0 ){
-                            withdrawDateStr = CalendarUtils.dateToString(date);
-                            String[] values = {"contractId", contractId, "withdrawDate", withdrawDateStr,
-                                               "balance", CurrencyStringUtils.copecksToRubles(currentBalance)};
-                            enService.sendNotification(client, EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING, values);
-                            break;
+                    if(subBalance - cycleDiagram.getWeekPrice()<0){
+                        String[] values = {
+                                "contractId", contractId, "withdrawDate", withdrawDateStr,
+                                "balance", CurrencyStringUtils.copecksToRubles(subBalance)};
+                        enService.sendNotification(client, EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING, values);
+                    }
+                } else {
+                    if(deactivateDate!=null){
+                        long[] days = new long[7];
+                        days[0] = cycleDiagram.getSundayPrice();
+                        days[1] = cycleDiagram.getMondayPrice();
+                        days[2] = cycleDiagram.getTuesdayPrice();
+                        days[3] = cycleDiagram.getWednesdayPrice();
+                        days[4] = cycleDiagram.getThursdayPrice();
+                        days[5] = cycleDiagram.getFridayPrice();
+                        days[6] = cycleDiagram.getSaturdayPrice();
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(currentDate);
+                        final long currentBalance = subBalance;
+                        int dayWeek = calendar.get(Calendar.DAY_OF_WEEK);
+                        if(LOGGER.isDebugEnabled()){
+                            LOGGER.debug("Current Day: "+ dayWeek);
                         }
+                        for (int i=dayWeek; i<dayWeek+7; i++){
+                            subBalance = subBalance-days[i%7];
+                            final Date date = CalendarUtils.addDays(currentDate, i - 5);
+                            if(subBalance-days[i%7]<0 && date.compareTo(deactivateDate)<0 ){
+                                withdrawDateStr = CalendarUtils.dateToString(date);
+                                String[] values = {"contractId", contractId, "withdrawDate", withdrawDateStr,
+                                                   "balance", CurrencyStringUtils.copecksToRubles(currentBalance)};
+                                enService.sendNotification(client, EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING, values);
+                                break;
+                            }
 
+                        }
                     }
                 }
             }
