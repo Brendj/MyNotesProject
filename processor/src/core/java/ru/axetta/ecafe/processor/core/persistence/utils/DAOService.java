@@ -85,23 +85,23 @@ public class DAOService {
     }
 
     @SuppressWarnings("unchecked")
-    public List<ECafeSettings> geteCafeSettingses(final Long idOfOrg,final SettingsIds settingsIds,final Boolean deleted) {
-        Session session = (Session) entityManager.getDelegate();
+    public List<ECafeSettings> geteCafeSettingses(final Long idOfOrg, final SettingsIds settingsIds,
+            final Boolean deleted) {
+        Session session = entityManager.unwrap(Session.class);
         Criteria criteria = session.createCriteria(ECafeSettings.class);
-        if(idOfOrg==null && settingsIds==null){
+        if (idOfOrg == null && settingsIds == null) {
             return new ArrayList<ECafeSettings>(0);
         }
-        if(idOfOrg!=null){
+        if (idOfOrg != null) {
             criteria.add(Restrictions.eq("orgOwner", idOfOrg));
         }
-        if(settingsIds!=null){
-            criteria.add(Restrictions.eq("settingsId",settingsIds));
+        if (settingsIds != null) {
+            criteria.add(Restrictions.eq("settingsId", settingsIds));
         }
-        if(!deleted){
-            criteria.add(Restrictions.eq("deletedState",false));
+        if (!deleted) {
+            criteria.add(Restrictions.eq("deletedState", false));
         }
-        List<ECafeSettings> list =(List<ECafeSettings>) criteria.list();
-        return list;
+        return (List<ECafeSettings>) criteria.list();
     }
 
     public ConfigurationProvider onSave(ConfigurationProvider configurationProvider, User currentUser, List<Long> idOfOrgList) throws Exception {

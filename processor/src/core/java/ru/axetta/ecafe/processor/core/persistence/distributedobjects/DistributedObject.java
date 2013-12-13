@@ -136,6 +136,12 @@ public abstract class DistributedObject{
 
     public abstract void createProjections(Criteria criteria);
 
+    /* Метод вызывается перед сохранением объекта в БД.
+       Используется, если перед сохранением надо выполнить специфичную бизнес-логику.
+     */
+    public void beforePersist() {
+    }
+
     /**
      * Метод для выборки объектов которые уходят от создателя к создателю без логики
      * правил распределения, например: натройки ECafeSettings

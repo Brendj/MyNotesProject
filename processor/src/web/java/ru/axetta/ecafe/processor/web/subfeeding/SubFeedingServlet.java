@@ -218,13 +218,13 @@ public class SubFeedingServlet extends HttpServlet {
         try {
             session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
-            CycleDiagram cd = DAOUtils.findClientCycleDiagram(session, contractId);
+            CycleDiagram cd = DAOUtils.findLastCycleDiagram(session, contractId);
             Map<Integer, List<String>> activeComplexes = splitPlanComplexes(cd);
             for (Map.Entry<Integer, List<String>> entry : activeComplexes.entrySet()) {
                 int dayNumber = entry.getKey();
                 String newValue = cycle.getDayValue(dayNumber);
                 boolean isEqual = CollectionUtils.isEqualCollection(entry.getValue(),
-                        Arrays.asList(StringUtils.split(StringUtils.defaultString(newValue), ',')));
+                        Arrays.asList(StringUtils.split(StringUtils.defaultString(newValue), ';')));
                 if (!isEqual) {
                     return true;
                 }
@@ -269,13 +269,13 @@ public class SubFeedingServlet extends HttpServlet {
 
     private Map<Integer, List<String>> splitPlanComplexes(CycleDiagram cd) {
         Map<Integer, List<String>> activeComplexes = new HashMap<Integer, List<String>>();
-        activeComplexes.put(1, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getMonday()), ',')));
-        activeComplexes.put(2, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getTuesday()), ',')));
-        activeComplexes.put(3, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getWednesday()), ',')));
-        activeComplexes.put(4, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getThursday()), ',')));
-        activeComplexes.put(5, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getFriday()), ',')));
-        activeComplexes.put(6, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getSaturday()), ',')));
-        activeComplexes.put(7, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getSunday()), ',')));
+        activeComplexes.put(1, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getMonday()), ';')));
+        activeComplexes.put(2, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getTuesday()), ';')));
+        activeComplexes.put(3, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getWednesday()), ';')));
+        activeComplexes.put(4, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getThursday()), ';')));
+        activeComplexes.put(5, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getFriday()), ';')));
+        activeComplexes.put(6, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getSaturday()), ';')));
+        activeComplexes.put(7, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getSunday()), ';')));
         return activeComplexes;
     }
 
@@ -287,7 +287,7 @@ public class SubFeedingServlet extends HttpServlet {
                 String complexId = ids[0];
                 int dayNumber = Integer.parseInt(ids[1]);
                 String prevValue = cycle.getDayValue(dayNumber);
-                cycle.setDayValue(dayNumber, prevValue == null ? complexId : (prevValue + "," + complexId));
+                cycle.setDayValue(dayNumber, prevValue == null ? complexId : (prevValue + ";" + complexId));
             }
         }
         return cycle;

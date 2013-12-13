@@ -3882,18 +3882,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return res;
             }
             DAOService daoService = DAOService.getInstance();
-            List<ECafeSettings> settings = daoService
-                    .geteCafeSettingses(client.getOrg().getIdOfOrg(), SettingsIds.SubscriberFeeding, false);
-            if (settings.isEmpty()) {
-                res.resultCode = RC_SETTINGS_NOT_FOUND;
-                res.description = String
-                        .format("Отсутствуют настройки абонементного питания для организации %s (IdOfOrg = %s)",
-                                client.getOrg().getShortName(), client.getOrg().getIdOfOrg());
-                return res;
-            }
-            ECafeSettings cafeSettings = settings.get(0);
-            ECafeSettings.SubscriberFeedingSettingSettingValue parser = (ECafeSettings.SubscriberFeedingSettingSettingValue) cafeSettings
-                    .getSplitSettingValue();
             Date date = new Date();
             sf = new SubscriptionFeeding();
             sf.setCreatedDate(date);
@@ -3909,7 +3897,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             sf.setGlobalVersionOnCreate(version);
             sf.setGlobalVersion(version);
             session.persist(sf);
-            CycleDiagram cd = createCycleDiagram(client, cycleDiagramIn, session, parser);
+            CycleDiagram cd = createCycleDiagram(client, cycleDiagramIn, session, date, true);
             session.persist(cd);
             transaction.commit();
             res.resultCode = RC_OK;
@@ -3930,7 +3918,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         if (StringUtils.isEmpty(dayComplexes)) {
             return 0L;
         }
-        String[] complexIds = StringUtils.split(dayComplexes, ',');
+        String[] complexIds = StringUtils.split(dayComplexes, ';');
         List<Integer> ids = new ArrayList<Integer>();
         for (String id : complexIds) {
             ids.add(Integer.valueOf(id));
@@ -4075,7 +4063,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ECafeSettings cafeSettings = settings.get(0);
             ECafeSettings.SubscriberFeedingSettingSettingValue parser = (ECafeSettings.SubscriberFeedingSettingSettingValue) cafeSettings
                     .getSplitSettingValue();
-            CycleDiagram cd = createCycleDiagram(client, cycleDiagramIn, session, parser);
+            Date today = CalendarUtils.truncateToDayOfMonth(new Date());
+            Date activationDate = CalendarUtils.addDays(today, parser.getDayRequest());
+            CycleDiagram cd = createCycleDiagram(client, cycleDiagramIn, session, activationDate, false);
             session.persist(cd);
             transaction.commit();
             result.resultCode = RC_OK;
@@ -4092,17 +4082,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     private CycleDiagram createCycleDiagram(Client client, CycleDiagramIn cycleDiagramIn, Session session,
-            ECafeSettings.SubscriberFeedingSettingSettingValue parser) {
-        Date createDate = new Date();
-        Date today = CalendarUtils.truncateToDayOfMonth(createDate);
+            Date dateActivationDiagram, boolean active) {
         DAOService daoService = DAOService.getInstance();
         CycleDiagram cd = new CycleDiagram();
-        cd.setCreatedDate(createDate);
+        cd.setCreatedDate(new Date());
         cd.setClient(client);
         cd.setOrgOwner(client.getOrg().getIdOfOrg());
         cd.setIdOfClient(client.getIdOfClient());
-        cd.setDateActivationDiagram(CalendarUtils.addDays(today, parser.getDayRequest()));
-        cd.setStateDiagram(StateDiagram.WAIT);
+        cd.setDateActivationDiagram(dateActivationDiagram);
+        if (active) {
+            cd.setStateDiagram(StateDiagram.ACTIVE);
+        } else {
+            cd.setStateDiagram(StateDiagram.WAIT);
+        }
         cd.setGuid(UUID.randomUUID().toString());
         cd.setDeletedState(false);
         cd.setSendAll(SendToAssociatedOrgs.SendToSelf);

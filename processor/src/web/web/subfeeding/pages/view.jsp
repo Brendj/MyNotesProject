@@ -25,30 +25,14 @@
     <script src="${pageContext.request.contextPath}/subfeeding/js/jquery.ui.datepicker-ru.js"></script>
     <script>
         $(function () {
-            $("#datepickerBegin").datepicker();
-            $("#datepickerEnd").datepicker();
-            $("#errorDialog").dialog({
-                autoOpen: false,
-                modal: true,
-                buttons: {
-                    Ok: function () {
-                        $(this).dialog("close");
-                    }
+            var datepickerBegin = $("#datepickerBegin").datepicker({
+                onSelect: function (selected) {
+                    $("#datepickerEnd").datepicker("option", "minDate", selected);
                 }
             });
+            var datepickerEnd = $("#datepickerEnd").datepicker();
+            datepickerEnd.datepicker("option", "minDate", datepickerBegin.datepicker("getDate"));
         });
-
-        function validateDates() {
-            var format = 'dd.mm.yy';
-            var beginDate = $("#datepickerBegin").val();
-            var endDate = $("#datepickerEnd").val();
-            if ($.datepicker.parseDate(format, beginDate).getTime() > $.datepicker.parseDate(format,
-                    endDate).getTime()) {
-                $("#errorDialog").dialog("open");
-                return false;
-            }
-            return true;
-        }
     </script>
 </head>
 <body>
@@ -75,6 +59,9 @@
 <div class="textDiv">Текущий баланс основного счета: <%=subBalance0%> руб.</div>
 <div class="textDiv">Баланс субсчета АП: <%=subBalance1%> руб.</div>
 <div class="textDiv">Дата подключения услуги: <%=tf.format(sf.getDateActivateService())%></div>
+<div class="textDiv">Дата отключения услуги: <%=sf.getDateDeactivateService() == null ? "услуга бессрочная"
+        : df.format(sf.getDateDeactivateService())%>
+</div>
 <%
     if (wasSuspended) {
         String suspendDate = df.format(sf.getLastDatePauseService());
@@ -133,9 +120,8 @@
 %>
 
 <div class="textDiv" style="font-weight: bold; margin-top: 50px;">История операций</div>
-<div class="textDiv" id="errorDialog" hidden="hidden">Начальная дата не может быть больше конечной.</div>
 <form method="post" enctype="application/x-www-form-urlencoded"
-      action="${pageContext.request.contextPath}/sub-feeding/view" onsubmit="return validateDates();">
+      action="${pageContext.request.contextPath}/sub-feeding/view">
     <table class="customTable">
         <tr class="paymentEvenLine">
             <td>Начальная дата</td>

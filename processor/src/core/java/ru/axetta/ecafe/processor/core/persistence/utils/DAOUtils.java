@@ -111,7 +111,7 @@ public class DAOUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static Client findClientByContractId(Session persistenceSession, long contractId) throws Exception {
+    public static Client findClientByContractId(Session persistenceSession, long contractId) {
         Criteria contractCriteria = persistenceSession.createCriteria(Client.class);
         contractCriteria.add(Restrictions.eq("contractId", contractId));
         List<Client> resultList = (List<Client>) contractCriteria.list();
@@ -1619,7 +1619,19 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(CycleDiagram.class).createAlias("client", "c")
                 .add(Restrictions.eq("c.contractId", contractId)).add(Restrictions.eq("deletedState", false))
                 .add(Restrictions.le("dateActivationDiagram", new Date()))
-                .add(Restrictions.in("stateDiagram", new Object[]{StateDiagram.ACTIVE, StateDiagram.WAIT}));
+                .add(Restrictions.eq("stateDiagram", StateDiagram.ACTIVE));
+        return (CycleDiagram) criteria.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    // Возвращает циклограмму питания, созданную позже всех.
+    public static CycleDiagram findLastCycleDiagram(Session session, Long contractId) {
+        Client c = findClientByContractId(session, contractId);
+        DetachedCriteria subQuery = DetachedCriteria.forClass(CycleDiagram.class).add(Restrictions.eq("client", c))
+                .add(Restrictions.in("stateDiagram", new Object[]{StateDiagram.WAIT, StateDiagram.ACTIVE}))
+                .add(Restrictions.eq("deletedState", false)).setProjection(Projections.max("dateActivationDiagram"));
+        Criteria criteria = session.createCriteria(CycleDiagram.class).add(Restrictions.eq("client", c))
+                .add(Subqueries.propertyEq("dateActivationDiagram", subQuery));
         return (CycleDiagram) criteria.uniqueResult();
     }
 }

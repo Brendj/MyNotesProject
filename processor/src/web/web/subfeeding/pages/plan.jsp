@@ -46,7 +46,6 @@
             <th rowspan="2">ЧТ</th>
             <th rowspan="2">ПТ</th>
             <th rowspan="2">СБ</th>
-            <th rowspan="2">ВС</th>
         </tr>
         <tr>
             <th class="dayNameHeader">Комплекс</th>
@@ -65,7 +64,7 @@
                     .copecksToRubles(complex.getCurrentPrice()) + " руб"%>
             </td>
             <%
-                for (int i = 1; i <= 7; i++) {
+                for (int i = 1; i <= 6; i++) {
                     String key = complex.getIdOfComplex() + "_" + i;
                     boolean checked = activeComplexes != null && activeComplexes.get(i)
                             .contains(String.valueOf(complex.getIdOfComplex()));
@@ -86,7 +85,7 @@
 <%
     if (sf == null) {
 %>
-            <td align="center" colspan="8">
+            <td align="center" colspan="7">
                 <input type="submit" class="reopenButton" name="activate" value="Активировать" />
             </td>
 <%
@@ -96,7 +95,7 @@
                 <input type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/view'"
                        class="reopenButton" name="back" value="Вернуться к подписке" />
             </td>
-            <td align="left" colspan="5">
+            <td align="left" colspan="4">
                 <input type="submit" class="reopenButton" name="edit" value="Сохранить изменения" />
             </td>
 <%

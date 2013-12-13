@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -65,19 +66,22 @@ public class ECafeSettings extends DistributedObject{
     @Override
     protected ECafeSettings parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null){
+        if (longOrgOwner != null) {
             setOrgOwner(longOrgOwner);
         } else {
             throw new DistributedObjectException("OrgOwner is empty");
         }
         String stringValue = XMLUtils.getStringAttributeValue(node, "Value", 128);
-        if (stringValue != null)
+        if (stringValue != null) {
             setSettingValue(stringValue);
+        }
         Integer intId = XMLUtils.getIntegerAttributeValue(node, "Id");
-        if (intId != null){
+        if (intId != null) {
             final int id = intId - 1;
             SettingsIds settingsId1 = SettingsIds.fromInteger(id);
-            if(settingsId1==null) throw new DistributedObjectException("ECafeSettings Unknown Settings Id");
+            if (settingsId1 == null) {
+                throw new DistributedObjectException("ECafeSettings Unknown Settings Id");
+            }
             setSettingsId(settingsId1);
         } else {
             throw new DistributedObjectException("ECafeSettings Id not null");
@@ -91,6 +95,20 @@ public class ECafeSettings extends DistributedObject{
         setOrgOwner(distributedObject.getOrgOwner());
         setSettingValue(((ECafeSettings) distributedObject).getSettingValue());
         setSettingsId(((ECafeSettings) distributedObject).getSettingsId());
+    }
+
+    // Настройки, заданные на клиенте, имеют приоритет над серверными.
+    // Поэтому активную настройку, созданную на сервере, мы блокируем и прикрываем активной клиентской.
+    // Не может быть у орг-ии двух активных настроек!
+    @Override
+    public void beforePersist() {
+        List<ECafeSettings> settingsList = DAOService.getInstance().geteCafeSettingses(orgOwner, settingsId, false);
+        if (settingsList.size() != 0) {
+            ECafeSettings settings = settingsList.get(0);
+            if (!this.equals(settings)) {
+                DAOService.getInstance().setDeletedState(settings);
+            }
+        }
     }
 
     public SettingsIds getSettingsId() {
