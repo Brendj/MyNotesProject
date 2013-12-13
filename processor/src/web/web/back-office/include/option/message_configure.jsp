@@ -196,7 +196,7 @@
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>
-        <rich:tab label="E-mail уведомление об изменении заявки" id="goodRequestChange-Email">
+        <rich:tab rendered="false" label="E-mail уведомление об изменении заявки" id="goodRequestChange-Email">
             <h:panelGrid styleClass="borderless-grid" columns="2">
                 <h:outputText escape="true" value="Тема:" styleClass="output-text" />
                 <h:inputText value="#{messageConfigurePage.goodRequestChangeEmailSubject}" size="80" maxlength="128"

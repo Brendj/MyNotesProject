@@ -68,8 +68,8 @@
     <h:inputText value="#{mainPage.contragentEditPage.publicKeyGOSTAlias}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Переводить номер счета" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.contragentEditPage.needAccountTranslate}" styleClass="output-text" />
-    <h:outputText escape="true" value="Список рассылки сводного отчета по заявкам" styleClass="output-text" />
-    <h:inputText value="#{mainPage.contragentEditPage.requestNotifyMailList}" maxlength="128" styleClass="input-text" />
+    <h:outputText escape="true" value="Список рассылки сводного отчета по заявкам" rendered="false" styleClass="output-text" />
+    <h:inputText value="#{mainPage.contragentEditPage.requestNotifyMailList}" rendered="false" maxlength="128" styleClass="input-text" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />

@@ -130,10 +130,10 @@
     <!--</task:scheduled-tasks>-->
 
     <!-- Оповещение контргента об изменении заявки, срабатывает каждве 20 минут-->
-    <task:scheduler id="goodRequestsSchedule"/>
-    <task:scheduled-tasks scheduler="goodRequestsSchedule">
-        <task:scheduled ref="goodRequestsNotificationService" method="notifyGoodRequestsReport"
-                        cron="0 0 * * * ?"/>
-    </task:scheduled-tasks>
+    <!--<task:scheduler id="goodRequestsSchedule"/>-->
+    <!--<task:scheduled-tasks scheduler="goodRequestsSchedule">-->
+        <!--<task:scheduled ref="goodRequestsNotificationService" method="notifyGoodRequestsReport"-->
+                        <!--cron="0 0 * * * ?"/>-->
+    <!--</task:scheduled-tasks>-->
 
 </beans>
