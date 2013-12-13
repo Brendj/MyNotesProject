@@ -105,6 +105,8 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
     private List<Map.Entry<String,Tree>> lvl2 = new ArrayList<Map.Entry<String, Tree>>();
     private List<Map.Entry<String,Tree>> lvlBottom = new ArrayList<Map.Entry<String, Tree>>();
     protected Calendar localCalendar;
+    public final static int REPORT_PERIOD_DAY = 0, REPORT_PERIOD_WEEK = 1, REPORT_PERIOD_2WEEKS = 2, REPORT_PERIOD_MONTH = 3, REPORT_PERIOD_DATE = 4;
+    protected int reportPeriod;
 
     @Override
     public void onShow() throws Exception {
@@ -115,6 +117,7 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
                 .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
 
         localCalendar.setTime(new Date());
+        reportPeriod = REPORT_PERIOD_MONTH;
         this.start = DateUtils.truncate(localCalendar, Calendar.MONTH).getTime();
 
         localCalendar.setTime(this.start);
@@ -287,6 +290,32 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
         localCalendar.add(Calendar.DAY_OF_MONTH,1);
         localCalendar.add(Calendar.SECOND, -1);
         this.end = localCalendar.getTime();
+    }
+
+    public void onDateSpecified(ActionEvent event) {
+        reportPeriod = REPORT_PERIOD_DATE;
+    }
+
+
+    public void onReportPeriodChanged(ActionEvent event) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTimeInMillis(start.getTime());
+        if (reportPeriod == REPORT_PERIOD_WEEK) {
+            cal.add(Calendar.DAY_OF_MONTH, 7);
+        } else if (reportPeriod == REPORT_PERIOD_2WEEKS) {
+            cal.add(Calendar.DAY_OF_MONTH, 14);
+        } else if (reportPeriod == REPORT_PERIOD_MONTH) {
+            cal.add(Calendar.MONTH, 1);
+        }
+        this.end = cal.getTime();
+    }
+
+    public int getReportPeriod() {
+        return reportPeriod;
+    }
+
+    public void setReportPeriod(int reportPeriod) {
+        this.reportPeriod = reportPeriod;
     }
 
     @Override

@@ -31,11 +31,26 @@
 
         <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
         <rich:calendar value="#{registerStampPage.start}" datePattern="dd.MM.yyyy" converter="dateConverter"
-                       inputClass="input-text" showWeeksBar="false" />
+                       inputClass="input-text" showWeeksBar="false">
+            <a4j:support event="onchanged" reRender="datePeriodSelect" actionListener="#{registerStampPage.onDateSpecified}"/>
+        </rich:calendar>
 
         <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
         <rich:calendar value="#{registerStampPage.end}" datePattern="dd.MM.yyyy" converter="dateConverter"
-                       inputClass="input-text" showWeeksBar="false" />
+                       inputClass="input-text" showWeeksBar="false" id="endDateCalendar">
+            <a4j:support event="onchanged" reRender="datePeriodSelect" actionListener="#{registerStampPage.onDateSpecified}"/>
+        </rich:calendar>
+
+        <h:outputText value="Интервал: " styleClass="output-text"/>
+        <h:selectOneMenu id="datePeriodSelect" value="#{registerStampPage.reportPeriod}" converter="javax.faces.Integer"
+                         styleClass="output-text" >
+            <f:selectItem itemValue="0" itemLabel="1 день"/>
+            <f:selectItem itemValue="1" itemLabel="1 неделя"/>
+            <f:selectItem itemValue="2" itemLabel="2 недели"/>
+            <f:selectItem itemValue="3" itemLabel="1 месяц"/>
+            <f:selectItem itemValue="4" itemLabel="Точная дата"/>
+            <a4j:support event="onchange" reRender="endDateCalendar" actionListener="#{registerStampPage.onReportPeriodChanged}"/>
+        </h:selectOneMenu>
 
         <a4j:commandButton value="Применить" action="#{registerStampPage.reload}"
                            reRender="registerStampReportPanelGrid" />
