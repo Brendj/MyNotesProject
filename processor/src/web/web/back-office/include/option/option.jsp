@@ -79,7 +79,7 @@
             <rich:inputNumberSpinner value="#{optionPage.tempCardValidDays}" minValue="0" maxValue="60"/>
         </h:panelGrid>
 
-        <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:panelGrid styleClass="borderless-grid" columns="2" rendered="false">
             <h:outputText escape="true" value="Включить оповещение об изменении в заявках:" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{optionPage.enableNotificationGoodRequestChange}" styleClass="output-text" />
         </h:panelGrid>
