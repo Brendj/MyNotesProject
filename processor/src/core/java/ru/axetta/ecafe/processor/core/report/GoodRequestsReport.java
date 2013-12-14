@@ -156,8 +156,12 @@ public class GoodRequestsReport extends BasicReport {
                 int value       = ((BigInteger) entry [4]).intValue();
                 int dailySample = ((BigDecimal) entry[5]).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
 
-                RequestItem item = new RequestItem(org, orgFull, good, report);
-                items.add(item);
+
+                RequestItem item = findItemByOrgAndGood(items, org, good);
+                if (item == null) {
+                    item = new RequestItem(org, orgFull, good, report);
+                    items.add(item);
+                }
                 item.addValue(date, new RequestValue(value));
                 item.addDailySample(date, new RequestValue(dailySample));
 
@@ -188,6 +192,15 @@ public class GoodRequestsReport extends BasicReport {
                     addValue(1356998400000L, new RequestValue(Math.random())).
                     addValue(1357430400000L, new RequestValue(Math.random())));*/
             return report;
+        }
+
+        public RequestItem findItemByOrgAndGood(List<RequestItem>  list, String org, String good) {
+            for (RequestItem i : list) {
+                if (i.getOrg().equals(org) && i.getGood().equals(good)) {
+                    return i;
+                }
+            }
+            return null;
         }
     }
 
