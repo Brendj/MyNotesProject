@@ -2119,9 +2119,9 @@ NamedNodeMap namedNodeMap = itemNode.getAttributes();
             this.dateOnlyFormat.setTimeZone(utcTimeZone);
 
             //TimeZone localTimeZone = TimeZone.getTimeZone("Europe/Moscow");
-            //TimeZone localTimeZone = RuntimeContext.getInstance().getDefaultLocalTimeZone(null);
+            TimeZone localTimeZone = RuntimeContext.getInstance().getDefaultLocalTimeZone(null);
             this.timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-            this.timeFormat.setTimeZone(utcTimeZone);
+            this.timeFormat.setTimeZone(localTimeZone);
 
             this.paymentRegistryBuilder = new PaymentRegistryBuilder();
             this.accIncRegistryRequestBuilder = new AccIncRegistryRequest.Builder();
