@@ -152,6 +152,9 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             complesCount = complesCount == null ? 0L : complesCount;
             goodsCount = goodsCount == null ? 0L : goodsCount;
 
+            if (idofcomplex == null) {
+                continue;
+            }
             OrderedComplex c = new OrderedComplex(idofcomplex, ORDER_TYPE, ORDER_TYPE_NAME);
             c.setCount(complesCount.intValue() * goodsCount.intValue());
             orderedComplexes.add(c);

@@ -50,7 +50,7 @@
                                        styleClass="command-button" style="width: 80px;"/>
                     <a4j:commandButton value="Закрыть" action="#{groupCreatePanel.doClose}"
                                        reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
-                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('groupCreatePanel')}.hide();"
+                                       oncomplete="#{rich:component('groupCreatePanel')}.hide();"
                                        styleClass="command-button" style="width: 80px;">
                     </a4j:commandButton>
                 </h:panelGrid>
