@@ -1171,10 +1171,6 @@ public class SyncResponse {
 
     private final SyncType syncType;
 
-    public SyncType getSyncType() {
-        return syncType;
-    }
-
     private final Long idOfOrg;
     private final String orgName;
     private final Long idOfPacket;
@@ -1268,7 +1264,6 @@ public class SyncResponse {
         ecafeEnvelopeElement.setAttribute("Version", this.protoVersion.toString());
         ecafeEnvelopeElement.setAttribute("Date", timeFormat.format(this.time));
         ecafeEnvelopeElement.setAttribute("Options", this.options);
-        //ecafeEnvelopeElement.setAttribute("Type", TYPE_NAMES[type]);
         ecafeEnvelopeElement.setAttribute("Type",syncType.toString());
 
         // ResPaymentRegistry
@@ -1325,16 +1320,6 @@ public class SyncResponse {
         if (tempCardOperationData != null) {
             ecafeEnvelopeElement.appendChild(tempCardOperationData.toElement(document));
         }
-
-        // ResLibraryData
-        //if (resLibraryData != null) {
-        //    ecafeEnvelopeElement.appendChild(resLibraryData.toElement(document));
-        //}
-        //
-        //// ResLibraryData2
-        //if (resLibraryData2 != null) {
-        //    ecafeEnvelopeElement.appendChild(resLibraryData2.toElement(document));
-        //}
 
         // ResCategoriesDiscountsAndRules
         if (resCategoriesDiscountsAndRules != null) {
