@@ -32,7 +32,8 @@
 <%--@elvariable id="claimCalendarEditPage" type="ru.axetta.ecafe.processor.web.ui.claim.ClaimCalendarEditPage"--%>
 <%--@elvariable id="yesNoConfirmPanel" type="ru.axetta.ecafe.processor.web.ui.modal.YesNoConfirmPanel"--%>
 <a4j:form id="claimCalendarForm">
-    <h:panelGrid id="claimCalendarEditPage" binding="#{claimCalendarEditPage.pageComponent}" styleClass="borderless-grid" style="width: 100%">
+    <h:panelGrid id="claimCalendarEditPage" binding="#{claimCalendarEditPage.pageComponent}" styleClass="borderless-grid" style="width: 100%"
+                 >
 
 
         <h:panelGrid columns="2">
@@ -75,7 +76,7 @@
         <a4j:region>
         <rich:panel id="claimsCalendar" style="height: 450px; width: 1350px; overflow: auto;">
             <rich:dataTable value="#{claimCalendarEditPage.entries}" var="e"
-                            width="350px" rows="15" id="table" rowKeyVar="row">
+                            width="350px" rows="15" id="table" rowKeyVar="row" footerClass="data-table-footer">
                 <rich:column>
                     <f:facet name="header">
                         <h:outputText value="№"></h:outputText>
