@@ -3897,7 +3897,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             sf.setGlobalVersionOnCreate(version);
             sf.setGlobalVersion(version);
             session.persist(sf);
-            CycleDiagram cd = createCycleDiagram(client, cycleDiagramIn, session, date, true);
+            // Активируем циклограмму сегодняшним днем.
+            CycleDiagram cd = createCycleDiagram(client, cycleDiagramIn, session,
+                    CalendarUtils.truncateToDayOfMonth(date), true);
             session.persist(cd);
             transaction.commit();
             res.resultCode = RC_OK;

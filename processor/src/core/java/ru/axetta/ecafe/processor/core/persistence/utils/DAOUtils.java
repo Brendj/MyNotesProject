@@ -1637,9 +1637,9 @@ public class DAOUtils {
         Client c = findClientByContractId(session, contractId);
         DetachedCriteria subQuery = DetachedCriteria.forClass(CycleDiagram.class).add(Restrictions.eq("client", c))
                 .add(Restrictions.in("stateDiagram", new Object[]{StateDiagram.WAIT, StateDiagram.ACTIVE}))
-                .add(Restrictions.eq("deletedState", false)).setProjection(Projections.max("dateActivationDiagram"));
+                .add(Restrictions.eq("deletedState", false)).setProjection(Projections.max("createdDate"));
         Criteria criteria = session.createCriteria(CycleDiagram.class).add(Restrictions.eq("client", c))
-                .add(Subqueries.propertyEq("dateActivationDiagram", subQuery));
-        return (CycleDiagram) criteria.uniqueResult();
+                .add(Subqueries.propertyEq("createdDate", subQuery));
+        return (CycleDiagram) criteria.list().get(0);
     }
 }
