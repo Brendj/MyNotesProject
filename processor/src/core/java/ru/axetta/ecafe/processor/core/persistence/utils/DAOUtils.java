@@ -216,6 +216,14 @@ public class DAOUtils {
         return (CardTemp) criteria.uniqueResult();
     }
 
+    public static Client findClientByCardNo(EntityManager em, long cardNo) throws Exception {
+        javax.persistence.Query q = em.createQuery("from Card where cardNo=:cardNo");
+        q.setParameter("cardNo", cardNo);
+        List l = q.getResultList();
+        if (l.size()==0) return null;
+        return ((Card)l.get(0)).getClient();
+    }
+
     public static Client findClientByContractId(EntityManager em, long cardNo) throws Exception {
         return findClientByContractId((Session)em.getDelegate(), cardNo);
     }

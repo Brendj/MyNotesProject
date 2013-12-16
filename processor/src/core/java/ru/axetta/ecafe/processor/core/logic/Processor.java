@@ -1391,7 +1391,7 @@ public class Processor implements SyncProcessor,
     }
 
     public ResPaymentRegistryItem processSyncPaymentRegistryPayment(Long idOfSync, Long idOfOrg,
-            Payment Payment, List<Long> errorClientIds) throws Exception {
+            Payment payment, List<Long> errorClientIds) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -1402,24 +1402,24 @@ public class Processor implements SyncProcessor,
             //Org organization = DAOUtils.findOrg(persistenceSession, idOfOrg);
             Long idOfOrganization = DAOUtils.getIdOfOrg(persistenceSession, idOfOrg);
             if (null == idOfOrganization) {
-                return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 130,
+                return new ResPaymentRegistryItem(payment.getIdOfOrder(), 130,
                         String.format("Organization no found, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
-                                Payment.getIdOfOrder()));
+                                payment.getIdOfOrder()));
             }
             // Check order existence
-            if (DAOUtils.existOrder(persistenceSession, idOfOrg, Payment.getIdOfOrder())) {
+            if (DAOUtils.existOrder(persistenceSession, idOfOrg, payment.getIdOfOrder())) {
                 Order order = DAOUtils
-                        .findOrder(persistenceSession, new CompositeIdOfOrder(idOfOrg, Payment.getIdOfOrder()));
+                        .findOrder(persistenceSession, new CompositeIdOfOrder(idOfOrg, payment.getIdOfOrder()));
                 // if order == payment (may be last sync result was not transferred to client)
                 Long orderCardNo = order.getCard() == null ? null : order.getCard().getCardNo();
-                if ((("" + orderCardNo).equals("" + Payment.getCardNo())) && (order.getCreateTime()
-                        .equals(Payment.getTime())) && (order.getSumByCard().equals(Payment.getSumByCard()))) {
-                    return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 0,
+                if ((("" + orderCardNo).equals("" + payment.getCardNo())) && (order.getCreateTime()
+                        .equals(payment.getTime())) && (order.getSumByCard().equals(payment.getSumByCard()))) {
+                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 0,
                             "Order is already registered");
                 } else {
-                    return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 110, String.format(
+                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 110, String.format(
                             "Order already registered but attributes differ, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
-                            Payment.getIdOfOrder()));
+                            payment.getIdOfOrder()));
                 }
                 /* updateOrderDetails(persistenceSession, order, payment);
                 // Commit data model transaction
@@ -1433,26 +1433,26 @@ public class Processor implements SyncProcessor,
             }
             // If cardNo specified - load card from data model
             Card card = null;
-            Long cardNo = Payment.getCardNo();
+            Long cardNo = payment.getCardNo();
             if (null != cardNo) {
                 card = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
                 if (null == card) {
-                    return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 200,
+                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 200,
                             String.format("Unknown card, IdOfOrg == %s, IdOfOrder == %s, CardNo == %s", idOfOrg,
-                                    Payment.getIdOfOrder(), cardNo));
+                                    payment.getIdOfOrder(), cardNo));
                 }
             }
             // If client specified - load client from data model
             Client client = null;
-            Long idOfClient = Payment.getIdOfClient();
+            Long idOfClient = payment.getIdOfClient();
             if (null != idOfClient) {
                 client = DAOUtils.findClient(persistenceSession, idOfClient);
                 // Check client existance
 
                 if (null == client) {
-                    return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 210,
+                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 210,
                             String.format("Unknown client, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s", idOfOrg,
-                                    Payment.getIdOfOrder(), idOfClient));
+                                    payment.getIdOfOrder(), idOfClient));
                 }
             }
             if (null != card) {
@@ -1461,9 +1461,9 @@ public class Processor implements SyncProcessor,
                     client = card.getClient();
                 } else if (!card.getClient().getIdOfClient().equals(client.getIdOfClient())) {
                     // Specified client isn't the owner of the specified card
-                    return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 230, String.format(
+                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 230, String.format(
                             "Client isn't the owner of the specified card, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s, CardNo == %s",
-                            idOfOrg, Payment.getIdOfOrder(), idOfClient, cardNo));
+                            idOfOrg, payment.getIdOfOrder(), idOfClient, cardNo));
                 }
             }
             if (null != client && card != null) {
@@ -1516,40 +1516,40 @@ public class Processor implements SyncProcessor,
                 //}
             }
             // Verify spicified sums to be valid non negative numbers
-            if (Payment.getSumByCard() < 0 || Payment.getSumByCash() < 0 || Payment.getSocDiscount() < 0
-                    || Payment.getRSum() < 0 || Payment.getGrant() < 0) {
-                return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 250,
+            if (payment.getSumByCard() < 0 || payment.getSumByCash() < 0 || payment.getSocDiscount() < 0
+                    || payment.getRSum() < 0 || payment.getGrant() < 0) {
+                return new ResPaymentRegistryItem(payment.getIdOfOrder(), 250,
                         String.format("Negative sum(s) are specified, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
-                                Payment.getIdOfOrder()));
+                                payment.getIdOfOrder()));
             }
-            if (0 != Payment.getSumByCard() && card == null) {
+            if (0 != payment.getSumByCard() && card == null) {
                 // Check if card is specified
-                return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 240, String.format(
+                return new ResPaymentRegistryItem(payment.getIdOfOrder(), 240, String.format(
                         "Payment has card part but doesn't specify CardNo, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s",
-                        idOfOrg, Payment.getIdOfOrder(), idOfClient));
+                        idOfOrg, payment.getIdOfOrder(), idOfClient));
             }
             // Create order
             RuntimeContext.getFinancialOpsManager()
-                    .createOrderCharge(persistenceSession, Payment, idOfOrg, client, card, Payment.getConfirmerId());
+                    .createOrderCharge(persistenceSession, payment, idOfOrg, client, card, payment.getConfirmerId());
             long totalPurchaseDiscount = 0;
             long totalPurchaseRSum = 0;
             // Register order details (purchase)
-            Iterator<Purchase> purchases = Payment.getPurchases().iterator();
+            Iterator<Purchase> purchases = payment.getPurchases().iterator();
             while (purchases.hasNext()) {
                 Purchase Purchase = purchases.next();
                 if (null != DAOUtils.findOrderDetail(persistenceSession,
                         new CompositeIdOfOrderDetail(idOfOrg, Purchase.getIdOfOrderDetail()))) {
-                    return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 120, String.format(
+                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 120, String.format(
                             "Order detail is already registered, IdOfOrg == %s, IdOfOrder == %s, IdOfOrderDetail == %s",
-                            idOfOrg, Payment.getIdOfOrder(), Purchase.getIdOfOrderDetail()));
+                            idOfOrg, payment.getIdOfOrder(), Purchase.getIdOfOrderDetail()));
                 }
                 if (Purchase.getDiscount() < 0 || Purchase.getrPrice() < 0 || Purchase.getQty() < 0) {
-                    return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 250, String.format(
+                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 250, String.format(
                             "Negative sum(s) or quantitiy are specified, IdOfOrg == %s, IdOfOrder == %s, IdOfPurchase == %s",
-                            idOfOrg, Payment.getIdOfOrder(), Purchase.getQty()));
+                            idOfOrg, payment.getIdOfOrder(), Purchase.getQty()));
                 }
                 OrderDetail orderDetail = new OrderDetail(
-                        new CompositeIdOfOrderDetail(idOfOrg, Purchase.getIdOfOrderDetail()), Payment.getIdOfOrder(),
+                        new CompositeIdOfOrderDetail(idOfOrg, Purchase.getIdOfOrderDetail()), payment.getIdOfOrder(),
                         Purchase.getQty(), Purchase.getDiscount(), Purchase.getSocDiscount(), Purchase.getrPrice(),
                         Purchase.getName(), Purchase.getRootMenu(), Purchase.getMenuGroup(), Purchase.getMenuOrigin(),
                         Purchase.getMenuOutput(), Purchase.getType());
@@ -1570,16 +1570,16 @@ public class Processor implements SyncProcessor,
                 totalPurchaseRSum += Purchase.getrPrice() * Purchase.getQty();
             }
             // Check payment sums
-            if (totalPurchaseRSum != Payment.getRSum() || totalPurchaseDiscount != Payment.getSocDiscount() + Payment
-                    .getTrdDiscount() + Payment.getGrant()) {
-                return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 300,
+            if (totalPurchaseRSum != payment.getRSum() || totalPurchaseDiscount != payment.getSocDiscount() + payment
+                    .getTrdDiscount() + payment.getGrant()) {
+                return new ResPaymentRegistryItem(payment.getIdOfOrder(), 300,
                         String.format("Invalid total sum by order, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
-                                Payment.getIdOfOrder()));
+                                payment.getIdOfOrder()));
             }
-            if (Payment.getRSum() != Payment.getSumByCard() + Payment.getSumByCash()) {
-                return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 310,
+            if (payment.getRSum() != payment.getSumByCard() + payment.getSumByCash()) {
+                return new ResPaymentRegistryItem(payment.getIdOfOrder(), 310,
                         String.format("Invalid sum of order card and cash payments, IdOfOrg == %s, IdOfOrder == %s",
-                                idOfOrg, Payment.getIdOfOrder()));
+                                idOfOrg, payment.getIdOfOrder()));
             }
 
             // Commit data model transaction
@@ -1592,11 +1592,11 @@ public class Processor implements SyncProcessor,
             if(client!=null){
                 RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                         .sendNotificationAsync(client, EventNotificationService.MESSAGE_PAYMENT,
-                                generatePaymentNotificationParams(persistenceSession, client, Payment));
+                                generatePaymentNotificationParams(persistenceSession, client, payment));
             }
 
             // Return no errors
-            return new ResPaymentRegistryItem(Payment.getIdOfOrder(), 0, null);
+            return new ResPaymentRegistryItem(payment.getIdOfOrder(), 0, null);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
