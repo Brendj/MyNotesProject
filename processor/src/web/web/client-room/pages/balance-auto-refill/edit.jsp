@@ -19,7 +19,6 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Arrays" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.TimeZone" %>
 
 <%
     final Logger logger = LoggerFactory
@@ -32,6 +31,7 @@
         logger.error(ex.getMessage());
         throw new ServletException(ex.getMessage());
     }
+    RuntimeContext runtimeContext = RuntimeContext.getInstance();
     Long bsId = Long.valueOf(StringUtils.trim(request.getParameter("bs")));
     RegularPaymentSubscriptionService rpService = RuntimeContext.getAppContext()
             .getBean(RegularPaymentSubscriptionService.class);
@@ -67,12 +67,15 @@
                 <select size="1" class="input-text" name="refillAmount" id="refillAmount"
                         <%=bs.isActive() ? "" : "disabled"%> required>
                     <%
-                        String values = RuntimeContext.getInstance()
-                            .getOptionValueString(Option.OPTION_AUTOREFILL_VALUES);
-                        String[] list = StringUtils.split(values, ";");
+                        String values = runtimeContext.getOptionValueString(Option.OPTION_AUTOREFILL_VALUES);
+                        List<String> list = Arrays.asList(StringUtils.split(values, ";"));
+                        String paymentAmount = bs.getPaymentAmount().toString();
+                        if (!list.contains(paymentAmount)) {
+                            list.add(paymentAmount);
+                        }
                         for (String value : list) {
                     %>
-                    <option value="<%=value%>" <%=(bs.getPaymentAmount().toString().equals(value)) ? "selected"
+                    <option value="<%=value%>" <%=(paymentAmount.equals(value)) ? "selected"
                             : ""%>><%=CurrencyStringUtils.copecksToRubles(Long.parseLong(value))%>
                     </option>
                     <%}%>
@@ -87,11 +90,15 @@
                 <select size="1" class="input-text" name="thresholdAmount" id="thresholdAmount"
                         <%=bs.isActive() ? "" : "disabled"%> required>
                     <%
-                        values = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_THRESHOLD_VALUES);
-                        list = StringUtils.split(values, ";");
+                        values = runtimeContext.getOptionValueString(Option.OPTION_THRESHOLD_VALUES);
+                        list = Arrays.asList(StringUtils.split(values, ";"));
+                        String thresholdAmount = bs.getThresholdAmount().toString();
+                        if (!list.contains(thresholdAmount)) {
+                            list.add(thresholdAmount);
+                        }
                         for (String value : list) {
                     %>
-                    <option value="<%=value%>" <%=(bs.getThresholdAmount().toString().equals(value)) ? "selected"
+                    <option value="<%=value%>" <%=(thresholdAmount.equals(value)) ? "selected"
                             : ""%>><%=CurrencyStringUtils.copecksToRubles(Long.parseLong(value))%>
                     </option>
                     <%}%>
@@ -197,7 +204,7 @@
     </tr>
 <%
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-        df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+        df.setTimeZone(runtimeContext.getDefaultLocalTimeZone(null));
         for (RegularPayment rp : paymentList) {
             String paymentDate = rp.getPaymentDate() == null ? "" : df.format(rp.getPaymentDate());
 %>

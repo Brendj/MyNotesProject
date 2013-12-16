@@ -15,7 +15,6 @@
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.TimeZone" %>
 
 <%
     final Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.client-room.pages.balance-auto-refill.show_jsp");
@@ -27,6 +26,7 @@
         logger.error(ex.getMessage());
         throw new ServletException(ex.getMessage());
     }
+    RuntimeContext runtimeContext = RuntimeContext.getInstance();
     RegularPaymentSubscriptionService cs = RuntimeContext.getAppContext()
             .getBean(RegularPaymentSubscriptionService.class);
     List<BankSubscription> list = cs.findClientBankSubscriptions(ClientAuthToken.loadFrom(session).getContractId());
@@ -69,9 +69,9 @@
 
 <%
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-        df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+        df.setTimeZone(runtimeContext.getDefaultLocalTimeZone(null));
         DateFormat tf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-        tf.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+        tf.setTimeZone(runtimeContext.getDefaultLocalTimeZone(null));
         for (int i = 0; i < list.size(); i++) {
             BankSubscription bs = list.get(i);
             String params = "&command=edit&bs=" + bs.getIdOfSubscription();

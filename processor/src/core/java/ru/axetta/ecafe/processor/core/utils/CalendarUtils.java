@@ -92,12 +92,13 @@ public class CalendarUtils {
     }
 
     public static Date parseDate(String s) throws Exception {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         dateFormat.setTimeZone(utcTimeZone);
-        if(StringUtils.isEmpty(s)){
+        if (StringUtils.isEmpty(s)) {
             return null;
         } else {
             Date date = dateFormat.parse(s);
-            if(date.after(AFTER_DATE)) {
+            if (date.after(AFTER_DATE)) {
                 throw new Exception("Не верно введена дата");
             }
             return date;
