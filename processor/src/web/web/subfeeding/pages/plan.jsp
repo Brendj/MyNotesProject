@@ -1,6 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page trimDirectiveWhitespaces="true" %>
+<%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
+<%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.ComplexInfo" %>
 <%@ page import="ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
@@ -22,8 +24,11 @@
 <%
     @SuppressWarnings("unchecked")
     SubscriptionFeeding sf = (SubscriptionFeeding) request.getAttribute("subscriptionFeeding");
+    Client client = (Client) request.getAttribute("client");
     String action = sf == null ? "activate" : "edit";
 %>
+<div class="textDiv"><%=client.getPerson().getFullName()%></div>
+<div class="textDiv">Номер контракта: <%=ContractIdFormat.format(client.getContractId())%></div>
 <c:if test="${empty requestScope.subscriptionFeeding}">
     <div class="textDiv">Активировать подписку абонементного питания? Нажимая на данную кнопку Вы согласны с условиями
         предоставления услуги.

@@ -5,15 +5,27 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.StateDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -123,4 +135,96 @@ public class SubscriptionFeedingService {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    // Возвращает полную стоимость питания на сегодня по заданным комплексам орг-ии.
+    public Long sumComplexesPrice(List<Integer> complexIds, Org org) {
+        Session session = entityManager.unwrap(Session.class);
+        Date today = CalendarUtils.truncateToDayOfMonth(new Date());
+        Date tomorrow = CalendarUtils.addDays(today, 1);
+        Criteria criteria = session.createCriteria(ComplexInfo.class).add(Restrictions.eq("org", org))
+                .add(Restrictions.eq("usedSubscriptionFeeding", 1)).add(Restrictions.in("idOfComplex", complexIds))
+                .add(Restrictions.ge("menuDate", today)).add(Restrictions.lt("menuDate", tomorrow))
+                .setProjection(Projections.sum("currentPrice"));
+        return (Long) criteria.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    // Возвращает комплексы, участвующие в АП, для данной орг-ии.
+    public List<ComplexInfo> findComplexesWithSubFeeding(Org org) {
+        Session session = entityManager.unwrap(Session.class);
+        Date today = CalendarUtils.truncateToDayOfMonth(new Date());
+        Date tomorrow = CalendarUtils.addDays(today, 1);
+        Criteria criteria = session.createCriteria(ComplexInfo.class).add(Restrictions.eq("org", org))
+                .add(Restrictions.eq("usedSubscriptionFeeding", 1)).add(Restrictions.ge("menuDate", today))
+                .add(Restrictions.lt("menuDate", tomorrow));
+        return (List<ComplexInfo>) criteria.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    // Возвращает подписку АП, действующую на текущий день.
+    public SubscriptionFeeding findClientSubscriptionFeeding(Long contractId) {
+        Session session = entityManager.unwrap(Session.class);
+        Date now = new Date();
+        DetachedCriteria subQuery = DetachedCriteria.forClass(SubscriptionFeeding.class).createAlias("client", "cc")
+                .add(Restrictions.eq("cc.contractId", contractId)).add(Restrictions
+                .or(Restrictions.isNull("dateDeactivateService"), Restrictions.gt("dateDeactivateService", now)))
+                .setProjection(Projections.max("dateActivateService"));
+        Criteria criteria = session.createCriteria(SubscriptionFeeding.class).createAlias("client", "c")
+                .add(Restrictions.eq("c.contractId", contractId)).add(Restrictions.eq("deletedState", false))
+                .add(Subqueries.propertyEq("dateActivateService", subQuery));
+        return (SubscriptionFeeding) criteria.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    // Возвращает циклограмму питания, актуальную на текущий день.
+    public CycleDiagram findClientCycleDiagram(Long contractId) {
+        Session session = entityManager.unwrap(Session.class);
+        Criteria criteria = session.createCriteria(CycleDiagram.class).createAlias("client", "c")
+                .add(Restrictions.eq("c.contractId", contractId)).add(Restrictions.eq("deletedState", false))
+                .add(Restrictions.le("dateActivationDiagram", new Date()))
+                .add(Restrictions.eq("stateDiagram", StateDiagram.ACTIVE));
+        return (CycleDiagram) criteria.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    // Возвращает циклограмму питания, созданную позже всех.
+    public CycleDiagram findLastCycleDiagram(Long contractId) {
+        Session session = entityManager.unwrap(Session.class);
+        Client c = DAOUtils.findClientByContractId(session, contractId);
+        DetachedCriteria subQuery = DetachedCriteria.forClass(CycleDiagram.class).add(Restrictions.eq("client", c))
+                .add(Restrictions.in("stateDiagram", new Object[]{StateDiagram.WAIT, StateDiagram.ACTIVE}))
+                .add(Restrictions.eq("deletedState", false)).setProjection(Projections.max("globalId"));
+        Criteria criteria = session.createCriteria(CycleDiagram.class).add(Restrictions.eq("client", c))
+                .add(Subqueries.propertyEq("globalId", subQuery));
+        return (CycleDiagram) criteria.uniqueResult();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    // Приостанавливает подписку АП.
+    public void suspendSubscriptionFeeding(Long contractId) {
+        Date date = new Date();
+        SubscriptionFeeding sf = findClientSubscriptionFeeding(contractId);
+        sf.setLastDatePauseService(CalendarUtils.truncateToDayOfMonth(CalendarUtils.addDays(date, 2)));
+        sf.setWasSuspended(true);
+        DAOService daoService = DAOService.getInstance();
+        sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
+        sf.setLastUpdate(date);
+        entityManager.merge(sf);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    // Возобновляет подписку АП.
+    public void reopenSubscriptionFeeding(Long contractId) {
+        SubscriptionFeeding sf = findClientSubscriptionFeeding(contractId);
+        sf.setWasSuspended(false);
+        DAOService daoService = DAOService.getInstance();
+        sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
+        sf.setLastUpdate(new Date());
+        entityManager.merge(sf);
+    }
 }

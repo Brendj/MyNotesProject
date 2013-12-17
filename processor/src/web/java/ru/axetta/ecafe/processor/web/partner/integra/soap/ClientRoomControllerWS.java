@@ -34,6 +34,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
+import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -3869,13 +3870,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Result res = new Result();
         try {
             runtimeContext = RuntimeContext.getInstance();
+            SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
+                    .getBean(SubscriptionFeedingService.class);
             session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
             Client client = findClientByContractId(session, contractId, res);
             if (client == null) {
                 return res;
             }
-            SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
+            SubscriptionFeeding sf = sfService.findClientSubscriptionFeeding(contractId);
             if (sf != null) {
                 res.resultCode = RC_SUBSCRIPTION_FEEDING_DUPLICATE;
                 res.description = RC_SUBSCRIPTION_FEEDING_DUPLICATE_DESC;
@@ -3898,7 +3901,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             sf.setGlobalVersion(version);
             session.persist(sf);
             // Активируем циклограмму сегодняшним днем.
-            CycleDiagram cd = createCycleDiagram(client, cycleDiagramIn, session,
+            CycleDiagram cd = createCycleDiagram(client, cycleDiagramIn, sfService,
                     CalendarUtils.truncateToDayOfMonth(date), true);
             session.persist(cd);
             transaction.commit();
@@ -3916,7 +3919,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @SuppressWarnings("unchecked")
-    private Long getPriceOfDay(String dayComplexes, Session session, Org org) {
+    private Long getPriceOfDay(String dayComplexes, SubscriptionFeedingService sfService, Org org) {
         if (StringUtils.isEmpty(dayComplexes)) {
             return 0L;
         }
@@ -3925,7 +3928,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         for (String id : complexIds) {
             ids.add(Integer.valueOf(id));
         }
-        return DAOUtils.sumComplexesPrice(session, ids, org);
+        return sfService.sumComplexesPrice(ids, org);
     }
 
     private <T extends Result> Client findClientByContractId(Session session, Long contractId, T res) throws Exception {
@@ -3949,16 +3952,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
             Client client = findClientByContractId(session, contractId, res);
+            transaction.commit();
             if (client == null) {
                 return res;
             }
-            SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
+            SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
+                    .getBean(SubscriptionFeedingService.class);
+            SubscriptionFeeding sf = sfService.findClientSubscriptionFeeding(contractId);
             res.setIdOfSubscriptionFeeding(sf.getGlobalId());
             res.setDateActivate(sf.getDateActivateService());
             res.setLastDatePause(sf.getLastDatePauseService());
             res.setDateDeactivate(sf.getDateDeactivateService());
             res.setSuspended(sf.getWasSuspended());
-            transaction.commit();
             res.resultCode = RC_OK;
             res.description = RC_OK_DESC;
         } catch (Exception ex) {
@@ -3982,17 +3987,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             Client client = findClientByContractId(session, contractId, result);
+            transaction.commit();
             if (client == null) {
                 return result;
             }
-            Date date = new Date();
-            SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
-            sf.setWasSuspended(true);
-            sf.setLastDatePauseService(CalendarUtils.truncateToDayOfMonth(CalendarUtils.addDays(date, 2)));
-            DAOService daoService = DAOService.getInstance();
-            sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
-            sf.setLastUpdate(date);
-            transaction.commit();
+            SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
+                    .getBean(SubscriptionFeedingService.class);
+            sfService.suspendSubscriptionFeeding(contractId);
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
@@ -4016,15 +4017,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             Client client = findClientByContractId(session, contractId, result);
+            transaction.commit();
             if (client == null) {
                 return result;
             }
-            SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
-            sf.setWasSuspended(false);
-            DAOService daoService = DAOService.getInstance();
-            sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
-            sf.setLastUpdate(new Date());
-            transaction.commit();
+            SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
+                    .getBean(SubscriptionFeedingService.class);
+            sfService.reopenSubscriptionFeeding(contractId);
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
@@ -4067,7 +4066,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     .getSplitSettingValue();
             Date today = CalendarUtils.truncateToDayOfMonth(new Date());
             Date activationDate = CalendarUtils.addDays(today, parser.getDayRequest());
-            CycleDiagram cd = createCycleDiagram(client, cycleDiagramIn, session, activationDate, false);
+            SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
+                    .getBean(SubscriptionFeedingService.class);
+            CycleDiagram cd = createCycleDiagram(client, cycleDiagramIn, sfService, activationDate, false);
             session.persist(cd);
             transaction.commit();
             result.resultCode = RC_OK;
@@ -4083,8 +4084,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    private CycleDiagram createCycleDiagram(Client client, CycleDiagramIn cycleDiagramIn, Session session,
-            Date dateActivationDiagram, boolean active) {
+    private CycleDiagram createCycleDiagram(Client client, CycleDiagramIn cycleDiagramIn,
+            SubscriptionFeedingService sfService, Date dateActivationDiagram, boolean active) {
         DAOService daoService = DAOService.getInstance();
         CycleDiagram cd = new CycleDiagram();
         cd.setCreatedDate(new Date());
@@ -4104,19 +4105,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         cd.setGlobalVersion(version);
         cd.setGlobalVersionOnCreate(version);
         cd.setMonday(cycleDiagramIn.getMonday());
-        cd.setMondayPrice(getPriceOfDay(cd.getMonday(), session, client.getOrg()));
+        cd.setMondayPrice(getPriceOfDay(cd.getMonday(), sfService, client.getOrg()));
         cd.setTuesday(cycleDiagramIn.getTuesday());
-        cd.setTuesdayPrice(getPriceOfDay(cd.getTuesday(), session, client.getOrg()));
+        cd.setTuesdayPrice(getPriceOfDay(cd.getTuesday(), sfService, client.getOrg()));
         cd.setWednesday(cycleDiagramIn.getWednesday());
-        cd.setWednesdayPrice(getPriceOfDay(cd.getWednesday(), session, client.getOrg()));
+        cd.setWednesdayPrice(getPriceOfDay(cd.getWednesday(), sfService, client.getOrg()));
         cd.setThursday(cycleDiagramIn.getThursday());
-        cd.setThursdayPrice(getPriceOfDay(cd.getThursday(), session, client.getOrg()));
+        cd.setThursdayPrice(getPriceOfDay(cd.getThursday(), sfService, client.getOrg()));
         cd.setFriday(cycleDiagramIn.getFriday());
-        cd.setFridayPrice(getPriceOfDay(cd.getFriday(), session, client.getOrg()));
+        cd.setFridayPrice(getPriceOfDay(cd.getFriday(), sfService, client.getOrg()));
         cd.setSaturday(cycleDiagramIn.getSaturday());
-        cd.setSaturdayPrice(getPriceOfDay(cd.getSaturday(), session, client.getOrg()));
+        cd.setSaturdayPrice(getPriceOfDay(cd.getSaturday(), sfService, client.getOrg()));
         cd.setSunday(cycleDiagramIn.getSunday());
-        cd.setSundayPrice(getPriceOfDay(cd.getSunday(), session, client.getOrg()));
+        cd.setSundayPrice(getPriceOfDay(cd.getSunday(), sfService, client.getOrg()));
         return cd;
     }
 }

@@ -24,7 +24,6 @@ public class CalendarUtils {
 
     //private final static TimeZone localTimeZone = RuntimeContext.getInstance().getLocalTimeZone(null);
     private final static TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
-    private final static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
     private final static SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private final static SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     private final static SimpleDateFormat dateShortFormat = new SimpleDateFormat("dd.MM.yy");
@@ -249,6 +248,12 @@ public class CalendarUtils {
         c.add(Calendar.DAY_OF_YEAR, 6);
         res[1] = c.getTime();
         return res;
+    }
+
+    public static DateFormat getDateFormatLocal() {
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+        df.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));
+        return df;
     }
 
     private CalendarUtils() {}

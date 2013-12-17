@@ -11,7 +11,6 @@
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="java.util.Date" %>
 <%@ page import="java.util.TimeZone" %>
 <!DOCTYPE html>
 <html>
@@ -65,9 +64,9 @@
 <%
     if (wasSuspended) {
         String suspendDate = df.format(sf.getLastDatePauseService());
-        String status = sf.getLastDatePauseService().before(new Date()) ? "приостановлена" : "будет приостановлена";
+        String status = "Услуга приостановлена. Заявки сформированы до " + suspendDate + ".";
 %>
-<div class="textDiv">Услуга <%=status%> с <%=suspendDate%></div>
+<div class="textDiv"><%=status%></div>
 <%
     }
 %>

@@ -6,10 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.StateDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup;
@@ -17,14 +14,16 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Pr
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.*;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
@@ -1582,64 +1581,5 @@ public class DAOUtils {
             productCriteria.add(Restrictions.eq("deletedState",false));
         }
         return productCriteria.list();
-    }
-
-    @SuppressWarnings("unchecked")
-    // Возвращает полную стоимость питания на сегодня по заданным комплексам орг-ии.
-    public static Long sumComplexesPrice(Session session, List<Integer> complexIds, Org org) {
-        Date today = CalendarUtils.truncateToDayOfMonth(new Date());
-        Date tomorrow = CalendarUtils.addDays(today, 1);
-        Criteria criteria = session.createCriteria(ComplexInfo.class).add(Restrictions.eq("org", org))
-                .add(Restrictions.eq("usedSubscriptionFeeding", 1)).add(Restrictions.in("idOfComplex", complexIds))
-                .add(Restrictions.ge("menuDate", today)).add(Restrictions.lt("menuDate", tomorrow))
-                .setProjection(Projections.sum("currentPrice"));
-        return (Long) criteria.uniqueResult();
-    }
-
-    @SuppressWarnings("unchecked")
-    // Возвращает комплексы, участвующие в АП, для данной орг-ии.
-    public static List<ComplexInfo> findComplexesWithSubFeeding(Session session, Org org) {
-        Date today = CalendarUtils.truncateToDayOfMonth(new Date());
-        Date tomorrow = CalendarUtils.addDays(today, 1);
-        Criteria criteria = session.createCriteria(ComplexInfo.class).add(Restrictions.eq("org", org))
-                .add(Restrictions.eq("usedSubscriptionFeeding", 1)).add(Restrictions.ge("menuDate", today))
-                .add(Restrictions.lt("menuDate", tomorrow));
-        return (List<ComplexInfo>) criteria.list();
-    }
-
-    @SuppressWarnings("unchecked")
-    // Возвращает подписку АП, действующую на текущий день.
-    public static SubscriptionFeeding findClientSubscriptionFeeding(Session session, Long contractId) {
-        Date now = new Date();
-        DetachedCriteria subQuery = DetachedCriteria.forClass(SubscriptionFeeding.class).createAlias("client", "cc")
-                .add(Restrictions.eq("cc.contractId", contractId)).add(Restrictions
-                .or(Restrictions.isNull("dateDeactivateService"), Restrictions.gt("dateDeactivateService", now)))
-                .setProjection(Projections.max("dateActivateService"));
-        Criteria criteria = session.createCriteria(SubscriptionFeeding.class).createAlias("client", "c")
-                .add(Restrictions.eq("c.contractId", contractId)).add(Restrictions.eq("deletedState", false))
-                .add(Subqueries.propertyEq("dateActivateService", subQuery));
-        return (SubscriptionFeeding) criteria.uniqueResult();
-    }
-
-    @SuppressWarnings("unchecked")
-    // Возвращает циклограмму питания, актуальную на текущий день.
-    public static CycleDiagram findClientCycleDiagram(Session session, Long contractId) {
-        Criteria criteria = session.createCriteria(CycleDiagram.class).createAlias("client", "c")
-                .add(Restrictions.eq("c.contractId", contractId)).add(Restrictions.eq("deletedState", false))
-                .add(Restrictions.le("dateActivationDiagram", new Date()))
-                .add(Restrictions.eq("stateDiagram", StateDiagram.ACTIVE));
-        return (CycleDiagram) criteria.uniqueResult();
-    }
-
-    @SuppressWarnings("unchecked")
-    // Возвращает циклограмму питания, созданную позже всех.
-    public static CycleDiagram findLastCycleDiagram(Session session, Long contractId) {
-        Client c = findClientByContractId(session, contractId);
-        DetachedCriteria subQuery = DetachedCriteria.forClass(CycleDiagram.class).add(Restrictions.eq("client", c))
-                .add(Restrictions.in("stateDiagram", new Object[]{StateDiagram.WAIT, StateDiagram.ACTIVE}))
-                .add(Restrictions.eq("deletedState", false)).setProjection(Projections.max("createdDate"));
-        Criteria criteria = session.createCriteria(CycleDiagram.class).add(Restrictions.eq("client", c))
-                .add(Subqueries.propertyEq("createdDate", subQuery));
-        return (CycleDiagram) criteria.list().get(0);
     }
 }

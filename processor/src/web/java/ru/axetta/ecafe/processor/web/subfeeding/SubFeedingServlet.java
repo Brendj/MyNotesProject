@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
@@ -36,7 +37,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -50,6 +50,7 @@ public class SubFeedingServlet extends HttpServlet {
 
     private ClientRoomController clientRoomController;
     private RuntimeContext runtimeContext;
+    private SubscriptionFeedingService sfService;
     private static final String root = "/subfeeding/pages/";
     private static final Logger logger = LoggerFactory.getLogger(SubFeedingServlet.class);
     private static final String SUCCESS_MESSAGE = "subFeedingSuccess";
@@ -61,6 +62,7 @@ public class SubFeedingServlet extends HttpServlet {
         super.init(config);
         clientRoomController = new ClientRoomControllerWSService().getClientRoomControllerWSPort();
         runtimeContext = RuntimeContext.getInstance();
+        sfService = RuntimeContext.getAppContext().getBean(SubscriptionFeedingService.class);
     }
 
     @Override
@@ -135,7 +137,7 @@ public class SubFeedingServlet extends HttpServlet {
         try {
             session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
-            SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
+            SubscriptionFeeding sf = sfService.findClientSubscriptionFeeding(contractId);
             Client client = DAOUtils.findClientByContractId(session, contractId);
             client.getPerson(); // нужно для ФИО.
             transaction.commit();
@@ -144,8 +146,7 @@ public class SubFeedingServlet extends HttpServlet {
             if (sf == null) {
                 sendRedirect(req, resp, "/plan");
             } else {
-                DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-                df.setTimeZone(runtimeContext.getLocalTimeZone(null));
+                DateFormat df = CalendarUtils.getDateFormatLocal();
                 Date startDate = StringUtils.isBlank(req.getParameter("startDate")) ? null
                         : parseDate(req.getParameter("startDate"), df);
                 Date endDate = StringUtils.isBlank(req.getParameter("endDate")) ? null
@@ -197,7 +198,11 @@ public class SubFeedingServlet extends HttpServlet {
             if (isPlanChanged(req, cycle)) {
                 Result res = clientRoomController.editSubscriptionFeedingPlan(contractId, cycle);
                 if (res.resultCode == 0) {
-                    req.setAttribute(SUCCESS_MESSAGE, "Изменения плана питания успешно сохранены.");
+                    CycleDiagram cd = sfService.findLastCycleDiagram(contractId);
+                    DateFormat df = CalendarUtils.getDateFormatLocal();
+                    req.setAttribute(SUCCESS_MESSAGE,
+                            "Изменения плана питания успешно сохранены. Изменения вступят в силу " + df
+                                    .format(cd.getDateActivationDiagram()));
                 } else {
                     req.setAttribute(ERROR_MESSAGE, res.description);
                 }
@@ -213,29 +218,16 @@ public class SubFeedingServlet extends HttpServlet {
 
     private boolean isPlanChanged(HttpServletRequest req, CycleDiagramIn cycle) {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
-        Session session = null;
-        Transaction transaction = null;
-        try {
-            session = runtimeContext.createPersistenceSession();
-            transaction = session.beginTransaction();
-            CycleDiagram cd = DAOUtils.findLastCycleDiagram(session, contractId);
-            Map<Integer, List<String>> activeComplexes = splitPlanComplexes(cd);
-            for (Map.Entry<Integer, List<String>> entry : activeComplexes.entrySet()) {
-                int dayNumber = entry.getKey();
-                String newValue = cycle.getDayValue(dayNumber);
-                boolean isEqual = CollectionUtils.isEqualCollection(entry.getValue(),
-                        Arrays.asList(StringUtils.split(StringUtils.defaultString(newValue), ';')));
-                if (!isEqual) {
-                    return true;
-                }
+        CycleDiagram cd = sfService.findLastCycleDiagram(contractId);
+        Map<Integer, List<String>> activeComplexes = splitPlanComplexes(cd);
+        for (Map.Entry<Integer, List<String>> entry : activeComplexes.entrySet()) {
+            int dayNumber = entry.getKey();
+            String newValue = cycle.getDayValue(dayNumber);
+            boolean isEqual = CollectionUtils.isEqualCollection(entry.getValue(),
+                    Arrays.asList(StringUtils.split(StringUtils.defaultString(newValue), ';')));
+            if (!isEqual) {
+                return true;
             }
-            transaction.commit();
-        } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
-            logger.error(ex.getMessage());
-            throw new RuntimeException(ex.getMessage());
-        } finally {
-            HibernateUtils.close(session, logger);
         }
         return false;
     }
@@ -248,12 +240,13 @@ public class SubFeedingServlet extends HttpServlet {
             session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
             Client client = DAOUtils.findClientByContractId(session, contractId);
-            SubscriptionFeeding sf = DAOUtils.findClientSubscriptionFeeding(session, contractId);
+            client.getPerson(); client.getOrg();
+            transaction.commit();
+            SubscriptionFeeding sf = sfService.findClientSubscriptionFeeding(contractId);
             req.setAttribute("client", client);
             req.setAttribute("subscriptionFeeding", sf);
-            req.setAttribute("complexes", DAOUtils.findComplexesWithSubFeeding(session, client.getOrg()));
-            CycleDiagram cd = DAOUtils.findClientCycleDiagram(session, contractId);
-            transaction.commit();
+            req.setAttribute("complexes", sfService.findComplexesWithSubFeeding(client.getOrg()));
+            CycleDiagram cd = sfService.findClientCycleDiagram(contractId);
             if (sf != null && cd != null) {
                 req.setAttribute("activeComplexes", splitPlanComplexes(cd));
             }
@@ -319,10 +312,9 @@ public class SubFeedingServlet extends HttpServlet {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
         Result res = clientRoomController.reopenSubscriptionFeeding(contractId);
         if (res.resultCode == 0) {
-            DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-            df.setTimeZone(runtimeContext.getLocalTimeZone(null));
+            DateFormat df = CalendarUtils.getDateFormatLocal();
             String reopenDate = df.format(CalendarUtils.addDays(new Date(), 2));
-            req.setAttribute(SUCCESS_MESSAGE, "Подписка будет возобновлена " + reopenDate);
+            req.setAttribute(SUCCESS_MESSAGE, "Подписка возобновлена. Формирование заказов начнется с " + reopenDate);
         } else {
             req.setAttribute(ERROR_MESSAGE, res.description);
         }
