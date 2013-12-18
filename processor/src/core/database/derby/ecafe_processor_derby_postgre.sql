@@ -2886,15 +2886,16 @@ CREATE TABLE CF_SubAccount_Transfers (
   CONSTRAINT cf_subaccount_transfer_t_bcry_fk FOREIGN KEY (IdOfTransactionOnBeneficiary) REFERENCES cf_transactions (IdOfTransaction)
 );
 
--- CREATE TABLE cf_do_org_current_version (
---   IdDOOrgCurrentVersion bigserial NOT NULL,
---   ObjectId integer not null,
---   IdOfOrg bigint not null,
---   LastVersion bigint not null,
---   CONSTRAINT cf_do_org_current_version_pk PRIMARY KEY (IdDOOrgCurrentVersion)
--- );
+-- v53
+CREATE TABLE cf_do_org_current_version (
+  IdDOOrgCurrentVersion bigserial NOT NULL,
+  ObjectId integer not null,
+  IdOfOrg bigint not null,
+  LastVersion bigint not null,
+  CONSTRAINT cf_do_org_current_version_pk PRIMARY KEY (IdDOOrgCurrentVersion)
+);
 
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
-  VALUES(2, 2, 51, 131122, 0, '');
+  VALUES(2, 2, 52, 131213, 0, '');
 
