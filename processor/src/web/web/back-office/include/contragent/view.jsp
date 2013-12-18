@@ -71,8 +71,8 @@
     <h:outputText escape="true" value="Дата последнего изменения" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.contragentViewPage.updateTime}" converter="timeConverter"
                  styleClass="input-text" />
-    <h:outputText escape="true" value="Список рассылки сводного отчета по заявкам" rendered="false" styleClass="output-text" />
-    <h:inputText readonly="true" value="#{mainPage.contragentViewPage.requestNotifyMailList}" rendered="false" styleClass="input-text" />
+    <h:outputText escape="true" value="Список рассылки сводного отчета по заявкам" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.contragentViewPage.requestNotifyMailList}" styleClass="input-text" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />
