@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.text.DateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -70,9 +71,11 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
         Date dtTo = gc.getTime();
         this.differencesInfo = null;
         this.differencesList = null;
+        DateFormat df = CalendarUtils.getDateFormatLocal();
         try {
-            this.differencesList = reconciliationManager.processRegistry(caAgent,  caReceiver,  dtFrom,  dtTo, registryItems);
-            this.differencesInfo="Результаты сверки реестра за период: "+ CalendarUtils.dateToString(this.dtFrom)+" - "+CalendarUtils.dateToString(this.dtTo)+": записей в реестре - "+registryItems.size()+", различий - "+differencesList.size();
+            this.differencesList = reconciliationManager.processRegistry(caAgent, caReceiver, dtFrom, dtTo, registryItems);
+            this.differencesInfo = "Результаты сверки реестра за период: " + df.format(this.dtFrom) + " - " + df.format(this.dtTo)
+                    + ": записей в реестре - " + registryItems.size() + ", различий - " + differencesList.size();
         } catch (Exception e) {
             logAndPrintMessage("Ошибка при обработке", e);
         }
