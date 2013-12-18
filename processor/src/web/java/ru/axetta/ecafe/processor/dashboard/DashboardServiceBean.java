@@ -131,9 +131,10 @@ public class DashboardServiceBean {
         }
     }
 
-    public DashboardResponse.OrgBasicStats getOrgBasicStats(Date dt, Long idOfOrg) throws Exception {
+    public DashboardResponse.OrgBasicStats getOrgBasicStats(Date dt, Long idOfOrg, int orgStatus) throws Exception {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_SUPPORTS);
+        def.setReadOnly(true);
         TransactionStatus status = txManager.getTransaction(def);
         def.setTimeout(600 * 1000);
         DashboardResponse.OrgBasicStats basicStats = new DashboardResponse.OrgBasicStats();
@@ -152,15 +153,21 @@ public class DashboardServiceBean {
             Date dayStartDate = dayStart.getTime();
             Date dayEndDate = dayEnd.getTime();
 
-            String queryText = "SELECT org.idOfOrg, org.officialName, org.district, org.location, org.tag, org.lastSuccessfulBalanceSync FROM Org org WHERE org.state=1";
-            HashMap<Long, DashboardResponse.OrgBasicStatItem> orgStats = new HashMap<Long, DashboardResponse.OrgBasicStatItem>();
+            String queryText = "SELECT org.idOfOrg, org.officialName, org.district, org.location, org.tag, org.lastSuccessfulBalanceSync FROM Org org WHERE 1 = 1";
             if (idOfOrg != null) {
-                queryText += " AND org.idOfOrg=:idOfOrg";
+                queryText += " AND org.idOfOrg = :idOfOrg";
+            }
+            if (orgStatus < 2) {
+                queryText += " AND org.state = :orgStatus";
             }
             Query query = entityManager.createQuery(queryText);
-            if (idOfOrg!=null) {
+            if (idOfOrg != null) {
                 query.setParameter("idOfOrg", idOfOrg);
             }
+            if (orgStatus < 2) {
+                query.setParameter("orgStatus", orgStatus);
+            }
+            HashMap<Long, DashboardResponse.OrgBasicStatItem> orgStats = new HashMap<Long, DashboardResponse.OrgBasicStatItem>();
             List queryResult = query.getResultList();
             for (Object object : queryResult) {
                 Object[] result = (Object[]) object;
@@ -223,7 +230,7 @@ public class DashboardServiceBean {
                 statItem.setNumberOfClientsWithoutCard(Long.parseLong("" + result[1]));
             }
             ////
-            queryText = "SELECT eev.org.idOfOrg, count(*) FROM EnterEvent eev WHERE eev.evtDateTime BETWEEN :dayStart AND :dayEnd GROUP BY eev.org.idOfOrg";
+            queryText = "SELECT eev.org.idOfOrg, count(*), min(eev.evtDateTime) FROM EnterEvent eev WHERE eev.evtDateTime BETWEEN :dayStart AND :dayEnd GROUP BY eev.org.idOfOrg";
             query = entityManager.createQuery(queryText);
             query.setParameter("dayStart", dayStartDate);
             query.setParameter("dayEnd", dayEndDate);
@@ -236,6 +243,26 @@ public class DashboardServiceBean {
                     continue;
                 }
                 statItem.setNumberOfEnterEvents((Long) result[1]);
+                statItem.setLastEnterEvent((Date) result[2]);
+            }
+            //// Дата первой транзакции платного питания, Дата первой транзакции льготного питания.
+            queryText = "SELECT org.idOfOrg, min(case when o.socDiscount = 0 then a.transactionTime else null end), "
+                    + " min(case when o.socDiscount > 0 then a.transactionTime else null end) \n"
+                    + " FROM AccountTransaction a join a.ordersInternal o join o.org org \n"
+                    + "WHERE a.transactionTime BETWEEN :dayStart AND :dayEnd GROUP BY org.idOfOrg";
+            query = entityManager.createQuery(queryText);
+            query.setParameter("dayStart", dayStartDate);
+            query.setParameter("dayEnd", dayEndDate);
+            queryResult = query.getResultList();
+            for (Object object : queryResult) {
+                Object[] result = (Object[]) object;
+                Long curIdOfOrg = (Long) result[0];
+                DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
+                if (statItem == null) {
+                    continue;
+                }
+                statItem.setFirstPayOrderDate((Date) result[1]);
+                statItem.setFirstDiscountOrderDate((Date) result[2]);
             }
             ////
             queryText = "SELECT order.org.idOfOrg, count(*) FROM Order order WHERE order.socDiscount > 0 AND order.createTime BETWEEN :dayStart AND :dayEnd GROUP BY order.org.idOfOrg";

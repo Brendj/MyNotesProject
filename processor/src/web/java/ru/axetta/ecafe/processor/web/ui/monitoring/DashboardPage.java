@@ -25,11 +25,12 @@ public class DashboardPage extends BasicWorkspacePage implements OrgSelectPage.C
     DashboardServiceBean dashboardServiceBean;
 
     DashboardResponse.PaymentSystemStats psStatus;
-    DashboardResponse orgStatus = new DashboardResponse();
+    DashboardResponse response = new DashboardResponse();
     DashboardResponse.OrgBasicStats orgBasicStats;
 
     Date reportDate = new Date();
     Org filterOrg;
+    private int orgStatus = 1;
 
 
     @Override
@@ -43,32 +44,45 @@ public class DashboardPage extends BasicWorkspacePage implements OrgSelectPage.C
 
     public void updateOrgStatus() {
         try {
-            orgStatus = dashboardServiceBean.getOrgInfo(new DashboardResponse(), reportDate, filterOrg==null?null:filterOrg.getIdOfOrg());
+            response = dashboardServiceBean.getOrgInfo(new DashboardResponse(), reportDate, filterOrg==null?null:filterOrg.getIdOfOrg());
         } catch (Exception e) {
             logAndPrintMessage("Ошибка подготовки данных", e);
         }
     }
-    public void updateOrgBasicStats() {
+
+    public Object updateOrgBasicStats() {
         try {
-            orgBasicStats = dashboardServiceBean.getOrgBasicStats(reportDate, filterOrg==null?null:filterOrg.getIdOfOrg());
+            orgBasicStats = dashboardServiceBean
+                    .getOrgBasicStats(reportDate, filterOrg == null ? null : filterOrg.getIdOfOrg(), orgStatus);
         } catch (Exception e) {
             logAndPrintMessage("Ошибка подготовки данных", e);
         }
+        return null;
     }
-    public void updatePaySysStatus() {
+
+    public Object updatePaySysStatus() {
         try {
             psStatus = dashboardServiceBean.getPaymentSystemInfo(reportDate);
         } catch (Exception e) {
             logAndPrintMessage("Ошибка подготовки данных", e);
         }
+        return null;
     }
 
     public DashboardResponse.PaymentSystemStats getPsStatus() {
         return psStatus;
     }
 
-    public DashboardResponse getOrgStatus() {
+    public int getOrgStatus() {
         return orgStatus;
+    }
+
+    public void setOrgStatus(int orgStatus) {
+        this.orgStatus = orgStatus;
+    }
+
+    public DashboardResponse getResponse() {
+        return response;
     }
 
     public DashboardResponse.OrgBasicStats getOrgBasicStats() {

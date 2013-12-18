@@ -21,6 +21,12 @@
                            styleClass="command-link" style="width: 25px;" />
     </h:panelGroup>
 
+    <h:outputText escape="true" value="Статус" styleClass="output-text" />
+    <h:selectOneMenu value="#{dashboardPage.orgStatus}" styleClass="output-text">
+        <f:selectItem itemValue="0" itemLabel="Не обслуживается" />
+        <f:selectItem itemValue="1" itemLabel="Обслуживается" />
+        <f:selectItem itemValue="2" itemLabel="Все" />
+    </h:selectOneMenu>
 
     <h:outputText escape="true" value="Дата:" styleClass="output-text" />
     <rich:calendar value="#{dashboardPage.reportDate}" datePattern="dd.MM.yyyy"
@@ -35,7 +41,7 @@
 
     <rich:tabPanel>
          <rich:tab label="Организации (общая)">
-             <a4j:commandButton value="Обновить" action="#{dashboardPage.updateOrgBasicStats}" reRender="dashboardPanelGrid"/>
+             <a4j:commandButton value="Обновить" action="#{dashboardPage.updateOrgBasicStats}" reRender="orgBasicStatsTable"/>
 
              <rich:extendedDataTable id="orgBasicStatsTable" value="#{dashboardPage.orgBasicStats.orgBasicStatItems}" var="item"
                                      rows="500"
@@ -89,6 +95,12 @@
                      </f:facet>
                      <h:outputText value="#{item.numberOfEnterEvents}"/>
                  </rich:column>
+                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.lastEnterEvent}" width="120px">
+                     <f:facet name="header">
+                         <h:outputText value="Первый проход" styleClass="output-text" escape="true" />
+                     </f:facet>
+                     <h:outputText value="#{item.lastEnterEvent}" converter="timeMinuteConverter" escape="true" />
+                 </rich:column>
                  <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfEnterEvents}" width="70px">
                      <f:facet name="header">
                          <h:outputText value="%У" styleClass="output-text" escape="true"/>
@@ -107,6 +119,14 @@
                      </f:facet>
                      <h:outputText value="#{item.numberOfDiscountOrders}"/>
                  </rich:column>
+                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.firstDiscountOrderDate}"
+                              width="210px">
+                     <f:facet name="header">
+                         <h:outputText value="Первая транз. льготн. питания" styleClass="output-text" escape="true" />
+                     </f:facet>
+                     <h:outputText value="#{item.firstDiscountOrderDate}" converter="timeMinuteConverter"
+                                   escape="true" />
+                 </rich:column>
                  <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfDiscountOrders}" width="70px">
                      <f:facet name="header">
                          <h:outputText value="%У" styleClass="output-text" escape="true"/>
@@ -124,6 +144,13 @@
                          <h:outputText value="Платных заказов" styleClass="output-text" escape="true"/>
                      </f:facet>
                      <h:outputText value="#{item.numberOfPayOrders}"/>
+                 </rich:column>
+                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.firstPayOrderDate}"
+                              width="210px">
+                     <f:facet name="header">
+                         <h:outputText value="Первая транз. платн. питания" styleClass="output-text" escape="true" />
+                     </f:facet>
+                     <h:outputText value="#{item.firstPayOrderDate}" converter="timeMinuteConverter" escape="true" />
                  </rich:column>
                  <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfPayOrders}" width="70px">
                      <f:facet name="header">

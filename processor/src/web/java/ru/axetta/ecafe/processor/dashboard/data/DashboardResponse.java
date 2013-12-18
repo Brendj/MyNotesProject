@@ -85,8 +85,11 @@ public class DashboardResponse {
         String orgLocation;
         Date lastSuccessfulBalanceSyncTime;
         long numberOfEnterEvents;
+        private Date lastEnterEvent;
         long numberOfDiscountOrders;
+        private Date firstDiscountOrderDate;
         long numberOfPayOrders;
+        private Date firstPayOrderDate;
         long numberOfStudentClients;
         long numberOfNonStudentClients;
         double numberOfStudentsWithEnterEventsPercent;
@@ -146,6 +149,14 @@ public class DashboardResponse {
             this.numberOfEnterEvents = numberOfEnterEvents;
         }
 
+        public Date getLastEnterEvent() {
+            return lastEnterEvent;
+        }
+
+        public void setLastEnterEvent(Date lastEnterEvent) {
+            this.lastEnterEvent = lastEnterEvent;
+        }
+
         public long getNumberOfDiscountOrders() {
             return numberOfDiscountOrders;
         }
@@ -154,12 +165,28 @@ public class DashboardResponse {
             this.numberOfDiscountOrders = numberOfDiscountOrders;
         }
 
+        public Date getFirstDiscountOrderDate() {
+            return firstDiscountOrderDate;
+        }
+
+        public void setFirstDiscountOrderDate(Date firstDiscountOrderDate) {
+            this.firstDiscountOrderDate = firstDiscountOrderDate;
+        }
+
         public long getNumberOfPayOrders() {
             return numberOfPayOrders;
         }
 
         public void setNumberOfPayOrders(long numberOfPayOrders) {
             this.numberOfPayOrders = numberOfPayOrders;
+        }
+
+        public Date getFirstPayOrderDate() {
+            return firstPayOrderDate;
+        }
+
+        public void setFirstPayOrderDate(Date firstPayOrderDate) {
+            this.firstPayOrderDate = firstPayOrderDate;
         }
 
         public long getNumberOfStudentClients() {
