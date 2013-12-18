@@ -2167,7 +2167,6 @@ NamedNodeMap namedNodeMap = itemNode.getAttributes();
             }
             String sSyncType = getStringValueNullSafe(namedNodeMap, "Type");
 
-            //int type = parseSyncType(sSyncType);
             SyncType syncType = SyncType.parse(sSyncType);
 
             String clientVersion = getClientVersion(namedNodeMap);
@@ -2276,25 +2275,9 @@ NamedNodeMap namedNodeMap = itemNode.getAttributes();
                 clientRequests = clientRequestBuilder.build(clientRequestsNode);
             }
 
-
-            // 15.09.2011 LibraryData
-            //Node libraryDataNode = findFirstChildElement(envelopeNode, "LibraryData");
-            //LibraryData libraryData = null;
-            //if (libraryDataNode != null) {
-            //    libraryData = libraryDataBuilder.build(libraryDataNode, org.getIdOfOrg());
-            //}
-            //
-            //Node libraryData2Node = findFirstChildElement(envelopeNode, "LibraryData2");
-            //LibraryData2 libraryData2 = null;
-            //if (libraryData2Node != null) {
-            //    libraryData2 = libraryData2Builder.build(libraryData2Node);
-            //}
-
             /*  Модуль распределенной синхронизации объектов */
             Node roNode = findFirstChildElement(envelopeNode, "RO");
             if (roNode != null){
-                //DOSyncService doService = (DOSyncService) RuntimeContext.getAppContext().getBean("doSyncService");
-                //Boolean isCommodityAccounting = doService.isCommodityAccountingByOrg(org.getIdOfOrg());
                 String[] doGroupNames;
                 if(org.getCommodityAccounting()){
                     Boolean enableSubscriptionFeeding = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_SUBSCRIPTION_FEEDING);
