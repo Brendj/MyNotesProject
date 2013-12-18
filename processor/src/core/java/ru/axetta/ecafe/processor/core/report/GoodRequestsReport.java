@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -74,7 +73,12 @@ public class GoodRequestsReport extends BasicReport {
 
             String goodCondition = "";
             if (goodName.equals("")) {
-                goodCondition = "and cf_goods.nameofgood like '%" + goodName + "%'";
+                goodCondition = "and (cf_goods.nameofgood like '%" + goodName + "%' or cf_goods.fullname like '%"+goodName+"%' )";
+            }
+
+            String productCondition = "";
+            if (goodName.equals("")) {
+                productCondition = "and (cf_products.productname like '%" + goodName + "%' or cf_products.fullname like '%"+goodName+"%' )";
             }
 
             String stateCondition = " cf_goods_requests.deletedstate<>true and ";
@@ -92,7 +96,7 @@ public class GoodRequestsReport extends BasicReport {
                     break;
             }
             String orgCondition = "";
-            if (!idOfOrgList.isEmpty()) {
+            if (!(idOfOrgList==null || idOfOrgList.isEmpty())) {
                 // Обработать лист с организациями
                 orgCondition = " and (cf_goods_requests.orgowner in (";
                 for (Long idOfOrg : idOfOrgList) {
@@ -104,7 +108,7 @@ public class GoodRequestsReport extends BasicReport {
                 orgCondition = orgCondition + ")) ";
             }
             String suppliersCondition = "";
-            if (!idOfSupplierList.isEmpty()) {
+            if (!(idOfSupplierList==null || idOfSupplierList.isEmpty())) {
                 // Обработать лист с организациями
                 suppliersCondition = " and (cf_menuexchangerules.idofsourceorg in (";
                 for (Long idOfOrg : idOfSupplierList) {
@@ -123,14 +127,14 @@ public class GoodRequestsReport extends BasicReport {
                 notCreatedAtConfition = "and (cf_goods_requests.createddate < " + (limit) + ") ";
             }
 
-            String sql = "select requests.org, requests.orgFull, requests.good, requests.d, int8(sum(requests.cnt)), sum(coalesce(requests.ds_cnt, 0)) "+
+            String sqlGood = "select requests.org, requests.orgFull, requests.shortGood, requests.good, requests.idofgood, requests.d, int8(sum(requests.cnt)), sum(coalesce(requests.ds_cnt, 0)) "+
                          "from (select substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') as org, cf_orgs.officialname as orgFull, "+
-                         "             cf_goods.fullname as good , date_trunc('day', to_timestamp(cf_goods_requests.donedate / 1000)) as d, "+
+                         "             cf_goods.fullname as good, cf_goods.nameofgood as shortGood, cf_goods.idofgood as idofgood , date_trunc('day', to_timestamp(cf_goods_requests.donedate / 1000)) as d, "+
                          "             cf_goods_requests_positions.totalcount / 1000 as cnt, cf_goods_requests_positions.DailySampleCount / 1000 as ds_cnt "+
                          "       from cf_goods_requests "+
                          "      left join cf_orgs on cf_orgs.idoforg=cf_goods_requests.orgowner "+
                          "      left join cf_goods_requests_positions on cf_goods_requests.idofgoodsrequest=cf_goods_requests_positions.idofgoodsrequest "+
-                         "      join cf_goods on cf_goods.idofgood=cf_goods_requests_positions.idofgood "+
+                         "      join cf_goods on cf_goods.idofgood=cf_goods_requests_positions.idofgood and cf_goods_requests_positions.idofgood is not null "+
                          "      " + (suppliersCondition.length() < 1 ? "" : "join cf_menuexchangerules on idofdestorg=cf_orgs.idoforg ") +
                          "      where cf_orgs.officialname<> '' and " +
                          "            " + stateCondition +
@@ -139,37 +143,67 @@ public class GoodRequestsReport extends BasicReport {
                          "            " + goodCondition +
                          "            " + orgCondition +
                          "            " + suppliersCondition + ") as requests "+
-                         "group by requests.org, requests.orgFull, requests.good, requests.d "+
-                         "order by requests.org, requests.good, requests.d";
+                         "group by requests.org, requests.orgFull, requests.idofgood, requests.shortGood, requests.good, requests.d "+
+                         "order by requests.org, requests.idofgood, requests.d";
 
-            Map <String, RequestItem> totalItems = new TreeMap <String, RequestItem>();
-            RequestItem overallItem = new TotalItem(OVERALL_TITLE, "", OVERALL_ALL_TITLE, report);
+            String sqlProduct = "select requests.org, requests.orgFull, requests.shortGood, requests.good, requests.idofgood, requests.d, int8(sum(requests.cnt)), sum(coalesce(requests.ds_cnt, 0)) "+
+                    "from (select substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') as org, cf_orgs.officialname as orgFull, "+
+                    "             cf_products.fullname as good, cf_products.productname as shortGood, cf_products.idofproducts as idofgood , date_trunc('day', to_timestamp(cf_goods_requests.donedate / 1000)) as d, "+
+                    "             cf_goods_requests_positions.totalcount / 1000 as cnt, cf_goods_requests_positions.DailySampleCount / 1000 as ds_cnt "+
+                    "       from cf_goods_requests "+
+                    "      left join cf_orgs on cf_orgs.idoforg=cf_goods_requests.orgowner "+
+                    "      left join cf_goods_requests_positions on cf_goods_requests.idofgoodsrequest=cf_goods_requests_positions.idofgoodsrequest "+
+                    "      join cf_products on cf_products.idofproducts=cf_goods_requests_positions.idofproducts and cf_goods_requests_positions.idofproducts is not null"+
+                    "      " + (suppliersCondition.length() < 1 ? "" : "join cf_menuexchangerules on idofdestorg=cf_orgs.idoforg ") +
+                    "      where cf_orgs.officialname<> '' and " +
+                    "            " + stateCondition +
+                    "            (cf_goods_requests.donedate>=" + startDateLong + " and cf_goods_requests.donedate<" + endDateLong + ") "+
+                    "            " + notCreatedAtConfition +
+                    "            " + productCondition +
+                    "            " + orgCondition +
+                    "            " + suppliersCondition + ") as requests "+
+                    "group by requests.org, requests.orgFull, requests.idofgood, requests.shortGood, requests.good, requests.d "+
+                    "order by requests.org, requests.idofgood, requests.d";
 
-            Query query = session.createSQLQuery(sql);
-            List res = query.list();
+            //Map <String, RequestItem> totalItems = new TreeMap <String, RequestItem>();
+            Map <Long, RequestItem> totalItems = new TreeMap <Long, RequestItem>();
+            RequestItem overallItem = new TotalItem(OVERALL_TITLE, "", -1L,OVERALL_ALL_TITLE, report);
+
+            List res = new ArrayList();
+            Query queryGood = session.createSQLQuery(sqlGood);
+            Query queryProduct = session.createSQLQuery(sqlProduct);
+            //List res = queryGood.list();
+            res.addAll(queryGood.list());
+            res.addAll(queryProduct.list());
             for (Object o : res) {
                 Object entry [] = (Object []) o;
                 String org      = ((String) entry [0]).trim ();
                 String orgFull  = ((String) entry [1]).trim ();
                 String good     = ((String) entry [2]).trim ();
-                long date       = ((Timestamp) entry [3]).getTime();
-                int value       = ((BigInteger) entry [4]).intValue();
-                int dailySample = ((BigDecimal) entry[5]).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
+                String shortGood= ((String) entry [3]).trim ();
+                long idOfGood   = Long.valueOf(entry[4].toString());
+                long date       = ((Timestamp) entry [5]).getTime();
+                int value       = ((BigInteger) entry [6]).intValue();
+                int dailySample = ((BigDecimal) entry[7]).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
 
 
-                RequestItem item = findItemByOrgAndGood(items, org, good);
+                //RequestItem item = findItemByOrgAndGood(items, org, good);
+                RequestItem item = findItemByOrgAndGood(items, org, idOfGood);
                 if (item == null) {
-                    item = new RequestItem(org, orgFull, good, report);
+                    final String name = (StringUtils.isEmpty(good)? shortGood: good);
+                    item = new RequestItem(org, orgFull, idOfGood, name, report);
                     items.add(item);
                 }
                 item.addValue(date, new RequestValue(value));
                 item.addDailySample(date, new RequestValue(dailySample));
 
                 //  Получаем итоговый элемент по данному товару, чтобы добавить в него количество от текущей записи
-                RequestItem totalItem = totalItems.get(good);
+                //RequestItem totalItem = totalItems.get(good);
+                RequestItem totalItem = totalItems.get(idOfGood);
                 if (totalItem == null) {
-                    totalItem = new TotalItem(OVERALL_TITLE, "", good, report);
-                    totalItems.put(good, totalItem);
+                    totalItem = new TotalItem(OVERALL_TITLE, "", idOfGood, good, report);
+                    //totalItems.put(good, totalItem);
+                    totalItems.put(idOfGood, totalItem);
                 }
                 totalItem.addValue(date, new RequestValue(value));      //  Добавляем в итог по товару
                 totalItem.addDailySample(date, new RequestValue(dailySample));
@@ -178,7 +212,7 @@ public class GoodRequestsReport extends BasicReport {
             }
 
             //  Добавляем строки с общими значениями в список товаров
-            for (String key : totalItems.keySet()) {
+            for (Long key : totalItems.keySet()) {
                 items.add(totalItems.get(key));
             }
             items.add(overallItem);
@@ -197,6 +231,15 @@ public class GoodRequestsReport extends BasicReport {
         public RequestItem findItemByOrgAndGood(List<RequestItem>  list, String org, String good) {
             for (RequestItem i : list) {
                 if (i.getOrg().equals(org) && i.getGood().equals(good)) {
+                    return i;
+                }
+            }
+            return null;
+        }
+
+        public RequestItem findItemByOrgAndGood(List<RequestItem>  list, String org, Long good) {
+            for (RequestItem i : list) {
+                if (i.getOrg().equals(org) && i.getIdOfGood().equals(good)) {
                     return i;
                 }
             }
@@ -265,8 +308,8 @@ public class GoodRequestsReport extends BasicReport {
 
     public static class TotalItem extends RequestItem {
 
-        public TotalItem (String org, String orgFull, String item, GoodRequestsReport report) {
-            super(org, orgFull, item, report);
+        public TotalItem (String org, String orgFull,Long idOfGood, String item, GoodRequestsReport report) {
+            super(org, orgFull, idOfGood, item, report);
         }
 
         @Override
@@ -305,16 +348,18 @@ public class GoodRequestsReport extends BasicReport {
         protected List <String> result;
         protected final String org; // Наименование организации
         protected final String orgFull; // Полное наименование организации
+        protected final Long idOfGood; // Идентификатор  товара
         protected final String good; // Наименование товара
         protected Map<Long, RequestValue> values = new TreeMap<Long, RequestValue>();
         protected GoodRequestsReport report;
         protected Map<Long, RequestValue> dailySamples = new TreeMap<Long, RequestValue>();
 
 
-        public RequestItem(String org, String orgFull, String good, GoodRequestsReport report) {
+        public RequestItem(String org, String orgFull, long idOfGood, String good, GoodRequestsReport report) {
             this.org = org;
             this.orgFull = orgFull;
             this.good = good;
+            this.idOfGood = idOfGood;
             this.report = report;
         }
 
@@ -328,6 +373,10 @@ public class GoodRequestsReport extends BasicReport {
 
         public String getGood() {
             return good;
+        }
+
+        public Long getIdOfGood() {
+            return idOfGood;
         }
 
         public Set<Date> getDates () {
@@ -437,7 +486,7 @@ public class GoodRequestsReport extends BasicReport {
         }
 
 
-        private Calendar getColumnDate (String colName) {
+        public Calendar getColumnDate (String colName) {
             //  Если это не столбец по умолчанию, значит это дата - берем значение из массива, используя дату
             //  Используем дату от первого значений - нам понадоббятся его месяц и год
             Calendar firstDate = new GregorianCalendar();
