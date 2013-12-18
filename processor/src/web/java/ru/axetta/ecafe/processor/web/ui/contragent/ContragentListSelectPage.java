@@ -197,6 +197,7 @@ public class ContragentListSelectPage extends BasicPage {
             }
             criteria.add(exp);
         }
+        criteria.addOrder(Order.asc("contragentName"));
         return criteria.list();
     }
 
