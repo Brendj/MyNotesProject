@@ -263,7 +263,8 @@ public class Postman implements AutoReportPostman {
         try {
             Transport.send(mailMessage);
         } catch (Exception e) {
-        logger.error("Failed to transfer email", e);
+            logger.error("Failed to transfer email", e);
+            throw e;
         }
         if (logger.isDebugEnabled()) {
             logger.debug(String.format("Finished posting text with subject \"%s\" to \"%s\"", subject, address));
