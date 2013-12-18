@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 
 import java.util.*;
 
@@ -212,6 +213,7 @@ public class ContragentListPage extends BasicWorkspacePage {
             } catch (Exception e) {
                 idOfUser = null;
             }
+            criteria.addOrder(Order.asc("idOfContragent"));
             List contragents = criteria.list();
             for (Object object : contragents) {
                 Contragent contragent = (Contragent) object;
