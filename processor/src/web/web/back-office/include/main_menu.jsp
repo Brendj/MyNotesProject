@@ -887,6 +887,9 @@
     <rich:panelMenuItem id="activeClientsMenuItem" binding="#{activeClientsReportPage.mainMenuComponent}"
                         label="Отчет по доступным клиентам" action="#{activeClientsReportPage.show}"
                         reRender="workspaceForm" />
+    <rich:panelMenuItem id="referReportMenuItem" binding="#{referReportPage.mainMenuComponent}"
+                        label="Справки расходования средств" action="#{referReportPage.show}"
+                        reRender="workspaceForm" />
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
     <rich:panelMenuItem id="manualReportRunnerMenuItem" binding="#{manualReportRunnerPage.mainMenuComponent}"
                         label="Ручной запуск отчетов" action="#{manualReportRunnerPage.show}"
