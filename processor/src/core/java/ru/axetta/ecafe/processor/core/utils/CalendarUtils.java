@@ -159,11 +159,27 @@ public class CalendarUtils {
         return dateTimeFormat.format(date);
     }
 
+    public static Date getFirstDayOfMonth(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        truncateToMonth(calendar);
+        return calendar.getTime();
+    }
+
     public static long getTimeFirstDayOfMonth(long time) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(time);
         truncateToMonth(calendar);
         return calendar.getTimeInMillis();
+    }
+
+    public static Date getLastDayOfMonth(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.MONTH, 1);
+        truncateToMonth(calendar);
+        calendar.add(Calendar.MILLISECOND, -1);
+        return calendar.getTime();
     }
 
     public static long getTimeLastDayOfMonth(long time) {
