@@ -121,6 +121,29 @@ public class StateChange extends DistributedObject {
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setDate(((StateChange) distributedObject).getDate());
+        setStateFrom(((StateChange) distributedObject).getStateFrom());
+        setStateTo(((StateChange) distributedObject).getStateTo());
+
+        setGoodRequest(((StateChange) distributedObject).getGoodRequest());
+        setGuidOfGR(((StateChange) distributedObject).getGuidOfGR());
+
+        setWayBill(((StateChange) distributedObject).getWayBill());
+        setGuidOfWB(((StateChange) distributedObject).getGuidOfWB());
+
+        setInternalDisposingDocument(((StateChange) distributedObject).getInternalDisposingDocument());
+        setGuidOfIDD(((StateChange) distributedObject).getGuidOfIDD());
+
+        setInternalIncomingDocument(((StateChange) distributedObject).getInternalIncomingDocument());
+        setGuidOfIID(((StateChange) distributedObject).getGuidOfIID());
+
+        setStaff(((StateChange) distributedObject).getStaff());
+        setGuidOfS(((StateChange) distributedObject).getGuidOfS());
+    }
+
+    @Override
     protected StateChange parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null)
@@ -141,14 +164,6 @@ public class StateChange extends DistributedObject {
         guidOfS = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);
         setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
-        setDate(((StateChange) distributedObject).getDate());
-        setStateFrom(((StateChange) distributedObject).getStateFrom());
-        setStateTo(((StateChange) distributedObject).getStateTo());
     }
 
     public String getGuidOfS() {

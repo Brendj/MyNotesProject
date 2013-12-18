@@ -57,6 +57,14 @@ public class ProductGroup extends ConfigurationProviderDistributedObject {
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setNameOfGroup(((ProductGroup) distributedObject).getNameOfGroup());
+        setClassificationCode(((ProductGroup) distributedObject).getClassificationCode());
+        setIdOfConfigurationProvider(((ProductGroup) distributedObject).getIdOfConfigurationProvider());
+    }
+
+    @Override
     protected ProductGroup parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null){
@@ -72,14 +80,6 @@ public class ProductGroup extends ConfigurationProviderDistributedObject {
             setClassificationCode(stringClassificationCode);
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
-        setNameOfGroup(((ProductGroup) distributedObject).getNameOfGroup());
-        setClassificationCode(((ProductGroup) distributedObject).getClassificationCode());
-        setIdOfConfigurationProvider(((ProductGroup) distributedObject).getIdOfConfigurationProvider());
     }
 
     private String nameOfGroup;

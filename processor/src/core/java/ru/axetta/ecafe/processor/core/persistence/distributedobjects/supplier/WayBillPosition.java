@@ -105,6 +105,25 @@ public class WayBillPosition extends SupplierRequestDistributedObject {
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setGoodsCreationDate(((WayBillPosition) distributedObject).getGoodsCreationDate());
+        setLifeTime(((WayBillPosition) distributedObject).getLifeTime());
+        setUnitsScale(((WayBillPosition) distributedObject).getUnitsScale());
+        setTotalCount(((WayBillPosition) distributedObject).getTotalCount());
+        setNetWeight(((WayBillPosition) distributedObject).getNetWeight());
+        setGrossWeight(((WayBillPosition) distributedObject).getGrossWeight());
+        setPrice(((WayBillPosition) distributedObject).getPrice());
+        setNds(((WayBillPosition) distributedObject).getNds());
+
+        setGood(((WayBillPosition) distributedObject).getGood());
+        setGuidOfG(((WayBillPosition) distributedObject).getGuidOfG());
+
+        setWayBill(((WayBillPosition) distributedObject).getWayBill());
+        setGuidOfWB(((WayBillPosition) distributedObject).getGuidOfWB());
+    }
+
+    @Override
     protected WayBillPosition parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null)
@@ -140,19 +159,6 @@ public class WayBillPosition extends SupplierRequestDistributedObject {
         guidOfWB = XMLUtils.getStringAttributeValue(node, "GuidOfWayBill", 36);
         setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
-        setGoodsCreationDate(((WayBillPosition) distributedObject).getGoodsCreationDate());
-        setLifeTime(((WayBillPosition) distributedObject).getLifeTime());
-        setUnitsScale(((WayBillPosition) distributedObject).getUnitsScale());
-        setTotalCount(((WayBillPosition) distributedObject).getTotalCount());
-        setNetWeight(((WayBillPosition) distributedObject).getNetWeight());
-        setGrossWeight(((WayBillPosition) distributedObject).getGrossWeight());
-        setPrice(((WayBillPosition) distributedObject).getPrice());
-        setNds(((WayBillPosition) distributedObject).getNds());
     }
 
     public UnitScale getUnitsScale() {

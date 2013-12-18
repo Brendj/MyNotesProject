@@ -79,6 +79,13 @@ public class GoodComplaintBook extends DistributedObject {
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setClient(((GoodComplaintBook) distributedObject).getClient());
+        setGood(((GoodComplaintBook) distributedObject).getGood());
+    }
+
+    @Override
     protected GoodComplaintBook parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null){
@@ -90,13 +97,6 @@ public class GoodComplaintBook extends DistributedObject {
         guidOfGood = XMLUtils.getStringAttributeValue(node, "GuidOfGoods", 36);
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
-        setClient(((GoodComplaintBook) distributedObject).getClient());
-        setGood(((GoodComplaintBook) distributedObject).getGood());
     }
 
     public Client getClient() {

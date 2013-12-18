@@ -94,6 +94,14 @@ public class ActOfInventorization extends SupplierRequestDistributedObject {
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setDateOfAct(((ActOfInventorization) distributedObject).getDateOfAct());
+        setNumber(((ActOfInventorization) distributedObject).getNumber());
+        setCommission(((ActOfInventorization) distributedObject).getCommission());
+    }
+
+    @Override
     protected ActOfInventorization parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null)
@@ -112,14 +120,6 @@ public class ActOfInventorization extends SupplierRequestDistributedObject {
             setCommission(stringCommission);
         setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
-        setDateOfAct(((ActOfInventorization) distributedObject).getDateOfAct());
-        setNumber(((ActOfInventorization) distributedObject).getNumber());
-        setCommission(((ActOfInventorization) distributedObject).getCommission());
     }
 
     public Set<InternalDisposingDocument> getInternalDisposingDocumentInternal() {

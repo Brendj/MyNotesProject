@@ -89,6 +89,16 @@ public class GoodComplaintIterations extends DistributedObject {
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setIterationNumber(((GoodComplaintIterations)distributedObject).getIterationNumber());
+        setProblemDescription(((GoodComplaintIterations) distributedObject).getProblemDescription());
+        setConclusion(((GoodComplaintIterations) distributedObject).getConclusion());
+        setIterationStatusNumber(((GoodComplaintIterations) distributedObject).getIterationStatusNumber());
+        setComplaint(((GoodComplaintIterations) distributedObject).getComplaint());
+    }
+
+    @Override
     protected GoodComplaintIterations parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null){
@@ -103,14 +113,6 @@ public class GoodComplaintIterations extends DistributedObject {
         conclusion = XMLUtils.getStringAttributeValue(node, "Conclusion", 512);
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
-        setIterationNumber(((GoodComplaintIterations)distributedObject).getIterationNumber());
-        setProblemDescription(((GoodComplaintIterations) distributedObject).getProblemDescription());
-        setConclusion(((GoodComplaintIterations) distributedObject).getConclusion());
     }
 
     public GoodComplaintBook getComplaint() {

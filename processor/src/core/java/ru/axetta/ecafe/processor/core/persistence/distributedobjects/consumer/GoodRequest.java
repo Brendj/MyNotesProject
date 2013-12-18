@@ -121,6 +121,7 @@ public class GoodRequest extends ConsumerRequestDistributedObject {
     @Override
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(distributedObject.getOrgOwner());
+        setStaff(((GoodRequest) distributedObject).getStaff());
         setDateOfGoodsRequest(((GoodRequest) distributedObject).getDateOfGoodsRequest());
         setNumber(((GoodRequest) distributedObject).getNumber());
         setState(((GoodRequest) distributedObject).getState());

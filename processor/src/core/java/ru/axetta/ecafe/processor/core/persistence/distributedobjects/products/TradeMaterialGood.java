@@ -80,6 +80,21 @@ public class TradeMaterialGood extends ConfigurationProviderDistributedObject {
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setGoodsCreationDate(((TradeMaterialGood) distributedObject).getGoodsCreationDate());
+        setLifeTime(((TradeMaterialGood) distributedObject).getLifeTime());
+        setUnitScale(((TradeMaterialGood) distributedObject).getUnitScale());
+        setTotalCount(((TradeMaterialGood) distributedObject).getTotalCount());
+        setNetWeight(((TradeMaterialGood) distributedObject).getNetWeight());
+        setSelfPrice(((TradeMaterialGood) distributedObject).getSelfPrice());
+        setNds(((TradeMaterialGood) distributedObject).getNds());
+        setGood(((TradeMaterialGood) distributedObject).getGood());
+        setGuidOfG(((TradeMaterialGood) distributedObject).getGuidOfG());
+        setIdOfConfigurationProvider(((TradeMaterialGood) distributedObject).getIdOfConfigurationProvider());
+    }
+
+    @Override
     protected TradeMaterialGood parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null){
@@ -111,19 +126,6 @@ public class TradeMaterialGood extends ConfigurationProviderDistributedObject {
         guidOfG = XMLUtils.getStringAttributeValue(node, "GuidOfGoods", 36);
         setSendAll(SendToAssociatedOrgs.DontSend);
         return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
-        setGoodsCreationDate(((TradeMaterialGood) distributedObject).getGoodsCreationDate());
-        setLifeTime(((TradeMaterialGood) distributedObject).getLifeTime());
-        setUnitScale(((TradeMaterialGood) distributedObject).getUnitScale());
-        setTotalCount(((TradeMaterialGood) distributedObject).getTotalCount());
-        setNetWeight(((TradeMaterialGood) distributedObject).getNetWeight());
-        setSelfPrice(((TradeMaterialGood) distributedObject).getSelfPrice());
-        setNds(((TradeMaterialGood) distributedObject).getNds());
-        setIdOfConfigurationProvider(((TradeMaterialGood) distributedObject).getIdOfConfigurationProvider());
     }
 
     private Good good;

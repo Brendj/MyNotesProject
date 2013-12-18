@@ -79,6 +79,7 @@ public class TypeOfAccompanyingDocument extends LibraryDistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
         setTypeOfAccompanyingDocumentName(
                 ((TypeOfAccompanyingDocument) distributedObject).getTypeOfAccompanyingDocumentName());
         setHashCode(((TypeOfAccompanyingDocument) distributedObject).getHashCode());

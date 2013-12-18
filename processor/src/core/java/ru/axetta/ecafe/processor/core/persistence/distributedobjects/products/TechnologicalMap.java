@@ -115,6 +115,32 @@ public class TechnologicalMap extends ConfigurationProviderDistributedObject {
     }
 
     @Override
+    protected void appendAttributes(Element element) {
+        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
+        XMLUtils.setAttributeIfNotNull(element, "Name", nameOfTechnologicalMap);
+        XMLUtils.setAttributeIfNotNull(element, "Number", numberOfTechnologicalMap);
+        XMLUtils.setAttributeIfNotNull(element, "Technology", technologyOfPreparation);
+        XMLUtils.setAttributeIfNotNull(element, "TempPreparation", tempOfPreparation);
+        XMLUtils.setAttributeIfNotNull(element, "LifeTime", lifeTime);
+        XMLUtils.setAttributeIfNotNull(element, "Energy", energyValue);
+        XMLUtils.setAttributeIfNotNull(element, "Proteins", proteins);
+        XMLUtils.setAttributeIfNotNull(element, "Carbohydrates", carbohydrates);
+        XMLUtils.setAttributeIfNotNull(element, "Fats", fats);
+        XMLUtils.setAttributeIfNotNull(element, "Ca", microElCa);
+        XMLUtils.setAttributeIfNotNull(element, "Mg", microElMg);
+        XMLUtils.setAttributeIfNotNull(element, "P", microElP);
+        XMLUtils.setAttributeIfNotNull(element, "Fe", microElFe);
+        XMLUtils.setAttributeIfNotNull(element, "VA", vitaminA);
+        XMLUtils.setAttributeIfNotNull(element, "VB1", vitaminB1);
+        XMLUtils.setAttributeIfNotNull(element, "VB2", vitaminB2);
+        XMLUtils.setAttributeIfNotNull(element, "VPp", vitaminPp);
+        XMLUtils.setAttributeIfNotNull(element, "VC", vitaminC);
+        XMLUtils.setAttributeIfNotNull(element, "VE", vitaminE);
+        //XMLUtils.setAttributeIfNotNull(element, "GuidOfTMG", technologicalMapGroup.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "GuidOfTMG", guidOfTMG);
+    }
+
+    @Override
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(distributedObject.getOrgOwner());
         setNameOfTechnologicalMap(((TechnologicalMap) distributedObject).getNameOfTechnologicalMap());
@@ -140,33 +166,9 @@ public class TechnologicalMap extends ConfigurationProviderDistributedObject {
         setVitaminE(((TechnologicalMap) distributedObject).getVitaminE());
         setVitaminPp(((TechnologicalMap) distributedObject).getVitaminPp());
 
+        setTechnologicalMapGroup(((TechnologicalMap) distributedObject).getTechnologicalMapGroup());
+        setGuidOfTMG(((TechnologicalMap) distributedObject).getGuidOfTMG());
         setIdOfConfigurationProvider(((TechnologicalMap) distributedObject).getIdOfConfigurationProvider());
-    }
-
-    @Override
-    protected void appendAttributes(Element element) {
-        XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
-        XMLUtils.setAttributeIfNotNull(element, "Name", nameOfTechnologicalMap);
-        XMLUtils.setAttributeIfNotNull(element, "Number", numberOfTechnologicalMap);
-        XMLUtils.setAttributeIfNotNull(element, "Technology", technologyOfPreparation);
-        XMLUtils.setAttributeIfNotNull(element, "TempPreparation", tempOfPreparation);
-        XMLUtils.setAttributeIfNotNull(element, "LifeTime", lifeTime);
-        XMLUtils.setAttributeIfNotNull(element, "Energy", energyValue);
-        XMLUtils.setAttributeIfNotNull(element, "Proteins", proteins);
-        XMLUtils.setAttributeIfNotNull(element, "Carbohydrates", carbohydrates);
-        XMLUtils.setAttributeIfNotNull(element, "Fats", fats);
-        XMLUtils.setAttributeIfNotNull(element, "Ca", microElCa);
-        XMLUtils.setAttributeIfNotNull(element, "Mg", microElMg);
-        XMLUtils.setAttributeIfNotNull(element, "P", microElP);
-        XMLUtils.setAttributeIfNotNull(element, "Fe", microElFe);
-        XMLUtils.setAttributeIfNotNull(element, "VA", vitaminA);
-        XMLUtils.setAttributeIfNotNull(element, "VB1", vitaminB1);
-        XMLUtils.setAttributeIfNotNull(element, "VB2", vitaminB2);
-        XMLUtils.setAttributeIfNotNull(element, "VPp", vitaminPp);
-        XMLUtils.setAttributeIfNotNull(element, "VC", vitaminC);
-        XMLUtils.setAttributeIfNotNull(element, "VE", vitaminE);
-        //XMLUtils.setAttributeIfNotNull(element, "GuidOfTMG", technologicalMapGroup.getGuid());
-        XMLUtils.setAttributeIfNotNull(element, "GuidOfTMG", guidOfTMG);
     }
 
     @Override
@@ -491,6 +493,14 @@ public class TechnologicalMap extends ConfigurationProviderDistributedObject {
 
     public void setLifeTime(Integer lifeTime) {
         this.lifeTime = lifeTime;
+    }
+
+    public String getGuidOfTMG() {
+        return guidOfTMG;
+    }
+
+    public void setGuidOfTMG(String guidOfTMG) {
+        this.guidOfTMG = guidOfTMG;
     }
 
     @Override

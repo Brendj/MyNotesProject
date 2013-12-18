@@ -52,14 +52,14 @@
 
         <set name="stateChangeInternal" lazy="true" inverse="true">
             <key>
-                <column name="IdOfInternalIncomingDocument"/>
+                <column name="idofstatechange"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.StateChange" />
         </set>
 
         <set name="internalIncomingDocumentPositionInternal" lazy="true" inverse="true">
             <key>
-                <column name="IdOfInternalIncomingDocument"/>
+                <column name="idofinternalincomingdocumentpositions"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocumentPosition" />
         </set>

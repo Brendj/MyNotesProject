@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.products;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -48,22 +49,22 @@ public class ProhibitionExclusion extends DistributedObject {
 
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
-        //Prohibition p = DAOUtils.findDistributedObjectByRefGUID(Prohibition.class, session, guidOfProhibition);
-        //if (p == null) throw new DistributedObjectException("Prohibition NOT_FOUND_VALUE");
-        //setProhibition(p);
-        //
-        //Good g = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfGoods);
-        //GoodGroup gg =  DAOUtils.findDistributedObjectByRefGUID(GoodGroup.class, session, guidOfGoodsGroup);
-        //
-        //if(gg != null) {
-        //    setGoodsGroup(gg);
-        //    return;
-        //}
-        //if(g != null) {
-        //    setGood(g);
-        //    return;
-        //}
-        //throw new DistributedObjectException("NOT_FOUND_VALUE");
+        Prohibition p = DAOUtils.findDistributedObjectByRefGUID(Prohibition.class, session, guidOfProhibition);
+        if (p == null) throw new DistributedObjectException("Prohibition NOT_FOUND_VALUE");
+        setProhibition(p);
+
+        Good g = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfGoods);
+        GoodGroup gg =  DAOUtils.findDistributedObjectByRefGUID(GoodGroup.class, session, guidOfGoodsGroup);
+
+        if(gg != null) {
+            setGoodsGroup(gg);
+            return;
+        }
+        if(g != null) {
+            setGood(g);
+            return;
+        }
+        throw new DistributedObjectException("NOT_FOUND_VALUE");
     }
 
     @Override
@@ -101,6 +102,17 @@ public class ProhibitionExclusion extends DistributedObject {
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setProhibition(((ProhibitionExclusion) distributedObject).getProhibition());
+        setGuidOfProhibition(((ProhibitionExclusion) distributedObject).getGuidOfProhibition());
+        setGoodsGroup(((ProhibitionExclusion) distributedObject).getGoodsGroup());
+        setGuidOfGoodsGroup(((ProhibitionExclusion) distributedObject).getGuidOfGoodsGroup());
+        setGood(((ProhibitionExclusion) distributedObject).getGood());
+        setGuidOfGoods(((ProhibitionExclusion) distributedObject).getGuidOfGoods());
+    }
+
+    @Override
     protected ProhibitionExclusion parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null){
@@ -113,11 +125,6 @@ public class ProhibitionExclusion extends DistributedObject {
         //guidOfGoodsGroup = XMLUtils.getStringAttributeValue(node, "GuidOfGoodsGroup", 36);
         //setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
     }
 
     private Prohibition prohibition;

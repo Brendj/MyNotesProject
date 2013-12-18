@@ -103,6 +103,14 @@ public class GoodComplaintOrders extends DistributedObject {
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setComplaintIteration(((GoodComplaintOrders) distributedObject).getComplaintIteration());
+        setOrderDetail(((GoodComplaintOrders) distributedObject).getOrderDetail());
+        setOrderOrg(((GoodComplaintOrders) distributedObject).getOrderOrg());
+    }
+
+    @Override
     protected GoodComplaintOrders parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null){
@@ -115,14 +123,6 @@ public class GoodComplaintOrders extends DistributedObject {
         idOfOrderDetail = XMLUtils.getLongAttributeValue(node, "IdOfOrderDetail");
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
-        setComplaintIteration(((GoodComplaintOrders) distributedObject).getComplaintIteration());
-        setOrderDetail(((GoodComplaintOrders) distributedObject).getOrderDetail());
-        setOrderOrg(((GoodComplaintOrders) distributedObject).getOrderOrg());
     }
 
     public GoodComplaintIterations getComplaintIteration() {

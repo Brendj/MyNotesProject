@@ -91,6 +91,15 @@ public class ActOfWayBillDifference extends SupplierRequestDistributedObject {
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setDate(((ActOfWayBillDifference) distributedObject).getDate());
+        setNumber(((ActOfWayBillDifference) distributedObject).getNumber());
+        setStaff(((ActOfWayBillDifference) distributedObject).getStaff());
+        setGuidOfStaff(((ActOfWayBillDifference) distributedObject).getGuidOfStaff());
+    }
+
+    @Override
     protected ActOfWayBillDifference parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null)
@@ -107,13 +116,6 @@ public class ActOfWayBillDifference extends SupplierRequestDistributedObject {
         guidOfStaff = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);
         setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
-        setDate(((ActOfWayBillDifference) distributedObject).getDate());
-        setNumber(((ActOfWayBillDifference) distributedObject).getNumber());
     }
 
     public Set<ActOfWayBillDifferencePosition> getActOfWayBillDifferencePositionInternal() {

@@ -110,6 +110,25 @@ public class InternalIncomingDocument extends SupplierRequestDistributedObject {
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setDate(((InternalIncomingDocument) distributedObject).getDate());
+        setState(((InternalIncomingDocument) distributedObject).getState());
+
+        setWayBill(((InternalIncomingDocument) distributedObject).getWayBill());
+        setGuidOfWB(((InternalIncomingDocument) distributedObject).getGuidOfWB());
+
+        setInternalDisposingDocument(((InternalIncomingDocument) distributedObject).getInternalDisposingDocument());
+        setGuidOfIDD(((InternalIncomingDocument) distributedObject).getGuidOfIDD());
+
+        setGuidOfAI(((InternalIncomingDocument) distributedObject).getGuidOfAI());
+        setActOfInventorization(((InternalIncomingDocument) distributedObject).getActOfInventorization());
+
+        setStaff(((InternalIncomingDocument) distributedObject).getStaff());
+        setGuidOfS(((InternalIncomingDocument) distributedObject).getGuidOfS());
+    }
+
+    @Override
     protected InternalIncomingDocument parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null)
@@ -129,13 +148,6 @@ public class InternalIncomingDocument extends SupplierRequestDistributedObject {
         guidOfS = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);
         setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
-        setDate(((InternalIncomingDocument) distributedObject).getDate());
-        setState(((InternalIncomingDocument) distributedObject).getState());
     }
 
     public Set<InternalIncomingDocumentPosition> getInternalIncomingDocumentPositionInternal() {

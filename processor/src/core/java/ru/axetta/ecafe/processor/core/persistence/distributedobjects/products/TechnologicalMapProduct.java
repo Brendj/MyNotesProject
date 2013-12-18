@@ -65,17 +65,6 @@ public class TechnologicalMapProduct extends ConfigurationProviderDistributedObj
     }
 
     @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((TechnologicalMapProduct) distributedObject).getOrgOwner());
-        setGrossWeight(((TechnologicalMapProduct) distributedObject).getGrossWeight());
-        setNetWeight(((TechnologicalMapProduct) distributedObject).getNetWeight());
-        setProduct(((TechnologicalMapProduct) distributedObject).getProduct());
-        setTechnologicalMap(((TechnologicalMapProduct) distributedObject).getTechnologicalMap());
-        setNumberGroupReplace(((TechnologicalMapProduct) distributedObject).getNumberGroupReplace());
-        setIdOfConfigurationProvider(((TechnologicalMapProduct) distributedObject).getIdOfConfigurationProvider());
-    }
-
-    @Override
     protected void appendAttributes(Element element) {
         XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
         XMLUtils.setAttributeIfNotNull(element, "GWeight", grossWeight);
@@ -83,6 +72,19 @@ public class TechnologicalMapProduct extends ConfigurationProviderDistributedObj
         XMLUtils.setAttributeIfNotNull(element, "NumberGroupReplace", numberGroupReplace);
         XMLUtils.setAttributeIfNotNull(element, "GuidOfP", guidOfP);
         XMLUtils.setAttributeIfNotNull(element, "GuidOfTM", guidOfTM);
+    }
+
+    @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(((TechnologicalMapProduct) distributedObject).getOrgOwner());
+        setGrossWeight(((TechnologicalMapProduct) distributedObject).getGrossWeight());
+        setNetWeight(((TechnologicalMapProduct) distributedObject).getNetWeight());
+        setProduct(((TechnologicalMapProduct) distributedObject).getProduct());
+        setGuidOfP(((TechnologicalMapProduct) distributedObject).getGuidOfP());
+        setTechnologicalMap(((TechnologicalMapProduct) distributedObject).getTechnologicalMap());
+        setGuidOfTM(((TechnologicalMapProduct) distributedObject).getGuidOfTM());
+        setNumberGroupReplace(((TechnologicalMapProduct) distributedObject).getNumberGroupReplace());
+        setIdOfConfigurationProvider(((TechnologicalMapProduct) distributedObject).getIdOfConfigurationProvider());
     }
 
     @Override
@@ -160,6 +162,22 @@ public class TechnologicalMapProduct extends ConfigurationProviderDistributedObj
 
     public void setGrossWeight(Integer grossWeight) {
         this.grossWeight = grossWeight;
+    }
+
+    public String getGuidOfP() {
+        return guidOfP;
+    }
+
+    public void setGuidOfP(String guidOfP) {
+        this.guidOfP = guidOfP;
+    }
+
+    public String getGuidOfTM() {
+        return guidOfTM;
+    }
+
+    public void setGuidOfTM(String guidOfTM) {
+        this.guidOfTM = guidOfTM;
     }
 
     @Override

@@ -34,6 +34,7 @@ public abstract class ConsumerRequestDistributedObject extends DistributedObject
             List<Long> orgOwners = query.list();
             Criteria criteria = session.createCriteria(getClass());
             criteria.add(Restrictions.in("orgOwner", orgOwners));
+            criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
             createProjections(criteria);
             criteria.setCacheable(false);
             criteria.setReadOnly(true);

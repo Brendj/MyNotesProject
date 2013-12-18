@@ -77,6 +77,7 @@ public class Source extends LibraryDistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
         setSourceName(((Source) distributedObject).getSourceName());
         setHashCode(((Source) distributedObject).getHashCode());
     }

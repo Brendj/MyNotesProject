@@ -80,6 +80,14 @@ public class GoodBasicBasketPrice extends ConfigurationProviderDistributedObject
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setPrice(((GoodBasicBasketPrice) distributedObject).getPrice());
+        setGoodsBasicBasket(((GoodBasicBasketPrice) distributedObject).getGoodsBasicBasket());
+        setGood(((GoodBasicBasketPrice) distributedObject).getGood());
+    }
+
+    @Override
     protected GoodBasicBasketPrice parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null){
@@ -94,14 +102,6 @@ public class GoodBasicBasketPrice extends ConfigurationProviderDistributedObject
         guidOfGoodsBasicBasket = XMLUtils.getStringAttributeValue(node, "GuidOfBasicGood", 36);
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
-        setPrice(((GoodBasicBasketPrice) distributedObject).getPrice());
-        setGoodsBasicBasket(((GoodBasicBasketPrice) distributedObject).getGoodsBasicBasket());
-        setGood(((GoodBasicBasketPrice) distributedObject).getGood());
     }
 
     public Long getPrice() {

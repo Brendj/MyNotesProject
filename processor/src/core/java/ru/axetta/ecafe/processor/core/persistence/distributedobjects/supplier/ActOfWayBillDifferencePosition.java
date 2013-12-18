@@ -121,6 +121,25 @@ public class ActOfWayBillDifferencePosition extends SupplierRequestDistributedOb
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setUnitsScale(((ActOfWayBillDifferencePosition) distributedObject).getUnitsScale());
+        setTotalCount(((ActOfWayBillDifferencePosition) distributedObject).getTotalCount());
+        setNetWeight(((ActOfWayBillDifferencePosition) distributedObject).getNetWeight());
+        setGrossWeight(((ActOfWayBillDifferencePosition) distributedObject).getGrossWeight());
+        setGoodsCreationDate(((ActOfWayBillDifferencePosition) distributedObject).getGoodsCreationDate());
+        setLifeTime(((ActOfWayBillDifferencePosition) distributedObject).getLifeTime());
+        setPrice(((ActOfWayBillDifferencePosition) distributedObject).getPrice());
+        setNds(((ActOfWayBillDifferencePosition) distributedObject).getNds());
+
+        setGuidOfG(((ActOfWayBillDifferencePosition) distributedObject).getGuidOfG());
+        setGood(((ActOfWayBillDifferencePosition) distributedObject).getGood());
+
+        setActOfWayBillDifference(((ActOfWayBillDifferencePosition) distributedObject).getActOfWayBillDifference());
+        setGuidOfAWD(((ActOfWayBillDifferencePosition) distributedObject).getGuidOfAWD());
+    }
+
+    @Override
     protected ActOfWayBillDifferencePosition parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null)
@@ -156,19 +175,6 @@ public class ActOfWayBillDifferencePosition extends SupplierRequestDistributedOb
         guidOfAWD = XMLUtils.getStringAttributeValue(node, "GuidOfActOfDifference", 36);
         setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
-        setGoodsCreationDate(((ActOfWayBillDifferencePosition) distributedObject).getGoodsCreationDate());
-        setLifeTime(((ActOfWayBillDifferencePosition) distributedObject).getLifeTime());
-        setUnitsScale(((ActOfWayBillDifferencePosition) distributedObject).getUnitsScale());
-        setTotalCount(((ActOfWayBillDifferencePosition) distributedObject).getTotalCount());
-        setNetWeight(((ActOfWayBillDifferencePosition) distributedObject).getNetWeight());
-        setGrossWeight(((ActOfWayBillDifferencePosition) distributedObject).getGrossWeight());
-        setPrice(((ActOfWayBillDifferencePosition) distributedObject).getPrice());
-        setNds(((ActOfWayBillDifferencePosition) distributedObject).getNds());
     }
 
     public UnitScale getUnitsScale() {

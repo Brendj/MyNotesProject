@@ -153,6 +153,40 @@ public class Good extends ConfigurationProviderDistributedObject {
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(((Good) distributedObject).getOrgOwner());
+        setProduct(((Good) distributedObject).getProduct());
+        setGuidOfP(((Good) distributedObject).getGuidOfP());
+        setGoodGroup(((Good) distributedObject).getGoodGroup());
+        setGuidOfGG(((Good) distributedObject).getGuidOfGG());
+        setTechnologicalMap(((Good) distributedObject).getTechnologicalMap());
+        setGuidOfTM(((Good) distributedObject).getGuidOfTM());
+        setBasicGood(((Good) distributedObject).getBasicGood());
+        setGuidOfBasicGood(((Good) distributedObject).getGuidOfBasicGood());
+        setNameOfGood(((Good) distributedObject).getNameOfGood());
+        String stringFullName = ((Good) distributedObject).getFullName();
+        if (stringFullName != null) {
+            String[] tmp = stringFullName.split("/");
+            if (tmp.length > 0) {
+                StringBuilder sb = new StringBuilder();
+                for (String s : tmp) {
+                    sb.append(s.trim()).append("/");
+                }
+                String s = sb.toString();
+                setFullName(s.substring(0, s.length() - 1));
+            } else {
+                setFullName(stringFullName);
+            }
+        }
+        setGoodsCode(((Good) distributedObject).getGoodsCode());
+        setNetWeight(((Good) distributedObject).getNetWeight());
+        setLifeTime(((Good) distributedObject).getLifeTime());
+        setMargin(((Good) distributedObject).getMargin());
+        setUnitsScale(((Good) distributedObject).getUnitsScale());
+        setIdOfConfigurationProvider(((Good) distributedObject).getIdOfConfigurationProvider());
+    }
+
+    @Override
     protected Good parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null){
@@ -204,32 +238,6 @@ public class Good extends ConfigurationProviderDistributedObject {
         guidOfBasicGood = XMLUtils.getStringAttributeValue(node, "GuidOfBasicGood", 36);
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(((Good) distributedObject).getOrgOwner());
-        setNameOfGood(((Good) distributedObject).getNameOfGood());
-        String stringFullName = ((Good) distributedObject).getFullName();
-        if (stringFullName != null) {
-            String[] tmp = stringFullName.split("/");
-            if (tmp.length > 0) {
-                StringBuilder sb = new StringBuilder();
-                for (String s : tmp) {
-                    sb.append(s.trim()).append("/");
-                }
-                String s = sb.toString();
-                setFullName(s.substring(0, s.length() - 1));
-            } else {
-                setFullName(stringFullName);
-            }
-        }
-        setGoodsCode(((Good) distributedObject).getGoodsCode());
-        setNetWeight(((Good) distributedObject).getNetWeight());
-        setLifeTime(((Good) distributedObject).getLifeTime());
-        setMargin(((Good) distributedObject).getMargin());
-        setUnitsScale(((Good) distributedObject).getUnitsScale());
-        setIdOfConfigurationProvider(((Good) distributedObject).getIdOfConfigurationProvider());
     }
 
     public Set<ActOfWayBillDifferencePosition> getActOfWayBillDifferencePositionInternal() {

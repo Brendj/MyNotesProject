@@ -123,6 +123,26 @@ public class InternalDisposingDocumentPosition extends SupplierRequestDistribute
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setUnitsScale(((InternalDisposingDocumentPosition) distributedObject).getUnitsScale());
+        setTotalCount(((InternalDisposingDocumentPosition) distributedObject).getTotalCount());
+        setTotalCountMust(((InternalDisposingDocumentPosition) distributedObject).getTotalCountMust());
+        setNetWeight(((InternalDisposingDocumentPosition) distributedObject).getNetWeight());
+        setDisposePrice(((InternalDisposingDocumentPosition) distributedObject).getDisposePrice());
+        setNds(((InternalDisposingDocumentPosition) distributedObject).getNds());
+
+        setGood(((InternalDisposingDocumentPosition) distributedObject).getGood());
+        setGuidOfGood(((InternalDisposingDocumentPosition) distributedObject).getGuidOfGood());
+
+        setGuidOfTMG(((InternalDisposingDocumentPosition) distributedObject).getGuidOfTMG());
+        setTradeMaterialGood(((InternalDisposingDocumentPosition) distributedObject).getTradeMaterialGood());
+
+        setGuidOfIDD(((InternalDisposingDocumentPosition) distributedObject).getGuidOfIDD());
+        setInternalDisposingDocument(((InternalDisposingDocumentPosition) distributedObject).getInternalDisposingDocument());
+    }
+
+    @Override
     protected InternalDisposingDocumentPosition parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null)
@@ -154,17 +174,6 @@ public class InternalDisposingDocumentPosition extends SupplierRequestDistribute
         guidOfGood = XMLUtils.getStringAttributeValue(node, "GuidOfGoods", 36);
         setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
-        setUnitsScale(((InternalDisposingDocumentPosition) distributedObject).getUnitsScale());
-        setTotalCount(((InternalDisposingDocumentPosition) distributedObject).getTotalCount());
-        setTotalCountMust(((InternalDisposingDocumentPosition) distributedObject).getTotalCountMust());
-        setNetWeight(((InternalDisposingDocumentPosition) distributedObject).getNetWeight());
-        setDisposePrice(((InternalDisposingDocumentPosition) distributedObject).getDisposePrice());
-        setNds(((InternalDisposingDocumentPosition) distributedObject).getNds());
     }
 
     public Long getTotalCountMust() {

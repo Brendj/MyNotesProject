@@ -108,6 +108,21 @@ public class Prohibition extends DistributedObject {
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setClient(((Prohibition) distributedObject).getClient());
+        setIdOfClient(((Prohibition) distributedObject).getIdOfClient());
+        setProductGroup(((Prohibition) distributedObject).getProductGroup());
+        setGuidOfProductGroup(((Prohibition) distributedObject).getGuidOfProductGroup());
+        setProduct(((Prohibition) distributedObject).getProduct());
+        setGuidOfProduct(((Prohibition) distributedObject).getGuidOfProduct());
+        setGoodGroup(((Prohibition) distributedObject).getGoodGroup());
+        setGuidOfGoodsGroup(((Prohibition) distributedObject).getGuidOfGoodsGroup());
+        setGood(((Prohibition) distributedObject).getGood());
+        setGuidOfGoods(((Prohibition) distributedObject).getGuidOfGoods());
+    }
+
+    @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         //DistributedObjectException distributedObjectException = new DistributedObjectException("Client NOT_FOUND_VALUE");
         //distributedObjectException.setData(String.valueOf(idOfClient));
@@ -141,11 +156,6 @@ public class Prohibition extends DistributedObject {
         //    return;
         //}
         //throw new DistributedObjectException("NOT_FOUND_VALUE");
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
     }
 
     private Client client;

@@ -77,6 +77,7 @@ public class RetirementReason extends LibraryDistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
         setRetirementReasonName(((RetirementReason) distributedObject).getRetirementReasonName());
         setHashCode(((RetirementReason) distributedObject).getHashCode());
     }

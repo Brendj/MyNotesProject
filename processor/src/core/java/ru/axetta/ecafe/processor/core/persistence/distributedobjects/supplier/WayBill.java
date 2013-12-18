@@ -107,6 +107,23 @@ public class WayBill extends SupplierRequestDistributedObject {
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setNumber(((WayBill) distributedObject).getNumber());
+        setDateOfWayBill(((WayBill) distributedObject).getDateOfWayBill());
+        setState(((WayBill) distributedObject).getState());
+        setInn(((WayBill) distributedObject).getInn());
+        setShipper(((WayBill) distributedObject).getShipper());
+        setReceiver(((WayBill) distributedObject).getReceiver());
+
+        setStaff(((WayBill) distributedObject).getStaff());
+        setGuidOfSt(((WayBill) distributedObject).getGuidOfSt());
+
+        setActOfWayBillDifference(((WayBill) distributedObject).getActOfWayBillDifference());
+        setGuidOfAWD(((WayBill) distributedObject).getGuidOfAWD());
+    }
+
+    @Override
     protected WayBill parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null)
@@ -138,17 +155,6 @@ public class WayBill extends SupplierRequestDistributedObject {
         guidOfAWD = XMLUtils.getStringAttributeValue(node, "GuidOfActOfDifference", 36);
         setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
-        setNumber(((WayBill) distributedObject).getNumber());
-        setDateOfWayBill(((WayBill) distributedObject).getDateOfWayBill());
-        setState(((WayBill) distributedObject).getState());
-        setInn(((WayBill) distributedObject).getInn());
-        setShipper(((WayBill) distributedObject).getShipper());
-        setReceiver(((WayBill) distributedObject).getReceiver());
     }
 
     public Set<InternalIncomingDocument> getInternalIncomingDocumentInternal() {

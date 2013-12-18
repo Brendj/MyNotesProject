@@ -145,6 +145,7 @@ public class Publication extends LibraryDistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
         setIsbn(((Publication) distributedObject).getIsbn());
         setData(((Publication) distributedObject).getData());
         setAuthor(((Publication) distributedObject).getAuthor());

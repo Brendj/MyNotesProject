@@ -107,17 +107,19 @@ public class Staff extends DistributedObject {
 
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
-        Criteria criteria = session.createCriteria(Staff.class);
-        criteria.add(Restrictions.eq("hashCode", getHashCode()));
-        Staff staff = null;
-        List list = criteria.list();
-        if(list!=null && !list.isEmpty()){
-            staff = (Staff) list.get(0);
-        }
-        if(!(staff==null || staff.getDeletedState() || guid.equals(staff.getGuid()))){
-            DistributedObjectException distributedObjectException =  new DistributedObjectException("Staff DATA_EXIST_VALUE");
-            distributedObjectException.setData(staff.getGuid());
-            throw distributedObjectException;
+        if(getTagName().equals("C")){
+            Criteria criteria = session.createCriteria(Staff.class);
+            criteria.add(Restrictions.eq("hashCode", getHashCode()));
+            Staff staff = null;
+            List list = criteria.list();
+            if(list!=null && !list.isEmpty()){
+                staff = (Staff) list.get(0);
+            }
+            if(!(staff==null || staff.getDeletedState() || guid.equals(staff.getGuid()))){
+                DistributedObjectException distributedObjectException =  new DistributedObjectException("Staff DATA_EXIST_VALUE");
+                distributedObjectException.setData(staff.getGuid());
+                throw distributedObjectException;
+            }
         }
     }
 
@@ -134,6 +136,21 @@ public class Staff extends DistributedObject {
         XMLUtils.setAttributeIfNotNull(element, "StaffPosition", staffPosition);
         XMLUtils.setAttributeIfNotNull(element, "PersonalCode", personalCode);
         XMLUtils.setAttributeIfNotNull(element, "Rights", rights);
+    }
+
+    @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setIdOfClient(((Staff) distributedObject).getIdOfClient());
+        setIdOfRole(((Staff) distributedObject).getIdOfRole());
+        setParentId(((Staff) distributedObject).getParentId());
+        setFlags(((Staff) distributedObject).getFlags());
+        setSurName(((Staff) distributedObject).getSurName());
+        setFirstName(((Staff) distributedObject).getFirstName());
+        setSecondName(((Staff) distributedObject).getSecondName());
+        setStaffPosition(((Staff) distributedObject).getStaffPosition());
+        setPersonalCode(((Staff) distributedObject).getPersonalCode());
+        setRights(((Staff) distributedObject).getRights());
     }
 
     @Override
@@ -171,21 +188,6 @@ public class Staff extends DistributedObject {
         setHashCode(hashCode());
         setSendAll(SendToAssociatedOrgs.SendToAll);
         return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
-        setIdOfClient(((Staff) distributedObject).getIdOfClient());
-        setIdOfRole(((Staff) distributedObject).getIdOfRole());
-        setParentId(((Staff) distributedObject).getParentId());
-        setFlags(((Staff) distributedObject).getFlags());
-        setSurName(((Staff) distributedObject).getSurName());
-        setFirstName(((Staff) distributedObject).getFirstName());
-        setSecondName(((Staff) distributedObject).getSecondName());
-        setStaffPosition(((Staff) distributedObject).getStaffPosition());
-        setPersonalCode(((Staff) distributedObject).getPersonalCode());
-        setRights(((Staff) distributedObject).getRights());
     }
 
     Set<GoodRequest> getGoodRequestInternal() {

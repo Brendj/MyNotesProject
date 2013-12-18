@@ -84,6 +84,20 @@ public class Product extends ConfigurationProviderDistributedObject {
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setProductGroup(((Product) distributedObject).getProductGroup());
+        setProductGroupGuid(((Product) distributedObject).getProductGroupGuid());
+        setFullName (((Product) distributedObject).getFullName());
+        setProductName( ((Product) distributedObject).getProductName());
+        setCode( ((Product) distributedObject).getCode());
+        setOkpCode (((Product) distributedObject).getOkpCode());
+        setDensity(((Product) distributedObject).getDensity());
+        setClassificationCode(((Product) distributedObject).getClassificationCode());
+        setIdOfConfigurationProvider(((Product) distributedObject).getIdOfConfigurationProvider());
+    }
+
+    @Override
     protected Product parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null){
@@ -121,22 +135,9 @@ public class Product extends ConfigurationProviderDistributedObject {
     }
 
     @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
-        setCode( ((Product) distributedObject).getCode());
-        setFullName (((Product) distributedObject).getFullName());
-        setProductName( ((Product) distributedObject).getProductName());
-        setOkpCode (((Product) distributedObject).getOkpCode());
-        setIdOfConfigurationProvider(((Product) distributedObject).getIdOfConfigurationProvider());
-        setClassificationCode(((Product) distributedObject).getClassificationCode());
-        setDensity(((Product) distributedObject).getDensity());
-        setIdOfConfigurationProvider(((Product) distributedObject).getIdOfConfigurationProvider());
-    }
-
-    @Override
     protected void beforeProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         ProductGroup pg = DAOUtils.findDistributedObjectByRefGUID(ProductGroup.class, session, productGroupGuid);
-        if(pg==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
+        if(pg==null) throw new DistributedObjectException("ProductGroup NOT_FOUND_VALUE");
         setProductGroup(pg);
     }
 

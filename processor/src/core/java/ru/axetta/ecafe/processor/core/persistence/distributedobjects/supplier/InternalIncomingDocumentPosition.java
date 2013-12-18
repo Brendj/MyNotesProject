@@ -113,6 +113,27 @@ public class InternalIncomingDocumentPosition extends SupplierRequestDistributed
     }
 
     @Override
+    public void fill(DistributedObject distributedObject) {
+        setOrgOwner(distributedObject.getOrgOwner());
+        setGoodsCreationDate(((InternalIncomingDocumentPosition) distributedObject).getGoodsCreationDate());
+        setLifeTime(((InternalIncomingDocumentPosition) distributedObject).getLifeTime());
+        setUnitsScale(((InternalIncomingDocumentPosition) distributedObject).getUnitsScale());
+        setTotalCount(((InternalIncomingDocumentPosition) distributedObject).getTotalCount());
+        setNetWeight(((InternalIncomingDocumentPosition) distributedObject).getNetWeight());
+        setIncomingPrice(((InternalIncomingDocumentPosition) distributedObject).getIncomingPrice());
+        setNds(((InternalIncomingDocumentPosition) distributedObject).getNds());
+
+        setInternalIncomingDocument(((InternalIncomingDocumentPosition) distributedObject).getInternalIncomingDocument());
+        setGuidOfIID(((InternalIncomingDocumentPosition) distributedObject).getGuidOfIID());
+
+        setTradeMaterialGood(((InternalIncomingDocumentPosition) distributedObject).getTradeMaterialGood());
+        setGuidOfTMG(((InternalIncomingDocumentPosition) distributedObject).getGuidOfTMG());
+
+        setGood(((InternalIncomingDocumentPosition) distributedObject).getGood());
+        setGuidOfG(((InternalIncomingDocumentPosition) distributedObject).getGuidOfG());
+    }
+
+    @Override
     protected InternalIncomingDocumentPosition parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
         if (longOrgOwner != null)
@@ -147,18 +168,6 @@ public class InternalIncomingDocumentPosition extends SupplierRequestDistributed
         guidOfG = XMLUtils.getStringAttributeValue(node, "GuidOfGoods", 36);
         setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
-    }
-
-    @Override
-    public void fill(DistributedObject distributedObject) {
-        setOrgOwner(distributedObject.getOrgOwner());
-        setGoodsCreationDate(((InternalIncomingDocumentPosition) distributedObject).getGoodsCreationDate());
-        setLifeTime(((InternalIncomingDocumentPosition) distributedObject).getLifeTime());
-        setUnitsScale(((InternalIncomingDocumentPosition) distributedObject).getUnitsScale());
-        setTotalCount(((InternalIncomingDocumentPosition) distributedObject).getTotalCount());
-        setNetWeight(((InternalIncomingDocumentPosition) distributedObject).getNetWeight());
-        setIncomingPrice(((InternalIncomingDocumentPosition) distributedObject).getIncomingPrice());
-        setNds(((InternalIncomingDocumentPosition) distributedObject).getNds());
     }
 
     public String getGuidOfIID() {
