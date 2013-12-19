@@ -54,11 +54,8 @@ public class Product extends ConfigurationProviderDistributedObject {
         criteria.createAlias("productGroup","pg", JoinType.LEFT_OUTER_JOIN);
 
         ProjectionList projectionList = Projections.projectionList();
-        projectionList.add(Projections.property("guid"), "guid");
-        projectionList.add(Projections.property("globalId"), "globalId");
-        projectionList.add(Projections.property("globalVersion"), "globalVersion");
-        projectionList.add(Projections.property("deletedState"), "deletedState");
-        projectionList.add(Projections.property("orgOwner"), "orgOwner").add(Projections.property("fullName"), "fullName");
+        addDistributedObjectProjectionList(projectionList);
+        projectionList.add(Projections.property("fullName"), "fullName");
         projectionList.add(Projections.property("productName"), "productName").add(Projections.property("code"), "code");
         projectionList.add(Projections.property("okpCode"), "okpCode").add(Projections.property("density"), "density");
         projectionList.add(Projections.property("classificationCode"), "classificationCode");

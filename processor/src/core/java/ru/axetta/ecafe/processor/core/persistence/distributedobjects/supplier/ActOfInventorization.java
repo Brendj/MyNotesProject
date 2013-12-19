@@ -57,11 +57,7 @@ public class ActOfInventorization extends SupplierRequestDistributedObject {
     @Override
     public void createProjections(Criteria criteria) {
         ProjectionList projectionList = Projections.projectionList();
-        projectionList.add(Projections.property("guid"), "guid");
-        projectionList.add(Projections.property("globalId"), "globalId");
-        projectionList.add(Projections.property("globalVersion"), "globalVersion");
-        projectionList.add(Projections.property("deletedState"), "deletedState");
-        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+        addDistributedObjectProjectionList(projectionList);
 
         projectionList.add(Projections.property("dateOfAct"), "dateOfAct");
         projectionList.add(Projections.property("number"), "number");

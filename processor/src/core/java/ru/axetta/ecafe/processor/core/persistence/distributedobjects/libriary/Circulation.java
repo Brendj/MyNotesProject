@@ -54,11 +54,7 @@ public class Circulation extends LibraryDistributedObject {
         criteria.createAlias("issuable","i", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("client","c", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();
-        projectionList.add(Projections.property("guid"), "guid");
-        projectionList.add(Projections.property("globalId"), "globalId");
-        projectionList.add(Projections.property("globalVersion"), "globalVersion");
-        projectionList.add(Projections.property("deletedState"), "deletedState");
-        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+        addDistributedObjectProjectionList(projectionList);
 
         projectionList.add(Projections.property("issuanceDate"), "issuanceDate");
         projectionList.add(Projections.property("refundDate"), "refundDate");

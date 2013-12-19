@@ -64,11 +64,7 @@ public class InternalIncomingDocument extends SupplierRequestDistributedObject {
         criteria.createAlias("staff","s", JoinType.LEFT_OUTER_JOIN);
 
         ProjectionList projectionList = Projections.projectionList();
-        projectionList.add(Projections.property("guid"), "guid");
-        projectionList.add(Projections.property("globalId"), "globalId");
-        projectionList.add(Projections.property("globalVersion"), "globalVersion");
-        projectionList.add(Projections.property("deletedState"), "deletedState");
-        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+        addDistributedObjectProjectionList(projectionList);
 
         projectionList.add(Projections.property("state"), "state");
         projectionList.add(Projections.property("date"), "date");

@@ -37,11 +37,7 @@ public class TypeOfAccompanyingDocument extends LibraryDistributedObject {
     @Override
     public void createProjections(Criteria criteria) {
         ProjectionList projectionList = Projections.projectionList();
-        projectionList.add(Projections.property("guid"), "guid");
-        projectionList.add(Projections.property("globalId"), "globalId");
-        projectionList.add(Projections.property("globalVersion"), "globalVersion");
-        projectionList.add(Projections.property("deletedState"), "deletedState");
-        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+        addDistributedObjectProjectionList(projectionList);
 
         projectionList.add(Projections.property("typeOfAccompanyingDocumentName"), "typeOfAccompanyingDocumentName");
         projectionList.add(Projections.property("hashCode"), "hashCode");

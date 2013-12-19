@@ -80,11 +80,7 @@ public class Good extends ConfigurationProviderDistributedObject {
         criteria.createAlias("technologicalMap", "tm", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("basicGood", "bg", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();
-        projectionList.add(Projections.property("guid"), "guid");
-        projectionList.add(Projections.property("globalId"), "globalId");
-        projectionList.add(Projections.property("globalVersion"), "globalVersion");
-        projectionList.add(Projections.property("deletedState"), "deletedState");
-        projectionList.add(Projections.property("orgOwner"), "orgOwner");
+        addDistributedObjectProjectionList(projectionList);
 
         projectionList.add(Projections.property("nameOfGood"), "nameOfGood");
         projectionList.add(Projections.property("fullName"), "fullName");
@@ -93,6 +89,7 @@ public class Good extends ConfigurationProviderDistributedObject {
         projectionList.add(Projections.property("unitsScale"), "unitsScale");
         projectionList.add(Projections.property("netWeight"), "netWeight");
         projectionList.add(Projections.property("margin"), "margin");
+        projectionList.add(Projections.property("lifeTime"), "lifeTime");
         projectionList.add(Projections.property("gg.guid"), "guidOfGG");
         projectionList.add(Projections.property("p.guid"), "guidOfP");
         projectionList.add(Projections.property("tm.guid"), "guidOfTM");

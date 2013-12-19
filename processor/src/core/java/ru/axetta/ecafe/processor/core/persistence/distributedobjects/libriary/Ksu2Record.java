@@ -47,12 +47,7 @@ public class Ksu2Record extends LibraryDistributedObject {
         //criteria.createAlias("fund", "f", JoinType.LEFT_OUTER_JOIN);
         //criteria.createAlias("retirementReason","r", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();
-        projectionList.add(Projections.property("guid"), "guid");
-        projectionList.add(Projections.property("globalId"), "globalId");
-        projectionList.add(Projections.property("globalVersion"), "globalVersion");
-        projectionList.add(Projections.property("deletedState"), "deletedState");
-        projectionList.add(Projections.property("orgOwner"), "orgOwner");
-
+        addDistributedObjectProjectionList(projectionList);
         //projectionList.add(Projections.property("recordNumber"), "recordNumber");
         //projectionList.add(Projections.property("retirementDate"), "retirementDate");
 
