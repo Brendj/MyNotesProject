@@ -207,7 +207,7 @@ public class Contragent {
     }
 
     public void setRequestNotifyMailList(String requestNotifyEmailAddress) {
-        this.requestNotifyMailList = requestNotifyEmailAddress;
+        this.requestNotifyMailList = requestNotifyEmailAddress.trim();
     }
 
     public String getFax() {
