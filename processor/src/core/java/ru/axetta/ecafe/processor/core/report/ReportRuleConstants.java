@@ -205,7 +205,9 @@ public class ReportRuleConstants {
             new ReportHint(CWOACReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(SSTSReport.class.getCanonicalName(), new int[]{30}),
             new ReportHint(BudgetMealsShippingReport.class.getCanonicalName(), new int[]{3}),
-            new ReportHint(ActiveClientsReport.class.getCanonicalName(), new int[]{})
+            new ReportHint(ActiveClientsReport.class.getCanonicalName(), new int[]{}),
+            new ReportHint(ReferReport.class.getCanonicalName(), new int[]{-3}),
+            new ReportHint(DailyReferReport.class.getCanonicalName(), new int[]{-3})
             // отрицательное значение - обязательное
     };
 

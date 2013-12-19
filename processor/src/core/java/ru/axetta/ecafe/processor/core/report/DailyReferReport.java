@@ -145,23 +145,44 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
         private List<DailyReferReportItem> findDailyReferItems(Session session, Date startTime, Date endTime) {
             List<DailyReferReportItem> result = new ArrayList<DailyReferReportItem>();
             String sql =
-                    "select name, nameofgood, int8(EXTRACT(EPOCH FROM d) * 1000) as day, avg(summary) / 100 as price, "
-                            + "       count(distinct idoforder) as children, sum(summary) / 100 as summary "
-                            + "from "
-                            + "(select subcategory as name, date_trunc('day', to_timestamp(cf_orders.createddate / 1000)) as d, "
-                            + "        cf_orders.idofclient as idoforder, cf_orders.socdiscount as summary, nameofgood as nameofgood "
-                            + "from cf_discountrules "
-                            + "left join cf_orderdetails on cf_orderdetails.socdiscount<>0 and cf_discountrules.idofrule=cf_orderdetails.idofrule "
-                            + "join cf_orders on cf_orders.idoforder=cf_orderdetails.idoforder and "
-                            + "                       cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startTime.getTime()) + "') * 1000 and "
-                            + "                                                     EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endTime.getTime()) + "') * 1000 and "
-                            + "                       cf_orders.idoforg=:idoforg "
-                            + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
-                            + "where subcategory<>'') as data "
-                            + "group by name, d, nameofgood "
-                            + "order by 1, 2";
+                    "select subcategory, nameofgood, "
+                    + "       int8(EXTRACT(EPOCH FROM d) * 1000) as day, "
+                    + "       price, "
+                    + "       count(idoforder) as children, "
+                    + "       count(idoforder) * (price) as summary "
+                    + "from ("
+                    + "     select cf_discountrules.subcategory, cf_goods.nameofgood, "
+                    + "            cf_orders.idoforder, date_trunc('day', to_timestamp(cf_orders.createddate / 1000)) as d, "
+                    + "            cast (cf_orderdetails.rprice + cf_orderdetails.socdiscount as decimal) / 100 price "
+                    + "     from cf_orgs "
+                    + "     left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
+                    + "     join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
+                    + "     join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
+                    + "     join cf_discountrules on cf_discountrules.idofrule=cf_orderdetails.idofrule "
+                    + "     where cf_orderdetails.socdiscount<>0 and cf_orgs.idoforg=:idoforg and "
+                    + "           cf_orders.createddate between :start and :end and "
+                    + "           cf_discountrules.subcategory <> '') as data "
+                    + "group by subcategory, nameofgood, d, price "
+                    + "order by 1, 2"
+
+                    /*"select name, nameofgood, int8(EXTRACT(EPOCH FROM d) * 1000) as day, avg(summary) / 100 as price, "
+                    + "       count(distinct idofclient) as children, sum(summary) / 100 as summary "
+                    + "from "
+                    + "(select subcategory as name, date_trunc('day', to_timestamp(cf_orders.createddate / 1000)) as d, "
+                    + "        cf_orders.idofclient as idofclient, cf_orders.socdiscount as summary, nameofgood as nameofgood "
+                    + "from cf_discountrules "
+                    + "left join cf_orderdetails on cf_orderdetails.socdiscount<>0 and cf_discountrules.idofrule=cf_orderdetails.idofrule "
+                    + "join cf_orders on cf_orders.idoforder=cf_orderdetails.idoforder and "
+                    + "                       cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startTime.getTime()) + "') * 1000 and "
+                    + "                                                     EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endTime.getTime()) + "') * 1000 "
+                    + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
+                    + "where subcategory<>'' and cf_orders.idoforg=:idoforg) as data "
+                    + "group by name, d, nameofgood "
+                    + "order by 1, 2"*/;
             Query query = session.createSQLQuery(sql);
             query.setLong("idoforg", org.getIdOfOrg());
+            query.setLong("start", startTime.getTime());
+            query.setLong("end", endTime.getTime());
             List res = query.list();
             for (Object entry : res) {
                 Object e[]            = (Object[]) entry;

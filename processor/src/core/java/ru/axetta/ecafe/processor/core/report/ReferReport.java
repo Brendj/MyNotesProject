@@ -140,22 +140,27 @@ public class ReferReport extends BasicReportForAllOrgJob {
         private List<ReferReportItem> findReferItems(Session session, Date startTime, Date endTime) {
             List<ReferReportItem> result = new ArrayList<ReferReportItem>();
             String sql =
-                      "select distinct subcategory as name, "
-                    + "       count(distinct cf_clientscomplexdiscounts.idofclient) as children, "
-                    + "       count(distinct cf_orders.idofclient) as total, "
-                    + "       sum(cf_orders.socdiscount) / 100 as summary "
-                    + "from cf_discountrules "
-                    + "left join cf_clientscomplexdiscounts on cf_discountrules.idofrule=cf_clientscomplexdiscounts.idofrule "
-                    + "left join cf_clients on cf_clientscomplexdiscounts.idofclient=cf_clients.idofclient and cf_clients.idoforg=:idoforg "
-                    + "left join cf_orders on cf_clientscomplexdiscounts.idofclient=cf_orders.idofclient and "
-                    + "                       cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startTime.getTime()) + "') * 1000 and "
-                    + "                                                     EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endTime.getTime()) + "') * 1000 and "
-                    + "                       cf_orders.socdiscount<>0 and cf_orders.idoforg=:idoforg "
-                    + "where subcategory<>'' "
-                    + "group by subcategory "
-                    + "order by 1";
+                      "select subcategory, "
+                      + "       count(distinct children) as children, "
+                      + "       count(total) as total, "
+                      + "       count(total) * price as summary "
+                      + "from ("
+                      + "      select cf_discountrules.subcategory, "
+                      + "       cf_orders.idofclient as children, "
+                      + "       cf_orders.idoforder as total, "
+                      + "       cast(cf_orderdetails.rprice + cf_orderdetails.socdiscount as decimal) / 100 as price "
+                      + "from cf_orgs "
+                      + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
+                      + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
+                      + "join cf_discountrules on cf_discountrules.idofrule=cf_orderdetails.idofrule "
+                      + "where cf_orderdetails.socdiscount<>0 and cf_orgs.idoforg=:idoforg and "
+                      + "           cf_orders.createddate between :start and :end and "
+                      + "           cf_discountrules.subcategory <> '') as data "
+                      + "group by subcategory, price";
             Query query = session.createSQLQuery(sql);
             query.setLong("idoforg", org.getIdOfOrg());
+            query.setLong("start", startTime.getTime());
+            query.setLong("end", endTime.getTime());
             List res = query.list();
             for (Object entry : res) {
                 Object e[]            = (Object[]) entry;
