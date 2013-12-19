@@ -154,7 +154,11 @@ public class GoodRequestsNotificationService {
                     newValueHistory.append("</table>");
                     final String fio = contragent.getContactPerson().getSurnameAndFirstLetters();
                     String[] values = {"contactPerson", fio, "reportValues", newValueHistory.toString()};
-                    boolean sended = eventNotificationService.sendEmail(requestNotifyEmailAddress, notificationType, values);
+                    String addresses[] =  StringUtils.split(requestNotifyEmailAddress, ";");
+                    boolean sended = false;
+                    for (String address: addresses){
+                         sended |= eventNotificationService.sendEmail(address, notificationType, values);
+                    }
                     if(sended){
                         for (DOCurrentOrgVersion version: currentOrgVersions){
                             sql = "select max(globalVersion) from GoodRequestPosition p where p.orgOwner=:orgOwner";
