@@ -128,6 +128,13 @@ public abstract class DistributedObject{
     /* метод обновления версии родительского элемента */
     public void updateVersionFromParent(Session session){}
 
+    /* Метод вызывается перед сохранением нового объекта в БД.
+       Используется, если перед сохранением надо выполнить специфичную бизнес-логику.
+     */
+    //public void beforePersist(Session session, Long idOfOrg, String ignoreUuid) {}
+    //
+    //public void beforePersist(Session session, Long idOfOrg) {}
+
     protected abstract DistributedObject parseAttributes(Node node) throws Exception;
 
     public abstract void fill(DistributedObject distributedObject);
@@ -135,12 +142,6 @@ public abstract class DistributedObject{
     public abstract List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception;
 
     public abstract void createProjections(Criteria criteria);
-
-    /* Метод вызывается перед сохранением объекта в БД.
-       Используется, если перед сохранением надо выполнить специфичную бизнес-логику.
-     */
-    public void beforePersist() {
-    }
 
     /**
      * Метод для выборки объектов которые уходят от создателя к создателю без логики
@@ -287,4 +288,5 @@ public abstract class DistributedObject{
                 ", orgOwner=" + orgOwner +
                 '}';
     }
+
 }

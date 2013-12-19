@@ -4,8 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.settings;
 
-import ru.axetta.ecafe.processor.core.daoservices.org.SettingService;
+import ru.axetta.ecafe.processor.core.daoservices.org.SettingRepository;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.AbstractParserBySettingValue;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
@@ -32,14 +33,14 @@ public class SettingEditPage extends BasicWorkspacePage implements OrgSelectPage
     private ECafeSettings setting;
     private OrgItem orgItem;
     private Integer settingsIds;
-    private ECafeSettings.AbstractParserBySettingValue parserBySettingValue;
+    private AbstractParserBySettingValue parserBySettingValue;
 
     private List<String> allPrinters;
 
     @Autowired
     private SelectedSettingsGroupPage selectedSettingsGroupPage;
     @Autowired
-    private SettingService settingService;
+    private SettingRepository settingRepository;
 
     @Override
     public void onShow() throws Exception {
@@ -63,7 +64,7 @@ public class SettingEditPage extends BasicWorkspacePage implements OrgSelectPage
         settingsIds = setting.getSettingsId().getId();
         parserBySettingValue = setting.getSplitSettingValue();
         if(settingsIds.equals(0) || settingsIds.equals(1) || settingsIds.equals(2)){
-            allPrinters = settingService.findAllPrinterNames();
+            allPrinters = settingRepository.findAllPrinterNames();
         } else {
             allPrinters = new ArrayList<String>(0);
         }
@@ -82,7 +83,7 @@ public class SettingEditPage extends BasicWorkspacePage implements OrgSelectPage
         setting.setSettingValue(settingValue);
         setting.setOrgOwner(orgItem.getIdOfOrg());
         try {
-            settingService.save(setting);
+            settingRepository.save(setting);
             printMessage("Настройки успешно обновлены");
         } catch (Exception e) {
             getLogger().error("Error update setting: ",e);
@@ -129,7 +130,7 @@ public class SettingEditPage extends BasicWorkspacePage implements OrgSelectPage
         this.orgItem = orgItem;
     }
 
-    public ECafeSettings.AbstractParserBySettingValue getParserBySettingValue() {
+    public AbstractParserBySettingValue getParserBySettingValue() {
         return parserBySettingValue;
     }
 

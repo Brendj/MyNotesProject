@@ -26,6 +26,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Pu
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SubscriberFeedingSettingSettingValue;
 import ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryStatus;
@@ -4062,7 +4063,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
             ECafeSettings cafeSettings = settings.get(0);
-            ECafeSettings.SubscriberFeedingSettingSettingValue parser = (ECafeSettings.SubscriberFeedingSettingSettingValue) cafeSettings
+            SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) cafeSettings
                     .getSplitSettingValue();
             Date today = CalendarUtils.truncateToDayOfMonth(new Date());
             Date activationDate = CalendarUtils.addDays(today, parser.getDayRequest());

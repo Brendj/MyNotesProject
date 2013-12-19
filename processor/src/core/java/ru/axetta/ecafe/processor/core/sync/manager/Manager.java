@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.manager;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.daoservices.DOVersionRepository;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.SyncHistory;
 import ru.axetta.ecafe.processor.core.persistence.SyncHistoryException;
@@ -12,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConfirm;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConflict;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.doGroups.DOGroupsFactory;
 import ru.axetta.ecafe.processor.core.sync.doGroups.DOSyncClass;
@@ -233,7 +235,6 @@ public class Manager {
                         deleteQuery.setParameter("className", classSimpleName);
                         deleteQuery.setParameter("idOfOrg", idOfOrg);
                         deleteQuery.executeUpdate();
-                        persistenceSession.flush();
                         position = end;
                     }
                 } else {
@@ -243,9 +244,7 @@ public class Manager {
                     deleteQuery.setParameter("className", classSimpleName);
                     deleteQuery.setParameter("idOfOrg", idOfOrg);
                     deleteQuery.executeUpdate();
-                    persistenceSession.flush();
                 }
-
 
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -267,6 +266,7 @@ public class Manager {
 
     public void process(SessionFactory sessionFactory) {
         LOGGER.debug("RO begin process section");
+        //sessionFactory = RuntimeContext.reportsSessionFactory;
         SortedMap<DOSyncClass, List<DistributedObject>> currentDOListMap = new TreeMap<DOSyncClass, List<DistributedObject>>();
 
         for (DOSyncClass doSyncClass : incomeDOMap.keySet()) {
@@ -448,7 +448,6 @@ public class Manager {
         LOGGER.debug("RO end parse Confirm XML section");
     }
 
-    // TODO: неплохо отправить его в отдельный поток
     private void addConfirms(SessionFactory sessionFactory, String simpleName,
             List<DistributedObject> confirmDistributedObjectList) {
         Session persistenceSession = null;
@@ -539,7 +538,6 @@ public class Manager {
         LOGGER.debug("processDistributedObjectsList: init data");
         if (!distributedObjects.isEmpty()) {
             // Все объекты одного типа получают одну (новую) версию и все их изменения пишуться с этой версией.
-            //Long currentMaxVersion = doService.updateDOVersion(doSyncClass.getDoClass());
             Long currentMaxVersion = updateDOVersion(sessionFactory, doSyncClass.getDoClass().getSimpleName());
             for (DistributedObject distributedObject : distributedObjects) {
                 LOGGER.debug("Process: {}", distributedObject.toString());
@@ -566,19 +564,7 @@ public class Manager {
         try {
             persistenceSession = sessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            Criteria criteria = persistenceSession.createCriteria(DOVersion.class);
-            criteria.add(Restrictions.eq("distributedObjectClassName", doClass).ignoreCase());
-            criteria.setMaxResults(1);
-            DOVersion doVersion = (DOVersion) criteria.uniqueResult();
-            if(doVersion == null){
-                doVersion = new DOVersion();
-                doVersion.setDistributedObjectClassName(doClass);
-                version = 0L;
-            } else {
-                version = doVersion.getCurrentVersion() + 1;
-            }
-            doVersion.setCurrentVersion(version);
-            persistenceSession.save(doVersion);
+            version = DOVersionRepository.updateClassVersion(doClass, persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -591,6 +577,8 @@ public class Manager {
         return version;
     }
 
+
+
     private DistributedObject processCurrentObject(SessionFactory sessionFactory, DistributedObject distributedObject,
             Long currentMaxVersion) {
         Session persistenceSession = null;
@@ -600,15 +588,15 @@ public class Manager {
             persistenceSession = sessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             if (distributedObject.getDistributedObjectException() == null) {
+                String tagName = distributedObject.getTagName();
                 if (!(distributedObject.getDeletedState() == null || distributedObject.getDeletedState())) {
                     distributedObject.preProcess(persistenceSession, idOfOrg);
                     distributedObject = processDistributedObject(persistenceSession, distributedObject,
                             currentMaxVersion);
                 } else {
-                    String tagName = distributedObject.getTagName();
                     distributedObject = updateDeleteState(persistenceSession, distributedObject, currentMaxVersion);
-                    distributedObject.setTagName(tagName);
                 }
+                distributedObject.setTagName(tagName);
             } else {
                 Org org = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
                 DistributedObjectException de = distributedObject.getDistributedObjectException();
@@ -703,7 +691,7 @@ public class Manager {
             distributedObject.setGlobalVersion(currentMaxVersion);
             distributedObject.setGlobalVersionOnCreate(currentMaxVersion);
             distributedObject.setCreatedDate(new Date());
-            distributedObject.beforePersist();
+            //distributedObject.beforePersist(persistenceSession, idOfOrg, distributedObject.getGuid());
             persistenceSession.persist(distributedObject);
             distributedObject.setTagName("C");
         }
@@ -726,6 +714,7 @@ public class Manager {
                 persistenceSession.persist(doConflict);
             }
             currentDO.setTagName("M");
+            //currentDO.beforePersist(persistenceSession, idOfOrg, distributedObject.getGuid());
             currentDO.preProcess(persistenceSession, idOfOrg);
             currentDO.updateVersionFromParent(persistenceSession);
             persistenceSession.update(currentDO);

@@ -4,8 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.settings;
 
-import ru.axetta.ecafe.processor.core.daoservices.org.SettingService;
+import ru.axetta.ecafe.processor.core.daoservices.org.SettingRepository;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.AbstractParserBySettingValue;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -36,17 +37,22 @@ public class SettingCreatePage extends BasicWorkspacePage implements OrgSelectPa
     private OrgItem orgItem;
     private Integer settingsIds;
     private String settingsId;
-    private ECafeSettings.AbstractParserBySettingValue parserBySettingValue;
+    private AbstractParserBySettingValue parserBySettingValue;
     private SettingsIds[]  settingsIdses = SettingsIds.values();
     private List<String> allPrinters;
 
     @Autowired
-    private SettingService settingService;
+    private SettingRepository settingRepository;
 
-    public void valueChangeListener(ValueChangeEvent event) throws Exception{
-        if(event.getNewValue()!=null){
-            settingsIds = SettingsIds.fromString((String)event.getNewValue()).getId();
-            init();
+    public void valueChangeListener(ValueChangeEvent event){
+        try {
+            if(event.getNewValue()!=null){
+                settingsIds = SettingsIds.fromString((String)event.getNewValue()).getId();
+                init();
+            }
+        } catch (Exception e) {
+            printError("Ошибка: "+e.getMessage());
+            getLogger().error("Error create setting: ",e);
         }
     }
 
@@ -69,7 +75,7 @@ public class SettingCreatePage extends BasicWorkspacePage implements OrgSelectPa
             setting.setSettingsId(SettingsIds.fromInteger(settingsIds));
             parserBySettingValue = setting.getSplitSettingValue();
             if(settingsIds.equals(0) || settingsIds.equals(1) || settingsIds.equals(2)){
-                allPrinters = settingService.findAllPrinterNames();
+                allPrinters = settingRepository.findAllPrinterNames();
             } else {
                 allPrinters = new ArrayList<String>(0);
             }
@@ -98,7 +104,7 @@ public class SettingCreatePage extends BasicWorkspacePage implements OrgSelectPa
         setting.setOrgOwner(orgItem.getIdOfOrg());
         try {
             if(setting.getGlobalId()==null){
-                settingService.create(setting);
+                settingRepository.create(setting);
                 printMessage("Настройки успешно зарегистрированы");
             } else{
                 printWarn("Настройки уже зарегистрирована");
@@ -163,7 +169,7 @@ public class SettingCreatePage extends BasicWorkspacePage implements OrgSelectPa
         this.orgItem = orgItem;
     }
 
-    public ECafeSettings.AbstractParserBySettingValue getParserBySettingValue() {
+    public AbstractParserBySettingValue getParserBySettingValue() {
         return parserBySettingValue;
     }
 
