@@ -73,18 +73,19 @@ public class ECafeSettings extends DistributedObject{
 
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
-        if(getTagName().equals("C")){
+        //if(getTagName().equals("C")){
             Criteria criteria = session.createCriteria(ECafeSettings.class);
             criteria.add(Restrictions.eq("settingsId", settingsId));
             criteria.add(Restrictions.eq("orgOwner", idOfOrg));
             criteria.setMaxResults(1);
             ECafeSettings settings = (ECafeSettings) criteria.uniqueResult();
+            session.clear();
             if(settings!=null){
                 DistributedObjectException distributedObjectException =  new DistributedObjectException("ECafeSettings DATA_EXIST_VALUE");
                 distributedObjectException.setData(settings.getGuid());
                 throw distributedObjectException;
             }
-        }
+        //}
     }
 
     @Override

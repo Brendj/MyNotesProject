@@ -107,11 +107,12 @@ public class Staff extends DistributedObject {
 
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
-        if(getTagName().equals("C")){
+        //if(getTagName().equals("C")){
             Criteria criteria = session.createCriteria(Staff.class);
             criteria.add(Restrictions.eq("hashCode", getHashCode()));
             Staff staff = null;
             List list = criteria.list();
+            session.clear();
             if(list!=null && !list.isEmpty()){
                 staff = (Staff) list.get(0);
             }
@@ -120,7 +121,7 @@ public class Staff extends DistributedObject {
                 distributedObjectException.setData(staff.getGuid());
                 throw distributedObjectException;
             }
-        }
+      //  }
     }
 
     @Override

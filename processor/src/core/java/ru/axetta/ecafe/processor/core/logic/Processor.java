@@ -2726,6 +2726,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                                 .getBean(EventNotificationService.class);
                         final String[] values = generateNotificationParams(persistenceSession, client,
                                 e.getPassDirection(), e.getEvtDateTime(), e.getGuardianId());
+                        //final String[] values = generateNotificationParams(persistenceSession, client, e);
                         notificationService.sendNotificationAsync(client,
                                 e.getGuardianId() == null ? EventNotificationService.NOTIFICATION_ENTER_EVENT
                                         : EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values);
@@ -3096,6 +3097,42 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
         }
     }
 
+    private String[] generateNotificationParams(Session session, Client client, SyncRequest.EnterEvents.EnterEvent event) throws Exception {
+        final int passDirection = event.getPassDirection();
+        final Long guardianId = event.getGuardianId();
+        final Date eventDate = event.getEvtDateTime();
+        final String enterEvent = "Вход";
+        final String exitEvent = "Выход";
+        String eventName = "";
+        if (passDirection == EnterEvent.ENTRY) {
+            eventName = enterEvent;
+        } else if (passDirection == EnterEvent.EXIT) {
+            eventName = exitEvent;
+        } else if (passDirection == EnterEvent.RE_ENTRY) {
+            eventName = enterEvent;
+        } else if (passDirection == EnterEvent.RE_EXIT) {
+            eventName = exitEvent;
+        }
+        // Если представитель не пуст, то значит вход/выход в детский сад. Иначе - в школу.
+        eventName = eventName + (guardianId == null ? (eventName.equals(enterEvent) ? " в школу"
+                : eventName.equals(exitEvent) ? " из школы" : "") : "");
+        String guardianName = "";
+        if (guardianId != null) {
+            Person guardPerson = ((Client) session.load(Client.class, guardianId)).getPerson();
+            guardianName = StringUtils.join(new Object[]{guardPerson.getSurname(), guardPerson.getFirstName()}, ' ');
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(eventDate);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        String time = (hour < 10 ? "0" + hour : hour) + ":" + (minute < 10 ? "0" + minute : minute);
+        //String clientName = client.getPerson().getSurname() + " " + client.getPerson().getFirstName();
+        return new String[]{
+                "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()), "contractId",
+                ContractIdFormat.format(client.getContractId()), "surname", client.getPerson().getSurname(),
+                "firstName", client.getPerson().getFirstName(), "eventName", eventName, "eventTime", time, "guardian",
+                guardianName};
+    }
 
     private String[] generateNotificationParams(Session session, Client client, int passDirection, Date eventDate,
             Long guardianId) throws Exception {

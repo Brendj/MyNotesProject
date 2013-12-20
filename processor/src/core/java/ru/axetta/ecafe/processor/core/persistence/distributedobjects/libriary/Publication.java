@@ -75,6 +75,7 @@ public class Publication extends LibraryDistributedObject {
             criteria.add(Restrictions.eq("publicationdate",publicationdate));
             criteria.add(Restrictions.eq("validISBN",true));
             Publication publication = (Publication) criteria.uniqueResult();
+            session.clear();
             if(!(publication==null || publication.getDeletedState() || guid.equals(publication.getGuid()))){
                 DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication DATA_EXIST_VALUE isbn and publicationdate equals");
                 distributedObjectException.setData(publication.getGuid());
@@ -84,13 +85,15 @@ public class Publication extends LibraryDistributedObject {
             Criteria criteria = session.createCriteria(Publication.class);
             criteria.add(Restrictions.eq("hash",hash));
             Publication publication = (Publication) criteria.uniqueResult();
+            session.clear();
             if(!(publication==null || publication.getDeletedState() || guid.equals(publication.getGuid()))){
                 DistributedObjectException distributedObjectException =  new DistributedObjectException("Publication DATA_EXIST_VALUE hash equals");
                 distributedObjectException.setData(publication.getGuid());
                 throw  distributedObjectException;
             }
         }
-
+        //if(getTagName().equals("C")){
+        //}
     }
 
     @Override
@@ -150,6 +153,7 @@ public class Publication extends LibraryDistributedObject {
         setPublicationdate(((Publication) distributedObject).getPublicationdate());
         setPublisher(((Publication) distributedObject).getPublisher());
         setHash(((Publication) distributedObject).getHash());
+        setValidISBN(((Publication) distributedObject).getValidISBN());
     }
 
     public Set<Instance> getInstanceInternal() {
