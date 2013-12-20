@@ -43,7 +43,6 @@ import ru.axetta.ecafe.processor.core.utils.ParameterStringUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.ui.PaymentTextUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.hibernate.Criteria;
@@ -3919,19 +3918,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return res;
     }
 
-    @SuppressWarnings("unchecked")
-    private Long getPriceOfDay(String dayComplexes, SubscriptionFeedingService sfService, Org org) {
-        if (StringUtils.isEmpty(dayComplexes)) {
-            return 0L;
-        }
-        String[] complexIds = StringUtils.split(dayComplexes, ';');
-        List<Integer> ids = new ArrayList<Integer>();
-        for (String id : complexIds) {
-            ids.add(Integer.valueOf(id));
-        }
-        return sfService.sumComplexesPrice(ids, org);
-    }
-
     private <T extends Result> Client findClientByContractId(Session session, Long contractId, T res) throws Exception {
         Client client = DAOUtils.findClientByContractId(session, contractId);
         if (client == null) {
@@ -4106,19 +4092,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         cd.setGlobalVersion(version);
         cd.setGlobalVersionOnCreate(version);
         cd.setMonday(cycleDiagramIn.getMonday());
-        cd.setMondayPrice(getPriceOfDay(cd.getMonday(), sfService, client.getOrg()));
+        cd.setMondayPrice(sfService.getPriceOfDay(cd.getMonday(), client.getOrg()));
         cd.setTuesday(cycleDiagramIn.getTuesday());
-        cd.setTuesdayPrice(getPriceOfDay(cd.getTuesday(), sfService, client.getOrg()));
+        cd.setTuesdayPrice(sfService.getPriceOfDay(cd.getTuesday(), client.getOrg()));
         cd.setWednesday(cycleDiagramIn.getWednesday());
-        cd.setWednesdayPrice(getPriceOfDay(cd.getWednesday(), sfService, client.getOrg()));
+        cd.setWednesdayPrice(sfService.getPriceOfDay(cd.getWednesday(), client.getOrg()));
         cd.setThursday(cycleDiagramIn.getThursday());
-        cd.setThursdayPrice(getPriceOfDay(cd.getThursday(), sfService, client.getOrg()));
+        cd.setThursdayPrice(sfService.getPriceOfDay(cd.getThursday(), client.getOrg()));
         cd.setFriday(cycleDiagramIn.getFriday());
-        cd.setFridayPrice(getPriceOfDay(cd.getFriday(), sfService, client.getOrg()));
+        cd.setFridayPrice(sfService.getPriceOfDay(cd.getFriday(), client.getOrg()));
         cd.setSaturday(cycleDiagramIn.getSaturday());
-        cd.setSaturdayPrice(getPriceOfDay(cd.getSaturday(), sfService, client.getOrg()));
+        cd.setSaturdayPrice(sfService.getPriceOfDay(cd.getSaturday(), client.getOrg()));
         cd.setSunday(cycleDiagramIn.getSunday());
-        cd.setSundayPrice(getPriceOfDay(cd.getSunday(), sfService, client.getOrg()));
+        cd.setSundayPrice(sfService.getPriceOfDay(cd.getSunday(), client.getOrg()));
         return cd;
     }
 }

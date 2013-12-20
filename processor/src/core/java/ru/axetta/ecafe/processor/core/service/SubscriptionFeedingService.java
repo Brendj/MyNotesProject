@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -226,5 +228,18 @@ public class SubscriptionFeedingService {
         sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
         sf.setLastUpdate(new Date());
         entityManager.merge(sf);
+    }
+
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public Long getPriceOfDay(String dayComplexes, Org org) {
+        if (StringUtils.isEmpty(dayComplexes)) {
+            return 0L;
+        }
+        String[] complexIds = StringUtils.split(dayComplexes, ';');
+        List<Integer> ids = new ArrayList<Integer>();
+        for (String id : complexIds) {
+            ids.add(Integer.valueOf(id));
+        }
+        return sumComplexesPrice(ids, org);
     }
 }
