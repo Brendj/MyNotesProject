@@ -58,6 +58,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     @Autowired
     private GoodRequestRepository goodRequestRepository;
 
+    private static final int itemsOnPage = 15;
     private String errorMessages;
     private String infoMessages;
     private Org org;
@@ -71,6 +72,9 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
 
 
 
+    public int getItemsOnPage() {
+        return itemsOnPage;
+    }
 
     /**
      * ****************************************************************************************************************
@@ -187,7 +191,22 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
             resetDate(cal);
             overallEntry.add(cal.getTimeInMillis(), overall.get(ts), OVERALL_GLOBAL_ID);
         }
-        entries.add(overallEntry);
+        int i=0;
+        int iOnPage = 0;
+        while (true) {
+            if (i >= entries.size()) {
+                break;
+            }
+            if (iOnPage == itemsOnPage) {
+                entries.add(i - 1, overallEntry);
+                iOnPage = 0;
+            }
+            iOnPage++;
+            i++;
+        }
+        if (iOnPage != itemsOnPage) {
+            entries.add(i - 1, overallEntry);
+        }
     }
 
 

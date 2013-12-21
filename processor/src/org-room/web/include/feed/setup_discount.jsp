@@ -52,8 +52,13 @@
         min-width: 21px !important;
         max-width: 21px !important;
     }
+    .clientsgrid_col2 {
+        width: 50px !important;
+        min-width: 50px !important;
+        max-width: 50px !important;
+    }
 
-    .clientsgrid_col3, .clientsgrid_col4, .clientsgrid_col5, .clientsgrid_col6,
+    .clientsgrid_col4, .clientsgrid_col5, .clientsgrid_col6,
     .clientsgrid_col7, .clientsgrid_col8, .clientsgrid_col9, .clientsgrid_col10,
     .clientsgrid_col11, .clientsgrid_col12, .clientsgrid_col13, .clientsgrid_col14{
         width: 20px !important;
@@ -113,11 +118,16 @@ function updateWidth() {
 
         <rich:panel id="emptyClients" style="margin: 0px; padding: 0px; border-bottom: none">
             <rich:dataTable value="#{setupDiscountPage.emptyClients}" var="cl" id="table_head" rowKeyVar="row"styleClass="clientsTableHead"
-                            headerClass="clientsgrid_col1,clientsgrid_col2,clientsgrid_col3,clientsgrid_col4,clientsgrid_col5,clientsgrid_col6,clientsgrid_col7,clientsgrid_col8,clientsgrid_col9,clientsgrid_col10,clientsgrid_col11,clientsgrid_col12,clientsgrid_col13,clientsgrid_col14"
-                            columnClasses="clientsgrid_col1,clientsgrid_col2,clientsgrid_col3,clientsgrid_col4,clientsgrid_col5,clientsgrid_col6,clientsgrid_col7,clientsgrid_col8,clientsgrid_col9,clientsgrid_col10,clientsgrid_col11,clientsgrid_col12,clientsgrid_col13,clientsgrid_col14">
+                            headerClass="clientsgrid_col1,clientsgrid_col2,clientsgrid_col3,clientsgrid_col4,clientsgrid_col5,clientsgrid_col6,clientsgrid_col7,clientsgrid_col8,clientsgrid_col9,clientsgrid_col10,clientsgrid_col11,clientsgrid_col12,clientsgrid_col13,clientsgrid_col14,clientsgrid_col15"
+                            columnClasses="clientsgrid_col1,clientsgrid_col2,clientsgrid_col3,clientsgrid_col4,clientsgrid_col5,clientsgrid_col6,clientsgrid_col7,clientsgrid_col8,clientsgrid_col9,clientsgrid_col10,clientsgrid_col11,clientsgrid_col12,clientsgrid_col13,clientsgrid_col14,clientsgrid_col15">
                 <rich:column headerClass="center-aligned-column">
                     <f:facet name="header">
                         <h:outputText value="№"></h:outputText>
+                    </f:facet>
+                </rich:column>
+                <rich:column headerClass="center-aligned-column">
+                    <f:facet name="header">
+                        <h:outputText value="Р/с"></h:outputText>
                     </f:facet>
                 </rich:column>
                 <rich:column headerClass="center-aligned-column" style="width: 99%;">
@@ -136,10 +146,13 @@ function updateWidth() {
 
         <rich:panel id="clients" style="height: 500px; overflow: auto;">
             <rich:dataTable value="#{setupDiscountPage.clients}" var="cl" id="table" rowKeyVar="row" styleClass="clientsTable"
-                            headerClass="clientsgrid_col1,clientsgrid_col2,clientsgrid_col3,clientsgrid_col4,clientsgrid_col5,clientsgrid_col6,clientsgrid_col7,clientsgrid_col8,clientsgrid_col9,clientsgrid_col10,clientsgrid_col11,clientsgrid_col12,clientsgrid_col13,clientsgrid_col14"
-                            columnClasses="clientsgrid_col1,clientsgrid_col2,clientsgrid_col3,clientsgrid_col4,clientsgrid_col5,clientsgrid_col6,clientsgrid_col7,clientsgrid_col8,clientsgrid_col9,clientsgrid_col10,clientsgrid_col11,clientsgrid_col12,clientsgrid_col13,clientsgrid_col14">
+                            headerClass="clientsgrid_col1,clientsgrid_col2,clientsgrid_col3,clientsgrid_col4,clientsgrid_col5,clientsgrid_col6,clientsgrid_col7,clientsgrid_col8,clientsgrid_col9,clientsgrid_col10,clientsgrid_col11,clientsgrid_col12,clientsgrid_col13,clientsgrid_col14,clientsgrid_col15"
+                            columnClasses="clientsgrid_col1,clientsgrid_col2,clientsgrid_col3,clientsgrid_col4,clientsgrid_col5,clientsgrid_col6,clientsgrid_col7,clientsgrid_col8,clientsgrid_col9,clientsgrid_col10,clientsgrid_col11,clientsgrid_col12,clientsgrid_col13,clientsgrid_col14,clientsgrid_col15">
                 <rich:column headerClass="center-aligned-column">
                     <h:outputText value="#{row+1}" styleClass="output-text"></h:outputText>
+                </rich:column>
+                <rich:column headerClass="center-aligned-column" style="width: 1%;">
+                    <h:outputText value="#{cl.contractId}" styleClass="output-text-mod"></h:outputText>
                 </rich:column>
                 <rich:column headerClass="center-aligned-column" style="width: 99%;">
                     <h:outputText value="#{cl.fullName}" styleClass="output-text-mod"></h:outputText>

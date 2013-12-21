@@ -10,7 +10,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="43"/>
+	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -112,43 +112,43 @@
 				<text><![CDATA[СПРАВКА]]></text>
 			</staticText>
 			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
-				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" x="221" y="64" width="81" height="20"/>
+				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" x="344" y="64" width="81" height="20"/>
 				<textElement>
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{startDate}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="3b0a9d12-9433-4356-a2c3-59a58c8d9810" x="0" y="64" width="221" height="20"/>
+				<reportElement uuid="3b0a9d12-9433-4356-a2c3-59a58c8d9810" x="0" y="64" width="344" height="20"/>
 				<textElement>
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Расходования средств на питание в период]]></text>
 			</staticText>
 			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
-				<reportElement uuid="bc23afa8-7f9c-4f60-8502-75c07da67f28" x="330" y="64" width="102" height="20"/>
+				<reportElement uuid="bc23afa8-7f9c-4f60-8502-75c07da67f28" x="453" y="64" width="102" height="20"/>
 				<textElement>
 					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{endDate}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="36fcdcb0-9ad6-4df9-a1c3-8dd4c631dac7" x="302" y="64" width="28" height="20"/>
+				<reportElement uuid="36fcdcb0-9ad6-4df9-a1c3-8dd4c631dac7" x="425" y="64" width="28" height="20"/>
 				<textElement textAlignment="Center">
 					<font size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[по]]></text>
 			</staticText>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" x="474" y="0" width="239" height="20"/>
+				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" x="432" y="0" width="281" height="20"/>
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{orgName}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="24f636d2-0418-42b4-9970-a94414684b99" x="322" y="0" width="152" height="20"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
+				<reportElement uuid="24f636d2-0418-42b4-9970-a94414684b99" x="229" y="0" width="198" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Наименование уч-я]]></text>
@@ -304,13 +304,13 @@
 						</cellContents>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
-				<measure name="childrenMeasure" class="java.lang.Long">
+				<measure name="childrenMeasure" class="java.lang.Long" calculation="Sum">
 					<measureExpression><![CDATA[$F{children}]]></measureExpression>
 				</measure>
-				<measure name="totalMeasure" class="java.lang.Long">
+				<measure name="totalMeasure" class="java.lang.Long" calculation="Sum">
 					<measureExpression><![CDATA[$F{total}]]></measureExpression>
 				</measure>
-				<measure name="summaryMeasure" class="java.lang.Double">
+				<measure name="summaryMeasure" class="java.lang.Double" calculation="Sum">
 					<measureExpression><![CDATA[$F{summary}]]></measureExpression>
 				</measure>
 				<crosstabCell width="225" height="23">
@@ -337,7 +337,7 @@
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="Arial" size="10"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{summaryMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure})]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -365,7 +365,7 @@
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="Arial" size="10"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{summaryMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure})]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>

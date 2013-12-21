@@ -76,7 +76,7 @@
         <a4j:region>
         <rich:panel id="claimsCalendar" style="height: 450px; width: 1350px; overflow: auto;">
             <rich:dataTable value="#{claimCalendarEditPage.entries}" var="e"
-                            width="350px" rows="15" id="table" rowKeyVar="row" footerClass="data-table-footer">
+                            width="350px" rows="#{claimCalendarEditPage.itemsOnPage}" id="table" rowKeyVar="row" footerClass="data-table-footer">
                 <rich:column>
                     <f:facet name="header">
                         <h:outputText value="№"></h:outputText>

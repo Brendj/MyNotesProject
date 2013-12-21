@@ -588,6 +588,9 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
 
             //  Вносим изменения в пользователя
             updateClient(session);
+            if (!change) {
+                resetSelectedClient();
+            }
 
 
             //  Обновляем дерево и клиента
@@ -1092,7 +1095,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         public void setDiscountMode(String discountMode) {
             this.discountMode = discountMode;
         }
-        
+
         public String getClientGroupDiscount () {
             try {
                 int i = Integer.parseInt(clientGroup.replaceAll("[^0-9]", ""));

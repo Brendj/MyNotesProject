@@ -97,7 +97,7 @@ public class SetupDiscountPage extends BasicWorkspacePage {
         Long prevIdoOfClient = null;
         Client cl = null;
         
-        String sql = "select cf_clients.idofclient, cf_persons.firstname, cf_persons.secondname, cf_persons.surname, cf_clients_categorydiscounts.idofcategorydiscount "
+        String sql = "select cf_clients.idofclient, cf_persons.firstname, cf_persons.secondname, cf_persons.surname, cf_clients_categorydiscounts.idofcategorydiscount, cf_clients.contractId "
                 + "from cf_clients "
                 + "left join cf_persons on cf_persons.idofperson=cf_clients.idofperson "
                 + "left join cf_clients_categorydiscounts on cf_clients.idofclient=cf_clients_categorydiscounts.idofclient "
@@ -120,8 +120,9 @@ public class SetupDiscountPage extends BasicWorkspacePage {
             String secondname = HibernateUtils.getDbString(o[2]);
             String surname = HibernateUtils.getDbString(o[3]);
             Long idofcategorydiscount = HibernateUtils.getDbLong(o[4]);
+            Long contractId = HibernateUtils.getDbLong(o[5]);
             if (prevIdoOfClient == null || prevIdoOfClient.longValue() != idOfClient.longValue()) {
-                cl = new Client(idOfClient, firstName, secondname, surname);
+                cl = new Client(idOfClient, firstName, secondname, surname, contractId);
                 prevIdoOfClient = idOfClient;
                 clients.add(cl);
             }
@@ -435,6 +436,7 @@ public class SetupDiscountPage extends BasicWorkspacePage {
 
     public static class Client {
         protected long idofclient;
+        protected long contractId;
         protected String firstName;
         protected String secondName;
         protected String surname;
@@ -445,11 +447,12 @@ public class SetupDiscountPage extends BasicWorkspacePage {
 
         }
 
-        public Client (long idofclient, String firstName, String secondName, String surname) {
+        public Client (long idofclient, String firstName, String secondName, String surname, long contractId) {
             this.idofclient = idofclient;
             this.firstName = firstName;
             this.secondName = secondName;
             this.surname = surname;
+            this.contractId = contractId;
             rules = new HashMap<Long, Boolean>();
         }
 
@@ -482,6 +485,10 @@ public class SetupDiscountPage extends BasicWorkspacePage {
 
         public void addRule (long idofrule, boolean flag) {
             rules.put(idofrule, flag);
+        }
+
+        public long getContractId() {
+            return contractId;
         }
 
         public boolean getInput() {
