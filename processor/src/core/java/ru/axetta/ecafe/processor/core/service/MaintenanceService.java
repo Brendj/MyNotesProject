@@ -23,9 +23,9 @@ import java.util.*;
 
 @Component
 @Scope("singleton")
-public class MaintananceService {
+public class MaintenanceService {
 
-    private Logger logger = LoggerFactory.getLogger(MaintananceService.class);
+    private Logger logger = LoggerFactory.getLogger(MaintenanceService.class);
 
     private Date lastCleanDate;
     private Date srcOrgLastCleanDate;
@@ -37,8 +37,8 @@ public class MaintananceService {
     @Autowired
     private RuntimeContext runtimeContext;
 
-    private MaintananceService getProxy() {
-        return RuntimeContext.getAppContext().getBean(MaintananceService.class);
+    private MaintenanceService getProxy() {
+        return RuntimeContext.getAppContext().getBean(MaintenanceService.class);
     }
 
     public void run() {
@@ -95,7 +95,7 @@ public class MaintananceService {
                 .setParameter("date", timeToClean);
         List<Object[]> records = query.getResultList();
         Set<Long> orgIds = new HashSet<Long>();
-        MaintananceService proxy = getProxy();
+        MaintenanceService proxy = getProxy();
 
         logger.info("Cleaning menu details and menu...");
         int menuDetailDeletedCount = 0;
