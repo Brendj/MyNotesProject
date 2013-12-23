@@ -449,7 +449,7 @@ public class ClientManager {
                 }
             }
             if (discountMode != null) {
-                cl.setDiscountMode(Client.DISCOUNT_MODE_BY_CATEGORY);
+                cl.setDiscountMode(discountMode);
             }
             cl.setCategories(categories);
             session.save(cl);

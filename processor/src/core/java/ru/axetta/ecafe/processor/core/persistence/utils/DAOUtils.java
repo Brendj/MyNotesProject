@@ -1032,6 +1032,13 @@ public class DAOUtils {
         return minId-1;
     }
 
+    public static boolean removeEmptyClientGroupByName(Session persistenceSession, Long idOfOrg, String groupName) throws Exception {
+        Query q = persistenceSession.createSQLQuery("delete from cf_clientgroups where idoforg=:idoforg and groupname=:groupname");
+        q.setLong("idoforg", idOfOrg);
+        q.setString("groupname", groupName);
+        return q.executeUpdate() > 0;
+    }
+
     public static ClientGroup createClientGroup(Session persistenceSession, Long idOfOrg, ClientGroup.Predefined predefined) {
         Long idOfClientGroup =null;
         CompositeIdOfClientGroup compositeIdOfClientGroup = new CompositeIdOfClientGroup(idOfOrg,predefined.getValue());

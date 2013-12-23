@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -83,6 +84,8 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
     private String infoMessages;
     private Date enterEventDate;
     private List<CategoryDiscount> categoryDiscounts;
+    private boolean allowRemoveGroup;
+    private String selectedClientGroup;
 
 
 
@@ -111,6 +114,8 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         if (reset) {
             reset();
         }
+        allowRemoveGroup = false;
+        selectedClientGroup = null;
 
 
         //  Добавления в SQL
@@ -526,7 +531,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
                     clientNode.setData(GROUP_NO_CLIENTS);
                     groupNode.addChild(new Integer(clientCounter), clientNode);
                     clientCounter++;
-                    }
+                }
             }
 
             tree.addChild(new Integer(groupCounter), groupNode);
@@ -540,6 +545,16 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
 
     public SelectedClient getSelectedClient() {
         return selectedClient;
+    }
+
+
+    public void groupSelected(String groupName) {
+        List<Client> clients = dbTree.get(groupName);
+        if ((clients == null || clients.size() < 1) &&
+            groupName.matches("[0-9]{1,2}-?[а-яА-Я]")) {
+            allowRemoveGroup = true;
+            selectedClientGroup = groupName;
+        }
     }
 
     @Transactional
@@ -604,6 +619,35 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
             //HibernateUtils.close(session, logger);
         }
     }
+    
+    @Transactional
+    public void removeClientGroup() {
+        Session session = null;
+        //Transaction transaction = null;
+        try {
+            session = (Session) entityManager.getDelegate();
+            Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
+            boolean success = DAOUtils.removeEmptyClientGroupByName(session, org.getIdOfOrg(), selectedClientGroup);
+            if (success) {
+                sendInfo("Группа " + selectedClientGroup + " удалена");
+                dbTree.remove(selectedClientGroup);
+                fill(session, false);
+                allowRemoveGroup = false;
+                selectedClientGroup = null;
+            } else {
+                sendError("Не удалось удалить группу " + selectedClientGroup);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to load client by name", e);
+            sendError("Не удалось обновить данные пользователя");
+        } finally {
+            //HibernateUtils.rollback(transaction, logger);
+            //HibernateUtils.close(session, logger);
+        }
+
+    }
+    
+    
 
 
     /**
@@ -661,6 +705,8 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
     }
 
     public void doSelectClient(NodeSelectedEvent event) {
+        allowRemoveGroup = false;
+        selectedClientGroup = null;
         HtmlTree tree = (HtmlTree) event.getComponent();
         String selectedClientName = (String) tree.getRowData();
         if (tree.isLeaf()) {
@@ -668,6 +714,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
             RuntimeContext.getAppContext().getBean(ClientListEditPage.class).selectClient(selectedClientName);
         } else {
             isLeafSelected = false;
+            RuntimeContext.getAppContext().getBean(ClientListEditPage.class).groupSelected(selectedClientName);
         }
     }
 
@@ -688,6 +735,13 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
 
     public void doCancelChanges() {
         RuntimeContext.getAppContext().getBean(ClientListEditPage.class).resetSelectedClient();
+    }
+
+    public void doRemoveClientGroup() {
+        if (!allowRemoveGroup || selectedClientGroup == null || selectedClientGroup.length() < 1) {
+            return;
+        }
+        RuntimeContext.getAppContext().getBean(ClientListEditPage.class).removeClientGroup();
     }
 
     public void doRegisterClient() {
@@ -757,6 +811,21 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
 
         RuntimeContext.getAppContext().getBean(ClientListEditPage.class).fill(false);
     }
+
+    public boolean getAllowRemoveGroup() {
+        return allowRemoveGroup;
+    }
+
+    public void setAllowRemoveGroup(boolean allowRemoveGroup) {
+        this.allowRemoveGroup = allowRemoveGroup;
+    }
+
+
+
+
+
+
+
 
 
 

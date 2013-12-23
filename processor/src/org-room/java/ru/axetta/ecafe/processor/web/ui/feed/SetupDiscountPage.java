@@ -103,7 +103,7 @@ public class SetupDiscountPage extends BasicWorkspacePage {
                 + "left join cf_clients_categorydiscounts on cf_clients.idofclient=cf_clients_categorydiscounts.idofclient "
                 + groupJoin
                 + "where cf_clients.idoforg=:idoforg and surname<>'' " + groupRestr + discountRestr
-                + "order by surname, firstname, secondname, cf_clients_categorydiscounts.idofcategorydiscount";
+                + "order by idofclient, surname, firstname, secondname, cf_clients_categorydiscounts.idofcategorydiscount";
         org.hibernate.Query q = session.createSQLQuery(sql);
         q.setLong("idoforg", org.getIdOfOrg());
         if (group != null && group.length() > 0) {
@@ -170,7 +170,7 @@ public class SetupDiscountPage extends BasicWorkspacePage {
 
     public void loadGroups(Session session) {
         Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
-        groups = DAOServices.getInstance().loadGroups(session, org.getIdOfOrg(), true);
+        groups = DAOServices.getInstance().loadGroups(session, org.getIdOfOrg(), false);
         Collections.sort(groups, new ClientListEditPage.ClientComparator ());
     }
 

@@ -37,25 +37,37 @@
             <h:panelGrid columns="2" styleClass="borderless-grid" style="padding-bottom: 10px">
                 <h:panelGrid columns="2" styleClass="borderless-grid">
                     <a4j:commandButton image="/images/icon/add_client.png" action="#{clientListEditPage.doRegisterClient}"
-                                       reRender="editPanels, clientCardPanel" styleClass="command-button" status="clientLookupStatus" />
+                                       reRender="editPanels, clientCardPanel, mesasges_panel" styleClass="command-button" status="clientLookupStatus" />
                     <a4j:commandLink value="Регистрация клиента" action="#{clientListEditPage.doRegisterClient}"
-                                       reRender="editPanels, clientCardPanel" styleClass="command-button" status="clientLookupStatus" />
+                                       reRender="editPanels, clientCardPanel, mesasges_panel" styleClass="command-button" status="clientLookupStatus" />
                 </h:panelGrid>
-                <h:panelGrid columns="2" styleClass="borderless-grid">
+                <h:panelGrid styleClass="borderless-grid" id="manageClientGroup">
                     <h:outputLink value="#" id="createGroupCommandLink" styleClass="command-button">
-                        <h:graphicImage url="/images/icon/add_clients.png" />
+                        <h:graphicImage url="/images/icon/group_add.png" />
                         <h:outputText styleClass="output-text-mod" value="Добавить группу"/>
-                        <a4j:support event="onclick" action="#{mainPage.doShowSelectCreateGroupModal}" reRender="groupCreatePanel"
+                        <a4j:support event="onclick" action="#{mainPage.doShowSelectCreateGroupModal}" reRender="groupCreatePanel, mesasges_panel"
                                      oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('groupCreatePanel')}.show();"/>
                         <%--<rich:componentControl for="groupCreatePanel" attachTo="createGroupCommandLink"
                                                operation="show" event="onclick"/>--%>
+                    </h:outputLink>
+
+                    <h:outputLink value="#" id="removeGroupCommandLink" styleClass="command-button" rendered="#{clientListEditPage.allowRemoveGroup}">
+                        <h:graphicImage url="/images/icon/group_delete.png" />
+                        <h:outputText styleClass="output-text-mod" value="Удалить группу"/>
+                        <a4j:support event="onclick" action="#{clientListEditPage.doRemoveClientGroup}" reRender="clientListViewGrid"/>
+                        <%--<rich:componentControl for="groupCreatePanel" attachTo="createGroupCommandLink"
+                                               operation="show" event="onclick"/>--%>
+                    </h:outputLink>
+                    <h:outputLink value="#" id="removeGroupDisCommandLink" styleClass="command-button" rendered="#{!clientListEditPage.allowRemoveGroup}">
+                        <h:graphicImage url="/images/icon/group_grey.png"/>
+                        <h:outputText styleClass="output-text-mod" value="Удалить группу" style="color: #CCCCCC"/>
                     </h:outputLink>
                 </h:panelGrid>
             </h:panelGrid>
 
             <rich:panel id="clientTree" style="width:300px; height: 550px; overflow:auto;">
                 <rich:tree style="width:285px; height: 500px" nodeSelectListener="#{clientListEditPage.doSelectClient}"
-                           reRender="editPanels, clientCardPanel" ajaxSubmitSelection="true" switchType="client" binding="#{clientListEditPage.treeComponent}"
+                           reRender="editPanels, clientCardPanel, mesasges_panel, manageClientGroup" ajaxSubmitSelection="true" switchType="client" binding="#{clientListEditPage.treeComponent}"
                            value="#{clientListEditPage.tree}" var="item" ajaxKeys="#{null}">
                     <rich:treeNode>
                         <h:outputText value="#{item}" styleClass="output-text-mod" />
@@ -65,9 +77,9 @@
             <h:panelGrid columns="4" styleClass="borderless-grid" id="lookupPanel">
                 <h:inputText value="#{clientListEditPage.lookupClientName}" style="width: 220px" maxlength="100" styleClass="output-text" />
                 <a4j:commandButton action="#{clientListEditPage.doLookupClient}" image="/images/icon/search.png"
-                                   reRender="clientTree, editPanels, clientCardPanel, lookupPanel" styleClass="command-button" status="clientLookupStatus" />
+                                   reRender="clientTree, editPanels, clientCardPanel, lookupPanel, mesasges_panel" styleClass="command-button" status="clientLookupStatus" />
                 <a4j:commandButton action="#{clientListEditPage.doResetLookupClient}" image="/images/icon/cancel.png"
-                                   reRender="clientTree, editPanels, clientCardPanel, lookupPanel" styleClass="command-button" status="clientLookupStatus" />
+                                   reRender="clientTree, editPanels, clientCardPanel, lookupPanel, mesasges_panel" styleClass="command-button" status="clientLookupStatus" />
                 <a4j:status id="clientLookupStatus">
                     <f:facet name="start">
                         <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
@@ -102,7 +114,7 @@
                             <h:selectOneMenu id="clientGroup" value="#{clientListEditPage.clientGroup}" style="width:325px;" >
                                 <f:selectItems value="#{clientListEditPage.groups}"/>
                             </h:selectOneMenu>
-                            <a4j:commandButton value="В выбывшие" action="#{clientListEditPage.doRemoveClient}" reRender="clientGroup" />
+                            <a4j:commandButton value="В выбывшие" action="#{clientListEditPage.doRemoveClient}" reRender="clientGroup, mesasges_panel" />
                         </h:panelGrid>
                         <h:outputText escape="true" value="№" styleClass="output-text-mod" />
                         <h:panelGrid styleClass="borderless-grid" columns="3">
@@ -186,7 +198,7 @@
                                 <rich:calendar value="#{clientListEditPage.enterEventDate}" datePattern="dd.MM.yyyy"
                                                converter="dateConverter" inputClass="input-text" showWeeksBar="false"
                                                valueChangeListener="#{clientListEditPage.doChangeEnterEventDate}">
-                                    <a4j:support event="onchanged" reRender="enterEventsTable" bypassUpdates="true" />
+                                    <a4j:support event="onchanged" reRender="enterEventsTable, mesasges_panel" bypassUpdates="true" />
                                 </rich:calendar>
                             </h:panelGrid>
                             <rich:dataTable id="enterEventsTable" value="#{clientListEditPage.selectedClient.enterEvents}"
@@ -248,13 +260,17 @@
                     </h:panelGrid>--%>
 
                     <h:panelGrid styleClass="borderless-grid" columns="2" style="vertical-align: top; align: right;">
-                            <a4j:commandButton value="#{clientListEditPage.submitButtonLabel}" action="#{clientListEditPage.doApplyChanges}" reRender="clientTree, editPanels, clientCardPanel" />
-                            <a4j:commandButton value="Отменить" action="#{clientListEditPage.doCancelChanges}" reRender="editPanels, clientCardPanel" />
+                            <a4j:commandButton value="#{clientListEditPage.submitButtonLabel}" action="#{clientListEditPage.doApplyChanges}" reRender="clientTree, editPanels, clientCardPanel, mesasges_panel" />
+                            <a4j:commandButton value="Отменить" action="#{clientListEditPage.doCancelChanges}" reRender="editPanels, clientCardPanel, mesasges_panel" />
                     </h:panelGrid>
 
+                </h:panelGrid>
+
+                <h:panelGrid id="mesasges_panel">
                     <h:outputText escape="true" value="#{clientListEditPage.errorMessages}" rendered="#{not empty clientListEditPage.errorMessages}" styleClass="error-messages" />
                     <h:outputText escape="true" value="#{clientListEditPage.infoMessages}" rendered="#{not empty clientListEditPage.infoMessages}" styleClass="info-messages" />
                 </h:panelGrid>
+
                 </a4j:region>
             </h:panelGrid>
         </h:panelGrid>
