@@ -180,7 +180,7 @@ public class DAOService {
 
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public Long updateVersionByDistributedObjects(String name) {
+      public Long updateVersionByDistributedObjects(String name) {
         TypedQuery<DOVersion> query = entityManager
                 .createQuery("from DOVersion where UPPER(distributedObjectClassName)=:distributedObjectClassName",
                         DOVersion.class);
@@ -202,25 +202,6 @@ public class DAOService {
         entityManager.flush();
         return version;
     }
-
-
-    public void updateGoodsBasicBasket(GoodsBasicBasket goodsBasicBasket){
-        Query query = entityManager.createQuery("update GoodsBasicBasket set lastUpdate=:lastUpdate, nameOfGood=:nameOfGood, unitsScale=:unitsScale, netWeight=:netWeight where idOfBasicGood=:idOfBasicGood ");
-        query.setParameter("lastUpdate", new Date());
-        query.setParameter("nameOfGood", goodsBasicBasket.getNameOfGood());
-        query.setParameter("unitsScale", goodsBasicBasket.getUnitsScale());
-        query.setParameter("netWeight", goodsBasicBasket.getNetWeight());
-        query.setParameter("idOfBasicGood", goodsBasicBasket.getIdOfBasicGood());
-        query.executeUpdate();
-    }
-
-
-    public void removeGoodsBasicBasket(Long idOfBasicGood){
-        Query query = entityManager.createQuery("delete from GoodsBasicBasket where idOfBasicGood=:idOfBasicGood");
-        query.setParameter("idOfBasicGood",idOfBasicGood);
-        query.executeUpdate();
-    }
-
 
     public void removeTechnologicalMap(Long idOfTechnologicalMaps){
         Query query1 = entityManager.createNativeQuery("DELETE FROM cf_technological_map_products where idoftechnologicalmaps="+idOfTechnologicalMaps);
