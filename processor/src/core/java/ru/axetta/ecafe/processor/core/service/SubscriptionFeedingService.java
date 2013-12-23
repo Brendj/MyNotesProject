@@ -167,15 +167,14 @@ public class SubscriptionFeedingService {
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     // Возвращает подписку АП, действующую на текущий день.
-    public SubscriptionFeeding findClientSubscriptionFeeding(Long contractId) {
+    public SubscriptionFeeding findClientSubscriptionFeeding(Client c) {
         Session session = entityManager.unwrap(Session.class);
         Date now = new Date();
-        DetachedCriteria subQuery = DetachedCriteria.forClass(SubscriptionFeeding.class).createAlias("client", "cc")
-                .add(Restrictions.eq("cc.contractId", contractId)).add(Restrictions
-                .or(Restrictions.isNull("dateDeactivateService"), Restrictions.gt("dateDeactivateService", now)))
+        DetachedCriteria subQuery = DetachedCriteria.forClass(SubscriptionFeeding.class)
+                .add(Restrictions.eq("client", c)).add(Restrictions.eq("deletedState", false)).add(Restrictions
+                    .or(Restrictions.isNull("dateDeactivateService"), Restrictions.gt("dateDeactivateService", now)))
                 .setProjection(Projections.max("dateActivateService"));
-        Criteria criteria = session.createCriteria(SubscriptionFeeding.class).createAlias("client", "c")
-                .add(Restrictions.eq("c.contractId", contractId)).add(Restrictions.eq("deletedState", false))
+        Criteria criteria = session.createCriteria(SubscriptionFeeding.class).add(Restrictions.eq("client", c))
                 .add(Subqueries.propertyEq("dateActivateService", subQuery));
         return (SubscriptionFeeding) criteria.uniqueResult();
     }
@@ -183,12 +182,10 @@ public class SubscriptionFeedingService {
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     // Возвращает циклограмму питания, актуальную на текущий день.
-    public CycleDiagram findClientCycleDiagram(Long contractId) {
+    public CycleDiagram findClientCycleDiagram(Client c) {
         Session session = entityManager.unwrap(Session.class);
-        Criteria criteria = session.createCriteria(CycleDiagram.class).createAlias("client", "c")
-                .add(Restrictions.eq("c.contractId", contractId)).add(Restrictions.eq("deletedState", false))
-                .add(Restrictions.le("dateActivationDiagram", new Date()))
-                .add(Restrictions.eq("stateDiagram", StateDiagram.ACTIVE));
+        Criteria criteria = session.createCriteria(CycleDiagram.class).add(Restrictions.eq("client", c))
+                .add(Restrictions.eq("deletedState", false)).add(Restrictions.eq("stateDiagram", StateDiagram.ACTIVE));
         return (CycleDiagram) criteria.uniqueResult();
     }
 
@@ -201,16 +198,30 @@ public class SubscriptionFeedingService {
         DetachedCriteria subQuery = DetachedCriteria.forClass(CycleDiagram.class).add(Restrictions.eq("client", c))
                 .add(Restrictions.in("stateDiagram", new Object[]{StateDiagram.WAIT, StateDiagram.ACTIVE}))
                 .add(Restrictions.eq("deletedState", false)).setProjection(Projections.max("globalId"));
-        Criteria criteria = session.createCriteria(CycleDiagram.class).add(Restrictions.eq("client", c))
-                .add(Subqueries.propertyEq("globalId", subQuery));
+        Criteria criteria = session.createCriteria(CycleDiagram.class).add(Subqueries.propertyEq("globalId", subQuery));
+        return (CycleDiagram) criteria.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    // Возвращает циклограмму, действующую в определенный день.
+    public CycleDiagram findCycleDiagramOnDate(Client client, Date date) {
+        Date dateActivation = CalendarUtils.truncateToDayOfMonth(date);
+        Date tomorrow = CalendarUtils.addDays(dateActivation, 1);
+        Session session = entityManager.unwrap(Session.class);
+        Criteria criteria = session.createCriteria(CycleDiagram.class).add(Restrictions.eq("client", client))
+                .add(Restrictions.in("stateDiagram", new Object[]{StateDiagram.WAIT, StateDiagram.ACTIVE}))
+                .add(Restrictions.eq("deletedState", false))
+                .add(Restrictions.ge("dateActivationDiagram", dateActivation))
+                .add(Restrictions.lt("dateActivationDiagram", tomorrow));
         return (CycleDiagram) criteria.uniqueResult();
     }
 
     @Transactional(rollbackFor = Exception.class)
     // Приостанавливает подписку АП.
-    public void suspendSubscriptionFeeding(Long contractId) {
+    public void suspendSubscriptionFeeding(Client client) {
         Date date = new Date();
-        SubscriptionFeeding sf = findClientSubscriptionFeeding(contractId);
+        SubscriptionFeeding sf = findClientSubscriptionFeeding(client);
         sf.setLastDatePauseService(CalendarUtils.truncateToDayOfMonth(CalendarUtils.addDays(date, 2)));
         sf.setWasSuspended(true);
         DAOService daoService = DAOService.getInstance();
@@ -221,8 +232,8 @@ public class SubscriptionFeedingService {
 
     @Transactional(rollbackFor = Exception.class)
     // Возобновляет подписку АП.
-    public void reopenSubscriptionFeeding(Long contractId) {
-        SubscriptionFeeding sf = findClientSubscriptionFeeding(contractId);
+    public void reopenSubscriptionFeeding(Client client) {
+        SubscriptionFeeding sf = findClientSubscriptionFeeding(client);
         sf.setWasSuspended(false);
         DAOService daoService = DAOService.getInstance();
         sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));

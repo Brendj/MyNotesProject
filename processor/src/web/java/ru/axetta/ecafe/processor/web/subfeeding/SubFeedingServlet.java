@@ -137,10 +137,10 @@ public class SubFeedingServlet extends HttpServlet {
         try {
             session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
-            SubscriptionFeeding sf = sfService.findClientSubscriptionFeeding(contractId);
             Client client = DAOUtils.findClientByContractId(session, contractId);
             client.getPerson(); // нужно для ФИО.
             transaction.commit();
+            SubscriptionFeeding sf = sfService.findClientSubscriptionFeeding(client);
             req.setAttribute("client", client);
             req.setAttribute("subscriptionFeeding", sf);
             if (sf == null) {
@@ -242,11 +242,11 @@ public class SubFeedingServlet extends HttpServlet {
             Client client = DAOUtils.findClientByContractId(session, contractId);
             client.getPerson(); client.getOrg();
             transaction.commit();
-            SubscriptionFeeding sf = sfService.findClientSubscriptionFeeding(contractId);
+            SubscriptionFeeding sf = sfService.findClientSubscriptionFeeding(client);
             req.setAttribute("client", client);
             req.setAttribute("subscriptionFeeding", sf);
             req.setAttribute("complexes", sfService.findComplexesWithSubFeeding(client.getOrg()));
-            CycleDiagram cd = sfService.findClientCycleDiagram(contractId);
+            CycleDiagram cd = sfService.findClientCycleDiagram(client);
             if (sf != null && cd != null) {
                 req.setAttribute("activeComplexes", splitPlanComplexes(cd));
             }

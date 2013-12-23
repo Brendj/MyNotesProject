@@ -3878,7 +3878,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (client == null) {
                 return res;
             }
-            SubscriptionFeeding sf = sfService.findClientSubscriptionFeeding(contractId);
+            SubscriptionFeeding sf = sfService.findClientSubscriptionFeeding(client);
             if (sf != null) {
                 res.resultCode = RC_SUBSCRIPTION_FEEDING_DUPLICATE;
                 res.description = RC_SUBSCRIPTION_FEEDING_DUPLICATE_DESC;
@@ -3945,7 +3945,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
                     .getBean(SubscriptionFeedingService.class);
-            SubscriptionFeeding sf = sfService.findClientSubscriptionFeeding(contractId);
+            SubscriptionFeeding sf = sfService.findClientSubscriptionFeeding(client);
             res.setIdOfSubscriptionFeeding(sf.getGlobalId());
             res.setDateActivate(sf.getDateActivateService());
             res.setLastDatePause(sf.getLastDatePauseService());
@@ -3980,7 +3980,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
                     .getBean(SubscriptionFeedingService.class);
-            sfService.suspendSubscriptionFeeding(contractId);
+            sfService.suspendSubscriptionFeeding(client);
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
@@ -4010,7 +4010,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
                     .getBean(SubscriptionFeedingService.class);
-            sfService.reopenSubscriptionFeeding(contractId);
+            sfService.reopenSubscriptionFeeding(client);
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
@@ -4055,7 +4055,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Date activationDate = CalendarUtils.addDays(today, parser.getDayRequest());
             SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
                     .getBean(SubscriptionFeedingService.class);
-            CycleDiagram cd = createCycleDiagram(client, cycleDiagramIn, sfService, activationDate, false);
+            CycleDiagram cd = sfService.findCycleDiagramOnDate(client, activationDate);
+            if (cd != null) {
+                cd.setDeletedState(true);
+                cd.setGlobalVersion(daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName()));
+                session.update(cd);
+            }
+            cd = createCycleDiagram(client, cycleDiagramIn, sfService, activationDate, false);
             session.persist(cd);
             transaction.commit();
             result.resultCode = RC_OK;
