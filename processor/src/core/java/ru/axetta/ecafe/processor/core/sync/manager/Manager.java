@@ -327,6 +327,7 @@ public class Manager {
     private List<DistributedObject> findResponseResult(SessionFactory sessionFactory,
             Class<? extends DistributedObject> doClass, final Integer currentLimit) {
         List<DistributedObject> currentResultDOList = new ArrayList<DistributedObject>();
+        //sessionFactory = RuntimeContext.reportsSessionFactory;
         Session persistenceSession = null;
         String errorMessage = null;
         try {
