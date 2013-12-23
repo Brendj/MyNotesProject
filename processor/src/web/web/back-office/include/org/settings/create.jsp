@@ -42,12 +42,6 @@
             <a4j:support event="onchange" reRender="settingValueConfig" />
         </rich:comboBox>
 
-        <h:outputText escape="true" value="Статус" styleClass="output-text" />
-        <h:selectOneMenu value="#{settingCreatePage.setting.deletedState}" styleClass="input-text">
-            <f:selectItem itemValue="true" itemLabel="Удален"/>
-            <f:selectItem itemValue="false" itemLabel="Активен"/>
-        </h:selectOneMenu>
-
     </h:panelGrid>
 
     <h:panelGrid id="settingValueConfig">

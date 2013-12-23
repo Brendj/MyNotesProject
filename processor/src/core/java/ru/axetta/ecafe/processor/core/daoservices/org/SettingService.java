@@ -4,21 +4,19 @@
 
 package ru.axetta.ecafe.processor.core.daoservices.org;
 
-import ru.axetta.ecafe.processor.core.daoservices.DOVersionRepository;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,17 +29,35 @@ import java.util.List;
  * Time: 17:37
  * To change this template use File | Settings | File Templates.
  */
-@Repository
+@Service
 @Transactional
-public class SettingRepository {
+public class SettingService {
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
+    @Autowired
+    private DAOService daoService;
 
     public ECafeSettings save(ECafeSettings settings) throws Exception{
-        Long version = DOVersionRepository.updateClassVersion(ECafeSettings.class.getSimpleName(), entityManager.unwrap(Session.class));
-        settings.setGlobalVersion(version);
         //settings.setGlobalVersion(daoService.updateVersionByDistributedObjects(ECafeSettings.class.getSimpleName()));
+        final String qlString = "from DOVersion where distributedObjectClassName=:distributedObjectClassName";
+        TypedQuery<DOVersion> query = entityManager.createQuery(qlString, DOVersion.class);
+        query.setParameter("distributedObjectClassName", "ECafeSettings");
+        List<DOVersion> doVersionList = query.getResultList();
+        DOVersion doVersion = null;
+        Long version = null;
+        if (doVersionList.size() == 0) {
+            doVersion = new DOVersion();
+            doVersion.setCurrentVersion(0L);
+            version = 0L;
+        } else {
+            doVersion = entityManager.find(DOVersion.class, doVersionList.get(0).getIdOfDOObject());
+            version = doVersion.getCurrentVersion() + 1;
+            doVersion.setCurrentVersion(version);
+        }
+        doVersion.setDistributedObjectClassName("ECafeSettings");
+        entityManager.persist(doVersion);
+        settings.setGlobalVersion(version);
         settings.setLastUpdate(new Date());
         return entityManager.merge(settings);
     }
@@ -49,19 +65,33 @@ public class SettingRepository {
     public void create(ECafeSettings settings) throws Exception{
         settings.setSendAll(SendToAssociatedOrgs.SendToSelf);
         settings.setCreatedDate(new Date());
-        final Session session = entityManager.unwrap(Session.class);
-        Long version = DOVersionRepository.updateClassVersion(ECafeSettings.class.getSimpleName(), session);
-        //Long version = daoService.updateVersionByDistributedObjects(ECafeSettings.class.getSimpleName());
-        settings.setGlobalVersion(version);
-        settings.setGlobalVersionOnCreate(version);
-
-        //settings.beforePersist(entityManager.unwrap(Session.class), settings.getOrgOwner());
-        entityManager.persist(settings);
-        final String updateString = "update ECafeSettings set deletedState=true, deleteDate=current_date where orgOwner=:idoforg and settingsId=:settingsId";
-        final Query updateQ = session.createQuery(updateString);
+        final String qlString = "from DOVersion where distributedObjectClassName=:distributedObjectClassName";
+        TypedQuery<DOVersion> query = entityManager.createQuery(qlString, DOVersion.class);
+        query.setParameter("distributedObjectClassName", "ECafeSettings");
+        List<DOVersion> doVersionList = query.getResultList();
+        DOVersion doVersion = null;
+        Long version = null;
+        if (doVersionList.size() == 0) {
+            doVersion = new DOVersion();
+            doVersion.setCurrentVersion(0L);
+            version = 0L;
+        } else {
+            doVersion = entityManager.find(DOVersion.class, doVersionList.get(0).getIdOfDOObject());
+            version = doVersion.getCurrentVersion() + 1;
+            doVersion.setCurrentVersion(version);
+        }
+        doVersion.setDistributedObjectClassName("ECafeSettings");
+        entityManager.persist(doVersion);
+        String updateString = "update ECafeSettings set deletedState=true, deleteDate=:deleteDate where orgOwner=:idoforg and settingsId=:settingsId";
+        Query updateQ = entityManager.createQuery(updateString);
+        updateQ.setParameter("deleteDate",new Date());
         updateQ.setParameter("idoforg",settings.getOrgOwner());
         updateQ.setParameter("settingsId",settings.getSettingsId());
         updateQ.executeUpdate();
+        //Long version = daoService.updateVersionByDistributedObjects(ECafeSettings.class.getSimpleName());
+        settings.setGlobalVersion(version);
+        settings.setGlobalVersionOnCreate(version);
+        entityManager.persist(settings);
     }
 
     /* Вывести список всех возможных принтеров организации */

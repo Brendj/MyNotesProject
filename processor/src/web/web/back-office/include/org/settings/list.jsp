@@ -37,11 +37,6 @@
                 <f:selectItem itemValue="-1" itemLabel="--Не выбрано--"/>
                 <f:selectItems value="#{settingsListPage.settingsIdEnumTypeMenu.items}" />
             </h:selectOneMenu>
-            <h:outputText escape="true" value="Статус" styleClass="output-text"/>
-            <h:selectOneMenu value="#{settingsListPage.deleted}" styleClass="input-text">
-                <f:selectItem itemValue="true" itemLabel="Показать удаленные"/>
-                <f:selectItem itemValue="false" itemLabel="Не показать удаленные"/>
-            </h:selectOneMenu>
         </h:panelGrid>
 
         <h:panelGrid columns="2" styleClass="borderless-grid">
@@ -77,12 +72,6 @@
                 <h:outputText value="Тип устройства"/>
             </f:facet>
             <h:outputText value="#{setting.settingsId}"/>
-        </rich:column>
-        <rich:column>
-            <f:facet name="header">
-                <h:outputText value="Статус"/>
-            </f:facet>
-            <h:outputText value="#{(setting.deletedState?'Удален':'Активен')}"/>
         </rich:column>
         <rich:column>
             <f:facet name="header">

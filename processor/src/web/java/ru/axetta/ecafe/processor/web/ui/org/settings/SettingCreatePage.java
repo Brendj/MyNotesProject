@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.settings;
 
-import ru.axetta.ecafe.processor.core.daoservices.org.SettingRepository;
+import ru.axetta.ecafe.processor.core.daoservices.org.SettingService;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.AbstractParserBySettingValue;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Se
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -42,11 +43,11 @@ public class SettingCreatePage extends BasicWorkspacePage implements OrgSelectPa
     private List<String> allPrinters;
 
     @Autowired
-    private SettingRepository settingRepository;
+    private SettingService settingRepository;
 
     public void valueChangeListener(ValueChangeEvent event){
         try {
-            if(event.getNewValue()!=null){
+            if(StringUtils.isNotEmpty(String.valueOf(event.getNewValue()))){
                 settingsIds = SettingsIds.fromString((String)event.getNewValue()).getId();
                 init();
             }
@@ -100,6 +101,7 @@ public class SettingCreatePage extends BasicWorkspacePage implements OrgSelectPa
             return null;
         }
         String settingValue = parserBySettingValue.build();
+        setting.setDeletedState(false);
         setting.setSettingValue(settingValue);
         setting.setOrgOwner(orgItem.getIdOfOrg());
         try {

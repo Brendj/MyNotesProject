@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.settings;
 
-import ru.axetta.ecafe.processor.core.daoservices.org.SettingRepository;
+import ru.axetta.ecafe.processor.core.daoservices.org.SettingService;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.AbstractParserBySettingValue;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
@@ -40,7 +40,7 @@ public class SettingEditPage extends BasicWorkspacePage implements OrgSelectPage
     @Autowired
     private SelectedSettingsGroupPage selectedSettingsGroupPage;
     @Autowired
-    private SettingRepository settingRepository;
+    private SettingService settingRepository;
 
     @Override
     public void onShow() throws Exception {

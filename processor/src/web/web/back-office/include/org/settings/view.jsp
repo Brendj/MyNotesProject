@@ -34,9 +34,6 @@
         <h:outputText escape="true" value="Тип устройства" styleClass="output-text" />
         <h:inputText readonly="true" value="#{settingViewPage.setting.settingsId}" styleClass="output-text long-field" />
 
-        <h:outputText escape="true" value="Статус" styleClass="output-text" />
-        <h:inputText readonly="true" value="#{(settingViewPage.setting.deletedState?'Удален':'Активен')}" styleClass="output-text" />
-
     </h:panelGrid>
 
     <h:panelGrid columns="2" id="settingsEditCashierCheckPrinterPanelGrid"
