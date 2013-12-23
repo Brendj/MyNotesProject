@@ -77,6 +77,7 @@ public class ECafeSettings extends DistributedObject{
             Criteria criteria = session.createCriteria(ECafeSettings.class);
             criteria.add(Restrictions.eq("settingsId", settingsId));
             criteria.add(Restrictions.eq("orgOwner", idOfOrg));
+            criteria.add(Restrictions.ne("guid", guid));
             criteria.setMaxResults(1);
             ECafeSettings settings = (ECafeSettings) criteria.uniqueResult();
             session.clear();
