@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
@@ -218,7 +219,8 @@ public class SubFeedingServlet extends HttpServlet {
 
     private boolean isPlanChanged(HttpServletRequest req, CycleDiagramIn cycle) {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
-        CycleDiagram cd = sfService.findLastCycleDiagram(contractId);
+        Client client = DAOService.getInstance().getClientByContractId(contractId);
+        CycleDiagram cd = sfService.findClientCycleDiagram(client);
         Map<Integer, List<String>> activeComplexes = splitPlanComplexes(cd);
         for (Map.Entry<Integer, List<String>> entry : activeComplexes.entrySet()) {
             int dayNumber = entry.getKey();

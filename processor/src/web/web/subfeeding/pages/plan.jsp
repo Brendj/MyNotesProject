@@ -14,6 +14,13 @@
     <title>Абонементное питание</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/subfeeding/css/complexTable.css"/>
+    <script src="${pageContext.request.contextPath}/subfeeding/js/jquery-1.10.2.min.js"></script>
+    <script src="${pageContext.request.contextPath}/subfeeding/js/tools.js"></script>
+    <script>
+        $(function () {
+            $("#complexForm").preventDoubleSubmission();
+        });
+    </script>
 </head>
 <body>
 <div class="textDiv" style="position: relative; text-align: right; padding-right: 50px;">
@@ -40,7 +47,7 @@
 <c:if test="${not empty requestScope.subFeedingSuccess}">
     <div class="textDiv" style="color: green">${requestScope.subFeedingSuccess}</div>
 </c:if>
-<form method="post" enctype="application/x-www-form-urlencoded"
+<form method="post" enctype="application/x-www-form-urlencoded" id="complexForm"
       action="${pageContext.request.contextPath}/sub-feeding/<%=action%>">
     <table class="customTable">
         <tr>

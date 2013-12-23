@@ -397,12 +397,8 @@ public class DAOService {
     }
 
 
-    public Client getClientByContractId(long contractId) throws Exception {
-        Client cl = DAOUtils.findClientByContractId(entityManager, contractId);
-        if (cl == null) {
-            return null;
-        }
-        return cl;
+    public Client getClientByContractId(long contractId) {
+        return DAOUtils.findClientByContractId(entityManager, contractId);
     }
 
 

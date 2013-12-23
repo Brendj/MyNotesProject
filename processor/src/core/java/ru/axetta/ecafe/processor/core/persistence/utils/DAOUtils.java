@@ -223,8 +223,8 @@ public class DAOUtils {
         return ((Card)l.get(0)).getClient();
     }
 
-    public static Client findClientByContractId(EntityManager em, long cardNo) throws Exception {
-        return findClientByContractId((Session)em.getDelegate(), cardNo);
+    public static Client findClientByContractId(EntityManager em, long cardNo) {
+        return findClientByContractId(em.unwrap(Session.class), cardNo);
     }
 
     public static User findUser(Session persistenceSession, long idOfUser) throws Exception {
