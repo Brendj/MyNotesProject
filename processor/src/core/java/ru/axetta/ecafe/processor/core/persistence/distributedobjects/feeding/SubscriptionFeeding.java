@@ -18,6 +18,7 @@ import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -72,14 +73,15 @@ public class SubscriptionFeeding extends DistributedObject{
     protected void appendAttributes(Element element) {
         XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
         XMLUtils.setAttributeIfNotNull(element, "IdOfClient", idOfClient);
-        if(dateActivateService!=null){
-            XMLUtils.setAttributeIfNotNull(element, "DateActivate", CalendarUtils.dateToString(dateActivateService));
+        DateFormat df = CalendarUtils.getDateFormatLocal();
+        if (dateActivateService != null) {
+            XMLUtils.setAttributeIfNotNull(element, "DateActivate", df.format(dateActivateService));
         }
-        if(lastDatePauseService!=null){
-            XMLUtils.setAttributeIfNotNull(element, "LastDatePause", CalendarUtils.dateToString(lastDatePauseService));
+        if (lastDatePauseService != null) {
+            XMLUtils.setAttributeIfNotNull(element, "LastDatePause", df.format(lastDatePauseService));
         }
-        if(dateDeactivateService!=null){
-            XMLUtils.setAttributeIfNotNull(element, "DateDeactivate", CalendarUtils.dateToString(dateDeactivateService));
+        if (dateDeactivateService != null) {
+            XMLUtils.setAttributeIfNotNull(element, "DateDeactivate", df.format(dateDeactivateService));
         }
         XMLUtils.setAttributeIfNotNull(element, "WasSuspended", wasSuspended);
 

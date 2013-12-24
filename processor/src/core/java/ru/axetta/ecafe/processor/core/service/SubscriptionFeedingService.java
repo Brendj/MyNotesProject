@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -59,7 +60,8 @@ public class SubscriptionFeedingService {
     public void notifyClientsAboutSubscriptionFeeding() throws Exception {
         final Date currentDate = new Date();
         final Date withdrawDate = CalendarUtils.addDays(currentDate, 7);
-        String withdrawDateStr = CalendarUtils.dateToString(withdrawDate);
+        DateFormat df = CalendarUtils.getDateFormatLocal();
+        String withdrawDateStr = df.format(withdrawDate);
         String sql = "from CycleDiagram ccd where ccd.stateDiagram=0";
         TypedQuery<CycleDiagram> typedQuery = entityManager.createQuery(sql, CycleDiagram.class);
         List<CycleDiagram> cycleDiagrams = typedQuery.getResultList();
@@ -93,7 +95,7 @@ public class SubscriptionFeedingService {
                 final String contractId = String.format("%s01", String.valueOf(client.getContractId()));
                 if(sendNotification){
                     if(subBalance==null || subBalance==0L){
-                        withdrawDateStr = CalendarUtils.dateToString(CalendarUtils.addDays(currentDate, 1));
+                        withdrawDateStr = df.format(CalendarUtils.addDays(currentDate, 1));
                         subBalance = 0L;
                     }
                     if(subBalance - cycleDiagram.getWeekPrice()<0){
@@ -123,7 +125,7 @@ public class SubscriptionFeedingService {
                             subBalance = subBalance-days[i%7];
                             final Date date = CalendarUtils.addDays(currentDate, i - 5);
                             if(subBalance-days[i%7]<0 && date.compareTo(deactivateDate)<0 ){
-                                withdrawDateStr = CalendarUtils.dateToString(date);
+                                withdrawDateStr = df.format(date);
                                 String[] values = {"contractId", contractId, "withdrawDate", withdrawDateStr,
                                                    "balance", CurrencyStringUtils.copecksToRubles(currentBalance)};
                                 enService.sendNotification(client, EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING, values);

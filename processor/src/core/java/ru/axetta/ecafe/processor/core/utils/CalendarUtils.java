@@ -106,7 +106,7 @@ public class CalendarUtils {
 
     public static String dateToString(Date date) {
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        dateFormat.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));
         return dateFormat.format(date);
     }
 

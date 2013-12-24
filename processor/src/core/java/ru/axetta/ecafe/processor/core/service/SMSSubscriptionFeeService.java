@@ -22,6 +22,7 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -78,8 +79,10 @@ public class SMSSubscriptionFeeService {
         if (paymentType != SMS_PAYMENT_BY_SUBSCRIPTION_FEE) {
             return;
         }
-        String withdrawDate = CalendarUtils.dateToString(CalendarUtils.getFirstDayOfNextMonth(new Date()));
-        String currentDate = CalendarUtils.dateToString(new Date());
+        Date date = new Date();
+        DateFormat df = CalendarUtils.getDateFormatLocal();
+        String withdrawDate = df.format(CalendarUtils.getFirstDayOfNextMonth(date));
+        String currentDate = df.format(date);
         List<Long> ids = findClientsIdWithNotificationViaSMS();
         for (Long id : ids) {
             Client client = em.find(Client.class, id);
