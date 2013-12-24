@@ -38,7 +38,7 @@ public class SynchErrorsPage extends BasicWorkspacePage {
     private static final Logger logger = LoggerFactory.getLogger(SynchErrorsPage.class);
     @Autowired
     DashboardServiceBean dashboardServiceBean;
-    @PersistenceContext(unitName = "reportsPU")
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
     private long idoforg;
     private List<Item> items;

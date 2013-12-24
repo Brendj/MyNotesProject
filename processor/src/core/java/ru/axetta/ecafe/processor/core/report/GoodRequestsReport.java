@@ -72,12 +72,12 @@ public class GoodRequestsReport extends BasicReport {
             long endDateLong = endDate.getTime();
 
             String goodCondition = "";
-            if (goodName.equals("")) {
+            if (!goodName.equals("")) {
                 goodCondition = "and (cf_goods.nameofgood like '%" + goodName + "%' or cf_goods.fullname like '%"+goodName+"%' )";
             }
 
             String productCondition = "";
-            if (goodName.equals("")) {
+            if (!goodName.equals("")) {
                 productCondition = "and (cf_products.productname like '%" + goodName + "%' or cf_products.fullname like '%"+goodName+"%' )";
             }
 
