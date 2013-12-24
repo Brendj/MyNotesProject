@@ -74,6 +74,7 @@ public class Publication extends LibraryDistributedObject {
             criteria.add(Restrictions.eq("isbn",isbn));
             criteria.add(Restrictions.eq("publicationdate",publicationdate));
             criteria.add(Restrictions.eq("validISBN",true));
+            criteria.add(Restrictions.ne("guid", guid));
             Publication publication = (Publication) criteria.uniqueResult();
             session.clear();
             if(!(publication==null || publication.getDeletedState() || guid.equals(publication.getGuid()))){
