@@ -102,19 +102,6 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         }
     }
 
-    //public void updateVersionFromParent(Session session){
-    //    Criteria criteria = session.createCriteria(DOVersion.class);
-    //    criteria.add(Restrictions.eq("distributedObjectClassName", "GoodRequest"));
-    //    criteria.setMaxResults(1);
-    //    DOVersion version = (DOVersion) criteria.uniqueResult();
-    //    final long newVersion = version.getCurrentVersion()+1;
-    //    version.setCurrentVersion(newVersion);
-    //    session.update(version);
-    //    goodRequest.setLastUpdate(new Date());
-    //    goodRequest.setGlobalVersion(newVersion);
-    //    session.update(goodRequest);
-    //}
-
     @Override
     protected GoodRequestPosition parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
@@ -144,8 +131,8 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        //final Long lastTotalCount = getTotalCount();
-        //final Long lastDailySampleCount = getDailySampleCount();
+        final Long lastTotalCount = getTotalCount();
+        final Long lastDailySampleCount = getDailySampleCount();
         setOrgOwner(distributedObject.getOrgOwner());
         setGoodRequest(((GoodRequestPosition) distributedObject).getGoodRequest());
         setGood(((GoodRequestPosition) distributedObject).getGood());
@@ -154,20 +141,20 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         setNetWeight(((GoodRequestPosition) distributedObject).getNetWeight());
         setTotalCount(((GoodRequestPosition) distributedObject).getTotalCount());
         setDailySampleCount(((GoodRequestPosition) distributedObject).getDailySampleCount()); // суточная проба
-        //String lastHistory = getUpdateHistory();
-        //Date date = getLastUpdate()!=null? getLastUpdate():getCreatedDate();
-        //String newHistory="";
-        //final String strDate = CalendarUtils.dateToString(date);
-        //if(lastDailySampleCount==null){
-        //    newHistory= String.format("%s %d;", strDate, lastTotalCount/1000);
-        //} else {
-        //    newHistory= String.format("%s %d %d;", strDate, lastTotalCount/1000, lastDailySampleCount/1000);
-        //}
-        //if(StringUtils.isEmpty(lastHistory)){
-        //    setUpdateHistory(newHistory);
-        //} else {
-        //    setUpdateHistory(String.format("%s%s", lastHistory, newHistory));
-        //}
+        String lastHistory = getUpdateHistory();
+        Date date = getLastUpdate()!=null? getLastUpdate():getCreatedDate();
+        String newHistory="";
+        final String strDate = CalendarUtils.dateToString(date);
+        if(lastDailySampleCount==null){
+            newHistory= String.format("%s %d;", strDate, lastTotalCount/1000);
+        } else {
+            newHistory= String.format("%s %d %d;", strDate, lastTotalCount/1000, lastDailySampleCount/1000);
+        }
+        if(StringUtils.isEmpty(lastHistory)){
+            setUpdateHistory(newHistory);
+        } else {
+            setUpdateHistory(String.format("%s%s", lastHistory, newHistory));
+        }
     }
 
     public String getUpdateHistory() {
