@@ -29,6 +29,7 @@ public class GoodRequestsReport extends BasicReport {
     public static final long REQUESTS_MONITORING_TIMEOUT = 172800000;          //  2 дня
     public static final String OVERALL_TITLE = "ИТОГО";
     public static final String OVERALL_ALL_TITLE = "ВСЕГО";
+    private static final DateFormat YEAR_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
     private static final DateFormat MONTHLY_DATE_FORMAT = new SimpleDateFormat("dd.MM");
     private static final DateFormat DAILY_DATE_FORMAT = new SimpleDateFormat("dd");
     private final List<RequestItem> items;
@@ -295,8 +296,18 @@ public class GoodRequestsReport extends BasicReport {
         //  Анализируем месяц, если у первой и последней даты он разный, значит надо будет выводить даты с месяцами
         //boolean showMonths = ((Date) dates.toArray()[0]).getMonth() != ((Date) dates.toArray()[dates.size() - 1]).getMonth();
         boolean showMonths = startDate.getMonth() != endDate.getMonth();
+        boolean showYears = startDate.getYear() != endDate.getYear();
         for (Date d : dates) {
-            cols.add(showMonths ? MONTHLY_DATE_FORMAT.format(d) : DAILY_DATE_FORMAT.format(d));
+            DateFormat format = null;
+            if (showYears) {
+                format = YEAR_DATE_FORMAT;
+            } else if (showMonths) {
+                format = MONTHLY_DATE_FORMAT;
+            } else {
+                format = DAILY_DATE_FORMAT;
+            }
+
+            cols.add(format.format(d));
         }
         return cols.toArray();
     }
@@ -493,8 +504,20 @@ public class GoodRequestsReport extends BasicReport {
             firstDate.setTimeInMillis(values.keySet().iterator().next());
             Calendar cal = new GregorianCalendar();
             int day = -1;
-            int month = -1;
-            if (colName.indexOf(".") > 0) {
+            int month = firstDate.get(Calendar.MONTH);
+            int year = firstDate.get(Calendar.YEAR);
+            String parts [] = colName.split("\\.");
+            if (parts.length == 3) {
+                day = Integer.parseInt(parts[0]);
+                month = Integer.parseInt(parts[1]) - 1;
+                year = Integer.parseInt(parts[2]);
+            } else if (parts.length == 2) {
+                day = Integer.parseInt(parts[0]);
+                month = Integer.parseInt(parts[1]) - 1;
+            } else {
+                day = Integer.parseInt(parts[0]);
+            }
+            /*if (colName.indexOf(".") > 0) {
                 //  определяем есть ли месяц - если есть, значит будем использовать месяц + день
                 day = Integer.parseInt(colName.substring(0, colName.indexOf(".")));
                 month = Integer.parseInt(colName.substring(colName.indexOf(".") + 1)) - 1;
@@ -502,10 +525,10 @@ public class GoodRequestsReport extends BasicReport {
                 //  если месяца нет, то получаем его у первого значения
                 day = Integer.parseInt(colName);
                 month = firstDate.get(Calendar.MONTH);
-            }
+            }*/
             cal.set(Calendar.DAY_OF_MONTH, day);
             cal.set(Calendar.MONTH, month);
-            cal.set(Calendar.YEAR, firstDate.get(Calendar.YEAR));
+            cal.set(Calendar.YEAR, year);
             CalendarUtils.truncateToDayOfMonth(cal);
             return cal;
         }
