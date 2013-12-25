@@ -139,13 +139,14 @@ public class GoodRequestsNotificationService {
                                         CalendarUtils.truncateToDayOfMonth(calendar);
                                         Date day = calendar.getTime();
                                         final boolean c = day.equals(doneDate);
-                                        if(b && c){
+                                        final boolean d = position.getOrgOwner().equals(item.getIdOfOrg());
+                                        if(b && c && d){
                                             isGood = true; break;
                                         }
                                     }
                                 }
                             }
-                            newValueHistory.append("<td style='"+(isGood?"background-color: palevioletred; color: #fff;":"")+"'>");
+                            newValueHistory.append("<td style='text-align: center;"+(isGood?"background-color: palevioletred; color: #fff;":"")+"'>");
                             newValueHistory.append(rowValue);
                             newValueHistory.append("</td>");
                         }

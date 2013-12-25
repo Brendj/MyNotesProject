@@ -128,8 +128,8 @@ public class GoodRequestsReport extends BasicReport {
                 notCreatedAtConfition = "and (cf_goods_requests.createddate < " + (limit) + ") ";
             }
 
-            String sqlGood = "select requests.org, requests.orgFull, requests.shortGood, requests.good, requests.idofgood, requests.d, int8(sum(requests.cnt)), sum(coalesce(requests.ds_cnt, 0)) "+
-                         "from (select substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') as org, cf_orgs.officialname as orgFull, "+
+            String sqlGood = "select requests.idorg, requests.org, requests.orgFull, requests.shortGood, requests.good, requests.idofgood, requests.d, int8(sum(requests.cnt)), sum(coalesce(requests.ds_cnt, 0)) "+
+                         "from (select cf_orgs.idoforg as idorg, substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') as org, cf_orgs.officialname as orgFull, "+
                          "             cf_goods.fullname as good, cf_goods.nameofgood as shortGood, cf_goods.idofgood as idofgood , date_trunc('day', to_timestamp(cf_goods_requests.donedate / 1000)) as d, "+
                          "             cf_goods_requests_positions.totalcount / 1000 as cnt, cf_goods_requests_positions.DailySampleCount / 1000 as ds_cnt "+
                          "       from cf_goods_requests "+
@@ -144,11 +144,11 @@ public class GoodRequestsReport extends BasicReport {
                          "            " + goodCondition +
                          "            " + orgCondition +
                          "            " + suppliersCondition + ") as requests "+
-                         "group by requests.org, requests.orgFull, requests.idofgood, requests.shortGood, requests.good, requests.d "+
+                         "group by requests.idorg, requests.org, requests.orgFull, requests.idofgood, requests.shortGood, requests.good, requests.d "+
                          "order by requests.org, requests.idofgood, requests.d";
 
-            String sqlProduct = "select requests.org, requests.orgFull, requests.shortGood, requests.good, requests.idofgood, requests.d, int8(sum(requests.cnt)), sum(coalesce(requests.ds_cnt, 0)) "+
-                    "from (select substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') as org, cf_orgs.officialname as orgFull, "+
+            String sqlProduct = "select requests.idorg, requests.org, requests.orgFull, requests.shortGood, requests.good, requests.idofgood, requests.d, int8(sum(requests.cnt)), sum(coalesce(requests.ds_cnt, 0)) "+
+                    "from (select cf_orgs.idoforg as idorg, substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') as org, cf_orgs.officialname as orgFull, "+
                     "             cf_products.fullname as good, cf_products.productname as shortGood, cf_products.idofproducts as idofgood , date_trunc('day', to_timestamp(cf_goods_requests.donedate / 1000)) as d, "+
                     "             cf_goods_requests_positions.totalcount / 1000 as cnt, cf_goods_requests_positions.DailySampleCount / 1000 as ds_cnt "+
                     "       from cf_goods_requests "+
@@ -163,12 +163,12 @@ public class GoodRequestsReport extends BasicReport {
                     "            " + productCondition +
                     "            " + orgCondition +
                     "            " + suppliersCondition + ") as requests "+
-                    "group by requests.org, requests.orgFull, requests.idofgood, requests.shortGood, requests.good, requests.d "+
+                    "group by requests.idorg, requests.org, requests.orgFull, requests.idofgood, requests.shortGood, requests.good, requests.d "+
                     "order by requests.org, requests.idofgood, requests.d";
 
             //Map <String, RequestItem> totalItems = new TreeMap <String, RequestItem>();
             Map <Long, RequestItem> totalItems = new TreeMap <Long, RequestItem>();
-            RequestItem overallItem = new TotalItem(OVERALL_TITLE, "", -1L,OVERALL_ALL_TITLE, report);
+            RequestItem overallItem = new TotalItem(-1L,OVERALL_TITLE, "", -1L,OVERALL_ALL_TITLE, report);
 
             List res = new ArrayList();
             Query queryGood = session.createSQLQuery(sqlGood);
@@ -178,21 +178,22 @@ public class GoodRequestsReport extends BasicReport {
             res.addAll(queryProduct.list());
             for (Object o : res) {
                 Object entry [] = (Object []) o;
-                String org      = ((String) entry [0]).trim ();
-                String orgFull  = ((String) entry [1]).trim ();
-                String good     = ((String) entry [2]).trim ();
-                String shortGood= ((String) entry [3]).trim ();
-                long idOfGood   = Long.valueOf(entry[4].toString());
-                long date       = ((Timestamp) entry [5]).getTime();
-                int value       = ((BigInteger) entry [6]).intValue();
-                int dailySample = ((BigDecimal) entry[7]).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
+                long idOfOrg   = Long.valueOf(entry[0].toString());
+                String org      = ((String) entry [1]).trim ();
+                String orgFull  = ((String) entry [2]).trim ();
+                String good     = ((String) entry [3]).trim ();
+                String shortGood= ((String) entry [4]).trim ();
+                long idOfGood   = Long.valueOf(entry[5].toString());
+                long date       = ((Timestamp) entry [6]).getTime();
+                int value       = ((BigInteger) entry [7]).intValue();
+                int dailySample = ((BigDecimal) entry[8]).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
 
 
                 //RequestItem item = findItemByOrgAndGood(items, org, good);
                 RequestItem item = findItemByOrgAndGood(items, org, idOfGood);
                 if (item == null) {
                     final String name = (StringUtils.isEmpty(good)? shortGood: good);
-                    item = new RequestItem(org, orgFull, idOfGood, name, report);
+                    item = new RequestItem(idOfOrg, org, orgFull, idOfGood, name, report);
                     items.add(item);
                 }
                 item.addValue(date, new RequestValue(value));
@@ -202,7 +203,7 @@ public class GoodRequestsReport extends BasicReport {
                 //RequestItem totalItem = totalItems.get(good);
                 RequestItem totalItem = totalItems.get(idOfGood);
                 if (totalItem == null) {
-                    totalItem = new TotalItem(OVERALL_TITLE, "", idOfGood, good, report);
+                    totalItem = new TotalItem(-1L,OVERALL_TITLE, "", idOfGood, good, report);
                     //totalItems.put(good, totalItem);
                     totalItems.put(idOfGood, totalItem);
                 }
@@ -319,8 +320,8 @@ public class GoodRequestsReport extends BasicReport {
 
     public static class TotalItem extends RequestItem {
 
-        public TotalItem (String org, String orgFull,Long idOfGood, String item, GoodRequestsReport report) {
-            super(org, orgFull, idOfGood, item, report);
+        public TotalItem (Long idOfOrg, String org, String orgFull,Long idOfGood, String item, GoodRequestsReport report) {
+            super(idOfOrg, org, orgFull, idOfGood, item, report);
         }
 
         @Override
@@ -357,6 +358,7 @@ public class GoodRequestsReport extends BasicReport {
 
     public static class RequestItem {
         protected List <String> result;
+        protected final Long idOfOrg; // Идетификатор организации
         protected final String org; // Наименование организации
         protected final String orgFull; // Полное наименование организации
         protected final Long idOfGood; // Идентификатор  товара
@@ -366,12 +368,17 @@ public class GoodRequestsReport extends BasicReport {
         protected Map<Long, RequestValue> dailySamples = new TreeMap<Long, RequestValue>();
 
 
-        public RequestItem(String org, String orgFull, long idOfGood, String good, GoodRequestsReport report) {
+        public RequestItem(Long idOfOrg, String org, String orgFull, long idOfGood, String good, GoodRequestsReport report) {
+            this.idOfOrg = idOfOrg;
             this.org = org;
             this.orgFull = orgFull;
             this.good = good;
             this.idOfGood = idOfGood;
             this.report = report;
+        }
+
+        public Long getIdOfOrg() {
+            return idOfOrg;
         }
 
         public String getOrg () {
