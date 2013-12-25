@@ -106,14 +106,19 @@ public class Circulation extends LibraryDistributedObject {
         //Client cl = DAOUtils.findClientByRefGUID(session, guidClient);
         //if(cl==null) throw new DistributedObjectException("Client NOT_FOUND_VALUE");
         //setClient(cl);
-        if (idOfClient != null) {
+        if (idOfClient == null) {
+            throw new DistributedObjectException("NOT_FOUND_VALUE Client");
+        } else {
+            Client currentClient;
             try{
-                setClient(DAOUtils.findClient(session, idOfClient));
+                currentClient = DAOUtils.findClient(session, idOfClient);
             } catch (Exception e){
                 throw new DistributedObjectException("NOT_FOUND_VALUE Client");
             }
-        } else {
-            throw new DistributedObjectException("NOT_FOUND_VALUE Client");
+            if(currentClient==null){
+                throw new DistributedObjectException("NOT_FOUND_VALUE Client");
+            }
+            setClient(currentClient);
         }
 
     }
@@ -127,6 +132,7 @@ public class Circulation extends LibraryDistributedObject {
         setParentCirculation(((Circulation) distributedObject).getParentCirculation());
         setIssuable(((Circulation) distributedObject).getIssuable());
         setClient(((Circulation) distributedObject).getClient());
+        setIdOfClient(((Circulation) distributedObject).getIdOfClient());
     }
 
     public Circulation getParentCirculation() {
