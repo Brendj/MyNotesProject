@@ -6,6 +6,7 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
@@ -73,12 +74,22 @@ public class CycleDiagram extends DistributedObject{
 
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
-        Boolean enableSubscriptionFeeding = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_SUBSCRIPTION_FEEDING);
-        if(!enableSubscriptionFeeding) throw new DistributedObjectException("Subscription Feeding is disable");
+        Boolean enableSubscriptionFeeding = RuntimeContext.getInstance()
+                .getOptionValueBool(Option.OPTION_ENABLE_SUBSCRIPTION_FEEDING);
+        if (!enableSubscriptionFeeding) {
+            throw new DistributedObjectException("Subscription Feeding is disable");
+        }
         try {
             this.client = DAOUtils.findClient(session, idOfClient);
         } catch (Exception e) {
             throw new DistributedObjectException(e.getMessage());
+        }
+        SubscriptionFeedingService sfService = RuntimeContext.getAppContext().getBean(SubscriptionFeedingService.class);
+        CycleDiagram cd = sfService.findClientCycleDiagram(client);
+        if (cd != null && isActual()) {
+            DistributedObjectException doe = new DistributedObjectException("CycleDiagram DATA_EXIST_VALUE");
+            doe.setData(cd.getGuid());
+            throw doe;
         }
     }
 
@@ -164,6 +175,10 @@ public class CycleDiagram extends DistributedObject{
         setFriday(((CycleDiagram) distributedObject).getFriday());
         setSaturday(((CycleDiagram) distributedObject).getSaturday());
         setSunday(((CycleDiagram) distributedObject).getSunday());
+    }
+
+    public boolean isActual() {
+        return !deletedState && stateDiagram == StateDiagram.ACTIVE;
     }
 
     public Long getIdOfClient() {
