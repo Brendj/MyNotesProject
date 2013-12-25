@@ -58,7 +58,10 @@ public class MaintenanceService {
                 logger.info("Starting DB maintanance procedures...");
                 lastCleanDate = new Date();
                 try {
+                    long duration = System.currentTimeMillis();
                     String report = getProxy().clean(false);
+                    duration = System.currentTimeMillis() - duration;
+                    logger.debug("Total duration = " + duration);
                     logger.info("DB maintanance procedures finished successfully. " + report);
                 } catch (Exception e) {
                     logger.error("Database cleaning failed", e);
@@ -81,6 +84,7 @@ public class MaintenanceService {
     @SuppressWarnings("unchecked")
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.SUPPORTS, readOnly = true)
     public String clean(boolean isSource) throws Exception {
+        logger.debug("start clean: "+ new Date());
         long menuDaysForDeletion = runtimeContext.getOptionValueInt(
                 isSource ? Option.OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION : Option.OPTION_MENU_DAYS_FOR_DELETION);
         if (menuDaysForDeletion < 0) {
@@ -94,6 +98,7 @@ public class MaintenanceService {
                 "select m.IdOfMenu, m.IdOfOrg from CF_Menu m where m.IdOfOrg " + orgFilter + " and m.MenuDate < :date")
                 .setParameter("date", timeToClean);
         List<Object[]> records = query.getResultList();
+        logger.debug("count menu: "+ records.size());
         Set<Long> orgIds = new HashSet<Long>();
         MaintenanceService proxy = getProxy();
 
@@ -103,7 +108,11 @@ public class MaintenanceService {
         for (Object[] row : records) {
             Long idOfMenu = ((BigInteger) row[0]).longValue();
             orgIds.add(((BigInteger) row[1]).longValue());
+            long duration = System.currentTimeMillis();
+            logger.debug("Clean menu details from Menu "+idOfMenu);
             int[] res = proxy.cleanMenuInternal(idOfMenu);
+            duration = System.currentTimeMillis()-duration;
+            logger.debug("Successfully delete menu details duration= "+duration);
             menuDetailDeletedCount += res[0];
             menuDeletedCount += res[1];
         }
@@ -122,6 +131,9 @@ public class MaintenanceService {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public int[] cleanMenuInternal(Long idOfMenu) {
         int[] res = new int[2];
+        //String onHashJoin = "set enable_nestloop = off;set enable_hashjoin = on;set enable_mergejoin = off;";
+        //Query onHashJoinQuery =  entityManager.createNativeQuery(onHashJoin);
+        //onHashJoinQuery.executeUpdate();
         Query detailsQuery = entityManager
                 .createNativeQuery("DELETE FROM CF_MenuDetails md WHERE md.IdOfMenu = :idOfMenu");
         Query menuQuery = entityManager.createNativeQuery("DELETE FROM CF_Menu m WHERE m.IdOfMenu = :idOfMenu");
@@ -129,6 +141,9 @@ public class MaintenanceService {
         res[0] = detailsQuery.executeUpdate();
         menuQuery.setParameter("idOfMenu", idOfMenu);
         res[1] = menuQuery.executeUpdate();
+        //String onAllOptions = "set enable_nestloop = on;set enable_hashjoin = on;set enable_mergejoin = on;";
+        //Query onAllOptionsQuery =  entityManager.createNativeQuery(onAllOptions);
+        //onAllOptionsQuery.executeUpdate();
         return res;
     }
 
