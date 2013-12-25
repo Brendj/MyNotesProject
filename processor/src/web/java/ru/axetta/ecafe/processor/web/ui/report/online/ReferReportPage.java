@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.DailyReferReport;
 import ru.axetta.ecafe.processor.core.report.ReferReport;
@@ -21,6 +22,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.*;
@@ -43,6 +45,8 @@ public class ReferReportPage extends OnlineReportPage {
     private String htmlReport;
     private ReferReport monthlyReport;
     private DailyReferReport dailyReport;
+    private String category;
+    private List<String> categories;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
@@ -64,9 +68,46 @@ public class ReferReportPage extends OnlineReportPage {
         this.end = end;
     }
 
+    public List<SelectItem> getCategories() {
+        if(categories == null || categories.size() < 1) {
+            RuntimeContext.getAppContext().getBean(ReferReportPage.class).loadCategories();
+        }
+
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        items.add(new SelectItem(DailyReferReport.SUBCATEGORY_ALL));
+        for (String cat : categories) {
+            items.add(new SelectItem(cat));
+        }
+        return items;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+
+
+    @Transactional
+    public void loadCategories() {
+        Session session = null;
+        try {
+            session = (Session) entityManager.getDelegate();
+            categories = DAOUtils.getDiscountRuleSubcategories(session);
+        } catch (Exception e) {
+            logger.error("Failed to load clients data", e);
+        } finally {
+            //HibernateUtils.close(session, logger);
+        }
+    }
+
 
     @Override
     public void onShow() throws Exception {
+        category = "Все";
     }
 
     public void clear(){
@@ -127,6 +168,9 @@ public class ReferReportPage extends OnlineReportPage {
 
     public void generateDailyReport(Session session, BasicReportJob.OrgShortItem orgItem, Calendar cal) {
         DailyReferReport.Builder reportBuilder = new DailyReferReport.Builder();
+        Properties props = new Properties();
+        props.setProperty(DailyReferReport.SUBCATEGORY_PARAMETER, category);
+        reportBuilder.setReportProperties(props);
         reportBuilder.setOrg(orgItem);
         try {
             dailyReport = reportBuilder.build(session, start, end, cal);

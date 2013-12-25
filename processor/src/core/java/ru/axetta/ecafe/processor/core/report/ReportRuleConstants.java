@@ -157,6 +157,13 @@ public class ReportRuleConstants {
                     "{"+BasicReportJob.REPORT_PERIOD_LAST_WEEK+"}неделя,"+
                     "{"+BasicReportJob.REPORT_PERIOD_PREV_PREV_PREV_DAY+"}-3 дня,"+
                     "{"+BasicReportJob.REPORT_PERIOD_PREV_PREV_DAY+"}-2 дня,{"+BasicReportJob.REPORT_PERIOD_PREV_DAY+"}-1 день,{"+BasicReportJob.REPORT_PERIOD_TODAY+"}сегодня"),
+            new ParamHint("referCategory", "Категория").setDefaultRule("= "+RuleProcessor.COMBOBOX_EXPRESSION+
+                    "{Шк Здоровья 1-4 кл.(завтрак+обед)}Шк Здоровья 1-4 кл.(завтрак+обед),"
+                    + "{Шк Здоровья 5-11 кл.(завтрак+обед)}Шк Здоровья 5-11 кл.(завтрак+обед),"
+                    + "{Многодетные 1-4 кл.(завтрак+обед)}Многодетные 1-4 кл.(завтрак+обед),"
+                    + "{Многодетные 5-11 кл.(завтрак+обед)}Многодетные 5-11 кл.(завтрак+обед),"
+                    + "{Соц./незащищ. 5-11 кл.(завтрак+обед)}Соц./незащищ. 5-11 кл.(завтрак+обед),"
+                    + "{Соц./незащищ. 1-4 кл.(завтрак+обед)}Соц./незащищ. 1-4 кл.(завтрак+обед)"),
             // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
             /*new ParamHint("idOfContract", "Контракт"),
             new ParamHint("listValue", "Какое-то значение из списка").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION + "{111}один,{222}два,{333}три"),
@@ -207,7 +214,7 @@ public class ReportRuleConstants {
             new ReportHint(BudgetMealsShippingReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(ActiveClientsReport.class.getCanonicalName(), new int[]{}),
             //new ReportHint(ReferReport.class.getCanonicalName(), new int[]{-3}),
-            //new ReportHint(DailyReferReport.class.getCanonicalName(), new int[]{-3})
+            //new ReportHint(DailyReferReport.class.getCanonicalName(), new int[]{-3, -33})
             // отрицательное значение - обязательное
     };
 

@@ -37,6 +37,11 @@
             <h:outputText styleClass="output-text" escape="true" value=" {#{referReportPage.filter}}" />
         </h:panelGroup>
 
+        <h:outputText escape="true" value="Категория" styleClass="output-text" />
+        <h:selectOneMenu id="categoriesList" value="#{referReportPage.category}" style="width:325px;" >
+            <f:selectItems value="#{referReportPage.categories}"/>
+        </h:selectOneMenu>
+
         <a4j:commandButton value="Генерировать месячный отчет" action="#{referReportPage.doGenerateMonthly}"
                            reRender="mainMenu, workspaceTogglePanel"
                            styleClass="command-button" status="reportGenerateStatus" />

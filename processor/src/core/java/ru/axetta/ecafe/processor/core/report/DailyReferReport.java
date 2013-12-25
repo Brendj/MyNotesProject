@@ -44,6 +44,9 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
     private String htmlReport;
     public static DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     public static DateFormat dailyItemsFormat = new SimpleDateFormat("dd.MM.yyyy");
+    public static final String SUBCATEGORY_PARAMETER = "category";
+    public static final String SUBCATEGORY_ALL = "Все";
+    public static final String OVERALL_SUBCATEGORY_NAME = "Сведения о рационах питания, получеченных в отчетном периоде";
 
 
     public List<DailyReferReportItem> getItems() {
@@ -96,7 +99,15 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             totalSumm = 0D;
             Date generateTime = new Date();
 
-
+            String category = null;
+            try {
+                category = (String) reportProperties.get(SUBCATEGORY_PARAMETER);
+                if (category.equals(SUBCATEGORY_ALL)) {
+                    category = "";
+                }
+            } catch (Exception e) {
+                category = null;
+            }
             /* Строим параметры для передачи в jasper */
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             calendar.setTime(startTime);
@@ -105,13 +116,13 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             parameterMap.put("month", month + 1);
             parameterMap.put("monthName", new DateFormatSymbols().getMonths()[month]);
             parameterMap.put("year", calendar.get(Calendar.YEAR));*/
-            parameterMap.put("startDate", startTime);
-            parameterMap.put("endDate", endTime);
+            parameterMap.put("startDate", dailyItemsFormat.format(startTime));
+            parameterMap.put("endDate", dailyItemsFormat.format(endTime));
             parameterMap.put("orgName", org.getShortName());
 
 
             Date generateEndTime = new Date();
-            List<DailyReferReportItem> items = findDailyReferItems(session, startTime, endTime);
+            List<DailyReferReportItem> items = findDailyReferItems(session, startTime, endTime, category);
             //  После получения всего списка, передаем итоговую сумму в кач-ве параметра
             parameterMap.put("totalSum", totalSumm);
 
@@ -142,7 +153,14 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             return new JRBeanCollectionDataSource(items);
         }
 
-        private List<DailyReferReportItem> findDailyReferItems(Session session, Date startTime, Date endTime) {
+        private List<DailyReferReportItem> findDailyReferItems(Session session, Date startTime, Date endTime, String category) {
+            String categoryClause = "";
+            if (category != null && category.length() > 0) {
+                categoryClause = " and cf_discountrules.subcategory = '" + category + "' ";
+            } else {
+                //categoryClause = " and cf_discountrules.subcategory <> '' ";
+            }
+
             List<DailyReferReportItem> result = new ArrayList<DailyReferReportItem>();
             String sql =
                     "select subcategory, nameofgood, "
@@ -160,8 +178,8 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                     + "     join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
                     + "     join cf_discountrules on cf_discountrules.idofrule=cf_orderdetails.idofrule "
                     + "     where cf_orderdetails.socdiscount<>0 and cf_orgs.idoforg=:idoforg and "
-                    + "           cf_orders.createddate between :start and :end and "
-                    + "           cf_discountrules.subcategory <> '') as data "
+                    + "           cf_orders.createddate between :start and :end "
+                    + "           " + categoryClause + ") as data "
                     + "group by subcategory, nameofgood, d, price "
                     + "order by 1, 2"
 
@@ -187,6 +205,9 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             for (Object entry : res) {
                 Object e[]            = (Object[]) entry;
                 String name           = (String) e[0];
+                if (category == null || category.length() < 1) {
+                    name = OVERALL_SUBCATEGORY_NAME;
+                }
                 String goodname       = (String) e[1];
                 long ts               = ((BigInteger) e[2]).longValue();
                 BigDecimal priceObj   = e[3] == null ? new BigDecimal(0D) : (BigDecimal) e[3];
@@ -260,7 +281,11 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
 
         public DailyReferReportItem(long ts, String name, String goodname, long children, double price, double summary) {
             day = dailyItemsFormat.format(new Date(ts));
-            this.group1 = name.substring(0, name.indexOf("("));
+            if (name.equals(OVERALL_SUBCATEGORY_NAME)) {
+                this.group1 = name;
+            } else if (name.length() > 0) {
+                this.group1 = name.substring(0, name.indexOf("("));
+            }
             if (goodname.toLowerCase().indexOf("завтрак") > -1) {
                 this.group2 = "ЗАВТРАК";
             } else if (goodname.toLowerCase().indexOf("обед") > -1) {

@@ -1589,4 +1589,10 @@ public class DAOUtils {
         }
         return productCriteria.list();
     }
+    
+    public static List<String> getDiscountRuleSubcategories(Session session) {
+        org.hibernate.Query q = session.createSQLQuery(
+                "select distinct subcategory from cf_discountrules where subcategory<>''");
+        return (List<String>)q.list();
+    }
 }
