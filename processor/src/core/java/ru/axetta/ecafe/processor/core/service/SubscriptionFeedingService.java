@@ -33,10 +33,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -146,7 +143,10 @@ public class SubscriptionFeedingService {
         Session session = entityManager.unwrap(Session.class);
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
         Date tomorrow = CalendarUtils.addDays(today, 1);
-        Criteria criteria = session.createCriteria(ComplexInfo.class).add(Restrictions.eq("org", org))
+        // Ищем комплексы либо самой орг-ии, либо ее постащиков.
+        Set<Org> sourceOrg = entityManager.find(Org.class, org.getIdOfOrg()).getSourceMenuOrgs();
+        sourceOrg.add(org);
+        Criteria criteria = session.createCriteria(ComplexInfo.class).add(Restrictions.in("org", sourceOrg))
                 .add(Restrictions.eq("usedSubscriptionFeeding", 1)).add(Restrictions.in("idOfComplex", complexIds))
                 .add(Restrictions.ge("menuDate", today)).add(Restrictions.lt("menuDate", tomorrow))
                 .setProjection(Projections.sum("currentPrice"));
@@ -160,7 +160,10 @@ public class SubscriptionFeedingService {
         Session session = entityManager.unwrap(Session.class);
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
         Date tomorrow = CalendarUtils.addDays(today, 1);
-        Criteria criteria = session.createCriteria(ComplexInfo.class).add(Restrictions.eq("org", org))
+        // Ищем комплексы либо самой орг-ии, либо ее постащиков.
+        Set<Org> sourceOrg = entityManager.find(Org.class, org.getIdOfOrg()).getSourceMenuOrgs();
+        sourceOrg.add(org);
+        Criteria criteria = session.createCriteria(ComplexInfo.class).add(Restrictions.in("org", sourceOrg))
                 .add(Restrictions.eq("usedSubscriptionFeeding", 1)).add(Restrictions.ge("menuDate", today))
                 .add(Restrictions.lt("menuDate", tomorrow));
         return (List<ComplexInfo>) criteria.list();
