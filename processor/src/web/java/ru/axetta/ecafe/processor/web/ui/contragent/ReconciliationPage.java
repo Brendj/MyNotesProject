@@ -7,9 +7,11 @@ package ru.axetta.ecafe.processor.web.ui.contragent;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.PaymentReconciliationManager;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
@@ -25,7 +27,7 @@ import java.util.regex.Pattern;
 @Scope("session")
 public class ReconciliationPage extends BasicWorkspacePage implements ContragentSelectPage.CompleteHandler {
     final static String FIELD_ID_OF_PAYMENT="idOfPayment", FIELD_ID_OF_CONTRACT="idOfContract", FIELD_SUM="sum",
-        FIELD_SEPARATORS="separators", FIELD_DATE="date";
+        FIELD_SEPARATORS="separators", FIELD_DATE="date", FIELD_PAYMENT_TRANSFORM="paymentTransform";
     
     private Long caAgent;
     private Long caReceiver;
@@ -36,6 +38,8 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
     private List<PaymentReconciliationManager.RegistryItem> registryItems;
     private List<PaymentReconciliationManager.Difference> differencesList;
     private String differencesInfo;
+    private String settings;
+    private UploadItem item;
 
     @Override
     public String getPageFilename() {
@@ -44,22 +48,24 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
 
     @Override
     public void onShow() throws Exception {
-        super.onShow();    //To change body of overridden methods use File | Settings | File Templates.
+        super.onShow();
     }
     
     public Object processData() {
-        if (registryProcessingError!=null) {
+        readFile();
+        if (registryProcessingError != null) {
             printError(registryProcessingError);
             return null;
         }
-        if (registryItems==null) {
+        if (registryItems == null) {
             printError("Не загружен реестр платежей");
             return null;
         }
-        if (caAgent==null) {
+        if (caAgent == null) {
             printError("Не указан агент");
             return null;
         }
+        RuntimeContext.getInstance().setOptionValueWithSave(Option.OPTION_RECONCILIATION_SETTING, settings);
         PaymentReconciliationManager reconciliationManager = RuntimeContext.getAppContext().getBean(PaymentReconciliationManager.class);
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(dtFrom);
@@ -104,17 +110,22 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
         else {
             throw new Exception("Неправильный тип контрагента: "+classTypes);
         }
+        settings = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_RECONCILIATION_SETTING);
     }
 
     public static class LineConfig {
         Pattern separators;
         Integer nIdOfContractField, nIdOfPaymentField, nSumField, nDateField;
+        String paymentTransform;
     }
-    
+
     public void uploadFileListener(UploadEvent event) {
-        UploadItem item = event.getUploadItem();
+        item = event.getUploadItem();
+    }
+
+    private void readFile() {
         InputStream inputStream = null;
-        long dataSize = 0;
+        long dataSize;
         try {
             if (item.isTempFile()) {
                 File file = item.getFile();
@@ -128,10 +139,10 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
             loadRegistry(inputStream, dataSize);
             registryProcessingError = null;
         } catch (Exception e) {
-            registryProcessingError = "Ошибка при обработке файла реестра: "+e.getMessage();
+            registryProcessingError = "Ошибка при обработке файла реестра: " + e.getMessage();
             logAndPrintMessage("Ошибка при обработке файла реестра", e);
         } finally {
-            if (inputStream!=null) {
+            if (inputStream != null) {
                 try {
                     inputStream.close();
                 } catch (IOException ignored) {
@@ -139,19 +150,22 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
             }
         }
     }
-    
-    
+
     public void loadRegistry(InputStream inputStream, long dataSize) throws Exception {
         List<PaymentReconciliationManager.RegistryItem> registryItems = new ArrayList<PaymentReconciliationManager.RegistryItem>();
 
         int lineNo = 0;
         LineConfig lineConfig = new LineConfig();
+        String[] rows = StringUtils.split(settings, "\n");
+        for (String row : rows) {
+            parseLineConfig(lineConfig, row);
+        }
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1251"));
         String currLine = reader.readLine();
         while (null != currLine) {
             try {
                 if (currLine.startsWith("!")) {
-                    parseLineConfig(lineConfig, currLine);
+                    //parseLineConfig(lineConfig, currLine);
                 } else {
                     if (currLine.trim().isEmpty()) continue;
                     if (lineConfig.nIdOfPaymentField==null) throw new Exception("Не указано позиция обязательного поля: "+FIELD_ID_OF_PAYMENT);
@@ -188,6 +202,9 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
             if (strSum.indexOf('.')!=-1) { sum = (long)(100*Float.parseFloat(v[lineConfig.nSumField])); }
             else sum = Long.parseLong(v[lineConfig.nSumField]);
         }
+        if (lineConfig.paymentTransform != null) {
+            idOfPayment = lineConfig.paymentTransform + idOfPayment;
+        }
         return new PaymentReconciliationManager.RegistryItem(dt, sum, idOfContract, idOfPayment);
     }
 
@@ -201,14 +218,21 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
         if (eqpos==-1) throw new Exception("Неправильный формат строки, ожидалось <параметр>=<значение>");
         String n = l.substring(0, eqpos).trim();
         String v = l.substring(eqpos+1).trim();
-        if (n.compareToIgnoreCase(FIELD_ID_OF_CONTRACT)==0) lineConfig.nIdOfContractField = Integer.parseInt(v);
-        else if (n.compareToIgnoreCase(FIELD_ID_OF_PAYMENT)==0) lineConfig.nIdOfPaymentField = Integer.parseInt(v);
-        else if (n.compareToIgnoreCase(FIELD_SUM)==0) lineConfig.nSumField = Integer.parseInt(v);
-        else if (n.compareToIgnoreCase(FIELD_DATE)==0) lineConfig.nDateField = Integer.parseInt(v);
-        else if (n.compareToIgnoreCase(FIELD_SEPARATORS)==0) {
+        if (n.compareToIgnoreCase(FIELD_ID_OF_CONTRACT) == 0) {
+            lineConfig.nIdOfContractField = Integer.parseInt(v);
+        } else if (n.compareToIgnoreCase(FIELD_ID_OF_PAYMENT) == 0) {
+            lineConfig.nIdOfPaymentField = Integer.parseInt(v);
+        } else if (n.compareToIgnoreCase(FIELD_SUM) == 0) {
+            lineConfig.nSumField = Integer.parseInt(v);
+        } else if (n.compareToIgnoreCase(FIELD_DATE) == 0) {
+            lineConfig.nDateField = Integer.parseInt(v);
+        } else if (n.compareToIgnoreCase(FIELD_SEPARATORS) == 0) {
             lineConfig.separators = Pattern.compile(v);
+        } else if (n.compareToIgnoreCase(FIELD_PAYMENT_TRANSFORM) == 0) {
+            lineConfig.paymentTransform = StringUtils.substringBefore(v, "#");
+        } else {
+            throw new Exception("Неизвестный параметр: " + n);
         }
-        else throw new Exception("Неизвестный параметр: "+n);
     }
 
     public Long getCaAgent() {
@@ -265,5 +289,13 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
 
     public void setCaReceiverName(String caReceiverName) {
         this.caReceiverName = caReceiverName;
+    }
+
+    public String getSettings() {
+        return settings;
+    }
+
+    public void setSettings(String settings) {
+        this.settings = settings;
     }
 }

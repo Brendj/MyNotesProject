@@ -71,28 +71,30 @@
                     <f:facet name="label">
                         <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]" />
                     </f:facet>
-                    <a4j:support event="onuploadcomplete" reRender="fileUploadMessages" />
-                    <a4j:support event="onclear" reRender="fileUploadMessages" />
+                    <%--<a4j:support event="onuploadcomplete" reRender="fileUploadMessages" />--%>
+                    <a4j:support event="onclear" reRender="paymentRegistryFileUploadElement" />
                 </rich:fileUpload>
 
-                <h:panelGrid styleClass="output-text">
-                    Вставьте в файл заголовок формата, пример:<br/>
+                <h:panelGrid>
+<%--                    Вставьте в файл заголовок формата, пример:<br/>
                     !separators=[|@]<br/>
                     !idOfContract=2<br/>
                     !idOfPayment=1<br/>
                     !sum=3<br/>
                     !date=0
-                    </pre>
+                    <pre/>--%>
+                    <h:inputTextarea rows="8" cols="30" value="#{reconciliationPage.settings}"
+                                     styleClass="input-text" />
                 </h:panelGrid>
             </h:panelGrid>
             <a4j:commandButton value="Обработать" action="#{reconciliationPage.processData}"
-                               reRender="workspaceTogglePanel" />
+                               reRender="reconcilePanel" />
 
         </h:panelGrid>
     </rich:simpleTogglePanel>
 
     <rich:panel header="Результаты сверки" headerClass="filter-panel-header"
-                rendered="#{reconciliationPage.differencesInfo!=null}">
+                rendered="#{not empty reconciliationPage.differencesInfo}">
         <h:outputText value="#{reconciliationPage.differencesInfo}" styleClass="output-text"/>
         <rich:spacer height="10" />
         <rich:dataTable id="differencesTable" value="#{reconciliationPage.differencesList}" var="item" rows="20"
