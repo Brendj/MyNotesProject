@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 @Scope("session")
 public class ReconciliationPage extends BasicWorkspacePage implements ContragentSelectPage.CompleteHandler {
     final static String FIELD_ID_OF_PAYMENT="idOfPayment", FIELD_ID_OF_CONTRACT="idOfContract", FIELD_SUM="sum",
-        FIELD_SEPARATORS="separators", FIELD_DATE="date", FIELD_PAYMENT_TRANSFORM="paymentTransform";
+        FIELD_SEPARATORS="separators", FIELD_DATE="date", PAYMENT_TRANSFORM="paymentTransform", SKIP_LINE="skipLine";
     
     private Long caAgent;
     private Long caReceiver;
@@ -117,6 +117,7 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
         Pattern separators;
         Integer nIdOfContractField, nIdOfPaymentField, nSumField, nDateField;
         String paymentTransform;
+        boolean skipFirst, skipLast;
     }
 
     public void uploadFileListener(UploadEvent event) {
@@ -161,24 +162,35 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
             parseLineConfig(lineConfig, row);
         }
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1251"));
-        String currLine = reader.readLine();
-        while (null != currLine) {
-            try {
-                if (currLine.startsWith("!")) {
-                    //parseLineConfig(lineConfig, currLine);
-                } else {
-                    if (currLine.trim().isEmpty()) continue;
-                    if (lineConfig.nIdOfPaymentField==null) throw new Exception("Не указано позиция обязательного поля: "+FIELD_ID_OF_PAYMENT);
-                    if (lineConfig.separators==null) throw new Exception("Не указаны разделители, поле: "+FIELD_SEPARATORS);
-                    PaymentReconciliationManager.RegistryItem ri = parseLine(lineConfig, currLine, lineNo);
-                    registryItems.add(ri);
-                }
-                currLine = reader.readLine();
+        String currLine;
+        int infoLineCount = 0;
+        do {
+            currLine = reader.readLine();
+            if (currLine != null) {
                 ++lineNo;
-            } catch (Exception e) {
-                throw new Exception("Ошибка при обработке строки "+lineNo+": "+e.getMessage(), e);
+                try {
+                    if (currLine.startsWith("!")) {
+                        parseLineConfig(lineConfig, currLine);
+                    } else {
+                        infoLineCount++;
+                        if ((lineConfig.skipFirst && infoLineCount == 1) || currLine.trim().isEmpty() || (
+                                lineConfig.skipLast && !reader.ready())) {
+                            continue;
+                        }
+                        if (lineConfig.nIdOfPaymentField == null) {
+                            throw new Exception("Не указано позиция обязательного поля: " + FIELD_ID_OF_PAYMENT);
+                        }
+                        if (lineConfig.separators == null) {
+                            throw new Exception("Не указаны разделители, поле: " + FIELD_SEPARATORS);
+                        }
+                        PaymentReconciliationManager.RegistryItem ri = parseLine(lineConfig, currLine, lineNo);
+                        registryItems.add(ri);
+                    }
+                } catch (Exception e) {
+                    throw new Exception("Ошибка при обработке строки " + lineNo + ": " + e.getMessage(), e);
+                }
             }
-        }
+        } while (null != currLine);
         this.registryItems = registryItems;
     }
 
@@ -215,9 +227,11 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
         // !sum=8
         String l = currLine.substring(1).trim();
         int eqpos = l.indexOf('=');
-        if (eqpos==-1) throw new Exception("Неправильный формат строки, ожидалось <параметр>=<значение>");
+        if (eqpos == -1) {
+            throw new Exception("Неправильный формат строки, ожидалось <параметр>=<значение>");
+        }
         String n = l.substring(0, eqpos).trim();
-        String v = l.substring(eqpos+1).trim();
+        String v = l.substring(eqpos + 1).trim();
         if (n.compareToIgnoreCase(FIELD_ID_OF_CONTRACT) == 0) {
             lineConfig.nIdOfContractField = Integer.parseInt(v);
         } else if (n.compareToIgnoreCase(FIELD_ID_OF_PAYMENT) == 0) {
@@ -228,8 +242,18 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
             lineConfig.nDateField = Integer.parseInt(v);
         } else if (n.compareToIgnoreCase(FIELD_SEPARATORS) == 0) {
             lineConfig.separators = Pattern.compile(v);
-        } else if (n.compareToIgnoreCase(FIELD_PAYMENT_TRANSFORM) == 0) {
+        } else if (n.compareToIgnoreCase(PAYMENT_TRANSFORM) == 0) {
             lineConfig.paymentTransform = StringUtils.substringBefore(v, "#");
+        } else if (n.compareToIgnoreCase(SKIP_LINE) == 0) {
+            String[] linesToSkip = StringUtils.split(v, ',');
+            for (String skipLine : linesToSkip) {
+                if (StringUtils.trimToEmpty(skipLine).equalsIgnoreCase("first")) {
+                    lineConfig.skipFirst = true;
+                }
+                if (StringUtils.trimToEmpty(skipLine).equalsIgnoreCase("last")) {
+                    lineConfig.skipLast = true;
+                }
+            }
         } else {
             throw new Exception("Неизвестный параметр: " + n);
         }
