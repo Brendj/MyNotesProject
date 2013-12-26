@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.logic;
 
+import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -19,11 +20,13 @@ import java.util.*;
 @Component
 @Scope("singleton")
 public class PaymentReconciliationManager {
+
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
     
     public static class RegistryItem {
         String dt;
+        String dtNormal;
         Long sum;
         Long contractId;
         String idOfPayment;
@@ -42,8 +45,9 @@ public class PaymentReconciliationManager {
             return info;
         }
 
-        public RegistryItem(String dt, Long sum, Long contractId, String idOfPayment) {
+        public RegistryItem(String dt, String dtNormal, Long sum, Long contractId, String idOfPayment) {
             this.dt = dt;
+            this.dtNormal = dtNormal;
             this.sum = sum;
             this.contractId = contractId;
             this.idOfPayment = idOfPayment;
@@ -54,7 +58,20 @@ public class PaymentReconciliationManager {
             return String.format("Запись_реестра{время=%s, сумма=%d, лицевой счет=%d, ид. платежа='%s'}", dt, sum,
                     contractId, idOfPayment);
         }
+
+        public String toCsvString() {
+            return String.format("Запись реестра;%s;%s;%s;%s", dt, sum, contractId, idOfPayment);
+        }
+
+        public String toXmlString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<PT ContractId=\"").append(ContractIdFormat.format(contractId)).append("\" IdOfPayment=\"")
+                    .append(idOfPayment).append("\" PayTime=\"").append(dtNormal).append("\" Sum=\"").append(sum)
+                    .append("\"/>");
+            return sb.toString();
+        }
     }
+
     public static class PaymentItem {
         Date dt;
         long sum;

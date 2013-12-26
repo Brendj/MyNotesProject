@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -40,6 +41,8 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
     private String differencesInfo;
     private String settings;
     private UploadItem item;
+    private int exportType = 0;
+    private DateFormat localDateFormat = CalendarUtils.getDateFormatLocal();
 
     @Override
     public String getPageFilename() {
@@ -154,7 +157,8 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
 
     public void loadRegistry(InputStream inputStream, long dataSize) throws Exception {
         List<PaymentReconciliationManager.RegistryItem> registryItems = new ArrayList<PaymentReconciliationManager.RegistryItem>();
-
+        DateFormat df = new SimpleDateFormat("ddMMyyyy");
+        df.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));
         int lineNo = 0;
         LineConfig lineConfig = new LineConfig();
         String[] rows = StringUtils.split(settings, "\n");
@@ -183,7 +187,7 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
                         if (lineConfig.separators == null) {
                             throw new Exception("Не указаны разделители, поле: " + FIELD_SEPARATORS);
                         }
-                        PaymentReconciliationManager.RegistryItem ri = parseLine(lineConfig, currLine, lineNo);
+                        PaymentReconciliationManager.RegistryItem ri = parseLine(lineConfig, currLine, df);
                         registryItems.add(ri);
                     }
                 } catch (Exception e) {
@@ -194,7 +198,7 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
         this.registryItems = registryItems;
     }
 
-    private PaymentReconciliationManager.RegistryItem parseLine(LineConfig lineConfig, String currLine, int lineNo)
+    private PaymentReconciliationManager.RegistryItem parseLine(LineConfig lineConfig, String currLine, DateFormat df)
             throws Exception {
         String[] v = lineConfig.separators.split(currLine);
         String idOfPayment; String dt=null; Long sum=null, idOfContract=null;
@@ -217,7 +221,8 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
         if (lineConfig.paymentTransform != null) {
             idOfPayment = lineConfig.paymentTransform + idOfPayment;
         }
-        return new PaymentReconciliationManager.RegistryItem(dt, sum, idOfContract, idOfPayment);
+        String dtNormal = localDateFormat.format(df.parse(dt));
+        return new PaymentReconciliationManager.RegistryItem(dt, dtNormal, sum, idOfContract, idOfPayment);
     }
 
     private void parseLineConfig(LineConfig lineConfig, String currLine) throws Exception {
@@ -256,6 +261,18 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
             }
         } else {
             throw new Exception("Неизвестный параметр: " + n);
+        }
+    }
+
+    public String exportToFile() {
+        if (exportType == 0) {
+            return "reconciliationPageDifferCsv";
+        } else if (exportType == 1) {
+            return "reconciliationPageMissingCsv";
+        } else if (exportType == 2) {
+            return "reconciliationPageMissingXml";
+        } else {
+            return "";
         }
     }
 
@@ -321,5 +338,13 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
 
     public void setSettings(String settings) {
         this.settings = settings;
+    }
+
+    public int getExportType() {
+        return exportType;
+    }
+
+    public void setExportType(int exportType) {
+        this.exportType = exportType;
     }
 }

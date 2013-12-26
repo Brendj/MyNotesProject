@@ -118,6 +118,17 @@
                 </rich:datascroller>
             </f:facet>
         </rich:dataTable>
+        <h:panelGrid columns="2">
+            <h:outputText value="Выгрузка в файл" styleClass="output-text" />
+            <h:selectOneMenu value="#{reconciliationPage.exportType}" converter="javax.faces.Integer"
+                             styleClass="output-text">
+                <f:selectItem itemValue="0" itemLabel="экспорт различий" />
+                <f:selectItem itemValue="1" itemLabel="экспорт отсутствующих записей реестра" />
+                <f:selectItem itemValue="2" itemLabel="экспорт отсутствующих записей реестра в формате импорта" />
+            </h:selectOneMenu>
+            <h:commandButton action="#{reconciliationPage.exportToFile}" value="Выгрузить"
+                             styleClass="command-button" />
+        </h:panelGrid>
     </rich:panel>
 
 </h:panelGrid>
