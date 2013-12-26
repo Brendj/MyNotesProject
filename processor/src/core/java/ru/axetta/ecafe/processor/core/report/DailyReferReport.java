@@ -162,46 +162,8 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             }
 
             List<DailyReferReportItem> result = new ArrayList<DailyReferReportItem>();
-            String sql =
-                    "select subcategory, nameofgood, "
-                    + "       int8(EXTRACT(EPOCH FROM d) * 1000) as day, "
-                    + "       price, "
-                    + "       count(idoforder) as children, "
-                    + "       count(idoforder) * (price) as summary "
-                    + "from ("
-                    + "     select cf_discountrules.subcategory, cf_goods.nameofgood, "
-                    + "            cf_orders.idoforder, date_trunc('day', to_timestamp(cf_orders.createddate / 1000)) as d, "
-                    + "            cast (cf_orderdetails.rprice + cf_orderdetails.socdiscount as decimal) / 100 price "
-                    + "     from cf_orgs "
-                    + "     left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
-                    + "     join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
-                    + "     join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
-                    + "     join cf_discountrules on cf_discountrules.idofrule=cf_orderdetails.idofrule "
-                    + "     where cf_orderdetails.socdiscount<>0 and cf_orgs.idoforg=:idoforg and "
-                    + "           cf_orders.createddate between :start and :end "
-                    + "           " + categoryClause + ") as data "
-                    + "group by subcategory, nameofgood, d, price "
-                    + "order by 1, 2"
-
-                    /*"select name, nameofgood, int8(EXTRACT(EPOCH FROM d) * 1000) as day, avg(summary) / 100 as price, "
-                    + "       count(distinct idofclient) as children, sum(summary) / 100 as summary "
-                    + "from "
-                    + "(select subcategory as name, date_trunc('day', to_timestamp(cf_orders.createddate / 1000)) as d, "
-                    + "        cf_orders.idofclient as idofclient, cf_orders.socdiscount as summary, nameofgood as nameofgood "
-                    + "from cf_discountrules "
-                    + "left join cf_orderdetails on cf_orderdetails.socdiscount<>0 and cf_discountrules.idofrule=cf_orderdetails.idofrule "
-                    + "join cf_orders on cf_orders.idoforder=cf_orderdetails.idoforder and "
-                    + "                       cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startTime.getTime()) + "') * 1000 and "
-                    + "                                                     EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endTime.getTime()) + "') * 1000 "
-                    + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
-                    + "where subcategory<>'' and cf_orders.idoforg=:idoforg) as data "
-                    + "group by name, d, nameofgood "
-                    + "order by 1, 2"*/;
-            Query query = session.createSQLQuery(sql);
-            query.setLong("idoforg", org.getIdOfOrg());
-            query.setLong("start", startTime.getTime());
-            query.setLong("end", endTime.getTime());
-            List res = query.list();
+            List res = getReportData(session, org.getIdOfOrg(), startTime.getTime(), endTime.getTime(),
+                                     categoryClause);
             for (Object entry : res) {
                 Object e[]            = (Object[]) entry;
                 String name           = (String) e[0];
@@ -213,7 +175,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 BigDecimal priceObj   = e[3] == null ? new BigDecimal(0D) : (BigDecimal) e[3];
                 priceObj              = priceObj.setScale(2, BigDecimal.ROUND_HALF_DOWN);
                 long children         = ((BigInteger) e[4]).longValue();
-                BigDecimal summaryObj = e[3] == null ? new BigDecimal(0D) : (BigDecimal) e[5];
+                BigDecimal summaryObj = e[5] == null ? new BigDecimal(0D) : (BigDecimal) e[5];
                 summaryObj            = summaryObj.setScale(2, BigDecimal.ROUND_HALF_DOWN);
                 DailyReferReportItem item = new DailyReferReportItem(ts, name, goodname, children, priceObj.doubleValue(), summaryObj.doubleValue());
                 totalSumm             += summaryObj.doubleValue();
@@ -222,7 +184,35 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             return result;
         }
     }
-
+    
+    public static final List getReportData(Session session, long idoforg, long start, long end, 
+                                           String categoryClause) {
+        String sql =
+                  "select subcategory, nameofgood, "
+                + "       int8(EXTRACT(EPOCH FROM d) * 1000) as day, "
+                + "       price, "
+                + "       count(idoforder) as children, "
+                + "       count(idoforder) * (price) as summary "
+                + "from ("
+                + "     select cf_discountrules.subcategory, cf_goods.nameofgood, "
+                + "            cf_orders.idoforder, date_trunc('day', to_timestamp(cf_orders.createddate / 1000)) as d, "
+                + "            cast (cf_orderdetails.rprice + cf_orderdetails.socdiscount as decimal) / 100 price "
+                + "     from cf_orgs "
+                + "     left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
+                + "     join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
+                + "     join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
+                + "     join cf_discountrules on cf_discountrules.idofrule=cf_orderdetails.idofrule "
+                + "     where cf_orderdetails.socdiscount<>0 and cf_orgs.idoforg=:idoforg and "
+                + "           cf_orders.createddate between :start and :end "
+                + "           " + categoryClause + ") as data "
+                + "group by subcategory, nameofgood, d, price "
+                + "order by 1, 2";
+        Query query = session.createSQLQuery(sql);
+        query.setLong("idoforg", idoforg);
+        query.setLong("start", start);
+        query.setLong("end", end);
+        return query.list();
+    }
 
     public DailyReferReport() {
     }
@@ -287,10 +277,20 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 this.group1 = name.substring(0, name.indexOf("("));
             }
             if (goodname.toLowerCase().indexOf("завтрак") > -1) {
-                this.group2 = "ЗАВТРАК";
+                this.group2 = ReferReport.BREAKFAST;
             } else if (goodname.toLowerCase().indexOf("обед") > -1) {
-                this.group2 = "ОБЕД";
+                this.group2 = ReferReport.LUNCH;
             }
+
+            //  Если это суббота и обед, то значение ставим в 0!!!
+            Calendar cal = new GregorianCalendar();
+            cal.setTimeInMillis(ts);
+            if (this.group2.equals(ReferReport.LUNCH) &&
+                cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
+                children = 0L;
+                summary = 0D;
+            }
+
             this.children = children;
             this.price = price;
             this.summary = summary;
