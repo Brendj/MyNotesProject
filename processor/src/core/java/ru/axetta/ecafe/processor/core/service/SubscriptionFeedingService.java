@@ -143,9 +143,8 @@ public class SubscriptionFeedingService {
         Session session = entityManager.unwrap(Session.class);
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
         Date tomorrow = CalendarUtils.addDays(today, 1);
-        // Ищем комплексы либо самой орг-ии, либо ее постащиков.
+        // Ищем комплексы постащиков орг-ии.
         Set<Org> sourceOrg = entityManager.find(Org.class, org.getIdOfOrg()).getSourceMenuOrgs();
-        sourceOrg.add(org);
         Criteria criteria = session.createCriteria(ComplexInfo.class).add(Restrictions.in("org", sourceOrg))
                 .add(Restrictions.eq("usedSubscriptionFeeding", 1)).add(Restrictions.in("idOfComplex", complexIds))
                 .add(Restrictions.ge("menuDate", today)).add(Restrictions.lt("menuDate", tomorrow))
@@ -160,9 +159,8 @@ public class SubscriptionFeedingService {
         Session session = entityManager.unwrap(Session.class);
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
         Date tomorrow = CalendarUtils.addDays(today, 1);
-        // Ищем комплексы либо самой орг-ии, либо ее постащиков.
+        // Ищем комплексы постащиков орг-ии.
         Set<Org> sourceOrg = entityManager.find(Org.class, org.getIdOfOrg()).getSourceMenuOrgs();
-        sourceOrg.add(org);
         Criteria criteria = session.createCriteria(ComplexInfo.class).add(Restrictions.in("org", sourceOrg))
                 .add(Restrictions.eq("usedSubscriptionFeeding", 1)).add(Restrictions.ge("menuDate", today))
                 .add(Restrictions.lt("menuDate", tomorrow));

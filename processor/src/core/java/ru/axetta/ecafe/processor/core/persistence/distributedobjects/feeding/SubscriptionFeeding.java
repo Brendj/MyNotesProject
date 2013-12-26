@@ -70,7 +70,7 @@ public class SubscriptionFeeding extends DistributedObject{
         SubscriptionFeeding sf = sfService.findClientSubscriptionFeeding(client);
         // Если уже есть у клиента актуальная подписка и с АРМа приходит тоже актулаьная, то АРМовскую "разворачиваем".
         // Потому что не может быть у клиента двух актуальных подписок на АП !
-        if (sf != null && isActual()) {
+        if (sf != null && isActual() && !sf.getGuid().equals(guid)) {
             DistributedObjectException doe = new DistributedObjectException("SubscriptionFeeding DATA_EXIST_VALUE");
             doe.setData(sf.getGuid());
             throw doe;

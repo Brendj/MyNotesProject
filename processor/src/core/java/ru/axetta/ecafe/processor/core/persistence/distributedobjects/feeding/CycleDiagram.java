@@ -86,7 +86,7 @@ public class CycleDiagram extends DistributedObject{
         }
         SubscriptionFeedingService sfService = RuntimeContext.getAppContext().getBean(SubscriptionFeedingService.class);
         CycleDiagram cd = sfService.findClientCycleDiagram(client);
-        if (cd != null && isActual()) {
+        if (cd != null && isActual() && !cd.getGuid().equals(guid)) {
             DistributedObjectException doe = new DistributedObjectException("CycleDiagram DATA_EXIST_VALUE");
             doe.setData(cd.getGuid());
             throw doe;
