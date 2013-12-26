@@ -5,8 +5,14 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,6 +103,7 @@ public class MaintenanceService {
         Query query = entityManager.createNativeQuery(
                 "select m.IdOfMenu, m.IdOfOrg from CF_Menu m where m.IdOfOrg " + orgFilter + " and m.MenuDate < :date")
                 .setParameter("date", timeToClean);
+        //query.setMaxResults(1);
         List<Object[]> records = query.getResultList();
         logger.debug("count menu: "+ records.size());
         Set<Long> orgIds = new HashSet<Long>();
@@ -105,16 +112,19 @@ public class MaintenanceService {
         logger.info("Cleaning menu details and menu...");
         int menuDetailDeletedCount = 0;
         int menuDeletedCount = 0;
+        int complexInfoDeletedCount = 0;
+        int complexDeletedCount = 0;
         for (Object[] row : records) {
             Long idOfMenu = ((BigInteger) row[0]).longValue();
             orgIds.add(((BigInteger) row[1]).longValue());
             long duration = System.currentTimeMillis();
-            logger.debug("Clean menu details from Menu "+idOfMenu);
-            int[] res = proxy.cleanMenuInternal(idOfMenu);
+            int[] res = cleanMenuInformationInternal(idOfMenu);
             duration = System.currentTimeMillis()-duration;
-            logger.debug("Successfully delete menu details duration= "+duration);
-            menuDetailDeletedCount += res[0];
-            menuDeletedCount += res[1];
+            logger.debug(String.format("Successfully delete menu[%d] duration=%d", idOfMenu, duration));
+            complexInfoDeletedCount += res[0];
+            complexDeletedCount += res[1];
+            menuDetailDeletedCount += res[2];
+            menuDeletedCount += res[3];
         }
 
         logger.info("Cleaning menu exchange...");
@@ -123,29 +133,57 @@ public class MaintenanceService {
             menuExchangeDeletedCount += proxy.cleanMenuExchange(idOfOrg, timeToClean);
         }
 
-        return ("Deleted all records before - " + new Date(timeToClean) + ", deleted records count: menu - "
-                + menuDeletedCount +
-                ", menu detail - " + menuDetailDeletedCount + ", menu exchange - " + menuExchangeDeletedCount);
+        final String format = "Deleted all records before - %s, deleted records count: menu -%d, "
+                + "menu detail - %d, menu exchange - %d "
+                + "complex - %d, complex info - %d";
+        return String.format(format, new Date(timeToClean), menuDeletedCount,
+                menuDetailDeletedCount, menuExchangeDeletedCount,
+                complexDeletedCount, complexInfoDeletedCount);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
-    public int[] cleanMenuInternal(Long idOfMenu) {
-        int[] res = new int[2];
-        //String onHashJoin = "set enable_nestloop = off;set enable_hashjoin = on;set enable_mergejoin = off;";
-        //Query onHashJoinQuery =  entityManager.createNativeQuery(onHashJoin);
-        //onHashJoinQuery.executeUpdate();
-        Query detailsQuery = entityManager
-                .createNativeQuery("DELETE FROM CF_MenuDetails md WHERE md.IdOfMenu = :idOfMenu");
-        Query menuQuery = entityManager.createNativeQuery("DELETE FROM CF_Menu m WHERE m.IdOfMenu = :idOfMenu");
-        detailsQuery.setParameter("idOfMenu", idOfMenu);
-        res[0] = detailsQuery.executeUpdate();
-        menuQuery.setParameter("idOfMenu", idOfMenu);
-        res[1] = menuQuery.executeUpdate();
-        //String onAllOptions = "set enable_nestloop = on;set enable_hashjoin = on;set enable_mergejoin = on;";
-        //Query onAllOptionsQuery =  entityManager.createNativeQuery(onAllOptions);
-        //onAllOptionsQuery.executeUpdate();
+    public int[] cleanMenuInformationInternal(Long idOfMenu) {
+        int[] res = new int[4];
+        Session session = entityManager.unwrap(Session.class);
+
+        org.hibernate.Query qComplexInfo = session.createQuery("delete from ComplexInfoDetail where menuDetail.idOfMenuDetail in (select idOfMenuDetail from MenuDetail WHERE menu.idOfMenu = :idOfMenu)");
+        qComplexInfo.setParameter("idOfMenu", idOfMenu);
+        res[0] = qComplexInfo.executeUpdate();
+
+        org.hibernate.Query qComplex = session.createQuery("delete from ComplexInfo where menuDetail.idOfMenuDetail in (select idOfMenuDetail from MenuDetail WHERE menu.idOfMenu = :idOfMenu)");
+        qComplex.setParameter("idOfMenu", idOfMenu);
+        res[1] = qComplex.executeUpdate();
+
+        org.hibernate.Query qMenuDetail = session.createQuery("delete from MenuDetail where idOfMenuDetail in (select idOfMenuDetail from MenuDetail WHERE menu.idOfMenu = :idOfMenu)");
+        qMenuDetail.setParameter("idOfMenu", idOfMenu);
+        res[2] = qMenuDetail.executeUpdate();
+
+        org.hibernate.Query qMenu = session.createQuery("delete from Menu WHERE idOfMenu = :idOfMenu");
+        qMenu.setParameter("idOfMenu", idOfMenu);
+        res[3] = qMenu.executeUpdate();
+
         return res;
     }
+
+    //@Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
+    //public int cleanMenuInternal(Long idOfMenu) {
+    //    int[] res = new int[2];
+    //    //String onHashJoin = "set enable_nestloop = off;set enable_hashjoin = on;set enable_mergejoin = off;";
+    //    //Query onHashJoinQuery =  entityManager.createNativeQuery(onHashJoin);
+    //    //onHashJoinQuery.executeUpdate();
+    //    //Query detailsQuery = entityManager
+    //    //        .createNativeQuery("DELETE FROM CF_MenuDetails md WHERE md.IdOfMenu = :idOfMenu");
+    //    Query menuQuery = entityManager.createNativeQuery("DELETE FROM CF_Menu m WHERE m.IdOfMenu = :idOfMenu");
+    //    //detailsQuery.setParameter("idOfMenu", idOfMenu);
+    //    //res[0] = detailsQuery.executeUpdate();
+    //    menuQuery.setParameter("idOfMenu", idOfMenu);
+    //    return menuQuery.executeUpdate();
+    //    //res[1] = menuQuery.executeUpdate();
+    //    //String onAllOptions = "set enable_nestloop = on;set enable_hashjoin = on;set enable_mergejoin = on;";
+    //    //Query onAllOptionsQuery =  entityManager.createNativeQuery(onAllOptions);
+    //    //onAllOptionsQuery.executeUpdate();
+    //    //return res;
+    //}
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public int cleanMenuExchange(Long idOfOrg, long timeToClean) {
