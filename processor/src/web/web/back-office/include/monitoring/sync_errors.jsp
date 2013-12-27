@@ -10,8 +10,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="ui" uri="http://java.sun.com/jstl/fmt" %>
 
-
-
 <%-- Панель просмотра списка организаций --%>
 <%--@elvariable id="synchErrorsPage" type="ru.axetta.ecafe.processor.web.ui.monitoring.SynchErrorsPage"--%>
 <h:panelGrid id="synchErrorsPageGrid" binding="#{synchErrorsPage.pageComponent}" styleClass="borderless-grid">
@@ -24,8 +22,8 @@
     </h:panelGrid>
 
     <h:panelGrid columns="2" rendered="#{synchErrorsPage.count > 0}">
-        <rich:dataTable value="#{synchErrorsPage.items}" var="item"
-                        footerClass="data-table-footer" columnClasses="center-aligned-column">
+        <rich:dataTable id="synchErrorsPageTable" value="#{synchErrorsPage.items}" var="item"
+                        footerClass="data-table-footer" rows="20" columnClasses="center-aligned-column">
             <rich:column headerClass="column-header">
                 <f:facet name="header">
                     <h:outputText escape="true" value="Дата синхронизации" />
@@ -38,6 +36,17 @@
                 </f:facet>
                 <h:outputText escape="false" value="#{item.message}" styleClass="output-text"/>
             </rich:column>
+            <f:facet name="footer">
+                <rich:datascroller for="synchErrorsPageTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
+                                   stepControls="auto" boundaryControls="hide">
+                    <f:facet name="previous">
+                        <h:graphicImage value="/images/16x16/left-arrow.png" />
+                    </f:facet>
+                    <f:facet name="next">
+                        <h:graphicImage value="/images/16x16/right-arrow.png" />
+                    </f:facet>
+                </rich:datascroller>
+            </f:facet>
         </rich:dataTable>
     </h:panelGrid>
 
