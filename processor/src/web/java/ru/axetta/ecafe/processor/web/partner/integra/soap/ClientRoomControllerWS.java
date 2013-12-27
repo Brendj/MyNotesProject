@@ -3885,14 +3885,27 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return res;
             }
             DAOService daoService = DAOService.getInstance();
+            List<ECafeSettings> settings = daoService
+                    .geteCafeSettingses(client.getOrg().getIdOfOrg(), SettingsIds.SubscriberFeeding, false);
+            if (settings.isEmpty()) {
+                res.resultCode = RC_SETTINGS_NOT_FOUND;
+                res.description = String
+                        .format("Отсутствуют настройки абонементного питания для организации %s (IdOfOrg = %s)",
+                                client.getOrg().getShortName(), client.getOrg().getIdOfOrg());
+                return res;
+            }
+            ECafeSettings cafeSettings = settings.get(0);
+            SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) cafeSettings
+                    .getSplitSettingValue();
             Date date = new Date();
+            Date dayBegin = CalendarUtils.truncateToDayOfMonth(date);
             sf = new SubscriptionFeeding();
             sf.setCreatedDate(date);
             sf.setClient(client);
             sf.setOrgOwner(client.getOrg().getIdOfOrg());
             sf.setIdOfClient(client.getIdOfClient());
             sf.setGuid(UUID.randomUUID().toString());
-            sf.setDateActivateService(date);
+            sf.setDateActivateService(CalendarUtils.addDays(dayBegin, 1 + parser.getDayForbidChange()));
             sf.setDeletedState(false);
             sf.setSendAll(SendToAssociatedOrgs.SendToSelf);
             sf.setWasSuspended(false);
@@ -3901,8 +3914,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             sf.setGlobalVersion(version);
             session.persist(sf);
             // Активируем циклограмму сегодняшним днем.
-            CycleDiagram cd = createCycleDiagram(client, cycleDiagramIn, sfService,
-                    CalendarUtils.truncateToDayOfMonth(date), true);
+            CycleDiagram cd = createCycleDiagram(client, cycleDiagramIn, sfService, dayBegin, true);
             session.persist(cd);
             transaction.commit();
             res.resultCode = RC_OK;

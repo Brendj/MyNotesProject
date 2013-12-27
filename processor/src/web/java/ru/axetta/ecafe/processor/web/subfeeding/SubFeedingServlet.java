@@ -180,7 +180,7 @@ public class SubFeedingServlet extends HttpServlet {
             CycleDiagramIn cycle = getSubFeedingPlan(req);
             Result res = clientRoomController.createSubscriptionFeeding(contractId, cycle);
             if (res.resultCode == 0) {
-                req.setAttribute(SUCCESS_MESSAGE, "Подписка успешно активирована.");
+                req.setAttribute(SUCCESS_MESSAGE, "Подписка успешно подключена.");
                 showSubscriptionFeeding(req, resp);
             } else {
                 req.setAttribute(ERROR_MESSAGE, res.description);
@@ -314,9 +314,7 @@ public class SubFeedingServlet extends HttpServlet {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
         Result res = clientRoomController.reopenSubscriptionFeeding(contractId);
         if (res.resultCode == 0) {
-            DateFormat df = CalendarUtils.getDateFormatLocal();
-            String reopenDate = df.format(CalendarUtils.addDays(new Date(), 2));
-            req.setAttribute(SUCCESS_MESSAGE, "Подписка возобновлена. Формирование заказов начнется с " + reopenDate);
+            req.setAttribute(SUCCESS_MESSAGE, "Подписка возобновлена.");
         } else {
             req.setAttribute(ERROR_MESSAGE, res.description);
         }

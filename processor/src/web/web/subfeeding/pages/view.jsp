@@ -57,14 +57,14 @@
 <div class="textDiv">Номер контракта: <%=ContractIdFormat.format(client.getContractId())%></div>
 <div class="textDiv">Текущий баланс основного счета: <%=subBalance0%> руб.</div>
 <div class="textDiv">Баланс субсчета АП: <%=subBalance1%> руб.</div>
-<div class="textDiv">Дата подключения услуги: <%=tf.format(sf.getDateActivateService())%></div>
+<div class="textDiv">Дата активации услуги: <%=tf.format(sf.getDateActivateService())%></div>
 <div class="textDiv">Дата отключения услуги: <%=sf.getDateDeactivateService() == null ? "услуга бессрочная"
         : df.format(sf.getDateDeactivateService())%>
 </div>
 <%
     if (wasSuspended) {
         String suspendDate = df.format(sf.getLastDatePauseService());
-        String status = "Услуга приостановлена. Заявки сформированы до " + suspendDate + ".";
+        String status = "Услуга приостанавливается с " + suspendDate + ".";
 %>
 <div class="textDiv"><%=status%></div>
 <%

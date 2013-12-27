@@ -225,7 +225,7 @@ public class SubscriptionFeedingService {
     public void suspendSubscriptionFeeding(Client client) {
         Date date = new Date();
         SubscriptionFeeding sf = findClientSubscriptionFeeding(client);
-        sf.setLastDatePauseService(CalendarUtils.truncateToDayOfMonth(CalendarUtils.addDays(date, 2)));
+        sf.setLastDatePauseService(date.before(sf.getDateActivateService()) ? sf.getDateActivateService() : date);
         sf.setWasSuspended(true);
         DAOService daoService = DAOService.getInstance();
         sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
