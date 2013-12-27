@@ -13,6 +13,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -184,9 +185,15 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             return result;
         }
     }
+
+    public static final List getReportData(Session session, long idoforg, long start, long end,
+            String categoryClause) {
+        return getReportData(session, idoforg, start, end, categoryClause,
+                             " and ordertype<>" + OrderTypeEnumType.DAILY_SAMPLE.ordinal());
+    }
     
     public static final List getReportData(Session session, long idoforg, long start, long end, 
-                                           String categoryClause) {
+                                           String categoryClause, String orderTypeClause) {
         String sql =
                   "select subcategory, nameofgood, "
                 + "       int8(EXTRACT(EPOCH FROM d) * 1000) as day, "
@@ -204,6 +211,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 + "     join cf_discountrules on cf_discountrules.idofrule=cf_orderdetails.idofrule "
                 + "     where cf_orderdetails.socdiscount<>0 and cf_orgs.idoforg=:idoforg and "
                 + "           cf_orders.createddate between :start and :end "
+                + "           " + orderTypeClause
                 + "           " + categoryClause + ") as data "
                 + "group by subcategory, nameofgood, d, price "
                 + "order by 1, 2";

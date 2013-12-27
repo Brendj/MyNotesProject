@@ -13,6 +13,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.hibernate.Query;
@@ -39,7 +40,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
 
     private final static Logger logger = LoggerFactory.getLogger(ReferReport.class);
 
-    private List<ReferReportItem> items;
+    private List<List<ReferReportItem>> items;
     private Date startDate;
     private Date endDate;
     private String htmlReport;
@@ -50,7 +51,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
     public static final String LUNCH = "ОБЕД";
 
 
-    public List<ReferReportItem> getItems() {
+    public List<List<ReferReportItem>> getItems() {
         return items;
     }
 
@@ -110,17 +111,30 @@ public class ReferReport extends BasicReportForAllOrgJob {
             parameterMap.put("startDate", DailyReferReport.dailyItemsFormat.format(startTime));
             parameterMap.put("endDate", DailyReferReport.dailyItemsFormat.format(endTime));
             parameterMap.put("orgName", org.getShortName());
+            parameterMap.put("SUBREPORT_DIR", RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath());
 
 
+            //  Получение рабочих и выходных дней
             Date generateEndTime = new Date();
-            int counts [] = getWorkDaysCount(session, org.getIdOfOrg(), startTime, endTime);
+            int counts [] = getDaysCount(session, org.getIdOfOrg(), startTime, endTime);
             int workDaysCount = counts [0];
             int weekendsCount = counts [1];
+            //  Загрузка данных из БД
             List<DailyReferReportItem> items = findReferItems(session, startTime, endTime);
-            List<String> categories = DAOUtils.getDiscountRuleSubcategories(session);
-            List<ReferReportItem> total = getTotalItems(workDaysCount, weekendsCount, items, categories);
+            List<String> categories = DAOUtils.getDiscountRuleSubcategories(session);                   //  Данные по дням
+            DailyReferReportItem samples [] = getSampleItems(session, startTime, endTime);    //  Хранится 2 объекта с данными по пробе
+            //  Соединение всего вместе
+            List<List<ReferReportItem>> total = getTotalItems(workDaysCount, weekendsCount, items, categories,
+                                                                samples [0], samples[1]);
+            //  Добавляем массив как параметр отчета
+            parameterMap.put("reports", total);
+            parameterMap.put("workdaysCount", workDaysCount);
+            parameterMap.put("weekendsCount", weekendsCount);
+            //
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, startTime, endTime, (Calendar) calendar.clone(), parameterMap, total));
+                    createDataSource(session, startTime, endTime, (Calendar) calendar.clone(), parameterMap,
+                            //total));
+                            Collections.EMPTY_LIST));
             //  Если имя шаблона присутствует, значит строится для джаспера
             if (!exportToHTML) {
                 return new ReferReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
@@ -142,14 +156,44 @@ public class ReferReport extends BasicReportForAllOrgJob {
         }
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Calendar calendar,
-                Map<String, Object> parameterMap, List<ReferReportItem> items) throws Exception {
+                Map<String, Object> parameterMap, List<List<ReferReportItem>> items) throws Exception {
             return new JRBeanCollectionDataSource(items);
+        }
+        
+        private DailyReferReportItem[] getSampleItems(Session session, Date startTime, Date endTime) {
+            DailyReferReportItem result [] = new DailyReferReportItem [] { new DailyReferReportItem("БУДНИЕ"),
+                                                                           new DailyReferReportItem("ВЫХОДНЫЕ") };
+            Query query = session.createSQLQuery(
+                    "select cast (cf_orders.rsum + cf_orders.socdiscount as decimal) / 100 as price, cf_orders.createddate "
+                    + "from cf_orders "
+                    + "where cf_orders.socdiscount<>0 and cf_orders.idoforg=:idoforg and "
+                    + "      cf_orders.createddate between :start and :end "
+                    + "      and cf_orders.ordertype=:ordertype ");
+            query.setLong("idoforg", org.getIdOfOrg());
+            query.setLong("start", startTime.getTime());
+            query.setLong("end", endTime.getTime());
+            query.setInteger("ordertype", OrderTypeEnumType.DAILY_SAMPLE.ordinal());
+            Calendar cal = new GregorianCalendar();
+            List res = query.list();
+            for (Object entry : res) {
+                Object e[] = (Object[]) entry;
+                BigDecimal priceObj   = e[0] == null ? new BigDecimal(0D) : (BigDecimal) e[0];
+                priceObj              = priceObj.setScale(2, BigDecimal.ROUND_HALF_DOWN);
+                long ts               = ((BigInteger) e[1]).longValue();
+                cal.setTimeInMillis(ts);
+                //  Заносим изменения в соответствующий объект
+                int index = cal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY &&
+                            cal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY ? 0 : 1;
+                result[index].setTotal(result[index].getTotal() + 1);
+                result[index].setPrice(priceObj.doubleValue());
+            }
+            return result;
         }
         
         private List<DailyReferReportItem> findReferItems(Session session, Date startTime, Date endTime) {
             List<DailyReferReportItem> result = new ArrayList<DailyReferReportItem>();
             List res = DailyReferReport.getReportData(session, org.getIdOfOrg(), startTime.getTime(), endTime.getTime(),
-                                                      " and cf_discountrules.subcategory = 'Многодетные 1-4 кл.(завтрак+обед)'");
+                                                      " and cf_discountrules.subcategory <> ''");
             for (Object entry : res) {
                 Object e[]            = (Object[]) entry;
                 String name           = (String) e[0];
@@ -169,20 +213,25 @@ public class ReferReport extends BasicReportForAllOrgJob {
         }
     }
 
-    private static final List<ReferReportItem> getTotalItems(int workDaysCount,
+    private static final List<List<ReferReportItem>> getTotalItems(int workDaysCount,
                                                              int weekendsCount,
                                                              List<DailyReferReportItem> items,
-                                                             List<String> categories) {
+                                                             List<String> categories,
+                                                             DailyReferReportItem workdaysSample,
+                                                             DailyReferReportItem weekendsSample) {
         Calendar tmp = new GregorianCalendar();
         List<ReferReportItem> workdays = new ArrayList<ReferReportItem>();
         List<ReferReportItem> weekends = new ArrayList<ReferReportItem>();
+        int id = 0;
         for (String cat : categories) {
             //  Поиск итогового объекта
             ReferReportItem workdayItem = new ReferReportItem();
+            workdayItem.setLineId(id);
             workdayItem.setName(cat);
             workdayItem.setValue(1);
             workdays.add(workdayItem);
             ReferReportItem weekendItem = new ReferReportItem();
+            weekendItem.setLineId(id);
             weekendItem.setName(cat);
             weekendItem.setValue(1);
             weekends.add(weekendItem);
@@ -209,11 +258,27 @@ public class ReferReport extends BasicReportForAllOrgJob {
                     weekendItem.setSummary(weekendItem.getSummary() + i.getPrice() * i.getChildren());
                 }
             }
+            id++;
         }
 
+        //  Подсчет пробы
+        ReferReportItem workdaysTestItem = new ReferReportItem();
+        workdaysTestItem.setName("ПРОБА");
+        workdaysTestItem.setLineId(id);
+        workdaysTestItem.setTotal(workdaysSample.getTotal());
+        workdaysTestItem.setSummary(workdaysSample.getTotal() * workdaysSample.getPrice());
+        ReferReportItem weekendsTestItem = new ReferReportItem();
+        weekendsTestItem.setName("ПРОБА");
+        weekendsTestItem.setLineId(id++);
+        weekendsTestItem.setTotal(weekendsSample.getTotal());
+        weekendsTestItem.setSummary(weekendsSample.getTotal() * weekendsSample.getPrice());
+        workdays.add(workdaysTestItem);
+        weekends.add(weekendsTestItem);
 
-        ReferReportItem workdaysTotalItem = new ReferReportItem();
+
+        /*ReferReportItem workdaysTotalItem = new ReferReportItem();
         workdaysTotalItem.setName("ИТОГО");
+        workdaysTotalItem.setLineId(id);
         //  Считаем итог по будням
         for (ReferReportItem i : workdays) {
             i.setChildren(Math.round(i.getTotal() / workDaysCount));
@@ -225,26 +290,23 @@ public class ReferReport extends BasicReportForAllOrgJob {
         //  Считаем итог по выходным
         ReferReportItem weekendsTotalItem = new ReferReportItem();
         weekendsTotalItem.setName("ИТОГО");
+        weekendsTotalItem.setLineId(id++);
         for (ReferReportItem i : weekends) {
             i.setTotal(Math.round(i.getChildren() / workDaysCount));
             weekendsTotalItem.setChildren(weekendsTotalItem.getChildren() + i.getChildren());
             weekendsTotalItem.setTotal(weekendsTotalItem.getTotal() + i.getTotal());
             weekendsTotalItem.setSummary(weekendsTotalItem.getSummary() + i.getSummary());
         }
-        weekends.add(weekendsTotalItem);
+        weekends.add(weekendsTotalItem);*/
 
-        //  Подсчет пробы
-        ReferReportItem workdaysTestItem = new ReferReportItem();
-        workdaysTestItem.setName("ПРОБА");
-        ReferReportItem weekendsTestItem = new ReferReportItem();
-        weekendsTestItem.setName("ПРОБА");
-        workdays.add(workdaysTestItem);
-        weekends.add(weekendsTestItem);
 
-        return workdays;
+        List<List<ReferReportItem>> result = new ArrayList<List<ReferReportItem>>();
+        result.add(workdays);
+        result.add(weekends);
+        return result;
     }
 
-    private static final int [] getWorkDaysCount(Session session, long idoforg, Date startTime, Date endTime) {
+    private static final int [] getDaysCount(Session session, long idoforg, Date startTime, Date endTime) {
         int count [] = new int[] {0, 0};    //  0 - будние дние; 1 - выхоные
         Calendar day = getClearCalendar(startTime.getTime());
         Query query = session.createSQLQuery(
@@ -285,13 +347,13 @@ public class ReferReport extends BasicReportForAllOrgJob {
 
 
     public ReferReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
-            Date endTime, List<ReferReportItem> items) {
+            Date endTime, List<List<ReferReportItem>> items) {
         super(generateTime, generateDuration, print, startTime, endTime);
         this.items = items;
     }
 
     public ReferReport(Date generateTime, long generateDuration, Date startTime, Date endTime,
-            List<ReferReportItem> items) {
+            List<List<ReferReportItem>> items) {
         this.items = items;
     }
 
@@ -335,6 +397,10 @@ public class ReferReport extends BasicReportForAllOrgJob {
         
         public DailyReferReportItem() {
 
+        }
+
+        public DailyReferReportItem(String name) {
+            this.name = name;
         }
 
         public DailyReferReportItem(long ts, String name, String goodname, long children, double price, double summary) {
@@ -395,6 +461,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
 
 
     public static class ReferReportItem {
+        protected int lineId;             //  id для категории
         protected String name;            //  наименование правила
         protected long children;          //  количество детей
         protected long total;             //  дето/дни
@@ -402,6 +469,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
         protected int value;              //  поле для группировки, всегда = 1
 
         public ReferReportItem() {
+            lineId = -1;
             name = "";
             children = 0L;
             total = 0L;
@@ -410,12 +478,21 @@ public class ReferReport extends BasicReportForAllOrgJob {
 
         }
 
-        public ReferReportItem(String name, long children, long total, double summary) {
+        public ReferReportItem(int lineId, String name, long children, long total, double summary) {
             value = 1;
+            this.lineId = lineId;
             this.name = name;
             this.children = children;
             this.total = total;
             this.summary = summary;
+        }
+
+        public int getLineId() {
+            return lineId;
+        }
+
+        public void setLineId(int lineId) {
+            this.lineId = lineId;
         }
 
         public int getValue() {
