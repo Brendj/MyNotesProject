@@ -21,4 +21,13 @@ where description='Социально-незащищенные 1-4';
 update cf_discountrules set subcategory='Соц./незащищ. 5-11 кл.(завтрак+обед)'
 where description='Социально-незащищенные 5-8' or description='Социально-незащищенные 9-11';
 
---! ФИНАЛИЗИРОВАН (Кадыров, 131224) НЕ МЕНЯТЬ
+update cf_discountrules set subcategory='Многодетные 5-11 кл.(завтрак+обед)'
+  where description='9-11 кл+малообесп/завтрак+обед' or
+      description='5-8 кл+опека/завтрак+обед' or
+      description='5-8 кл+малообесп/завтрак+обед' or
+      description='5-8 кл+инв/завтрак+обед' or
+      description='9-11 кл+инв/завтрак+обед';
+
+
+
+--! ФИНАЛИЗИРОВАН (Кадыров, 131227) НЕ МЕНЯТЬ

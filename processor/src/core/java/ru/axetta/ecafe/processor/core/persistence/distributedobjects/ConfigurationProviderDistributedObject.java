@@ -1,13 +1,17 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
 import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -45,13 +49,22 @@ public abstract class ConfigurationProviderDistributedObject extends Distributed
             throw new DistributedObjectException(e.getMessage());
         }
         Criteria criteria = session.createCriteria(getClass());
+        //Criteria criteria = session.createCriteria(Good.class);
         criteria.add(Restrictions.eq("idOfConfigurationProvider", idOfConfigurationProvider));
         criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
+
+        //Boolean isSupplier = DAOUtils.isSupplierByOrg(session, idOfOrg);
+        //if(isSupplier){
+        //    criteria.add(Restrictions.eq("orgOwner", idOfOrg));
+        //} else {
+        //    Long supplierId = DAOUtils.findMenuExchangeSourceOrg(session, idOfOrg);
+        //    criteria.add(Restrictions.in("orgOwner", Arrays.asList(idOfOrg, supplierId)));
+        //}
         createProjections(criteria);
         criteria.setCacheable(false);
         criteria.setReadOnly(true);
         criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
-        return criteria.list();  //To change body of implemented methods use File | Settings | File Templates.
+        return criteria.list();
     }
 
     public Long getIdOfConfigurationProvider() {
