@@ -178,7 +178,7 @@ public class CycleDiagram extends DistributedObject{
     }
 
     public boolean isActual() {
-        return !deletedState && stateDiagram == StateDiagram.ACTIVE;
+        return (deletedState == null || !deletedState) && stateDiagram == StateDiagram.ACTIVE;
     }
 
     public Long getIdOfClient() {
