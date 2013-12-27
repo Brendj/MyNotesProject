@@ -451,6 +451,9 @@ CREATE TABLE CF_ComplexInfoDetail (
   CONSTRAINT CF_ComplexInfoDetail_IdOfMenuDetail_fk FOREIGN KEY (IdOfMenuDetail) REFERENCES CF_MenuDetails (IdOfMenuDetail)
 );
 
+create index CF_ComplexInfo_md_idx on CF_ComplexInfo(IdOfMenuDetail);
+create index CF_ComplexInfoDetail_md_idx on CF_ComplexInfoDetail(IdOfMenuDetail);
+
 CREATE TABLE CF_Assortment (
   IdOfAst                 BIGINT            NOT NULL,  -- surrogate key
   IdOfOrg                 BIGINT            NOT NULL,
