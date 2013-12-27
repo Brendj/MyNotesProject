@@ -12,4 +12,4 @@ CREATE TABLE cf_do_org_current_version (
   CONSTRAINT cf_do_org_current_version_pk PRIMARY KEY (IdDOOrgCurrentVersion)
 );
 
---! ФИНАЛИЗИРОВАН (Кадыров, 131224) НЕ МЕНЯТЬ
+--! ФИНАЛИЗИРОВАН (Кадыров, 131227) НЕ МЕНЯТЬ
