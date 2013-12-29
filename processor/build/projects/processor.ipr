@@ -534,7 +534,7 @@
       <default-schemas>akazan.public</default-schemas>
       <libraries>
         <library>
-          <url>jar://D:/home/java/testing/report/lib/postgresql-9.1-901.jdbc4.jar!/</url>
+          <url>jar://$PROJECT_DIR$/../../../../../testing/report/lib/postgresql-9.1-901.jdbc4.jar!/</url>
         </library>
       </libraries>
     </data-source>
