@@ -4,9 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.client;
 
-import ru.axetta.ecafe.processor.core.daoservices.client.ClientRepository;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
 import ru.axetta.ecafe.processor.core.persistence.ClientMigration;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,25 +43,6 @@ public class ClientService {
             clientMigrationItemInfoList.add(new ClientMigrationItemInfo(clientMigration));
         }
         return clientMigrationItemInfoList;
-    }
-
-    @Autowired
-    private ClientRepository repository;
-
-    @Transactional(readOnly = true)
-    public Client getGuardian(Long idOfClient){
-        Client client = null;
-        try {
-            ClientGuardian clientGuardian = repository.findClientGuardianByChildren(idOfClient);
-            client = repository.getClient(clientGuardian.getIdOfGuardian());
-        } catch (NoResultException ignore){}
-        return client;
-    }
-
-    @Transactional
-    public void setGuardian(Long idOfChildren, Long idOfGuardian){
-        ClientGuardian clientGuardian = new ClientGuardian(idOfChildren, idOfGuardian);
-        repository.createClientGuardian(clientGuardian);
     }
 
 }

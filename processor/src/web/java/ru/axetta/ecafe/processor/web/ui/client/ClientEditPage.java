@@ -717,10 +717,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
         }
 
-        if(this.guardian!=null){
-            clientService.setGuardian(idOfClient, this.guardian);
-        }
-
         persistenceSession.update(client);
 
         fill(client);
@@ -793,20 +789,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             categoriesFilter.append("Не выбрано");
         }
         this.filter = categoriesFilter.toString();
-        Client guardianClient = clientService.getGuardian(idOfClient);
-        if(guardianClient!=null){
-            this.guardian = guardianClient.getIdOfClient();
-        }
-    }
-
-    private Long guardian;
-
-    public Long getGuardian() {
-        return guardian;
-    }
-
-    public void setGuardian(Long guardian) {
-        this.guardian = guardian;
     }
 
     public String getIdOfCategoryListString() {
@@ -817,7 +799,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private List<Long> idOfCategoryList = new ArrayList<Long>();
     private Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
     private boolean newOrgHasCatDiscount = true;
-    private ClientService clientService = RuntimeContext.getAppContext().getBean(ClientService.class);
 
 
     public String getFilter() {
