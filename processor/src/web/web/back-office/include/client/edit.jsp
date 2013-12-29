@@ -174,10 +174,6 @@
     <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.clientGUID}" maxlength="64" styleClass="input-text"/>
 
-    <h:outputText escape="true" value="Родитель" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientEditPage.guardian}" maxlength="64" styleClass="input-text"/>
-
-
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />
