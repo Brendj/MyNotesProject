@@ -100,7 +100,7 @@ public class SyncServlet extends HttpServlet {
             // Save requestDocument by means of SyncLogger as IdOfOrg-IdOfSync-in.xml
             SyncLogger syncLogger = runtimeContext.getSyncLogger();
              /* Must be FALSE for testing!!!  */
-            boolean verifySignature = true;
+            boolean verifySignature = false;
             if (!verifySignature || bLogPackets) syncLogger.registerSyncRequest(requestData.document, idOfOrg, idOfSync);
             else {
                 final String message = "Synchronization with %s - type: %s - packets not logged";

@@ -141,6 +141,28 @@
     <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.clientGUID}" maxlength="64" styleClass="input-text" readonly="true"/>
 
+    <h:outputText escape="true" value="Опекуны" styleClass="output-text"/>
+    <rich:dataTable id="clientGuardianViewTable" value="#{mainPage.clientViewPage.clientGuardianItems}" var="clientGuardian"
+                    columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"
+                    footerClass="data-table-footer-center">
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Номер договора" />
+            </f:facet>
+            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
+                <h:outputText escape="true" value="#{clientGuardian.contractId}" converter="contractIdConverter"
+                              styleClass="output-text" />
+                <f:setPropertyActionListener value="#{clientGuardian.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
+            </a4j:commandLink>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="ФИО клиента" />
+            </f:facet>
+            <h:outputText escape="true" value="#{clientGuardian.personName}" styleClass="output-text" />
+        </rich:column>
+    </rich:dataTable>
+
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />

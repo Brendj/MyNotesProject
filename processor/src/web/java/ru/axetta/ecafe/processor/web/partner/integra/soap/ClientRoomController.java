@@ -222,4 +222,8 @@ public interface ClientRoomController {
     @WebMethod(operationName = "editSubscriptionFeedingPlan")
     Result editSubscriptionFeedingPlan(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn);
+
+    //Result attachGuardianByClient(@WebParam(name = "childrenContractId") Long childrenContractId,
+    //        @WebParam(name = "childrenGuardianId") Long GuardianId);
+
 }

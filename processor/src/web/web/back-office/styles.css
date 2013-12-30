@@ -287,6 +287,12 @@
     background: none;
 }
 
+.data-table-footer-center {
+    background: none;
+    text-align: center;
+    vertical-align: middle;
+}
+
 .messages {
     font-family: Tahoma, Arial, Sans-Serif;
     font-size: 10pt;

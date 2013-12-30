@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
+import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
@@ -14,6 +15,8 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
 import java.util.*;
+
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.loadGuardiansByClient;
 
 /**
  * Created by IntelliJ IDEA.
@@ -354,7 +357,12 @@ public class ClientViewPage extends BasicWorkspacePage {
                 .add(Restrictions.isNotNull("activationDate"));
         this.bankSubscriptions = (List<BankSubscription>) bankSubscriptionCriteria.list();
 
+        this.wasSuspended = DAOUtils.wasSuspendedLastSubscriptionFeedingByClient(session, idOfClient);
+
+        this.clientGuardianItems = loadGuardiansByClient(session, idOfClient);
+
         // Категории скидок старое не используется
+        // TODO: переписать использутеся кривая логика с return! По этому не рекомендуется писать ниже код
         //categoryDiscountNames = new ArrayList<String>();
         List clientCategories = Arrays.asList(client.getCategoriesDiscounts().split(","));
         if (clientCategories.isEmpty())
@@ -383,8 +391,14 @@ public class ClientViewPage extends BasicWorkspacePage {
         //        .add(Projections.))
         //SubscriptionFeeding subscriptionFeeding =
 
-        this.wasSuspended = DAOUtils.wasSuspendedLastSubscriptionFeedingByClient(session, idOfClient);
 
+
+    }
+
+    private List<ClientGuardianItem> clientGuardianItems;
+
+    public List<ClientGuardianItem> getClientGuardianItems() {
+        return clientGuardianItems;
     }
 
 }
