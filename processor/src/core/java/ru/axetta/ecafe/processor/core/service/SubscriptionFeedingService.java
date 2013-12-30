@@ -138,33 +138,26 @@ public class SubscriptionFeedingService {
 
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    // Возвращает полную стоимость питания на сегодня по заданным комплексам орг-ии.
-    public Long sumComplexesPrice(List<Integer> complexIds, Org org) {
-        Session session = entityManager.unwrap(Session.class);
-        Date today = CalendarUtils.truncateToDayOfMonth(new Date());
-        Date tomorrow = CalendarUtils.addDays(today, 1);
-        // Ищем комплексы постащиков орг-ии.
-        Set<Org> sourceOrg = entityManager.find(Org.class, org.getIdOfOrg()).getSourceMenuOrgs();
-        Criteria criteria = session.createCriteria(ComplexInfo.class).add(Restrictions.in("org", sourceOrg))
-                .add(Restrictions.eq("usedSubscriptionFeeding", 1)).add(Restrictions.in("idOfComplex", complexIds))
-                .add(Restrictions.ge("menuDate", today)).add(Restrictions.lt("menuDate", tomorrow))
-                .setProjection(Projections.sum("currentPrice"));
-        return (Long) criteria.uniqueResult();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     // Возвращает комплексы, участвующие в АП, для данной орг-ии.
     public List<ComplexInfo> findComplexesWithSubFeeding(Org org) {
-        Session session = entityManager.unwrap(Session.class);
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
         Date tomorrow = CalendarUtils.addDays(today, 1);
         // Ищем комплексы постащиков орг-ии.
         Set<Org> sourceOrg = entityManager.find(Org.class, org.getIdOfOrg()).getSourceMenuOrgs();
-        Criteria criteria = session.createCriteria(ComplexInfo.class).add(Restrictions.in("org", sourceOrg))
-                .add(Restrictions.eq("usedSubscriptionFeeding", 1)).add(Restrictions.ge("menuDate", today))
-                .add(Restrictions.lt("menuDate", tomorrow));
-        return (List<ComplexInfo>) criteria.list();
+        // Если у орг-ии поставщиков нет, то ищем комплексы у самой орг-ии.
+        if (sourceOrg.isEmpty()) {
+            sourceOrg.add(org);
+        }
+        TypedQuery<ComplexInfo> query = entityManager.createQuery("select distinct ci from ComplexInfo ci "
+                + "where ci.org in (:org) and usedSubscriptionFeeding = 1 and menuDate >= :startDate and menuDate < :endDate",
+                ComplexInfo.class).setParameter("org", sourceOrg).setParameter("startDate", today)
+                .setParameter("endDate", tomorrow);
+        List<ComplexInfo> res = query.getResultList();
+        // Если комплексов у поставщиков нет, то ищем комплексы у самой орг-ии.
+        if (res.isEmpty()) {
+            res = query.setParameter("org", Arrays.asList(org)).getResultList();
+        }
+        return res;
     }
 
     @SuppressWarnings("unchecked")
@@ -245,6 +238,7 @@ public class SubscriptionFeedingService {
     }
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    // Возвращает полную стоимость питания на сегодня по заданным комплексам орг-ии.
     public Long getPriceOfDay(String dayComplexes, Org org) {
         if (StringUtils.isEmpty(dayComplexes)) {
             return 0L;
@@ -254,6 +248,13 @@ public class SubscriptionFeedingService {
         for (String id : complexIds) {
             ids.add(Integer.valueOf(id));
         }
-        return sumComplexesPrice(ids, org);
+        List<ComplexInfo> res = findComplexesWithSubFeeding(org);
+        Long price = 0L;
+        for (ComplexInfo ci : res) {
+            if (ids.contains(ci.getIdOfComplex())) {
+                price += ci.getCurrentPrice();
+            }
+        }
+        return price;
     }
 }
