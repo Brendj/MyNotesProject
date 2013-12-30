@@ -351,7 +351,9 @@
                     for (NotificationSettingItem it : notifications) {
                         %>
                         <tr>
-                            <td><%=it.getNotifyName()%></td>
+                            <td>
+                                <div class="output-text"><%=it.getNotifyName()%></div>
+                            </td>
                             <td>
                                 <input type="checkbox" name="<%=NOTIFY_RULE_PARAM%>-<%= it.getNotifyType() %>" size="16" maxlength="64" class="input-text"
                                        <%=it.isEnabled() ? HTML_CHECKED : ""%>
