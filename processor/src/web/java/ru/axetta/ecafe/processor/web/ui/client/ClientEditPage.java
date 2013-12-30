@@ -4,9 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.client.ClientService;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
+import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
@@ -24,6 +23,10 @@ import org.hibernate.criterion.Restrictions;
 import javax.faces.model.SelectItem;
 import java.util.*;
 
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.addGuardiansByClient;
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.loadGuardiansByClient;
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.removeGuardiansByClient;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Developer
@@ -33,7 +36,8 @@ import java.util.*;
  */
 public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler,
         CategoryListSelectPage.CompleteHandlerList,
-        ClientGroupSelectPage.CompleteHandler {
+        ClientGroupSelectPage.CompleteHandler,
+        ClientSelectPage.CompleteHandler{
 
 
     private String fax;
@@ -535,7 +539,72 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
         }
         this.clientGroupName = client.getClientGroup() == null ? "" : client.getClientGroup().getGroupName();
+
+        Criteria criteria = session.createCriteria(ClientGuardian.class);
+        criteria.add(Restrictions.eq("idOfChildren", idOfClient));
+        //if(isParent(clientGroupName)){
+        //    criteria.add(Restrictions.eq("idOfGuardian", idOfClient));
+        //} else {
+        //}
+        List results = criteria.list();
+        //clientGuardianItems = new ArrayList<ClientGuardianItem>();
+        //for (Object o: results){
+        //    ClientGuardian clientGuardian = (ClientGuardian) o;
+        //    Client cl = null;
+        //    //if(isParent(clientGroupName)){
+        //    //    cl = DAOUtils.findClient(session, clientGuardian.getIdOfChildren());
+        //    //} else {
+        //    //}
+        //    cl = DAOUtils.findClient(session, clientGuardian.getIdOfGuardian());
+        //    if(cl != null){
+        //        clientGuardianItems.add(new ClientGuardianItem(cl));
+        //    }
+        //}
+
+        this.clientGuardianItems = loadGuardiansByClient(session, idOfClient);
+
+
         fill(client);
+    }
+
+    public Boolean getAddClientGuardianButtonRendered(){
+        return clientGuardianItems == null || clientGuardianItems.isEmpty() || clientGuardianItems.size() < 2;
+    }
+
+    public Object removeClientGuardian() {
+        if(currentClientGuardian!=null && !clientGuardianItems.isEmpty()){
+            clientGuardianItems.remove(currentClientGuardian);
+            removeListGuardianItems.add(currentClientGuardian);
+        }
+        return null;
+    }
+
+    private ClientGuardianItem currentClientGuardian;
+
+    public ClientGuardianItem getCurrentClientGuardian() {
+        return currentClientGuardian;
+    }
+
+    public void setCurrentClientGuardian(ClientGuardianItem currentClientGuardian) {
+        this.currentClientGuardian = currentClientGuardian;
+    }
+
+    private List<ClientGuardianItem> clientGuardianItems;
+    private List<ClientGuardianItem> removeListGuardianItems = new ArrayList<ClientGuardianItem>();
+
+    public List<ClientGuardianItem> getClientGuardianItems() {
+        return clientGuardianItems;
+    }
+
+    private boolean isParent(String groupName) {
+        return groupName.equalsIgnoreCase(ClientGroup.Predefined.CLIENT_PARENTS.getNameOfGroup());
+    }
+
+    public void completeClientSelection(Session session, Long idOfClient) throws Exception {
+        if (null != idOfClient) {
+            Client client = (Client) session.load(Client.class, idOfClient);
+            clientGuardianItems.add(new ClientGuardianItem(client));
+        }
     }
 
     public void completeClientGroupSelection(Session session, Long idOfClientGroup) throws Exception {
@@ -717,6 +786,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             }
         }
 
+        if(clientGuardianItems!=null && !clientGuardianItems.isEmpty()){
+            addGuardiansByClient(persistenceSession, idOfClient, clientGuardianItems);
+        }
+        if(removeListGuardianItems!=null && !removeListGuardianItems.isEmpty()){
+            removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems);
+        }
+
         persistenceSession.update(client);
 
         fill(client);
@@ -788,7 +864,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         } else {
             categoriesFilter.append("Не выбрано");
         }
-        this.filter = categoriesFilter.toString();
+
     }
 
     public String getIdOfCategoryListString() {
@@ -799,7 +875,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private List<Long> idOfCategoryList = new ArrayList<Long>();
     private Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
     private boolean newOrgHasCatDiscount = true;
-
 
     public String getFilter() {
         return filter;

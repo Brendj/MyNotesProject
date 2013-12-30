@@ -163,8 +163,6 @@
         <h:outputText styleClass="output-text" id="categoryListFilter" escape="true" value=" {#{mainPage.clientEditPage.filter}}" />
     </h:panelGroup>
 
-
-
     <h:outputText escape="true" value="СНИЛС" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.san}" maxlength="11" styleClass="input-text" />
     <h:outputText escape="true" value="СНИЛС опекун" styleClass="output-text" />
@@ -173,6 +171,44 @@
     <h:inputText value="#{mainPage.clientEditPage.externalId}" maxlength="64" styleClass="input-text"/>
     <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.clientGUID}" maxlength="64" styleClass="input-text"/>
+
+    <h:outputText escape="true" value="Опекуны" styleClass="output-text" />
+    <rich:dataTable id="clientGuardianEditTable" value="#{mainPage.clientEditPage.clientGuardianItems}" var="clientGuardian"
+                    columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"
+                    footerClass="data-table-footer-center">
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Номер договора" />
+            </f:facet>
+            <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
+                <h:outputText escape="true" value="#{clientGuardian.contractId}" converter="contractIdConverter"
+                              styleClass="output-text" />
+                <f:setPropertyActionListener value="#{clientGuardian.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
+            </a4j:commandLink>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="ФИО клиента" />
+            </f:facet>
+            <h:outputText escape="true" value="#{clientGuardian.personName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Удалить" />
+            </f:facet>
+            <a4j:commandLink ajaxSingle="true" styleClass="command-link" reRender="clientGuardianEditTable"
+                    action="#{mainPage.clientEditPage.removeClientGuardian}">
+                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                <f:setPropertyActionListener value="#{clientGuardian}" target="#{mainPage.clientEditPage.currentClientGuardian}" />
+            </a4j:commandLink>
+        </rich:column>
+        <f:facet name="footer">
+            <a4j:commandButton value="Добавить" rendered="#{mainPage.clientEditPage.addClientGuardianButtonRendered}" action="#{mainPage.showClientSelectPage}" reRender="modalClientSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
+                               styleClass="command-link" />
+        </f:facet>
+    </rich:dataTable>
+
 
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
