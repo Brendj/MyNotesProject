@@ -1,10 +1,11 @@
 /*
- * Copyright (c) 2012. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2013. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -16,6 +17,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -840,6 +843,79 @@ public class ClientManager {
             res.addAll(set);
         }
         return res;
+    }
+
+
+    /* Загрузить список  */
+    public static List<ClientGuardianItem> loadGuardiansByClient(Session session, Long idOfClient) throws Exception {
+        Criteria criteria = session.createCriteria(ClientGuardian.class);
+        criteria.add(Restrictions.eq("idOfChildren", idOfClient));
+        List results = criteria.list();
+        List<ClientGuardianItem> guardianItems = new ArrayList<ClientGuardianItem>(results.size());
+        for (Object o: results){
+            ClientGuardian clientGuardian = (ClientGuardian) o;
+            Client cl = DAOUtils.findClient(session, clientGuardian.getIdOfGuardian());
+            if(cl != null){
+                guardianItems.add(new ClientGuardianItem(cl));
+            }
+        }
+        return guardianItems;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<Client> findGuardiansByClient(Session session, Long idOfChildren, Long idOfGuardian) throws Exception {
+
+        DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
+        idOfGuardianCriteria.add(Restrictions.eq("idOfChildren", idOfChildren));
+        idOfGuardianCriteria.add(Restrictions.ne("idOfGuardian", idOfGuardian));
+        idOfGuardianCriteria.setProjection(Property.forName("idOfGuardian"));
+        Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
+        Integer countResult = subCriteria.list().size();
+
+        Criteria clientCriteria = session.createCriteria(Client.class);
+        if(countResult>0){
+            clientCriteria.add(Property.forName("idOfClient").in(idOfGuardianCriteria));
+        } else {
+            clientCriteria.add(Restrictions.eq("idOfClient", idOfChildren));
+        }
+        return clientCriteria.list();
+    }
+
+    /* Удалить список опекунов клиента */
+    public static void removeGuardiansByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientGuardians) {
+        for (ClientGuardianItem item: clientGuardians){
+            removeGuardianByClient(session, idOfClient, item.getIdOfClient());
+        }
+    }
+
+    /* Удалить опекуна клиента */
+    public static void removeGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian) {
+        Criteria criteria = session.createCriteria(ClientGuardian.class);
+        criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
+        criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
+        ClientGuardian clientGuardian = (ClientGuardian) criteria.uniqueResult();
+        if(clientGuardian!=null){
+            session.delete(clientGuardian);
+        }
+    }
+
+    /* Добавить список опекунов клиента */
+    public static void addGuardiansByClient(Session session, Long idOfClient, List<ClientGuardianItem> clientGuardians) {
+        for (ClientGuardianItem item: clientGuardians){
+            addGuardianByClient(session, idOfClient, item.getIdOfClient());
+        }
+    }
+
+    /* Добавить опекуна клиенту */
+    public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian) {
+        Criteria criteria = session.createCriteria(ClientGuardian.class);
+        criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
+        criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
+        ClientGuardian clientGuardian = (ClientGuardian) criteria.uniqueResult();
+        if(clientGuardian==null){
+            clientGuardian = new ClientGuardian(idOfChildren, idOfGuardian);
+            session.persist(clientGuardian);
+        }
     }
 
 }

@@ -56,6 +56,8 @@ import org.slf4j.LoggerFactory;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Developer
@@ -2659,12 +2661,13 @@ public class Processor implements SyncProcessor,
                 persistenceTransaction = persistenceSession.beginTransaction();
 
                 // Check enter event existence
+                final Long idOfClient = e.getIdOfClient();
                 if (DAOUtils.existEnterEvent(persistenceSession, e.getIdOfOrg(), e.getIdOfEnterEvent())) {
                     EnterEvent ee = DAOUtils.findEnterEvent(persistenceSession,
                             new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), e.getIdOfOrg()));
                     // Если ENTER событие существует (может быть последний результат синхронизации не был передан клиенту)
-final boolean checkClient = (ee.getClient() == null && e.getIdOfClient() == null) || (ee.getClient() != null && ee
-                                    .getClient().getIdOfClient().equals(e.getIdOfClient()));
+final boolean checkClient = (ee.getClient() == null && idOfClient == null) || (ee.getClient() != null && ee
+                                    .getClient().getIdOfClient().equals(idOfClient));
 final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard() == null) || (ee.getIdOfTempCard() != null && ee.getIdOfTempCard().equals(e.getIdOfTempCard()));
 
                     if (checkClient && ee.getEvtDateTime().equals(e.getEvtDateTime()) && checkTempCard) {
@@ -2682,12 +2685,12 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                 } else {
                     // find client by id
                     Client client = null;
-                    if (e.getIdOfClient() != null) {
-                        client = (Client) persistenceSession.get(Client.class, e.getIdOfClient());
+                    if (idOfClient != null) {
+                        client = (Client) persistenceSession.get(Client.class, idOfClient);
                         if (client == null) {
                             SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(
                                     e.getIdOfEnterEvent(), SyncResponse.ResEnterEvents.Item.RC_CLIENT_NOT_FOUND,
-                                    String.format("Client not found: %d", e.getIdOfClient()));
+                                    String.format("Client not found: %d", idOfClient));
                             resEnterEvents.addItem(item);
                             continue;
                         }
@@ -2709,7 +2712,8 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                     enterEvent.setDocSerialNum(e.getDocSerialNum());
                     enterEvent.setIssueDocDate(e.getIssueDocDate());
                     enterEvent.setVisitDateTime(e.getVisitDateTime());
-                    enterEvent.setGuardianId(e.getGuardianId());
+                    final Long guardianId = e.getGuardianId();
+                    enterEvent.setGuardianId(guardianId);
                     persistenceSession.save(enterEvent);
 
 
@@ -2718,18 +2722,26 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                     resEnterEvents.addItem(item);
 
                     if (isDateToday(e.getEvtDateTime()) &&
-                            e.getIdOfClient() != null &&
+                            idOfClient != null &&
                             (e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT ||
                                     e.getPassDirection() == EnterEvent.RE_ENTRY
                                     || e.getPassDirection() == EnterEvent.RE_EXIT)) {
                         final EventNotificationService notificationService = RuntimeContext.getAppContext()
                                 .getBean(EventNotificationService.class);
                         final String[] values = generateNotificationParams(persistenceSession, client,
-                                e.getPassDirection(), e.getEvtDateTime(), e.getGuardianId());
+                                e.getPassDirection(), e.getEvtDateTime(), guardianId);
                         //final String[] values = generateNotificationParams(persistenceSession, client, e);
-                        notificationService.sendNotificationAsync(client,
-                                e.getGuardianId() == null ? EventNotificationService.NOTIFICATION_ENTER_EVENT
-                                        : EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values);
+                        if(guardianId == null){
+                            notificationService.sendNotificationAsync(client,
+                                    EventNotificationService.NOTIFICATION_ENTER_EVENT, values);
+                        } else {
+                            List<Client> clients = findGuardiansByClient(persistenceSession, idOfClient, guardianId);
+                            for (Client cl: clients){
+                                notificationService.sendNotificationAsync(cl,
+                                        EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values);
+                            }
+
+                        }
                     }
 
                     /// Формирование журнала транзакции
