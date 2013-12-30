@@ -5,7 +5,10 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.ActiveClientsReport;
+import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.TotalServicesReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -49,6 +52,13 @@ public class ActiveClientsReportPage extends OnlineReportPage {
     {
         this.report = new ActiveClientsReport ();
         ActiveClientsReport.Builder reportBuilder = new ActiveClientsReport.Builder();
+        if (idOfOrg != null) {
+            Org org = null;
+            if (idOfOrg != null && idOfOrg > -1) {
+                org = DAOService.getInstance().findOrById(idOfOrg);
+            }
+            reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+        }
         this.report = reportBuilder.build (session, startDate, endDate, new GregorianCalendar());
     }
 

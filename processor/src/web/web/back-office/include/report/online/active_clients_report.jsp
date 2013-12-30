@@ -28,6 +28,15 @@
         <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
         <rich:calendar value="#{activeClientsReportPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+
+        <h:outputText escape="true" value="Организация" styleClass="output-text" />
+        <h:panelGroup>
+            <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;" />
+            <h:outputText styleClass="output-text" escape="true" value=" {#{activeClientsReportPage.filter}}" />
+        </h:panelGroup>
+
         <a4j:commandButton value="Генерировать отчет" action="#{activeClientsReportPage.executeReport}"
                            reRender="mainMenu, workspaceTogglePanel, itemsReportTable"
                            styleClass="command-button" status="reportGenerateStatus" />
@@ -48,13 +57,19 @@
                         <h:outputText styleClass="column-header" escape="true" value="Название учреждения" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column">
-                        <h:outputText styleClass="column-header" escape="true" value="Количество учащихся (шт.)" />
+                        <h:outputText styleClass="column-header" escape="true" value="Количество клиентов" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column">
-                        <h:outputText styleClass="column-header" escape="true" value="Количество клиентов, совершавших покупки за период" />
+                        <h:outputText styleClass="column-header" escape="true" value="Количество клиентов, совершавших покупки/пополнения за период" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column">
                         <h:outputText styleClass="column-header" escape="true" value="Количество клиентов-бесплатников" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column">
+                        <h:outputText styleClass="column-header" escape="true" value="Количество клиентов-бесплатников, совершавших покупки/пополнения за период" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column">
+                        <h:outputText styleClass="column-header" escape="true" value="Количество клиентов, совершавших проход за период" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column">
                         <h:outputText styleClass="column-header" escape="true" value="Количество сотрудников" />
@@ -81,6 +96,12 @@
             </rich:column>
             <rich:column styleClass="#{item.style}">
                 <h:outputText styleClass="output-text" value="#{item.discountCount}" />
+            </rich:column>
+            <rich:column styleClass="#{item.style}">
+                <h:outputText styleClass="output-text" value="#{item.realDiscountCount}" />
+            </rich:column>
+            <rich:column styleClass="#{item.style}">
+                <h:outputText styleClass="output-text" value="#{item.entersCount}" />
             </rich:column>
             <rich:column styleClass="#{item.style}">
                 <h:outputText styleClass="output-text" value="#{item.employeesCount}" />

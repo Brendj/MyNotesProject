@@ -28,6 +28,8 @@ public class ActiveClientsItem {
     private long employeesCount;
     private String active;
     private String style;
+    private long realDiscountCount;
+    private long entersCount;
 
 
     public ActiveClientsItem(long idOfOrg, String shortname, String num, String region, String style) {
@@ -39,6 +41,8 @@ public class ActiveClientsItem {
         this.paymentCount = 0;
         this.discountCount = 0;
         this.employeesCount = 0;
+        this.realDiscountCount = 0;
+        this.entersCount = 0;
         this.style = style;
     }
 
@@ -132,5 +136,21 @@ public class ActiveClientsItem {
 
     public void setStyle(String style) {
         this.style = style;
+    }
+
+    public long getRealDiscountCount() {
+        return realDiscountCount;
+    }
+
+    public void setRealDiscountCount(long realDiscountCount) {
+        this.realDiscountCount = realDiscountCount;
+    }
+
+    public long getEntersCount() {
+        return entersCount;
+    }
+
+    public void setEntersCount(long entersCount) {
+        this.entersCount = entersCount;
     }
 }

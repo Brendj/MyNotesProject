@@ -49,6 +49,8 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
     public static final int DISCOUNT_COUNT_VALUE = 2;
     public static final int PAYMENT_COUNT_VALUE = 3;
     public static final int EMPLOYEE_COUNT_VALUE = 4;
+    public static final int REAL_DISCOUNT_COUNT_VALUE = 5;
+    public static final int ENTERS_COUNT_VALUE = 6;
 
     private final static Logger logger = LoggerFactory.getLogger(ActiveClientsReport.class);
 
@@ -139,27 +141,41 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
             endCal.set(Calendar.MINUTE, 0);
             endCal.set(Calendar.SECOND, 0);
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-
+            String orgRestriction = "";
+            if (org != null && org.getIdOfOrg() != null) {
+                orgRestriction = " and cf_orgs.idoforg=" + org.getIdOfOrg() + " ";
+            }
 
             
             List<ActiveClientsItem> result = new ArrayList<ActiveClientsItem>();
             String sql =
                 /* Все */
-                  "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
+                "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
+                + "       cf_orgs.district, count(distinct totalClients.idofclient), " + TOTAL_COUNT_VALUE + " as valType "
+                + "from cf_orgs "
+                + "left join cf_clients as totalClients on cf_orgs.idoforg=totalClients.idoforg "
+                + "left join cf_clientgroups on totalClients.idoforg=cf_clientgroups.idoforg and totalClients.idOfClientGroup=cf_clientgroups.idOfClientGroup "
+                + "where cf_orgs.district is not null and cf_orgs.district<>'' "
+                       + getClientsClause("totalClients")
+                       + orgRestriction
+                + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
+                /*+ "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
                 + "       cf_orgs.district, count(totalClients.idofclient), " + TOTAL_COUNT_VALUE + " as valType "
                 + "from cf_orgs "
                 + "left join cf_clients as totalClients on cf_orgs.idoforg=totalClients.idoforg "
                 + "where cf_orgs.district is not null and cf_orgs.district<>'' "
                           + getClientsClause("totalClients")
-                + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
+                + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "*/
                 + "union all "
                 /* Бесплатники */
                 + "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
-                + "       cf_orgs.district, count(discountClients.idofclient), " + DISCOUNT_COUNT_VALUE + " as valType "
+                + "       cf_orgs.district, count(distinct discountClients.idofclient), " + DISCOUNT_COUNT_VALUE + " as valType "
                 + "from cf_orgs "
                 + "left join cf_clients as discountClients on cf_orgs.idoforg=discountClients.idoforg and discountClients.discountmode<>0 "
+                + "left join cf_clientgroups on discountClients.idoforg=cf_clientgroups.idoforg and discountClients.idOfClientGroup=cf_clientgroups.idOfClientGroup "
                 + "where cf_orgs.district is not null and cf_orgs.district<>'' "
-                          + getClientsClause("discountClients")
+                         + getClientsClause("discountClients")
+                         + orgRestriction
                 + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
                 + "union all "
                 /* Осуществившие платежи */
@@ -170,18 +186,49 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
                 + "                       orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startCal.getTime()) + "') * 1000 AND "
                 + "                                                  EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endCal.getTime()) + "') * 1000 "
                 + "join cf_clients as ordclients on orders.idofclient=ordclients.idofclient "
+                + "left join cf_clientgroups on ordclients.idoforg=cf_clientgroups.idoforg and ordclients.idOfClientGroup=cf_clientgroups.idOfClientGroup "
                 + "where cf_orgs.district is not null and cf_orgs.district<>'' "
                         + getClientsClause("ordclients")
+                        + orgRestriction
                 + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
                 + "union all "
                 /* Сотрудники */
                 + "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
-                + "       cf_orgs.district, count(employeeClients.idofclient), " + EMPLOYEE_COUNT_VALUE + " as valType "
+                + "       cf_orgs.district, count(distinct employeeClients.idofclient), " + EMPLOYEE_COUNT_VALUE + " as valType "
                 + "from cf_orgs "
                 + "left join cf_clients as employeeClients on cf_orgs.idoforg=employeeClients.idoforg "
                 + "where cf_orgs.district is not null and cf_orgs.district<>'' "
                 + "      AND employeeClients.idOfClientGroup>=" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
                 + "      AND employeeClients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() + " "
+                        + orgRestriction
+                + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
+                + "union all "
+                /* Осуществление льготного питания за период */
+                + "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
+                + "       cf_orgs.district, count(distinct orders.idofclient), " + REAL_DISCOUNT_COUNT_VALUE + " as valType "
+                + "from cf_orgs "
+                + "join cf_orders as orders on cf_orgs.idoforg=orders.idoforg and orders.socdiscount<>0 and "
+                + "                       orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startCal.getTime()) + "') * 1000 AND "
+                + "                                                  EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endCal.getTime()) + "') * 1000 "
+                + "join cf_clients as ordclients on orders.idofclient=ordclients.idofclient "
+                + "left join cf_clientgroups on ordclients.idoforg=cf_clientgroups.idoforg and ordclients.idOfClientGroup=cf_clientgroups.idOfClientGroup "
+                + "where cf_orgs.district is not null and cf_orgs.district<>'' "
+                         + getClientsClause("ordclients")
+                         + orgRestriction
+                + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
+                + "union all "
+                //  Проходы
+                + "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
+                + "       cf_orgs.district, count(distinct cf_enterevents.idofclient), " + ENTERS_COUNT_VALUE + " as valType "
+                + "from cf_orgs "
+                + "join cf_enterevents on cf_enterevents.idoforg=cf_orgs.idoforg and "
+                + "     cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startCal.getTime()) + "') * 1000 AND "
+                + "                                        EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endCal.getTime()) + "') * 1000 "
+                + "join cf_clients as entclients on cf_enterevents.idofclient=entclients.idofclient "
+                + "left join cf_clientgroups on entclients.idoforg=cf_clientgroups.idoforg and entclients.idOfClientGroup=cf_clientgroups.idOfClientGroup "
+                + "where cf_orgs.district is not null and cf_orgs.district<>'' "
+                         + getClientsClause("entclients")
+                         + orgRestriction
                 + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
                 + "order by district, shortname, valType";
             Query query = session.createSQLQuery(sql);
@@ -248,6 +295,16 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
                         prevRegionItem.setEmployeesCount(prevRegionItem.getEmployeesCount() + count);
                         prevItem.setEmployeesCount(count);
                         break;
+                    case REAL_DISCOUNT_COUNT_VALUE:
+                        overallItem.setRealDiscountCount(overallItem.getRealDiscountCount() + count);
+                        prevRegionItem.setRealDiscountCount(prevRegionItem.getRealDiscountCount() + count);
+                        prevItem.setRealDiscountCount(count);
+                        break;
+                    case ENTERS_COUNT_VALUE:
+                        overallItem.setEntersCount(overallItem.getEntersCount() + count);
+                        prevRegionItem.setEntersCount(prevRegionItem.getEntersCount() + count);
+                        prevItem.setEntersCount(count);
+                        break;
                 }
                 prevRegion = district;
             }
@@ -269,8 +326,13 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
     }
     
     private static String getClientsClause(String table) {
-        String onlyActiveClients = " AND " + table + ".idOfClientGroup>=" + ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue() +
-                                   " AND " + table + ".idOfClientGroup<" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() + " ";
+        /*String onlyActiveClients = " AND " + table + ".idOfClientGroup>=" + ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue() +
+                                   " AND " + table + ".idOfClientGroup<" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() + " ";*/
+        String onlyActiveClients =
+                 " AND ((" + table + ".idOfClientGroup>=" + ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue()
+               + "           AND " + table + ".idOfClientGroup<" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() + ") or "
+               + "           " + table + ".idOfClientGroup is null or "
+               + "           cf_clientgroups.groupname='') ";
         return onlyActiveClients;
     }
 
