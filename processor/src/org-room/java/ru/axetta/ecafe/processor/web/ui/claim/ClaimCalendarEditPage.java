@@ -89,6 +89,8 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     public void fill(boolean buildData) {
         Session session = null;
         try {
+            errorMessages = "";
+            infoMessages = "";
             session = (Session) entityManager.getDelegate();
             fill(session, buildData);
         } catch (Exception e) {
@@ -204,8 +206,8 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
             iOnPage++;
             i++;
         }
-        if (iOnPage != itemsOnPage) {
-            entries.add(i - 1, overallEntry);
+        if (/*iOnPage != itemsOnPage && */entries.size() > 0) {
+            entries.add(overallEntry);
         }
     }
 
@@ -258,7 +260,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
                 if (v == null) {
                     continue;
                 }
-                v = v * 1000;
+                 v = v * 1000;
                 List<Long> ids = e.ids.get(ts);
 
                 //  Если списка id не существует, это обозначает что значения добавлены, необходимо создавать заявку

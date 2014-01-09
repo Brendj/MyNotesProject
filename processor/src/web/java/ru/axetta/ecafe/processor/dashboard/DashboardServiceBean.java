@@ -651,8 +651,8 @@ public class DashboardServiceBean {
         if (allowedTagsStr == null || allowedTagsStr.length() < 1) {
             return "";
         }
-        String allowedTags [] = allowedTagsStr.split(",");
-        String orgTags [] = orgTagsStr.split(",");
+        String allowedTags [] = allowedTagsStr.split(";");
+        String orgTags [] = orgTagsStr.split(";");
         String result = "";
         for (String allowedTag : allowedTags) {
             for (String orgTag : orgTags) {

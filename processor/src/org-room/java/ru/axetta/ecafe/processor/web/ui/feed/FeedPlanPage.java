@@ -565,11 +565,9 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             MainPage.getSessionInstance().doShowOrderRegistrationResultPanel(this);
         } else if (clearPlan) {
             resetMessages();
-            for (Client cl : clients) {
-                if (cl.getIdoforder() != null) {
-                    sendError("Присутствуют уже оплаченные заказы, план очистить невозможно");
-                    return;
-                }
+            if (hasSavedData()) {
+                sendError("Присутствуют уже оплаченные заказы, план очистить невозможно");
+                return;
             }
 
             RuntimeContext.getAppContext().getBean(FeedPlanPage.class).clear();
@@ -682,8 +680,27 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
                 }
             }
         }
-        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).clear(complexesToDelete);
-        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
+        if (hasSavedData()) {
+            RuntimeContext.getAppContext().getBean(FeedPlanPage.class).clear(complexesToDelete);
+            RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
+        } else {
+            for (Client cl : clients) {
+                for (int c : complexesToDelete) {
+                    if (cl.getComplex() == c) {
+                        cl.setActionType(BLOCK_CLIENT);
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean hasSavedData() {
+        for (Client cl : clients) {
+            if (cl.getIdoforder() != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void onReplaceClientEvent(ReplaceClientEvent event) {

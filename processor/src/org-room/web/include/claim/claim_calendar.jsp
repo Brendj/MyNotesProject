@@ -74,7 +74,7 @@
         </h:panelGrid>
 
         <a4j:region>
-        <rich:panel id="claimsCalendar" style="height: 450px; width: 1350px; overflow: auto;">
+        <rich:panel id="claimsCalendar" style="height: 450px; width: 65%; overflow: auto;">
             <rich:dataTable value="#{claimCalendarEditPage.entries}" var="e"
                             width="350px" rows="#{claimCalendarEditPage.itemsOnPage}" id="table" rowKeyVar="row" footerClass="data-table-footer">
                 <rich:column>
