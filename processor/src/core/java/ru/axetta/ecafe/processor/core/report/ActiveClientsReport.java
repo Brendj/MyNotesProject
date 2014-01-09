@@ -218,18 +218,17 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
                 + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
                 + "union all "*/
                 + "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
-                + "       cf_orgs.district, count(distinct trans.idofclient), " + REAL_DISCOUNT_COUNT_VALUE + " as valType "
+                + "       cf_orgs.district, count(distinct orders.idofclient) + count(distinct trans.idofclient), " + REAL_DISCOUNT_COUNT_VALUE + " as valType "
                 + "from cf_orgs "
-                + "left join cf_orders as orders on cf_orgs.idoforg=orders.idoforg and orders.socdiscount<>0 and "
+                + "join cf_clients as transclients on cf_orgs.idoforg=transclients.idoforg "
+                + "left join cf_orders as orders on transclients.idofclient=orders.idofclient and socdiscount<>0 and "
                 + "                       orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startCal.getTime()) + "') * 1000 AND "
                 + "                                                  EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endCal.getTime()) + "') * 1000 "
-                + "left join cf_transactions as trans on cf_orgs.idoforg=trans.idoforg and "
+                + "left join cf_transactions as trans on transclients.idofclient=trans.idofclient and "
                 + "                        trans.transactiondate between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startCal.getTime()) + "') * 1000 AND "
                 + "                                                  EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endCal.getTime()) + "') * 1000 "
-                + "join cf_clients as transclients on ((orders.idofclient=transclients.idofclient and orders.idoforg=transclients.idoforg) or "
-                + "                                    (trans.idofclient=transclients.idofclient and trans.idoforg=transclients.idoforg)) and transclients.discountmode<>0 "
                 + "left join cf_clientgroups on transclients.idoforg=cf_clientgroups.idoforg and transclients.idOfClientGroup=cf_clientgroups.idOfClientGroup "
-                + "where cf_orgs.district is not null and cf_orgs.district<>''  "
+                + "where cf_orgs.district is not null and cf_orgs.district<>'' "
                         + getClientsClause("transclients")
                         + orgRestriction
                 + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
