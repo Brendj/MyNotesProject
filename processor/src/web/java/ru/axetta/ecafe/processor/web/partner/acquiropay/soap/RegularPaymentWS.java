@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.partner.acquiropay.soap;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
@@ -312,4 +313,26 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
         return si;
     }
 
+    @Override
+    @WebMethod
+    public RequestResult regularPaymentReadSettings() {
+        RequestResult result = new RequestResult();
+        LowerLimitAmountList limitAmountList = new LowerLimitAmountList();
+        limitAmountList.setList(new ArrayList<Long>());
+        result.setLowerLimitAmountList(limitAmountList);
+        String lowerLimitAmounts = runtimeContext.getOptionValueString(Option.OPTION_THRESHOLD_VALUES);
+        String[] lowerLimitAmountArray = StringUtils.split(lowerLimitAmounts, ";");
+        for (String value : lowerLimitAmountArray) {
+            limitAmountList.getList().add(Long.valueOf(value));
+        }
+        PaymentAmountList paymentAmountList = new PaymentAmountList();
+        paymentAmountList.setList(new ArrayList<Long>());
+        result.setPaymentAmountList(paymentAmountList);
+        String paymentAmounts = runtimeContext.getOptionValueString(Option.OPTION_AUTOREFILL_VALUES);
+        String[] paymentAmountArray = StringUtils.split(paymentAmounts, ";");
+        for (String value : paymentAmountArray) {
+            paymentAmountList.getList().add(Long.valueOf(value));
+        }
+        return result;
+    }
 }

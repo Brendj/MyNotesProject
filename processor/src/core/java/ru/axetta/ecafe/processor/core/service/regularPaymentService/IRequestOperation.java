@@ -28,6 +28,6 @@ public interface IRequestOperation {
 
     void processResponse(Long mfrRequestId, PaymentResponse paymentResponse);
 
-    boolean postProcessResponse(Long mfrRequestId, PaymentResponse paymentResponse);
+    boolean postProcessResponse(Long mfrRequestId, Long subscriptionId, PaymentResponse paymentResponse);
 
 }

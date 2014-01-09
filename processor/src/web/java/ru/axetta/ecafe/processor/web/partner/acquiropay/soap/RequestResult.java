@@ -33,6 +33,10 @@ public class RequestResult {
     private SubscriptionInfo subscriptionInfo;
     @XmlElement(name = "RegularPaymentList")
     private RegularPaymentList paymentList;
+    @XmlElement(name = "LowerLimitAmountList")
+    private LowerLimitAmountList lowerLimitAmountList;
+    @XmlElement(name = "PaymentAmountList")
+    private PaymentAmountList paymentAmountList;
 
     public int getErrorCode() {
         return errorCode;
@@ -80,5 +84,21 @@ public class RequestResult {
 
     public void setPaymentList(RegularPaymentList paymentList) {
         this.paymentList = paymentList;
+    }
+
+    public LowerLimitAmountList getLowerLimitAmountList() {
+        return lowerLimitAmountList;
+    }
+
+    public void setLowerLimitAmountList(LowerLimitAmountList lowerLimitAmountList) {
+        this.lowerLimitAmountList = lowerLimitAmountList;
+    }
+
+    public PaymentAmountList getPaymentAmountList() {
+        return paymentAmountList;
+    }
+
+    public void setPaymentAmountList(PaymentAmountList paymentAmountList) {
+        this.paymentAmountList = paymentAmountList;
     }
 }

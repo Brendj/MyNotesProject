@@ -17,6 +17,7 @@
 <%@ page import="java.net.URI" %>
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Arrays" %>
 <%@ page import="java.util.List" %>
 
@@ -71,6 +72,7 @@
                         List<String> list = Arrays.asList(StringUtils.split(values, ";"));
                         String paymentAmount = bs.getPaymentAmount().toString();
                         if (!list.contains(paymentAmount)) {
+                            list = new ArrayList<String>(list);
                             list.add(paymentAmount);
                         }
                         for (String value : list) {
@@ -94,6 +96,7 @@
                         list = Arrays.asList(StringUtils.split(values, ";"));
                         String thresholdAmount = bs.getThresholdAmount().toString();
                         if (!list.contains(thresholdAmount)) {
+                            list = new ArrayList<String>(list);
                             list.add(thresholdAmount);
                         }
                         for (String value : list) {
@@ -147,27 +150,9 @@
             </form>
         </td>
     </tr>
-    <tr>
-        <td>
-            <form action="<%=StringEscapeUtils.escapeHtml(response.encodeURL(currentUri.toString()))%>" method="post">
-                <input type="hidden" name="bs" value="<%=bs.getIdOfSubscription()%>"/>
-                <input type="hidden" name="command" value="edit" />
-                <input type="hidden" name="stage" value="pay" />
-                <input class="command-button" type="submit" value="Отправить запрос на платёж" />
-            </form>
-        </td>
-    </tr>
 </table>
 
 <%
-    if ("pay".equals(stage)) {
-        rpService.refillOneClientBalance(bsId);
-%>
-
-<span>Запрос на платеж отправлен!</span>
-
-<%
-    }
     List<RegularPayment> paymentList = rpService.getSubscriptionPayments(bsId, null, null, false);
     if (!paymentList.isEmpty()) {
         int i = 1;

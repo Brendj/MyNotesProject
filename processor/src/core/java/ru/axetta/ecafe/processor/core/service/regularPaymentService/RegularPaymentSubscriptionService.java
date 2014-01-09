@@ -84,9 +84,9 @@ public class RegularPaymentSubscriptionService {
             try {
                 BankSubscription bs = findBankSubscription(id);
                 if (bs.getValidToDate().before(today)) {
-                    makeSubscriptionOperation(id, IRequestOperation.SUBSCRIPTION_DELETE);
+                    deactivateSubscription(id);
                 } else {
-                    makeSubscriptionOperation(id, IRequestOperation.REGULAR_PAYMENT);
+                    refillOneClientBalance(id);
                 }
             } catch (Exception ex) {
                 logger.error(ex.getMessage());
@@ -95,30 +95,27 @@ public class RegularPaymentSubscriptionService {
         logger.info("RegularPaymentSubscriptionService work is over.");
     }
 
-    private boolean makeSubscriptionOperation(Long subscriptionId, String operationName) {
+    private PaymentResponse sendSubscriptionRequest(Long subscriptionId, String operationName) {
         IRequestOperation operation = getOperationBean(operationName);
         MfrRequest mfrRequest = operation.createRequest(subscriptionId);
         Map<String, String> params = operation.getRequestParams(mfrRequest);
         PaymentResponse paymentResponse = sendRequest(mfrRequest.getRequestUrl(), params);
         operation.processResponse(mfrRequest.getIdOfRequest(), paymentResponse);
-        if (operationName.equals(IRequestOperation.SUBSCRIPTION_DELETE)) {
-            return operation.postProcessResponse(mfrRequest.getIdOfRequest(), paymentResponse);
-        }
-        return true;
+        return paymentResponse;
     }
 
     public void refillOneClientBalance(Long bsId) {
-        makeSubscriptionOperation(bsId, IRequestOperation.REGULAR_PAYMENT);
+        sendSubscriptionRequest(bsId, IRequestOperation.REGULAR_PAYMENT);
     }
 
     // Обработка callback'а на запрос активации подписки на автопополнение.
     public void processSubscriptionActivated(Long mfrRequestId, PaymentResponse paymentResponse) {
-        getOperationBean(IRequestOperation.SUBSCRIPTION_REG).postProcessResponse(mfrRequestId, paymentResponse);
+        getOperationBean(IRequestOperation.SUBSCRIPTION_REG).postProcessResponse(mfrRequestId, null, paymentResponse);
     }
 
     // Обработка callback'а на запрос проведения регулярного пополнения (списания с карты).
     public void processRegularPayment(Long mfrRequestId, PaymentResponse paymentResponse) {
-        getOperationBean(IRequestOperation.REGULAR_PAYMENT).postProcessResponse(mfrRequestId, paymentResponse);
+        getOperationBean(IRequestOperation.REGULAR_PAYMENT).postProcessResponse(mfrRequestId, null, paymentResponse);
     }
 
     // Возвращает параметры для запроса по активации подписки (привязка карты).
@@ -127,7 +124,14 @@ public class RegularPaymentSubscriptionService {
     }
 
     public boolean deactivateSubscription(Long subscriptionId) {
-        return makeSubscriptionOperation(subscriptionId, IRequestOperation.SUBSCRIPTION_DELETE);
+        PaymentResponse paymentResponse = sendSubscriptionRequest(subscriptionId,
+                IRequestOperation.SUBSCRIPTION_DELETE);
+        return getOperationBean(IRequestOperation.SUBSCRIPTION_DELETE)
+                .postProcessResponse(null, subscriptionId, paymentResponse);
+    }
+
+    public PaymentResponse checkSubscriptionStatus(Long subscriptionId) {
+        return sendSubscriptionRequest(subscriptionId, IRequestOperation.STATUS_CHECK);
     }
 
     private PaymentResponse sendRequest(String uri, Map<String, String> params) {

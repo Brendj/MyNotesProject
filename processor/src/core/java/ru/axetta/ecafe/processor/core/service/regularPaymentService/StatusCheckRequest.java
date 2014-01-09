@@ -88,7 +88,7 @@ public class StatusCheckRequest implements IRequestOperation {
     }
 
     @Override
-    public boolean postProcessResponse(Long mfrRequestId, PaymentResponse paymentResponse) {
+    public boolean postProcessResponse(Long mfrRequestId, Long subscriptionId, PaymentResponse paymentResponse) {
         return true;
     }
 }

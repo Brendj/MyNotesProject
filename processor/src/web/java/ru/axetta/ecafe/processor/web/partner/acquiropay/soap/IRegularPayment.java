@@ -51,4 +51,7 @@ public interface IRegularPayment {
     @WebMethod
     RequestResult regularPaymentReadPayments(@WebParam(name = "regularPaymentSubscriptionID") Long subscriptionID,
             @WebParam(name = "beginDate") Date beginDate, @WebParam(name = "endDate") Date endDate);
+
+    @WebMethod
+    RequestResult regularPaymentReadSettings();
 }

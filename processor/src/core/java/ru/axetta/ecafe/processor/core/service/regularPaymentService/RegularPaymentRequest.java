@@ -115,7 +115,7 @@ public class RegularPaymentRequest implements IRequestOperation {
 
     @Override
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
-    public boolean postProcessResponse(Long mfrRequestId, PaymentResponse paymentResponse) {
+    public boolean postProcessResponse(Long mfrRequestId, Long subscriptionId, PaymentResponse paymentResponse) {
         MfrRequest mfrRequest = em.find(MfrRequest.class, mfrRequestId);
         mfrRequest.setResponseStatus(paymentResponse.getStatus());
         RegularPayment rp = mfrRequest.getRegularPayment();

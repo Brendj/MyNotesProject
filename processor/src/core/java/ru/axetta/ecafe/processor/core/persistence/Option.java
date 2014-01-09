@@ -110,10 +110,10 @@ public class Option {
             OPTION_SMS_PAYMENT_TYPE, String.valueOf(SMSSubscriptionFeeService.SMS_PAYMENT_BY_THE_PIECE),
             OPTION_SMS_DEFAULT_SUBSCRIPTION_FEE, "0",
             OPTION_ENABLE_BALANCE_AUTOREFILL, "",
-            OPTION_AUTOREFILL_VALUES, "",
+            OPTION_AUTOREFILL_VALUES, "0",
             OPTION_ENABLE_SUBSCRIPTION_FEEDING, "0",
             OPTION_ENABLE_SUB_BALANCE_OPERATION, "0",
-            OPTION_THRESHOLD_VALUES, "",
+            OPTION_THRESHOLD_VALUES, "0",
             OPTION_TEMP_CARD_VALID_DAYS, "0",
             OPTION_ENABLE_NOTIFICATION_GOOD_REQUEST_CHANGE, "0", // отключено по умолчанию
             OPTION_NSI_LAST_SYNC_TIME, null,
