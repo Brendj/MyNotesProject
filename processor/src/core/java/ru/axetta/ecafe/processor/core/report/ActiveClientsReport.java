@@ -204,17 +204,34 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
                 + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
                 + "union all "
                 /* Осуществление льготного питания за период */
-                + "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
+                /*+ "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
                 + "       cf_orgs.district, count(distinct orders.idofclient), " + REAL_DISCOUNT_COUNT_VALUE + " as valType "
                 + "from cf_orgs "
                 + "join cf_orders as orders on cf_orgs.idoforg=orders.idoforg and orders.socdiscount<>0 and "
                 + "                       orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startCal.getTime()) + "') * 1000 AND "
                 + "                                                  EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endCal.getTime()) + "') * 1000 "
-                + "join cf_clients as ordclients on orders.idofclient=ordclients.idofclient "
+                + "join cf_clients as ordclients on orders.idofclient=ordclients.idofclient and orders.idoforg=ordclients.idoforg "
                 + "left join cf_clientgroups on ordclients.idoforg=cf_clientgroups.idoforg and ordclients.idOfClientGroup=cf_clientgroups.idOfClientGroup "
                 + "where cf_orgs.district is not null and cf_orgs.district<>'' "
                          + getClientsClause("ordclients")
                          + orgRestriction
+                + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
+                + "union all "*/
+                + "select cf_orgs.idoforg, cf_orgs.shortname, substring(cf_orgs.shortname FROM '[0-9]+') as num, "
+                + "       cf_orgs.district, count(distinct trans.idofclient), " + REAL_DISCOUNT_COUNT_VALUE + " as valType "
+                + "from cf_orgs "
+                + "left join cf_orders as orders on cf_orgs.idoforg=orders.idoforg and orders.socdiscount<>0 and "
+                + "                       orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startCal.getTime()) + "') * 1000 AND "
+                + "                                                  EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endCal.getTime()) + "') * 1000 "
+                + "left join cf_transactions as trans on cf_orgs.idoforg=trans.idoforg and "
+                + "                        trans.transactiondate between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startCal.getTime()) + "') * 1000 AND "
+                + "                                                  EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endCal.getTime()) + "') * 1000 "
+                + "join cf_clients as transclients on ((orders.idofclient=transclients.idofclient and orders.idoforg=transclients.idoforg) or "
+                + "                                    (trans.idofclient=transclients.idofclient and trans.idoforg=transclients.idoforg)) and transclients.discountmode<>0 "
+                + "left join cf_clientgroups on transclients.idoforg=cf_clientgroups.idoforg and transclients.idOfClientGroup=cf_clientgroups.idOfClientGroup "
+                + "where cf_orgs.district is not null and cf_orgs.district<>''  "
+                        + getClientsClause("transclients")
+                        + orgRestriction
                 + "group by cf_orgs.idOfOrg, cf_orgs.shortname, cf_orgs.district "
                 + "union all "
                 //  Проходы
@@ -224,7 +241,7 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
                 + "join cf_enterevents on cf_enterevents.idoforg=cf_orgs.idoforg and "
                 + "     cf_enterevents.evtdatetime between EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(startCal.getTime()) + "') * 1000 AND "
                 + "                                        EXTRACT(EPOCH FROM TIMESTAMP '" + format.format(endCal.getTime()) + "') * 1000 "
-                + "join cf_clients as entclients on cf_enterevents.idofclient=entclients.idofclient "
+                + "join cf_clients as entclients on cf_enterevents.idofclient=entclients.idofclient and cf_enterevents.idoforg=entclients.idoforg "
                 + "left join cf_clientgroups on entclients.idoforg=cf_clientgroups.idoforg and entclients.idOfClientGroup=cf_clientgroups.idOfClientGroup "
                 + "where cf_orgs.district is not null and cf_orgs.district<>'' "
                          + getClientsClause("entclients")
