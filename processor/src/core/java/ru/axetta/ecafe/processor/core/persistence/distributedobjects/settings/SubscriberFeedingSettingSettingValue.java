@@ -25,7 +25,7 @@ public class SubscriberFeedingSettingSettingValue  extends AbstractParserBySetti
         this.dayRequest = Integer.parseInt(values[0]);
         this.dayDeActivate = Integer.parseInt(values[1]);
         this.enableFeeding = values[2].equals("1");
-        this.dayForbidChange = 1; //Integer.parseInt(values[3]);
+        this.dayForbidChange = Integer.parseInt(values[3]);
     }
 
     @Override
