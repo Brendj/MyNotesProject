@@ -2141,10 +2141,26 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
                     Transaction transaction) throws Exception {
-                processEnterEventList(client, data, objectFactory, session, endDate, startDate);
+                processEnterEventList(client, data, objectFactory, session, endDate, startDate, false);
             }
         });
 
+        EnterEventListResult enterEventListResult = new EnterEventListResult();
+        enterEventListResult.enterEventList = data.getEnterEventList();
+        enterEventListResult.resultCode = data.getResultCode();
+        enterEventListResult.description = data.getDescription();
+        return enterEventListResult;
+    }
+
+    @Override
+    public EnterEventListResult getEnterEventListByGuardian(Long contractId, final Date startDate, final Date endDate) {
+        authenticateRequest(contractId);
+        Data data = new ClientRequest().process(contractId, new Processor() {
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
+                    Session session, Transaction transaction) throws Exception {
+                processEnterEventList(client, data, objectFactory, session, endDate, startDate, true);
+            }
+        });
         EnterEventListResult enterEventListResult = new EnterEventListResult();
         enterEventListResult.enterEventList = data.getEnterEventList();
         enterEventListResult.resultCode = data.getResultCode();
@@ -2160,7 +2176,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
                     public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
                             Transaction transaction) throws Exception {
-                        processEnterEventList(client, data, objectFactory, session, endDate, startDate);
+                        processEnterEventList(client, data, objectFactory, session, endDate, startDate, false);
                     }
                 });
 
@@ -2172,10 +2188,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     private void processEnterEventList(Client client, Data data, ObjectFactory objectFactory, Session session,
-            Date endDate, Date startDate) throws DatatypeConfigurationException {
+            Date endDate, Date startDate, boolean byGuardian) throws DatatypeConfigurationException {
         Date nextToEndDate = DateUtils.addDays(endDate, 1);
         Criteria enterEventCriteria = session.createCriteria(EnterEvent.class);
-        enterEventCriteria.add(Restrictions.eq("client", client));
+        enterEventCriteria.add(byGuardian ? Restrictions.eq("guardianId", client.getIdOfClient())
+                : Restrictions.eq("client", client));
         enterEventCriteria.add(Restrictions.ge("evtDateTime", startDate));
         enterEventCriteria.add(Restrictions.lt("evtDateTime", nextToEndDate));
         enterEventCriteria.addOrder(org.hibernate.criterion.Order.asc("evtDateTime"));

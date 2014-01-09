@@ -102,6 +102,8 @@ public interface ClientRoomController {
     EnterEventListResult getEnterEventList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getEnterEventListBySan")
     EnterEventListResult getEnterEventList(@WebParam(name="san") String san, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
+    @WebMethod (operationName = "getEnterEventListByGuardian")
+    EnterEventListResult getEnterEventListByGuardian(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getClientsByGuardSan")
     ClientsData getClientsByGuardSan(@WebParam(name="san") String san);
     @WebMethod (operationName = "attachGuardSanBySan")
