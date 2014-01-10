@@ -24,6 +24,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,13 +64,18 @@ public class RegularPaymentSubscriptionService {
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
 
-    private IRequestOperation getOperationBean(String name) {
-        return (IRequestOperation) RuntimeContext.getAppContext().getBean(name);
-    }
+    @Autowired
+    private RegularPaymentRequest regularPaymentRequest;
+    @Autowired
+    private StatusCheckRequest statusCheckRequest;
+    @Autowired
+    private SubscriptionDeleteRequest subscriptionDeleteRequest;
+    @Autowired
+    private SubscriptionRegRequest subscriptionRegRequest;
 
     public MfrRequest createRequestForSubscriptionReg(Long contractId, Long paymentAmount, Long thresholdAmount,
-            int period) throws Exception {
-        return ((SubscriptionRegRequest) getOperationBean(IRequestOperation.SUBSCRIPTION_REG))
+            int period) {
+        return subscriptionRegRequest
                 .createRequestForSubscriptionReg(contractId, paymentAmount, thresholdAmount, period);
     }
 
@@ -95,8 +101,7 @@ public class RegularPaymentSubscriptionService {
         logger.info("RegularPaymentSubscriptionService work is over.");
     }
 
-    private PaymentResponse sendSubscriptionRequest(Long subscriptionId, String operationName) {
-        IRequestOperation operation = getOperationBean(operationName);
+    private PaymentResponse sendSubscriptionRequest(Long subscriptionId, IRequestOperation operation) {
         MfrRequest mfrRequest = operation.createRequest(subscriptionId);
         Map<String, String> params = operation.getRequestParams(mfrRequest);
         PaymentResponse paymentResponse = sendRequest(mfrRequest.getRequestUrl(), params);
@@ -105,33 +110,31 @@ public class RegularPaymentSubscriptionService {
     }
 
     public void refillOneClientBalance(Long bsId) {
-        sendSubscriptionRequest(bsId, IRequestOperation.REGULAR_PAYMENT);
+        sendSubscriptionRequest(bsId, regularPaymentRequest);
     }
 
     // Обработка callback'а на запрос активации подписки на автопополнение.
     public void processSubscriptionActivated(Long mfrRequestId, PaymentResponse paymentResponse) {
-        getOperationBean(IRequestOperation.SUBSCRIPTION_REG).postProcessResponse(mfrRequestId, null, paymentResponse);
+        subscriptionRegRequest.postProcessResponse(mfrRequestId, null, paymentResponse);
     }
 
     // Обработка callback'а на запрос проведения регулярного пополнения (списания с карты).
     public void processRegularPayment(Long mfrRequestId, PaymentResponse paymentResponse) {
-        getOperationBean(IRequestOperation.REGULAR_PAYMENT).postProcessResponse(mfrRequestId, null, paymentResponse);
+        regularPaymentRequest.postProcessResponse(mfrRequestId, null, paymentResponse);
     }
 
     // Возвращает параметры для запроса по активации подписки (привязка карты).
     public Map<String, String> getParamsForRegRequest(MfrRequest mfrRequest) {
-        return getOperationBean(IRequestOperation.SUBSCRIPTION_REG).getRequestParams(mfrRequest);
+        return subscriptionRegRequest.getRequestParams(mfrRequest);
     }
 
     public boolean deactivateSubscription(Long subscriptionId) {
-        PaymentResponse paymentResponse = sendSubscriptionRequest(subscriptionId,
-                IRequestOperation.SUBSCRIPTION_DELETE);
-        return getOperationBean(IRequestOperation.SUBSCRIPTION_DELETE)
-                .postProcessResponse(null, subscriptionId, paymentResponse);
+        PaymentResponse paymentResponse = sendSubscriptionRequest(subscriptionId, subscriptionDeleteRequest);
+        return subscriptionDeleteRequest.postProcessResponse(null, subscriptionId, paymentResponse);
     }
 
     public PaymentResponse checkSubscriptionStatus(Long subscriptionId) {
-        return sendSubscriptionRequest(subscriptionId, IRequestOperation.STATUS_CHECK);
+        return sendSubscriptionRequest(subscriptionId, statusCheckRequest);
     }
 
     private PaymentResponse sendRequest(String uri, Map<String, String> params) {

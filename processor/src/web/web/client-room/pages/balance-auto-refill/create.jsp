@@ -119,13 +119,7 @@
         }
         RegularPaymentSubscriptionService cs = RuntimeContext.getAppContext()
                 .getBean(RegularPaymentSubscriptionService.class);
-        MfrRequest mfrRequest;
-        try {
-            mfrRequest = cs.createRequestForSubscriptionReg(ct.getContractId(), refillAmount, thresholdAmount, period);
-        } catch (Exception ex) {
-            logger.error(ex.getMessage());
-            throw new ServletException(ex.getMessage());
-        }
+        MfrRequest mfrRequest = cs.createRequestForSubscriptionReg(ct.getContractId(), refillAmount, thresholdAmount, period);
         Map<String, String> params = cs.getParamsForRegRequest(mfrRequest);
 %>
 
