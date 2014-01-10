@@ -7,9 +7,11 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.StateDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SubscriberFeedingSettingSettingValue;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -237,9 +239,97 @@ public class SubscriptionFeedingService {
         entityManager.merge(sf);
     }
 
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    @Transactional(rollbackFor = Exception.class)
+    // Подключает подписку на АП. Создает также первую циклограмму.
+    public SubscriptionFeeding createSubscriptionFeeding(Client client, Org org, String monday, String tuesday,
+            String wednesday, String thursday, String friday, String saturday,
+            SubscriberFeedingSettingSettingValue parser) {
+        DAOService daoService = DAOService.getInstance();
+        Date date = new Date();
+        Date dayBegin = CalendarUtils.truncateToDayOfMonth(date);
+        SubscriptionFeeding sf = new SubscriptionFeeding();
+        sf.setCreatedDate(date);
+        sf.setClient(client);
+        sf.setOrgOwner(org.getIdOfOrg());
+        sf.setIdOfClient(client.getIdOfClient());
+        sf.setGuid(UUID.randomUUID().toString());
+        sf.setDateActivateService(CalendarUtils.addDays(dayBegin, 1 + parser.getDayForbidChange()));
+        sf.setDeletedState(false);
+        sf.setSendAll(SendToAssociatedOrgs.SendToSelf);
+        sf.setWasSuspended(false);
+        Long version = daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName());
+        sf.setGlobalVersionOnCreate(version);
+        sf.setGlobalVersion(version);
+        entityManager.persist(sf);
+        CycleDiagram cd = findClientCycleDiagram(client);
+        // Если осталась активная циклограмма со старой подписки, то ее необходимо удалить.
+        if (cd != null) {
+            cd.setDeletedState(true);
+            cd.setGlobalVersion(daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName()));
+            entityManager.merge(cd);
+        }
+        // Активируем циклограмму сегодняшним днем.
+        createCycleDiagram(client, org, monday, tuesday, wednesday, thursday, friday, saturday, dayBegin, true);
+        return sf;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    // Создает новую циклограмму.
+    public CycleDiagram createCycleDiagram(Client client, Org org, String monday, String tuesday, String wednesday,
+            String thursday, String friday, String saturday, Date dateActivationDiagram, boolean active) {
+        DAOService daoService = DAOService.getInstance();
+        CycleDiagram cd = new CycleDiagram();
+        cd.setCreatedDate(new Date());
+        cd.setClient(client);
+        cd.setOrgOwner(org.getIdOfOrg());
+        cd.setIdOfClient(client.getIdOfClient());
+        cd.setDateActivationDiagram(dateActivationDiagram);
+        if (active) {
+            cd.setStateDiagram(StateDiagram.ACTIVE);
+        } else {
+            cd.setStateDiagram(StateDiagram.WAIT);
+        }
+        cd.setGuid(UUID.randomUUID().toString());
+        cd.setDeletedState(false);
+        cd.setSendAll(SendToAssociatedOrgs.SendToSelf);
+        Long version = daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
+        cd.setGlobalVersion(version);
+        cd.setGlobalVersionOnCreate(version);
+        List<ComplexInfo> availableComplexes = findComplexesWithSubFeeding(org);
+        cd.setMonday(monday);
+        cd.setMondayPrice(getPriceOfDay(monday, availableComplexes));
+        cd.setTuesday(tuesday);
+        cd.setTuesdayPrice(getPriceOfDay(tuesday, availableComplexes));
+        cd.setWednesday(wednesday);
+        cd.setWednesdayPrice(getPriceOfDay(wednesday, availableComplexes));
+        cd.setThursday(thursday);
+        cd.setThursdayPrice(getPriceOfDay(thursday, availableComplexes));
+        cd.setFriday(friday);
+        cd.setFridayPrice(getPriceOfDay(friday, availableComplexes));
+        cd.setSaturday(saturday);
+        cd.setSaturdayPrice(getPriceOfDay(saturday, availableComplexes));
+        entityManager.persist(cd);
+        return cd;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    // Создает новую циклограмму. Если на дату ее активации уже есть цилкограмма, то переводит ее в удаленные.
+    public CycleDiagram editCycleDiagram(Client client, Org org, String monday, String tuesday, String wednesday,
+            String thursday, String friday, String saturday, Date dateActivationDiagram) {
+        DAOService daoService = DAOService.getInstance();
+        CycleDiagram cd = findCycleDiagramOnDate(client, dateActivationDiagram);
+        if (cd != null) {
+            cd.setDeletedState(true);
+            cd.setGlobalVersion(daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName()));
+            entityManager.merge(cd);
+        }
+        cd = createCycleDiagram(client, org, monday, tuesday, wednesday, thursday, friday, saturday,
+                dateActivationDiagram, false);
+        return cd;
+    }
+
     // Возвращает полную стоимость питания на сегодня по заданным комплексам орг-ии.
-    public Long getPriceOfDay(String dayComplexes, Org org) {
+    private Long getPriceOfDay(String dayComplexes, List<ComplexInfo> availableComplexes) {
         if (StringUtils.isEmpty(dayComplexes)) {
             return 0L;
         }
@@ -248,9 +338,8 @@ public class SubscriptionFeedingService {
         for (String id : complexIds) {
             ids.add(Integer.valueOf(id));
         }
-        List<ComplexInfo> res = findComplexesWithSubFeeding(org);
-        Long price = 0L;
-        for (ComplexInfo ci : res) {
+        long price = 0L;
+        for (ComplexInfo ci : availableComplexes) {
             if (ids.contains(ci.getIdOfComplex())) {
                 price += ci.getCurrentPrice();
             }
