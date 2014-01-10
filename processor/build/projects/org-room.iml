@@ -64,6 +64,7 @@
     <orderEntry type="library" scope="PROVIDED" name="axetta_smpp" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="axetta_charset" level="project" />
     <orderEntry type="library" name="jasperlib" level="project" />
+    <orderEntry type="library" name="cxf" level="project" />
   </component>
 </module>
 
