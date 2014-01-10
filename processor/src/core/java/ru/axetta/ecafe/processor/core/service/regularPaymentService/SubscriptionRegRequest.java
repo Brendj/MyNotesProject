@@ -60,7 +60,7 @@ public class SubscriptionRegRequest implements IRequestOperation {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public MfrRequest createRequestForSubscriptionReg(Long contractId, Long paymentAmount, Long thresholdAmount,
-            int period) throws Exception {
+            int period) {
         MfrRequest request = new MfrRequest();
         request.setPaySystem(MfrRequest.ACQUIROPAY_SYSTEM);
         request.setRequestType(MfrRequest.REQUEST_TYPE_ACTIVATION);
