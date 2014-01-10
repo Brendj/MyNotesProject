@@ -6,6 +6,7 @@
 <%@ page import="ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryExt" %>
 <%@ page import="ru.axetta.ecafe.processor.web.partner.integra.dataflow.ComplexInfoExt" %>
 <%@ page import="ru.axetta.ecafe.processor.web.partner.integra.dataflow.SubFeedingResult" %>
+<%@ page import="java.util.Collections" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <!DOCTYPE html>
@@ -69,6 +70,9 @@
         <%
             @SuppressWarnings("unchecked")
             List<ComplexInfoExt> complexes = (List<ComplexInfoExt>) request.getAttribute("complexes");
+            if (complexes == null) {
+                complexes = Collections.emptyList();
+            }
             @SuppressWarnings("unchecked")
             Map<Integer, List<String>> activeComplexes = (Map<Integer, List<String>>) request.getAttribute("activeComplexes");
             int j = 1;

@@ -126,7 +126,8 @@ public class SubFeedingServlet extends HttpServlet {
         if (sf.getIdOfSubscriptionFeeding() == null) {
             sendRedirect(req, resp, "/plan");
         } else {
-            DateFormat df = CalendarUtils.getDateFormatLocal();
+            DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+            df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
             Date startDate = StringUtils.isBlank(req.getParameter("startDate")) ? null
                     : parseDate(req.getParameter("startDate"), df);
             Date endDate = StringUtils.isBlank(req.getParameter("endDate")) ? null
