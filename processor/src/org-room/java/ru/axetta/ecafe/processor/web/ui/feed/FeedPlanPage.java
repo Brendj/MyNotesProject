@@ -8,10 +8,19 @@ package ru.axetta.ecafe.processor.web.ui.feed;
 //import generated.payments.processing.POSPaymentControllerWSService;
 //import generated.payments.processing.PosPayment;
 
+import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
+import generated.pos.POSPaymentController;
+import generated.pos.POSPaymentControllerWSService;
+import generated.pos.Payment;
+import generated.pos.PosPayment;
+
+import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestRepository;
 //import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestService;
+import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -23,6 +32,9 @@ import ru.axetta.ecafe.processor.web.ui.modal.feed_plan.*;
 //import org.apache.cxf.frontend.ClientProxy;
 //import org.apache.cxf.transport.http.HTTPConduit;
 //import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +46,10 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.faces.event.ValueChangeEvent;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -424,6 +439,9 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
     public Map<Client, String> saveOrders(Session session) {
         Map <Client, String> result = new HashMap<Client, String>();
         boolean hasError = false;
+        Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);
+        POSPaymentController service = createController(logger);
+        List<PosPayment> payments = new ArrayList<PosPayment>();
         for (Client client : clients) {
             if (client.getActionType() != PAY_CLIENT || client.getSaved()) {
                 continue;
@@ -435,9 +453,19 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
                 continue;
             }
             //  Вызов веб-службы и добавление заказа
-            /*Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);
-            POSPaymentController service = createController(logger);
-            service.createOrder(org.getIdOfOrg(), new PosPayment());*/
+            client.getIdofrule();
+
+
+            DiscountRule rule;
+            PosPayment payment = new PosPayment();
+            /*payment.setCardNo();
+            payment.setComments("- Оплачено из ТК -");
+            payment.setSocDiscount();
+            payment.setIdOfClient(client.getIdofclient());
+            payment.setTime(time);
+            payment.setOrderDate();*/
+            payments.add(payment);
+
 
 
             Random rand = new Random();
@@ -454,29 +482,29 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             client.setIdoforder(idoforder);
             result.put(client, "Заказ успешно составлен");
         }
+        service.createOrder(org.getIdOfOrg(), payments);
         return result;
     }
 
 
-    //public static POSPaymentController createController(Logger logger) {
-    //    /*POSPaymentController controller = null;
-    //    try {
-    //        POSPaymentControllerWSService service = new POSPaymentControllerWSService(new URL("http://localhost:8080/processor/soap/front?wsdl"),
-    //                new QName("http://ru.axetta.ecafe", "FrontControllerService"));
-    //        controller = service.getPOSPaymentControllerWSPort();
-    //
-    //        Client client = ClientProxy.getClient(controller);
-    //        HTTPConduit conduit = (HTTPConduit) client.getConduit();
-    //        HTTPClientPolicy policy = conduit.getClient();
-    //        policy.setReceiveTimeout(10 * 60 * 1000);
-    //        policy.setConnectionTimeout(10 * 60 * 1000);
-    //        return controller;
-    //    } catch (Exception e) {
-    //        logger.error("Failed to intialize FrontControllerService", e);
-    //        return null;
-    //    }*/
-    //    return null;
-    //}
+    public static POSPaymentController createController(Logger logger) {
+        POSPaymentController controller = null;
+        try {
+            POSPaymentControllerWSService service = new POSPaymentControllerWSService(new URL("http://localhost:8080/processor/soap/front?wsdl"),
+                    new QName("http://ru.axetta.ecafe", "FrontControllerService"));
+            controller = service.getPOSPaymentControllerWSPort();
+
+            org.apache.cxf.endpoint.Client client = ClientProxy.getClient(controller);
+            HTTPConduit conduit = (HTTPConduit) client.getConduit();
+            HTTPClientPolicy policy = conduit.getClient();
+            policy.setReceiveTimeout(10 * 60 * 1000);
+            policy.setConnectionTimeout(10 * 60 * 1000);
+            return controller;
+        } catch (Exception e) {
+            logger.error("Failed to intialize FrontControllerService", e);
+            return null;
+        }
+    }
 
     public void clear() {
         RuntimeContext.getAppContext().getBean(FeedPlanPage.class).clear(Collections.EMPTY_LIST);

@@ -145,6 +145,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         List<GoodRequest> goodRequestList = goodRequestRepository.findByFilter(org.getIdOfOrg(),stateList,
                                                                             dateFrom.getTime(),dateTo.getTime(),
                                                                             deletedState, goodGroup);
+        goodRequestList = clearGoodRequests(goodRequestList);
         for (GoodRequest gr : goodRequestList) {
             List<GoodRequestPosition> positions = goodRequestRepository.getGoodRequestPositionByGoodRequest(gr);
             for (GoodRequestPosition pos : positions) {
@@ -211,6 +212,19 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         }
     }
 
+    private List<GoodRequest> clearGoodRequests(List<GoodRequest> requests) {
+        List<Long> ids = new ArrayList<Long>();
+        List<GoodRequest> res = new ArrayList<GoodRequest>();
+        for (int i=0; i<requests.size(); i++) {
+            GoodRequest req = requests.get(i);
+            if (!ids.contains(req.getGlobalId())) {
+                ids.add(req.getGlobalId());
+                res.add(req);
+            }
+        }
+        return res;
+    }
+
 
     private void buildColumns (Calendar dateFrom, Calendar dateTo) {
         columns.clear();
@@ -257,10 +271,10 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         for (Entry e : entries) {
             for (long ts : e.data.keySet()) {
                 Long v = e.getDataForDate(ts);
-                if (v == null) {
+                if (v == null || v < 1L) {
                     continue;
                 }
-                 v = v * 1000;
+                v = v * 1000;
                 List<Long> ids = e.ids.get(ts);
 
                 //  Если списка id не существует, это обозначает что значения добавлены, необходимо создавать заявку
