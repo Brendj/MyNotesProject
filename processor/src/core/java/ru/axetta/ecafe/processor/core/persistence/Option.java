@@ -47,6 +47,7 @@ public class Option {
             OPTION_THRESHOLD_VALUES=1011,
             OPTION_TEMP_CARD_VALID_DAYS=1012,
             OPTION_ENABLE_NOTIFICATION_GOOD_REQUEST_CHANGE=1013, // оповещение по изменению заявок
+            OPTION_HIDE_MISSED_COL_NOTIFICATION_GOOD_REQUEST_CHANGE =1014, // отображать пустые колонки
 
             OPTION_NSI_LAST_SYNC_TIME=10001,
             OPTION_STOP_LIST_LAST_UPDATE=10010,
@@ -115,7 +116,8 @@ public class Option {
             OPTION_ENABLE_SUB_BALANCE_OPERATION, "0",
             OPTION_THRESHOLD_VALUES, "0",
             OPTION_TEMP_CARD_VALID_DAYS, "0",
-            OPTION_ENABLE_NOTIFICATION_GOOD_REQUEST_CHANGE, "0", // отключено по умолчанию
+            OPTION_ENABLE_NOTIFICATION_GOOD_REQUEST_CHANGE, "0", // по умолчанию отключено
+            OPTION_HIDE_MISSED_COL_NOTIFICATION_GOOD_REQUEST_CHANGE, "0", // по умолчанию отображать пустые колонки
             OPTION_NSI_LAST_SYNC_TIME, null,
             OPTION_STOP_LIST_LAST_UPDATE, null,
             OPTION_MSR_STOPLIST_ON, "0",

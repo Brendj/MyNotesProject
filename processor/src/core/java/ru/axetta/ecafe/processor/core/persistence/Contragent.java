@@ -555,7 +555,7 @@ public class Contragent {
         return "Contragent{" + "idOfContragent=" + idOfContragent + ", contactPerson=" + contactPerson + ", parentId="
                 + parentId + ", contragentName='" + contragentName + '\'' + ", classId=" + classId + ", flags=" + flags
                 + ", title='" + title + '\'' + ", address='" + address + '\'' + ", phone='" + phone + '\''
-                + ", mobile='" + mobile + '\'' + ", email='" + email + '\'' + ", fax='" + fax + '\'' + ", remarks='"
+                + ", mobile='" + mobile + '\'' + ", email='" + email + '\'' + ", requestNotifyMailList='" + requestNotifyMailList + '\'' + ", fax='" + fax + '\'' + ", remarks='"
                 + remarks + '\'' + ", inn='" + inn + '\'' + ", bank='" + bank + '\'' + ", bic='" + bic + '\''
                 + ", corrAccount='" + corrAccount + '\'' + ", account='" + account + '\'' + ", createTime=" + createTime
                 + ", updateTime=" + updateTime + ", publicKey='" + publicKey + '\''

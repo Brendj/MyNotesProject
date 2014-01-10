@@ -8,6 +8,9 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 
 import org.apache.commons.lang.StringUtils;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,6 +32,16 @@ public class CalendarUtils {
     private final static SimpleDateFormat dateShortFormat = new SimpleDateFormat("dd.MM.yy");
     private final static SimpleDateFormat dayInWeekFormat = new SimpleDateFormat("EE", new Locale("ru"));
     public final static Date AFTER_DATE = getAfterDate();
+
+    public static XMLGregorianCalendar getXMLGregorianCalendarByDate(Date date) throws DatatypeConfigurationException {
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        return DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);
+    }
+
+    public static XMLGregorianCalendar getXMLGregorianCalendar() throws DatatypeConfigurationException {
+        return DatatypeFactory.newInstance().newXMLGregorianCalendar();
+    }
 
     private static Date getAfterDate(){
         Calendar date = new GregorianCalendar();
@@ -147,7 +160,7 @@ public class CalendarUtils {
     }
 
     public static String dayInWeekToString(Date date) {
-        return timeFormat.format(date);
+        return dayInWeekFormat.format(date);
     }
 
     public static String dateShortToString(Date date) {

@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -29,9 +30,12 @@ public class GoodRequestsReport extends BasicReport {
     public static final long REQUESTS_MONITORING_TIMEOUT = 172800000;          //  2 дня
     public static final String OVERALL_TITLE = "ИТОГО";
     public static final String OVERALL_ALL_TITLE = "ВСЕГО";
-    private static final DateFormat YEAR_DATE_FORMAT = new SimpleDateFormat("dd.MM.yyyy");
-    private static final DateFormat MONTHLY_DATE_FORMAT = new SimpleDateFormat("dd.MM");
-    private static final DateFormat DAILY_DATE_FORMAT = new SimpleDateFormat("dd");
+    private static final String STR_YEAR_DATE_FORMAT = "dd.MM.yyyy EE";
+    //private static final String STR_MONTHLY_DATE_FORMAT = "dd.MM EE";
+    //private static final String STR_DAILY_DATE_FORMAT = "dd EE";
+    private static final DateFormat YEAR_DATE_FORMAT = new SimpleDateFormat(STR_YEAR_DATE_FORMAT, new Locale("ru"));
+    //private static final DateFormat MONTHLY_DATE_FORMAT = new SimpleDateFormat(STR_MONTHLY_DATE_FORMAT, new Locale("ru"));
+    //private static final DateFormat DAILY_DATE_FORMAT = new SimpleDateFormat(STR_DAILY_DATE_FORMAT, new Locale("ru"));
     private final List<RequestItem> items;
     private boolean hideMissedColumns;
     private List <String> cols;
@@ -55,14 +59,26 @@ public class GoodRequestsReport extends BasicReport {
 
     public static class Builder {
 
+        public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
+                Date startDate, Date endDate, Long idOfOrg) throws Exception{
+            return build(session, hideMissedColumns,startDate,endDate, Arrays.asList(idOfOrg),null,3, "", false);
+        }
+
         public GoodRequestsReport build(Session session,
-                Date startDate, Date endDate, List <Long> idOfSupplierList) throws Exception{
-             return build(session, false,startDate,endDate, new ArrayList<Long>(0),idOfSupplierList,3, "");
+                Date startDate, Date endDate, List<Long> idOfSupplierList) throws Exception{
+             return build(session, false,startDate,endDate, new ArrayList<Long>(0),idOfSupplierList,3, "", true);
         }
 
         public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
+                Date startDate, Date endDate, List<Long> idOfOrgList, List<Long> idOfSupplierList,
+                int requestsFilter, String goodName)
+                throws Exception {
+            return build(session, hideMissedColumns,startDate,endDate, idOfOrgList ,idOfSupplierList, requestsFilter, goodName, true);
+        }
+
+        private GoodRequestsReport build(Session session, Boolean hideMissedColumns,
                                         Date startDate, Date endDate, List<Long> idOfOrgList, List <Long> idOfSupplierList,
-                                        int requestsFilter, String goodName)
+                                        int requestsFilter, String goodName, Boolean isWriteTotalRow)
                 throws Exception {
             Date generateTime = new Date();
             List<RequestItem> items = new LinkedList<RequestItem>();
@@ -128,10 +144,12 @@ public class GoodRequestsReport extends BasicReport {
                 notCreatedAtConfition = "and (cf_goods_requests.createddate < " + (limit) + ") ";
             }
 
-            String sqlGood = "select requests.idorg, requests.org, requests.orgFull, requests.shortGood, requests.good, requests.idofgood, requests.d, int8(sum(requests.cnt)), sum(coalesce(requests.ds_cnt, 0)) "+
-                         "from (select cf_orgs.idoforg as idorg, substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') as org, cf_orgs.officialname as orgFull, "+
+            String sqlGood = "select requests.idorg, requests.org, requests.orgFull, requests.shortGood, requests.good, requests.idofgood, requests.d, int8(sum(requests.cnt)) as sumcnt, sum(coalesce(requests.ds_cnt, 0)) as sumdscnt, "+
+                         " sum(coalesce(requests.lcnt, 0)) as lastsumcnt, sum(coalesce(requests.lds_cnt, 0)) as lastsumdscnt"  +
+                         " from (select cf_orgs.idoforg as idorg, substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') as org, cf_orgs.officialname as orgFull, "+
                          "             cf_goods.fullname as good, cf_goods.nameofgood as shortGood, cf_goods.idofgood as idofgood , date_trunc('day', to_timestamp(cf_goods_requests.donedate / 1000)) as d, "+
-                         "             cf_goods_requests_positions.totalcount / 1000 as cnt, cf_goods_requests_positions.DailySampleCount / 1000 as ds_cnt "+
+                         "             cf_goods_requests_positions.TotalCount / 1000 as cnt, cf_goods_requests_positions.DailySampleCount / 1000 as ds_cnt," +
+                         "             cf_goods_requests_positions.LastTotalCount / 1000 as lcnt, cf_goods_requests_positions.lastDailySampleCount / 1000 as lds_cnt "+
                          "       from cf_goods_requests "+
                          "      left join cf_orgs on cf_orgs.idoforg=cf_goods_requests.orgowner "+
                          "      left join cf_goods_requests_positions on cf_goods_requests.idofgoodsrequest=cf_goods_requests_positions.idofgoodsrequest "+
@@ -147,10 +165,12 @@ public class GoodRequestsReport extends BasicReport {
                          "group by requests.idorg, requests.org, requests.orgFull, requests.idofgood, requests.shortGood, requests.good, requests.d "+
                          "order by requests.org, requests.idofgood, requests.d";
 
-            String sqlProduct = "select requests.idorg, requests.org, requests.orgFull, requests.shortGood, requests.good, requests.idofgood, requests.d, int8(sum(requests.cnt)), sum(coalesce(requests.ds_cnt, 0)) "+
-                    "from (select cf_orgs.idoforg as idorg, substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') as org, cf_orgs.officialname as orgFull, "+
+            String sqlProduct = "select requests.idorg, requests.org, requests.orgFull, requests.shortGood, requests.good, requests.idofgood, requests.d, int8(sum(requests.cnt)) as sumcnt, sum(coalesce(requests.ds_cnt, 0)) as sumdscnt, "+
+                    "  sum(coalesce(requests.lcnt, 0)) as lastsumcnt, sum(coalesce(requests.lds_cnt, 0)) as lastsumdscnt"  +
+                    "  from (select cf_orgs.idoforg as idorg, substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') as org, cf_orgs.officialname as orgFull, "+
                     "             cf_products.fullname as good, cf_products.productname as shortGood, cf_products.idofproducts as idofgood , date_trunc('day', to_timestamp(cf_goods_requests.donedate / 1000)) as d, "+
-                    "             cf_goods_requests_positions.totalcount / 1000 as cnt, cf_goods_requests_positions.DailySampleCount / 1000 as ds_cnt "+
+                    "             cf_goods_requests_positions.totalcount / 1000 as cnt, cf_goods_requests_positions.DailySampleCount / 1000 as ds_cnt, "+
+                    "             cf_goods_requests_positions.LastTotalCount / 1000 as lcnt, cf_goods_requests_positions.lastDailySampleCount / 1000 as lds_cnt "+
                     "       from cf_goods_requests "+
                     "      left join cf_orgs on cf_orgs.idoforg=cf_goods_requests.orgowner "+
                     "      left join cf_goods_requests_positions on cf_goods_requests.idofgoodsrequest=cf_goods_requests_positions.idofgoodsrequest "+
@@ -181,12 +201,14 @@ public class GoodRequestsReport extends BasicReport {
                 long idOfOrg   = Long.valueOf(entry[0].toString());
                 String org      = ((String) entry [1]).trim ();
                 String orgFull  = ((String) entry [2]).trim ();
-                String good     = ((String) entry [3]).trim ();
-                String shortGood= ((String) entry [4]).trim ();
+                String shortGood= ((String) entry [3]).trim ();
+                String good     = ((String) entry [4]).trim ();
                 long idOfGood   = Long.valueOf(entry[5].toString());
                 long date       = ((Timestamp) entry [6]).getTime();
                 int value       = ((BigInteger) entry [7]).intValue();
                 int dailySample = ((BigDecimal) entry[8]).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
+                int lastValue       = ((BigDecimal) entry[9]).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
+                int lastDailySample = ((BigDecimal) entry[10]).setScale(0, BigDecimal.ROUND_HALF_UP).intValue();
 
 
                 //RequestItem item = findItemByOrgAndGood(items, org, good);
@@ -198,26 +220,46 @@ public class GoodRequestsReport extends BasicReport {
                 }
                 item.addValue(date, new RequestValue(value));
                 item.addDailySample(date, new RequestValue(dailySample));
+                if(lastValue==0 || lastValue==value){
+                    item.addLastValue(date, new RequestValue(value));
+                } else {
+                    item.addLastValue(date, new RequestValue(lastValue));
+                }
+                if(lastDailySample==0 || lastDailySample==dailySample){
+                    item.addLastDailySample(date, new RequestValue(dailySample));
+                } else {
+                    item.addLastDailySample(date, new RequestValue(lastDailySample));
+                }
 
                 //  Получаем итоговый элемент по данному товару, чтобы добавить в него количество от текущей записи
                 //RequestItem totalItem = totalItems.get(good);
-                RequestItem totalItem = totalItems.get(idOfGood);
-                if (totalItem == null) {
-                    totalItem = new TotalItem(-1L,OVERALL_TITLE, "", idOfGood, good, report);
-                    //totalItems.put(good, totalItem);
-                    totalItems.put(idOfGood, totalItem);
+                if(isWriteTotalRow){
+                    RequestItem totalItem = totalItems.get(idOfGood);
+                    if (totalItem == null) {
+                        totalItem = new TotalItem(-1L,OVERALL_TITLE, "", idOfGood, good, report);
+                        //totalItems.put(good, totalItem);
+                        totalItems.put(idOfGood, totalItem);
+                    }
+                    totalItem.addValue(date, new RequestValue(value));      //  Добавляем в итог по товару
+                    totalItem.addDailySample(date, new RequestValue(dailySample));
+                    //totalItem.addLastValue(date, new RequestValue(lastValue));      //  Добавляем в итог по товару
+                    //totalItem.addLastDailySample(date, new RequestValue(lastDailySample));
                 }
-                totalItem.addValue(date, new RequestValue(value));      //  Добавляем в итог по товару
-                totalItem.addDailySample(date, new RequestValue(dailySample));
                 overallItem.addValue(date, new RequestValue(value));    //  Добавляем в общий итог
                 overallItem.addDailySample(date, new RequestValue(dailySample));
+                //overallItem.addLastValue(date, new RequestValue(lastValue));    //  Добавляем в общий итог
+                //overallItem.addLastDailySample(date, new RequestValue(lastDailySample));
             }
 
             //  Добавляем строки с общими значениями в список товаров
-            for (Long key : totalItems.keySet()) {
-                items.add(totalItems.get(key));
+            if(isWriteTotalRow){
+                for (Long key : totalItems.keySet()) {
+                    items.add(totalItems.get(key));
+                }
             }
+
             items.add(overallItem);
+
 
             /*items.add(new RequestItem("1477", "ГБОУ СОШ 1477", "Школа / СД / 1-4 / Завтрак 2", report).
                     addValue(1356998400000L, new RequestValue(Math.random())).
@@ -296,19 +338,20 @@ public class GoodRequestsReport extends BasicReport {
         }
         //  Анализируем месяц, если у первой и последней даты он разный, значит надо будет выводить даты с месяцами
         //boolean showMonths = ((Date) dates.toArray()[0]).getMonth() != ((Date) dates.toArray()[dates.size() - 1]).getMonth();
-        boolean showMonths = startDate.getMonth() != endDate.getMonth();
-        boolean showYears = startDate.getYear() != endDate.getYear();
+        //boolean showMonths = startDate.getMonth() != endDate.getMonth();
+        //boolean showYears = startDate.getYear() != endDate.getYear();
         for (Date d : dates) {
-            DateFormat format = null;
-            if (showYears) {
-                format = YEAR_DATE_FORMAT;
-            } else if (showMonths) {
-                format = MONTHLY_DATE_FORMAT;
-            } else {
-                format = DAILY_DATE_FORMAT;
-            }
+            //DateFormat format = null;
+            //if (showYears) {
+            //    format = YEAR_DATE_FORMAT;
+            //} else if (showMonths) {
+            //    format = MONTHLY_DATE_FORMAT;
+            //} else {
+            //    format = DAILY_DATE_FORMAT;
+            //}
 
-            cols.add(format.format(d));
+
+            cols.add(YEAR_DATE_FORMAT.format(d));
         }
         return cols.toArray();
     }
@@ -353,6 +396,37 @@ public class GoodRequestsReport extends BasicReport {
             }
 
         }
+
+
+        @Override
+        public void addLastValue(Long ts, RequestValue value) {
+            Calendar cal = new GregorianCalendar();
+            cal.setTimeInMillis(ts);
+            CalendarUtils.truncateToDayOfMonth(cal);
+
+            //  Необходимо переписать подсчет количества товара для итоговых строк - необходимо не
+            //  переписывать значения, а складывать с предыдущими
+            RequestValue nowVal = lastValues.get(cal.getTimeInMillis());
+            if (nowVal != null) {
+                nowVal.setValue(nowVal.getValue() + value.getValue());
+            } else {
+                lastValues.put(cal.getTimeInMillis(), value);
+            }
+        }
+
+        @Override
+        public void addLastDailySample(Long ts, RequestValue value) {
+            Calendar cal = new GregorianCalendar();
+            cal.setTimeInMillis(ts);
+            CalendarUtils.truncateToDayOfMonth(cal);
+            RequestValue nowVal = lastDailySamples.get(cal.getTimeInMillis());
+            if (nowVal != null) {
+                nowVal.setValue(nowVal.getValue() + value.getValue());
+            } else {
+                lastDailySamples.put(cal.getTimeInMillis(), value);
+            }
+
+        }
     }
 
 
@@ -366,6 +440,8 @@ public class GoodRequestsReport extends BasicReport {
         protected Map<Long, RequestValue> values = new TreeMap<Long, RequestValue>();
         protected GoodRequestsReport report;
         protected Map<Long, RequestValue> dailySamples = new TreeMap<Long, RequestValue>();
+        protected Map<Long, RequestValue> lastValues = new TreeMap<Long, RequestValue>();
+        protected Map<Long, RequestValue> lastDailySamples = new TreeMap<Long, RequestValue>();
 
 
         public RequestItem(Long idOfOrg, String org, String orgFull, long idOfGood, String good, GoodRequestsReport report) {
@@ -440,14 +516,19 @@ public class GoodRequestsReport extends BasicReport {
                 }
 
                 return style;
-            } catch ( Exception e) {
+            } catch ( Exception ignore) {
                 return "";
             }
         }
 
         public String getRowValue(String colName, int dailySamplesMode) {
-            String dailySample = getDailySample(colName);
-            return getValue(colName) + (dailySamplesMode == 1 && !dailySample.equals("0") ? ("/" + dailySample) : "");
+           String dailySample = getDailySample(colName);
+           return getValue(colName) + (dailySamplesMode == 1 && !dailySample.equals("0") ? ("/" + dailySample) : "");
+        }
+
+        public String getRowLastValue(String colName, int dailySamplesMode) {
+            String lastDailySample = getDailySample(colName);
+            return getLastValue(colName) +(dailySamplesMode == 1 && !lastDailySample.equals("0") ? ("/" + lastDailySample) : "");
         }
 
         public String getValue (String colName) {
@@ -472,6 +553,26 @@ public class GoodRequestsReport extends BasicReport {
             try {
                 Calendar cal = getColumnDate(colName);
                 RequestValue rv = dailySamples.get(cal.getTimeInMillis());
+                return rv != null ? String.valueOf(rv.getValue()) : "0";
+            } catch (Exception e) {
+                return "0";
+            }
+        }
+
+        public String getLastValue(String colName) {
+            try {
+                Calendar cal = getColumnDate(colName);
+                RequestValue rv = lastValues.get(cal.getTimeInMillis());
+                return rv != null ? String.valueOf(rv.getValue()) : "0";
+            } catch (Exception e) {
+                return "0";
+            }
+        }
+
+        public String getLastDailySample(String colName) {
+            try {
+                Calendar cal = getColumnDate(colName);
+                RequestValue rv = lastDailySamples.get(cal.getTimeInMillis());
                 return rv != null ? String.valueOf(rv.getValue()) : "0";
             } catch (Exception e) {
                 return "0";
@@ -504,26 +605,26 @@ public class GoodRequestsReport extends BasicReport {
         }
 
 
-        public Calendar getColumnDate (String colName) {
+        public Calendar getColumnDate (String colName) throws ParseException {
             //  Если это не столбец по умолчанию, значит это дата - берем значение из массива, используя дату
             //  Используем дату от первого значений - нам понадоббятся его месяц и год
-            Calendar firstDate = new GregorianCalendar();
-            firstDate.setTimeInMillis(values.keySet().iterator().next());
-            Calendar cal = new GregorianCalendar();
-            int day = -1;
-            int month = firstDate.get(Calendar.MONTH);
-            int year = firstDate.get(Calendar.YEAR);
-            String parts [] = colName.split("\\.");
-            if (parts.length == 3) {
-                day = Integer.parseInt(parts[0]);
-                month = Integer.parseInt(parts[1]) - 1;
-                year = Integer.parseInt(parts[2]);
-            } else if (parts.length == 2) {
-                day = Integer.parseInt(parts[0]);
-                month = Integer.parseInt(parts[1]) - 1;
-            } else {
-                day = Integer.parseInt(parts[0]);
-            }
+            //Calendar firstDate = new GregorianCalendar();
+            //firstDate.setTimeInMillis(values.keySet().iterator().next());
+            //Calendar cal = new GregorianCalendar();
+            //int day = -1;
+            //int month = firstDate.get(Calendar.MONTH);
+            //int year = firstDate.get(Calendar.YEAR);
+            //String parts [] = colName.split("\\.");
+            //if (parts.length == 3) {
+            //    day = Integer.parseInt(parts[0]);
+            //    month = Integer.parseInt(parts[1]) - 1;
+            //    year = Integer.parseInt(parts[2]);
+            //} else if (parts.length == 2) {
+            //    day = Integer.parseInt(parts[0]);
+            //    month = Integer.parseInt(parts[1]) - 1;
+            //} else {
+            //    day = Integer.parseInt(parts[0]);
+            //}
             /*if (colName.indexOf(".") > 0) {
                 //  определяем есть ли месяц - если есть, значит будем использовать месяц + день
                 day = Integer.parseInt(colName.substring(0, colName.indexOf(".")));
@@ -533,11 +634,26 @@ public class GoodRequestsReport extends BasicReport {
                 day = Integer.parseInt(colName);
                 month = firstDate.get(Calendar.MONTH);
             }*/
-            cal.set(Calendar.DAY_OF_MONTH, day);
-            cal.set(Calendar.MONTH, month);
-            cal.set(Calendar.YEAR, year);
-            CalendarUtils.truncateToDayOfMonth(cal);
-            return cal;
+            //cal.set(Calendar.DAY_OF_MONTH, day);
+            //cal.set(Calendar.MONTH, month);
+            //cal.set(Calendar.YEAR, year);
+            //CalendarUtils.truncateToDayOfMonth(cal);
+            //DateFormat format = null;
+            //final int length = colName.length();
+            //if(length==STR_YEAR_DATE_FORMAT.length()){
+            //    format = YEAR_DATE_FORMAT;
+            //}
+            //if(length==STR_MONTHLY_DATE_FORMAT.length()){
+            //    format = MONTHLY_DATE_FORMAT;
+            //}
+            //if(length==STR_DAILY_DATE_FORMAT.length()){
+            //    format = DAILY_DATE_FORMAT;
+            //}
+            Date date = YEAR_DATE_FORMAT.parse(colName);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            CalendarUtils.truncateToDayOfMonth(calendar);
+            return calendar;
         }
 
         public void addValue(Long ts, RequestValue value) {
@@ -548,6 +664,16 @@ public class GoodRequestsReport extends BasicReport {
         public void addDailySample(Long ts, RequestValue value) {
             Date date = CalendarUtils.truncateToDayOfMonth(new Date(ts));
             dailySamples.put(date.getTime(), value);
+        }
+
+        public void addLastValue(Long ts, RequestValue value) {
+            Date date = CalendarUtils.truncateToDayOfMonth(new Date(ts));
+            lastValues.put(date.getTime(), value);
+        }
+
+        public void addLastDailySample(Long ts, RequestValue value) {
+            Date date = CalendarUtils.truncateToDayOfMonth(new Date(ts));
+            lastDailySamples.put(date.getTime(), value);
         }
     }
 

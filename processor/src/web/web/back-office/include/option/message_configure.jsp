@@ -206,8 +206,9 @@
                                  styleClass="input-text" />
                 <h:outputText escape="true" value="Ключевые слова:" styleClass="output-text" />
                 <h:panelGrid>
-                    <h:outputText value="[contactPerson] - ФИО контактоного лица контрагента" styleClass="output-text" />
-                    <h:outputText value="[newValueHistory] - таблица сводного отчета по заявкам" styleClass="output-text" />
+                    <h:outputText value="[shortOrgName] - Короткое наименование организации" styleClass="output-text" />
+                    <h:outputText value="[address] - адресс организации" styleClass="output-text" />
+                    <h:outputText value="[reportValues] - таблица сводного отчета по заявкам" styleClass="output-text" />
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>

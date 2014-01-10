@@ -36,8 +36,12 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
     private UnitScale unitsScale;
     private Long totalCount;
     private Long dailySampleCount; // суточная проба
+
+    /* старые значения всего и суточной пробы */
+    private Long lastTotalCount;
+    private Long lastDailySampleCount; // суточная проба
+
     private Long netWeight;
-    private String updateHistory;
     private Product product;
     private String guidOfP;
     private GoodRequest goodRequest;
@@ -58,7 +62,8 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         projectionList.add(Projections.property("totalCount"), "totalCount");
         projectionList.add(Projections.property("dailySampleCount"), "dailySampleCount"); // суточная проба
         projectionList.add(Projections.property("netWeight"), "netWeight");
-        projectionList.add(Projections.property("updateHistory"), "updateHistory");
+        projectionList.add(Projections.property("lastTotalCount"), "lastTotalCount");
+        projectionList.add(Projections.property("lastDailySampleCount"), "lastDailySampleCount");
 
         projectionList.add(Projections.property("gr.guid"), "guidOfGR");
         projectionList.add(Projections.property("g.guid"), "guidOfG");
@@ -73,7 +78,6 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         XMLUtils.setAttributeIfNotNull(element, "TotalCount", totalCount);
         XMLUtils.setAttributeIfNotNull(element, "DailySampleCount", dailySampleCount);  // суточная проба
         XMLUtils.setAttributeIfNotNull(element, "NetWeight", netWeight);
-        //XMLUtils.setAttributeIfNotNull(element, "UpdateHistory", updateHistory);
         if (!StringUtils.isEmpty(guidOfGR))
             XMLUtils.setAttributeIfNotNull(element, "GuidOfGoodsRequest", guidOfGR);
         else {
@@ -141,29 +145,34 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         setNetWeight(((GoodRequestPosition) distributedObject).getNetWeight());
         setTotalCount(((GoodRequestPosition) distributedObject).getTotalCount());
         setDailySampleCount(((GoodRequestPosition) distributedObject).getDailySampleCount()); // суточная проба
-        String lastHistory = getUpdateHistory();
-        Date date = getLastUpdate()!=null? getLastUpdate():getCreatedDate();
-        String newHistory="";
-        final String strDate = CalendarUtils.dateToString(date);
-        if(lastDailySampleCount==null){
-            newHistory= String.format("%s %d;", strDate, lastTotalCount/1000);
-        } else {
-            newHistory= String.format("%s %d %d;", strDate, lastTotalCount/1000, lastDailySampleCount/1000);
-        }
-        if(StringUtils.isEmpty(lastHistory)){
-            setUpdateHistory(newHistory);
-        } else {
-            setUpdateHistory(String.format("%s%s", lastHistory, newHistory));
-        }
+        /* старые значения всего и суточной пробы */
+        setLastTotalCount(lastTotalCount);
+        setLastDailySampleCount(lastDailySampleCount); // суточная проба
+
+
+        //String lastHistory = getUpdateHistory();
+        //Date date = getLastUpdate()!=null? getLastUpdate():getCreatedDate();
+        //String newHistory="";
+        //final String strDate = CalendarUtils.dateToString(date);
+        //if(lastDailySampleCount==null){
+        //    newHistory= String.format("%s %d;", strDate, lastTotalCount/1000);
+        //} else {
+        //    newHistory= String.format("%s %d %d;", strDate, lastTotalCount/1000, lastDailySampleCount/1000);
+        //}
+        //if(StringUtils.isEmpty(lastHistory)){
+        //    setUpdateHistory(newHistory);
+        //} else {
+        //    setUpdateHistory(String.format("%s%s", lastHistory, newHistory));
+        //}
     }
 
-    public String getUpdateHistory() {
-        return updateHistory;
-    }
-
-    public void setUpdateHistory(String updateHistory) {
-        this.updateHistory = updateHistory;
-    }
+    //public String getUpdateHistory() {
+    //    return updateHistory;
+    //}
+    //
+    //public void setUpdateHistory(String updateHistory) {
+    //    this.updateHistory = updateHistory;
+    //}
 
     public String getGuidOfP() {
         return guidOfP;
@@ -265,4 +274,19 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         }
     }
 
+    public Long getLastTotalCount() {
+        return lastTotalCount;
+    }
+
+    public void setLastTotalCount(Long lastTotalCount) {
+        this.lastTotalCount = lastTotalCount;
+    }
+
+    public Long getLastDailySampleCount() {
+        return lastDailySampleCount;
+    }
+
+    public void setLastDailySampleCount(Long lastDailySampleCount) {
+        this.lastDailySampleCount = lastDailySampleCount;
+    }
 }

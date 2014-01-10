@@ -124,14 +124,12 @@ public class EventNotificationService {
             NOTIFICATION_PASS_WITH_GUARDIAN + "." + TYPE_EMAIL_SUBJECT,
             "Уведомление о времени прихода и ухода",
             NOTIFICATION_GOOD_REQUEST_CHANGE + "." + TYPE_EMAIL_TEXT,
-            "<html>\n<body>\nУважаемый(-ая) [contactPerson], <br/><br/>\n\n"
+            "<html>\n<body>"
+                    + "[address]<br/>\n"
                     + "[reportValues]<br/>\n"
-                    + "С уважением.<br/>\n"
-                    // + "Служба поддержки клиентов\n<br/><br/>\n"
-                    //+ "<p style=\"color:#cccccc;font-size:xx-small;font-weight:bold\">Вы можете отключить данные уведомления в своем личном кабинете</p>\n"
                     + "</body>\n</html>",
             NOTIFICATION_GOOD_REQUEST_CHANGE + "." + TYPE_EMAIL_SUBJECT,
-            "Уведомление об изменении заявки"
+            "Уведомление об изменении заявки [shortOrgName] - [address]"
     };                       // короткое имя школы
 
     String getDefaultText(String name) {

@@ -2,17 +2,14 @@
 --! после финализации они уберутся
 --! Информация для разработчика -- информация для пользователя
 
--- Пакет обновлений 2.2.55
+-- Пакет обновлений 2.2.54
 
-CREATE TABLE cf_client_guardian
-(
-  idofclientguardian bigserial NOT NULL,
-  idofchildren bigint NOT NULL,
-  idofguardian bigint NOT NULL,
-  CONSTRAINT cf_client_guardian_pk PRIMARY KEY (idofclientguardian),
-  CONSTRAINT cf_client_guardian_idofchildren_fk FOREIGN KEY (idofchildren) REFERENCES cf_clients (idofclient),
-  CONSTRAINT cf_client_guardian_idofguardian_fk FOREIGN KEY (idofguardian) REFERENCES cf_clients (idofclient)
-);
+-- Поправки в отчете по заявкам
+-- Добавлено увидомление о заявках
+--! предыдущие значения Суточной пробы и общего количества
+alter table cf_goods_requests_positions add column LastDailySampleCount bigint default null;
+alter table cf_goods_requests_positions add column LastTotalCount bigint default null;
+--! нет необходимости хранить данную колнку
+alter table cf_goods_requests_positions drop column UpdateHistory;
 
-create index cf_client_guardian_child_idx on cf_client_guardian(idofchildren);
-create index cf_client_guardian_guard_idx on cf_client_guardian(idofguardian);
+--! ФИНАЛИЗИРОВАН (Кадыров, 140110) НЕ МЕНЯТЬ

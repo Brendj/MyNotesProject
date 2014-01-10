@@ -1540,7 +1540,8 @@ CREATE TABLE  cf_goods_requests_positions (
   UnitsScale  integer NOT NULL DEFAULT 0,
   TotalCount  bigint NOT NULL,
   DailySampleCount bigint default null, --v52
-  UpdateHistory text default null,      --v52
+  LastDailySampleCount bigint default null, --v54
+  LastTotalCount bigint default null, --v54
   NetWeight  bigint NOT NULL,
   SendAll integer DEFAULT 0,
   CONSTRAINT cf_goods_requests_positions_pk PRIMARY KEY (IdOfGoodsRequestPosition ),

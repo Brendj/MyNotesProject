@@ -94,6 +94,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Integer tempCardValidDays;
     private String lastBIDataUpdate;
     private Boolean enableNotificationGoodRequestChange;
+    private Boolean hideMissedColumnsNotificationGoodRequestChange;
 
     private List<BankOptionItem> banks;
 
@@ -560,7 +561,17 @@ public class OptionPage extends BasicWorkspacePage {
     }
 
     public void setEnableNotificationGoodRequestChange(Boolean enableNotificationGoodRequestChange) {
+        if(!enableNotificationGoodRequestChange) hideMissedColumnsNotificationGoodRequestChange=false;
         this.enableNotificationGoodRequestChange = enableNotificationGoodRequestChange;
+    }
+
+    public Boolean getHideMissedColumnsNotificationGoodRequestChange() {
+        return hideMissedColumnsNotificationGoodRequestChange;
+    }
+
+    public void setHideMissedColumnsNotificationGoodRequestChange(
+            Boolean hideMissedColumnsNotificationGoodRequestChange) {
+        this.hideMissedColumnsNotificationGoodRequestChange = hideMissedColumnsNotificationGoodRequestChange;
     }
 
     public String getPageFilename() {
@@ -636,6 +647,7 @@ public class OptionPage extends BasicWorkspacePage {
         lastBIDataUpdate = biDataDateFormat.format(cal.getTime());
 
         enableNotificationGoodRequestChange = runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATION_GOOD_REQUEST_CHANGE);
+        hideMissedColumnsNotificationGoodRequestChange = runtimeContext.getOptionValueBool(Option.OPTION_HIDE_MISSED_COL_NOTIFICATION_GOOD_REQUEST_CHANGE);
 
         bankListPage.onShow();
 
@@ -748,7 +760,10 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_MSK_MONITORING_ALLOWED_TAGS, monitoringAllowedTags);
             runtimeContext.setOptionValue(Option.OPTION_MSK_CLEANUP_REPOSITORY_REPORTS, cleanupRepositoryReports);
 
-            runtimeContext.setOptionValue(Option.OPTION_ENABLE_NOTIFICATION_GOOD_REQUEST_CHANGE, enableNotificationGoodRequestChange);
+            runtimeContext.setOptionValue(Option.OPTION_ENABLE_NOTIFICATION_GOOD_REQUEST_CHANGE,
+                    enableNotificationGoodRequestChange);
+            runtimeContext.setOptionValue(Option.OPTION_HIDE_MISSED_COL_NOTIFICATION_GOOD_REQUEST_CHANGE,
+                    hideMissedColumnsNotificationGoodRequestChange);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");

@@ -31,7 +31,6 @@
         <!-- End Global params -->
 
         <property name="orgOwner" column="OrgOwner" type="long"/>
-        <!--<property name="unitsScale" column="UnitsScale" type="integer"/>-->
         <property name="unitsScale" column="UnitsScale">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale</param>
@@ -41,7 +40,8 @@
         <property name="totalCount" column="TotalCount" type="long"/>
         <property name="dailySampleCount" column="DailySampleCount" type="long"/>
         <property name="netWeight" column="NetWeight" type="long"/>
-        <property name="updateHistory" column="UpdateHistory" type="string"/>
+        <property name="lastTotalCount" column="LastTotalCount" type="long"/>
+        <property name="lastDailySampleCount" column="LastDailySampleCount" type="long"/>
 
         <many-to-one name="goodRequest" fetch="select" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest">
             <column name="IdOfGoodsRequest" not-null="false" />
