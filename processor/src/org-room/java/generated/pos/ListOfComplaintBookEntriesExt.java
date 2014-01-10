@@ -1,0 +1,262 @@
+
+package generated.pos;
+
+import java.util.ArrayList;
+import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+
+/**
+ * <p>Java class for ListOfComplaintBookEntriesExt complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
+ * <pre>
+ * &lt;complexType name="ListOfComplaintBookEntriesExt">
+ *   &lt;complexContent>
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *       &lt;sequence>
+ *         &lt;element name="Iterations" type="{http://soap.integra.partner.web.processor.ecafe.axetta.ru/}ListOfComplaintIterations" maxOccurs="unbounded" minOccurs="0"/>
+ *       &lt;/sequence>
+ *       &lt;attribute name="ContractId" type="{http://www.w3.org/2001/XMLSchema}long" />
+ *       &lt;attribute name="GuidOfGood" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="NameOfGood" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="Guid" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="DeletedState" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="CreatedDate" type="{http://www.w3.org/2001/XMLSchema}date" />
+ *       &lt;attribute name="OrgOwner" type="{http://www.w3.org/2001/XMLSchema}long" />
+ *     &lt;/restriction>
+ *   &lt;/complexContent>
+ * &lt;/complexType>
+ * </pre>
+ * 
+ * 
+ */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "ListOfComplaintBookEntriesExt", propOrder = {
+    "iterations"
+})
+public class ListOfComplaintBookEntriesExt {
+
+    @XmlElement(name = "Iterations")
+    protected List<ListOfComplaintIterations> iterations;
+    @XmlAttribute(name = "ContractId")
+    protected Long contractId;
+    @XmlAttribute(name = "GuidOfGood")
+    protected String guidOfGood;
+    @XmlAttribute(name = "NameOfGood")
+    protected String nameOfGood;
+    @XmlAttribute(name = "Guid")
+    protected String guid;
+    @XmlAttribute(name = "DeletedState")
+    protected Boolean deletedState;
+    @XmlAttribute(name = "CreatedDate")
+    @XmlSchemaType(name = "date")
+    protected XMLGregorianCalendar createdDate;
+    @XmlAttribute(name = "OrgOwner")
+    protected Long orgOwner;
+
+    /**
+     * Gets the value of the iterations property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the iterations property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getIterations().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link ListOfComplaintIterations }
+     * 
+     * 
+     */
+    public List<ListOfComplaintIterations> getIterations() {
+        if (iterations == null) {
+            iterations = new ArrayList<ListOfComplaintIterations>();
+        }
+        return this.iterations;
+    }
+
+    /**
+     * Gets the value of the contractId property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Long }
+     *     
+     */
+    public Long getContractId() {
+        return contractId;
+    }
+
+    /**
+     * Sets the value of the contractId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Long }
+     *     
+     */
+    public void setContractId(Long value) {
+        this.contractId = value;
+    }
+
+    /**
+     * Gets the value of the guidOfGood property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getGuidOfGood() {
+        return guidOfGood;
+    }
+
+    /**
+     * Sets the value of the guidOfGood property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setGuidOfGood(String value) {
+        this.guidOfGood = value;
+    }
+
+    /**
+     * Gets the value of the nameOfGood property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getNameOfGood() {
+        return nameOfGood;
+    }
+
+    /**
+     * Sets the value of the nameOfGood property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setNameOfGood(String value) {
+        this.nameOfGood = value;
+    }
+
+    /**
+     * Gets the value of the guid property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getGuid() {
+        return guid;
+    }
+
+    /**
+     * Sets the value of the guid property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setGuid(String value) {
+        this.guid = value;
+    }
+
+    /**
+     * Gets the value of the deletedState property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isDeletedState() {
+        return deletedState;
+    }
+
+    /**
+     * Sets the value of the deletedState property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setDeletedState(Boolean value) {
+        this.deletedState = value;
+    }
+
+    /**
+     * Gets the value of the createdDate property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link XMLGregorianCalendar }
+     *     
+     */
+    public XMLGregorianCalendar getCreatedDate() {
+        return createdDate;
+    }
+
+    /**
+     * Sets the value of the createdDate property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link XMLGregorianCalendar }
+     *     
+     */
+    public void setCreatedDate(XMLGregorianCalendar value) {
+        this.createdDate = value;
+    }
+
+    /**
+     * Gets the value of the orgOwner property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Long }
+     *     
+     */
+    public Long getOrgOwner() {
+        return orgOwner;
+    }
+
+    /**
+     * Sets the value of the orgOwner property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Long }
+     *     
+     */
+    public void setOrgOwner(Long value) {
+        this.orgOwner = value;
+    }
+
+}
