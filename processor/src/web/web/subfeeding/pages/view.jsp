@@ -1,10 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page trimDirectiveWhitespaces="true" %>
-<%@ page import="ru.axetta.ecafe.processor.core.RuntimeContext" %>
 <%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.web.partner.integra.dataflow.*" %>
 <%@ page import="ru.axetta.ecafe.processor.web.subfeeding.OrderDetailViewInfo" %>
@@ -41,29 +38,28 @@
     </form>
 </div>
 <%
-    TimeZone timeZone = RuntimeContext.getInstance().getLocalTimeZone(null);
     DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-    df.setTimeZone(timeZone);
+    df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
     DateFormat tf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-    tf.setTimeZone(timeZone);
+    tf.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
     @SuppressWarnings("unchecked")
-    SubscriptionFeeding sf = (SubscriptionFeeding) request.getAttribute("subscriptionFeeding");
-    Client client = (Client) request.getAttribute("client");
-    String subBalance1 = CurrencyStringUtils.copecksToRubles(client.getSubBalance(1));
-    String subBalance0 = CurrencyStringUtils.copecksToRubles(client.getBalance() - client.getSubBalance(1));
-    boolean wasSuspended = sf.getWasSuspended() != null && sf.getWasSuspended();
+    SubFeedingResult sf = (SubFeedingResult) request.getAttribute("subscriptionFeeding");
+    ClientSummaryExt client = (ClientSummaryExt) request.getAttribute("client");
+    String subBalance1 = CurrencyStringUtils.copecksToRubles(client.getSubBalance1());
+    String subBalance0 = CurrencyStringUtils.copecksToRubles(client.getSubBalance0());
+    boolean wasSuspended = sf.getSuspended() != null && sf.getSuspended();
 %>
-<div class="textDiv"><%=client.getPerson().getFullName()%></div>
+<div class="textDiv"><%=client.getFullName()%></div>
 <div class="textDiv">Номер контракта: <%=ContractIdFormat.format(client.getContractId())%></div>
 <div class="textDiv">Текущий баланс основного счета: <%=subBalance0%> руб.</div>
 <div class="textDiv">Баланс субсчета АП: <%=subBalance1%> руб.</div>
-<div class="textDiv">Дата активации услуги: <%=tf.format(sf.getDateActivateService())%></div>
-<div class="textDiv">Дата отключения услуги: <%=sf.getDateDeactivateService() == null ? "услуга бессрочная"
-        : df.format(sf.getDateDeactivateService())%>
+<div class="textDiv">Дата активации услуги: <%=tf.format(sf.getDateActivate())%></div>
+<div class="textDiv">Дата отключения услуги: <%=sf.getDateDeactivate() == null ? "услуга бессрочная"
+        : df.format(sf.getDateDeactivate())%>
 </div>
 <%
     if (wasSuspended) {
-        String suspendDate = df.format(sf.getLastDatePauseService());
+        String suspendDate = df.format(sf.getLastDatePause());
         String status = "Услуга приостанавливается с " + suspendDate + ".";
 %>
 <div class="textDiv"><%=status%></div>

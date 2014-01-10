@@ -308,6 +308,8 @@ public class SubscriptionFeedingService {
         cd.setFridayPrice(getPriceOfDay(friday, availableComplexes));
         cd.setSaturday(saturday);
         cd.setSaturdayPrice(getPriceOfDay(saturday, availableComplexes));
+        cd.setSunday("");
+        cd.setSundayPrice(0L);
         entityManager.persist(cd);
         return cd;
     }

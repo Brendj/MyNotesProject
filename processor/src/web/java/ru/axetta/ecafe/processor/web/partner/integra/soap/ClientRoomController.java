@@ -222,9 +222,14 @@ public interface ClientRoomController {
     Result reopenSubscriptionFeeding(@WebParam(name = "contractId") Long contractId);
 
     @WebMethod(operationName = "editSubscriptionFeedingPlan")
-    Result editSubscriptionFeedingPlan(@WebParam(name = "contractId") Long contractId,
+    CycleDiagramOut editSubscriptionFeedingPlan(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn);
 
+    @WebMethod(operationName = "findClientCycleDiagram")
+    CycleDiagramOut findClientCycleDiagram(@WebParam(name = "contractId") Long contractId);
+
+    @WebMethod(operationName = "findComplexesWithSubFeeding")
+    ComplexInfoResult findComplexesWithSubFeeding(@WebParam(name = "contractId") Long contractId);
     //Result attachGuardianByClient(@WebParam(name = "childrenContractId") Long childrenContractId,
     //        @WebParam(name = "childrenGuardianId") Long GuardianId);
 

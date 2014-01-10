@@ -2,10 +2,10 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page trimDirectiveWhitespaces="true" %>
 <%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.Client" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.ComplexInfo" %>
-<%@ page import="ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryExt" %>
+<%@ page import="ru.axetta.ecafe.processor.web.partner.integra.dataflow.ComplexInfoExt" %>
+<%@ page import="ru.axetta.ecafe.processor.web.partner.integra.dataflow.SubFeedingResult" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <!DOCTYPE html>
@@ -30,17 +30,21 @@
 </div>
 <%
     @SuppressWarnings("unchecked")
-    SubscriptionFeeding sf = (SubscriptionFeeding) request.getAttribute("subscriptionFeeding");
-    Client client = (Client) request.getAttribute("client");
-    String action = sf == null ? "activate" : "edit";
+    SubFeedingResult sf = (SubFeedingResult) request.getAttribute("subscriptionFeeding");
+    ClientSummaryExt client = (ClientSummaryExt) request.getAttribute("client");
+    String action = sf.getIdOfSubscriptionFeeding() == null ? "activate" : "edit";
 %>
-<div class="textDiv"><%=client.getPerson().getFullName()%></div>
+<div class="textDiv"><%=client.getFullName()%></div>
 <div class="textDiv">Номер контракта: <%=ContractIdFormat.format(client.getContractId())%></div>
-<c:if test="${empty requestScope.subscriptionFeeding}">
-    <div class="textDiv">Активировать подписку абонементного питания? Нажимая на данную кнопку Вы согласны с условиями
-        предоставления услуги.
-    </div>
-</c:if>
+<%
+    if (sf.getIdOfSubscriptionFeeding() == null) {
+%>
+<div class="textDiv">Активировать подписку абонементного питания? Нажимая на данную кнопку Вы согласны с условиями
+    предоставления услуги.
+</div>
+<%
+     }
+%>
 <c:if test="${not empty requestScope.subFeedingError}">
     <div class="textDiv" style="color: red">${requestScope.subFeedingError}</div>
 </c:if>
@@ -64,11 +68,11 @@
         </tr>
         <%
             @SuppressWarnings("unchecked")
-            List<ComplexInfo> complexes = (List<ComplexInfo>) request.getAttribute("complexes");
+            List<ComplexInfoExt> complexes = (List<ComplexInfoExt>) request.getAttribute("complexes");
             @SuppressWarnings("unchecked")
             Map<Integer, List<String>> activeComplexes = (Map<Integer, List<String>>) request.getAttribute("activeComplexes");
             int j = 1;
-            for (ComplexInfo complex : complexes) {
+            for (ComplexInfoExt complex : complexes) {
                 boolean even = j % 2 == 0;
         %>
         <tr class="<%=even ? "evenLine" : "unevenLine"%>">
@@ -95,7 +99,7 @@
         %>
         <tr>
 <%
-    if (sf == null) {
+    if (sf.getIdOfSubscriptionFeeding() == null) {
 %>
             <td align="center" colspan="7">
                 <input type="submit" class="reopenButton" name="activate" value="Активировать" />

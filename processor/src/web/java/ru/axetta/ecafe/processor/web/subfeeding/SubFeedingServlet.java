@@ -4,28 +4,17 @@
 
 package ru.axetta.ecafe.processor.web.subfeeding;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ClientAuthToken;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.CycleDiagramIn;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomController;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWSService;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -50,8 +40,6 @@ import java.util.*;
 public class SubFeedingServlet extends HttpServlet {
 
     private ClientRoomController clientRoomController;
-    private RuntimeContext runtimeContext;
-    private SubscriptionFeedingService sfService;
     private static final String root = "/subfeeding/pages/";
     private static final Logger logger = LoggerFactory.getLogger(SubFeedingServlet.class);
     private static final String SUCCESS_MESSAGE = "subFeedingSuccess";
@@ -62,8 +50,6 @@ public class SubFeedingServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         clientRoomController = new ClientRoomControllerWSService().getClientRoomControllerWSPort();
-        runtimeContext = RuntimeContext.getInstance();
-        sfService = RuntimeContext.getAppContext().getBean(SubscriptionFeedingService.class);
     }
 
     @Override
@@ -133,44 +119,29 @@ public class SubFeedingServlet extends HttpServlet {
 
     private void showSubscriptionFeeding(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
-        Session session = null;
-        Transaction transaction = null;
-        try {
-            session = runtimeContext.createPersistenceSession();
-            transaction = session.beginTransaction();
-            Client client = DAOUtils.findClientByContractId(session, contractId);
-            client.getPerson(); // нужно для ФИО.
-            transaction.commit();
-            SubscriptionFeeding sf = sfService.findClientSubscriptionFeeding(client);
-            req.setAttribute("client", client);
-            req.setAttribute("subscriptionFeeding", sf);
-            if (sf == null) {
-                sendRedirect(req, resp, "/plan");
-            } else {
-                DateFormat df = CalendarUtils.getDateFormatLocal();
-                Date startDate = StringUtils.isBlank(req.getParameter("startDate")) ? null
-                        : parseDate(req.getParameter("startDate"), df);
-                Date endDate = StringUtils.isBlank(req.getParameter("endDate")) ? null
-                        : parseDate(req.getParameter("endDate"), df);
-                if (startDate == null || endDate == null) {
-                    Date[] week = CalendarUtils.getCurrentWeekBeginAndEnd(new Date());
-                    startDate = week[0];
-                    endDate = week[1];
-                }
-                Long subBalanceNumber = Long.parseLong(contractId + "01");
-                req.setAttribute("payments", clientRoomController.getPaymentList(subBalanceNumber, startDate, endDate));
-                req.setAttribute("purchases",
-                        clientRoomController.getPurchaseList(subBalanceNumber, startDate, endDate));
-                req.setAttribute("startDate", df.format(startDate));
-                req.setAttribute("endDate", df.format(endDate));
-                outputPage("view", req, resp);
+        ClientSummaryResult client = clientRoomController.getSummary(contractId);
+        SubFeedingResult sf = clientRoomController.findSubscriptionFeeding(contractId);
+        req.setAttribute("client", client.clientSummary);
+        req.setAttribute("subscriptionFeeding", sf);
+        if (sf.getIdOfSubscriptionFeeding() == null) {
+            sendRedirect(req, resp, "/plan");
+        } else {
+            DateFormat df = CalendarUtils.getDateFormatLocal();
+            Date startDate = StringUtils.isBlank(req.getParameter("startDate")) ? null
+                    : parseDate(req.getParameter("startDate"), df);
+            Date endDate = StringUtils.isBlank(req.getParameter("endDate")) ? null
+                    : parseDate(req.getParameter("endDate"), df);
+            if (startDate == null || endDate == null) {
+                Date[] week = CalendarUtils.getCurrentWeekBeginAndEnd(new Date());
+                startDate = week[0];
+                endDate = week[1];
             }
-        } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
-            logger.error(ex.getMessage());
-            throw new RuntimeException(ex.getMessage());
-        } finally {
-            HibernateUtils.close(session, logger);
+            Long subBalanceNumber = Long.parseLong(contractId + "01");
+            req.setAttribute("payments", clientRoomController.getPaymentList(subBalanceNumber, startDate, endDate));
+            req.setAttribute("purchases", clientRoomController.getPurchaseList(subBalanceNumber, startDate, endDate));
+            req.setAttribute("startDate", df.format(startDate));
+            req.setAttribute("endDate", df.format(endDate));
+            outputPage("view", req, resp);
         }
     }
 
@@ -197,13 +168,13 @@ public class SubFeedingServlet extends HttpServlet {
         if (checkComplexesChecked(req)) {
             CycleDiagramIn cycle = getSubFeedingPlan(req);
             if (isPlanChanged(req, cycle)) {
-                Result res = clientRoomController.editSubscriptionFeedingPlan(contractId, cycle);
+                CycleDiagramOut res = clientRoomController.editSubscriptionFeedingPlan(contractId, cycle);
                 if (res.resultCode == 0) {
-                    CycleDiagram cd = sfService.findLastCycleDiagram(contractId);
-                    DateFormat df = CalendarUtils.getDateFormatLocal();
+                    DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+                    df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
                     req.setAttribute(SUCCESS_MESSAGE,
                             "Изменения плана питания успешно сохранены. Изменения вступят в силу " + df
-                                    .format(cd.getDateActivationDiagram()));
+                                    .format(res.getDateActivationDiagram()));
                 } else {
                     req.setAttribute(ERROR_MESSAGE, res.description);
                 }
@@ -219,8 +190,7 @@ public class SubFeedingServlet extends HttpServlet {
 
     private boolean isPlanChanged(HttpServletRequest req, CycleDiagramIn cycle) {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
-        Client client = DAOService.getInstance().getClientByContractId(contractId);
-        CycleDiagram cd = sfService.findClientCycleDiagram(client);
+        CycleDiagramOut cd = clientRoomController.findClientCycleDiagram(contractId);
         Map<Integer, List<String>> activeComplexes = splitPlanComplexes(cd);
         for (Map.Entry<Integer, List<String>> entry : activeComplexes.entrySet()) {
             int dayNumber = entry.getKey();
@@ -234,35 +204,22 @@ public class SubFeedingServlet extends HttpServlet {
         return false;
     }
 
-    private void showSubscriptionFeedingPlan(HttpServletRequest req, HttpServletResponse resp) {
+    private void showSubscriptionFeedingPlan(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
-        Session session = null;
-        Transaction transaction = null;
-        try {
-            session = runtimeContext.createPersistenceSession();
-            transaction = session.beginTransaction();
-            Client client = DAOUtils.findClientByContractId(session, contractId);
-            client.getPerson(); client.getOrg();
-            transaction.commit();
-            SubscriptionFeeding sf = sfService.findClientSubscriptionFeeding(client);
-            req.setAttribute("client", client);
-            req.setAttribute("subscriptionFeeding", sf);
-            req.setAttribute("complexes", sfService.findComplexesWithSubFeeding(client.getOrg()));
-            CycleDiagram cd = sfService.findClientCycleDiagram(client);
-            if (sf != null && cd != null) {
-                req.setAttribute("activeComplexes", splitPlanComplexes(cd));
-            }
-            outputPage("plan", req, resp);
-        } catch (Exception ex) {
-            HibernateUtils.rollback(transaction, logger);
-            logger.error(ex.getMessage());
-            throw new RuntimeException(ex.getMessage());
-        } finally {
-            HibernateUtils.close(session, logger);
+        ClientSummaryResult client = clientRoomController.getSummary(contractId);
+        SubFeedingResult sf = clientRoomController.findSubscriptionFeeding(contractId);
+        req.setAttribute("client", client.clientSummary);
+        req.setAttribute("subscriptionFeeding", sf);
+        req.setAttribute("complexes",
+                clientRoomController.findComplexesWithSubFeeding(contractId).getComplexInfoList().getList());
+        CycleDiagramOut cd = clientRoomController.findClientCycleDiagram(contractId);
+        if (cd.getGlobalId() != null) {
+            req.setAttribute("activeComplexes", splitPlanComplexes(cd));
         }
+        outputPage("plan", req, resp);
     }
 
-    private Map<Integer, List<String>> splitPlanComplexes(CycleDiagram cd) {
+    private Map<Integer, List<String>> splitPlanComplexes(CycleDiagramOut cd) {
         Map<Integer, List<String>> activeComplexes = new HashMap<Integer, List<String>>();
         activeComplexes.put(1, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getMonday()), ';')));
         activeComplexes.put(2, Arrays.asList(StringUtils.split(StringUtils.defaultString(cd.getTuesday()), ';')));

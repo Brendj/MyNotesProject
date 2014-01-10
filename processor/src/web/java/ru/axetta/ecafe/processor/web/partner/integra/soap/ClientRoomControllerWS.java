@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
@@ -3957,11 +3958,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
                     .getBean(SubscriptionFeedingService.class);
             SubscriptionFeeding sf = sfService.findClientSubscriptionFeeding(client);
-            res.setIdOfSubscriptionFeeding(sf.getGlobalId());
-            res.setDateActivate(sf.getDateActivateService());
-            res.setLastDatePause(sf.getLastDatePauseService());
-            res.setDateDeactivate(sf.getDateDeactivateService());
-            res.setSuspended(sf.getWasSuspended());
+            if (sf != null) {
+                res.setIdOfSubscriptionFeeding(sf.getGlobalId());
+                res.setDateActivate(sf.getDateActivateService());
+                res.setLastDatePause(sf.getLastDatePauseService());
+                res.setDateDeactivate(sf.getDateDeactivateService());
+                res.setSuspended(sf.getWasSuspended());
+            }
             res.resultCode = RC_OK;
             res.description = RC_OK_DESC;
         } catch (Exception ex) {
@@ -4036,12 +4039,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result editSubscriptionFeedingPlan(@WebParam(name = "contractId") Long contractId, @WebParam(
+    public CycleDiagramOut editSubscriptionFeedingPlan(@WebParam(name = "contractId") Long contractId, @WebParam(
             name = "cycleDiagram") CycleDiagramIn cycleDiagramIn) {
         authenticateRequest(contractId);
         Session session = null;
         Transaction transaction = null;
-        Result result = new Result();
+        CycleDiagramOut result = new CycleDiagramOut();
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
@@ -4067,9 +4070,81 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Date activationDate = CalendarUtils.addDays(today, parser.getDayRequest());
             SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
                     .getBean(SubscriptionFeedingService.class);
-            sfService.editCycleDiagram(client, client.getOrg(), cycleDiagramIn.getMonday(), cycleDiagramIn.getTuesday(),
-                    cycleDiagramIn.getWednesday(), cycleDiagramIn.getThursday(), cycleDiagramIn.getFriday(),
-                    cycleDiagramIn.getSaturday(), activationDate);
+            CycleDiagram cd = sfService
+                    .editCycleDiagram(client, client.getOrg(), cycleDiagramIn.getMonday(), cycleDiagramIn.getTuesday(),
+                            cycleDiagramIn.getWednesday(), cycleDiagramIn.getThursday(), cycleDiagramIn.getFriday(),
+                            cycleDiagramIn.getSaturday(), activationDate);
+            result = new CycleDiagramOut(cd);
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage());
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public CycleDiagramOut findClientCycleDiagram(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+        Session session = null;
+        Transaction transaction = null;
+        CycleDiagramOut result = new CycleDiagramOut();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = findClientByContractId(session, contractId, result);
+            if (client == null) {
+                return result;
+            }
+            transaction.commit();
+            SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
+                    .getBean(SubscriptionFeedingService.class);
+            CycleDiagram cd = sfService.findClientCycleDiagram(client);
+            if (cd != null) {
+                result = new CycleDiagramOut(cd);
+            }
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage());
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public ComplexInfoResult findComplexesWithSubFeeding(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+        Session session = null;
+        Transaction transaction = null;
+        ComplexInfoResult result = new ComplexInfoResult();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = findClientByContractId(session, contractId, result);
+            if (client == null) {
+                return result;
+            }
+            Org org = client.getOrg();
+            transaction.commit();
+            SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
+                    .getBean(SubscriptionFeedingService.class);
+            List<ComplexInfo> complexInfoList = sfService.findComplexesWithSubFeeding(org);
+            result.setComplexInfoList(new ComplexInfoList());
+            List<ComplexInfoExt> list = new ArrayList<ComplexInfoExt>();
+            result.getComplexInfoList().setList(list);
+            for (ComplexInfo ci : complexInfoList) {
+                list.add(new ComplexInfoExt(ci));
+            }
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
