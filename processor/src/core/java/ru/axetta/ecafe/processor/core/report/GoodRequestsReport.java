@@ -61,12 +61,12 @@ public class GoodRequestsReport extends BasicReport {
 
         public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
                 Date startDate, Date endDate, Long idOfOrg) throws Exception{
-            return build(session, hideMissedColumns,startDate,endDate, Arrays.asList(idOfOrg),null,3, "", false);
+            return build(session, hideMissedColumns,startDate,endDate, Arrays.asList(idOfOrg),null,-1, "", false);
         }
 
         public GoodRequestsReport build(Session session,
                 Date startDate, Date endDate, List<Long> idOfSupplierList) throws Exception{
-             return build(session, false,startDate,endDate, new ArrayList<Long>(0),idOfSupplierList,3, "", true);
+             return build(session, false,startDate,endDate, new ArrayList<Long>(0),idOfSupplierList,-1, "", true);
         }
 
         public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
@@ -98,7 +98,8 @@ public class GoodRequestsReport extends BasicReport {
                 productCondition = "and (cf_products.productname like '%" + goodName + "%' or cf_products.fullname like '%"+goodName+"%' )";
             }
 
-            String stateCondition = " cf_goods_requests.deletedstate<>true and ";
+            String stateCondition = "";
+            stateCondition = " cf_goods_requests.deletedstate<>true and ";
             switch (requestsFilter) {
                 case 0:
                     stateCondition = " cf_goods_requests.state=" + DocumentState.CREATED.ordinal() + " AND ";
@@ -112,6 +113,8 @@ public class GoodRequestsReport extends BasicReport {
                 default:
                     break;
             }
+            //if(requestsFilter>0){
+            //}
             String orgCondition = "";
             if (!(idOfOrgList==null || idOfOrgList.isEmpty())) {
                 // Обработать лист с организациями
@@ -213,8 +216,8 @@ public class GoodRequestsReport extends BasicReport {
 
                 //RequestItem item = findItemByOrgAndGood(items, org, good);
                 RequestItem item = findItemByOrgAndGood(items, org, idOfGood);
+                final String name = (StringUtils.isEmpty(StringUtils.trimToNull(good))? shortGood: good);
                 if (item == null) {
-                    final String name = (StringUtils.isEmpty(good)? shortGood: good);
                     item = new RequestItem(idOfOrg, org, orgFull, idOfGood, name, report);
                     items.add(item);
                 }
@@ -236,7 +239,7 @@ public class GoodRequestsReport extends BasicReport {
                 if(isWriteTotalRow){
                     RequestItem totalItem = totalItems.get(idOfGood);
                     if (totalItem == null) {
-                        totalItem = new TotalItem(-1L,OVERALL_TITLE, "", idOfGood, good, report);
+                        totalItem = new TotalItem(-1L,OVERALL_TITLE, "", idOfGood, name, report);
                         //totalItems.put(good, totalItem);
                         totalItems.put(idOfGood, totalItem);
                     }
