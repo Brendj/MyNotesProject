@@ -520,7 +520,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
             if (clients != null && clients.size() > 0) {
                 for (Client cl : clients) {
                     TreeNodeImpl clientNode = new TreeNodeImpl();
-                    clientNode.setData(cl.toString());
+                    clientNode.setData(cl);
                     groupNode.addChild(new Integer(clientCounter), clientNode);
                     clientCounter++;
                 }
@@ -558,33 +558,17 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
     }
 
     @Transactional
-    public void selectClient(String selectedClientName) {
+    public void selectClient(Client selectedClient) {
         resetMessages();
         Session session = null;
         try {
             session = (Session) entityManager.getDelegate();
             resetSelectedClient();
 
-            //  Получаем выбранного клиента
-            for (String group : dbTree.keySet()) {
-                List<Client> clients = dbTree.get(group);
-                for (Client cl : clients) {
-                    if (!cl.toString().equals(selectedClientName)) {
-                        continue;
-                    }
 
-                    //  Если клиент найден, то сравниваем его с уже выюранным, и если они не совпадают выбираем его
-                    if (cl.getIdOfClient() != selectedClient.getIdOfClient()) {
-                        selectedClient.copy(cl);
-                        //  Дозагружаем нужные данные
-                        loadSelectedClientData(session);
-                    }
-                    break;
-                }
-                if (isClientSelected()) {
-                    break;
-                }
-            }
+            this.selectedClient.copy(selectedClient);
+            //  Дозагружаем нужные данные
+            loadSelectedClientData(session);
         } catch (Exception e) {
             sendError("Произошел критический сбой, пожалуйста, повторите попытку позже");
             logger.error("Failed to select client", e);
@@ -708,13 +692,13 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         allowRemoveGroup = false;
         selectedClientGroup = null;
         HtmlTree tree = (HtmlTree) event.getComponent();
-        String selectedClientName = (String) tree.getRowData();
+        Client selectedClient = (Client) tree.getRowData();
         if (tree.isLeaf()) {
             isLeafSelected = true;
-            RuntimeContext.getAppContext().getBean(ClientListEditPage.class).selectClient(selectedClientName);
+            RuntimeContext.getAppContext().getBean(ClientListEditPage.class).selectClient(selectedClient);
         } else {
             isLeafSelected = false;
-            RuntimeContext.getAppContext().getBean(ClientListEditPage.class).groupSelected(selectedClientName);
+            RuntimeContext.getAppContext().getBean(ClientListEditPage.class).groupSelected(selectedClient.toString());
         }
     }
 
