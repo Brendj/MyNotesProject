@@ -359,13 +359,15 @@ public class DashboardServiceBean {
                 if (employeesEntersCount != null && statItem.getNumberOfEnterEvents() != 0) {
                     per2 = (double) employeesEntersCount / (double) statItem.getNumberOfEnterEvents();
                 }
-                if (studentsPayOrdersCount != null && statItem.getNumberOfPayOrders() != 0) {
-                    per3 = (double) studentsPayOrdersCount / (double) (statItem.getNumberOfStudentClients() +
-                            statItem.getNumberOfNonStudentClients());
-                }
-                if (employeePayOrdersCount != null && statItem.getNumberOfPayOrders() != 0) {
-                    per4 = (double) employeePayOrdersCount / (double) (statItem.getNumberOfNonStudentClients() +
-                            statItem.getNumberOfStudentClients());
+                if(statItem.getNumberOfStudentClients()+statItem.getNumberOfNonStudentClients()!=0){
+                    if (studentsPayOrdersCount != null && statItem.getNumberOfPayOrders() != 0) {
+                        per3 = (double) studentsPayOrdersCount / (double) (statItem.getNumberOfStudentClients() +
+                                statItem.getNumberOfNonStudentClients());
+                    }
+                    if (employeePayOrdersCount != null && statItem.getNumberOfPayOrders() != 0) {
+                        per4 = (double) employeePayOrdersCount / (double) (statItem.getNumberOfNonStudentClients() +
+                                statItem.getNumberOfStudentClients());
+                    }
                 }
                 if (studentsUniqueCount != null && studentsDiscountsCount != 0) {
                     per5 = (double) studentsUniqueCount / (double) studentsDiscountsCount;
