@@ -159,6 +159,7 @@ public class GoodRequestsReport extends BasicReport {
                          "      join cf_goods on cf_goods.idofgood=cf_goods_requests_positions.idofgood and cf_goods_requests_positions.idofgood is not null "+
                          "      " + (suppliersCondition.length() < 1 ? "" : "join cf_menuexchangerules on idofdestorg=cf_orgs.idoforg ") +
                          "      where cf_orgs.officialname<> '' and " +
+                         "            cf_goods_requests_positions.totalCount <> 0 and "+
                          "            " + stateCondition +
                          "            (cf_goods_requests.donedate>=" + startDateLong + " and cf_goods_requests.donedate<" + endDateLong + ") "+
                          "            " + notCreatedAtConfition +
@@ -180,6 +181,7 @@ public class GoodRequestsReport extends BasicReport {
                     "      join cf_products on cf_products.idofproducts=cf_goods_requests_positions.idofproducts and cf_goods_requests_positions.idofproducts is not null"+
                     "      " + (suppliersCondition.length() < 1 ? "" : "join cf_menuexchangerules on idofdestorg=cf_orgs.idoforg ") +
                     "      where cf_orgs.officialname<> '' and " +
+                    "            cf_goods_requests_positions.totalCount <> 0 and "+
                     "            " + stateCondition +
                     "            (cf_goods_requests.donedate>=" + startDateLong + " and cf_goods_requests.donedate<" + endDateLong + ") "+
                     "            " + notCreatedAtConfition +

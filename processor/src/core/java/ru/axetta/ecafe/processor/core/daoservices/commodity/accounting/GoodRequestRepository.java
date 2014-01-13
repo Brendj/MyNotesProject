@@ -70,12 +70,25 @@ public class GoodRequestRepository {
     @SuppressWarnings("unchecked")
     @Transactional
     public List<GoodRequest> findByFilter(Long idOfOrg, List<DocumentState> stateList, Date startDate,Date endDate,  Integer deletedState){
-        return findByFilter(idOfOrg, stateList, startDate, endDate, deletedState, null);
+        Long idofgoodsgroup = null;
+        return findByFilter(idOfOrg, stateList, startDate, endDate, deletedState, idofgoodsgroup);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional
+    public List<GoodRequest> findByFilter(Long idOfOrg, List<DocumentState> stateList, Date startDate,Date endDate,  Integer deletedState, Boolean showZero){
+        return findByFilter(idOfOrg, stateList, startDate, endDate, deletedState, null, showZero);
     }
 
     @SuppressWarnings("unchecked")
     @Transactional
     public List<GoodRequest> findByFilter(Long idOfOrg, List<DocumentState> stateList, Date startDate,Date endDate,  Integer deletedState, Long idofgoodsgroup){
+        return findByFilter(idOfOrg, stateList, startDate, endDate, deletedState, idofgoodsgroup, Boolean.FALSE);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional
+    public List<GoodRequest> findByFilter(Long idOfOrg, List<DocumentState> stateList, Date startDate,Date endDate,  Integer deletedState, Long idofgoodsgroup, Boolean showZero){
         Session session =  (Session) entityManager.getDelegate();
         Criteria criteria = session.createCriteria(GoodRequest.class);
         criteria.add(Restrictions.between("doneDate", startDate, endDate));
@@ -89,8 +102,16 @@ public class GoodRequestRepository {
         if (idOfOrg != null) {
             criteria.add(Restrictions.eq("orgOwner",idOfOrg));
         }
-        if (idofgoodsgroup != null && idofgoodsgroup != Long.MIN_VALUE) {
-            criteria.createCriteria("goodRequestPositionInternal").createCriteria("good").createCriteria("goodGroup").add(Restrictions.eq("globalId", idofgoodsgroup));
+        boolean restrictByZero = showZero != null && !showZero;
+        boolean restrictByGroup = idofgoodsgroup != null && idofgoodsgroup != Long.MIN_VALUE;
+        if (restrictByZero || restrictByGroup) {
+            Criteria goodPos = criteria.createCriteria("goodRequestPositionInternal");
+            if (restrictByZero) {
+                goodPos.add(Restrictions.ne("totalCount", 0L));
+            }
+            if (restrictByGroup) {
+                goodPos.createCriteria("good").createCriteria("goodGroup").add(Restrictions.eq("globalId", idofgoodsgroup));
+            }
         }
         if ((stateList != null) && !stateList.isEmpty()) {
             criteria.add(Restrictions.in("state",stateList));

@@ -62,7 +62,7 @@ public class GoodRequestListPage extends BasicWorkspacePage {
         localCalendar.setTime(endDate);
         localCalendar.add(Calendar.DAY_OF_MONTH,1);
         Date end = localCalendar.getTime();
-        goodRequestList = goodRequestRepository.findByFilter(idOfOrg,stateList,baseDate,end,deletedState);
+        goodRequestList = goodRequestRepository.findByFilter(idOfOrg,stateList,baseDate,end,deletedState, Boolean.FALSE);
     }
 
     public String getPageTitle() {

@@ -144,7 +144,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
         List<GoodRequest> goodRequestList = goodRequestRepository.findByFilter(org.getIdOfOrg(),stateList,
                                                                             dateFrom.getTime(),dateTo.getTime(),
-                                                                            deletedState, goodGroup);
+                                                                            deletedState, goodGroup, Boolean.FALSE);
         goodRequestList = clearGoodRequests(goodRequestList);
         for (GoodRequest gr : goodRequestList) {
             List<GoodRequestPosition> positions = goodRequestRepository.getGoodRequestPositionByGoodRequest(gr);
@@ -187,6 +187,12 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
             }
             entries.add(entry);
         }
+        Collections.sort(entries, new Comparator<Entry>() {
+            public int compare(Entry o1, Entry o2) {
+                return o1.getFood().compareTo(o2.getFood());
+            }
+
+        });
         Entry overallEntry = new Entry(OVERALL_TITLE, OVERALL_GLOBAL_ID);
         for (Long ts : overall.keySet()) {
             Calendar cal = Calendar.getInstance();
@@ -271,7 +277,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
         for (Entry e : entries) {
             for (long ts : e.data.keySet()) {
                 Long v = e.getDataForDate(ts);
-                if (v == null || v < 1L) {
+                if (v == null || v < 0L) {
                     continue;
                 }
                 v = v * 1000;
