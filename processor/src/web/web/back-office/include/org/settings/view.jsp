@@ -164,6 +164,8 @@
         <h:outputText escape="true" value="Включить автоматическую приостановку/возобновление подписок на услугу АП в зависимости от посещения учреждения" styleClass="output-text" />
         <h:inputText readonly="true" value="#{(settingViewPage.setting.splitSettingValue.enableFeeding?'Включен':'Выключен')}"
                      styleClass="output-text" />
+        <h:outputText escape="true" value="Количество дней, в течение которых запрещено редактировать заявки" styleClass="output-text" />
+        <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.dayForbidChange}" styleClass="input-text" style="width: 207px" />
 
     </h:panelGrid>
 

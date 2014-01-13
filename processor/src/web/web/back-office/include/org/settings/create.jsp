@@ -278,6 +278,8 @@
                 <f:selectItem itemValue="false"/>
             </h:selectBooleanCheckbox>
 
+            <h:outputText escape="true" value="Количество дней, в течение которых запрещено редактировать заявки" styleClass="output-text" />
+            <h:inputText value="#{settingCreatePage.parserBySettingValue.dayForbidChange}" styleClass="input-text" style="width: 207px"/>
         </h:panelGrid>
 
     </h:panelGrid>
