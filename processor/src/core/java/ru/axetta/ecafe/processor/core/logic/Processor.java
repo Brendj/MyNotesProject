@@ -23,7 +23,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
 import ru.axetta.ecafe.processor.core.sync.*;
-import ru.axetta.ecafe.processor.core.sync.request.ClientRequests;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardRequestProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoleProcessor;
@@ -38,6 +37,7 @@ import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.process.ClientGuardianDataProcessor;
 import ru.axetta.ecafe.processor.core.sync.request.AccRegistryUpdateRequest;
 import ru.axetta.ecafe.processor.core.sync.request.ClientGuardianRequest;
+import ru.axetta.ecafe.processor.core.sync.request.ClientRequests;
 import ru.axetta.ecafe.processor.core.sync.response.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
@@ -1406,8 +1406,11 @@ public class Processor implements SyncProcessor,
                     }
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
-                    final String resultMessage = (dbClientGuardian==null?null:"Client guardian exist");
-                    clientGuardianResponse.addItem(clientGuardian, 0, resultMessage);
+                    if(dbClientGuardian==null){
+                        clientGuardianResponse.addItem(clientGuardian, 0, null);
+                    } else {
+                        clientGuardianResponse.addItem(dbClientGuardian, 0, "Client guardian exist");
+                    }
                 } catch (Exception ex) {
                     String message = String.format(
                             "Save Client Guardian to database error, idOfChildren == %s, idOfGuardian == %s",
