@@ -14,7 +14,8 @@ CREATE TABLE cf_client_guardian
   CONSTRAINT cf_client_guardian_children_fk FOREIGN KEY (IdOfChildren)
   REFERENCES cf_clients (IdOfClient),
   CONSTRAINT cf_client_guardian_guardian_fk FOREIGN KEY (IdOfGuardian)
-  REFERENCES cf_clients (IdOfClient)
+  REFERENCES cf_clients (IdOfClient),
+  CONSTRAINT cf_client_guardian_uk UNIQUE (IdOfChildren, IdOfGuardian)
 );
 
 create index cf_client_guardian_child_idx on cf_client_guardian(IdOfChildren);
