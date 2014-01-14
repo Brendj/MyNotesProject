@@ -64,7 +64,7 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     private Org org;
     private List<Entry> entries = new ArrayList<Entry>();
     private List<DateColumn> columns = new ArrayList<DateColumn>();
-    private Map<Long, String> goodsGroups;
+    private List<String[]> goodsGroups;
     private Long goodGroup;
     private Long month;
     private Long prevMonth;
@@ -452,8 +452,8 @@ public class ClaimCalendarEditPage extends BasicWorkspacePage implements YesNoLi
     public List<SelectItem> getGoodsGroups () {
         List<SelectItem> result = new ArrayList<SelectItem>();
         result.add(new SelectItem(Long.MIN_VALUE, "Все"));
-        for (Long idofgoodgroup : goodsGroups.keySet()) {
-            result.add(new SelectItem(idofgoodgroup, goodsGroups.get(idofgoodgroup)));
+        for (String [] group : goodsGroups) {
+            result.add(new SelectItem(group[0], group[1]));
         }
         return result;
     }

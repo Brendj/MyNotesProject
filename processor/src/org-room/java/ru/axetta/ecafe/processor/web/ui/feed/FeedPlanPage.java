@@ -342,7 +342,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
     }
 
     private static final Long getIdOfSuperClientGroup (Integer groupNum) {
-        if (groupNum < 4) {
+        if (groupNum < 5) {
             return ELEMENTARY_CLASSES_TYPE;
         } else if (groupNum < 10) {
             return MIDDLE_CLASSES_TYPE;
