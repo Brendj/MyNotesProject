@@ -1,12 +1,6 @@
 package ru.axetta.ecafe.processor.core.sync.request;
 
-import ru.axetta.ecafe.processor.core.sync.handlers.client.request.ClientRequests;
-import ru.axetta.ecafe.processor.core.utils.XMLUtils;
-
 import org.w3c.dom.Node;
-
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
