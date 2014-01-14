@@ -468,6 +468,28 @@
       <column name="is_cycled" sqlType="bool" length="1" precision="0" nullable="false" jdbcType="-7"/>
       <column name="is_called" sqlType="bool" length="1" precision="0" nullable="false" jdbcType="-7"/>
     </table>
+    <table name="cf_client_guardian" schema="public" catalog="amoscow" type="TABLE">
+      <column name="idofclientguardian" sqlType="bigserial" length="19" precision="0" nullable="false" jdbcType="-5" def="bmV4dHZhbCgnY2ZfY2xpZW50X2d1YXJkaWFuX2lkb2ZjbGllbnRndWFyZGlhbl9zZXEnOjpyZWdjbGFzcyk=" autoIncrement="true"/>
+      <column name="idofchildren" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="idofguardian" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <primary-key name="cf_client_guardian_pk" columns="idofclientguardian"/>
+      <foreign-key name="cf_client_guardian_idofchildren_fk" columns="idofchildren" ref-table="cf_clients" ref-schema="public" ref-catalog="" ref-columns="idofclient" update-rule="3" delete-rule="3" deferrability="2"/>
+      <foreign-key name="cf_client_guardian_idofguardian_fk" columns="idofguardian" ref-table="cf_clients" ref-schema="public" ref-catalog="" ref-columns="idofclient" update-rule="3" delete-rule="3" deferrability="2"/>
+      <index name="cf_client_guardian_child_idx" unique="false" columns="idofchildren"/>
+      <index name="cf_client_guardian_guard_idx" unique="false" columns="idofguardian"/>
+    </table>
+    <table name="cf_client_guardian_idofclientguardian_seq" schema="public" catalog="amoscow" type="SEQUENCE">
+      <column name="sequence_name" sqlType="name" length="2147483647" precision="0" nullable="false" jdbcType="12"/>
+      <column name="last_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="start_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="increment_by" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="max_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="min_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="cache_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="log_cnt" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="is_cycled" sqlType="bool" length="1" precision="0" nullable="false" jdbcType="-7"/>
+      <column name="is_called" sqlType="bool" length="1" precision="0" nullable="false" jdbcType="-7"/>
+    </table>
     <table name="cf_clientallocationrule" schema="public" catalog="amoscow" type="TABLE">
       <column name="idofclientallocationrule" sqlType="bigserial" length="19" precision="0" nullable="false" jdbcType="-5" def="bmV4dHZhbCgnY2ZfY2xpZW50YWxsb2NhdGlvbnJ1bGVfaWRvZmNsaWVudGFsbG9jYXRpb25ydWxlX3NlcSc6OnJlZ2NsYXNzKQ==" autoIncrement="true"/>
       <column name="idofsourceorg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
@@ -609,6 +631,8 @@
       <exported-key name="cf_calls_idofclient_fk" table="cf_calls" schema="public" catalog="amoscow" columns="idofclient"/>
       <exported-key name="cf_cards_idofclient_fk" table="cf_cards" schema="public" catalog="amoscow" columns="idofclient"/>
       <exported-key name="cf_circulation_client_fk" table="cf_circulations" schema="public" catalog="amoscow" columns="idofclient"/>
+      <exported-key name="cf_client_guardian_idofguardian_fk" table="cf_client_guardian" schema="public" catalog="amoscow" columns="idofguardian"/>
+      <exported-key name="cf_client_guardian_idofchildren_fk" table="cf_client_guardian" schema="public" catalog="amoscow" columns="idofchildren"/>
       <exported-key name="cf_clientpaymentorders_idofclient_fk" table="cf_clientpaymentorders" schema="public" catalog="amoscow" columns="idofclient"/>
       <exported-key name="cf_clienscategorydiscount_client" table="cf_clients_categorydiscounts" schema="public" catalog="amoscow" columns="idofclient"/>
       <exported-key name="cf_clients_cycle_diagrams_clients_fk" table="cf_clients_cycle_diagrams" schema="public" catalog="amoscow" columns="idofclient"/>
@@ -897,6 +921,8 @@
       <column name="kpp" sqlType="varchar" length="10" precision="0" nullable="false" jdbcType="12" def="Jyc="/>
       <column name="ogrn" sqlType="varchar" length="15" precision="0" nullable="false" jdbcType="12" def="Jyc="/>
       <column name="okato" sqlType="varchar" length="11" precision="0" nullable="true" jdbcType="12" def="Jyc="/>
+      <column name="requestnotifyemailaddress" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12" def="TlVMTA=="/>
+      <column name="requestnotifymaillist" sqlType="varchar" length="128" precision="0" nullable="true" jdbcType="12" def="TlVMTA=="/>
       <primary-key name="cf_contragents_pk" columns="idofcontragent"/>
       <foreign-key name="cf_contragents_idofcontactperson_fk" columns="idofcontactperson" ref-table="cf_persons" ref-schema="public" ref-catalog="" ref-columns="idofperson" update-rule="3" delete-rule="3" deferrability="2"/>
       <exported-key name="cf_addpayments_idofcontragentpayer_fk" table="cf_addpayments" schema="public" catalog="amoscow" columns="idofcontragentpayer"/>
@@ -1041,6 +1067,7 @@
       <column name="complex47" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" def="MA=="/>
       <column name="complex48" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" def="MA=="/>
       <column name="complex49" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" def="MA=="/>
+      <column name="subcategory" sqlType="varchar" length="100" precision="0" nullable="true" jdbcType="12" def="Jyc="/>
       <primary-key name="cf_discountrules_pk" columns="idofrule"/>
       <exported-key name="cf_discountrulescategorydiscount_idofdiscountrules" table="cf_discountrules_categorydiscounts" schema="public" catalog="amoscow" columns="idofrule"/>
       <exported-key name="cf_catorgdiscrule_discountrule" table="cf_discountrules_categoryorg" schema="public" catalog="amoscow" columns="idofrule"/>
@@ -1187,6 +1214,25 @@
       <primary-key name="cf_do_conflicts_pk" columns="idofdoconflict"/>
     </table>
     <table name="cf_do_conflicts_idofdoconflict_seq" schema="public" catalog="amoscow" type="SEQUENCE">
+      <column name="sequence_name" sqlType="name" length="2147483647" precision="0" nullable="false" jdbcType="12"/>
+      <column name="last_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="start_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="increment_by" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="max_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="min_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="cache_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="log_cnt" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="is_cycled" sqlType="bool" length="1" precision="0" nullable="false" jdbcType="-7"/>
+      <column name="is_called" sqlType="bool" length="1" precision="0" nullable="false" jdbcType="-7"/>
+    </table>
+    <table name="cf_do_org_current_version" schema="public" catalog="amoscow" type="TABLE">
+      <column name="iddoorgcurrentversion" sqlType="bigserial" length="19" precision="0" nullable="false" jdbcType="-5" def="bmV4dHZhbCgnY2ZfZG9fb3JnX2N1cnJlbnRfdmVyc2lvbl9pZGRvb3JnY3VycmVudHZlcnNpb25fc2VxJzo6cmVnY2xhc3Mp" autoIncrement="true"/>
+      <column name="objectid" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="lastversion" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <primary-key name="cf_do_org_current_version_pk" columns="iddoorgcurrentversion"/>
+    </table>
+    <table name="cf_do_org_current_version_iddoorgcurrentversion_seq" schema="public" catalog="amoscow" type="SEQUENCE">
       <column name="sequence_name" sqlType="name" length="2147483647" precision="0" nullable="false" jdbcType="12"/>
       <column name="last_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
       <column name="start_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
@@ -1686,6 +1732,9 @@
       <column name="sendall" sqlType="int4" length="10" precision="0" nullable="true" jdbcType="4" def="MA=="/>
       <column name="globalversiononcreate" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
       <column name="dailysamplecount" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
+      <column name="updatehistory" sqlType="text" length="2147483647" precision="0" nullable="true" jdbcType="12"/>
+      <column name="lastdailysamplecount" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
+      <column name="lasttotalcount" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
       <primary-key name="cf_goods_requests_positions_pk" columns="idofgoodsrequestposition"/>
       <foreign-key name="cf_goods_requests_positions_goods_request_fk" columns="idofgoodsrequest" ref-table="cf_goods_requests" ref-schema="public" ref-catalog="" ref-columns="idofgoodsrequest" update-rule="3" delete-rule="3" deferrability="2"/>
       <index name="cf_goods_requests_positions_guid_key" unique="true" columns="guid"/>
@@ -3340,6 +3389,31 @@
       <column name="is_cycled" sqlType="bool" length="1" precision="0" nullable="false" jdbcType="-7"/>
       <column name="is_called" sqlType="bool" length="1" precision="0" nullable="false" jdbcType="-7"/>
     </table>
+    <table name="cf_temp2" schema="public" catalog="amoscow" type="TABLE">
+      <column name="id" sqlType="bigserial" length="19" precision="0" nullable="false" jdbcType="-5" def="bmV4dHZhbCgnY2ZfdGVtcDJfaWRfc2VxJzo6cmVnY2xhc3Mp" autoIncrement="true"/>
+      <primary-key name="cf_temp_pk" columns="id"/>
+    </table>
+    <table name="cf_temp2_id_seq" schema="public" catalog="amoscow" type="SEQUENCE">
+      <column name="sequence_name" sqlType="name" length="2147483647" precision="0" nullable="false" jdbcType="12"/>
+      <column name="last_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="start_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="increment_by" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="max_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="min_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="cache_value" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="log_cnt" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <column name="is_cycled" sqlType="bool" length="1" precision="0" nullable="false" jdbcType="-7"/>
+      <column name="is_called" sqlType="bool" length="1" precision="0" nullable="false" jdbcType="-7"/>
+    </table>
+    <table name="cf_temp3" schema="public" catalog="amoscow" type="TABLE">
+      <column name="id" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <primary-key name="cf_temp3_pk" columns="id"/>
+    </table>
+    <table name="cf_temp4" schema="public" catalog="amoscow" type="TABLE">
+      <column name="id" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
+      <primary-key name="cf_temp4_pk" columns="id"/>
+      <index name="cf_temp4_idx" unique="false" columns="id"/>
+    </table>
     <table name="cf_temporary_orders" schema="public" catalog="amoscow" type="TABLE">
       <column name="idoforg" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
       <column name="idofclient" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5"/>
@@ -3512,6 +3586,7 @@
       <column name="lastentryip" sqlType="varchar" length="15" precision="0" nullable="true" jdbcType="12"/>
       <column name="lastentrytime" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
       <column name="isblocked" sqlType="bool" length="1" precision="0" nullable="false" jdbcType="-7" def="ZmFsc2U="/>
+      <column name="region" sqlType="varchar" length="10" precision="0" nullable="true" jdbcType="12" def="TlVMTA=="/>
       <primary-key name="cf_users_pk" columns="idofuser"/>
       <exported-key name="cf_permissions_idofuser_fk" table="cf_permissions" schema="public" catalog="amoscow" columns="idofuser"/>
       <exported-key name="cf_usercontragents_idofuser_fk" table="cf_usercontragents" schema="public" catalog="amoscow" columns="idofuser"/>
@@ -3527,6 +3602,7 @@
       <column name="driverlicencenumber" sqlType="varchar" length="50" precision="0" nullable="true" jdbcType="12"/>
       <column name="driverlicencedate" sqlType="int8" length="19" precision="0" nullable="true" jdbcType="-5"/>
       <column name="visitortype" sqlType="int8" length="19" precision="0" nullable="false" jdbcType="-5" def="MA=="/>
+      <column name="isdeleted" sqlType="int4" length="10" precision="0" nullable="false" jdbcType="4" def="MA=="/>
       <primary-key name="cf_visitors_pk" columns="idofvisitor"/>
       <foreign-key name="cf_visitors_idofperson_fk" columns="idofperson" ref-table="cf_persons" ref-schema="public" ref-catalog="" ref-columns="idofperson" update-rule="3" delete-rule="3" deferrability="2"/>
     </table>
