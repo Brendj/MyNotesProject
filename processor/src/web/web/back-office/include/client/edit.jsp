@@ -172,10 +172,10 @@
     <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.clientGUID}" maxlength="64" styleClass="input-text"/>
 
-    <h:outputText escape="true" value="Опекуны" styleClass="output-text" />
+    <h:outputText escape="true" value="Опекуны" styleClass="output-text" rendered="false"/>
     <rich:dataTable id="clientGuardianEditTable" value="#{mainPage.clientEditPage.clientGuardianItems}" var="clientGuardian"
                     columnClasses="left-aligned-column, center-aligned-column, center-aligned-column"
-                    footerClass="data-table-footer-center">
+                    footerClass="data-table-footer-center" rendered="false">
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер договора" />
