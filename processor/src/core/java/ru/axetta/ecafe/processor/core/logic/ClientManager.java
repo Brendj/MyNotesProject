@@ -862,23 +862,30 @@ public class ClientManager {
         return guardianItems;
     }
 
-    @SuppressWarnings("unchecked")
-    public static List<Client> findGuardiansByClient(Session session, Long idOfChildren, Long idOfGuardian) throws Exception {
 
+    public static List<Client> loadGuardiansByChildren(Session session, Long idOfChildren) throws Exception {
+        return findGuardiansByClient(session, idOfChildren, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    /* получить список опекунов за исключением идентифткатора опекуна idOfGuardian
+    * если идентификатор опекуна пуст то выведутся все опекуны*/
+    public static List<Client> findGuardiansByClient(Session session, Long idOfChildren, Long idOfGuardian) throws Exception {
+        List<Client> clients = new ArrayList<Client>();
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfChildren", idOfChildren));
-        idOfGuardianCriteria.add(Restrictions.ne("idOfGuardian", idOfGuardian));
+        if(idOfGuardian!=null){
+            idOfGuardianCriteria.add(Restrictions.ne("idOfGuardian", idOfGuardian));
+        }
         idOfGuardianCriteria.setProjection(Property.forName("idOfGuardian"));
         Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();
-
-        Criteria clientCriteria = session.createCriteria(Client.class);
         if(countResult>0){
+            Criteria clientCriteria = session.createCriteria(Client.class);
             clientCriteria.add(Property.forName("idOfClient").in(idOfGuardianCriteria));
-        } else {
-            clientCriteria.add(Restrictions.eq("idOfClient", idOfChildren));
+            clients = clientCriteria.list();
         }
-        return clientCriteria.list();
+        return clients;
     }
 
     /* Удалить список опекунов клиента */
