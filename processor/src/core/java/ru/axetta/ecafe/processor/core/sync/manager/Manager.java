@@ -4,16 +4,13 @@
 
 package ru.axetta.ecafe.processor.core.sync.manager;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.DOVersionRepository;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.SyncHistory;
 import ru.axetta.ecafe.processor.core.persistence.SyncHistoryException;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConfirm;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConflict;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.doGroups.DOGroupsFactory;
 import ru.axetta.ecafe.processor.core.sync.doGroups.DOSyncClass;
@@ -81,6 +78,7 @@ public class Manager {
     private Long idOfOrg;
     private SyncHistory syncHistory;
     private final String[] doGroupNames;
+    private final DOGroupsFactory doGroupsFactory = new DOGroupsFactory();
 
     /* Максимальное количество объектов используемых в запросах конструкции IN */
     private static final int maxCount = 1000;
@@ -122,7 +120,7 @@ public class Manager {
         // Получаем секции РО, которые будем обрабатывать.
         List<Node> doNodeList = XMLUtils.findNodesWithNameNotEqualsTo(roNode, "Confirm");
         for (String groupName : doGroupNames) {
-            IDOGroup doGroup = DOGroupsFactory.getGroup(groupName);
+            IDOGroup doGroup = doGroupsFactory.createGroup(groupName);
             buildOneGroup(doGroup, doNodeList.iterator());
         }
     }
