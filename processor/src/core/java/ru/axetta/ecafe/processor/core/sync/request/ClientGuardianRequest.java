@@ -1,6 +1,7 @@
 package ru.axetta.ecafe.processor.core.sync.request;
 
 import ru.axetta.ecafe.processor.core.sync.response.ClientGuardianResponseElement;
+import ru.axetta.ecafe.processor.core.utils.*;
 
 import org.w3c.dom.Node;
 
@@ -16,8 +17,10 @@ import java.util.*;
 public class ClientGuardianRequest {
 
     private final List<ClientGuardianResponseElement> clientGuardianResponseElement;
+    private final Long maxVersion;
 
-    public ClientGuardianRequest(List<ClientGuardianResponseElement> clientGuardianResponseElement) {
+    public ClientGuardianRequest(Long maxVersion, List<ClientGuardianResponseElement> clientGuardianResponseElement) {
+        this.maxVersion = maxVersion;
         this.clientGuardianResponseElement = clientGuardianResponseElement;
     }
 
@@ -25,7 +28,12 @@ public class ClientGuardianRequest {
         return clientGuardianResponseElement;
     }
 
+    public Long getMaxVersion() {
+        return maxVersion;
+    }
+
     static ClientGuardianRequest build(Node clientGuardianRequestNode) throws Exception {
+        final Long maxVersion = XMLUtils.getLongAttributeValue(clientGuardianRequestNode, "V");
         Node itemNode = clientGuardianRequestNode.getFirstChild();
         List<ClientGuardianResponseElement> items = new LinkedList<ClientGuardianResponseElement>();
         while (null != itemNode) {
@@ -34,7 +42,7 @@ public class ClientGuardianRequest {
             }
             itemNode = itemNode.getNextSibling();
         }
-        return new ClientGuardianRequest(items);
+        return new ClientGuardianRequest(maxVersion, items);
     }
 
 }

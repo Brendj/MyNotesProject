@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.core.sync.request;
 
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
+
 import org.w3c.dom.Node;
 
 import static ru.axetta.ecafe.processor.core.utils.XMLUtils.findFirstChildElement;
@@ -16,7 +18,7 @@ public class ClientGuardianBuilder {
     private Node mainNode;
 
     public void createMainNode(Node envelopeNode){
-        mainNode = findFirstChildElement(envelopeNode, "ClientGuardians");
+        mainNode = findFirstChildElement(envelopeNode, "ClientsGuardians");
     }
 
     public ClientGuardianRequest build() throws Exception {

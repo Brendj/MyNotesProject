@@ -652,7 +652,13 @@ public class Processor implements SyncProcessor,
             final List<ClientGuardianResponseElement> clientGuardianResponseElement
                     = clientGuardianRequest.getClientGuardianResponseElement();
             if(clientGuardianResponseElement !=null) {
-                clientGuardianResponse = processClientGuardian(clientGuardianResponseElement, request.getIdOfOrg(),syncHistory);
+                clientGuardianResponse = processClientGuardian(clientGuardianResponseElement, request.getIdOfOrg(),
+                        syncHistory);
+            }
+            final Long responseClientGuardian = clientGuardianRequest.getMaxVersion();
+            if(responseClientGuardian!=null) {
+                clientGuardianData = processClientGuardianData(request.getIdOfOrg(), syncHistory,
+                        responseClientGuardian);
             }
         }
 
@@ -760,11 +766,6 @@ public class Processor implements SyncProcessor,
                 ClientRequests clientRequests = request.getClientRequests();
                 if(clientRequests.getResponseTempCardOperation()) {
                     tempCardOperationData = processClientRequestsOperations(request.getIdOfOrg());
-                }
-                final Long responseClientGuardian = clientRequests.getResponseClientGuardian();
-                if(responseClientGuardian!=null) {
-                    clientGuardianData = processClientGuardianData(request.getIdOfOrg(),
-                            syncHistory, responseClientGuardian);
                 }
             }
         } catch (Exception e) {

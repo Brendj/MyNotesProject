@@ -35,7 +35,7 @@ public class ClientGuardianData extends AbstractToElement {
 
     @Override
     public Element toElement(Document document) throws Exception {
-        Element element = document.createElement("ClientGuardians");
+        Element element = document.createElement("ClientsGuardians");
         if(this.result!=null){
             XMLUtils.setAttributeIfNotNull(element, "ResCode", result.getCode());
             XMLUtils.setAttributeIfNotNull(element, "ResultMessage", result.getMessage());
