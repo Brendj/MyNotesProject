@@ -102,7 +102,9 @@
                 <h:outputText escape="true" value="К связи" />
             </f:facet>
             <h:selectBooleanCheckbox readonly="#{item.idOfClientForBind!=null}}" value="#{item.toBind}"
-                                     styleClass="output-text" />
+                                     styleClass="output-text" >
+                <a4j:support event="onchange" reRender="pupilCatalogFindTable" />
+            </h:selectBooleanCheckbox>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -162,7 +164,9 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="К регистрации" />
             </f:facet>
-            <h:selectBooleanCheckbox readonly="#{item.canBeAdded}}" value="#{item.toAdd}" styleClass="output-text" />
+            <h:selectBooleanCheckbox readonly="#{item.canBeAdded}}" value="#{item.toAdd}" styleClass="output-text" >
+                <a4j:support event="onchange" reRender="pupilCatalogFindTable" />
+            </h:selectBooleanCheckbox>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
