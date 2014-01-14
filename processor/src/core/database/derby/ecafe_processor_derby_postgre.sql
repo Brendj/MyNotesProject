@@ -2868,7 +2868,7 @@ CREATE TABLE cf_subscriber_feeding
   LastDatePauseService bigint,
   DateDeactivateService bigint,
   ServiceState integer NOT NULL DEFAULT 0,
-  wassuspended boolean NOT NULL DEFAULT false,
+  WasSuspended boolean NOT NULL DEFAULT false,
   CONSTRAINT cf_service_subscriber_feeding_pk PRIMARY KEY (IdOfServiceSubscriberFeeding),
   CONSTRAINT cf_service_subscriber_feeding_clients_fk FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
 );
@@ -2899,7 +2899,25 @@ CREATE TABLE cf_do_org_current_version (
   CONSTRAINT cf_do_org_current_version_pk PRIMARY KEY (IdDOOrgCurrentVersion)
 );
 
+-- v55
+-- Таблица связкаЖ Опекун и ребенок
+CREATE TABLE cf_client_guardian
+(
+  IdOfClientGuardian bigserial NOT NULL,
+  Version bigint NOT NULL,
+  IdOfChildren bigint NOT NULL,
+  IdOfGuardian bigint NOT NULL,
+  CONSTRAINT cf_client_guardian_pk PRIMARY KEY (IdOfClientGuardian),
+  CONSTRAINT cf_client_guardian_children_fk FOREIGN KEY (IdOfChildren)
+  REFERENCES cf_clients (IdOfClient),
+  CONSTRAINT cf_client_guardian_guardian_fk FOREIGN KEY (IdOfGuardian)
+  REFERENCES cf_clients (IdOfClient)
+);
+
+create index cf_client_guardian_child_idx on cf_client_guardian(IdOfChildren);
+create index cf_client_guardian_guard_idx on cf_client_guardian(IdOfGuardian);
+
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
-  VALUES(2, 2, 52, 131213, 0, '');
+  VALUES(2, 2, 54, 140110, 0, '');
 

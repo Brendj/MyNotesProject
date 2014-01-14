@@ -10,6 +10,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 public class ClientGuardian {
 
     private Long idOfClientGuardian;
+    private Long version;
     private Long idOfChildren;
     private Long idOfGuardian;
 
@@ -28,6 +29,14 @@ public class ClientGuardian {
         this.idOfClientGuardian = idOfClientGuardian;
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
     public Long getIdOfChildren() {
         return idOfChildren;
     }
@@ -43,4 +52,5 @@ public class ClientGuardian {
     public void setIdOfGuardian(Long idOfGuardian) {
         this.idOfGuardian = idOfGuardian;
     }
+
 }

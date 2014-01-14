@@ -8,14 +8,11 @@
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.ClientGuardian" table="cf_client_guardian">
-        <id name="idOfClientGuardian" column="idofclientguardian" type="long">
+        <id name="idOfClientGuardian" column="IdOfClientGuardian" type="long">
             <generator class="identity"/>
         </id>
-        <property name="idOfChildren" type="long">
-            <column name="idofchildren" not-null="true"/>
-        </property>
-        <property name="idOfGuardian" type="long">
-            <column name="idofguardian" not-null="true"/>
-        </property>
+        <version name="version" column="Version" type="long"/>
+        <property name="idOfChildren" column="IdOfChildren" type="long" not-null="true"/>
+        <property name="idOfGuardian" column="IdOfGuardian" type="long" not-null="true"/>
     </class>
 </hibernate-mapping>
