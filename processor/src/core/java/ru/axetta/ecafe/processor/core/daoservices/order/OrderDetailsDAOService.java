@@ -44,7 +44,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 " where cforder.createddate>=:startDate and cforder.createddate<:endDate and orderdetail.socdiscount>0 and" +
                 " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"' and " +
                 " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
-                " cforder.ordertype in (0,1,4,6) " +
+                " cforder.ordertype in (0,1,4,6,8) " +
                 " group by orderdetail.qty ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idoforg",idOfOrg);
@@ -98,6 +98,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN);
         orderTypeEnumTypeSet.add(OrderTypeEnumType.DAILY_SAMPLE);
         orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.CORRECTION_TYPE);
         String sql = "select distinct good.globalId as globalId, good.pathPart3 as pathPart3, "
                 + "good.pathPart4 as pathPart4,good.pathPart2 as pathPart2, good.fullName as fullName "
                 + " from OrderDetail details "
