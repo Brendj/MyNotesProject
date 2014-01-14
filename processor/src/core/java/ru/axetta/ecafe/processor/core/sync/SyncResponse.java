@@ -12,9 +12,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.ResPaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
-import ru.axetta.ecafe.processor.core.sync.response.DirectiveElement;
-import ru.axetta.ecafe.processor.core.sync.response.GoodsBasicBasketData;
-import ru.axetta.ecafe.processor.core.sync.response.QuestionaryData;
+import ru.axetta.ecafe.processor.core.sync.response.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
@@ -1196,6 +1194,8 @@ public class SyncResponse {
     private final GoodsBasicBasketData goodsBasicBasketData;
     private final Manager manager;
     private final DirectiveElement directiveElement;
+    private final ClientGuardianResponse clientGuardianResponse;
+    private final ClientGuardianData clientGuardians;
 
     public CorrectingNumbersOrdersRegistry getCorrectingNumbersOrdersRegistry() {
         return correctingNumbersOrdersRegistry;
@@ -1209,7 +1209,7 @@ public class SyncResponse {
             ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules, ComplexRoles complexRoles,
             CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData,
             QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData,
-            DirectiveElement directiveElement) {
+            DirectiveElement directiveElement, ClientGuardianResponse clientGuardianResponse, ClientGuardianData clientGuardians) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1236,6 +1236,8 @@ public class SyncResponse {
         this.questionaryData = questionaryData;
         this.goodsBasicBasketData = goodsBasicBasketData;
         this.directiveElement = directiveElement;
+        this.clientGuardianResponse = clientGuardianResponse;
+        this.clientGuardians = clientGuardians;
     }
 
     public Document toDocument() throws Exception {
@@ -1284,6 +1286,14 @@ public class SyncResponse {
         // ClientRegistry
         if (null != clientRegistry) {
             ecafeEnvelopeElement.appendChild(clientRegistry.toElement(document));
+        }
+
+        if(clientGuardianResponse != null){
+            ecafeEnvelopeElement.appendChild(clientGuardianResponse.toElement(document));
+        }
+
+        if(clientGuardians != null){
+            ecafeEnvelopeElement.appendChild(clientGuardians.toElement(document));
         }
 
         // ResOrgStructure
@@ -1355,6 +1365,7 @@ public class SyncResponse {
         if(directiveElement != null) {
             ecafeEnvelopeElement.appendChild(directiveElement.toElement(document));
         }
+
 
         bodyElement.appendChild(ecafeEnvelopeElement);
         dataElement.appendChild(bodyElement);

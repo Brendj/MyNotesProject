@@ -23,7 +23,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
 import ru.axetta.ecafe.processor.core.sync.*;
-import ru.axetta.ecafe.processor.core.sync.handlers.client.request.ClientRequests;
+import ru.axetta.ecafe.processor.core.sync.request.ClientRequests;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardRequestProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoleProcessor;
@@ -35,10 +35,10 @@ import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTem
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardOperationProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
+import ru.axetta.ecafe.processor.core.sync.process.ClientGuardianDataProcessor;
 import ru.axetta.ecafe.processor.core.sync.request.AccRegistryUpdateRequest;
-import ru.axetta.ecafe.processor.core.sync.response.DirectiveElement;
-import ru.axetta.ecafe.processor.core.sync.response.GoodsBasicBasketData;
-import ru.axetta.ecafe.processor.core.sync.response.QuestionaryData;
+import ru.axetta.ecafe.processor.core.sync.request.ClientGuardianRequest;
+import ru.axetta.ecafe.processor.core.sync.response.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -48,6 +48,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrTokenizer;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.*;
+import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -609,6 +610,8 @@ public class Processor implements SyncProcessor,
         GoodsBasicBasketData goodsBasicBasketData = null;
         DirectiveElement directiveElement = null;
         List<Long> errorClientIds = new ArrayList<Long>();
+        ClientGuardianResponse clientGuardianResponse = null;
+        ClientGuardianData clientGuardianData = null;
 
         boolean bError = false;
 
@@ -642,6 +645,15 @@ public class Processor implements SyncProcessor,
             String message = String.format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg());
             createSyncHistory(request.getIdOfOrg(),syncHistory, message);
             logger.error(message, e);
+        }
+
+        ClientGuardianRequest clientGuardianRequest = request.getClientGuardianRequest();
+        if(clientGuardianRequest!=null){
+            final List<ClientGuardianResponseElement> clientGuardianResponseElement
+                    = clientGuardianRequest.getClientGuardianResponseElement();
+            if(clientGuardianResponseElement !=null) {
+                clientGuardianResponse = processClientGuardian(clientGuardianResponseElement, request.getIdOfOrg(),syncHistory);
+            }
         }
 
         // Process OrgStructure
@@ -748,6 +760,11 @@ public class Processor implements SyncProcessor,
                 ClientRequests clientRequests = request.getClientRequests();
                 if(clientRequests.getResponseTempCardOperation()) {
                     tempCardOperationData = processClientRequestsOperations(request.getIdOfOrg());
+                }
+                final Long responseClientGuardian = clientRequests.getResponseClientGuardian();
+                if(responseClientGuardian!=null) {
+                    clientGuardianData = processClientGuardianData(request.getIdOfOrg(),
+                            syncHistory, responseClientGuardian);
                 }
             }
         } catch (Exception e) {
@@ -862,7 +879,7 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement);
+                directiveElement, clientGuardianResponse, clientGuardianData);
     }
 
     /* Do process short synchronization for update Client parameters */
@@ -891,9 +908,8 @@ public class Processor implements SyncProcessor,
         DirectiveElement directiveElement = null;
         AccRegistryUpdateRequest accRegistryUpdateRequest = null;
         List<Long> errorClientIds = new ArrayList<Long>();
-
-
-
+        ClientGuardianResponse clientGuardianResponse = null;
+        ClientGuardianData clientGuardianData = null;
 
         // Build AccRegistryUpdateRequest
         try {
@@ -958,7 +974,7 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement);
+                directiveElement, clientGuardianResponse, clientGuardianData);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -986,6 +1002,8 @@ public class Processor implements SyncProcessor,
         GoodsBasicBasketData goodsBasicBasketData = null;
         DirectiveElement directiveElement = null;
         AccRegistryUpdateRequest accRegistryUpdateRequest = null;
+        ClientGuardianResponse clientGuardianResponse = null;
+        ClientGuardianData clientGuardianData = null;
 
         // Build AccRegistryUpdateRequest
         try {
@@ -1033,7 +1051,7 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement);
+                directiveElement, clientGuardianResponse, clientGuardianData);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -1060,6 +1078,8 @@ public class Processor implements SyncProcessor,
         GoodsBasicBasketData goodsBasicBasketData = null;
         DirectiveElement directiveElement = null;
         List<Long> errorClientIds = new ArrayList<Long>();
+        ClientGuardianResponse clientGuardianResponse = null;
+        ClientGuardianData clientGuardianData = null;
 
         boolean bError = false;
 
@@ -1140,7 +1160,7 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement);
+                directiveElement, clientGuardianResponse, clientGuardianData);
     }
 
     private void createSyncHistory(long idOfOrg, SyncHistory syncHistory, String s) {
@@ -1257,8 +1277,8 @@ public class Processor implements SyncProcessor,
         return resPaymentRegistry;
     }
 
-    private static Purchase findPurchase(Payment Payment, Long idOfOrderDetail) throws Exception {
-        Iterator<Purchase> purchases = Payment.getPurchases().iterator();
+    private static Purchase findPurchase(Payment payment, Long idOfOrderDetail) throws Exception {
+        Iterator<Purchase> purchases = payment.getPurchases().iterator();
         while (purchases.hasNext()) {
             Purchase Purchase = purchases.next();
             if (idOfOrderDetail.equals(Purchase.getIdOfOrderDetail())) {
@@ -1268,12 +1288,12 @@ public class Processor implements SyncProcessor,
         return null;
     }
 
-    private static void updateOrderDetails(Session session, Order order, Payment Payment)
+    private static void updateOrderDetails(Session session, Order order, Payment payment)
             throws Exception {
         Set<OrderDetail> orderDetails = order.getOrderDetails();
         for (OrderDetail orderDetail : orderDetails) {
             if (StringUtils.isEmpty(orderDetail.getRootMenu())) {
-                Purchase Purchase = findPurchase(Payment,
+                Purchase Purchase = findPurchase(payment,
                         orderDetail.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
                 if (null != Purchase) {
                     String rootMenu = Purchase.getRootMenu();
@@ -1338,6 +1358,97 @@ public class Processor implements SyncProcessor,
             HibernateUtils.close(persistenceSession, logger);
         }
         return tempCardOperationData;
+    }
+
+    private ClientGuardianData processClientGuardianData(Long idOfOrg,SyncHistory syncHistory, Long maxVersion){
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ClientGuardianData clientGuardianData = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            //persistenceSession = RuntimeContext.reportsSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            ClientGuardianDataProcessor processor = new ClientGuardianDataProcessor(persistenceSession, idOfOrg, maxVersion);
+            clientGuardianData = processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception ex) {
+            String message = String.format("Load Client Guardian to database error, IdOfOrg == %s :",idOfOrg);
+            logger.error(message, ex);
+            clientGuardianData = new ClientGuardianData(new ResultOperation(100, ex.getMessage()));
+            createSyncHistory(idOfOrg, syncHistory, message);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return clientGuardianData;
+    }
+
+    private ClientGuardianResponse processClientGuardian(List<ClientGuardianResponseElement> items, Long idOfOrg, SyncHistory syncHistory){
+
+        ClientGuardianResponse clientGuardianResponse = new ClientGuardianResponse();
+        for (ClientGuardianResponseElement item: items){
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            ClientGuardian clientGuardian = item.createNewClientGuardian();
+            if(item.getDeleteState()==0){
+                try {
+                    persistenceSession = persistenceSessionFactory.openSession();
+                    //persistenceSession = RuntimeContext.reportsSessionFactory.openSession();
+                    persistenceTransaction = persistenceSession.beginTransaction();
+
+                    Criteria criteria = persistenceSession.createCriteria(ClientGuardian.class);
+                    criteria.add(Example.create(clientGuardian));
+                    ClientGuardian dbClientGuardian = (ClientGuardian) criteria.uniqueResult();
+                    if(dbClientGuardian==null){
+                        clientGuardian = (ClientGuardian) persistenceSession.merge(clientGuardian);
+                    }
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
+                    final String resultMessage = (dbClientGuardian==null?null:"Client guardian exist");
+                    clientGuardianResponse.addItem(clientGuardian, 0, resultMessage);
+                } catch (Exception ex) {
+                    String message = String.format(
+                            "Save Client Guardian to database error, idOfChildren == %s, idOfGuardian == %s",
+                            clientGuardian.getIdOfChildren(), clientGuardian.getIdOfGuardian());
+                    logger.error(message, ex);
+                    clientGuardianResponse.addItem(clientGuardian, 100, ex.getMessage());
+                    createSyncHistory(idOfOrg, syncHistory, message);
+                } finally {
+                    HibernateUtils.rollback(persistenceTransaction, logger);
+                    HibernateUtils.close(persistenceSession, logger);
+                }
+            } else {
+                try {
+                    persistenceSession = persistenceSessionFactory.openSession();
+                    //persistenceSession = RuntimeContext.reportsSessionFactory.openSession();
+                    persistenceTransaction = persistenceSession.beginTransaction();
+
+                    Criteria criteria = persistenceSession.createCriteria(ClientGuardian.class);
+                    criteria.add(Example.create(clientGuardian));
+                    ClientGuardian dbClientGuardian = (ClientGuardian) criteria.uniqueResult();
+                    if(dbClientGuardian!=null){
+                        persistenceSession.delete(dbClientGuardian);
+                    }
+
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
+                    final String resultMessage = (dbClientGuardian==null?"Client guardian is removed":null);
+                    clientGuardianResponse.addItem(item, 0, resultMessage);
+                } catch (Exception ex) {
+                    String message = String.format(
+                            "Delete Client Guardian to database error, idOfChildren == %s, idOfGuardian == %s",
+                            clientGuardian.getIdOfChildren(), clientGuardian.getIdOfGuardian());
+                    logger.error(message, ex);
+                    clientGuardianResponse.addItem(clientGuardian, 100, ex.getMessage());
+                    createSyncHistory(idOfOrg, syncHistory, message);
+                } finally {
+                    HibernateUtils.rollback(persistenceTransaction, logger);
+                    HibernateUtils.close(persistenceSession, logger);
+                }
+            }
+        }
+        return clientGuardianResponse;
     }
 
     private ComplexRoles processComplexRoles() throws Exception {
@@ -1536,40 +1647,38 @@ public class Processor implements SyncProcessor,
             long totalPurchaseDiscount = 0;
             long totalPurchaseRSum = 0;
             // Register order details (purchase)
-            Iterator<Purchase> purchases = payment.getPurchases().iterator();
-            while (purchases.hasNext()) {
-                Purchase Purchase = purchases.next();
+            for (Purchase purchase : payment.getPurchases()) {
                 if (null != DAOUtils.findOrderDetail(persistenceSession,
-                        new CompositeIdOfOrderDetail(idOfOrg, Purchase.getIdOfOrderDetail()))) {
+                        new CompositeIdOfOrderDetail(idOfOrg, purchase.getIdOfOrderDetail()))) {
                     return new ResPaymentRegistryItem(payment.getIdOfOrder(), 120, String.format(
                             "Order detail is already registered, IdOfOrg == %s, IdOfOrder == %s, IdOfOrderDetail == %s",
-                            idOfOrg, payment.getIdOfOrder(), Purchase.getIdOfOrderDetail()));
+                            idOfOrg, payment.getIdOfOrder(), purchase.getIdOfOrderDetail()));
                 }
-                if (Purchase.getDiscount() < 0 || Purchase.getrPrice() < 0 || Purchase.getQty() < 0) {
+                if (purchase.getDiscount() < 0 || purchase.getrPrice() < 0 /*|| purchase.getQty() < 0*/) {
                     return new ResPaymentRegistryItem(payment.getIdOfOrder(), 250, String.format(
-                            "Negative sum(s) or quantitiy are specified, IdOfOrg == %s, IdOfOrder == %s, IdOfPurchase == %s",
-                            idOfOrg, payment.getIdOfOrder(), Purchase.getQty()));
+                            "Negative Discount or rPrice are specified, IdOfOrg == %s, IdOfOrder == %s, Discount == %s, Discount == %s",
+                            idOfOrg, payment.getIdOfOrder(), purchase.getDiscount(), purchase.getrPrice()));
                 }
                 OrderDetail orderDetail = new OrderDetail(
-                        new CompositeIdOfOrderDetail(idOfOrg, Purchase.getIdOfOrderDetail()), payment.getIdOfOrder(),
-                        Purchase.getQty(), Purchase.getDiscount(), Purchase.getSocDiscount(), Purchase.getrPrice(),
-                        Purchase.getName(), Purchase.getRootMenu(), Purchase.getMenuGroup(), Purchase.getMenuOrigin(),
-                        Purchase.getMenuOutput(), Purchase.getType());
-                if (Purchase.getItemCode() != null) {
-                    orderDetail.setItemCode(Purchase.getItemCode());
+                        new CompositeIdOfOrderDetail(idOfOrg, purchase.getIdOfOrderDetail()), payment.getIdOfOrder(),
+                        purchase.getQty(), purchase.getDiscount(), purchase.getSocDiscount(), purchase.getrPrice(),
+                        purchase.getName(), purchase.getRootMenu(), purchase.getMenuGroup(), purchase.getMenuOrigin(),
+                        purchase.getMenuOutput(), purchase.getType());
+                if (purchase.getItemCode() != null) {
+                    orderDetail.setItemCode(purchase.getItemCode());
                 }
-                if ( Purchase.getIdOfRule() != null) {
-                    orderDetail.setIdOfRule(Purchase.getIdOfRule());
+                if (purchase.getIdOfRule() != null) {
+                    orderDetail.setIdOfRule(purchase.getIdOfRule());
                 }
-                if (Purchase.getGuidOfGoods() != null) {
-                    Good good = DAOUtils.findGoodByGuid(persistenceSession, Purchase.getGuidOfGoods());
+                if (purchase.getGuidOfGoods() != null) {
+                    Good good = DAOUtils.findGoodByGuid(persistenceSession, purchase.getGuidOfGoods());
                     if (good != null) {
                         orderDetail.setGood(good);
                     }
                 }
                 persistenceSession.save(orderDetail);
-                totalPurchaseDiscount += Purchase.getDiscount() * Purchase.getQty();
-                totalPurchaseRSum += Purchase.getrPrice() * Purchase.getQty();
+                totalPurchaseDiscount += purchase.getDiscount() * Math.abs(purchase.getQty());
+                totalPurchaseRSum += purchase.getrPrice() * Math.abs(purchase.getQty());
             }
             // Check payment sums
             if (totalPurchaseRSum != payment.getRSum() || totalPurchaseDiscount != payment.getSocDiscount() + payment
@@ -1591,7 +1700,7 @@ public class Processor implements SyncProcessor,
 
             // !!!!! ОПОВЕЩЕНИЕ ПО СМС !!!!!!!!
             /* в случее если ананимного зака мы не знаем клиента */
-            if(client!=null){
+            if(client!=null && !payment.getOrderType().equals(OrderTypeEnumType.CORRECTION_TYPE)){
                 RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                         .sendNotificationAsync(client, EventNotificationService.MESSAGE_PAYMENT,
                                 generatePaymentNotificationParams(persistenceSession, client, payment));
@@ -2736,11 +2845,15 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                                     EventNotificationService.NOTIFICATION_ENTER_EVENT, values);
                         } else {
                             List<Client> clients = findGuardiansByClient(persistenceSession, idOfClient, guardianId);
-                            for (Client cl: clients){
-                                notificationService.sendNotificationAsync(cl,
+                            if(!(clients==null || clients.isEmpty())){
+                                for (Client cl: clients){
+                                    notificationService.sendNotificationAsync(cl,
+                                            EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values);
+                                }
+                            } else {
+                                notificationService.sendNotificationAsync(client,
                                         EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values);
                             }
-
                         }
                     }
 
@@ -3186,11 +3299,11 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
         long others = 0L;
         Iterator<Purchase> purchases = payment.getPurchases().iterator();
         while (purchases.hasNext()) {
-            Purchase Purchase = purchases.next();
-            if (Purchase.getType() >= OrderDetail.TYPE_COMPLEX_MIN && Purchase.getType() <= OrderDetail.TYPE_COMPLEX_MAX) {
-                complexes += Purchase.getSocDiscount() + Purchase.getrPrice();
+            Purchase purchase = purchases.next();
+            if (purchase.getType() >= OrderDetail.TYPE_COMPLEX_MIN && purchase.getType() <= OrderDetail.TYPE_COMPLEX_MAX) {
+                complexes += purchase.getSocDiscount() + purchase.getrPrice();
             } else {
-                others += Purchase.getSocDiscount() + Purchase.getrPrice();
+                others += purchase.getSocDiscount() + purchase.getrPrice();
             }
         }
 

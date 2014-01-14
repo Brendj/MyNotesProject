@@ -8,8 +8,8 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.sync.handlers.client.request.ClientRequestBuilder;
-import ru.axetta.ecafe.processor.core.sync.handlers.client.request.ClientRequests;
+import ru.axetta.ecafe.processor.core.sync.request.ClientRequestBuilder;
+import ru.axetta.ecafe.processor.core.sync.request.ClientRequests;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistryBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperationBuilder;
@@ -17,6 +17,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCa
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.request.AccRegistryUpdateRequest;
 import ru.axetta.ecafe.processor.core.sync.request.AccRegistryUpdateRequestBuilder;
+import ru.axetta.ecafe.processor.core.sync.request.ClientGuardianBuilder;
+import ru.axetta.ecafe.processor.core.sync.request.ClientGuardianRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -1430,8 +1432,8 @@ public class SyncRequest {
                 }
 
                 public Item build(Node itemNode, LoadContext loadContext) throws Exception {
+                    NamedNodeMap namedNodeMap = itemNode.getAttributes();
 
-NamedNodeMap namedNodeMap = itemNode.getAttributes();
                     Date date = loadContext.dateOnlyFormat.parse(namedNodeMap.getNamedItem("Value").getTextContent());
                     ////// process ML items (menu list)
                     List<ReqMenuDetail> reqMenuDetails = new LinkedList<ReqMenuDetail>();
@@ -2111,7 +2113,8 @@ NamedNodeMap namedNodeMap = itemNode.getAttributes();
         private final TempCardsOperationBuilder tempCardsOperationBuilder;
         private Manager manager;
         private final ClientRequestBuilder clientRequestBuilder;
-        private final AccRegistryUpdateRequestBuilder accRegistryUpdateRequestBuilder = new AccRegistryUpdateRequestBuilder();
+        private final AccRegistryUpdateRequestBuilder accRegistryUpdateRequestBuilder;
+        private final ClientGuardianBuilder clientGuardianBuilder;
 
         public Builder() {
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
@@ -2134,6 +2137,8 @@ NamedNodeMap namedNodeMap = itemNode.getAttributes();
             this.enterEventsBuilder = new EnterEvents.Builder();
             this.tempCardsOperationBuilder = new TempCardsOperationBuilder();
             this.clientRequestBuilder = new ClientRequestBuilder();
+            this.accRegistryUpdateRequestBuilder = new AccRegistryUpdateRequestBuilder();
+            this.clientGuardianBuilder = new ClientGuardianBuilder();
         }
 
         public static Node findEnvelopeNode(Document document) throws Exception {
@@ -2269,11 +2274,22 @@ NamedNodeMap namedNodeMap = itemNode.getAttributes();
                 tempCardsOperations = tempCardsOperationBuilder.build(tempCardsOperationsNode, org.getIdOfOrg());
             }
 
-            ClientRequests clientRequests = null;
-            Node clientRequestsNode = findFirstChildElement(envelopeNode, "ClientRequests");
-            if (clientRequestsNode != null) {
-                clientRequests = clientRequestBuilder.build(clientRequestsNode);
-            }
+            //ClientRequests clientRequests = null;
+            //Node clientRequestsNode = findFirstChildElement(envelopeNode, "ClientRequests");
+            //if (clientRequestsNode != null) {
+            //    clientRequests = clientRequestBuilder.build(clientRequestsNode);
+            //}
+
+            //Node clientGuardianRequestParseRequestNode = findFirstChildElement(envelopeNode, "ClientGuardianRequest");
+            //if (clientGuardianRequestParseRequestNode != null) {
+            //    accRegistryUpdateRequest=accRegistryUpdateRequestBuilder.build(accRegistryUpdateRequestParseRequestNode);
+            //}
+
+            clientRequestBuilder.createMainNode(envelopeNode);
+            ClientRequests clientRequests = clientRequestBuilder.build();
+
+            clientGuardianBuilder.createMainNode(envelopeNode);
+            ClientGuardianRequest clientGuardianRequest = clientGuardianBuilder.build();
 
             /*  Модуль распределенной синхронизации объектов */
             Node roNode = findFirstChildElement(envelopeNode, "RO");
@@ -2296,7 +2312,8 @@ NamedNodeMap namedNodeMap = itemNode.getAttributes();
 
             return new SyncRequest(remoteAddr, version, syncType , clientVersion, org, syncTime, idOfPacket, paymentRegistry, accIncRegistryRequest,
                     clientParamRegistry, clientRegistryRequest, orgStructure, menuGroups, reqMenu, reqDiary, message,
-                    enterEvents, tempCardsOperations, clientRequests, manager, accRegistryUpdateRequest);
+                    enterEvents, tempCardsOperations, clientRequests, manager, accRegistryUpdateRequest,
+                    clientGuardianRequest);
         }
 
 
@@ -2328,13 +2345,14 @@ NamedNodeMap namedNodeMap = itemNode.getAttributes();
     private final ClientRequests clientRequests;
     private final Manager manager;
     private final AccRegistryUpdateRequest accRegistryUpdateRequest;
+    private final ClientGuardianRequest clientGuardianRequest;
 
     public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket,
             PaymentRegistry paymentRegistry, AccIncRegistryRequest accIncRegistryRequest, ClientParamRegistry clientParamRegistry,
             ClientRegistryRequest clientRegistryRequest, OrgStructure orgStructure, MenuGroups menuGroups, ReqMenu reqMenu, ReqDiary reqDiary, String message,
             EnterEvents enterEvents,
             TempCardsOperations tempCardsOperations, ClientRequests clientRequests, Manager manager,
-            AccRegistryUpdateRequest accRegistryUpdateRequest) {
+            AccRegistryUpdateRequest accRegistryUpdateRequest, ClientGuardianRequest clientGuardianRequest) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.syncType = syncType;
@@ -2343,6 +2361,7 @@ NamedNodeMap namedNodeMap = itemNode.getAttributes();
         this.clientRequests = clientRequests;
         this.manager = manager;
         this.accRegistryUpdateRequest = accRegistryUpdateRequest;
+        this.clientGuardianRequest = clientGuardianRequest;
         this.idOfOrg = org.getIdOfOrg();
         this.org = org;
         this.syncTime = syncTime;
@@ -2437,6 +2456,10 @@ NamedNodeMap namedNodeMap = itemNode.getAttributes();
 
     public AccRegistryUpdateRequest getAccRegistryUpdateRequest() {
         return accRegistryUpdateRequest;
+    }
+
+    public ClientGuardianRequest getClientGuardianRequest() {
+        return clientGuardianRequest;
     }
 
     @Override
