@@ -69,6 +69,13 @@ public class CycleDiagram extends DistributedObject{
         projectionList.add(Projections.property("friday"), "friday");
         projectionList.add(Projections.property("saturday"), "saturday");
         projectionList.add(Projections.property("sunday"), "sunday");
+        projectionList.add(Projections.property("mondayPrice"), "mondayPrice");
+        projectionList.add(Projections.property("wednesdayPrice"), "wednesdayPrice");
+        projectionList.add(Projections.property("tuesdayPrice"), "tuesdayPrice");
+        projectionList.add(Projections.property("thursdayPrice"), "thursdayPrice");
+        projectionList.add(Projections.property("fridayPrice"), "fridayPrice");
+        projectionList.add(Projections.property("saturdayPrice"), "saturdayPrice");
+        projectionList.add(Projections.property("sundayPrice"), "sundayPrice");
         criteria.setProjection(projectionList);
     }
 
