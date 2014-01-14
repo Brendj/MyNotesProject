@@ -807,13 +807,14 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         allowRemoveGroup = false;
         selectedClientGroup = null;
         HtmlTree tree = (HtmlTree) event.getComponent();
-        Client selectedClient = (Client) tree.getRowData();
         if (tree.isLeaf()) {
             isLeafSelected = true;
+            Client selectedClient = (Client) tree.getRowData();
             RuntimeContext.getAppContext().getBean(ClientListEditPage.class).selectClient(selectedClient);
         } else {
             isLeafSelected = false;
-            RuntimeContext.getAppContext().getBean(ClientListEditPage.class).groupSelected(selectedClient.toString());
+            String selectedClient = (String) tree.getRowData();
+            RuntimeContext.getAppContext().getBean(ClientListEditPage.class).groupSelected(selectedClient);
         }
     }
 
