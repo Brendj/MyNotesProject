@@ -187,6 +187,11 @@ public class ContragentPaymentReportPage extends OnlineReportPage
             props.setProperty(ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID,
                     "" + contragentReceiverFilter.getContragent().getIdOfContragent());
         }
+        if (contragentFilter.getContragent() != null &&
+                contragentFilter.getContragent().getIdOfContragent() != null) {
+            props.setProperty(ContragentPaymentReport.PARAM_CONTRAGENT_PAYER_ID,
+                    "" + contragentFilter.getContragent().getIdOfContragent());
+        }
         return props;
     }
 }
