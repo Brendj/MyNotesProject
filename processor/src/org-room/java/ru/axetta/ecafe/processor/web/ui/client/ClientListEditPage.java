@@ -96,6 +96,82 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
      * ****************************************************************************************************************
      */
     @Transactional
+    public void loadClientsForGroup(List<String> groups) {
+        Session session = null;
+        try {
+            session = (Session) entityManager.getDelegate();
+            loadClientsForGroup(session, groups);
+        } catch (Exception e) {
+            logger.error("Failed to load client by name", e);
+            sendError("Произошел критический сбой, пожалуйста, повторите попытку позже");
+        } finally {
+            //HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void loadClientsForGroup(Session session, List<String> groups) throws Exception {
+        if (groups == null || groups.size() < 1) {
+            return;
+        }
+
+        StringBuilder groupsRestrict = new StringBuilder();
+        String noGroup = "";
+        for (String group : groups) {
+            if (group.equals(NO_GROUP)) {
+                noGroup = "cf_clients.idofclientgroup is null";
+            } else {
+                if (groupsRestrict.length() > 0) {
+                    groupsRestrict.append(", ");
+                }
+                groupsRestrict.append("'").append(group).append("'");
+            }
+        }
+        String groupsClause = " and (" + (groupsRestrict.length() > 0 ? "cf_clientgroups.groupname in (" + groupsRestrict + ")" : "") +
+                                         (noGroup.length() > 0 ? (groupsRestrict.length() > 0 ? " or " : " ") + noGroup : "") + ") ";
+        
+        List<Client> clients = new ArrayList<Client>();
+        Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
+        String sql =
+                "select idofclient, firstname, secondname, surname, groupname, cf_persons.idofperson, cf_clients.idofclientgroup "
+                + "from cf_clients "
+                + "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "
+                + "left join cf_clientgroups on cf_clients.idoforg=cf_clientgroups.idoforg and cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup "
+                + "where cf_clients.idoforg=:idoforg " + groupsClause + " "
+                + "order by groupname, surname, firstname, secondname";
+        org.hibernate.Query q = session.createSQLQuery(sql);
+        q.setLong("idoforg", org.getIdOfOrg());
+        List resultList = q.list();
+        String prevGroupName = "";
+        for (Object entry : resultList) {
+            Object o[] = (Object[]) entry;
+            Long idOfClient = HibernateUtils.getDbLong(o[0]);
+            String firstName = HibernateUtils.getDbString(o[1]);
+            String secondName = HibernateUtils.getDbString(o[2]);
+            String surname = HibernateUtils.getDbString(o[3]);
+            String groupName = HibernateUtils.getDbString(o[4]);
+            Long idOfPerson = HibernateUtils.getDbLong(o[5]);
+            Long idOfClientGroup = HibernateUtils.getDbLong(o[6]);
+
+            if (!groupName.equals(prevGroupName)) {
+                if (clients != null) {
+                    dbTree.put(prevGroupName, clients);
+                }
+                clients = new ArrayList<Client>();
+                prevGroupName = groupName;
+            }
+
+            Client i = new Client(idOfClient, firstName, secondName, surname, idOfPerson);
+            clients.add(i);
+        }
+        if (clients != null) {
+            dbTree.put(prevGroupName, clients);
+        }
+
+        buildGroupsTree(clients);
+    }
+
+
+    @Transactional
     public void fill(boolean reset) {
         Session session = null;
         try {
@@ -118,8 +194,38 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         selectedClientGroup = null;
 
 
+        /* Загрузка учителей */
+        teachers = new ArrayList<Client>();
+        Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
+        String sql =
+                "select idofclient, firstname, secondname, surname, groupname, cf_persons.idofperson, cf_clients.idofclientgroup "
+                        + "from cf_clients " + "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "
+                        + "left join cf_clientgroups on cf_clients.idoforg=cf_clientgroups.idoforg and cf_clients.idofclientgroup=cf_clientgroups.idofclientgroup "
+                        + "where cf_clients.idoforg=:idoforg and cf_clients.idofclientgroup=" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " "
+                        + "order by groupname, surname, firstname, secondname";
+        org.hibernate.Query q = session.createSQLQuery(sql);
+        q.setLong("idoforg", org.getIdOfOrg());
+        List resultList = q.list();
+        for (Object entry : resultList) {
+            Object o[] = (Object[]) entry;
+            Long idOfClient = HibernateUtils.getDbLong(o[0]);
+            String firstName = HibernateUtils.getDbString(o[1]);
+            String secondName = HibernateUtils.getDbString(o[2]);
+            String surname = HibernateUtils.getDbString(o[3]);
+            String groupName = HibernateUtils.getDbString(o[4]);
+            Long idOfPerson = HibernateUtils.getDbLong(o[5]);
+            Long idOfClientGroup = HibernateUtils.getDbLong(o[6]);
+
+            Client i = new Client(idOfClient, firstName, secondName, surname, idOfPerson);
+            teachers.add(i);
+        }
+
+        dbTree = new TreeMap<String, List<Client>>();
+
+
+
         //  Добавления в SQL
-        String lookupClientByNameClause = "";
+        /*String lookupClientByNameClause = "";
         if (lookupClientName != null && lookupClientName.length() > 0) {
             String look = lookupClientName.trim().toLowerCase().replaceAll("  ", " ");
             lookupClientByNameClause =
@@ -132,7 +238,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         }
 
         //  Загружаем данные и записываем их в map
-        dbTree = new TreeMap<String, List<Client>>();
+
         teachers = new ArrayList<Client>();
         Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
         String sql =
@@ -174,10 +280,10 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         }
         if (clients != null) {
             dbTree.put(prevGroupName, clients);
-        }
+        }*/
 
         loadGroups(session);
-        buildGroupsTree(clients);
+        buildGroupsTree(Collections.EMPTY_LIST);
     }
 
     @Transactional
@@ -256,6 +362,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
             selectedClient.setFirstName(firstName);
             selectedClient.setSecondName(secondName);
             selectedClient.setSurname(surname);
+            selectedClient.setDefaultClientGroup(groupName);
             selectedClient.setClientGroup(groupName);
             selectedClient.setContractId(contractId);
             selectedClient.setAddress(address);
@@ -321,7 +428,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         q.setLong("idofclient", selectedClient.getIdOfClient());
         List resultList = q.list();
         for (Object entry : resultList) {
-            selectedClient.getDiscounts().put(((BigInteger)entry).longValue(), Boolean.TRUE);
+            selectedClient.getDiscounts().put(((BigInteger) entry).longValue(), Boolean.TRUE);
         }
     }
 
@@ -437,7 +544,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
     public void loadGroups(Session session) {
         Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
         groups = DAOServices.getInstance().loadGroups(session, org.getIdOfOrg());
-        Collections.sort(groups, new ClientComparator ());
+        Collections.sort(groups, new ClientComparator());
         groups.add(0, "");
     }
 
@@ -504,9 +611,9 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
      */
     public void buildGroupsTree(List<Client> clients) {
         //  Полученные данные сохраняем в дерево
-        if (dbTree.isEmpty()) {
+        /*if (dbTree.isEmpty()) {
             return;
-        }
+        }*/
         tree = new TreeNodeImpl();
         int groupCounter = 0;
         for (String k : groups) {
@@ -688,6 +795,14 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         this.lookupClientName = lookupClientName;
     }
 
+    public void doClientsNodeExpand(org.richfaces.event.NodeExpandedEvent event) {
+        HtmlTree tree = (HtmlTree) event.getComponent();
+        String group = (String) tree.getRowData();
+        List<String> groups = new ArrayList<String>();
+        groups.add(group);
+        RuntimeContext.getAppContext().getBean(ClientListEditPage.class).loadClientsForGroup(groups);
+    }
+
     public void doSelectClient(NodeSelectedEvent event) {
         allowRemoveGroup = false;
         selectedClientGroup = null;
@@ -703,7 +818,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
     }
 
     public void doLookupClient() {
-        RuntimeContext.getAppContext().getBean(ClientListEditPage.class).fill(true);
+        //RuntimeContext.getAppContext().getBean(ClientListEditPage.class).fill(true);
     }
 
     public void doResetLookupClient() {
@@ -713,7 +828,11 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
 
     public void doApplyChanges() {
         RuntimeContext.getAppContext().getBean(ClientListEditPage.class).applyChanges();
-        RuntimeContext.getAppContext().getBean(ClientListEditPage.class).fill(false);
+        List<String> groups = new ArrayList<String>();
+        groups.add(selectedClient.getClientGroup());
+        groups.add(selectedClient.getDefaultClientGroup());
+        RuntimeContext.getAppContext().getBean(ClientListEditPage.class).loadClientsForGroup(groups);
+        //RuntimeContext.getAppContext().getBean(ClientListEditPage.class).fill(false);
         RuntimeContext.getAppContext().getBean(ClientListEditPage.class).loadSelectedClientData();
     }
 
@@ -979,6 +1098,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         private List<MigrationHistory> migrations;
         private String discountMode;
         private Map<Long, Boolean> discounts;
+        private String defaultClientGroup;
 
 
         public SelectedClient() {
@@ -1000,6 +1120,14 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
             secondName = client.getSecondName();
             surname = client.getSurname();
             idOfPerson = client.getIdOfPerson();
+        }
+
+        public String getDefaultClientGroup() {
+            return defaultClientGroup;
+        }
+
+        public void setDefaultClientGroup(String defaultClientGroup) {
+            this.defaultClientGroup = defaultClientGroup;
         }
 
         public String getClientGroup() {
@@ -1161,7 +1289,7 @@ public class ClientListEditPage extends BasicWorkspacePage implements GroupCreat
         public String getClientSuperGroupDiscount () {
             try {
                 int i = Integer.parseInt(clientGroup.replaceAll("[^0-9]", ""));
-                if (i < 4) {
+                if (i < 5) {
                     return "Младшие классы";
                 } else if (i > 3 && i < 10) {
                     return "Средние классы";

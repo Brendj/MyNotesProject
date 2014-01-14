@@ -102,16 +102,16 @@ public class DAOServices {
         return categories;
     }
 
-    public Map<Long, String> loadGoodsGroups(Session session) {
-        Map <Long, String> groups = new HashMap <Long, String> ();
+    public List<String []> loadGoodsGroups(Session session) {
+        List<String[]> groups = new ArrayList <String[]> ();
         org.hibernate.Query q = session.createSQLQuery("select idofgoodsgroup, nameofgoodsgroup "
-                                                    + "from cf_goods_groups");
+                                                    + "from cf_goods_groups order by nameofgoodsgroup");
         List resultList = q.list();
         for (Object entry : resultList) {
             Object o[] = (Object[]) entry;
             Long idofcategorydiscount = HibernateUtils.getDbLong(o[0]);
             String name = HibernateUtils.getDbString(o[1]);
-            groups.put(idofcategorydiscount, name);
+            groups.add(new String[] { "" + idofcategorydiscount, name});
         }
         return groups;
     }

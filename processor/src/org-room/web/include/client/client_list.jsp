@@ -67,7 +67,10 @@
 
             <rich:panel id="clientTree" style="width:300px; height: 550px; overflow:auto;">
                 <rich:tree style="width:285px; height: 500px" nodeSelectListener="#{clientListEditPage.doSelectClient}"
-                           reRender="editPanels, clientCardPanel, mesasges_panel, manageClientGroup" ajaxSubmitSelection="true" switchType="client" binding="#{clientListEditPage.treeComponent}"
+                           changeExpandListener="#{clientListEditPage.doClientsNodeExpand}"
+                           ajaxSubmitSelection="true"
+                           reRender="editPanels, clientCardPanel, mesasges_panel, manageClientGroup"
+                           switchType="ajax" binding="#{clientListEditPage.treeComponent}" status="clientLookupStatus"
                            value="#{clientListEditPage.tree}" var="item" ajaxKeys="#{null}">
                     <rich:treeNode>
                         <h:outputText value="#{item}" styleClass="output-text-mod" />
