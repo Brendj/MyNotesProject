@@ -1607,4 +1607,21 @@ public class DAOService {
         q.setLong("idoforg", org.getIdOfOrg());
         return ((BigInteger) q.uniqueResult()).longValue();
     }
+
+
+    public long getComplexPrice(long idoforg, int complex) {
+        Session session = (Session) entityManager.getDelegate();
+        org.hibernate.Query q = session.createSQLQuery(
+                "select currentprice, max(menudate) "
+                + "from cf_complexinfo "
+                + "where idoforg=:idoforg and idofcomplex=:complex "
+                + "group by currentprice");
+        q.setLong("idoforg", idoforg);
+        q.setInteger("complex", complex);
+        Object res [] = ((Object[]) q.uniqueResult());
+        if (res[0] == null) {
+            return 0L;
+        }
+        return ((BigInteger) res[0]).longValue();
+    }
 }

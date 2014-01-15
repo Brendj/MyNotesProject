@@ -9,10 +9,7 @@ package ru.axetta.ecafe.processor.web.ui.feed;
 //import generated.payments.processing.PosPayment;
 
 import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
-import generated.pos.POSPaymentController;
-import generated.pos.POSPaymentControllerWSService;
-import generated.pos.Payment;
-import generated.pos.PosPayment;
+import generated.pos.*;
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
@@ -46,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.faces.event.ValueChangeEvent;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import java.math.BigDecimal;
@@ -438,54 +436,75 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
 
     public Map<Client, String> saveOrders(Session session) {
         Map <Client, String> result = new HashMap<Client, String>();
-        boolean hasError = false;
         Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);
         POSPaymentController service = createController(logger);
+        if (service == null) {
+            for (Client client : clients) {
+                if (client.getActionType() != PAY_CLIENT || client.getSaved()) {
+                    continue;
+                }
+                result.put(client, "Не удалось осуществить оплату: Не удалось подключиться к веб-службе");
+            }
+            return result;
+        }
         List<PosPayment> payments = new ArrayList<PosPayment>();
         for (Client client : clients) {
             if (client.getActionType() != PAY_CLIENT || client.getSaved()) {
-                continue;
-            }
-            //  Ошибка, для теста
-            if(!hasError) {
-                result.put(client, "Не удалось добавить заказ, здесь указывается причина ошибки");
-                hasError = true;
                 continue;
             }
             //  Вызов веб-службы и добавление заказа
             client.getIdofrule();
 
 
-            DiscountRule rule;
+            XMLGregorianCalendar paymentDate = getPaymentDate();
             PosPayment payment = new PosPayment();
-            /*payment.setCardNo();
+            payment.setSocDiscount(DAOService.getInstance().getComplexPrice(org.getIdOfOrg(), client.getComplex()));
             payment.setComments("- Оплачено из ТК -");
-            payment.setSocDiscount();
             payment.setIdOfClient(client.getIdofclient());
-            payment.setTime(time);
-            payment.setOrderDate();*/
+            payment.setTime(paymentDate);
+            payment.setOrderDate(paymentDate);
+            payments.clear();
             payments.add(payment);
 
 
-
-            Random rand = new Random();
-            long idoforder = rand.nextLong();
-            org.hibernate.Query query = session.createSQLQuery(
-                    "update cf_temporary_orders set idoforder=:idoforder, modificationdate=:date "
-                            + "where idofclient=:idofclient and idofcomplex=:idofcomplex and plandate=:plandate");
-            query.setLong("idofclient", client.getIdofclient());
-            query.setInteger("idofcomplex", client.getComplex());
-            query.setLong("plandate", planDate.getTimeInMillis());
-            query.setLong("date", System.currentTimeMillis());
-            query.setLong("idoforder", idoforder);
-            query.executeUpdate();
-            client.setIdoforder(idoforder);
-            result.put(client, "Заказ успешно составлен");
+            PosResPaymentRegistry res = service.createOrder(org.getIdOfOrg(), payments);
+            PosResPaymentRegistryItemList resList = res.getProhibitionsList();
+            for (PosResPaymentRegistryItem item : resList.getI()) {
+                if (item.getResult() == 0) {
+                    org.hibernate.Query query = session.createSQLQuery(
+                            "update cf_temporary_orders set idoforder=:idoforder, modificationdate=:date "
+                                    + "where idofclient=:idofclient and idofcomplex=:idofcomplex and plandate=:plandate");
+                    query.setLong("idofclient", client.getIdofclient());
+                    query.setInteger("idofcomplex", client.getComplex());
+                    query.setLong("plandate", planDate.getTimeInMillis());
+                    query.setLong("date", System.currentTimeMillis());
+                    query.setLong("idoforder", item.getIdOfOrder());
+                    query.executeUpdate();
+                    client.setIdoforder(item.getIdOfOrder());
+                    result.put(client, "Заказ успешно составлен");
+                } else {
+                    result.put(client, "Не удалось осуществить оплату: " + item.getError());
+                }
+            }
         }
-        service.createOrder(org.getIdOfOrg(), payments);
+
+
+
+
         return result;
     }
 
+    protected XMLGregorianCalendar getPaymentDate() {
+        try {
+            GregorianCalendar calendar = new GregorianCalendar();
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            XMLGregorianCalendar xmlCalendar = DatatypeFactory.newInstance()
+                    .newXMLGregorianCalendar(calendar);
+            return xmlCalendar;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     public static POSPaymentController createController(Logger logger) {
         POSPaymentController controller = null;
