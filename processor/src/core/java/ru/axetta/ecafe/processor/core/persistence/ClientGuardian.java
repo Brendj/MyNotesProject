@@ -13,6 +13,7 @@ public class ClientGuardian {
     private Long version;
     private Long idOfChildren;
     private Long idOfGuardian;
+    private Integer guardianType;
 
     protected ClientGuardian() {}
 
@@ -53,4 +54,11 @@ public class ClientGuardian {
         this.idOfGuardian = idOfGuardian;
     }
 
+    public Integer getGuardianType() {
+        return guardianType;
+    }
+
+    public void setGuardianType(Integer guardianType) {
+        this.guardianType = guardianType;
+    }
 }

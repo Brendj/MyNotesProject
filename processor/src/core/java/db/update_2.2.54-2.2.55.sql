@@ -10,6 +10,7 @@ CREATE TABLE cf_client_guardian
   Version bigint NOT NULL,
   IdOfChildren bigint NOT NULL,
   IdOfGuardian bigint NOT NULL,
+  GuardianType integer DEFAULT 0,
   CONSTRAINT cf_client_guardian_pk PRIMARY KEY (IdOfClientGuardian),
   CONSTRAINT cf_client_guardian_children_fk FOREIGN KEY (IdOfChildren)
   REFERENCES cf_clients (IdOfClient),
