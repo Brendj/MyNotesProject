@@ -116,10 +116,15 @@ public class Instance extends LibraryDistributedObject {
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(distributedObject.getOrgOwner());
         setFund(((Instance) distributedObject).getFund());
+        setGuidFund(((Instance) distributedObject).getGuidFund());
         setPublication(((Instance) distributedObject).getPublication());
+        setGuidPublication(((Instance) distributedObject).getGuidPublication());
         setInventoryBook(((Instance) distributedObject).getInventoryBook());
+        setGuidInventaryBook(((Instance) distributedObject).getGuidInventaryBook());
         setKsu1Record(((Instance) distributedObject).getKsu1Record());
+        setGuidKsu1Record(((Instance) distributedObject).getGuidKsu1Record());
         setKsu2Record(((Instance) distributedObject).getKsu2Record());
+        setGuidKsu2Record(((Instance) distributedObject).getGuidKsu2Record());
         setInGroup(((Instance) distributedObject).isInGroup());
         setInvNumber(((Instance)distributedObject).getInvNumber());
         setCost(((Instance) distributedObject).getCost());
@@ -195,5 +200,46 @@ public class Instance extends LibraryDistributedObject {
 
     public void setIssuableInternal(Set<Issuable> issuableInternal) {
         this.issuableInternal = issuableInternal;
+    }
+
+
+    public String getGuidPublication() {
+        return guidPublication;
+    }
+
+    public void setGuidPublication(String guidPublication) {
+        this.guidPublication = guidPublication;
+    }
+
+    public String getGuidFund() {
+        return guidFund;
+    }
+
+    public void setGuidFund(String guidFund) {
+        this.guidFund = guidFund;
+    }
+
+    public String getGuidInventaryBook() {
+        return guidInventaryBook;
+    }
+
+    public void setGuidInventaryBook(String guidInventaryBook) {
+        this.guidInventaryBook = guidInventaryBook;
+    }
+
+    public String getGuidKsu1Record() {
+        return guidKsu1Record;
+    }
+
+    public void setGuidKsu1Record(String guidKsu1Record) {
+        this.guidKsu1Record = guidKsu1Record;
+    }
+
+    public String getGuidKsu2Record() {
+        return guidKsu2Record;
+    }
+
+    public void setGuidKsu2Record(String guidKsu2Record) {
+        this.guidKsu2Record = guidKsu2Record;
     }
 }
