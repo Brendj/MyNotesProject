@@ -207,7 +207,7 @@ public class Contragent {
     }
 
     public void setRequestNotifyMailList(String requestNotifyEmailAddress) {
-        if(StringUtils.isNotEmpty(requestNotifyEmailAddress)){
+        if(StringUtils.trimToNull(requestNotifyEmailAddress)!=null){
             this.requestNotifyMailList = requestNotifyEmailAddress.trim();
         } else {
             this.requestNotifyMailList = requestNotifyEmailAddress;
