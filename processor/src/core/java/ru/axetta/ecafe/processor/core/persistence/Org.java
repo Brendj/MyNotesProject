@@ -95,6 +95,7 @@ public class Org {
     private Set<ClientMigration> clientMigration = new HashSet<ClientMigration>();
     private Boolean fullSyncParam;
     private Boolean commodityAccounting;
+
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
     //private OrganizationType type;
 
@@ -105,6 +106,57 @@ public class Org {
     //public void setType(OrganizationType type) {
     //    this.type = type;
     //}
+
+    public Org(String shortName, String officialName, String address, Person officialPerson, String officialPosition,
+            String contractId, Date contractTime, int state, long cardLimit, String publicKey, Long priceOfSms,
+            Long subscriptionPrice, Contragent defaultSupplier, String INN, String OGRN, String mailingListReportsOnNutrition,
+            String mailingListReportsOnVisits, String mailingListReports1, String mailingListReports2) throws Exception {
+        this.shortName = shortName;
+        this.officialName = officialName;
+        this.address = address;
+        this.officialPerson = officialPerson;
+        this.officialPosition = officialPosition;
+        this.contractId = contractId;
+        this.contractTime = contractTime;
+        this.state = state;
+        this.cardLimit = cardLimit;
+        this.publicKey = publicKey;
+        this.idOfPacket = 0L;
+        this.lastClientContractId = 0L;
+        this.priceOfSms = priceOfSms;
+        this.subscriptionPrice = subscriptionPrice;
+        this.defaultSupplier = defaultSupplier;
+        this.OGRN=OGRN;
+        this.INN=INN;
+        this.mailingListReportsOnNutrition = mailingListReportsOnNutrition;
+        this.mailingListReportsOnVisits = mailingListReportsOnVisits;
+        this.mailingListReports1 = mailingListReports1;
+        this.mailingListReports2 = mailingListReports2;
+        this.fullSyncParam=false;
+        this.commodityAccounting=false;
+        //this.type = type;
+    }
+
+    static Pattern patterNumber = Pattern.compile("\\d+");
+    public String getOrgNumberInName() {
+        return extractOrgNumberFromName(shortName);
+    }
+    public static String extractOrgNumberFromName(String name) {
+        Matcher m = patterNumber.matcher(name);
+        if (m.find()) {
+            return m.group();
+        }
+        return "";
+    }
+
+    private static String encryptPassword(String plainPassword) throws NoSuchAlgorithmException, IOException {
+        MessageDigest hash = MessageDigest.getInstance("SHA1");
+        ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(plainPassword.getBytes());
+        DigestInputStream digestInputStream = new DigestInputStream(arrayInputStream, hash);
+        ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+        IOUtils.copy(digestInputStream, arrayOutputStream);
+        return new String(Base64.encodeBase64(arrayOutputStream.toByteArray()), CharEncoding.US_ASCII);
+    }
 
     public Boolean getCommodityAccounting() {
         return commodityAccounting;
@@ -234,36 +286,6 @@ public class Org {
     private String mailingListReports1;
     private String mailingListReports2;
     * */
-
-    public Org(String shortName, String officialName, String address, Person officialPerson, String officialPosition,
-            String contractId, Date contractTime, int state, long cardLimit, String publicKey, Long priceOfSms,
-            Long subscriptionPrice, Contragent defaultSupplier, String INN, String ORGN, String mailingListReportsOnNutrition,
-            String mailingListReportsOnVisits, String mailingListReports1, String mailingListReports2) throws Exception {
-        this.shortName = shortName;
-        this.officialName = officialName;
-        this.address = address;
-        this.officialPerson = officialPerson;
-        this.officialPosition = officialPosition;
-        this.contractId = contractId;
-        this.contractTime = contractTime;
-        this.state = state;
-        this.cardLimit = cardLimit;
-        this.publicKey = publicKey;
-        this.idOfPacket = 0L;
-        this.lastClientContractId = 0L;
-        this.priceOfSms = priceOfSms;
-        this.subscriptionPrice = subscriptionPrice;
-        this.defaultSupplier = defaultSupplier;
-        this.OGRN=ORGN;
-        this.INN=INN;
-        this.mailingListReportsOnNutrition = mailingListReportsOnNutrition;
-        this.mailingListReportsOnVisits = mailingListReportsOnVisits;
-        this.mailingListReports1 = mailingListReports1;
-        this.mailingListReports2 = mailingListReports2;
-        this.fullSyncParam=false;
-        this.commodityAccounting=false;
-        //this.type = type;
-    }
 
     public Long getIdOfOrg() {
         return idOfOrg;
@@ -692,19 +714,6 @@ public class Org {
         this.guid = guid;
     }
 
-
-    static Pattern patterNumber = Pattern.compile("\\d+");
-    public String getOrgNumberInName() {
-        return extractOrgNumberFromName(shortName);
-    }
-    public static String extractOrgNumberFromName(String name) {
-        Matcher m = patterNumber.matcher(name); 
-        if (m.find()) {
-           return m.group();
-        }
-        return "";
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -734,12 +743,4 @@ public class Org {
                 + subscriptionPrice + ", defaultSupplier=" + defaultSupplier +'}';
     }
 
-    private static String encryptPassword(String plainPassword) throws NoSuchAlgorithmException, IOException {
-        MessageDigest hash = MessageDigest.getInstance("SHA1");
-        ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(plainPassword.getBytes());
-        DigestInputStream digestInputStream = new DigestInputStream(arrayInputStream, hash);
-        ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
-        IOUtils.copy(digestInputStream, arrayOutputStream);
-        return new String(Base64.encodeBase64(arrayOutputStream.toByteArray()), CharEncoding.US_ASCII);
-    }
 }
