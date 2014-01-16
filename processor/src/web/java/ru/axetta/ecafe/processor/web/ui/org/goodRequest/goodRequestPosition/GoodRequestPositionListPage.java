@@ -4,9 +4,12 @@
 
 package ru.axetta.ecafe.processor.web.ui.org.goodRequest.goodRequestPosition;
 
+import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestRepository;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +24,14 @@ import java.util.List;
 public class GoodRequestPositionListPage extends BasicWorkspacePage {
 
     private List<GoodRequestPosition> goodRequestPositionList;
-    private Long idOfGoodRequest;
+    //private Long idOfGoodRequest;
+    private GoodRequest goodRequest;
 
-    @PersistenceContext(unitName = "processorPU")
-    private EntityManager entityManager;
+    //@PersistenceContext(unitName = "processorPU")
+    //private EntityManager entityManager;
+
+    @Autowired
+    private GoodRequestRepository goodRequestRepository;
 
     @Override
     public void onShow() {}
@@ -35,12 +42,16 @@ public class GoodRequestPositionListPage extends BasicWorkspacePage {
         return null;
     }
 
-    @Transactional
+    //@Transactional
     public void reload() throws Exception {
-        String where = "idofgoodsrequest=" + idOfGoodRequest;
-        where = (where.equals("")?"":" where ") + where;
-        TypedQuery<GoodRequestPosition> query = entityManager.createQuery("from GoodRequestPosition " + where, GoodRequestPosition.class);
-        goodRequestPositionList = query.getResultList();
+        if(goodRequest!=null){
+            goodRequestPositionList = goodRequestRepository.getGoodRequestPositionByGoodRequest(goodRequest);
+        }
+
+        //String where = "idofgoodsrequest=" + idOfGoodRequest;
+        //where = (where.equals("")?"":" where ") + where;
+        //TypedQuery<GoodRequestPosition> query = entityManager.createQuery("from GoodRequestPosition " + where, GoodRequestPosition.class);
+        //goodRequestPositionList = query.getResultList();
     }
 
     public String getPageTitle() {
@@ -63,12 +74,19 @@ public class GoodRequestPositionListPage extends BasicWorkspacePage {
         this.goodRequestPositionList = goodRequestPositionList;
     }
 
-    public Long getIdOfGoodRequest() {
-        return idOfGoodRequest;
+    //public Long getIdOfGoodRequest() {
+    //    return idOfGoodRequest;
+    //}
+    //
+    //public void setIdOfGoodRequest(Long idOfGoodRequest) {
+    //    this.idOfGoodRequest = idOfGoodRequest;
+    //}
+
+    public GoodRequest getGoodRequest() {
+        return goodRequest;
     }
 
-    public void setIdOfGoodRequest(Long idOfGoodRequest) {
-        this.idOfGoodRequest = idOfGoodRequest;
+    public void setGoodRequest(GoodRequest goodRequest) {
+        this.goodRequest = goodRequest;
     }
-
 }
