@@ -45,6 +45,9 @@ public class EnterEventItem {
     protected Integer direction;
     @XmlAttribute(name = "TemporaryCard")
     protected Integer temporaryCard;
+    @XmlAttribute(name = "GuardianSan")
+    protected String guardianSan;
+
 
     /**
      * Gets the value of the dateTime property.
@@ -166,4 +169,11 @@ public class EnterEventItem {
         this.temporaryCard = value;
     }
 
+    public String getGuardianSan() {
+        return guardianSan;
+    }
+
+    public void setGuardianSan(String guardianSan) {
+        this.guardianSan = guardianSan;
+    }
 }

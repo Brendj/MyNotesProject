@@ -401,6 +401,10 @@ public class DAOService {
         return DAOUtils.findClientByContractId(entityManager, contractId);
     }
 
+    public List<Client> findClientsBySan(String san) {
+        return DAOUtils.findClientsBySan(entityManager, san);
+    }
+
 
     public void addIntegraPartnerAccessPermissionToClient(Long idOfClient, String idOfIntegraPartner) throws Exception {
         Client cl = entityManager.find(Client.class, idOfClient);

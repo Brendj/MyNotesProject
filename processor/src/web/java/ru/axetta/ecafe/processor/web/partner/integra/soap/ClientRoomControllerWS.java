@@ -175,6 +175,59 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public Result transferBalance(@WebParam(name = "contractId") String san,
+            @WebParam(name = "fromSub") Integer fromSub, @WebParam(name = "toSub") Integer toSub,
+            @WebParam(name = "amount") Long amount) {
+
+        authenticateRequest(null);
+
+        Result r = new Result();
+        r.resultCode = RC_OK;
+        r.description = RC_OK_DESC;
+        Boolean enableSubBalanceOperation = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_SUB_BALANCE_OPERATION);
+        if(enableSubBalanceOperation){
+            List<Client> clients = new ArrayList<Client>();
+            final DAOService instance = DAOService.getInstance();
+            try {
+                clients = instance.findClientsBySan(san);
+            } catch (Exception e) {
+                logger.error("INTERNAL ERROR", e);
+                r.resultCode = RC_INTERNAL_ERROR;
+                r.description = RC_INTERNAL_ERROR_DESC;
+                return r;
+            }
+            if(clients.size()>1){
+                r.resultCode = RC_SEVERAL_CLIENTS_WERE_FOUND;
+                r.description = RC_SEVERAL_CLIENTS_WERE_FOUND_DESC;
+                return r;
+            }
+            if (clients.isEmpty() || clients.get(0)==null) {
+                r.resultCode = RC_CLIENT_NOT_FOUND;
+                r.description = RC_CLIENT_NOT_FOUND_DESC;
+                return r;
+            }
+            Client client = clients.get(0);
+            try {
+                FinancialOpsManager financialOpsManager = RuntimeContext.getAppContext().getBean(FinancialOpsManager.class);
+                financialOpsManager.createSubAccountTransfer(client, fromSub, toSub, amount);
+            } catch (FinancialOpsManager.AccountTransactionException ate){
+                r.resultCode = RC_CLIENT_FINANCIAL_OPERATION_ERROR;
+                r.description = ate.getMessage();
+                logger.error("Failed to process client room controller request", ate);
+            } catch (Exception e) {
+                r.resultCode = RC_INTERNAL_ERROR;
+                r.description = RC_INTERNAL_ERROR_DESC;
+                logger.error("Failed to process client room controller request", e);
+            }
+        } else {
+            r.resultCode = RC_CLIENT_FINANCIAL_OPERATION_ERROR;
+            r.description = RC_DO_NOT_ACCESS_TO_SUB_BALANCE_DESC;
+        }
+
+        return r;
+    }
+
+    @Override
     public ListOfComplaintBookEntriesResult getListOfComplaintBookEntriesByOrg(Long orgId) {
         return getListOfComplaintBookEntriesByCriteria(orgId, null);
     }
@@ -1689,6 +1742,25 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return purchaseListResult;
     }
 
+    @Override
+    public PurchaseListResult getPurchaseSubscriptionFeedingList(String san, final Date startDate, final Date endDate) {
+        authenticateRequest(null);
+
+        Data data = new ClientRequest()
+                .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
+                    public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
+                            Transaction transaction) throws Exception {
+                        processPurchaseList(client, data, objectFactory, session, endDate, startDate, OrderTypeEnumType.SUBSCRIPTION_FEEDING);
+                    }
+                });
+
+        PurchaseListResult purchaseListResult = new PurchaseListResult();
+        purchaseListResult.purchaseList = data.getPurchaseListExt();
+        purchaseListResult.resultCode = data.getResultCode();
+        purchaseListResult.description = data.getDescription();
+        return purchaseListResult;
+    }
+
     private void processPurchaseList(Client client, Data data, ObjectFactory objectFactory, Session session,
             Date endDate, Date startDate, OrderTypeEnumType orderType) throws DatatypeConfigurationException {
         int nRecs = 0;
@@ -1774,6 +1846,26 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     public void process(Client client, Integer subBalanceNum,  Data data, ObjectFactory objectFactory, Session session,
                             Transaction transaction) throws Exception {
                         processPaymentList(client, subBalanceNum, data, objectFactory, session, endDate, startDate);
+                    }
+                });
+
+        PaymentListResult paymentListResult = new PaymentListResult();
+        paymentListResult.paymentList = data.getPaymentList();
+        paymentListResult.resultCode = data.getResultCode();
+        paymentListResult.description = data.getDescription();
+
+        return paymentListResult;
+    }
+
+    @Override
+    public PaymentListResult getPaymentSubscriptionFeedingList(String san, final Date startDate, final Date endDate) {
+        authenticateRequest(null);
+
+        Data data = new ClientRequest()
+                .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
+                    public void process(Client client, Integer subBalanceNum,  Data data, ObjectFactory objectFactory, Session session,
+                            Transaction transaction) throws Exception {
+                        processPaymentList(client, 1, data, objectFactory, session, endDate, startDate);
                     }
                 });
 
@@ -2187,7 +2279,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     private void processEnterEventList(Client client, Data data, ObjectFactory objectFactory, Session session,
-            Date endDate, Date startDate, boolean byGuardian) throws DatatypeConfigurationException {
+            Date endDate, Date startDate, boolean byGuardian) throws Exception {
         Date nextToEndDate = DateUtils.addDays(endDate, 1);
         Criteria enterEventCriteria = session.createCriteria(EnterEvent.class);
         enterEventCriteria.add(byGuardian ? Restrictions.eq("guardianId", client.getIdOfClient())
@@ -2213,6 +2305,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             enterEventItem.setEnterName(enterEvent.getEnterName());
             enterEventItem.setDirection(enterEvent.getPassDirection());
             enterEventItem.setTemporaryCard(enterEvent.getIdOfTempCard() != null ? 1 : 0);
+            final Long guardianId = enterEvent.getGuardianId();
+            if(guardianId !=null){
+                //Client guardian = DAOUtils.findClient(session, guardianId);
+                //enterEventItem.setGuardianSan(guardian.getSan());
+                enterEventItem.setGuardianSan(DAOUtils.extractSanFromClient(session, guardianId));
+            }
             enterEventList.getE().add(enterEventItem);
         }
         data.setEnterEventList(enterEventList);

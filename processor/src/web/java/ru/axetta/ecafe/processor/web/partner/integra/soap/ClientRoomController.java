@@ -47,10 +47,14 @@ public interface ClientRoomController {
     PurchaseListResult getPurchaseList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getPurchaseListBySan")
     PurchaseListResult getPurchaseList(@WebParam(name="san") String san, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
+    @WebMethod (operationName = "getPurchaseSubscriptionFeedingListBySan")
+    PurchaseListResult getPurchaseSubscriptionFeedingList(@WebParam(name="san") String san, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getPaymentList")
     PaymentListResult getPaymentList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
     @WebMethod (operationName = "getPaymentListBySan")
     PaymentListResult getPaymentList(@WebParam(name="san") String san, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
+    @WebMethod (operationName = "getPaymenteSubscriptionFeedingListBySan")
+    PaymentListResult getPaymentSubscriptionFeedingList(@WebParam(name="san") String san, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate") Date endDate);
 
     @WebMethod(operationName="getClientSmsList")
     ClientSmsListResult getClientSmsList(@WebParam(name="contractId") Long contractId, @WebParam(name="startDate") Date startDate, @WebParam(name="endDate")Date endDate);
@@ -206,6 +210,10 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "transferBalance")
     Result transferBalance(@WebParam(name = "contractId") Long contractId, @WebParam(name = "fromSub") Integer fromSub,
+            @WebParam(name = "toSub") Integer toSub, @WebParam(name = "amount") Long amount);
+
+    @WebMethod(operationName = "transferBalanceBySan")
+    Result transferBalance(@WebParam(name = "san") String san, @WebParam(name = "fromSub") Integer fromSub,
             @WebParam(name = "toSub") Integer toSub, @WebParam(name = "amount") Long amount);
 
     @WebMethod(operationName = "createSubscriptionFeeding")

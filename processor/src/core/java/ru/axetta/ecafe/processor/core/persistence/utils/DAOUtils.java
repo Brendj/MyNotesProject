@@ -97,12 +97,6 @@ public class DAOUtils {
         return clientList;
     }
 
-    public static GoodsBasicBasket findBasicGood(Session persistenceSession, String guidOfBasicGood) {
-        Criteria criteria = persistenceSession.createCriteria(GoodsBasicBasket.class);
-        criteria.add(Restrictions.eq("guid",guidOfBasicGood));
-        return (GoodsBasicBasket) criteria.uniqueResult();
-    }
-
     public static Client getClientReference(Session persistenceSession, long idOfClient) throws Exception {
         return (Client) persistenceSession.load(Client.class, idOfClient);
     }
@@ -113,6 +107,13 @@ public class DAOUtils {
         contractCriteria.add(Restrictions.eq("contractId", contractId));
         List<Client> resultList = (List<Client>) contractCriteria.list();
         return resultList.isEmpty() ? null : resultList.get(0);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<Client> findClientBySan(Session persistenceSession, String san) {
+        Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+        clientCriteria.add(Restrictions.ilike("san", san, MatchMode.EXACT));
+        return clientCriteria.list();
     }
 
     public static Client findClientByGuid(EntityManager em, String guid) {
@@ -143,6 +144,23 @@ public class DAOUtils {
         return (List<Client>) query.list();
     }
 
+    public static boolean wasSuspendedLastSubscriptionFeedingByClient(Session session, long idOfClient){
+        Query query = session.createQuery("from SubscriptionFeeding where idOfClient=:idOfClient and dateDeactivateService>=:currentDate order by dateDeactivateService desc");
+        query.setParameter("idOfClient", idOfClient);
+        query.setParameter("currentDate", new Date());
+        query.setMaxResults(1);
+        SubscriptionFeeding subscriptionFeeding = (SubscriptionFeeding) query.uniqueResult();
+        if(subscriptionFeeding==null) return false;
+        return subscriptionFeeding.getWasSuspended();
+    }
+
+    public static String extractSanFromClient(Session session, long idOfClient){
+        Criteria criteria = session.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("idOfClient", idOfClient));
+        criteria.setProjection(Projections.property("san"));
+        return (String) criteria.uniqueResult();
+    }
+
     @SuppressWarnings("unchecked")
     public static List<Long> findActiveClientsId(Session session, List<Org> orgList) {
         //Query query = session.createQuery(
@@ -163,21 +181,34 @@ public class DAOUtils {
         return activeClientCriteria.list();
     }
 
+    public static Client findClientByCardNo(EntityManager em, long cardNo) throws Exception {
+        javax.persistence.Query q = em.createQuery("from Card where cardNo=:cardNo");
+        q.setParameter("cardNo", cardNo);
+        List l = q.getResultList();
+        if (l.size()==0) return null;
+        return ((Card)l.get(0)).getClient();
+    }
+
+    public static Client findClientByContractId(EntityManager em, long cardNo) {
+        return findClientByContractId(em.unwrap(Session.class), cardNo);
+    }
+
+    public static List<Client> findClientsBySan(EntityManager em, String san) {
+        return findClientBySan(em.unwrap(Session.class), san);
+    }
+
+
+
+    public static GoodsBasicBasket findBasicGood(Session persistenceSession, String guidOfBasicGood) {
+        Criteria criteria = persistenceSession.createCriteria(GoodsBasicBasket.class);
+        criteria.add(Restrictions.eq("guid",guidOfBasicGood));
+        return (GoodsBasicBasket) criteria.uniqueResult();
+    }
+
     public static List<String> getRegions(Session session) {
         Query q = session.createSQLQuery("select distinct district from cf_orgs where trim(both ' ' from district)<>''");
         return (List<String>) q.list();
     }
-
-    public static boolean wasSuspendedLastSubscriptionFeedingByClient(Session session, long idOfClient){
-        Query query = session.createQuery("from SubscriptionFeeding where idOfClient=:idOfClient and dateDeactivateService>=:currentDate order by dateDeactivateService desc");
-        query.setParameter("idOfClient", idOfClient);
-        query.setParameter("currentDate", new Date());
-        query.setMaxResults(1);
-        SubscriptionFeeding subscriptionFeeding = (SubscriptionFeeding) query.uniqueResult();
-        if(subscriptionFeeding==null) return false;
-        return subscriptionFeeding.getWasSuspended();
-    }
-
 
     public static Org findOrg(Session persistenceSession, long idOfOrg) throws Exception {
         return (Org) persistenceSession.get(Org.class, idOfOrg);
@@ -221,18 +252,6 @@ public class DAOUtils {
         Criteria criteria = persistenceSession.createCriteria(CardTemp.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));
         return (CardTemp) criteria.uniqueResult();
-    }
-
-    public static Client findClientByCardNo(EntityManager em, long cardNo) throws Exception {
-        javax.persistence.Query q = em.createQuery("from Card where cardNo=:cardNo");
-        q.setParameter("cardNo", cardNo);
-        List l = q.getResultList();
-        if (l.size()==0) return null;
-        return ((Card)l.get(0)).getClient();
-    }
-
-    public static Client findClientByContractId(EntityManager em, long cardNo) {
-        return findClientByContractId(em.unwrap(Session.class), cardNo);
     }
 
     public static User findUser(Session persistenceSession, long idOfUser) throws Exception {
