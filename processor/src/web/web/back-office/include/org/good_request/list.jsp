@@ -68,7 +68,8 @@
                 </f:facet>
                 <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{goodRequest.globalId}"
                                  action="#{goodRequestPositionListPage.onSearch}" styleClass="command-link">
-                    <f:setPropertyActionListener value="#{goodRequest.globalId}" target="#{goodRequestPositionListPage.idOfGoodRequest}" />
+                    <%--<f:setPropertyActionListener value="#{goodRequest.globalId}" target="#{goodRequestPositionListPage.idOfGoodRequest}" />--%>
+                    <f:setPropertyActionListener value="#{goodRequest}" target="#{goodRequestPositionListPage.goodRequest}" />
                 </a4j:commandLink>
             </rich:column>
             <rich:column  headerClass="column-header">
@@ -77,7 +78,8 @@
                 </f:facet>
                 <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{goodRequest.number}"
                                  action="#{goodRequestPositionListPage.onSearch}" styleClass="command-link">
-                    <f:setPropertyActionListener value="#{goodRequest.globalId}" target="#{goodRequestPositionListPage.idOfGoodRequest}" />
+                    <%--<f:setPropertyActionListener value="#{goodRequest.globalId}" target="#{goodRequestPositionListPage.idOfGoodRequest}" />--%>
+                    <f:setPropertyActionListener value="#{goodRequest}" target="#{goodRequestPositionListPage.goodRequest}" />
                 </a4j:commandLink>
             </rich:column>
             <rich:column headerClass="column-header" sortBy="#{goodRequest.doneDate}">
