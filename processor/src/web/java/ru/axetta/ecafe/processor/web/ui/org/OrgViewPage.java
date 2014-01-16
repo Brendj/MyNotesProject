@@ -310,7 +310,6 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.mailingListReports1 = org.getMailingListReports1();
         this.mailingListReports2 = org.getMailingListReports2();
 
-
     }
 
 

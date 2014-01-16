@@ -87,31 +87,6 @@ public class OrgEditPage extends BasicWorkspacePage
     private List<Long> friendlyIdOfOrgList = new ArrayList<Long>();
     private String filterFriendlyOrgs = "Не выбрано";
 
-    public static class ContragentItem {
-        private final Long idOfContragent;
-
-        private final String contragentName;
-
-        public ContragentItem(Contragent contragent) {
-            this.idOfContragent = contragent.getIdOfContragent();
-            this.contragentName = contragent.getContragentName();
-        }
-
-        public ContragentItem() {
-            this.idOfContragent = null;
-            this.contragentName = null;
-        }
-
-        public Long getIdOfContragent() {
-            return idOfContragent;
-        }
-        public String getContragentName() {
-            return contragentName;
-        }
-
-
-    }
-
     public void fill(Session session, Long idOfOrg) throws Exception {
         Org org = (Org) session.load(Org.class, idOfOrg);
         fill(org);
@@ -733,5 +708,28 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public OrganizationTypeMenu getOrganizationTypeMenu() {
         return organizationTypeMenu;
+    }
+
+    public static class ContragentItem {
+        private final Long idOfContragent;
+
+        private final String contragentName;
+
+        public ContragentItem(Contragent contragent) {
+            this.idOfContragent = contragent.getIdOfContragent();
+            this.contragentName = contragent.getContragentName();
+        }
+
+        public ContragentItem() {
+            this.idOfContragent = null;
+            this.contragentName = null;
+        }
+
+        public Long getIdOfContragent() {
+            return idOfContragent;
+        }
+        public String getContragentName() {
+            return contragentName;
+        }
     }
 }

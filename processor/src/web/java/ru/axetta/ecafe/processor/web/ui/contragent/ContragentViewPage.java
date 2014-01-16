@@ -132,7 +132,7 @@ public class ContragentViewPage extends BasicWorkspacePage {
         this.requestNotifyMailList = requestNotifyMailList;
     }
 
-    public Object getRequestNotifyMailList() {
+    public String getRequestNotifyMailList() {
         return requestNotifyMailList;
     }
 
