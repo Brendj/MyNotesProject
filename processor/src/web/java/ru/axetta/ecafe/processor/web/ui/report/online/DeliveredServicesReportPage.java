@@ -96,14 +96,13 @@ public class DeliveredServicesReportPage extends OnlineReportPage
 
     public void showCSVList(ActionEvent actionEvent){
         FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
             AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
             String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + DeliveredServicesReport.class.getSimpleName() + ".jasper";
             DeliveredServicesReport.Builder builder = new DeliveredServicesReport.Builder(templateFilename);
-            Session session = RuntimeContext.getInstance().createPersistenceSession();
+            Session session = RuntimeContext.getInstance().createReportPersistenceSession();
             DeliveredServicesReport deliveredServicesReport = builder.build(session,startDate, endDate, localCalendar,contragentFilter.getContragent().getIdOfContragent(),
                     contractFilter.getContract().getIdOfContract());
 
@@ -135,7 +134,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage
         } catch (Exception e) {
             getLogger().error("Failed to build sales report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", e.getMessage()));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, getLogger());
             HibernateUtils.close(persistenceSession, getLogger());
@@ -146,10 +145,10 @@ public class DeliveredServicesReportPage extends OnlineReportPage
         DeliveredServicesReport.Builder reportBuilder = new DeliveredServicesReport.Builder();
         if (idOfOrg != null) {
             Org org = null;
-            if (idOfOrg != null && idOfOrg > -1) {
+            if (idOfOrg > -1) {
                 org = DAOService.getInstance().findOrById(idOfOrg);
+                reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
             }
-            reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
         }
         this.deliveredServices = reportBuilder.build(session, startDate, endDate, localCalendar,
                                                     contragentFilter.getContragent().getIdOfContragent(),
