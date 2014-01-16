@@ -13,7 +13,6 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.Sta
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SubscriberFeedingSettingSettingValue;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
@@ -189,19 +188,6 @@ public class SubscriptionFeedingService {
 
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    // Возвращает циклограмму питания, созданную позже всех.
-    public CycleDiagram findLastCycleDiagram(Long contractId) {
-        Session session = entityManager.unwrap(Session.class);
-        Client c = DAOUtils.findClientByContractId(session, contractId);
-        DetachedCriteria subQuery = DetachedCriteria.forClass(CycleDiagram.class).add(Restrictions.eq("client", c))
-                .add(Restrictions.in("stateDiagram", new Object[]{StateDiagram.WAIT, StateDiagram.ACTIVE}))
-                .add(Restrictions.eq("deletedState", false)).setProjection(Projections.max("globalId"));
-        Criteria criteria = session.createCriteria(CycleDiagram.class).add(Subqueries.propertyEq("globalId", subQuery));
-        return (CycleDiagram) criteria.uniqueResult();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     // Возвращает циклограмму, действующую в определенный день.
     public CycleDiagram findCycleDiagramOnDate(Client client, Date date) {
         Date dateActivation = CalendarUtils.truncateToDayOfMonth(date);
@@ -253,7 +239,12 @@ public class SubscriptionFeedingService {
         sf.setOrgOwner(org.getIdOfOrg());
         sf.setIdOfClient(client.getIdOfClient());
         sf.setGuid(UUID.randomUUID().toString());
-        sf.setDateActivateService(CalendarUtils.addDays(dayBegin, 1 + parser.getDayForbidChange()));
+        Date dateActivateService = CalendarUtils.addDays(dayBegin, 1 + parser.getDayForbidChange());
+        // Если день активации выпадает на выходной - воскресенье, то берем понедельник.
+        if (!CalendarUtils.isWorkingDate(dateActivateService)) {
+            dateActivateService = CalendarUtils.addDays(dateActivateService, 1);
+        }
+        sf.setDateActivateService(dateActivateService);
         sf.setDeletedState(false);
         sf.setSendAll(SendToAssociatedOrgs.SendToSelf);
         sf.setWasSuspended(false);

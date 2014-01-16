@@ -98,6 +98,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_CLIENT_FINANCIAL_OPERATION_ERROR = 170L;
     private static final Long RC_SETTINGS_NOT_FOUND = 180L;
     private static final Long RC_SUBSCRIPTION_FEEDING_DUPLICATE = 190L;
+    private static final Long RC_LACK_OF_SUBBALANCE1 = 200L;
 
     private static final String RC_OK_DESC = "OK";
     private static final String RC_CLIENT_NOT_FOUND_DESC = "Клиент не найден";
@@ -109,6 +110,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_NO_CONTACT_DATA_DESC = "У лицевого счета нет контактных данных";
     private static final String RC_DO_NOT_ACCESS_TO_SUB_BALANCE_DESC = "Нет доступа к субсчетам";
     private static final String RC_SUBSCRIPTION_FEEDING_DUPLICATE_DESC = "У клиента уже есть активная подписка на АП.";
+    private static final String RC_LACK_OF_SUBBALANCE1_DESC = "У клиента недостаточно средств на субсчете АП";
 
     @Resource
     private WebServiceContext context;
@@ -3998,6 +4000,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 res.description = RC_SUBSCRIPTION_FEEDING_DUPLICATE_DESC;
                 return res;
             }
+            if (client.getSubBalance(1) <= 0) {
+                res.resultCode = RC_LACK_OF_SUBBALANCE1;
+                res.description = RC_LACK_OF_SUBBALANCE1_DESC;
+                return res;
+            }
             DAOService daoService = DAOService.getInstance();
             List<ECafeSettings> settings = daoService
                     .geteCafeSettingses(client.getOrg().getIdOfOrg(), SettingsIds.SubscriberFeeding, false);
@@ -4165,7 +4172,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) cafeSettings
                     .getSplitSettingValue();
             Date today = CalendarUtils.truncateToDayOfMonth(new Date());
-            Date activationDate = CalendarUtils.addDays(today, parser.getDayRequest());
+            Date activationDate = CalendarUtils.addDays(today, 1 + parser.getDayForbidChange());
+            // Если день активации выпадает на выходной - воскресенье, то берем понедельник.
+            if (!CalendarUtils.isWorkingDate(activationDate)) {
+                activationDate = CalendarUtils.addDays(activationDate, 1);
+            }
             SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
                     .getBean(SubscriptionFeedingService.class);
             CycleDiagram cd = sfService

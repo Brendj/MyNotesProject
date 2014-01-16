@@ -285,5 +285,10 @@ public class CalendarUtils {
         return df;
     }
 
+    public static boolean isWorkingDate(Date date) {
+        int day = getDayOfMonth(date);
+        return day != Calendar.SUNDAY;
+    }
+
     private CalendarUtils() {}
 }
