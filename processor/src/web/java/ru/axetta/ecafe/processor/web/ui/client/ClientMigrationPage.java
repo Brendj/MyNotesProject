@@ -4,8 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
-import ru.axetta.ecafe.processor.core.client.ClientMigrationItemInfo;
-import ru.axetta.ecafe.processor.core.client.ClientService;
+import ru.axetta.ecafe.processor.core.client.ClientStatsReporter;
+import ru.axetta.ecafe.processor.core.client.items.ClientMigrationItemInfo;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class ClientMigrationPage extends BasicWorkspacePage{
     private Long idOfClient;
     protected List<ClientMigrationItemInfo> clientMigrationItemInfoList;
     @Autowired
-    private ClientService clientService;
+    private ClientStatsReporter clientService;
 
     @Override
     public void onShow() throws Exception {

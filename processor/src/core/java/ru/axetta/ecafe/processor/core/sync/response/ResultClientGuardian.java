@@ -17,32 +17,32 @@ import java.util.List;
  * Time: 13:12
  * To change this template use File | Settings | File Templates.
  */
-public class ClientGuardianResponse extends AbstractToElement {
+public class ResultClientGuardian extends AbstractToElement {
 
-    private final List<ClientGuardianResponseElement> clientGuardianResponseItems;
+    private final List<ClientGuardianItem> clientGuardianResponseItems;
 
-    public ClientGuardianResponse() {
-        this.clientGuardianResponseItems = new LinkedList<ClientGuardianResponseElement>();
+    public ResultClientGuardian() {
+        this.clientGuardianResponseItems = new LinkedList<ClientGuardianItem>();
     }
 
     public void addItem(ClientGuardian clientGuardian, Integer resCode, String resultMessage) {
-        clientGuardianResponseItems.add(new ClientGuardianResponseElement(clientGuardian, resCode,resultMessage));
+        clientGuardianResponseItems.add(new ClientGuardianItem(clientGuardian, resCode,resultMessage));
     }
 
-    public void addItem(ClientGuardianResponseElement item, Integer resCode, String resultMessage) {
+    public void addItem(ClientGuardianItem item, Integer resCode, String resultMessage) {
         item.setResult(new ResultOperation(resCode, resultMessage));
         clientGuardianResponseItems.add(item);
     }
 
     public void addItem(ClientGuardian clientGuardian) {
-        final ClientGuardianResponseElement e = new ClientGuardianResponseElement(clientGuardian, 0, null);
+        final ClientGuardianItem e = new ClientGuardianItem(clientGuardian, 0, null);
         clientGuardianResponseItems.add(e);
     }
 
     @Override
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("ResClientGuardian");
-        for (ClientGuardianResponseElement item : this.clientGuardianResponseItems) {
+        for (ClientGuardianItem item : this.clientGuardianResponseItems) {
             element.appendChild(item.toElement(document, "RCG"));
         }
         return element;

@@ -4,7 +4,6 @@ import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
 import ru.axetta.ecafe.processor.core.sync.ResultOperation;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import org.hibernate.criterion.Example;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -16,7 +15,7 @@ import org.w3c.dom.Node;
  * Time: 14:47
  * To change this template use File | Settings | File Templates.
  */
-public class ClientGuardianResponseElement {
+public class ClientGuardianItem {
 
     private Long idOfGuardian;
     private Long idOfChildren;
@@ -24,7 +23,7 @@ public class ClientGuardianResponseElement {
     private Integer deleteState;
     private ResultOperation result;
 
-    public ClientGuardianResponseElement(ClientGuardian clientGuardian) {
+    public ClientGuardianItem(ClientGuardian clientGuardian) {
         this.idOfGuardian = clientGuardian.getIdOfGuardian();
         this.idOfChildren = clientGuardian.getIdOfChildren();
         this.version = clientGuardian.getVersion();
@@ -39,16 +38,15 @@ public class ClientGuardianResponseElement {
         this.result = result;
     }
 
-    /* idOfClientGuardian == null */
-    public ClientGuardian createNewClientGuardian(){
-        return new ClientGuardian(idOfChildren, idOfGuardian);
+    public Long getIdOfGuardian() {
+        return idOfGuardian;
     }
 
-    public Example createExampleRestriction(){
-        return Example.create(new ClientGuardian(idOfChildren, idOfGuardian));
+    public Long getIdOfChildren() {
+        return idOfChildren;
     }
 
-    public ClientGuardianResponseElement(ClientGuardian clientGuardian, Integer resCode, String resultMessage) {
+    public ClientGuardianItem(ClientGuardian clientGuardian, Integer resCode, String resultMessage) {
         this.idOfGuardian = clientGuardian.getIdOfGuardian();
         this.idOfChildren = clientGuardian.getIdOfChildren();
         this.version = clientGuardian.getVersion();
@@ -68,14 +66,14 @@ public class ClientGuardianResponseElement {
         return element;
     }
 
-    public static ClientGuardianResponseElement build(Node itemNode){
+    public static ClientGuardianItem build(Node itemNode){
         Long idOfGuardian = XMLUtils.getLongAttributeValue(itemNode, "IdOfGuardian");
         Long idOfChildren = XMLUtils.getLongAttributeValue(itemNode, "IdOfChildren");
         Integer delete = XMLUtils.getIntegerValueZeroSafe(itemNode, "D");
-        return new ClientGuardianResponseElement(idOfGuardian, idOfChildren, delete);
+        return new ClientGuardianItem(idOfGuardian, idOfChildren, delete);
     }
 
-    private ClientGuardianResponseElement(Long idOfGuardian, Long idOfChildren, Integer deleteSate) {
+    private ClientGuardianItem(Long idOfGuardian, Long idOfChildren, Integer deleteSate) {
         this.idOfGuardian = idOfGuardian;
         this.idOfChildren = idOfChildren;
         this.deleteState = deleteSate;

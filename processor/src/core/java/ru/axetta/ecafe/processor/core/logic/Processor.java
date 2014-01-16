@@ -610,7 +610,7 @@ public class Processor implements SyncProcessor,
         GoodsBasicBasketData goodsBasicBasketData = null;
         DirectiveElement directiveElement = null;
         List<Long> errorClientIds = new ArrayList<Long>();
-        ClientGuardianResponse clientGuardianResponse = null;
+        ResultClientGuardian resultClientGuardian = null;
         ClientGuardianData clientGuardianData = null;
 
         boolean bError = false;
@@ -649,10 +649,10 @@ public class Processor implements SyncProcessor,
 
         ClientGuardianRequest clientGuardianRequest = request.getClientGuardianRequest();
         if(clientGuardianRequest!=null){
-            final List<ClientGuardianResponseElement> clientGuardianResponseElement
+            final List<ClientGuardianItem> clientGuardianResponseElement
                     = clientGuardianRequest.getClientGuardianResponseElement();
             if(clientGuardianResponseElement !=null) {
-                clientGuardianResponse = processClientGuardian(clientGuardianResponseElement, request.getIdOfOrg(),
+                resultClientGuardian = processClientGuardian(clientGuardianResponseElement, request.getIdOfOrg(),
                         syncHistory);
             }
             final Long responseClientGuardian = clientGuardianRequest.getMaxVersion();
@@ -880,7 +880,7 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, clientGuardianResponse, clientGuardianData);
+                directiveElement, resultClientGuardian, clientGuardianData);
     }
 
     /* Do process short synchronization for update Client parameters */
@@ -909,7 +909,7 @@ public class Processor implements SyncProcessor,
         DirectiveElement directiveElement = null;
         AccRegistryUpdateRequest accRegistryUpdateRequest = null;
         List<Long> errorClientIds = new ArrayList<Long>();
-        ClientGuardianResponse clientGuardianResponse = null;
+        ResultClientGuardian resultClientGuardian = null;
         ClientGuardianData clientGuardianData = null;
 
         // Build AccRegistryUpdateRequest
@@ -975,7 +975,7 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, clientGuardianResponse, clientGuardianData);
+                directiveElement, resultClientGuardian, clientGuardianData);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -1003,7 +1003,7 @@ public class Processor implements SyncProcessor,
         GoodsBasicBasketData goodsBasicBasketData = null;
         DirectiveElement directiveElement = null;
         AccRegistryUpdateRequest accRegistryUpdateRequest = null;
-        ClientGuardianResponse clientGuardianResponse = null;
+        ResultClientGuardian resultClientGuardian = null;
         ClientGuardianData clientGuardianData = null;
 
         // Build AccRegistryUpdateRequest
@@ -1052,7 +1052,7 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, clientGuardianResponse, clientGuardianData);
+                directiveElement, resultClientGuardian, clientGuardianData);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -1079,7 +1079,7 @@ public class Processor implements SyncProcessor,
         GoodsBasicBasketData goodsBasicBasketData = null;
         DirectiveElement directiveElement = null;
         List<Long> errorClientIds = new ArrayList<Long>();
-        ClientGuardianResponse clientGuardianResponse = null;
+        ResultClientGuardian resultClientGuardian = null;
         ClientGuardianData clientGuardianData = null;
 
         boolean bError = false;
@@ -1161,7 +1161,7 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, clientGuardianResponse, clientGuardianData);
+                directiveElement, resultClientGuardian, clientGuardianData);
     }
 
     private void createSyncHistory(long idOfOrg, SyncHistory syncHistory, String s) {
@@ -1385,19 +1385,17 @@ public class Processor implements SyncProcessor,
         return clientGuardianData;
     }
 
-    private ClientGuardianResponse processClientGuardian(List<ClientGuardianResponseElement> items, Long idOfOrg, SyncHistory syncHistory){
-
-        ClientGuardianResponse clientGuardianResponse = new ClientGuardianResponse();
-        for (ClientGuardianResponseElement item: items){
+    private ResultClientGuardian processClientGuardian(List<ClientGuardianItem> items, Long idOfOrg, SyncHistory syncHistory){
+        ResultClientGuardian resultClientGuardian = new ResultClientGuardian();
+        for (ClientGuardianItem item: items){
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
-            ClientGuardian clientGuardian = item.createNewClientGuardian();
+            ClientGuardian clientGuardian = new ClientGuardian(item.getIdOfChildren(), item.getIdOfGuardian());
             if(item.getDeleteState()==0){
                 try {
                     persistenceSession = persistenceSessionFactory.openSession();
                     //persistenceSession = RuntimeContext.reportsSessionFactory.openSession();
                     persistenceTransaction = persistenceSession.beginTransaction();
-
                     Criteria criteria = persistenceSession.createCriteria(ClientGuardian.class);
                     criteria.add(Example.create(clientGuardian));
                     ClientGuardian dbClientGuardian = (ClientGuardian) criteria.uniqueResult();
@@ -1407,16 +1405,16 @@ public class Processor implements SyncProcessor,
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
                     if(dbClientGuardian==null){
-                        clientGuardianResponse.addItem(clientGuardian, 0, null);
+                        resultClientGuardian.addItem(clientGuardian, 0, null);
                     } else {
-                        clientGuardianResponse.addItem(dbClientGuardian, 0, "Client guardian exist");
+                        resultClientGuardian.addItem(dbClientGuardian, 0, "Client guardian exist");
                     }
                 } catch (Exception ex) {
                     String message = String.format(
                             "Save Client Guardian to database error, idOfChildren == %s, idOfGuardian == %s",
                             clientGuardian.getIdOfChildren(), clientGuardian.getIdOfGuardian());
                     logger.error(message, ex);
-                    clientGuardianResponse.addItem(clientGuardian, 100, ex.getMessage());
+                    resultClientGuardian.addItem(clientGuardian, 100, ex.getMessage());
                     createSyncHistory(idOfOrg, syncHistory, message);
                 } finally {
                     HibernateUtils.rollback(persistenceTransaction, logger);
@@ -1427,24 +1425,22 @@ public class Processor implements SyncProcessor,
                     persistenceSession = persistenceSessionFactory.openSession();
                     //persistenceSession = RuntimeContext.reportsSessionFactory.openSession();
                     persistenceTransaction = persistenceSession.beginTransaction();
-
                     Criteria criteria = persistenceSession.createCriteria(ClientGuardian.class);
                     criteria.add(Example.create(clientGuardian));
                     ClientGuardian dbClientGuardian = (ClientGuardian) criteria.uniqueResult();
                     if(dbClientGuardian!=null){
                         persistenceSession.delete(dbClientGuardian);
                     }
-
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
                     final String resultMessage = (dbClientGuardian==null?"Client guardian is removed":null);
-                    clientGuardianResponse.addItem(item, 0, resultMessage);
+                    resultClientGuardian.addItem(item, 0, resultMessage);
                 } catch (Exception ex) {
                     String message = String.format(
                             "Delete Client Guardian to database error, idOfChildren == %s, idOfGuardian == %s",
                             clientGuardian.getIdOfChildren(), clientGuardian.getIdOfGuardian());
                     logger.error(message, ex);
-                    clientGuardianResponse.addItem(clientGuardian, 100, ex.getMessage());
+                    resultClientGuardian.addItem(clientGuardian, 100, ex.getMessage());
                     createSyncHistory(idOfOrg, syncHistory, message);
                 } finally {
                     HibernateUtils.rollback(persistenceTransaction, logger);
@@ -1452,7 +1448,7 @@ public class Processor implements SyncProcessor,
                 }
             }
         }
-        return clientGuardianResponse;
+        return resultClientGuardian;
     }
 
     private ComplexRoles processComplexRoles() throws Exception {

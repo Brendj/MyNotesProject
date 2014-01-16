@@ -1194,7 +1194,7 @@ public class SyncResponse {
     private final GoodsBasicBasketData goodsBasicBasketData;
     private final Manager manager;
     private final DirectiveElement directiveElement;
-    private final ClientGuardianResponse clientGuardianResponse;
+    private final ResultClientGuardian resultClientGuardian;
     private final ClientGuardianData clientGuardians;
 
     public CorrectingNumbersOrdersRegistry getCorrectingNumbersOrdersRegistry() {
@@ -1209,7 +1209,7 @@ public class SyncResponse {
             ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules, ComplexRoles complexRoles,
             CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData,
             QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData,
-            DirectiveElement directiveElement, ClientGuardianResponse clientGuardianResponse, ClientGuardianData clientGuardians) {
+            DirectiveElement directiveElement, ResultClientGuardian resultClientGuardian, ClientGuardianData clientGuardians) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1236,7 +1236,7 @@ public class SyncResponse {
         this.questionaryData = questionaryData;
         this.goodsBasicBasketData = goodsBasicBasketData;
         this.directiveElement = directiveElement;
-        this.clientGuardianResponse = clientGuardianResponse;
+        this.resultClientGuardian = resultClientGuardian;
         this.clientGuardians = clientGuardians;
     }
 
@@ -1288,8 +1288,8 @@ public class SyncResponse {
             ecafeEnvelopeElement.appendChild(clientRegistry.toElement(document));
         }
 
-        if(clientGuardianResponse != null){
-            ecafeEnvelopeElement.appendChild(clientGuardianResponse.toElement(document));
+        if(resultClientGuardian != null){
+            ecafeEnvelopeElement.appendChild(resultClientGuardian.toElement(document));
         }
 
         if(clientGuardians != null){

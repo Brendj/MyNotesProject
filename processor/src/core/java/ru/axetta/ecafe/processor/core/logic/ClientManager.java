@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
+import ru.axetta.ecafe.processor.core.client.items.ClientMigrationItemInfo;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -923,6 +924,18 @@ public class ClientManager {
             clientGuardian = new ClientGuardian(idOfChildren, idOfGuardian);
             session.persist(clientGuardian);
         }
+    }
+
+    /* История миграции клиента */
+    public static List<ClientMigrationItemInfo> reloadMigrationInfoByClient(Session session, Long idOfClient){
+        Criteria criteria = session.createCriteria(ClientMigration.class);
+        criteria.createCriteria("client").add(Restrictions.eq("idOfClient", idOfClient));
+        List<ClientMigration> clientMigrations = criteria.list();
+        List<ClientMigrationItemInfo> clientMigrationItemInfoList = new ArrayList<ClientMigrationItemInfo>(clientMigrations.size());
+        for (ClientMigration clientMigration: clientMigrations){
+            clientMigrationItemInfoList.add(new ClientMigrationItemInfo(clientMigration));
+        }
+        return clientMigrationItemInfoList;
     }
 
 }

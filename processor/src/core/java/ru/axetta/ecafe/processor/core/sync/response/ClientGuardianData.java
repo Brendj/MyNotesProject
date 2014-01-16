@@ -20,16 +20,16 @@ import java.util.List;
  */
 public class ClientGuardianData extends AbstractToElement {
 
-    private final List<ClientGuardianResponseElement> clientGuardianResponseItems;
+    private final List<ClientGuardianItem> clientGuardianResponseItems;
     private final ResultOperation result;
 
     public ClientGuardianData(ResultOperation result) {
-        this.clientGuardianResponseItems = new LinkedList<ClientGuardianResponseElement>();
+        this.clientGuardianResponseItems = new LinkedList<ClientGuardianItem>();
         this.result = result;
     }
 
     public void addItem(ClientGuardian clientGuardian) {
-        final ClientGuardianResponseElement e = new ClientGuardianResponseElement(clientGuardian);
+        final ClientGuardianItem e = new ClientGuardianItem(clientGuardian);
         clientGuardianResponseItems.add(e);
     }
 
@@ -40,7 +40,7 @@ public class ClientGuardianData extends AbstractToElement {
             XMLUtils.setAttributeIfNotNull(element, "ResCode", result.getCode());
             XMLUtils.setAttributeIfNotNull(element, "ResultMessage", result.getMessage());
         }
-        for (ClientGuardianResponseElement item : this.clientGuardianResponseItems) {
+        for (ClientGuardianItem item : this.clientGuardianResponseItems) {
             element.appendChild(item.toElement(document, "CG"));
         }
         return element;

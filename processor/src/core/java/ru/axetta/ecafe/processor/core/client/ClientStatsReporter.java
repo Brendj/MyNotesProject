@@ -4,7 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.client;
 
+import ru.axetta.ecafe.processor.core.client.items.ClientMigrationItemInfo;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientMigration;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.apache.commons.lang.time.DateUtils;
@@ -15,13 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.util.*;
 
 @Component
 public class ClientStatsReporter {
     
     @PersistenceContext(unitName = "reportsPU")
-    EntityManager em;
+    EntityManager entityManager;
 
 
     @Transactional
@@ -37,7 +40,7 @@ public class ClientStatsReporter {
         ///
         int nDaysInPeriod = (int)( (endCal.getTime().getTime() - startCal.getTime().getTime()) / (1000 * 60 * 60 * 24));
         ///
-        List<Object[]> clientInOrgTimes = DAOUtils.getClientInOrgTimes(em, client.getIdOfClient(), from, to);
+        List<Object[]> clientInOrgTimes = DAOUtils.getClientInOrgTimes(entityManager, client.getIdOfClient(), from, to);
         int nDaysWithData=0; Long maxTime=0L, sumTime=0L;
         for (Object[] d : clientInOrgTimes) {
             long timeIn = ((Number)d[1]).longValue();
@@ -63,5 +66,17 @@ public class ClientStatsReporter {
         long nMins = (timeSpan%(60*60))/60;
         long nHours = timeSpan/(60*60);
         return String.format("%d ч. %02d м.", nHours, nMins);
+    }
+
+    @Transactional
+    public List<ClientMigrationItemInfo> reloadMigrationInfoByClient(Long idOfClient){
+        TypedQuery<ClientMigration> clientMigrationTypedQuery = entityManager.createQuery("from ClientMigration where client.idOfClient=:idOfClient",ClientMigration.class);
+        clientMigrationTypedQuery.setParameter("idOfClient",idOfClient);
+        List<ClientMigration> clientMigrationList = clientMigrationTypedQuery.getResultList();
+        List<ClientMigrationItemInfo> clientMigrationItemInfoList = new ArrayList<ClientMigrationItemInfo>(clientMigrationList.size());
+        for (ClientMigration clientMigration: clientMigrationList){
+            clientMigrationItemInfoList.add(new ClientMigrationItemInfo(clientMigration));
+        }
+        return clientMigrationItemInfoList;
     }
 }

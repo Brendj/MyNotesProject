@@ -1,11 +1,13 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOCurrentOrgVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.GoodRequestsReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -14,6 +16,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,7 +172,24 @@ public class GoodRequestsNotificationService {
                         String[] values = {"address", org.getAddress(),
                                            "shortOrgName", org.getShortName(), "reportValues",
                                            newValueHistory.toString()};
-                        String addresses[] =  StringUtils.split(requestNotifyEmailAddress, ";");
+                        //String addresses[] =  StringUtils.split(requestNotifyEmailAddress, ";");
+                        List<String> addresses = new ArrayList<String>(Arrays.asList(StringUtils.split(requestNotifyEmailAddress, ";")));
+                        //addresses.addAll(Arrays.asList(StringUtils.split(org.getRequestNotifyMailList(), ";")));
+
+                        DetachedCriteria staffClientQuery = DetachedCriteria.forClass(Staff.class);
+                        staffClientQuery.add(Restrictions.eq("orgOwner", org.getIdOfOrg()));
+                        staffClientQuery.add(Restrictions.eq("idOfRole", 0L));
+                        staffClientQuery.setProjection(Property.forName("idOfClient"));
+                        Criteria subCriteria = staffClientQuery.getExecutableCriteria(session);
+                        Integer countResult = subCriteria.list().size();
+                        if(countResult>0){
+                            Criteria clientCriteria = session.createCriteria(Client.class);
+                            clientCriteria.add(Property.forName("idOfClient").in(staffClientQuery));
+                            clientCriteria.setProjection(Property.forName("email"));
+                            String address = (String) clientCriteria.uniqueResult();
+                            addresses.add(address);
+                        }
+
                         boolean sended = false;
                         for (String address: addresses){
                             sended |= eventNotificationService.sendEmail(address, notificationType, values);

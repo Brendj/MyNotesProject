@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
@@ -20,10 +21,7 @@ import ru.axetta.ecafe.util.DigitalSignatureUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.*;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
@@ -147,12 +145,22 @@ public class DAOUtils {
 
     @SuppressWarnings("unchecked")
     public static List<Long> findActiveClientsId(Session session, List<Org> orgList) {
-        Query query = session.createQuery(
-                "select cl.idOfClient from Client cl where cl.org in (:orgList) and (cl.idOfClientGroup not in (:cg) or cl.idOfClientGroup is null)")
-                .setParameterList("orgList", orgList)
-                .setParameterList("cg", Arrays.asList(ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
-                        ClientGroup.Predefined.CLIENT_DELETED.getValue()));
-        return (List<Long>) query.list();
+        //Query query = session.createQuery(
+        //        "select cl.idOfClient from Client cl where cl.org in (:orgList) and (cl.idOfClientGroup not in (:cg) or cl.idOfClientGroup is null)")
+        //        .setParameterList("orgList", orgList)
+        //        .setParameterList("cg", Arrays.asList(ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
+        //                ClientGroup.Predefined.CLIENT_DELETED.getValue()));
+        //return (List<Long>) query.list();
+        List<Long> group = Arrays.asList(ClientGroup.Predefined.CLIENT_LEAVING.getValue(),ClientGroup.Predefined.CLIENT_DELETED.getValue());
+        Criteria activeClientCriteria = session.createCriteria(Client.class);
+        activeClientCriteria.add(Restrictions.in("org", orgList));
+        activeClientCriteria.add(
+                Restrictions.or(
+                        Restrictions.not(Restrictions.in("idOfClientGroup",group)),
+                        Restrictions.isNull("idOfClientGroup"))
+        );
+        activeClientCriteria.setProjection(Property.forName("idOfGuardian"));
+        return activeClientCriteria.list();
     }
 
     public static List<String> getRegions(Session session) {
