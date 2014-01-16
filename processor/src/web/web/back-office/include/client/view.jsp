@@ -56,7 +56,7 @@
     <h:outputText escape="true" value="Текущий баланс" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.balance}" readonly="true" converter="copeckSumConverter"
                  styleClass="input-text" />
-    <h:outputText escape="true" value="Основнй счет" styleClass="output-text" />
+    <h:outputText escape="true" value="Основной счет" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.subBalance0}" readonly="true" converter="copeckSumConverter"
                  styleClass="input-text" />
     <h:outputText escape="true" value="Субсчет АП" styleClass="output-text" />
