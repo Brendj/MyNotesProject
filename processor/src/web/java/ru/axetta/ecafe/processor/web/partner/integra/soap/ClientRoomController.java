@@ -241,4 +241,27 @@ public interface ClientRoomController {
     //Result attachGuardianByClient(@WebParam(name = "childrenContractId") Long childrenContractId,
     //        @WebParam(name = "childrenGuardianId") Long GuardianId);
 
+    @WebMethod(operationName = "createSubscriptionFeedingBySan")
+    Result createSubscriptionFeeding(@WebParam(name = "san") String san,
+            @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn);
+
+    @WebMethod(operationName = "findSubscriptionFeedingBySan")
+    SubFeedingResult findSubscriptionFeeding(@WebParam(name = "san") String san);
+
+    @WebMethod(operationName = "suspendSubscriptionFeedingBySan")
+    Result suspendSubscriptionFeeding(@WebParam(name = "san") String san);
+
+    @WebMethod(operationName = "reopenSubscriptionFeedingBySan")
+    Result reopenSubscriptionFeeding(@WebParam(name = "san") String san);
+
+    @WebMethod(operationName = "editSubscriptionFeedingPlanBySan")
+    CycleDiagramOut editSubscriptionFeedingPlan(@WebParam(name = "san") String san,
+            @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn);
+
+    @WebMethod(operationName = "findClientCycleDiagramBySan")
+    CycleDiagramOut findClientCycleDiagram(@WebParam(name = "san") String san);
+
+    @WebMethod(operationName = "findComplexesWithSubFeedingBySan")
+    ComplexInfoResult findComplexesWithSubFeeding(@WebParam(name = "san") String san);
+
 }

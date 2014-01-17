@@ -3980,6 +3980,91 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public Result createSubscriptionFeeding(@WebParam(name = "contractId") Long contractId, @WebParam(
             name = "cycleDiagram") CycleDiagramIn cycleDiagramIn) {
         authenticateRequest(contractId);
+        return createSubscriptionFeeding(contractId, null, cycleDiagramIn);
+    }
+
+    @Override
+    public SubFeedingResult findSubscriptionFeeding(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+        return findSubscriptionFeeding(contractId, null);
+    }
+
+    @Override
+    public Result suspendSubscriptionFeeding(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+        return suspendSubscriptionFeeding(contractId, null);
+    }
+
+    @Override
+    public Result reopenSubscriptionFeeding(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+        return reopenSubscriptionFeeding(contractId, null);
+    }
+
+    @Override
+    public CycleDiagramOut editSubscriptionFeedingPlan(@WebParam(name = "contractId") Long contractId, @WebParam(
+            name = "cycleDiagram") CycleDiagramIn cycleDiagramIn) {
+        authenticateRequest(contractId);
+        return editSubscriptionFeedingPlan(contractId, null, cycleDiagramIn);
+    }
+
+    @Override
+    public CycleDiagramOut findClientCycleDiagram(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+        return findClientCycleDiagram(contractId, null);
+    }
+
+    @Override
+    public ComplexInfoResult findComplexesWithSubFeeding(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+        return findComplexesWithSubFeeding(contractId, null);
+    }
+
+    @Override
+    public Result createSubscriptionFeeding(@WebParam(name = "san") String san, @WebParam(
+            name = "cycleDiagram") CycleDiagramIn cycleDiagramIn) {
+        authenticateRequest(null);
+        return createSubscriptionFeeding(null, san, cycleDiagramIn);
+    }
+
+    @Override
+    public SubFeedingResult findSubscriptionFeeding(@WebParam(name = "san") String san) {
+        authenticateRequest(null);
+        return findSubscriptionFeeding(null, san);
+    }
+
+    @Override
+    public Result suspendSubscriptionFeeding(@WebParam(name = "san") String san) {
+        authenticateRequest(null);
+        return suspendSubscriptionFeeding(null, san);
+    }
+
+    @Override
+    public Result reopenSubscriptionFeeding(@WebParam(name = "san") String san) {
+        authenticateRequest(null);
+        return reopenSubscriptionFeeding(null, san);
+    }
+
+    @Override
+    public CycleDiagramOut editSubscriptionFeedingPlan(@WebParam(name = "san") String san, @WebParam(
+            name = "cycleDiagram") CycleDiagramIn cycleDiagramIn) {
+        authenticateRequest(null);
+        return editSubscriptionFeedingPlan(null, san, cycleDiagramIn);
+    }
+
+    @Override
+    public CycleDiagramOut findClientCycleDiagram(@WebParam(name = "san") String san) {
+        authenticateRequest(null);
+        return findClientCycleDiagram(null, san);
+    }
+
+    @Override
+    public ComplexInfoResult findComplexesWithSubFeeding(@WebParam(name = "san") String san) {
+        authenticateRequest(null);
+        return findComplexesWithSubFeeding(null, san);
+    }
+
+    private Result createSubscriptionFeeding(Long contractId, String san, CycleDiagramIn cycleDiagramIn) {
         RuntimeContext runtimeContext;
         Session session = null;
         Transaction transaction = null;
@@ -3990,7 +4075,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     .getBean(SubscriptionFeedingService.class);
             session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
-            Client client = findClientByContractId(session, contractId, res);
+            Client client = findClient(session, contractId, san, res);
             if (client == null) {
                 return res;
             }
@@ -4035,18 +4120,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return res;
     }
 
-    private <T extends Result> Client findClientByContractId(Session session, Long contractId, T res) throws Exception {
-        Client client = DAOUtils.findClientByContractId(session, contractId);
-        if (client == null) {
-            res.resultCode = RC_CLIENT_NOT_FOUND;
-            res.description = RC_CLIENT_NOT_FOUND_DESC;
-        }
-        return client;
-    }
-
-    @Override
-    public SubFeedingResult findSubscriptionFeeding(@WebParam(name = "contractId") Long contractId) {
-        authenticateRequest(contractId);
+    private SubFeedingResult findSubscriptionFeeding(Long contractId, String san) {
         RuntimeContext runtimeContext;
         Session session = null;
         Transaction transaction = null;
@@ -4055,7 +4129,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             runtimeContext = RuntimeContext.getInstance();
             session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
-            Client client = findClientByContractId(session, contractId, res);
+            Client client = findClient(session, contractId, san, res);
             transaction.commit();
             if (client == null) {
                 return res;
@@ -4083,16 +4157,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return res;
     }
 
-    @Override
-    public Result suspendSubscriptionFeeding(@WebParam(name = "contractId") Long contractId) {
-        authenticateRequest(contractId);
+    public Result suspendSubscriptionFeeding(Long contractId, String san) {
         Session session = null;
         Transaction transaction = null;
         Result result = new Result();
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client client = findClientByContractId(session, contractId, result);
+            Client client = findClient(session, contractId, san, result);
             transaction.commit();
             if (client == null) {
                 return result;
@@ -4113,16 +4185,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    @Override
-    public Result reopenSubscriptionFeeding(@WebParam(name = "contractId") Long contractId) {
-        authenticateRequest(contractId);
+    public Result reopenSubscriptionFeeding(Long contractId, String san) {
         Session session = null;
         Transaction transaction = null;
         Result result = new Result();
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client client = findClientByContractId(session, contractId, result);
+            Client client = findClient(session, contractId, san, result);
             transaction.commit();
             if (client == null) {
                 return result;
@@ -4143,17 +4213,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    @Override
-    public CycleDiagramOut editSubscriptionFeedingPlan(@WebParam(name = "contractId") Long contractId, @WebParam(
-            name = "cycleDiagram") CycleDiagramIn cycleDiagramIn) {
-        authenticateRequest(contractId);
+    public CycleDiagramOut editSubscriptionFeedingPlan(Long contractId, String san, CycleDiagramIn cycleDiagramIn) {
         Session session = null;
         Transaction transaction = null;
         CycleDiagramOut result = new CycleDiagramOut();
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client client = findClientByContractId(session, contractId, result);
+            Client client = findClient(session, contractId, san, result);
             if (client == null) {
                 return result;
             }
@@ -4197,16 +4264,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    @Override
-    public CycleDiagramOut findClientCycleDiagram(@WebParam(name = "contractId") Long contractId) {
-        authenticateRequest(contractId);
+    public CycleDiagramOut findClientCycleDiagram(Long contractId, String san) {
         Session session = null;
         Transaction transaction = null;
         CycleDiagramOut result = new CycleDiagramOut();
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client client = findClientByContractId(session, contractId, result);
+            Client client = findClient(session, contractId, san, result);
             if (client == null) {
                 return result;
             }
@@ -4230,16 +4295,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    @Override
-    public ComplexInfoResult findComplexesWithSubFeeding(@WebParam(name = "contractId") Long contractId) {
-        authenticateRequest(contractId);
+    public ComplexInfoResult findComplexesWithSubFeeding(Long contractId, String san) {
         Session session = null;
         Transaction transaction = null;
         ComplexInfoResult result = new ComplexInfoResult();
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client client = findClientByContractId(session, contractId, result);
+            Client client = findClient(session, contractId, san, result);
             if (client == null) {
                 return result;
             }
@@ -4266,4 +4329,41 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         return result;
     }
+
+    private <T extends Result> Client findClient(Session session, Long contractId, String san, final T res)
+            throws Exception {
+        if (contractId != null) {
+            return findClientByContractId(session, contractId, res);
+        } else if (san != null) {
+            return findClientBySan(session, san, res);
+        } else {
+            return null;
+        }
+    }
+
+    private <T extends Result> Client findClientByContractId(Session session, Long contractId, final T res)
+            throws Exception {
+        Client client = DAOUtils.findClientByContractId(session, contractId);
+        if (client == null) {
+            res.resultCode = RC_CLIENT_NOT_FOUND;
+            res.description = RC_CLIENT_NOT_FOUND_DESC;
+        }
+        return client;
+    }
+
+    private <T extends Result> Client findClientBySan(Session session, String san, final T res) throws Exception {
+        List<Client> clientList = DAOUtils.findClientBySan(session, san);
+        if (clientList.isEmpty()) {
+            res.resultCode = RC_CLIENT_NOT_FOUND;
+            res.description = RC_CLIENT_NOT_FOUND_DESC;
+            return null;
+        }
+        if (clientList.size() > 1) {
+            res.resultCode = RC_SEVERAL_CLIENTS_WERE_FOUND;
+            res.description = RC_SEVERAL_CLIENTS_WERE_FOUND_DESC;
+            return null;
+        }
+        return clientList.get(0);
+    }
+
 }
