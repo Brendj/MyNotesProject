@@ -143,20 +143,21 @@ public class SubscriptionFeedingService {
     public List<ComplexInfo> findComplexesWithSubFeeding(Org org) {
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
         Date tomorrow = CalendarUtils.addDays(today, 1);
-        // Ищем комплексы постащиков орг-ии.
-        Set<Org> sourceOrg = entityManager.find(Org.class, org.getIdOfOrg()).getSourceMenuOrgs();
-        // Если у орг-ии поставщиков нет, то ищем комплексы у самой орг-ии.
-        if (sourceOrg.isEmpty()) {
-            sourceOrg.add(org);
-        }
         TypedQuery<ComplexInfo> query = entityManager.createQuery("select distinct ci from ComplexInfo ci "
-                + "where ci.org in (:org) and usedSubscriptionFeeding = 1 and menuDate >= :startDate and menuDate < :endDate",
-                ComplexInfo.class).setParameter("org", sourceOrg).setParameter("startDate", today)
+                + "where ci.org = :org and usedSubscriptionFeeding = 1 and menuDate >= :startDate and menuDate < :endDate",
+                ComplexInfo.class).setParameter("org", org).setParameter("startDate", today)
                 .setParameter("endDate", tomorrow);
         List<ComplexInfo> res = query.getResultList();
-        // Если комплексов у поставщиков нет, то ищем комплексы у самой орг-ии.
-        if (res.isEmpty()) {
-            res = query.setParameter("org", Arrays.asList(org)).getResultList();
+        // Если комплексов на сегодня нет, то ищем их на каждый день в течение недели.
+        int dayCount = 1;
+        Date beginDate;
+        Date endDate = tomorrow;
+        while (res.isEmpty() && dayCount < 8) {
+            beginDate = endDate;
+            endDate = CalendarUtils.addDays(endDate, 1);
+            res = query.setParameter("org", org).setParameter("startDate", beginDate).setParameter("endDate", endDate)
+                    .getResultList();
+            dayCount++;
         }
         return res;
     }
