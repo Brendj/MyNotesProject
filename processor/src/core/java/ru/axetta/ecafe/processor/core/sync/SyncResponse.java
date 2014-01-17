@@ -1258,6 +1258,7 @@ public class SyncResponse {
         Element dataElement = document.createElement("Data");
         Element bodyElement = document.createElement("Body");
 
+
         Element ecafeEnvelopeElement = document.createElement("CafeteriaExchange");
         ecafeEnvelopeElement.setAttribute("IdOfOrg", this.idOfOrg.toString());
         ecafeEnvelopeElement.setAttribute("Org", this.orgName);
