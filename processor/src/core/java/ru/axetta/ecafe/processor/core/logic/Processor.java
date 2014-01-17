@@ -58,6 +58,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.setCategories;
 
 /**
  * Created by IntelliJ IDEA.
@@ -621,6 +622,7 @@ public class Processor implements SyncProcessor,
                 request.getRemoteAddr());
         addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
                 request.getRemoteAddr());
+
         // Process paymentRegistry
         try {
             if (request.getPaymentRegistry().getPayments().hasNext()) {
@@ -743,7 +745,7 @@ public class Processor implements SyncProcessor,
                         throw new Exception("no license slots available");
                     }
                 }
-                resEnterEvents = processSyncEnterEvents(request.getEnterEvents());
+                resEnterEvents = processSyncEnterEvents(request.getEnterEvents(), request.getOrg());
             }
         } catch (Exception e) {
             logger.error(String.format("Failed to process enter events, IdOfOrg == %s", request.getIdOfOrg()),
@@ -875,8 +877,8 @@ public class Processor implements SyncProcessor,
             updateSyncHistory(syncHistory.getIdOfSync(), syncResult, syncEndTime);
             updateFullSyncParam(request.getIdOfOrg());
         }
-        return new SyncResponse(request.getSyncType(), request.getIdOfOrg(),
-                request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+        return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
+                request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
@@ -962,7 +964,7 @@ public class Processor implements SyncProcessor,
         }
 
         try {
-            directiveElement = processSyncDirective(request.getIdOfOrg());
+            directiveElement = processSyncDirective(request.getOrg());
         } catch (Exception e) {
             logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()),
                     e);
@@ -970,8 +972,8 @@ public class Processor implements SyncProcessor,
 
         Date syncEndTime = new Date();
 
-        return new SyncResponse(request.getSyncType(), request.getIdOfOrg(),
-                request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+        return new SyncResponse(request.getSyncType(), request.getIdOfOrg(),request.getOrg().getShortName(),
+                request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
@@ -1039,7 +1041,7 @@ public class Processor implements SyncProcessor,
         }
 
         try {
-            directiveElement = processSyncDirective(request.getIdOfOrg());
+            directiveElement = processSyncDirective(request.getOrg());
         } catch (Exception e) {
             logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()),
                     e);
@@ -1047,8 +1049,8 @@ public class Processor implements SyncProcessor,
 
         Date syncEndTime = new Date();
 
-        return new SyncResponse(request.getSyncType(), request.getIdOfOrg(),
-                request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+        return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
+                request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
@@ -1122,7 +1124,7 @@ public class Processor implements SyncProcessor,
         }
 
         try {
-            directiveElement = processSyncDirective(request.getIdOfOrg());
+            directiveElement = processSyncDirective(request.getOrg());
         } catch (Exception e) {
             logger.error(String.format("Failed to build Directive, IdOfOrg == %s", request.getIdOfOrg()),
                     e);
@@ -1131,7 +1133,7 @@ public class Processor implements SyncProcessor,
         // Process enterEvents
         try {
             if (request.getEnterEvents() != null) {
-                resEnterEvents = processSyncEnterEvents(request.getEnterEvents());
+                resEnterEvents = processSyncEnterEvents(request.getEnterEvents(), request.getOrg());
             }
         } catch (Exception e) {
             logger.error(String.format("Failed to process Enter Events, IdOfOrg == %s", request.getIdOfOrg()),
@@ -1156,8 +1158,8 @@ public class Processor implements SyncProcessor,
 
         Date syncEndTime = new Date();
 
-        return new SyncResponse(request.getSyncType(), request.getIdOfOrg(),
-                request.getOrg().getShortName(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+        return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
+                request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
@@ -1197,14 +1199,14 @@ public class Processor implements SyncProcessor,
         }
     }
 
-    private DirectiveElement processSyncDirective(long idOfOrg) throws Exception{
+    private DirectiveElement processSyncDirective(Org org) throws Exception{
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         DirectiveElement directiveElement = new DirectiveElement();
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            directiveElement.process(persistenceSession, idOfOrg);
+            directiveElement.process(persistenceSession, org);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -1458,8 +1460,8 @@ public class Processor implements SyncProcessor,
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            AbstractProcessor processor = new ComplexRoleProcessor(persistenceSession);
-            complexRoles = (ComplexRoles) processor.process();
+            ComplexRoleProcessor processor = new ComplexRoleProcessor(persistenceSession);
+            complexRoles = processor.process();
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -2758,7 +2760,7 @@ public class Processor implements SyncProcessor,
         return new SyncResponse.ResDiary();
     }
 
-    private SyncResponse.ResEnterEvents processSyncEnterEvents(SyncRequest.EnterEvents enterEvents) {
+    private SyncResponse.ResEnterEvents processSyncEnterEvents(SyncRequest.EnterEvents enterEvents, Org org) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         SyncResponse.ResEnterEvents resEnterEvents = new SyncResponse.ResEnterEvents();
@@ -2771,9 +2773,10 @@ public class Processor implements SyncProcessor,
 
                 // Check enter event existence
                 final Long idOfClient = e.getIdOfClient();
-                if (DAOUtils.existEnterEvent(persistenceSession, e.getIdOfOrg(), e.getIdOfEnterEvent())) {
+                final long idOfOrg = org.getIdOfOrg();
+                if (DAOUtils.existEnterEvent(persistenceSession, idOfOrg, e.getIdOfEnterEvent())) {
                     EnterEvent ee = DAOUtils.findEnterEvent(persistenceSession,
-                            new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), e.getIdOfOrg()));
+                            new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), idOfOrg));
                     // Если ENTER событие существует (может быть последний результат синхронизации не был передан клиенту)
 final boolean checkClient = (ee.getClient() == null && idOfClient == null) || (ee.getClient() != null && ee
                                     .getClient().getIdOfClient().equals(idOfClient));
@@ -2788,7 +2791,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                         SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(
                                 e.getIdOfEnterEvent(), SyncResponse.ResEnterEvents.Item.RC_OK, String.format(
                                 "Enter event already registered but attributes differ, idOfOrg == %d, idOfEnterEvent == %d",
-                                e.getIdOfOrg(), e.getIdOfEnterEvent()));
+                                idOfOrg, e.getIdOfEnterEvent()));
                         resEnterEvents.addItem(item);
                     }
                 } else {
@@ -2806,7 +2809,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                     }
                     EnterEvent enterEvent = new EnterEvent();
                     enterEvent.setCompositeIdOfEnterEvent(
-                            new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), e.getIdOfOrg()));
+                            new CompositeIdOfEnterEvent(e.getIdOfEnterEvent(), idOfOrg));
                     enterEvent.setEnterName(e.getEnterName());
                     enterEvent.setTurnstileAddr(e.getTurnstileAddr());
                     enterEvent.setPassDirection(e.getPassDirection());
@@ -2840,20 +2843,25 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                         final String[] values = generateNotificationParams(persistenceSession, client,
                                 e.getPassDirection(), e.getEvtDateTime(), guardianId);
                         //final String[] values = generateNotificationParams(persistenceSession, client, e);
-                        if(guardianId == null){
-                            notificationService.sendNotificationAsync(client,
-                                    EventNotificationService.NOTIFICATION_ENTER_EVENT, values);
-                        } else {
-                            List<Client> clients = findGuardiansByClient(persistenceSession, idOfClient, guardianId);
-                            if(!(clients==null || clients.isEmpty())){
-                                for (Client cl: clients){
-                                    notificationService.sendNotificationAsync(cl,
-                                            EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values);
-                                }
-                            } else {
+                        switch (org.getType()){
+                            case SCHOOL: {
                                 notificationService.sendNotificationAsync(client,
-                                        EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values);
-                            }
+                                        EventNotificationService.NOTIFICATION_ENTER_EVENT, values);
+                            } break;
+                            case KINDERGARTEN: {
+                                if(guardianId!=null){
+                                    List<Client> clients = findGuardiansByClient(persistenceSession, idOfClient, guardianId);
+                                    if(!(clients==null || clients.isEmpty())){
+                                        for (Client cl: clients){
+                                            notificationService.sendNotificationAsync(cl,
+                                                    EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values);
+                                        }
+                                    } else {
+                                        notificationService.sendNotificationAsync(client,
+                                                EventNotificationService.NOTIFICATION_PASS_WITH_GUARDIAN, values);
+                                    }
+                                }
+                            } break;
                         }
                     }
 
@@ -2872,7 +2880,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                         }
 
                         if (card != null && card.getCardType() == Card.TYPE_UEC) {
-                            String OGRN = DAOUtils.extraxtORGNFromOrgByIdOfOrg(persistenceSession, e.getIdOfOrg());
+                            String OGRN = DAOUtils.extraxtORGNFromOrgByIdOfOrg(persistenceSession, idOfOrg);
                             String transCode;
                             switch (e.getPassDirection()) {
                                 case EnterEvent.ENTRY:
