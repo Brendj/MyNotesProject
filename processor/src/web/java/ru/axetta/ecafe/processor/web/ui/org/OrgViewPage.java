@@ -61,8 +61,99 @@ public class OrgViewPage extends BasicWorkspacePage {
     private String longitude;
     private Integer refectoryType;
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
-    //private OrganizationType type;
+    private OrganizationType organizationType;
     private String refectoryTypeStringRepresentation;
+
+    public String getRefectoryTypeStringRepresentation() {
+        if ((refectoryType == null) || (refectoryType >= Org.REFECTORY_TYPE_NAMES.length)) {
+            refectoryType = -1;
+            refectoryTypeStringRepresentation = "";
+        } else if (refectoryType == -1) {
+            refectoryTypeStringRepresentation = "";
+        } else {
+            refectoryTypeStringRepresentation = Org.REFECTORY_TYPE_NAMES[refectoryType];
+        }
+        return refectoryTypeStringRepresentation;
+    }
+
+    public OrganizationType getOrganizationType() {
+        return organizationType;
+    }
+
+    public void fill(Session session, Long idOfOrg) throws Exception {
+        Org org = (Org) session.load(Org.class, idOfOrg);
+        this.idOfOrg = org.getIdOfOrg();
+        this.shortName = org.getShortName();
+        this.officialName = org.getOfficialName();
+        this.tag = org.getTag();
+        this.city = org.getCity();
+        this.district = org.getDistrict();
+        this.location = org.getLocation();
+        this.longitude = org.getLongitude();
+        this.latitude = org.getLatitude();
+        this.address = org.getAddress();
+        this.phone = org.getPhone();
+        Person officialPerson = org.getOfficialPerson();
+        this.officialPersonFirstName = officialPerson.getFirstName();
+        this.officialPersonSurname = officialPerson.getSurname();
+        this.officialPersonSecondName = officialPerson.getSecondName();
+        this.officialPosition = org.getOfficialPosition();
+        this.contractId = org.getContractId();
+        this.contractTime = org.getContractTime();
+        this.state = org.getState();
+        this.cardLimit = org.getCardLimit();
+        this.publicKey = org.getPublicKey();
+        this.idOfPacket = org.getIdOfPacket();
+        this.smsSender = org.getSmsSender();
+        this.priceOfSms = org.getPriceOfSms();
+        this.subscriptionPrice = org.getSubscriptionPrice();
+        this.defaultSupplierName = org.getDefaultSupplier().getContragentName();
+        this.INN=org.getINN();
+        this.OGRN=org.getOGRN();
+        this.guid = org.getGuid();
+        this.categoryOrg= new LinkedList<CategoryOrg>();
+        if(!org.getCategories().isEmpty()){
+           for (CategoryOrg co: org.getCategories()){
+               this.categoryOrg.add(co);
+           }
+        }
+
+        this.refectoryType = org.getRefectoryType();
+        getRefectoryTypeStringRepresentation();
+        this.organizationType= org.getType();
+
+        ////  menu exchange source
+        Long menuExchangeSourceOrgId = DAOUtils.findMenuExchangeSourceOrg(session, idOfOrg);
+        if (menuExchangeSourceOrgId == null) {
+            menuExchangeSourceOrgName = "";
+        } else {
+            Org menuExchangeSourceOrg = (Org) session.load(Org.class, menuExchangeSourceOrgId);
+            menuExchangeSourceOrgName = menuExchangeSourceOrg.getShortName();
+        }
+
+        ConfigurationProvider configurationProvider = org.getConfigurationProvider();
+        if (configurationProvider == null) {
+            configurationProviderName = "";
+        } else {
+           configurationProviderName = configurationProvider.getName();
+        }
+        Set<Org> friendlyOrganisation = org.getFriendlyOrg();
+        friendlyFilterOrgs = "Не выбрано";
+        if(!(friendlyOrganisation==null || friendlyOrganisation.isEmpty())){
+            StringBuilder stringBuilder = new StringBuilder();
+            for (Org friendlyOrg: org.getFriendlyOrg()){
+                stringBuilder.append(friendlyOrg.getShortName());
+                stringBuilder.append("; ");
+            }
+            friendlyFilterOrgs = stringBuilder.toString();
+        }
+
+        this.mailingListReportsOnNutrition = org.getMailingListReportsOnNutrition();
+        this.mailingListReportsOnVisits = org.getMailingListReportsOnVisits();
+        this.mailingListReports1 = org.getMailingListReports1();
+        this.mailingListReports2 = org.getMailingListReports2();
+
+    }
 
     public String getFriendlyFilterOrgs() {
         return friendlyFilterOrgs;
@@ -220,99 +311,6 @@ public class OrgViewPage extends BasicWorkspacePage {
     public Integer getRefectoryType() {
         return refectoryType;
     }
-
-    public String getRefectoryTypeStringRepresentation() {
-        if ((refectoryType == null) || (refectoryType >= Org.REFECTORY_TYPE_NAMES.length)) {
-            refectoryType = -1;
-            refectoryTypeStringRepresentation = "";
-        } else if (refectoryType == -1) {
-            refectoryTypeStringRepresentation = "";
-        } else {
-            refectoryTypeStringRepresentation = Org.REFECTORY_TYPE_NAMES[refectoryType];
-        }
-        return refectoryTypeStringRepresentation;
-    }
-
-    //public OrganizationType getType() {
-    //    return type;
-    //}
-
-    public void fill(Session session, Long idOfOrg) throws Exception {
-        Org org = (Org) session.load(Org.class, idOfOrg);
-        this.idOfOrg = org.getIdOfOrg();
-        this.shortName = org.getShortName();
-        this.officialName = org.getOfficialName();
-        this.tag = org.getTag();
-        this.city = org.getCity();
-        this.district = org.getDistrict();
-        this.location = org.getLocation();
-        this.longitude = org.getLongitude();
-        this.latitude = org.getLatitude();
-        this.address = org.getAddress();
-        this.phone = org.getPhone();
-        Person officialPerson = org.getOfficialPerson();
-        this.officialPersonFirstName = officialPerson.getFirstName();
-        this.officialPersonSurname = officialPerson.getSurname();
-        this.officialPersonSecondName = officialPerson.getSecondName();
-        this.officialPosition = org.getOfficialPosition();
-        this.contractId = org.getContractId();
-        this.contractTime = org.getContractTime();
-        this.state = org.getState();
-        this.cardLimit = org.getCardLimit();
-        this.publicKey = org.getPublicKey();
-        this.idOfPacket = org.getIdOfPacket();
-        this.smsSender = org.getSmsSender();
-        this.priceOfSms = org.getPriceOfSms();
-        this.subscriptionPrice = org.getSubscriptionPrice();
-        this.defaultSupplierName = org.getDefaultSupplier().getContragentName();
-        this.INN=org.getINN();
-        this.OGRN=org.getOGRN();
-        this.guid = org.getGuid();
-        this.categoryOrg= new LinkedList<CategoryOrg>();
-        if(!org.getCategories().isEmpty()){
-           for (CategoryOrg co: org.getCategories()){
-               this.categoryOrg.add(co);
-           }
-        }
-
-        this.refectoryType = org.getRefectoryType();
-        getRefectoryTypeStringRepresentation();
-        //this.type= org.getType();
-
-        ////  menu exchange source
-        Long menuExchangeSourceOrgId = DAOUtils.findMenuExchangeSourceOrg(session, idOfOrg);
-        if (menuExchangeSourceOrgId == null) {
-            menuExchangeSourceOrgName = "";
-        } else {
-            Org menuExchangeSourceOrg = (Org) session.load(Org.class, menuExchangeSourceOrgId);
-            menuExchangeSourceOrgName = menuExchangeSourceOrg.getShortName();
-        }
-
-        ConfigurationProvider configurationProvider = org.getConfigurationProvider();
-        if (configurationProvider == null) {
-            configurationProviderName = "";
-        } else {
-           configurationProviderName = configurationProvider.getName();
-        }
-        Set<Org> friendlyOrganisation = org.getFriendlyOrg();
-        friendlyFilterOrgs = "Не выбрано";
-        if(!(friendlyOrganisation==null || friendlyOrganisation.isEmpty())){
-            StringBuilder stringBuilder = new StringBuilder();
-            for (Org friendlyOrg: org.getFriendlyOrg()){
-                stringBuilder.append(friendlyOrg.getShortName());
-                stringBuilder.append("; ");
-            }
-            friendlyFilterOrgs = stringBuilder.toString();
-        }
-
-        this.mailingListReportsOnNutrition = org.getMailingListReportsOnNutrition();
-        this.mailingListReportsOnVisits = org.getMailingListReportsOnVisits();
-        this.mailingListReports1 = org.getMailingListReports1();
-        this.mailingListReports2 = org.getMailingListReports2();
-
-    }
-
-
 
     public String getMailingListReportsOnNutrition() {
         return mailingListReportsOnNutrition;

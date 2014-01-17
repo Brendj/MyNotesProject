@@ -57,15 +57,15 @@
                 <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
         </a4j:commandButton>
     </h:panelGroup>
+    <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.orgEditPage.organizationType}" styleClass="input-text" style="width: 250px;">
+        <f:converter converterId="organizationTypeConverter"/>
+        <f:selectItems value="#{mainPage.orgEditPage.organizationTypeMenu.items}" />
+    </h:selectOneMenu>
     <h:outputText escape="true" value="Тип пищеблока" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.orgEditPage.refectoryType}" styleClass="input-text" style="width: 250px;">
         <f:selectItems value="#{mainPage.orgEditPage.refectoryTypeComboMenuItems}" />
     </h:selectOneMenu>
-   <%-- <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
-    <h:selectOneMenu value="#{mainPage.orgEditPage.type}" styleClass="input-text" style="width: 250px;">
-        <f:converter converterId="organizationTypeConverter"/>
-        <f:selectItems value="#{mainPage.orgEditPage.organizationTypeMenu.items}" />
-    </h:selectOneMenu>--%>
     <h:outputText escape="true" value="Номер договора" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.contractId}" maxlength="50" styleClass="input-text" />
     <h:outputText escape="true" value="Дата заключения договора" styleClass="output-text" />

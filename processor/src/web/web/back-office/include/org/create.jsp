@@ -55,17 +55,17 @@
                                              target="#{mainPage.classTypes}" />
         </a4j:commandButton>
     </h:panelGroup>
+    <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
+    <h:selectOneMenu value="#{mainPage.orgCreatePage.organizationType}" styleClass="input-text" style="width: 250px;">
+        <f:converter converterId="organizationTypeConverter"/>
+        <f:selectItems value="#{mainPage.orgCreatePage.organizationTypeMenu.items}" />
+    </h:selectOneMenu>
     <h:outputText escape="true" value="Тип пищеблока" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.orgCreatePage.refectoryType}" styleClass="input-text" style="width: 250px;">
         <f:selectItem itemValue="-1" itemLabel="-- не выставлено --" />
         <f:selectItems value="#{mainPage.orgCreatePage.refectoryTypeComboMenuItems}" />
     </h:selectOneMenu>
 
-  <%--  <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
-    <h:selectOneMenu value="#{mainPage.orgCreatePage.type}" styleClass="input-text" style="width: 250px;">
-        <f:converter converterId="organizationTypeConverter"/>
-        <f:selectItems value="#{mainPage.orgCreatePage.organizationTypeMenu.items}" />
-    </h:selectOneMenu>--%>
 
     <h:outputText escape="true" value="Номер договора" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.contractId}" maxlength="50" styleClass="input-text" />

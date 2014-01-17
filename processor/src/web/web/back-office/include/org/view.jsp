@@ -45,13 +45,11 @@
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.phone}" styleClass="input-text"
                  converter="phoneConverter" />
     <h:outputText escape="true" value="Поставщик по умолчанию" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgViewPage.defaultSupplierName}" readonly="true"
-                     styleClass="input-text" />
+    <h:inputText value="#{mainPage.orgViewPage.defaultSupplierName}" readonly="true" styleClass="input-text" />
+    <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgViewPage.organizationType}" readonly="true" styleClass="input-text" />
     <h:outputText escape="true" value="Тип пищеблока" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgViewPage.refectoryTypeStringRepresentation}" readonly="true"
-                 styleClass="input-text" />
-   <%-- <h:outputText escape="true" value="Тип организации" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgViewPage.type}" readonly="true" styleClass="input-text" />--%>
+    <h:inputText value="#{mainPage.orgViewPage.refectoryTypeStringRepresentation}" readonly="true" styleClass="input-text" />
     <h:outputText escape="true" value="Номер договора" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.contractId}" styleClass="input-text" />
     <h:outputText escape="true" value="Дата заключения договора" styleClass="output-text" />

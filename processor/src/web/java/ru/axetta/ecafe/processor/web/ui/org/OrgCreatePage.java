@@ -65,9 +65,17 @@ public class OrgCreatePage extends BasicWorkspacePage
     private String longitude;
     private Integer refectoryType;
     private SelectItem[] refectoryTypeComboMenuItems = readRefectoryTypeComboMenuItems();
-    // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
-    //private OrganizationType type;
+    // тип организации "Школа / ДОУ / Поставщик питания"
+    private OrganizationType organizationType;
     private final OrganizationTypeMenu organizationTypeMenu = new OrganizationTypeMenu();
+
+    public OrganizationType getOrganizationType() {
+        return organizationType;
+    }
+
+    public void setOrganizationType(OrganizationType organizationType) {
+        this.organizationType = organizationType;
+    }
 
     public String getINN() {
         return INN;
@@ -383,7 +391,7 @@ public class OrgCreatePage extends BasicWorkspacePage
                 this.defaultSupplier.getIdOfContragent());
 
         Org org = new Org(this.shortName, this.officialName, this.address, officialPerson, this.officialPosition,
-                this.contractId, this.contractTime, this.state, this.cardLimit, this.publicKey, this.priceOfSms,
+                this.contractId, this.contractTime, this.organizationType, this.state, this.cardLimit, this.publicKey, this.priceOfSms,
                 this.subscriptionPrice, defaultSupplier, this.INN, this.OGRN, this.mailingListReportsOnNutrition,
                 this.mailingListReportsOnVisits, this.mailingListReports1, this.mailingListReports2);
         org.setCity(city);

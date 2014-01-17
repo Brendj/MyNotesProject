@@ -76,7 +76,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean changeCommodityAccounting;
 
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
-    //private OrganizationType type;
+    private OrganizationType organizationType;
     private final OrganizationTypeMenu organizationTypeMenu = new OrganizationTypeMenu();
 
     private Integer refectoryType;
@@ -168,7 +168,7 @@ public class OrgEditPage extends BasicWorkspacePage
         } else {
             org.setConfigurationProvider(null);
         }
-        //org.setType(this.type);
+        org.setType(this.organizationType);
 
         if(this.fullSyncParam){
             org.setFullSyncParam(fullSyncParam);
@@ -217,7 +217,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.fullSyncParam = org.getFullSyncParam();
 
         this.changeCommodityAccounting = org.getCommodityAccounting();
-        //this.type = org.getType();
+        this.organizationType = org.getType();
 
         this.refectoryType = org.getRefectoryType();
         if (this.refectoryType == null) {
@@ -698,13 +698,13 @@ public class OrgEditPage extends BasicWorkspacePage
         this.fullSyncParam = fullSyncParam;
     }
 
-    //public OrganizationType getType() {
-    //    return type;
-    //}
-    //
-    //public void setType(OrganizationType type) {
-    //    this.type = type;
-    //}
+    public OrganizationType getOrganizationType() {
+        return organizationType;
+    }
+
+    public void setOrganizationType(OrganizationType organizationType) {
+        this.organizationType = organizationType;
+    }
 
     public OrganizationTypeMenu getOrganizationTypeMenu() {
         return organizationTypeMenu;
