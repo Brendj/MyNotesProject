@@ -68,6 +68,12 @@
                   type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
 
+        <property name="type" column="OrganizationType">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.OrganizationType</param>
+            </type>
+        </property>
+
         <many-to-one name="defaultSupplier" class="ru.axetta.ecafe.processor.core.persistence.Contragent"
                      column="DefaultSupplier"
                      not-null="true"/>

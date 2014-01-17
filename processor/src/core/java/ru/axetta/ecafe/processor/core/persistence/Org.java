@@ -96,19 +96,19 @@ public class Org {
     private Boolean fullSyncParam;
     private Boolean commodityAccounting;
 
-    // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
-    //private OrganizationType type;
+    // тип организации "Школа / ДОУ / Поставщик питания"
+    private OrganizationType type;
 
-    //public OrganizationType getType() {
-    //    return type;
-    //}
-    //
-    //public void setType(OrganizationType type) {
-    //    this.type = type;
-    //}
+    public OrganizationType getType() {
+        return type;
+    }
+
+    public void setType(OrganizationType type) {
+        this.type = type;
+    }
 
     public Org(String shortName, String officialName, String address, Person officialPerson, String officialPosition,
-            String contractId, Date contractTime, int state, long cardLimit, String publicKey, Long priceOfSms,
+            String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
             Long subscriptionPrice, Contragent defaultSupplier, String INN, String OGRN, String mailingListReportsOnNutrition,
             String mailingListReportsOnVisits, String mailingListReports1, String mailingListReports2) throws Exception {
         this.shortName = shortName;
@@ -134,7 +134,7 @@ public class Org {
         this.mailingListReports2 = mailingListReports2;
         this.fullSyncParam=false;
         this.commodityAccounting=false;
-        //this.type = type;
+        this.type = type;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
