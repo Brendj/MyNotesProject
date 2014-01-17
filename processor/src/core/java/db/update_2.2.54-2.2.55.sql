@@ -22,3 +22,5 @@ CREATE TABLE cf_client_guardian
 create index cf_client_guardian_child_idx on cf_client_guardian(IdOfChildren);
 create index cf_client_guardian_guard_idx on cf_client_guardian(IdOfGuardian);
 
+ALTER TABLE cf_orgs ADD COLUMN OrganizationType integer NOT NULL DEFAULT 0; -- по умолчнию все будут школами
+update cf_orgs set OrganizationType=2 where RefectoryType=3;
