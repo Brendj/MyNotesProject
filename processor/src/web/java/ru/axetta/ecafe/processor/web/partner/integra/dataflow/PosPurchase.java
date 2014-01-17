@@ -18,7 +18,7 @@ public class PosPurchase {
 
     @XmlAttribute(name = "Discount")
     private Long discount;
-    @XmlAttribute(name = "CardNo")
+    @XmlAttribute(name = "SocDiscount")
     private Long socDiscount;
     @XmlAttribute(name = "IdOfOrderDetail")
     private Long idOfOrderDetail;

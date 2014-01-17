@@ -1,0 +1,90 @@
+/*
+ * Copyright (c) 2014. Axetta LLC. All Rights Reserved.
+ */
+
+package ru.axetta.ecafe.processor.web.ui.report.online;
+
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.report.ActiveClientsReport;
+import ru.axetta.ecafe.processor.core.report.ActiveDiscountClientsReport;
+import ru.axetta.ecafe.processor.core.report.BasicReportJob;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.List;
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: chirikov
+ * Date: 17.01.14
+ * Time: 13:37
+ * To change this template use File | Settings | File Templates.
+ */
+@Component
+@Scope(value = "session")
+public class ActiveDiscountClientsReportPage extends OnlineReportPage {
+
+    private final static Logger logger = LoggerFactory.getLogger(ActiveDiscountClientsReportPage.class);
+    private ru.axetta.ecafe.processor.core.report.ActiveDiscountClientsReport report;
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager entityManager;
+
+
+    public String getPageFilename ()
+    {
+        return "report/online/active_discount_clients_report";
+    }
+
+    public ru.axetta.ecafe.processor.core.report.ActiveDiscountClientsReport getReport()
+    {
+        return report;
+    }
+
+    public void executeReport () throws Exception {
+        RuntimeContext.getAppContext().getBean(ActiveDiscountClientsReportPage.class).build();
+    }
+
+    public void build () throws Exception {
+        Session session = null;
+        try {
+            session = (Session) entityManager.getDelegate();
+            build(session);
+        } catch (Exception e) {
+            logger.error("Failed to load active discount clients", e);
+            //sendError("Не создать заказ для " + client.getFullName() + ": " + e.getMessage());
+        } finally {
+            //HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void build (Session session) throws Exception {
+        ActiveDiscountClientsReport.Builder reportBuilder = new ActiveDiscountClientsReport.Builder();
+        if (idOfOrg != null) {
+            Org org = null;
+            if (idOfOrg != null && idOfOrg > -1) {
+                org = DAOService.getInstance().findOrById(idOfOrg);
+            }
+            reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+        }
+        this.report = reportBuilder.build (session, startDate, endDate, new GregorianCalendar());
+    }
+
+    
+    public List<ActiveDiscountClientsReport.ActiveDiscountClientsItem> getItems() {
+        return report.getItems();
+    }
+}

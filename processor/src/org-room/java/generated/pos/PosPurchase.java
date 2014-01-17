@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;sequence>
  *       &lt;/sequence>
  *       &lt;attribute name="Discount" type="{http://www.w3.org/2001/XMLSchema}long" />
- *       &lt;attribute name="CardNo" type="{http://www.w3.org/2001/XMLSchema}long" />
+ *       &lt;attribute name="SocDiscount" type="{http://www.w3.org/2001/XMLSchema}long" />
  *       &lt;attribute name="IdOfOrderDetail" type="{http://www.w3.org/2001/XMLSchema}long" />
  *       &lt;attribute name="Name" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="Qty" type="{http://www.w3.org/2001/XMLSchema}long" />
@@ -45,8 +45,8 @@ public class PosPurchase {
 
     @XmlAttribute(name = "Discount")
     protected Long discount;
-    @XmlAttribute(name = "CardNo")
-    protected Long cardNo;
+    @XmlAttribute(name = "SocDiscount")
+    protected Long socDiscount;
     @XmlAttribute(name = "IdOfOrderDetail")
     protected Long idOfOrderDetail;
     @XmlAttribute(name = "Name")
@@ -97,27 +97,27 @@ public class PosPurchase {
     }
 
     /**
-     * Gets the value of the cardNo property.
+     * Gets the value of the socDiscount property.
      * 
      * @return
      *     possible object is
      *     {@link Long }
      *     
      */
-    public Long getCardNo() {
-        return cardNo;
+    public Long getSocDiscount() {
+        return socDiscount;
     }
 
     /**
-     * Sets the value of the cardNo property.
+     * Sets the value of the socDiscount property.
      * 
      * @param value
      *     allowed object is
      *     {@link Long }
      *     
      */
-    public void setCardNo(Long value) {
-        this.cardNo = value;
+    public void setSocDiscount(Long value) {
+        this.socDiscount = value;
     }
 
     /**

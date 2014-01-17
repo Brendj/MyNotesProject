@@ -1616,16 +1616,34 @@ public class DAOService {
     public long getComplexPrice(long idoforg, int complex) {
         Session session = (Session) entityManager.getDelegate();
         org.hibernate.Query q = session.createSQLQuery(
-                "select currentprice, max(menudate) "
+                "select currentprice, max(menudate) as d "
                 + "from cf_complexinfo "
                 + "where idoforg=:idoforg and idofcomplex=:complex "
-                + "group by currentprice");
+                + "group by currentprice "
+                + "order by d desc");
         q.setLong("idoforg", idoforg);
         q.setInteger("complex", complex);
-        Object res [] = ((Object[]) q.uniqueResult());
-        if (res[0] == null) {
-            return 0L;
+        List res = q.list();
+        for (Object o : res) {
+            Object entry [] = (Object[]) o;
+            return ((BigInteger) entry[0]).longValue();
         }
-        return ((BigInteger) res[0]).longValue();
+        return 0L;
+    }
+
+    public long getNextIdOfOrder(Org org) {
+        Session session = (Session) entityManager.getDelegate();
+        org.hibernate.Query q = session.createSQLQuery(
+                "select max(idoforder) from cf_orders where idoforg=:idoforg");
+        q.setLong("idoforg", org.getIdOfOrg());
+        return ((BigInteger) q.uniqueResult()).longValue() + 1;
+    }
+
+    public long getNextIdOfOrderDetail(Org org) {
+        Session session = (Session) entityManager.getDelegate();
+        org.hibernate.Query q = session.createSQLQuery(
+                "select max(idoforderdetail) from cf_orderdetails where idoforg=:idoforg");
+        q.setLong("idoforg", org.getIdOfOrg());
+        return ((BigInteger) q.uniqueResult()).longValue() + 1;
     }
 }

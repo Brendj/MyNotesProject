@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestRepository;
 //import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.GoodRequestService;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
+import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -391,12 +392,12 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
         if (client.getTemporarySaved()) {
             sql = "update cf_temporary_orders set action=:action, "
                   + "idofreplaceclient=" + (client.getIdofReplaceClient() == null ? "null" : ":idofreplaceclient") + ", "
-                  + "modificationdate=:date, idofuser=:idofuser, inBuilding=:inBuilding "
+                  + "modificationdate=:date, idofuser=:idofuser, inBuilding=:inBuilding, idoffule=:idofrule "
                   + "where idofclient=:idofclient and idofcomplex=:idofcomplex and plandate=:plandate";
         } else {
-            sql = "insert into cf_temporary_orders (idoforg, idofclient, idofcomplex, plandate, action, creationdate, idofuser, idofreplaceclient, inBuilding) "
+            sql = "insert into cf_temporary_orders (idoforg, idofclient, idofcomplex, plandate, action, creationdate, idofuser, idofreplaceclient, inBuilding, idofrule) "
                 + "values (:idoforg, :idofclient, :idofcomplex, :plandate, :action, :date, :idofuser, "
-                + (client.getIdofReplaceClient() == null ? "null" : ":idofreplaceclient") + ", :inBuilding)";
+                + (client.getIdofReplaceClient() == null ? "null" : ":idofreplaceclient") + ", :inBuilding, :idofrule)";
         }
 
         clearDate(planDate);
@@ -407,7 +408,8 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
         query.setLong("plandate", planDate.getTimeInMillis());
         query.setInteger("action", client.getActionType());
         query.setLong("date", currentTS);
-        query.setLong("idofuser", -1L);
+        query.setLong("idofrule", client.getIdofrule());
+        query.setLong("idofuser", RuntimeContext.getAppContext().getBean(LoginBean.class).getUser().getIdOfClient());
         query.setInteger("inBuilding", client.getInBuilding());
         if (!client.getTemporarySaved()) {
             query.setLong("idoforg", org.getIdOfOrg());
@@ -456,42 +458,94 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             client.getIdofrule();
 
 
+            ru.axetta.ecafe.processor.core.persistence.Client dbClient = DAOService.getInstance().findClientById(client.getIdofclient());
+            long discountPrice = DAOService.getInstance().getComplexPrice(org.getIdOfOrg(), client.getComplex());
+            OrderPurchaseItem opi = getOrderPurchaseItem(client, session);
             XMLGregorianCalendar paymentDate = getPaymentDate();
             PosPayment payment = new PosPayment();
-            payment.setSocDiscount(DAOService.getInstance().getComplexPrice(org.getIdOfOrg(), client.getComplex()));
-            payment.setComments("- Оплачено из ТК -");
             payment.setIdOfClient(client.getIdofclient());
+            if (dbClient.getCards() != null && dbClient.getCards().size() > 0) {
+                payment.setCardNo(dbClient.getCards().iterator().next().getCardNo());
+            } else {
+                payment.setCardNo(0L);
+            }
+            payment.setIdOfOrder(DAOService.getInstance().getNextIdOfOrder(org));
+            //payment.setIdOfPOS(0L);
+            payment.setConfirmerId(0L);
+            payment.setIdOfCashier(RuntimeContext.getAppContext().getBean(LoginBean.class).getUser().getIdOfClient());
             payment.setTime(paymentDate);
             payment.setOrderDate(paymentDate);
+            payment.setTrdDiscount(0L);
+            payment.setOrderType(4);
+            payment.setRSum(0L);
+            payment.setSumByCard(0L);
+            payment.setSumByCash(0L);
+            payment.setSocDiscount(discountPrice);
+            payment.setGrant(0L);
+            payment.setComments("- Оплачено из ТК -");
+            PosPurchase purchase = new PosPurchase();
+            purchase.setIdOfOrderDetail(DAOService.getInstance().getNextIdOfOrderDetail(org));
+            purchase.setQty(1L);
+            purchase.setRPrice(0L);
+            purchase.setDiscount(discountPrice);
+            purchase.setSocDiscount(discountPrice);
+            purchase.setName(opi.getName());
+            purchase.setMenuGroup(opi.getMenuGroup());
+            purchase.setMenuOrigin(opi.getMenuOrigin());
+            purchase.setRootMenu(opi.getRootMenu());
+            purchase.setType(opi.getType());
+            purchase.setIdOfRule(opi.getIdOfRule());
+            purchase.setGuidOfGoods(opi.getGoodGuid());
+            purchase.setItemCode("");
+            purchase.setMenuOutput("");
+            payment.getPurchases().add(purchase);
             payments.clear();
             payments.add(payment);
 
 
             PosResPaymentRegistry res = service.createOrder(org.getIdOfOrg(), payments);
+            if (res.getResultCode() == 100L) {
+                result.put(client, "Не удалось осуществить оплату: Произошла внутренняя ошибка");
+                continue;
+            }
             PosResPaymentRegistryItemList resList = res.getProhibitionsList();
-            for (PosResPaymentRegistryItem item : resList.getI()) {
-                if (item.getResult() == 0) {
+            if (resList == null || resList.getI().size() < 1) {
+                try {
                     org.hibernate.Query query = session.createSQLQuery(
                             "update cf_temporary_orders set idoforder=:idoforder, modificationdate=:date "
-                                    + "where idofclient=:idofclient and idofcomplex=:idofcomplex and plandate=:plandate");
+                            + "where idofclient=:idofclient and idofcomplex=:idofcomplex and plandate=:plandate");
                     query.setLong("idofclient", client.getIdofclient());
                     query.setInteger("idofcomplex", client.getComplex());
                     query.setLong("plandate", planDate.getTimeInMillis());
                     query.setLong("date", System.currentTimeMillis());
-                    query.setLong("idoforder", item.getIdOfOrder());
+                    query.setLong("idoforder", payment.getIdOfOrder());
                     query.executeUpdate();
-                    client.setIdoforder(item.getIdOfOrder());
+                    client.setIdoforder(payment.getIdOfOrder());
                     result.put(client, "Заказ успешно составлен");
-                } else {
-                    result.put(client, "Не удалось осуществить оплату: " + item.getError());
+                } catch (Exception e) {
+                    logger.error("Failed to update order in database", e);
+                    result.put(client, "Не удалось осуществить оплату: Произошла внутренняя ошибка");
                 }
+            } else {
+                StringBuilder str = new StringBuilder();
+                for (PosResPaymentRegistryItem item : resList.getI()) {
+                    if (item.getError() != null && item.getError().length() > 0) {
+                        if (str.length() > 0) {
+                            str.append("; ");
+                        }
+                        str.append(item.getError());
+                    }
+                }
+                result.put(client, "Не удалось осуществить оплату: " + str);
             }
         }
 
-
-
-
         return result;
+    }
+    
+    protected OrderPurchaseItem getOrderPurchaseItem(Client client, Session session) {
+        //client.get
+        return new OrderPurchaseItem("", "", "", client.getIdofrule(), "", OrderDetail.TYPE_COMPLEX_0, 0, 0L);
     }
 
     protected XMLGregorianCalendar getPaymentDate() {
@@ -509,8 +563,8 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
     public static POSPaymentController createController(Logger logger) {
         POSPaymentController controller = null;
         try {
-            POSPaymentControllerWSService service = new POSPaymentControllerWSService(new URL("http://localhost:8080/processor/soap/front?wsdl"),
-                    new QName("http://ru.axetta.ecafe", "FrontControllerService"));
+            POSPaymentControllerWSService service = new POSPaymentControllerWSService(new URL("http://localhost:8080/processor/soap/pos?wsdl"),
+                    new QName("http://soap.integra.partner.web.processor.ecafe.axetta.ru/", "POSPaymentControllerWSService"));
             controller = service.getPOSPaymentControllerWSPort();
 
             org.apache.cxf.endpoint.Client client = ClientProxy.getClient(controller);
@@ -1414,6 +1468,62 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
 
         public String getNameOfTargetClient() {
             return nameOfTargetClient;
+        }
+    }
+
+    public class OrderPurchaseItem {
+        
+        protected String name;
+        protected String menuGroup;
+        protected String rootMenu;
+        protected long idOfRule;
+        protected String goodGuid;
+        protected int type;
+        protected int menuOrigin;
+        protected long idOfOrderDetail;
+
+        public OrderPurchaseItem(String name, String menuGroup, String rootMenu,
+                long idOfRule, String goodGuid, int type, int menuOrigin, long idOfOrderDetail) {
+            this.name = name;
+            this.menuGroup = menuGroup;
+            this.rootMenu = rootMenu;
+            this.idOfRule = idOfRule;
+            this.goodGuid = goodGuid;
+            this.type = type;
+            this.menuOrigin = menuOrigin;
+            this.idOfOrderDetail = idOfOrderDetail;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getMenuGroup() {
+            return menuGroup;
+        }
+
+        public String getRootMenu() {
+            return rootMenu;
+        }
+
+        public long getIdOfRule() {
+            return idOfRule;
+        }
+
+        public String getGoodGuid() {
+            return goodGuid;
+        }
+
+        public int getType() {
+            return type;
+        }
+
+        public int getMenuOrigin() {
+            return menuOrigin;
+        }
+
+        public long getIdOfOrderDetail() {
+            return idOfOrderDetail;
         }
     }
 }

@@ -887,6 +887,9 @@
     <rich:panelMenuItem id="activeClientsMenuItem" binding="#{activeClientsReportPage.mainMenuComponent}"
                         label="Отчет по доступным клиентам" action="#{activeClientsReportPage.show}"
                         reRender="workspaceForm" />
+    <rich:panelMenuItem id="activeDiscountClientsMenuItem" binding="#{activeDiscountClientsReportPage.mainMenuComponent}"
+                        label="Отчет по питающимся льготникам" action="#{activeDiscountClientsReportPage.show}"
+                        reRender="workspaceForm" />
     <rich:panelMenuItem id="referReportMenuItem" binding="#{referReportPage.mainMenuComponent}"
                         label="Справки расходования средств" action="#{referReportPage.show}"
                         reRender="workspaceForm" />
