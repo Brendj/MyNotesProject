@@ -1867,12 +1867,12 @@ public class SyncRequest {
 
         public static class EnterEvent {
 
-            public EnterEvent(long idOfEnterEvent, long idOfOrg, String enterName, String turnstileAddr,
+            public EnterEvent(long idOfEnterEvent, /*long idOfOrg,*/ String enterName, String turnstileAddr,
                     int passDirection, int eventCode, Long idOfCard, Long idOfClient, Long idOfTempCard,
                     Date evtDateTime, Long idOfVisitor, String visitorFullName, Integer docType, String docSerialNum,
                     Date issueDocDate, Date visitDateTime, Long guardianId) {
                 this.idOfEnterEvent = idOfEnterEvent;
-                this.idOfOrg = idOfOrg;
+                //this.idOfOrg = idOfOrg;
                 this.enterName = enterName;
                 this.turnstileAddr = turnstileAddr;
                 this.passDirection = passDirection;
@@ -1892,7 +1892,7 @@ public class SyncRequest {
 
             public static class Builder {
 
-                public EnterEvent build(Node enterEventNode, LoadContext loadContext, long idOfOrg) throws Exception {
+                public EnterEvent build(Node enterEventNode, LoadContext loadContext) throws Exception {
                     long idOfEnterEvent = Long
                             .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfEnterEvent").getTextContent());
                     String enterName = enterEventNode.getAttributes().getNamedItem("EnterName").getTextContent();
@@ -1956,14 +1956,83 @@ public class SyncRequest {
                         guardianId = Long.parseLong(
                                 enterEventNode.getAttributes().getNamedItem("PassWithGuardian").getTextContent());
                     }
-                    return new EnterEvent(idOfEnterEvent, idOfOrg, enterName, turnstileAddr, passDirection, eventCode,
+                    return new EnterEvent(idOfEnterEvent, enterName, turnstileAddr, passDirection, eventCode,
+                            idOfCard, idOfClient, idOfTempCard, evtDateTime, idOfVisitor, visitorFullName, docType,
+                            docSerialNum, issueDocDate, visitDateTime, guardianId);
+                }
+
+                protected EnterEvent build(Node enterEventNode, LoadContext loadContext, long idOfOrg) throws Exception {
+                    long idOfEnterEvent = Long
+                            .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfEnterEvent").getTextContent());
+                    String enterName = enterEventNode.getAttributes().getNamedItem("EnterName").getTextContent();
+                    String turnstileAddr = enterEventNode.getAttributes().getNamedItem("TurnstileAddr")
+                            .getTextContent();
+                    int passDirection = Integer
+                            .parseInt(enterEventNode.getAttributes().getNamedItem("PassDirection").getTextContent());
+                    int eventCode = Integer
+                            .parseInt(enterEventNode.getAttributes().getNamedItem("EventCode").getTextContent());
+                    Long idOfCard = null;
+                    if (enterEventNode.getAttributes().getNamedItem("IdOfCard") != null) {
+                        idOfCard = Long
+                                .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfCard").getTextContent());
+                    }
+                    Long idOfClient = null;
+                    if (enterEventNode.getAttributes().getNamedItem("IdOfClient") != null) {
+                        idOfClient = Long
+                                .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfClient").getTextContent());
+                    }
+                    Long idOfTempCard = null;
+                    if (enterEventNode.getAttributes().getNamedItem("IdOfTempCard") != null) {
+                        idOfTempCard = Long.parseLong(
+                                enterEventNode.getAttributes().getNamedItem("IdOfTempCard").getTextContent());
+                    }
+                    TimeZone localTimeZone = RuntimeContext.getInstance().getLocalTimeZone(null);//TimeZone.getTimeZone("Europe/Moscow");
+                    DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+                    timeFormat.setTimeZone(localTimeZone);
+                    Date evtDateTime = timeFormat
+                            .parse(enterEventNode.getAttributes().getNamedItem("EvtDateTime").getTextContent());
+                    Long idOfVisitor = null;
+                    if (enterEventNode.getAttributes().getNamedItem("IdOfVisitor") != null) {
+                        idOfVisitor = Long
+                                .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfVisitor").getTextContent());
+                    }
+                    String visitorFullName = null;
+                    if (enterEventNode.getAttributes().getNamedItem("VisitorFullName") != null) {
+                        visitorFullName = enterEventNode.getAttributes().getNamedItem("VisitorFullName")
+                                .getTextContent();
+                    }
+                    Integer docType = null;
+                    if (enterEventNode.getAttributes().getNamedItem("DocType") != null) {
+                        docType = Integer
+                                .parseInt(enterEventNode.getAttributes().getNamedItem("DocType").getTextContent());
+                    }
+                    String docSerialNum = null;
+                    if (enterEventNode.getAttributes().getNamedItem("DocSerialNum") != null) {
+                        docSerialNum = enterEventNode.getAttributes().getNamedItem("DocSerialNum").getTextContent();
+                    }
+                    Date issueDocDate = null;
+                    if (enterEventNode.getAttributes().getNamedItem("IssueDocDate") != null) {
+                        issueDocDate = loadContext.dateOnlyFormat
+                                .parse(enterEventNode.getAttributes().getNamedItem("IssueDocDate").getTextContent());
+                    }
+                    Date visitDateTime = null;
+                    if (enterEventNode.getAttributes().getNamedItem("VisitDateTime") != null) {
+                        visitDateTime = timeFormat
+                                .parse(enterEventNode.getAttributes().getNamedItem("VisitDateTime").getTextContent());
+                    }
+                    Long guardianId = null;
+                    if (enterEventNode.getAttributes().getNamedItem("PassWithGuardian") != null) {
+                        guardianId = Long.parseLong(
+                                enterEventNode.getAttributes().getNamedItem("PassWithGuardian").getTextContent());
+                    }
+                    return new EnterEvent(idOfEnterEvent, /*idOfOrg, */enterName, turnstileAddr, passDirection, eventCode,
                             idOfCard, idOfClient, idOfTempCard, evtDateTime, idOfVisitor, visitorFullName, docType,
                             docSerialNum, issueDocDate, visitDateTime, guardianId);
                 }
             }
 
             private final long idOfEnterEvent;
-            private final long idOfOrg;
+            //private long idOfOrg;
             private final String enterName;
             private final String turnstileAddr;
             private final int passDirection;
@@ -1984,9 +2053,9 @@ public class SyncRequest {
                 return idOfEnterEvent;
             }
 
-            public long getIdOfOrg() {
-                return idOfOrg;
-            }
+            //public long getIdOfOrg() {
+            //    return idOfOrg;
+            //}
 
             public String getEnterName() {
                 return enterName;
@@ -2051,8 +2120,8 @@ public class SyncRequest {
             @Override
             public String toString() {
                 return String
-                        .format("EnterEvent{idOfEnterEvent=%d, idOfOrg=%d, enterName='%s', turnstileAddr='%s', passDirection=%d, eventCode=%d, idOfCard=%d, idOfClient=%d, idOfTempCard=%d, evtDateTime=%s, idOfVisitor=%d, visitorFullName='%s', docType=%d, docSerialNum='%s', issueDocDate=%s, visitDateTime=%s, guardianId=%s}",
-                                idOfEnterEvent, idOfOrg, enterName, turnstileAddr, passDirection, eventCode, idOfCard,
+                        .format("EnterEvent{idOfEnterEvent=%d,  enterName='%s', turnstileAddr='%s', passDirection=%d, eventCode=%d, idOfCard=%d, idOfClient=%d, idOfTempCard=%d, evtDateTime=%s, idOfVisitor=%d, visitorFullName='%s', docType=%d, docSerialNum='%s', issueDocDate=%s, visitDateTime=%s, guardianId=%s}",
+                                idOfEnterEvent, enterName, turnstileAddr, passDirection, eventCode, idOfCard,
                                 idOfClient, idOfTempCard, evtDateTime, idOfVisitor, visitorFullName, docType,
                                 docSerialNum, issueDocDate, visitDateTime, guardianId);
             }
