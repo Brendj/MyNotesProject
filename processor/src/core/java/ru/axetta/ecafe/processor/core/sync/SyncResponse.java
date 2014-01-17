@@ -1168,9 +1168,9 @@ public class SyncResponse {
     }
 
     private final SyncType syncType;
-
     private final Long idOfOrg;
     private final String orgName;
+    private final OrganizationType organizationType;
     private final Long idOfPacket;
     private final Long protoVersion;
     private final Date time;
@@ -1201,7 +1201,7 @@ public class SyncResponse {
         return correctingNumbersOrdersRegistry;
     }
 
-    public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, Long idOfPacket, Long protoVersion, Date time,
+    public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType, Long idOfPacket, Long protoVersion, Date time,
             String options, AccRegistry accRegistry, ResPaymentRegistry resPaymentRegistry, AccIncRegistry accIncRegistry,
             ClientRegistry clientRegistry, ResOrgStructure resOrgStructure, ResMenuExchangeData resMenuExchangeData,
             ResDiary resDiary, String message, ResEnterEvents resEnterEvents,
@@ -1213,6 +1213,7 @@ public class SyncResponse {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
+        this.organizationType = organizationType;
         this.idOfPacket = idOfPacket;
         this.protoVersion = protoVersion;
         this.time = time;
@@ -1267,6 +1268,7 @@ public class SyncResponse {
         ecafeEnvelopeElement.setAttribute("Date", timeFormat.format(this.time));
         ecafeEnvelopeElement.setAttribute("Options", this.options);
         ecafeEnvelopeElement.setAttribute("Type",syncType.toString());
+        ecafeEnvelopeElement.setAttribute("OrganizationType", String.valueOf(organizationType.ordinal()));
 
         // ResPaymentRegistry
         if (null != resPaymentRegistry) {
