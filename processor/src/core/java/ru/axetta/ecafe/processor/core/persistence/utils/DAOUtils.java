@@ -177,7 +177,7 @@ public class DAOUtils {
                         Restrictions.not(Restrictions.in("idOfClientGroup",group)),
                         Restrictions.isNull("idOfClientGroup"))
         );
-        activeClientCriteria.setProjection(Property.forName("idOfGuardian"));
+        activeClientCriteria.setProjection(Property.forName("idOfClient"));
         return activeClientCriteria.list();
     }
 
