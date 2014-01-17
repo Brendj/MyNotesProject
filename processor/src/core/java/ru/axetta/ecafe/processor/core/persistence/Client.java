@@ -108,86 +108,6 @@ public class Client {
     private Set<LibVisit> libVisitInternal;
     private Set<Circulation> circulationInternal;
 
-    public Set<Circulation> getCirculationInternal() {
-        return circulationInternal;
-    }
-
-    public void setCirculationInternal(Set<Circulation> circulationInternal) {
-        this.circulationInternal = circulationInternal;
-    }
-
-    public Set<LibVisit> getLibVisitInternal() {
-        return libVisitInternal;
-    }
-
-    public void setLibVisitInternal(Set<LibVisit> libVisitInternal) {
-        this.libVisitInternal = libVisitInternal;
-    }
-
-    public Set<GoodComplaintBook> getGoodComplaintBookInternal() {
-        return goodComplaintBookInternal;
-    }
-
-    public void setGoodComplaintBookInternal(Set<GoodComplaintBook> goodComplaintBookInternal) {
-        this.goodComplaintBookInternal = goodComplaintBookInternal;
-    }
-
-    public Set<Prohibition> getProhibitionInternal() {
-        return prohibitionInternal;
-    }
-
-    public void setProhibitionInternal(Set<Prohibition> prohibitionInternal) {
-        this.prohibitionInternal = prohibitionInternal;
-    }
-
-    public Set<ClientMigration> getClientMigration() {
-        return clientMigration;
-    }
-
-    public void setClientMigration(Set<ClientMigration> clientMigration) {
-        this.clientMigration = clientMigration;
-    }
-
-    public Set<ClientAnswerByQuestionary> getClientAnswerByQuestionary() {
-        return clientAnswerByQuestionary;
-    }
-
-    public void setClientAnswerByQuestionary(Set<ClientAnswerByQuestionary> clientAnswerByQuestionary) {
-        this.clientAnswerByQuestionary = clientAnswerByQuestionary;
-    }
-
-    public Boolean getCanConfirmGroupPayment() {
-        return canConfirmGroupPayment;
-    }
-
-    public void setCanConfirmGroupPayment(Boolean canConfirmGroupPayment) {
-        this.canConfirmGroupPayment = canConfirmGroupPayment;
-    }
-
-    public String getFax() {
-        return fax;
-    }
-
-    public void setFax(String fax) {
-        this.fax = fax;
-    }
-
-    public Set<CategoryDiscount> getCategories() {
-        return getCategoriesInternal();
-    }
-
-    public void setCategories(Set<CategoryDiscount> categories) {
-        this.categoriesInternal = categories;
-    }
-
-    private Set<CategoryDiscount> getCategoriesInternal() {
-        return categoriesInternal;
-    }
-
-    private void setCategoriesInternal(Set<CategoryDiscount> categoriesInternal) {
-        this.categoriesInternal = categoriesInternal;
-    }
-
     protected Client() {
         // For Hibernate only
     }
@@ -224,6 +144,98 @@ public class Client {
                 notificationSettings.add(new ClientNotificationSetting(this, predefined.getValue()));
             }
         }
+    }
+
+    public Card findActiveCard(Session session, Card failCard) throws Exception {
+        // Ищем активную карту
+        Criteria activeClientCardCriteria = session.createCriteria(Card.class);
+        activeClientCardCriteria.add(Restrictions.eq("client", this));
+        activeClientCardCriteria.add(Restrictions.eq("state", Card.ACTIVE_STATE));
+        List paymentApproachingCards = activeClientCardCriteria.list();
+        if (!paymentApproachingCards.isEmpty()) {
+            return (Card) paymentApproachingCards.iterator().next();
+        }
+        // Если задана приорететная карта, то ее и возвращаем
+        if (null != failCard) {
+            return failCard;
+        }
+        // Берем любую карту
+        Set<Card> clientCards = getCards();
+        if (!clientCards.isEmpty()) {
+            return clientCards.iterator().next();
+        }
+        return null;
+    }
+
+    public boolean isParentGroup(){
+        return idOfClientGroup!=null && idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+    }
+
+    public static String encryptPassword(String plainPassword) throws NoSuchAlgorithmException, IOException {
+        MessageDigest hash = MessageDigest.getInstance("SHA1");
+        ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(plainPassword.getBytes());
+        DigestInputStream digestInputStream = new DigestInputStream(arrayInputStream, hash);
+        ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
+        IOUtils.copy(digestInputStream, arrayOutputStream);
+        return new String(Base64.encodeBase64(arrayOutputStream.toByteArray()), CharEncoding.US_ASCII);
+    }
+
+    /* не использовать метод для получения имени группы*/
+    @Deprecated
+    public String getClientGroupTypeAsString() {
+        long idOfClientGroup = getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup();
+        if (idOfClientGroup >= ClientGroup.PREDEFINED_ID_OF_GROUP_OTHER) {
+            return "Другое";
+        } else if (idOfClientGroup >= ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES) {
+            return "Сотрудники";
+        } else {
+            return "Ученик";
+        }
+    }
+
+    public static String checkAndConvertMobile(String mobilePhone) {
+        if (mobilePhone == null || mobilePhone.length() == 0) {
+            return mobilePhone;
+        }
+        mobilePhone = mobilePhone.replaceAll("[+ \\-()]", "");
+        if (mobilePhone.startsWith("8")) {
+            mobilePhone = "7" + mobilePhone.substring(1);
+        }
+        if (mobilePhone.length() == 10) {
+            mobilePhone = "7" + mobilePhone;
+        } else if (mobilePhone.length() != 11) {
+            return null;
+        }
+        return mobilePhone;
+    }
+
+    public boolean hasIntegraPartnerAccessPermission(String id) {
+        return getRemarks() != null && getRemarks().contains("{integra.access:" + id + "}");
+    }
+
+    public void addIntegraPartnerAccessPermission(String id) {
+        if (!hasIntegraPartnerAccessPermission(id)) {
+            String r = getRemarks();
+            String accessMarker = "{integra.access:" + id + "}";
+            if (r == null) {
+                r = accessMarker;
+            } else {
+                r += "\n" + accessMarker;
+            }
+            setRemarks(r);
+        }
+    }
+
+    public boolean hasMobile() {
+        return mobile != null && mobile.length() > 0;
+    }
+
+    public boolean hasEmail() {
+        return email != null && email.length() > 0;
+    }
+
+    public static boolean isValidContractState(int contractState) {
+        return contractState >= 0 && contractState < CONTRACT_STATE_NAMES.length;
     }
 
     public Set<GuardSan> getGuardSan() {
@@ -753,25 +765,84 @@ public class Client {
         this.notificationSettings = notificationSettings;
     }
 
-    public Card findActiveCard(Session session, Card failCard) throws Exception {
-        // Ищем активную карту
-        Criteria activeClientCardCriteria = session.createCriteria(Card.class);
-        activeClientCardCriteria.add(Restrictions.eq("client", this));
-        activeClientCardCriteria.add(Restrictions.eq("state", Card.ACTIVE_STATE));
-        List paymentApproachingCards = activeClientCardCriteria.list();
-        if (!paymentApproachingCards.isEmpty()) {
-            return (Card) paymentApproachingCards.iterator().next();
-        }
-        // Если задана приорететная карта, то ее и возвращаем
-        if (null != failCard) {
-            return failCard;
-        }
-        // Берем любую карту
-        Set<Card> clientCards = getCards();
-        if (!clientCards.isEmpty()) {
-            return clientCards.iterator().next();
-        }
-        return null;
+    public Set<Circulation> getCirculationInternal() {
+        return circulationInternal;
+    }
+
+    public void setCirculationInternal(Set<Circulation> circulationInternal) {
+        this.circulationInternal = circulationInternal;
+    }
+
+    public Set<LibVisit> getLibVisitInternal() {
+        return libVisitInternal;
+    }
+
+    public void setLibVisitInternal(Set<LibVisit> libVisitInternal) {
+        this.libVisitInternal = libVisitInternal;
+    }
+
+    public Set<GoodComplaintBook> getGoodComplaintBookInternal() {
+        return goodComplaintBookInternal;
+    }
+
+    public void setGoodComplaintBookInternal(Set<GoodComplaintBook> goodComplaintBookInternal) {
+        this.goodComplaintBookInternal = goodComplaintBookInternal;
+    }
+
+    public Set<Prohibition> getProhibitionInternal() {
+        return prohibitionInternal;
+    }
+
+    public void setProhibitionInternal(Set<Prohibition> prohibitionInternal) {
+        this.prohibitionInternal = prohibitionInternal;
+    }
+
+    public Set<ClientMigration> getClientMigration() {
+        return clientMigration;
+    }
+
+    public void setClientMigration(Set<ClientMigration> clientMigration) {
+        this.clientMigration = clientMigration;
+    }
+
+    public Set<ClientAnswerByQuestionary> getClientAnswerByQuestionary() {
+        return clientAnswerByQuestionary;
+    }
+
+    public void setClientAnswerByQuestionary(Set<ClientAnswerByQuestionary> clientAnswerByQuestionary) {
+        this.clientAnswerByQuestionary = clientAnswerByQuestionary;
+    }
+
+    public Boolean getCanConfirmGroupPayment() {
+        return canConfirmGroupPayment;
+    }
+
+    public void setCanConfirmGroupPayment(Boolean canConfirmGroupPayment) {
+        this.canConfirmGroupPayment = canConfirmGroupPayment;
+    }
+
+    public String getFax() {
+        return fax;
+    }
+
+    public void setFax(String fax) {
+        this.fax = fax;
+    }
+
+    public Set<CategoryDiscount> getCategories() {
+        return getCategoriesInternal();
+    }
+
+    public void setCategories(Set<CategoryDiscount> categories) {
+        this.categoriesInternal = categories;
+    }
+
+    private Set<CategoryDiscount> getCategoriesInternal() {
+        return categoriesInternal;
+    }
+
+    private void setCategoriesInternal(Set<CategoryDiscount> categoriesInternal) {
+        this.categoriesInternal = categoriesInternal;
     }
 
     @Override
@@ -804,73 +875,6 @@ public class Client {
                 + ", lastFreePayTime=" + lastFreePayTime + ", discountMode=" + discountMode + ", balance=" + balance
                 + ", limit=" + limit + ", expenditureLimit=" + expenditureLimit + ", categoriesDiscounts="
                 + categoriesDiscounts + '}';
-    }
-
-    public static String encryptPassword(String plainPassword) throws NoSuchAlgorithmException, IOException {
-        MessageDigest hash = MessageDigest.getInstance("SHA1");
-        ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(plainPassword.getBytes());
-        DigestInputStream digestInputStream = new DigestInputStream(arrayInputStream, hash);
-        ByteArrayOutputStream arrayOutputStream = new ByteArrayOutputStream();
-        IOUtils.copy(digestInputStream, arrayOutputStream);
-        return new String(Base64.encodeBase64(arrayOutputStream.toByteArray()), CharEncoding.US_ASCII);
-    }
-
-    /* не использовать метод для получения имени группы*/
-    @Deprecated
-    public String getClientGroupTypeAsString() {
-        long idOfClientGroup = getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup();
-        if (idOfClientGroup >= ClientGroup.PREDEFINED_ID_OF_GROUP_OTHER) {
-            return "Другое";
-        } else if (idOfClientGroup >= ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES) {
-            return "Сотрудники";
-        } else {
-            return "Ученик";
-        }
-    }
-
-    public static String checkAndConvertMobile(String mobilePhone) {
-        if (mobilePhone == null || mobilePhone.length() == 0) {
-            return mobilePhone;
-        }
-        mobilePhone = mobilePhone.replaceAll("[+ \\-()]", "");
-        if (mobilePhone.startsWith("8")) {
-            mobilePhone = "7" + mobilePhone.substring(1);
-        }
-        if (mobilePhone.length() == 10) {
-            mobilePhone = "7" + mobilePhone;
-        } else if (mobilePhone.length() != 11) {
-            return null;
-        }
-        return mobilePhone;
-    }
-
-    public boolean hasIntegraPartnerAccessPermission(String id) {
-        return getRemarks() != null && getRemarks().contains("{integra.access:" + id + "}");
-    }
-
-    public void addIntegraPartnerAccessPermission(String id) {
-        if (!hasIntegraPartnerAccessPermission(id)) {
-            String r = getRemarks();
-            String accessMarker = "{integra.access:" + id + "}";
-            if (r == null) {
-                r = accessMarker;
-            } else {
-                r += "\n" + accessMarker;
-            }
-            setRemarks(r);
-        }
-    }
-
-    public boolean hasMobile() {
-        return mobile != null && mobile.length() > 0;
-    }
-
-    public boolean hasEmail() {
-        return email != null && email.length() > 0;
-    }
-
-    public static boolean isValidContractState(int contractState) {
-        return contractState >= 0 && contractState < CONTRACT_STATE_NAMES.length;
     }
 
 }
