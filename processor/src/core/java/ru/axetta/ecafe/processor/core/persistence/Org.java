@@ -95,17 +95,8 @@ public class Org {
     private Set<ClientMigration> clientMigration = new HashSet<ClientMigration>();
     private Boolean fullSyncParam;
     private Boolean commodityAccounting;
-
     // тип организации "Школа / ДОУ / Поставщик питания"
     private OrganizationType type;
-
-    public OrganizationType getType() {
-        return type;
-    }
-
-    public void setType(OrganizationType type) {
-        this.type = type;
-    }
 
     public Org(String shortName, String officialName, String address, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
@@ -712,6 +703,14 @@ public class Org {
 
     public void setGuid(String guid) {
         this.guid = guid;
+    }
+
+    public OrganizationType getType() {
+        return type;
+    }
+
+    public void setType(OrganizationType type) {
+        this.type = type;
     }
 
     @Override

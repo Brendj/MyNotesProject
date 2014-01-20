@@ -4,6 +4,7 @@
 
 -- Пакет обновлений 2.2.55
 
+-- Cвязка Опекун и ребенок
 CREATE TABLE cf_client_guardian
 (
   IdOfClientGuardian bigserial NOT NULL,
@@ -22,26 +23,8 @@ CREATE TABLE cf_client_guardian
 create index cf_client_guardian_child_idx on cf_client_guardian(IdOfChildren);
 create index cf_client_guardian_guard_idx on cf_client_guardian(IdOfGuardian);
 
+-- Свойство тип организации
 ALTER TABLE cf_orgs ADD COLUMN OrganizationType integer NOT NULL DEFAULT 0; -- по умолчнию все будут школами
 update cf_orgs set OrganizationType=2 where RefectoryType=3;
 
-
---! В настоящий момент таблица не используется, можно удалить и создать заново, но лучше изменить.
-drop table cf_temporary_orders;
-CREATE TABLE cf_temporary_orders (
-  IdOfOrg bigint not null,
-  IdOfClient bigInt not null,
-  IdOfComplex int not null,
-  IdOfRule bigint not null,
-  PlanDate bigint not null,
-  Action int not null,
-  IdOfReplaceClient bigInt,
-  CreationDate bigint not null,
-  ModificationDate bigint,
-  IdOfOrder bigint default null,
-  IdOfUser bigint not null,
-  InBuilding int not null default 2,
-  CONSTRAINT cf_temporary_orders_pk PRIMARY KEY (IdOfOrg, IdOfClient, IdOfComplex, PlanDate, IdOfRule),
-  CONSTRAINT cf_temporary_orders_org FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg),
-  CONSTRAINT cf_temporary_orders_client FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
-);
+--! ФИНАЛИЗИРОВАН (Кадыров, 200110) НЕ МЕНЯТЬ

@@ -27,6 +27,11 @@
                   not-null="true"/>
         <property name="state" column="State" type="integer" not-null="true"/>
         <property name="refectoryType" column="RefectoryType" type="integer" not-null="false"/>
+        <!--<property name="refectoryType" column="RefectoryType">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.RefectoryType</param>
+            </type>
+        </property>-->
         <property name="cardLimit" column="CardLimit" type="long" not-null="true"/>
         <property name="publicKey" column="PublicKey" type="string" length="1024" not-null="true"/>
         <property name="idOfPacket" column="IdOfPacket" type="long" not-null="true"/>
