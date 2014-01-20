@@ -38,7 +38,7 @@
         </h:panelGroup>
 
         <a4j:commandButton value="Генерировать отчет" action="#{activeDiscountClientsReportPage.executeReport}"
-                           reRender="mainMenu, workspaceTogglePanel, itemsReportTable"
+                           reRender="mainMenu, workspaceTogglePanel, reportPanel"
                            styleClass="command-button" status="reportGenerateStatus" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
@@ -46,63 +46,43 @@
             </f:facet>
         </a4j:status>
     </h:panelGrid>
-    <h:panelGrid styleClass="borderless-grid">
-        <h:outputText escape="true" value="Активные клиенты" styleClass="output-text" />
-        <rich:dataTable id="itemsReportTable" value="#{activeDiscountClientsReportPage.items}"
-                        var="item" rowKeyVar="row" rows="20" footerClass="data-table-footer"
-                        columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
-            <f:facet name="header">
-                <rich:columnGroup>
-                    <rich:column headerClass="center-aligned-column" colspan="3">
-                        <h:outputText styleClass="column-header" escape="true" value="Район" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column">
-                        <h:outputText styleClass="column-header" escape="true" value="Организация" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column">
-                        <h:outputText styleClass="column-header" escape="true" value="Адрес" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column">
-                        <h:outputText styleClass="column-header" escape="true" value="Порядковый номер (№ п.п.)" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column">
-                        <h:outputText styleClass="column-header" escape="true" value="ФИО" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column">
-                        <h:outputText styleClass="column-header" escape="true" value="Класс" />
-                    </rich:column>
-                </rich:columnGroup>
-            </f:facet>
-            <rich:column styleClass="">
-                <h:outputText styleClass="output-text" value="#{item.district}" />
-            </rich:column>
-            <rich:column styleClass="">
-                <h:outputText styleClass="output-text" value="#{item.name}" />
-            </rich:column>
-            <rich:column styleClass="">
-                <h:outputText styleClass="output-text" value="#{item.address}" />
-            </rich:column>
-            <rich:column styleClass="#{item.style}">
-                <h:outputText styleClass="output-text" value="#{row + 1}" />
-            </rich:column>
-            <rich:column styleClass="#{item.style}">
-                <h:outputText styleClass="output-text" value="#{item.fullName}" />
-            </rich:column>
-            <rich:column styleClass="#{item.style}">
-                <h:outputText styleClass="output-text" value="#{item.groupName}" />
-            </rich:column>
-            <f:facet name="footer">
-                <rich:datascroller for="itemsReportTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
-                                   stepControls="auto" boundaryControls="hide">
-                    <f:facet name="previous">
-                        <h:graphicImage value="/images/16x16/left-arrow.png" />
+    <h:panelGrid styleClass="borderless-grid" id="reportPanel">
+        <c:if test="${!empty activeDiscountClientsReportPage.report && !empty activeDiscountClientsReportPage.report.items && !empty activeDiscountClientsReportPage.report.columnNames}" >
+            <h:outputText escape="true" value="Отчет по питающимся льготникам" styleClass="output-text" />
+            <rich:dataTable id="itemsReportTable" value="#{activeDiscountClientsReportPage.report.items}"
+                            var="item" rowKeyVar="row" rows="20" footerClass="data-table-footer"
+                            columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
+
+                <rich:column styleClass="center-aligned-column">
+                    <f:facet name="header">
+                        <h:outputText value="№" />
                     </f:facet>
-                    <f:facet name="next">
-                        <h:graphicImage value="/images/16x16/right-arrow.png" />
+                    <h:outputText value="#{row + 1}" styleClass="output-text" />
+                </rich:column>
+
+                <rich:columns value="#{activeDiscountClientsReportPage.report.columnNames}" var="columnName"
+                              styleClass="left-aligned-column" index="ind" headerClass="center-aligned-column">
+                    <f:facet name="header">
+                        <h:outputText escape="true" value="#{columnName}" />
                     </f:facet>
-                </rich:datascroller>
-            </f:facet>
-        </rich:dataTable>
+                    <h:outputText style="float: left;" escape="true"
+                                  value="#{item.getRowValue(columnName)}"
+                                  styleClass="output-text" />
+                </rich:columns>
+
+                <f:facet name="footer">
+                    <rich:datascroller for="itemsReportTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
+                                       stepControls="auto" boundaryControls="hide">
+                        <f:facet name="previous">
+                            <h:graphicImage value="/images/16x16/left-arrow.png" />
+                        </f:facet>
+                        <f:facet name="next">
+                            <h:graphicImage value="/images/16x16/right-arrow.png" />
+                        </f:facet>
+                    </rich:datascroller>
+                </f:facet>
+            </rich:dataTable>
+        </c:if>
         <%--<h:commandButton value="Выгрузить в CSV" action="#{mainPage.showSalesCSVList}" styleClass="command-button" />--%>
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"

@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormatSymbols;
 import java.util.*;
@@ -39,6 +40,33 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
     private Date startDate;
     private Date endDate;
     private String htmlReport;
+
+    private static final String DISTRICT_NAME = "Район";
+    private static final String ORG_NAME = "Организация";
+    private static final String ADDRESS_NAME = "Адрес";
+    private static final String POS_NAME = "Порядковый номер (№ п.п.)";
+    private static final String FIO_NAME = "ФИО";
+    private static final String CLASS_NAME = "Класс";
+    private static final String TOTAL_NAME = "Итого";
+    private static final int DISTRICT_COL = 0;
+    private static final int ORG_COL = 1;
+    private static final int ADDRESS_COL = 2;
+    private static final int POS_COL = 3;
+    private static final int FIO_COL = 4;
+    private static final int CLASS_COL = 5;
+    private static final int TOTAL_COL = 6;
+    private static final int CATEGORY_COL = 100;
+    private static final int GOOD_COL = 101;
+    private static final List <ReportColumn> DEFAULT_COLUMNS = new ArrayList <ReportColumn> ();
+    static
+    {
+        DEFAULT_COLUMNS.add(new ReportColumn (DISTRICT_COL, DISTRICT_NAME));
+        DEFAULT_COLUMNS.add(new ReportColumn (ORG_COL, ORG_NAME));
+        DEFAULT_COLUMNS.add(new ReportColumn (ADDRESS_COL, ADDRESS_NAME));
+        DEFAULT_COLUMNS.add(new ReportColumn (POS_COL, POS_NAME));
+        DEFAULT_COLUMNS.add(new ReportColumn (FIO_COL, FIO_NAME));
+        DEFAULT_COLUMNS.add(new ReportColumn (CLASS_COL, CLASS_NAME));
+    }
 
 
     public List<ActiveDiscountClientsItem> getItems() {
@@ -85,9 +113,9 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             Date generateEndTime = new Date();
             List<ActiveDiscountClientsItem> items = findActiveDiscountClients(session, startTime, endTime);
             //  Если имя шаблона присутствует, значит строится для джаспера
-            if (!exportToHTML) {
+            if (exportToHTML) {
                 return new ActiveDiscountClientsReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
-                                                       startTime, endTime, null);
+                                                       startTime, endTime, items);
             } else {
                 JasperPrint jasperPrint = JasperFillManager
                         .fillReport(templateFilename, parameterMap, createDataSource(items));
@@ -113,7 +141,8 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                 orgRestrict = " and cf_clients.idoforg=" + org.getIdOfOrg() + " ";
             }
             String sql =
-                    "select cf_orgs.district, cf_orgs.shortname, cf_orgs.address, "
+                    "select cf_orgs.idoforg, cf_clients.idofclient, cf_orgs.district, cf_orgs.shortname,"
+                    + "       cf_orgs.address, "
                     + "       cf_persons.surname, cf_persons.firstname, cf_persons.secondname, "
                     + "       cf_clientgroups.groupname, cf_categorydiscounts.categoryname, "
                     + "       cf_goods.nameofgood, sum(cf_orders.socdiscount) "
@@ -129,33 +158,90 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     + "left join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
                     + "left join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
                     + "where cf_clients.discountmode<>0 " + orgRestrict
-                    + "group by cf_orgs.district, cf_orgs.shortname, cf_orgs.address, "
+                    + "group by cf_orgs.idoforg, cf_clients.idofclient, "
+                    + "       cf_orgs.district, cf_orgs.shortname, cf_orgs.address, "
                     + "       cf_persons.surname, cf_persons.firstname, cf_persons.secondname, "
                     + "       cf_clientgroups.groupname, cf_categorydiscounts.categoryname, "
                     + "       cf_goods.nameofgood "
-                    + "order by cf_orgs.district, cf_orgs.shortname, cf_clientgroups.groupname, cf_persons.surname, cf_persons.firstname";
+                    + "order by cf_orgs.district, cf_orgs.shortname, cf_clientgroups.groupname, "
+                    + "         cf_persons.surname, cf_persons.firstname, cf_clients.idofclient";
             Query query = session.createSQLQuery(sql);
             query.setLong("startDate", start.getTime());
             query.setLong("endDate", end.getTime());
             List res = query.list();
+            long prevIdOfClient = -1L;
+            long prevIdOfOrg = -1L;
+            int position = 1;
+            String prevDistrict = null;
+            ActiveDiscountClientsItem item = null;
+            ActiveDiscountOrgItem orgItem = null;
+            ActiveDiscountOrgItem districtItem = null;
+            ActiveDiscountOrgItem overallItem = new ActiveDiscountOrgItem(null, null);
             for (Object entry : res) {
                 Object e[]          = (Object[]) entry;
-                String district     = (String) e[0];
-                String name         = (String) e[1];
-                String address      = (String) e[2];
-                String surname      = (String) e[3];
-                String firstname    = (String) e[4];
-                String secondname   = (String) e[5];
-                String groupName    = (String) e[6];
-                String categoryname = (String) e[7];
-                String goodName     = (String) e[8];
-                long price          = ((BigInteger) e[9]).longValue();
+                long idoforg        = ((BigInteger) e[0]).longValue();
+                long idofclient     = ((BigInteger) e[1]).longValue();
+                String district     = (String) e[2];
+                String name         = (String) e[3];
+                String address      = (String) e[4];
+                String surname      = (String) e[5];
+                String firstname    = (String) e[6];
+                String secondname   = (String) e[7];
+                String groupName    = (String) e[8];
+                String categoryname = (String) e[9];
+                String goodName     = (String) e[10];
+                long price          = 0L;
+                if (e[11] != null) {
+                    price = ((BigDecimal) e[11]).longValue();
+                }
 
-                ActiveDiscountClientsItem item = new ActiveDiscountClientsItem(district, name, address, surname,
-                                                                               firstname, secondname, groupName,
-                                                                               categoryname, goodName, price);
-                result.add(item);
+
+                if (idoforg != prevIdOfOrg) {
+                    if (!district.equals(prevDistrict)) {
+                        if (districtItem != null) {
+                            result.add(districtItem);
+                        }
+                        districtItem = new ActiveDiscountOrgItem(district, null);
+                    }
+
+                    if (orgItem != null){
+                        result.add(orgItem);
+                    }
+                    orgItem = new ActiveDiscountOrgItem(null, name);
+                    position = 1;
+                }
+                if (idofclient != prevIdOfClient) {
+                    item = new ActiveDiscountClientsItem
+                            (district, name, address, surname,
+                            firstname, secondname, groupName);
+                    item.setPosition(position);
+                    result.add(item);
+                    position++;
+                }
+                item.addCategory(categoryname);
+                item.addGood(goodName, price);
+                item.addTotal(price);
+
+                orgItem.addCategoryClient(categoryname);
+                orgItem.addGoodClient(categoryname, price);
+                orgItem.addTotal(price);
+                districtItem.addCategoryClient(categoryname);
+                districtItem.addGoodClient(categoryname, price);
+                districtItem.addTotal(price);
+                overallItem.addCategoryClient(categoryname);
+                overallItem.addGoodClient(categoryname, price);
+                overallItem.addTotal(price);
+
+                prevIdOfOrg = idoforg;
+                prevDistrict = district;
             }
+            if (orgItem != null) {
+                result.add(orgItem);
+            }
+            if (districtItem != null) {
+                result.add(districtItem);
+            }
+            result.add(overallItem);
             return result;
         }
 
@@ -174,12 +260,54 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
 
 
     public ActiveDiscountClientsReport() {
+        items = Collections.emptyList();
     }
 
 
     public ActiveDiscountClientsReport(Date generateTime, long generateDuration, Date startTime,
                                        Date endTime, List<ActiveDiscountClientsItem> items) {
         this.items = items;
+    }
+
+    private List <ReportColumn> cols;
+    public Object[] getColumnNames () {
+        if (cols != null) {
+            cols.clear();
+        } else {
+            cols = new ArrayList<ReportColumn>();
+        }
+        for (ReportColumn c : DEFAULT_COLUMNS) {
+            cols.add(c);
+        }
+
+        if (items == null || items.size() < 1) {
+            return cols.toArray();
+        }
+        Set<String> categoriesSet = new TreeSet<String>();
+        Set<String> goodsSet = new TreeSet<String>();
+        for (ActiveDiscountClientsItem i : items) {
+            if (i instanceof ActiveDiscountOrgItem) {
+                continue;
+            }
+            for (String cat : i.getCategories()) {
+                if (!categoriesSet.contains(cat)) {
+                    categoriesSet.add(cat);
+                }
+            }
+            for (String good : i.getGoods()) {
+                if (!goodsSet.contains(good)) {
+                    goodsSet.add(good);
+                }
+            }
+        }
+        for (String cat : categoriesSet) {
+            cols.add(new ReportColumn(CATEGORY_COL, cat));
+        }
+        for (String good : goodsSet) {
+            cols.add(new ReportColumn(GOOD_COL, good));
+        }
+        cols.add(new ReportColumn(TOTAL_COL, TOTAL_NAME));
+        return cols.toArray();
     }
 
 
@@ -212,32 +340,161 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
         return this;
     }
 
+    public static class ActiveDiscountOrgItem extends ActiveDiscountClientsItem {
+        protected int totalClients;
+        protected Map<String, Integer> categoriesClients;
+        protected Map<String, Long> goodsClients;
+
+        public ActiveDiscountOrgItem(String district, String name) {
+            if (district != null && district.length() > 0) {
+                this.district = "Итого по " + district;
+                this.name = "";
+            } else if (name != null && name.length() > 0) {
+                this.district = "";
+                this.name = "Итого по " + name;
+            } else {
+                this.district = "ИТОГО";
+                this.name = "";
+            }
+            this.address    = "";
+            this.surname    = "";
+            this.firstname  = "";
+            this.secondname = "";
+            this.groupName  = "";
+            categoriesClients      = new HashMap<String, Integer>();
+            goodsClients           = new HashMap<String, Long>();
+            total           = 0L;
+        }
+
+        public void addCategoryClient(String category) {
+            Integer cc = categoriesClients.get(category);
+            if (cc == null) {
+                cc = 0;
+            }
+            categoriesClients.put(category, cc + 1);
+        }
+
+        public void addGoodClient(String category, long price) {
+            Long gc = goodsClients.get(category);
+            if (gc == null) {
+                gc = 0L;
+            }
+            goodsClients.put(category, gc + price);
+        }
+
+        @Override
+        public String getRowValue(Object columnObj) {
+            ReportColumn col = (ReportColumn) columnObj;
+            if (col.getType() != CATEGORY_COL && col.getType() != GOOD_COL) {
+                switch (col.getType()) {
+                    case DISTRICT_COL:
+                        return district;
+                    case ORG_COL:
+                        return name;
+                    case ADDRESS_COL:
+                        return "";
+                    case POS_COL:
+                        return "";
+                    case FIO_COL:
+                        return "";
+                    case CLASS_COL:
+                        return "";
+                    case TOTAL_COL:
+                        return "" + total;
+                }
+            } else if (col.getType() == CATEGORY_COL) {
+                Integer val = categoriesClients.get(col.getName());
+                if (val == null) {
+                    return "0";
+                }
+                return "" + val;
+            } else if (col.getType() == GOOD_COL) {
+                Long val = goodsClients.get(col.getName());
+                if (val == null) {
+                    return "0";
+                }
+                return "" + val;
+            }
+            return "";
+        }
+    }
+
     public static class ActiveDiscountClientsItem {
         protected String district;
         protected String name;
         protected String address;
+        protected int position;
         protected String surname;
         protected String firstname;
         protected String secondname;
         protected String groupName;
-        protected String categoryname;
-        protected String goodName;
-        protected long price;
+        protected List<String> categories;
+        protected Map<String, Long> goods;
+        protected Long total;
+
+        public ActiveDiscountClientsItem() {
+
+        }
 
         public ActiveDiscountClientsItem(String district, String name, String address, String surname, String firstname,
-                String secondname, String groupName, String categoryname, String goodName, long price) {
-            this.district = district;
-            this.name = name;
-            this.address = address;
-            this.surname = surname;
-            this.firstname = firstname;
+                String secondname, String groupName) {
+            this.district   = district;
+            this.name       = name;
+            this.address    = address;
+            this.surname    = surname;
+            this.firstname  = firstname;
             this.secondname = secondname;
-            this.groupName = groupName;
-            this.categoryname = categoryname;
-            this.goodName = goodName;
-            this.price = price;
+            this.groupName  = groupName;
+            categories      = new ArrayList<String>();
+            goods           = new HashMap<String,Long>();
+            total           = 0L;
+        }
+
+        public void addTotal(long total) {
+            this.total += total;
+        }
+
+        public long getTotal() {
+            return total;
+        }
+
+        public void setPosition(int position) {
+            this.position = position;
+        }
+
+        public void addGood(String good, long price) {
+            if (good == null || price < 0) {
+                return;
+            }
+            Long current = goods.get(good);
+            if (current == null) {
+                current = 0L;
+            }
+            goods.put(good, current + price);
+        }
+
+        public void addCategory(String category) {
+            if (categories.contains(category)) {
+                return;
+            }
+            categories.add(category);
+        }
+
+        public List<String> getCategories() {
+            return categories;
+        }
+
+        public long getGood(String good) {
+            if (goods.size() < 1) {
+                return 0L;
+            }
+            return goods.get(good);
         }
         
+        public Set<String> getGoods() {
+            return goods.keySet();
+        }
+
         public String getFullName() {
             return surname + " " + firstname + " " + secondname;
         }
@@ -266,20 +523,65 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             return secondname;
         }
 
-        public String getGroupName() {
-            return groupName;
+        public String getRowValue(Object columnObj) {
+            ReportColumn col = (ReportColumn) columnObj;
+            if (col.getType() != CATEGORY_COL && col.getType() != GOOD_COL) {
+                switch (col.getType()) {
+                    case DISTRICT_COL:
+                        return district;
+                    case ORG_COL:
+                        return name;
+                    case ADDRESS_COL:
+                        return address;
+                    case POS_COL:
+                        return "" + position;
+                    case FIO_COL:
+                        return surname + " " + firstname + " " + secondname;
+                    case CLASS_COL:
+                        return groupName;
+                    case TOTAL_COL:
+                        return "" + total;
+                }
+            } else if (col.getType() == CATEGORY_COL) {
+                if (categories.contains(col.getName())) {
+                    return "X";
+                }
+                return "";
+            } else if (col.getType() == GOOD_COL) {
+                Long val = goods.get(col.getName());
+                if (val == null) {
+                    return "";
+                }
+                return "" + val;
+            }
+            return "";
+        }
+    }
+
+    public static class ReportColumn {
+        private String name;
+        private int type;
+
+        public ReportColumn (int type, String name) {
+            this.type = type;
+            this.name = name;
         }
 
-        public String getCategoryname() {
-            return categoryname;
+        public String getName () {
+            return name;
         }
 
-        public String getGoodName() {
-            return goodName;
+        public int getType() {
+            return type;
         }
 
-        public long getPrice() {
-            return price;
+        public void setType(int type) {
+            this.type = type;
+        }
+
+        @Override
+        public String toString() {
+            return name;
         }
     }
 }

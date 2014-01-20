@@ -1626,6 +1626,9 @@ public class DAOService {
         List res = q.list();
         for (Object o : res) {
             Object entry [] = (Object[]) o;
+            if (entry [0] == null) {
+                return 0L;
+            }
             return ((BigInteger) entry[0]).longValue();
         }
         return 0L;

@@ -41,7 +41,7 @@ public class ActiveDiscountClientsReportPage extends OnlineReportPage {
     private final static Logger logger = LoggerFactory.getLogger(ActiveDiscountClientsReportPage.class);
     private ru.axetta.ecafe.processor.core.report.ActiveDiscountClientsReport report;
     @PersistenceContext(unitName = "processorPU")
-    private EntityManager entityManager;
+    public EntityManager entityManager;
 
 
     public String getPageFilename ()
@@ -54,24 +54,46 @@ public class ActiveDiscountClientsReportPage extends OnlineReportPage {
         return report;
     }
 
-    public void executeReport () throws Exception {
-        RuntimeContext.getAppContext().getBean(ActiveDiscountClientsReportPage.class).build();
+    @Override
+    public void onShow() throws Exception {
+        report = new ActiveDiscountClientsReport();
     }
 
-    public void build () throws Exception {
-        Session session = null;
-        try {
-            session = (Session) entityManager.getDelegate();
-            build(session);
-        } catch (Exception e) {
-            logger.error("Failed to load active discount clients", e);
-            //sendError("Не создать заказ для " + client.getFullName() + ": " + e.getMessage());
-        } finally {
-            //HibernateUtils.close(session, logger);
+    public void executeReport ()
+    {
+        FacesContext facesContext = FacesContext.getCurrentInstance ();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try
+        {
+            runtimeContext = RuntimeContext.getInstance ();
+            persistenceSession = runtimeContext.createPersistenceSession ();
+            persistenceTransaction = persistenceSession.beginTransaction ();
+            buildReport (persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+        }
+        catch (Exception e)
+        {
+            logger.error("Failed to build active discount clients report", e);
+            facesContext.addMessage (null, new FacesMessage (FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке отчета", null));
+        }
+        finally
+        {
+            try {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            } catch (Exception e) {
+                logger.error("Failed to build active clients report", e);
+            }
         }
     }
 
-    public void build (Session session) throws Exception {
+    public void buildReport (Session session) throws Exception {
         ActiveDiscountClientsReport.Builder reportBuilder = new ActiveDiscountClientsReport.Builder();
         if (idOfOrg != null) {
             Org org = null;
