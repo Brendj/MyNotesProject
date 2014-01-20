@@ -118,7 +118,7 @@ CREATE TABLE CF_Orgs (
   RemoteAddress           VARCHAR(20)     , -- v31
   FullSyncParam INTEGER NOT NULL default 0, -- v42
   CommodityAccounting integer NOT NULL DEFAULT 0, --v51
-  RequestNotifyMailList character varying(1024) default null, --v55
+  OrganizationType integer NOT NULL DEFAULT 0, --v55 по умолчнию все будут школами
   CONSTRAINT CF_Orgs_pk PRIMARY KEY (IdOfOrg),
   CONSTRAINT CF_Orgs_ShortName UNIQUE (ShortName),
   CONSTRAINT CF_Orgs_IdOfOfficialPerson_fk FOREIGN KEY (IdOfOfficialPerson) REFERENCES CF_Persons (IdOfPerson),
@@ -2901,7 +2901,7 @@ CREATE TABLE cf_do_org_current_version (
 );
 
 -- v55
--- Таблица связкаЖ Опекун и ребенок
+-- Таблица связка Опекун и ребенок
 CREATE TABLE cf_client_guardian
 (
   IdOfClientGuardian bigserial NOT NULL,
@@ -2922,5 +2922,5 @@ create index cf_client_guardian_guard_idx on cf_client_guardian(IdOfGuardian);
 
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
-  VALUES(2, 2, 54, 140110, 0, '');
+  VALUES(2, 2, 55, 200110, 0, '');
 
