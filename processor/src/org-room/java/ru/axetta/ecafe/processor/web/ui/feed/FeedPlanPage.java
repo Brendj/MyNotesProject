@@ -392,8 +392,8 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
         if (client.getTemporarySaved()) {
             sql = "update cf_temporary_orders set action=:action, "
                   + "idofreplaceclient=" + (client.getIdofReplaceClient() == null ? "null" : ":idofreplaceclient") + ", "
-                  + "modificationdate=:date, idofuser=:idofuser, inBuilding=:inBuilding, idofrule=:idofrule "
-                  + "where idofclient=:idofclient and idofcomplex=:idofcomplex and plandate=:plandate";
+                  + "modificationdate=:date, idofuser=:idofuser, inBuilding=:inBuilding "
+                  + "where idofclient=:idofclient and idofcomplex=:idofcomplex and plandate=:plandate and idofrule=:idofrule";
         } else {
             sql = "insert into cf_temporary_orders (idoforg, idofclient, idofcomplex, plandate, action, creationdate, idofuser, idofreplaceclient, inBuilding, idofrule) "
                 + "values (:idoforg, :idofclient, :idofcomplex, :plandate, :action, :date, :idofuser, "

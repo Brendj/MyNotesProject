@@ -60,7 +60,7 @@
 
 
     <h:panelGrid columns="2" styleClass="borderless-grid" style="width: 100%;" columnClasses="datagrid_col1,datagrid_col2">
-        <rich:panel style="width: 1100px; height: 400px; overflow: auto;">
+        <rich:panel style="width: 100%; height: 400px; overflow: auto;">
             <rich:dataTable id="clientsToRegister" value="#{clientRegisterPage.clientsForRegister}" var="client">
                 <rich:column style="text-align: center; background-color: #{client.color};">
                     <a4j:commandButton image="/images/icon/cancel.png" action="#{clientRegisterPage.doRemoveClient(client)}" style="padding-bottom: 10px"
