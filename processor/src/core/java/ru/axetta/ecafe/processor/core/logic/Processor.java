@@ -35,9 +35,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCa
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
 import ru.axetta.ecafe.processor.core.sync.process.ClientGuardianDataProcessor;
-import ru.axetta.ecafe.processor.core.sync.request.AccRegistryUpdateRequest;
-import ru.axetta.ecafe.processor.core.sync.request.ClientGuardianRequest;
-import ru.axetta.ecafe.processor.core.sync.request.ClientRequests;
+import ru.axetta.ecafe.processor.core.sync.request.*;
 import ru.axetta.ecafe.processor.core.sync.response.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
@@ -2760,12 +2758,12 @@ public class Processor implements SyncProcessor,
         return new SyncResponse.ResDiary();
     }
 
-    private SyncResponse.ResEnterEvents processSyncEnterEvents(SyncRequest.EnterEvents enterEvents, Org org) {
+    private SyncResponse.ResEnterEvents processSyncEnterEvents(EnterEvents enterEvents, Org org) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         SyncResponse.ResEnterEvents resEnterEvents = new SyncResponse.ResEnterEvents();
 
-        for (SyncRequest.EnterEvents.EnterEvent e : enterEvents.getEvents()) {
+        for (EnterEventItem e : enterEvents.getEvents()) {
 
             try {
                 persistenceSession = persistenceSessionFactory.openSession();
@@ -2840,9 +2838,9 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                                     || e.getPassDirection() == EnterEvent.RE_EXIT)) {
                         final EventNotificationService notificationService = RuntimeContext.getAppContext()
                                 .getBean(EventNotificationService.class);
-                        final String[] values = generateNotificationParams(persistenceSession, client,
-                                e.getPassDirection(), e.getEvtDateTime(), guardianId);
-                        //final String[] values = generateNotificationParams(persistenceSession, client, e);
+                        //final String[] values = generateNotificationParams(persistenceSession, client,
+                        //        e.getPassDirection(), e.getEvtDateTime(), guardianId);
+                        final String[] values = generateNotificationParams(persistenceSession, client, e);
                         switch (org.getType()){
                             case SCHOOL: {
                                 notificationService.sendNotificationAsync(client,
@@ -2914,7 +2912,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
             } catch (Exception ex) {
                 logger.error("Save enter event to database error: ", e);
                 resEnterEvents = new SyncResponse.ResEnterEvents();
-                for (SyncRequest.EnterEvents.EnterEvent ee : enterEvents.getEvents()) {
+                for (EnterEventItem ee : enterEvents.getEvents()) {
                     SyncResponse.ResEnterEvents.Item item;
                     item = new SyncResponse.ResEnterEvents.Item(ee.getIdOfEnterEvent(),1, "Save to data base error");
                     resEnterEvents.addItem(item);
@@ -3230,7 +3228,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
         }
     }
 
-    private String[] generateNotificationParams(Session session, Client client, SyncRequest.EnterEvents.EnterEvent event) throws Exception {
+    private String[] generateNotificationParams(Session session, Client client, EnterEventItem event) throws Exception {
         final int passDirection = event.getPassDirection();
         final Long guardianId = event.getGuardianId();
         final Date eventDate = event.getEvtDateTime();
@@ -3267,7 +3265,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                 guardianName};
     }
 
-    private String[] generateNotificationParams(Session session, Client client, int passDirection, Date eventDate,
+  /*  private String[] generateNotificationParams(Session session, Client client, int passDirection, Date eventDate,
             Long guardianId) throws Exception {
         final String enterEvent = "Вход";
         final String exitEvent = "Выход";
@@ -3300,7 +3298,7 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                 ContractIdFormat.format(client.getContractId()), "surname", client.getPerson().getSurname(),
                 "firstName", client.getPerson().getFirstName(), "eventName", eventName, "eventTime", time, "guardian",
                 guardianName};
-    }
+    }*/
 
     private String[] generatePaymentNotificationParams(Session session, Client client, Payment payment) {
         long complexes = 0L;

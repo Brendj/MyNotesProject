@@ -8,17 +8,12 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.sync.request.ClientRequestBuilder;
-import ru.axetta.ecafe.processor.core.sync.request.ClientRequests;
+import ru.axetta.ecafe.processor.core.sync.request.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistryBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperationBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.manager.Manager;
-import ru.axetta.ecafe.processor.core.sync.request.AccRegistryUpdateRequest;
-import ru.axetta.ecafe.processor.core.sync.request.AccRegistryUpdateRequestBuilder;
-import ru.axetta.ecafe.processor.core.sync.request.ClientGuardianBuilder;
-import ru.axetta.ecafe.processor.core.sync.request.ClientGuardianRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -61,7 +56,7 @@ public class SyncRequest {
                     int freePayMaxCount = Integer.parseInt(freePayCountTokens[1]);
                     Date lastFreePayTime = null;
                     if (0 != freePayCount) {
-                        lastFreePayTime = loadContext.timeFormat
+                        lastFreePayTime = loadContext.getTimeFormat()
                                 .parse(namedNodeMap.getNamedItem("FPLastTime").getTextContent());
                     }
                     int discountMode = getIntValue(namedNodeMap, "DiscountMode");
@@ -467,7 +462,7 @@ public class SyncRequest {
 
             public AccIncRegistryRequest build(Node node, LoadContext loadContext) throws Exception {
                 NamedNodeMap namedNodeMap = node.getAttributes();
-                Date dateTime = loadContext.timeFormat.parse(namedNodeMap.getNamedItem("Date").getTextContent());
+                Date dateTime = loadContext.getTimeFormat().parse(namedNodeMap.getNamedItem("Date").getTextContent());
                 return new AccIncRegistryRequest(dateTime);
             }
         }
@@ -1434,7 +1429,7 @@ public class SyncRequest {
                 public Item build(Node itemNode, LoadContext loadContext) throws Exception {
                     NamedNodeMap namedNodeMap = itemNode.getAttributes();
 
-                    Date date = loadContext.dateOnlyFormat.parse(namedNodeMap.getNamedItem("Value").getTextContent());
+                    Date date = loadContext.getDateOnlyFormat().parse(namedNodeMap.getNamedItem("Value").getTextContent());
                     ////// process ML items (menu list)
                     List<ReqMenuDetail> reqMenuDetails = new LinkedList<ReqMenuDetail>();
                     HashMap<Long, ReqMenuDetail> reqMenuDetailMap = new HashMap<Long, ReqMenuDetail>();
@@ -1442,21 +1437,21 @@ public class SyncRequest {
                     Node childNode = itemNode.getFirstChild();
                     while (null != childNode) {
                         if (Node.ELEMENT_NODE == childNode.getNodeType() && childNode.getNodeName().equals("ML")) {
-                            ReqMenuDetail reqMenuDetail = reqMenuDetailBuilder.build(childNode, loadContext.menuGroups);
+                            ReqMenuDetail reqMenuDetail = reqMenuDetailBuilder.build(childNode, loadContext.getMenuGroups());
                             reqMenuDetails.add(reqMenuDetail);
                             if (reqMenuDetail.idOfMenu != null) {
                                 reqMenuDetailMap.put(reqMenuDetail.idOfMenu, reqMenuDetail);
                             }
                         } else if (Node.ELEMENT_NODE == childNode.getNodeType() && childNode.getNodeName()
                                 .equals("AMI")) {
-                            ReqAssortment reqAssortment = reqAssortmentBuilder.build(childNode, loadContext.menuGroups);
+                            ReqAssortment reqAssortment = reqAssortmentBuilder.build(childNode, loadContext.getMenuGroups());
                             reqAssortments.add(reqAssortment);
                         }
                         childNode = childNode.getNextSibling();
                     }
                     ////// process CML items (complex menu)
                     List<ReqComplexInfo> reqComplexInfos = new LinkedList<ReqComplexInfo>();
-                    if (loadContext.protoVersion >= 5) {
+                    if (loadContext.getProtoVersion() >= 5) {
                         childNode = itemNode.getFirstChild();
                         while (null != childNode) {
                             if (Node.ELEMENT_NODE == childNode.getNodeType() && (childNode.getNodeName().equals("CML") || childNode.getNodeName().equals("CML2"))) {
@@ -1752,7 +1747,7 @@ public class SyncRequest {
 
                 public ReqDiaryTimesheet build(Node reqDiaryTimesheetNode, LoadContext loadContext) throws Exception {
                     NamedNodeMap namedNodeMap = reqDiaryTimesheetNode.getAttributes();
-                    Date date = loadContext.dateOnlyFormat.parse(namedNodeMap.getNamedItem("Date").getTextContent());
+                    Date date = loadContext.getDateOnlyFormat().parse(namedNodeMap.getNamedItem("Date").getTextContent());
                     long idOfClientGroup = getLongValue(namedNodeMap, "IdOfGroup");
                     Long classes[] = new Long[]{
                             getLongValueNullSafe(namedNodeMap, "C0"), getLongValueNullSafe(namedNodeMap, "C1"),
@@ -1863,309 +1858,6 @@ public class SyncRequest {
         }
     }
 
-    public static class EnterEvents {
-
-        public static class EnterEvent {
-
-            public EnterEvent(long idOfEnterEvent, /*long idOfOrg,*/ String enterName, String turnstileAddr,
-                    int passDirection, int eventCode, Long idOfCard, Long idOfClient, Long idOfTempCard,
-                    Date evtDateTime, Long idOfVisitor, String visitorFullName, Integer docType, String docSerialNum,
-                    Date issueDocDate, Date visitDateTime, Long guardianId) {
-                this.idOfEnterEvent = idOfEnterEvent;
-                //this.idOfOrg = idOfOrg;
-                this.enterName = enterName;
-                this.turnstileAddr = turnstileAddr;
-                this.passDirection = passDirection;
-                this.eventCode = eventCode;
-                this.idOfCard = idOfCard;
-                this.idOfClient = idOfClient;
-                this.idOfTempCard = idOfTempCard;
-                this.evtDateTime = evtDateTime;
-                this.idOfVisitor = idOfVisitor;
-                this.visitorFullName = visitorFullName;
-                this.docType = docType;
-                this.docSerialNum = docSerialNum;
-                this.issueDocDate = issueDocDate;
-                this.visitDateTime = visitDateTime;
-                this.guardianId = guardianId;
-            }
-
-            public static class Builder {
-
-                public EnterEvent build(Node enterEventNode, LoadContext loadContext) throws Exception {
-                    long idOfEnterEvent = Long
-                            .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfEnterEvent").getTextContent());
-                    String enterName = enterEventNode.getAttributes().getNamedItem("EnterName").getTextContent();
-                    String turnstileAddr = enterEventNode.getAttributes().getNamedItem("TurnstileAddr")
-                            .getTextContent();
-                    int passDirection = Integer
-                            .parseInt(enterEventNode.getAttributes().getNamedItem("PassDirection").getTextContent());
-                    int eventCode = Integer
-                            .parseInt(enterEventNode.getAttributes().getNamedItem("EventCode").getTextContent());
-                    Long idOfCard = null;
-                    if (enterEventNode.getAttributes().getNamedItem("IdOfCard") != null) {
-                        idOfCard = Long
-                                .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfCard").getTextContent());
-                    }
-                    Long idOfClient = null;
-                    if (enterEventNode.getAttributes().getNamedItem("IdOfClient") != null) {
-                        idOfClient = Long
-                                .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfClient").getTextContent());
-                    }
-                    Long idOfTempCard = null;
-                    if (enterEventNode.getAttributes().getNamedItem("IdOfTempCard") != null) {
-                        idOfTempCard = Long.parseLong(
-                                enterEventNode.getAttributes().getNamedItem("IdOfTempCard").getTextContent());
-                    }
-                    TimeZone localTimeZone = RuntimeContext.getInstance().getLocalTimeZone(null);//TimeZone.getTimeZone("Europe/Moscow");
-                    DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-                    timeFormat.setTimeZone(localTimeZone);
-                    Date evtDateTime = timeFormat
-                            .parse(enterEventNode.getAttributes().getNamedItem("EvtDateTime").getTextContent());
-                    Long idOfVisitor = null;
-                    if (enterEventNode.getAttributes().getNamedItem("IdOfVisitor") != null) {
-                        idOfVisitor = Long
-                                .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfVisitor").getTextContent());
-                    }
-                    String visitorFullName = null;
-                    if (enterEventNode.getAttributes().getNamedItem("VisitorFullName") != null) {
-                        visitorFullName = enterEventNode.getAttributes().getNamedItem("VisitorFullName")
-                                .getTextContent();
-                    }
-                    Integer docType = null;
-                    if (enterEventNode.getAttributes().getNamedItem("DocType") != null) {
-                        docType = Integer
-                                .parseInt(enterEventNode.getAttributes().getNamedItem("DocType").getTextContent());
-                    }
-                    String docSerialNum = null;
-                    if (enterEventNode.getAttributes().getNamedItem("DocSerialNum") != null) {
-                        docSerialNum = enterEventNode.getAttributes().getNamedItem("DocSerialNum").getTextContent();
-                    }
-                    Date issueDocDate = null;
-                    if (enterEventNode.getAttributes().getNamedItem("IssueDocDate") != null) {
-                        issueDocDate = loadContext.dateOnlyFormat
-                                .parse(enterEventNode.getAttributes().getNamedItem("IssueDocDate").getTextContent());
-                    }
-                    Date visitDateTime = null;
-                    if (enterEventNode.getAttributes().getNamedItem("VisitDateTime") != null) {
-                        visitDateTime = timeFormat
-                                .parse(enterEventNode.getAttributes().getNamedItem("VisitDateTime").getTextContent());
-                    }
-                    Long guardianId = null;
-                    if (enterEventNode.getAttributes().getNamedItem("PassWithGuardian") != null) {
-                        guardianId = Long.parseLong(
-                                enterEventNode.getAttributes().getNamedItem("PassWithGuardian").getTextContent());
-                    }
-                    return new EnterEvent(idOfEnterEvent, enterName, turnstileAddr, passDirection, eventCode,
-                            idOfCard, idOfClient, idOfTempCard, evtDateTime, idOfVisitor, visitorFullName, docType,
-                            docSerialNum, issueDocDate, visitDateTime, guardianId);
-                }
-
-                protected EnterEvent build(Node enterEventNode, LoadContext loadContext, long idOfOrg) throws Exception {
-                    long idOfEnterEvent = Long
-                            .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfEnterEvent").getTextContent());
-                    String enterName = enterEventNode.getAttributes().getNamedItem("EnterName").getTextContent();
-                    String turnstileAddr = enterEventNode.getAttributes().getNamedItem("TurnstileAddr")
-                            .getTextContent();
-                    int passDirection = Integer
-                            .parseInt(enterEventNode.getAttributes().getNamedItem("PassDirection").getTextContent());
-                    int eventCode = Integer
-                            .parseInt(enterEventNode.getAttributes().getNamedItem("EventCode").getTextContent());
-                    Long idOfCard = null;
-                    if (enterEventNode.getAttributes().getNamedItem("IdOfCard") != null) {
-                        idOfCard = Long
-                                .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfCard").getTextContent());
-                    }
-                    Long idOfClient = null;
-                    if (enterEventNode.getAttributes().getNamedItem("IdOfClient") != null) {
-                        idOfClient = Long
-                                .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfClient").getTextContent());
-                    }
-                    Long idOfTempCard = null;
-                    if (enterEventNode.getAttributes().getNamedItem("IdOfTempCard") != null) {
-                        idOfTempCard = Long.parseLong(
-                                enterEventNode.getAttributes().getNamedItem("IdOfTempCard").getTextContent());
-                    }
-                    TimeZone localTimeZone = RuntimeContext.getInstance().getLocalTimeZone(null);//TimeZone.getTimeZone("Europe/Moscow");
-                    DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-                    timeFormat.setTimeZone(localTimeZone);
-                    Date evtDateTime = timeFormat
-                            .parse(enterEventNode.getAttributes().getNamedItem("EvtDateTime").getTextContent());
-                    Long idOfVisitor = null;
-                    if (enterEventNode.getAttributes().getNamedItem("IdOfVisitor") != null) {
-                        idOfVisitor = Long
-                                .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfVisitor").getTextContent());
-                    }
-                    String visitorFullName = null;
-                    if (enterEventNode.getAttributes().getNamedItem("VisitorFullName") != null) {
-                        visitorFullName = enterEventNode.getAttributes().getNamedItem("VisitorFullName")
-                                .getTextContent();
-                    }
-                    Integer docType = null;
-                    if (enterEventNode.getAttributes().getNamedItem("DocType") != null) {
-                        docType = Integer
-                                .parseInt(enterEventNode.getAttributes().getNamedItem("DocType").getTextContent());
-                    }
-                    String docSerialNum = null;
-                    if (enterEventNode.getAttributes().getNamedItem("DocSerialNum") != null) {
-                        docSerialNum = enterEventNode.getAttributes().getNamedItem("DocSerialNum").getTextContent();
-                    }
-                    Date issueDocDate = null;
-                    if (enterEventNode.getAttributes().getNamedItem("IssueDocDate") != null) {
-                        issueDocDate = loadContext.dateOnlyFormat
-                                .parse(enterEventNode.getAttributes().getNamedItem("IssueDocDate").getTextContent());
-                    }
-                    Date visitDateTime = null;
-                    if (enterEventNode.getAttributes().getNamedItem("VisitDateTime") != null) {
-                        visitDateTime = timeFormat
-                                .parse(enterEventNode.getAttributes().getNamedItem("VisitDateTime").getTextContent());
-                    }
-                    Long guardianId = null;
-                    if (enterEventNode.getAttributes().getNamedItem("PassWithGuardian") != null) {
-                        guardianId = Long.parseLong(
-                                enterEventNode.getAttributes().getNamedItem("PassWithGuardian").getTextContent());
-                    }
-                    return new EnterEvent(idOfEnterEvent, /*idOfOrg, */enterName, turnstileAddr, passDirection, eventCode,
-                            idOfCard, idOfClient, idOfTempCard, evtDateTime, idOfVisitor, visitorFullName, docType,
-                            docSerialNum, issueDocDate, visitDateTime, guardianId);
-                }
-            }
-
-            private final long idOfEnterEvent;
-            //private long idOfOrg;
-            private final String enterName;
-            private final String turnstileAddr;
-            private final int passDirection;
-            private final int eventCode;
-            private final Long idOfCard;
-            private final Long idOfClient;
-            private final Long idOfTempCard;
-            private final Date evtDateTime;
-            private final Long idOfVisitor;
-            private final String visitorFullName;
-            private final Integer docType;
-            private final String docSerialNum;
-            private final Date issueDocDate;
-            private final Date visitDateTime;
-            private final Long guardianId;
-
-            public long getIdOfEnterEvent() {
-                return idOfEnterEvent;
-            }
-
-            //public long getIdOfOrg() {
-            //    return idOfOrg;
-            //}
-
-            public String getEnterName() {
-                return enterName;
-            }
-
-            public String getTurnstileAddr() {
-                return turnstileAddr;
-            }
-
-            public int getPassDirection() {
-                return passDirection;
-            }
-
-            public int getEventCode() {
-                return eventCode;
-            }
-
-            public Long getIdOfCard() {
-                return idOfCard;
-            }
-
-            public Long getIdOfClient() {
-                return idOfClient;
-            }
-
-            public Long getIdOfTempCard() {
-                return idOfTempCard;
-            }
-
-            public Date getEvtDateTime() {
-                return evtDateTime;
-            }
-
-            public Long getIdOfVisitor() {
-                return idOfVisitor;
-            }
-
-            public String getVisitorFullName() {
-                return visitorFullName;
-            }
-
-            public Integer getDocType() {
-                return docType;
-            }
-
-            public String getDocSerialNum() {
-                return docSerialNum;
-            }
-
-            public Date getIssueDocDate() {
-                return issueDocDate;
-            }
-
-            public Date getVisitDateTime() {
-                return visitDateTime;
-            }
-
-            public Long getGuardianId() {
-                return guardianId;
-            }
-
-            @Override
-            public String toString() {
-                return String
-                        .format("EnterEvent{idOfEnterEvent=%d,  enterName='%s', turnstileAddr='%s', passDirection=%d, eventCode=%d, idOfCard=%d, idOfClient=%d, idOfTempCard=%d, evtDateTime=%s, idOfVisitor=%d, visitorFullName='%s', docType=%d, docSerialNum='%s', issueDocDate=%s, visitDateTime=%s, guardianId=%s}",
-                                idOfEnterEvent, enterName, turnstileAddr, passDirection, eventCode, idOfCard,
-                                idOfClient, idOfTempCard, evtDateTime, idOfVisitor, visitorFullName, docType,
-                                docSerialNum, issueDocDate, visitDateTime, guardianId);
-            }
-        }
-
-        public static class Builder {
-
-            private final EnterEvent.Builder enterEventBuilder;
-
-            public Builder() {
-                this.enterEventBuilder = new EnterEvent.Builder();
-            }
-
-            public EnterEvents build(Node enterEventsNode, LoadContext loadContext, long idOfOrg) throws Exception {
-                List<EnterEvent> enterEventList = new ArrayList<EnterEvent>();
-                Node itemNode = enterEventsNode.getFirstChild();
-                while (null != itemNode) {
-                    if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("EE")) {
-                        enterEventList.add(enterEventBuilder.build(itemNode, loadContext, idOfOrg));
-                    }
-                    itemNode = itemNode.getNextSibling();
-                }
-                return new EnterEvents(enterEventList);
-            }
-        }
-
-        private final List<EnterEvent> events;
-
-        public EnterEvents(List<EnterEvent> events) {
-            this.events = events;
-        }
-
-        public List<EnterEvent> getEvents() {
-            return events;
-        }
-    }
-
-    public static class LoadContext {
-
-        public MenuGroups menuGroups;
-        public long protoVersion;
-        public DateFormat timeFormat, dateOnlyFormat;
-    }
-
     public static class Builder {
 
         private final DateFormat dateOnlyFormat;
@@ -2178,10 +1870,11 @@ public class SyncRequest {
         private final ReqMenu.Builder reqMenuBuilder;
         private final ReqDiary.Builder reqDiaryBuilder;
         private final MenuGroups.Builder menuGroupsBuilder;
-        private final EnterEvents.Builder enterEventsBuilder;
+        //private final EnterEvents.Builder enterEventsBuilder;
         private final TempCardsOperationBuilder tempCardsOperationBuilder;
         private Manager manager;
         private final ClientRequestBuilder clientRequestBuilder;
+        private final EnterEventsBuilder enterEventsBuilder;
         private final AccRegistryUpdateRequestBuilder accRegistryUpdateRequestBuilder;
         private final ClientGuardianBuilder clientGuardianBuilder;
 
@@ -2203,7 +1896,8 @@ public class SyncRequest {
             this.reqMenuBuilder = new ReqMenu.Builder();
             this.reqDiaryBuilder = new ReqDiary.Builder();
             this.menuGroupsBuilder = new MenuGroups.Builder();
-            this.enterEventsBuilder = new EnterEvents.Builder();
+            //this.enterEventsBuilder = new EnterEvents.Builder();
+            this.enterEventsBuilder = new EnterEventsBuilder();
             this.tempCardsOperationBuilder = new TempCardsOperationBuilder();
             this.clientRequestBuilder = new ClientRequestBuilder();
             this.accRegistryUpdateRequestBuilder = new AccRegistryUpdateRequestBuilder();
@@ -2267,11 +1961,11 @@ public class SyncRequest {
                 menuGroups = MenuGroups.Builder.buildEmpty();
             }
 
-            LoadContext loadContext = new LoadContext();
-            loadContext.menuGroups = menuGroups;
-            loadContext.protoVersion = version;
-            loadContext.dateOnlyFormat = dateOnlyFormat;
-            loadContext.timeFormat = timeFormat;
+            LoadContext loadContext = new LoadContext(menuGroups, version, timeFormat, dateOnlyFormat);
+            //loadContext.menuGroups = menuGroups;
+            //loadContext.protoVersion = version;
+            //loadContext.dateOnlyFormat = dateOnlyFormat;
+            //loadContext.timeFormat = timeFormat;
 
             Node paymentRegistryNode = findFirstChildElement(envelopeNode, "PaymentRegistry");
             PaymentRegistry paymentRegistry = null;
@@ -2331,28 +2025,21 @@ public class SyncRequest {
             }
 
             // 07.09.2011 EnterEvents
-            Node enterEventsNode = findFirstChildElement(envelopeNode, "EnterEvents");
-            EnterEvents enterEvents = null;
-            if (enterEventsNode != null) {
-                enterEvents = enterEventsBuilder.build(enterEventsNode, loadContext, org.getIdOfOrg());
-            }
+
+            //Node enterEventsNode = findFirstChildElement(envelopeNode, "EnterEvents");
+            //EnterEvents enterEvents = null;
+            //if (enterEventsNode != null) {
+            //    enterEvents = enterEventsBuilder.build(enterEventsNode, loadContext);
+            //}
+
+            enterEventsBuilder.createMainNode(envelopeNode);
+            EnterEvents enterEvents = enterEventsBuilder.build(loadContext);
 
             TempCardsOperations tempCardsOperations = null;
             Node tempCardsOperationsNode = findFirstChildElement(envelopeNode, "TempCardsOperations");
             if (tempCardsOperationsNode != null) {
                 tempCardsOperations = tempCardsOperationBuilder.build(tempCardsOperationsNode, org.getIdOfOrg());
             }
-
-            //ClientRequests clientRequests = null;
-            //Node clientRequestsNode = findFirstChildElement(envelopeNode, "ClientRequests");
-            //if (clientRequestsNode != null) {
-            //    clientRequests = clientRequestBuilder.build(clientRequestsNode);
-            //}
-
-            //Node clientGuardianRequestParseRequestNode = findFirstChildElement(envelopeNode, "ClientGuardianRequest");
-            //if (clientGuardianRequestParseRequestNode != null) {
-            //    accRegistryUpdateRequest=accRegistryUpdateRequestBuilder.build(accRegistryUpdateRequestParseRequestNode);
-            //}
 
             clientRequestBuilder.createMainNode(envelopeNode);
             ClientRequests clientRequests = clientRequestBuilder.build();
@@ -2553,3 +2240,225 @@ public class SyncRequest {
         return Double.parseDouble(replacedString);
     }
 }
+
+
+/* public static class EnterEvents {
+
+        public static class EnterEvent {
+
+            public EnterEvent(long idOfEnterEvent, String enterName, String turnstileAddr,
+                    int passDirection, int eventCode, Long idOfCard, Long idOfClient, Long idOfTempCard,
+                    Date evtDateTime, Long idOfVisitor, String visitorFullName, Integer docType, String docSerialNum,
+                    Date issueDocDate, Date visitDateTime, Long guardianId) {
+                this.idOfEnterEvent = idOfEnterEvent;
+                this.enterName = enterName;
+                this.turnstileAddr = turnstileAddr;
+                this.passDirection = passDirection;
+                this.eventCode = eventCode;
+                this.idOfCard = idOfCard;
+                this.idOfClient = idOfClient;
+                this.idOfTempCard = idOfTempCard;
+                this.evtDateTime = evtDateTime;
+                this.idOfVisitor = idOfVisitor;
+                this.visitorFullName = visitorFullName;
+                this.docType = docType;
+                this.docSerialNum = docSerialNum;
+                this.issueDocDate = issueDocDate;
+                this.visitDateTime = visitDateTime;
+                this.guardianId = guardianId;
+            }
+
+            public static class Builder {
+
+                public EnterEvent build(Node enterEventNode, LoadContext loadContext) throws Exception {
+                    long idOfEnterEvent = Long
+                            .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfEnterEvent").getTextContent());
+                    String enterName = enterEventNode.getAttributes().getNamedItem("EnterName").getTextContent();
+                    String turnstileAddr = enterEventNode.getAttributes().getNamedItem("TurnstileAddr")
+                            .getTextContent();
+                    int passDirection = Integer
+                            .parseInt(enterEventNode.getAttributes().getNamedItem("PassDirection").getTextContent());
+                    int eventCode = Integer
+                            .parseInt(enterEventNode.getAttributes().getNamedItem("EventCode").getTextContent());
+                    Long idOfCard = null;
+                    if (enterEventNode.getAttributes().getNamedItem("IdOfCard") != null) {
+                        idOfCard = Long
+                                .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfCard").getTextContent());
+                    }
+                    Long idOfClient = null;
+                    if (enterEventNode.getAttributes().getNamedItem("IdOfClient") != null) {
+                        idOfClient = Long
+                                .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfClient").getTextContent());
+                    }
+                    Long idOfTempCard = null;
+                    if (enterEventNode.getAttributes().getNamedItem("IdOfTempCard") != null) {
+                        idOfTempCard = Long.parseLong(
+                                enterEventNode.getAttributes().getNamedItem("IdOfTempCard").getTextContent());
+                    }
+                    TimeZone localTimeZone = RuntimeContext.getInstance().getLocalTimeZone(null);//TimeZone.getTimeZone("Europe/Moscow");
+                    DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+                    timeFormat.setTimeZone(localTimeZone);
+                    Date evtDateTime = timeFormat
+                            .parse(enterEventNode.getAttributes().getNamedItem("EvtDateTime").getTextContent());
+                    Long idOfVisitor = null;
+                    if (enterEventNode.getAttributes().getNamedItem("IdOfVisitor") != null) {
+                        idOfVisitor = Long
+                                .parseLong(enterEventNode.getAttributes().getNamedItem("IdOfVisitor").getTextContent());
+                    }
+                    String visitorFullName = null;
+                    if (enterEventNode.getAttributes().getNamedItem("VisitorFullName") != null) {
+                        visitorFullName = enterEventNode.getAttributes().getNamedItem("VisitorFullName")
+                                .getTextContent();
+                    }
+                    Integer docType = null;
+                    if (enterEventNode.getAttributes().getNamedItem("DocType") != null) {
+                        docType = Integer
+                                .parseInt(enterEventNode.getAttributes().getNamedItem("DocType").getTextContent());
+                    }
+                    String docSerialNum = null;
+                    if (enterEventNode.getAttributes().getNamedItem("DocSerialNum") != null) {
+                        docSerialNum = enterEventNode.getAttributes().getNamedItem("DocSerialNum").getTextContent();
+                    }
+                    Date issueDocDate = null;
+                    if (enterEventNode.getAttributes().getNamedItem("IssueDocDate") != null) {
+                        issueDocDate = loadContext.dateOnlyFormat
+                                .parse(enterEventNode.getAttributes().getNamedItem("IssueDocDate").getTextContent());
+                    }
+                    Date visitDateTime = null;
+                    if (enterEventNode.getAttributes().getNamedItem("VisitDateTime") != null) {
+                        visitDateTime = timeFormat
+                                .parse(enterEventNode.getAttributes().getNamedItem("VisitDateTime").getTextContent());
+                    }
+                    Long guardianId = null;
+                    if (enterEventNode.getAttributes().getNamedItem("PassWithGuardian") != null) {
+                        guardianId = Long.parseLong(
+                                enterEventNode.getAttributes().getNamedItem("PassWithGuardian").getTextContent());
+                    }
+                    return new EnterEvent(idOfEnterEvent, enterName, turnstileAddr, passDirection, eventCode,
+                            idOfCard, idOfClient, idOfTempCard, evtDateTime, idOfVisitor, visitorFullName, docType,
+                            docSerialNum, issueDocDate, visitDateTime, guardianId);
+                }
+            }
+
+            private final long idOfEnterEvent;
+            private final String enterName;
+            private final String turnstileAddr;
+            private final int passDirection;
+            private final int eventCode;
+            private final Long idOfCard;
+            private final Long idOfClient;
+            private final Long idOfTempCard;
+            private final Date evtDateTime;
+            private final Long idOfVisitor;
+            private final String visitorFullName;
+            private final Integer docType;
+            private final String docSerialNum;
+            private final Date issueDocDate;
+            private final Date visitDateTime;
+            private final Long guardianId;
+
+            public long getIdOfEnterEvent() {
+                return idOfEnterEvent;
+            }
+
+            public String getEnterName() {
+                return enterName;
+            }
+
+            public String getTurnstileAddr() {
+                return turnstileAddr;
+            }
+
+            public int getPassDirection() {
+                return passDirection;
+            }
+
+            public int getEventCode() {
+                return eventCode;
+            }
+
+            public Long getIdOfCard() {
+                return idOfCard;
+            }
+
+            public Long getIdOfClient() {
+                return idOfClient;
+            }
+
+            public Long getIdOfTempCard() {
+                return idOfTempCard;
+            }
+
+            public Date getEvtDateTime() {
+                return evtDateTime;
+            }
+
+            public Long getIdOfVisitor() {
+                return idOfVisitor;
+            }
+
+            public String getVisitorFullName() {
+                return visitorFullName;
+            }
+
+            public Integer getDocType() {
+                return docType;
+            }
+
+            public String getDocSerialNum() {
+                return docSerialNum;
+            }
+
+            public Date getIssueDocDate() {
+                return issueDocDate;
+            }
+
+            public Date getVisitDateTime() {
+                return visitDateTime;
+            }
+
+            public Long getGuardianId() {
+                return guardianId;
+            }
+
+            @Override
+            public String toString() {
+                return String
+                        .format("EnterEvent{idOfEnterEvent=%d,  enterName='%s', turnstileAddr='%s', passDirection=%d, eventCode=%d, idOfCard=%d, idOfClient=%d, idOfTempCard=%d, evtDateTime=%s, idOfVisitor=%d, visitorFullName='%s', docType=%d, docSerialNum='%s', issueDocDate=%s, visitDateTime=%s, guardianId=%s}",
+                                idOfEnterEvent, enterName, turnstileAddr, passDirection, eventCode, idOfCard,
+                                idOfClient, idOfTempCard, evtDateTime, idOfVisitor, visitorFullName, docType,
+                                docSerialNum, issueDocDate, visitDateTime, guardianId);
+            }
+        }
+
+        public static class Builder {
+
+            private final EnterEvent.Builder enterEventBuilder;
+
+            public Builder() {
+                this.enterEventBuilder = new EnterEvent.Builder();
+            }
+
+            public EnterEvents build(Node enterEventsNode, LoadContext loadContext) throws Exception {
+                List<EnterEvent> enterEventList = new ArrayList<EnterEvent>();
+                Node itemNode = enterEventsNode.getFirstChild();
+                while (null != itemNode) {
+                    if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("EE")) {
+                        enterEventList.add(enterEventBuilder.build(itemNode, loadContext));
+                    }
+                    itemNode = itemNode.getNextSibling();
+                }
+                return new EnterEvents(enterEventList);
+            }
+        }
+
+        private final List<EnterEvent> events;
+
+        public EnterEvents(List<EnterEvent> events) {
+            this.events = events;
+        }
+
+        public List<EnterEvent> getEvents() {
+            return events;
+        }
+    }*/

@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.org.menu;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.sync.LoadContext;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -137,12 +138,7 @@ public class MenuLoadPage extends BasicWorkspacePage {
         DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         timeFormat.setTimeZone(localTimeZone);
 
-        SyncRequest.LoadContext loadContext = new SyncRequest.LoadContext();
-        loadContext.menuGroups = menuGroups;
-        loadContext.protoVersion = 5L;
-        loadContext.dateOnlyFormat = dateOnlyFormat;
-        loadContext.timeFormat = timeFormat;
-
+        LoadContext loadContext = new LoadContext(menuGroups, 5L, timeFormat, dateOnlyFormat);
         SyncRequest.ReqMenu reqMenu = null;
         if (menuNode != null) {
             reqMenu = reqMenuBuilder.build(menuNode, loadContext);
@@ -360,9 +356,9 @@ public class MenuLoadPage extends BasicWorkspacePage {
             throws Exception {
         while (reqMenuDetails.hasNext()) {
             SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
-            if (null == findMenuDetailByLocalId(menu, reqMenuDetail.getIdOfMenu())) {
-                MenuDetail menuDetail = new MenuDetail(menu, reqMenuDetail.getPath(), reqMenuDetail.getName(),
-                        reqMenuDetail.getMenuOrigin(), reqMenuDetail.getAvailableNow(),
+                if (null == findMenuDetailByLocalId(menu, reqMenuDetail.getIdOfMenu())) {
+                    MenuDetail menuDetail = new MenuDetail(menu, reqMenuDetail.getPath(), reqMenuDetail.getName(),
+                            reqMenuDetail.getMenuOrigin(), reqMenuDetail.getAvailableNow(),
                         reqMenuDetail.getFlags());
                 menuDetail.setLocalIdOfMenu(reqMenuDetail.getIdOfMenu());
                 menuDetail.setGroupName(reqMenuDetail.getGroup());

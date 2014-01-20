@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.payment.registry;
 
+import ru.axetta.ecafe.processor.core.sync.LoadContext;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 
 import org.w3c.dom.Node;
@@ -16,7 +17,7 @@ import java.util.List;
  */
 public class PaymentRegistryBuilder {
 
-    public PaymentRegistry build(Node paymentRegistryNode, SyncRequest.LoadContext loadContext) throws Exception {
+    public PaymentRegistry build(Node paymentRegistryNode, LoadContext loadContext) throws Exception {
         List<Payment> POSPayments = new LinkedList<Payment>();
         Node itemNode = paymentRegistryNode.getFirstChild();
         while (null != itemNode) {

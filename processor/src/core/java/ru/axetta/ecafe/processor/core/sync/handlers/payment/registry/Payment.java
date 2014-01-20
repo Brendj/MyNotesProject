@@ -1,6 +1,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.payment.registry;
 
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
+import ru.axetta.ecafe.processor.core.sync.LoadContext;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 
 import org.w3c.dom.NamedNodeMap;
@@ -41,17 +42,17 @@ public class Payment {
     private final OrderTypeEnumType orderType;
     private final List<Purchase> posPurchases;
 
-    public static Payment build(Node paymentNode, SyncRequest.LoadContext loadContext) throws Exception {
+    public static Payment build(Node paymentNode, LoadContext loadContext) throws Exception {
         NamedNodeMap namedNodeMap = paymentNode.getAttributes();
         Long cardNo = getLongValueNullSafe(namedNodeMap, "CardNo");
-        Date date = loadContext.timeFormat.parse(namedNodeMap.getNamedItem("Date").getTextContent());
+        Date date = loadContext.getTimeFormat().parse(namedNodeMap.getNamedItem("Date").getTextContent());
         /* поддержка версий которые не высылают OrderDate в эту колонку записываются дата из колоки Date */
         String orderDateStr = getStringValueNullSafe(namedNodeMap,"OrderDate");
         Date orderDate = null;
         if (orderDateStr == null) {
             orderDate = date;
         } else {
-            orderDate = loadContext.timeFormat.parse(orderDateStr);
+            orderDate = loadContext.getTimeFormat().parse(orderDateStr);
         }
         Long socDiscount = 0L;
         Long trdDiscount = 0L;
@@ -89,7 +90,7 @@ public class Payment {
         while (null != purchaseNode) {
             if (Node.ELEMENT_NODE == purchaseNode.getNodeType() && purchaseNode.getNodeName()
                     .equals("PC")) {
-                purchases.add(Purchase.build(purchaseNode, loadContext.menuGroups));
+                purchases.add(Purchase.build(purchaseNode, loadContext.getMenuGroups()));
             }
             purchaseNode = purchaseNode.getNextSibling();
         }
