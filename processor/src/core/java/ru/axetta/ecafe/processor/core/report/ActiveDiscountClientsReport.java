@@ -13,6 +13,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -44,7 +45,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
     private static final String DISTRICT_NAME = "Район";
     private static final String ORG_NAME = "Организация";
     private static final String ADDRESS_NAME = "Адрес";
-    private static final String POS_NAME = "Порядковый номер (№ п.п.)";
+    private static final String POS_NAME = "№";
     private static final String FIO_NAME = "ФИО";
     private static final String CLASS_NAME = "Класс";
     private static final String TOTAL_NAME = "Итого";
@@ -141,11 +142,11 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                 orgRestrict = " and cf_clients.idoforg=" + org.getIdOfOrg() + " ";
             }
             String sql =
-                    "select cf_orgs.idoforg, cf_clients.idofclient, cf_orgs.district, cf_orgs.shortname,"
+                    "select cf_orgs.idoforg, cf_clients.idofclient, cf_orgs.district, cf_orgs.shortname, "
                     + "       cf_orgs.address, "
                     + "       cf_persons.surname, cf_persons.firstname, cf_persons.secondname, "
                     + "       cf_clientgroups.groupname, cf_categorydiscounts.categoryname, "
-                    + "       cf_goods.nameofgood, sum(cf_orders.socdiscount) "
+                    + "       cf_complexroles.rolename, sum(cf_orders.socdiscount) "
                     + "from cf_clients "
                     + "join cf_orgs on cf_clients.idoforg=cf_orgs.idoforg "
                     + "join cf_persons on cf_clients.idofperson=cf_persons.idofperson "
@@ -156,13 +157,13 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     + "                       cf_orders.createddate >= :startDate and "
                     + "                       cf_orders.createddate <= :endDate "
                     + "left join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
-                    + "left join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
-                    + "where cf_clients.discountmode<>0 " + orgRestrict
+                    + "left join cf_complexroles on cf_complexroles.idofrole=cf_orderdetails.menutype-" + OrderDetail.TYPE_COMPLEX_MIN + " "
+                    + "where cf_clients.discountmode<>0 and cf_complexroles.rolename<>'' " + orgRestrict
                     + "group by cf_orgs.idoforg, cf_clients.idofclient, "
                     + "       cf_orgs.district, cf_orgs.shortname, cf_orgs.address, "
                     + "       cf_persons.surname, cf_persons.firstname, cf_persons.secondname, "
                     + "       cf_clientgroups.groupname, cf_categorydiscounts.categoryname, "
-                    + "       cf_goods.nameofgood "
+                    + "       cf_complexroles.rolename "
                     + "order by cf_orgs.district, cf_orgs.shortname, cf_clientgroups.groupname, "
                     + "         cf_persons.surname, cf_persons.firstname, cf_clients.idofclient";
             Query query = session.createSQLQuery(sql);
@@ -194,6 +195,9 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                 if (e[11] != null) {
                     price = ((BigDecimal) e[11]).longValue();
                 }
+                if (goodName == null || goodName.length() < 1) {
+                    goodName = "- Без льготы -";
+                }
 
 
                 if (idoforg != prevIdOfOrg) {
@@ -212,8 +216,10 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                 }
                 if (idofclient != prevIdOfClient) {
                     item = new ActiveDiscountClientsItem
-                            (district, name, address, surname,
-                            firstname, secondname, groupName);
+                            (!district.equals(prevDistrict) ? district : "",
+                             idoforg != prevIdOfOrg ? name : "",
+                             idoforg != prevIdOfOrg ? address : "", surname,
+                             firstname, secondname, groupName);
                     item.setPosition(position);
                     result.add(item);
                     position++;
@@ -223,15 +229,16 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                 item.addTotal(price);
 
                 orgItem.addCategoryClient(categoryname);
-                orgItem.addGoodClient(categoryname, price);
+                orgItem.addGoodClient(goodName, price);
                 orgItem.addTotal(price);
                 districtItem.addCategoryClient(categoryname);
-                districtItem.addGoodClient(categoryname, price);
+                districtItem.addGoodClient(goodName, price);
                 districtItem.addTotal(price);
                 overallItem.addCategoryClient(categoryname);
-                overallItem.addGoodClient(categoryname, price);
+                overallItem.addGoodClient(goodName, price);
                 overallItem.addTotal(price);
 
+                prevIdOfClient = idofclient;
                 prevIdOfOrg = idoforg;
                 prevDistrict = district;
             }

@@ -50,14 +50,14 @@
         <c:if test="${!empty activeDiscountClientsReportPage.report && !empty activeDiscountClientsReportPage.report.items && !empty activeDiscountClientsReportPage.report.columnNames}" >
             <h:outputText escape="true" value="Отчет по питающимся льготникам" styleClass="output-text" />
             <rich:dataTable id="itemsReportTable" value="#{activeDiscountClientsReportPage.report.items}"
-                            var="item" rowKeyVar="row" rows="20" footerClass="data-table-footer"
+                            var="item" rowKeyVar="row" rows="100" footerClass="data-table-footer"
                             columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
 
                 <rich:column styleClass="center-aligned-column">
                     <f:facet name="header">
-                        <h:outputText value="№" />
+                        <h:outputText value="" />
                     </f:facet>
-                    <h:outputText value="#{row + 1}" styleClass="output-text" />
+                    <h:outputText value="" styleClass="output-text" />
                 </rich:column>
 
                 <rich:columns value="#{activeDiscountClientsReportPage.report.columnNames}" var="columnName"
