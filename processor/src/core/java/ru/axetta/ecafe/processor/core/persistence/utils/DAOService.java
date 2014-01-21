@@ -277,14 +277,6 @@ public class DAOService {
         }
     }
 
-    public Long getClientContractIdByCardId(String idOfCard) throws Exception {
-        Client cl = DAOUtils.findClientByCardNo(entityManager, Long.decode(idOfCard));
-        if (cl == null) {
-            return null;
-        }
-        return cl.getContractId();
-    }
-
     public Long getContractIdByCardNo(long lCardId) throws Exception {
         Client client = DAOUtils.findClientByCardNo(entityManager, lCardId);
         if (client != null) {
@@ -292,18 +284,6 @@ public class DAOService {
         }
         return null;
     }
-
-    //public Long getContractIdByCardNo(long lCardId) throws Exception {
-    //    TypedQuery<Long> query = entityManager.createQuery("select card.client.contractId from Card card where card.cardNo=:cardNo", Long.class);
-    //    query.setParameter("cardNo", lCardId);
-    //    List<Long> list = query.getResultList();
-    //    if(list==null || list.isEmpty()){
-    //        return null;
-    //    } else {
-    //        return list.get(0);
-    //    }
-    //}
-
 
     public Long getContractIdByTempCardNoAndCheckValidDate(long lCardId, int days) throws Exception {
         /* так как в поле хранится дата на 00:00 ночи текущего дня вычтем из текущего дня 24 часа в милисекудах */
