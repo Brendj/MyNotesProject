@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.text.DateFormat;
 import java.util.*;
@@ -257,6 +259,7 @@ public class SubscriptionFeedingService {
         // Если осталась активная циклограмма со старой подписки, то ее необходимо удалить.
         if (cd != null) {
             cd.setDeletedState(true);
+            cd.setStateDiagram(StateDiagram.BLOCK);
             cd.setGlobalVersion(daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName()));
             entityManager.merge(cd);
         }
@@ -314,6 +317,7 @@ public class SubscriptionFeedingService {
         CycleDiagram cd = findCycleDiagramOnDate(client, dateActivationDiagram);
         if (cd != null) {
             cd.setDeletedState(true);
+            cd.setStateDiagram(StateDiagram.BLOCK);
             cd.setGlobalVersion(daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName()));
             entityManager.merge(cd);
         }
@@ -339,5 +343,36 @@ public class SubscriptionFeedingService {
             }
         }
         return price;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void activateCycleDiagrams() {
+        if (!RuntimeContext.getInstance().isMainNode()) {
+            return;
+        }
+        Date today = CalendarUtils.truncateToDayOfMonth(new Date());
+        Date tomorrow = CalendarUtils.addDays(today, 1);
+        Query updateQuery = entityManager.createQuery(
+                "update CycleDiagram cd set cd.stateDiagram = :active where cd.stateDiagram = :wait and cd.deletedState = false and "
+                        + "cd.dateActivationDiagram >= :today and cd.dateActivationDiagram < :tomorrow and cd.client.idOfClient = :id");
+        Query deleteQuery = entityManager.createQuery(
+                "update CycleDiagram cd set cd.stateDiagram = :block, cd.deletedState = true where cd.client.idOfClient = :id and cd.dateActivationDiagram < :today");
+        Query query = entityManager.createQuery(
+                "select cd.client.idOfClient from CycleDiagram cd where cd.stateDiagram = :active and cd.deletedState = false")
+                .setParameter("active", StateDiagram.ACTIVE);
+        List<Long> clientIds = (List<Long>) query.getResultList();
+        int activatedCount = 0;
+        int blockedCount = 0;
+        for (Long clientId : clientIds) {
+            int count = updateQuery.setParameter("active", StateDiagram.ACTIVE).setParameter("wait", StateDiagram.WAIT)
+                    .setParameter("today", today).setParameter("tomorrow", tomorrow).setParameter("id", clientId)
+                    .executeUpdate();
+            if (count != 0) {
+                blockedCount += deleteQuery.setParameter("id", clientId).setParameter("today", today).executeUpdate();
+            }
+        }
+        LOGGER.info("Today activated cycle diagrams count: {}", activatedCount);
+        LOGGER.info("Today blocked cycle diagrams count: {}", blockedCount);
     }
 }
