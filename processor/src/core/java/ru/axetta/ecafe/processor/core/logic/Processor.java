@@ -2408,10 +2408,6 @@ public class Processor implements SyncProcessor,
 
                         processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos(),
                             localIdsToMenuDetailMap);
-                    } else {
-                        processLocalIdsToMenuDetailMap(menu, item, item.getReqMenuDetails(), localIdsToMenuDetailMap);
-                        processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos(),
-                                localIdsToMenuDetailMap);
                     }
 
                     bFirstMenuItem = false;

@@ -480,24 +480,6 @@ public class SyncRequest {
                     private Long idOfItem;
                     private Integer count;
 
-                    ReqComplexInfoDetail(ReqMenuDetail reqMenuDetail, Long idOfItem, Integer count) {
-                        this.reqMenuDetail = reqMenuDetail;
-                        this.idOfItem = idOfItem;
-                        this.count = count;
-                    }
-
-                    public ReqMenuDetail getReqMenuDetail() {
-                        return reqMenuDetail;
-                    }
-
-                    public Long getIdOfItem() {
-                        return idOfItem;
-                    }
-
-                    public Integer getCount() {
-                        return count;
-                    }
-
                     public static class Builder {
 
                         public ReqComplexInfoDetail build(Node node, HashMap<Long, ReqMenuDetail> reqMenuDetailMap)
@@ -531,6 +513,58 @@ public class SyncRequest {
                         }
                     }
 
+                    ReqComplexInfoDetail(ReqMenuDetail reqMenuDetail, Long idOfItem, Integer count) {
+                        this.reqMenuDetail = reqMenuDetail;
+                        this.idOfItem = idOfItem;
+                        this.count = count;
+                    }
+
+                    public ReqMenuDetail getReqMenuDetail() {
+                        return reqMenuDetail;
+                    }
+
+                    public Long getIdOfItem() {
+                        return idOfItem;
+                    }
+
+
+                    public Integer getCount() {
+                        return count;
+                    }
+
+                    @Override
+                    public boolean equals(Object o) {
+                        if (this == o) {
+                            return true;
+                        }
+                        if (o == null || getClass() != o.getClass()) {
+                            return false;
+                        }
+
+                        ReqComplexInfoDetail that = (ReqComplexInfoDetail) o;
+
+                        if (!count.equals(that.count)) {
+                            return false;
+                        }
+                        if (!idOfItem.equals(that.idOfItem)) {
+                            return false;
+                        }
+                        if (!reqMenuDetail.equals(that.reqMenuDetail)) {
+                            return false;
+                        }
+
+                        return true;
+                    }
+
+                    @Override
+                    public int hashCode() {
+                        HashCodeBuilder builder = new HashCodeBuilder();
+                        builder.append(reqMenuDetail);
+                        builder.append(idOfItem);
+                        builder.append(count);
+                        return builder.toHashCode();
+
+                    }
                 }
 
                 public static class ReqComplexInfoDiscountDetail {
@@ -609,6 +643,42 @@ public class SyncRequest {
                                 '}';
                     }
 
+                    @Override
+                    public boolean equals(Object o) {
+                        if (this == o) {
+                            return true;
+                        }
+                        if (o == null || getClass() != o.getClass()) {
+                            return false;
+                        }
+
+                        ReqComplexInfoDiscountDetail that = (ReqComplexInfoDiscountDetail) o;
+
+                        if (isAllGroups != that.isAllGroups) {
+                            return false;
+                        }
+                        if (Double.compare(that.size, size) != 0) {
+                            return false;
+                        }
+                        if (!idOfClientGroup.equals(that.idOfClientGroup)) {
+                            return false;
+                        }
+                        if (!maxCount.equals(that.maxCount)) {
+                            return false;
+                        }
+
+                        return true;
+                    }
+
+                    @Override
+                    public int hashCode() {
+                        HashCodeBuilder builder = new HashCodeBuilder();
+                        builder.append(size);
+                        builder.append(isAllGroups);
+                        builder.append(maxCount);
+                        builder.append(idOfClientGroup);
+                        return builder.toHashCode();
+                    }
                 }
 
                 public static class Builder {
@@ -753,9 +823,86 @@ public class SyncRequest {
 
                 public int getUsedSubscriptionFeeding() {
                     return usedSubscriptionFeeding;
-            }
+                }
 
+                @Override
+                public boolean equals(Object o) {
+                    if (this == o) {
+                        return true;
                     }
+                    if (o == null || getClass() != o.getClass()) {
+                        return false;
+                    }
+
+                    ReqComplexInfo that = (ReqComplexInfo) o;
+
+                    if (complexId != that.complexId) {
+                        return false;
+                    }
+                    if (modeFree != that.modeFree) {
+                        return false;
+                    }
+                    if (modeGrant != that.modeGrant) {
+                        return false;
+                    }
+                    if (modeOfAdd != that.modeOfAdd) {
+                        return false;
+                    }
+                    if (usedSubscriptionFeeding != that.usedSubscriptionFeeding) {
+                        return false;
+                    }
+                    if (complexInfoDetails != null ? !complexInfoDetails.equals(that.complexInfoDetails)
+                            : that.complexInfoDetails != null) {
+                        return false;
+                    }
+                    if (complexInfoDiscountDetail != null ? !complexInfoDiscountDetail
+                            .equals(that.complexInfoDiscountDetail) : that.complexInfoDiscountDetail != null) {
+                        return false;
+                    }
+                    if (complexMenuName != null ? !complexMenuName.equals(that.complexMenuName)
+                            : that.complexMenuName != null) {
+                        return false;
+                    }
+                    if (currentPrice != null ? !currentPrice.equals(that.currentPrice) : that.currentPrice != null) {
+                        return false;
+                    }
+                    if (goodsGuid != null ? !goodsGuid.equals(that.goodsGuid) : that.goodsGuid != null) {
+                        return false;
+                    }
+                    if (reqMenuDetail != null ? !reqMenuDetail.equals(that.reqMenuDetail)
+                            : that.reqMenuDetail != null) {
+                        return false;
+                    }
+                    if (useTrDiscount != null ? !useTrDiscount.equals(that.useTrDiscount)
+                            : that.useTrDiscount != null) {
+                        return false;
+                    }
+
+                    return true;
+                }
+
+                @Override
+                public int hashCode() {
+                    HashCodeBuilder builder = new HashCodeBuilder();
+                    builder.append(complexId);
+                    builder.append(complexMenuName);
+                    builder.append(modeFree);
+                    builder.append(modeGrant);
+                    builder.append(modeOfAdd);
+                    builder.append(usedSubscriptionFeeding);
+                    builder.append(useTrDiscount);
+                    builder.append(currentPrice);
+                    builder.append(goodsGuid);
+                    builder.append(reqMenuDetail);
+                    builder.append(complexInfoDiscountDetail);
+                    if(complexInfoDetails != null){
+                        for (ReqComplexInfoDetail obj : complexInfoDetails) {
+                            builder.append(obj);
+                        }
+                    }
+                    return builder.toHashCode();
+                }
+            }
 
             public static class ReqMenuDetail {
 
@@ -1026,7 +1173,7 @@ public class SyncRequest {
                 public boolean equals(Object o) {
                     if (this == o) {
                         return true;
-            }
+                    }
                     if (o == null || getClass() != o.getClass()) {
                         return false;
                     }
@@ -1526,16 +1673,16 @@ public class SyncRequest {
                 if (date != null ? !date.equals(item.date) : item.date != null) {
                     return false;
                 }
+                if (reqMenuDetails != null ? !reqMenuDetails.equals(item.reqMenuDetails)
+                        : item.reqMenuDetails != null) {
+                    return false;
+                }
                 if (reqAssortments != null ? !reqAssortments.equals(item.reqAssortments)
                         : item.reqAssortments != null) {
                     return false;
                 }
                 if (reqComplexInfos != null ? !reqComplexInfos.equals(item.reqComplexInfos)
                         : item.reqComplexInfos != null) {
-                    return false;
-                }
-                if (reqMenuDetails != null ? !reqMenuDetails.equals(item.reqMenuDetails)
-                        : item.reqMenuDetails != null) {
                     return false;
                 }
 
@@ -1552,6 +1699,11 @@ public class SyncRequest {
                 }
                 if(reqAssortments != null){
                     for (ReqAssortment obj : reqAssortments) {
+                        builder.append(obj);
+                    }
+                }
+                if(reqComplexInfos != null){
+                    for (ReqComplexInfo obj : reqComplexInfos) {
                         builder.append(obj);
                     }
                 }
