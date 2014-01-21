@@ -156,7 +156,7 @@ public class SubscriptionFeeding extends DistributedObject{
 
     // Проверка подписки на актуальность.
     public boolean isActual() {
-        return (deletedState == null || !deletedState) && (dateDeactivateService == null || dateDeactivateService
+        return deletedState != null && !deletedState && (dateDeactivateService == null || dateDeactivateService
                 .after(new Date()));
     }
 
