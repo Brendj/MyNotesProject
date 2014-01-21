@@ -2210,12 +2210,13 @@ public class Processor implements SyncProcessor,
             List<Card> cards = DAOUtils.getClientsAndCardsForOrgs(persistenceSession, idOfOrgSet, clientIds);
             for (Card card : cards) {
                 Client client = card.getClient();
-                if (client.getClientGroup() == null || (!client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()
-                        .equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) && !client.getClientGroup()
-                        .getCompositeIdOfClientGroup().getIdOfClientGroup()
-                        .equals(ClientGroup.Predefined.CLIENT_DELETED.getValue()))) {
-                    accRegistry.addItem(new SyncResponse.AccRegistry.Item(card));
-                }
+                accRegistry.addItem(new SyncResponse.AccRegistry.Item(card));
+                //if (client.getClientGroup() == null || (!client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()
+                //        .equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) && !client.getClientGroup()
+                //        .getCompositeIdOfClientGroup().getIdOfClientGroup()
+                //        .equals(ClientGroup.Predefined.CLIENT_DELETED.getValue()))) {
+                //    accRegistry.addItem(new SyncResponse.AccRegistry.Item(card));
+                //}
             }
 						 // Добавляем карты перемещенных клиентов.
             if(clientIds==null || clientIds.isEmpty()){
