@@ -416,7 +416,7 @@ public class ImportRegisterClientsService {
                     .findClientGroupByGroupNameAndIdOfOrg(session, dbClient.getOrg().getIdOfOrg(),
                             ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
             if (clientGroup == null) {
-                clientGroup = DAOUtils.createNewClientGroup(session, dbClient.getOrg().getIdOfOrg(),
+                clientGroup = DAOUtils.createClientGroup(session, dbClient.getOrg().getIdOfOrg(),
                         ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
             }
             log(synchDate + "Удаление " +
@@ -613,7 +613,7 @@ public class ImportRegisterClientsService {
                 ClientGroup deletedClientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session, change.getIdOfOrg(),
                         ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
                 if (deletedClientGroup == null) {
-                    deletedClientGroup = DAOUtils.createNewClientGroup
+                    deletedClientGroup = DAOUtils.createClientGroup
                                 (session, change.getIdOfOrg(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
                 }
                 dbClient.setIdOfClientGroup(deletedClientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
