@@ -50,23 +50,23 @@ public class GoodRequestsReport extends BasicReport {
     private static final String GOOD_NAME = "Товар";
     private static final List <ReportColumn> DEFAULT_COLUMNS = new ArrayList <ReportColumn> ();
     static
-        {
+    {
         DEFAULT_COLUMNS.add(new ReportColumn (ORG_NUM));
         DEFAULT_COLUMNS.add(new ReportColumn (ORG_NAME));
         DEFAULT_COLUMNS.add(new ReportColumn (GOOD_NAME));
-        }
+    }
 
 
     public static class Builder {
 
         public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
                 Date startDate, Date endDate, Long idOfOrg) throws Exception{
-            return build(session, hideMissedColumns,startDate,endDate, Arrays.asList(idOfOrg),null,-1, "", false);
+            return build(session, hideMissedColumns,startDate,endDate, Arrays.asList(idOfOrg),null,3, "", false);
         }
 
         public GoodRequestsReport build(Session session,
                 Date startDate, Date endDate, List<Long> idOfSupplierList) throws Exception{
-             return build(session, false,startDate,endDate, new ArrayList<Long>(0),idOfSupplierList,-1, "", true);
+            return build(session, false,startDate,endDate, new ArrayList<Long>(0),idOfSupplierList,3, "", true);
         }
 
         public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
@@ -77,8 +77,8 @@ public class GoodRequestsReport extends BasicReport {
         }
 
         private GoodRequestsReport build(Session session, Boolean hideMissedColumns,
-                                        Date startDate, Date endDate, List<Long> idOfOrgList, List <Long> idOfSupplierList,
-                                        int requestsFilter, String goodName, Boolean isWriteTotalRow)
+                Date startDate, Date endDate, List<Long> idOfOrgList, List <Long> idOfSupplierList,
+                int requestsFilter, String goodName, Boolean isWriteTotalRow)
                 throws Exception {
             Date generateTime = new Date();
             List<RequestItem> items = new LinkedList<RequestItem>();
@@ -98,8 +98,7 @@ public class GoodRequestsReport extends BasicReport {
                 productCondition = "and (cf_products.productname like '%" + goodName + "%' or cf_products.fullname like '%"+goodName+"%' )";
             }
 
-            String stateCondition = "";
-            stateCondition = " cf_goods_requests.deletedstate<>true and ";
+            String stateCondition = " cf_goods_requests.deletedstate<>true and ";
             switch (requestsFilter) {
                 case 0:
                     stateCondition = " cf_goods_requests.state=" + DocumentState.CREATED.ordinal() + " AND ";
@@ -113,8 +112,6 @@ public class GoodRequestsReport extends BasicReport {
                 default:
                     break;
             }
-            //if(requestsFilter>0){
-            //}
             String orgCondition = "";
             if (!(idOfOrgList==null || idOfOrgList.isEmpty())) {
                 // Обработать лист с организациями
@@ -148,26 +145,25 @@ public class GoodRequestsReport extends BasicReport {
             }
 
             String sqlGood = "select requests.idorg, requests.org, requests.orgFull, requests.shortGood, requests.good, requests.idofgood, requests.d, int8(sum(requests.cnt)) as sumcnt, sum(coalesce(requests.ds_cnt, 0)) as sumdscnt, "+
-                         " sum(coalesce(requests.lcnt, 0)) as lastsumcnt, sum(coalesce(requests.lds_cnt, 0)) as lastsumdscnt"  +
-                         " from (select cf_orgs.idoforg as idorg, substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') as org, cf_orgs.officialname as orgFull, "+
-                         "             cf_goods.fullname as good, cf_goods.nameofgood as shortGood, cf_goods.idofgood as idofgood , date_trunc('day', to_timestamp(cf_goods_requests.donedate / 1000)) as d, "+
-                         "             cf_goods_requests_positions.TotalCount / 1000 as cnt, cf_goods_requests_positions.DailySampleCount / 1000 as ds_cnt," +
-                         "             cf_goods_requests_positions.LastTotalCount / 1000 as lcnt, cf_goods_requests_positions.lastDailySampleCount / 1000 as lds_cnt "+
-                         "       from cf_goods_requests "+
-                         "      left join cf_orgs on cf_orgs.idoforg=cf_goods_requests.orgowner "+
-                         "      left join cf_goods_requests_positions on cf_goods_requests.idofgoodsrequest=cf_goods_requests_positions.idofgoodsrequest "+
-                         "      join cf_goods on cf_goods.idofgood=cf_goods_requests_positions.idofgood and cf_goods_requests_positions.idofgood is not null "+
-                         "      " + (suppliersCondition.length() < 1 ? "" : "join cf_menuexchangerules on idofdestorg=cf_orgs.idoforg ") +
-                         "      where cf_orgs.officialname<> '' and " +
-                         "            cf_goods_requests_positions.totalCount <> 0 and "+
-                         "            " + stateCondition +
-                         "            (cf_goods_requests.donedate>=" + startDateLong + " and cf_goods_requests.donedate<" + endDateLong + ") "+
-                         "            " + notCreatedAtConfition +
-                         "            " + goodCondition +
-                         "            " + orgCondition +
-                         "            " + suppliersCondition + ") as requests "+
-                         "group by requests.idorg, requests.org, requests.orgFull, requests.idofgood, requests.shortGood, requests.good, requests.d "+
-                         "order by requests.org, requests.idofgood, requests.d";
+                    " sum(coalesce(requests.lcnt, 0)) as lastsumcnt, sum(coalesce(requests.lds_cnt, 0)) as lastsumdscnt"  +
+                    " from (select cf_orgs.idoforg as idorg, substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)') as org, cf_orgs.officialname as orgFull, "+
+                    "             cf_goods.fullname as good, cf_goods.nameofgood as shortGood, cf_goods.idofgood as idofgood , date_trunc('day', to_timestamp(cf_goods_requests.donedate / 1000)) as d, "+
+                    "             cf_goods_requests_positions.TotalCount / 1000 as cnt, cf_goods_requests_positions.DailySampleCount / 1000 as ds_cnt," +
+                    "             cf_goods_requests_positions.LastTotalCount / 1000 as lcnt, cf_goods_requests_positions.lastDailySampleCount / 1000 as lds_cnt "+
+                    "       from cf_goods_requests "+
+                    "      left join cf_orgs on cf_orgs.idoforg=cf_goods_requests.orgowner "+
+                    "      left join cf_goods_requests_positions on cf_goods_requests.idofgoodsrequest=cf_goods_requests_positions.idofgoodsrequest "+
+                    "      join cf_goods on cf_goods.idofgood=cf_goods_requests_positions.idofgood and cf_goods_requests_positions.idofgood is not null "+
+                    "      " + (suppliersCondition.length() < 1 ? "" : "join cf_menuexchangerules on idofdestorg=cf_orgs.idoforg ") +
+                    "      where cf_orgs.officialname<> '' and " +
+                    "            " + stateCondition +
+                    "            (cf_goods_requests.donedate>=" + startDateLong + " and cf_goods_requests.donedate<" + endDateLong + ") "+
+                    "            " + notCreatedAtConfition +
+                    "            " + goodCondition +
+                    "            " + orgCondition +
+                    "            " + suppliersCondition + ") as requests "+
+                    "group by requests.idorg, requests.org, requests.orgFull, requests.idofgood, requests.shortGood, requests.good, requests.d "+
+                    "order by requests.org, requests.idofgood, requests.d";
 
             String sqlProduct = "select requests.idorg, requests.org, requests.orgFull, requests.shortGood, requests.good, requests.idofgood, requests.d, int8(sum(requests.cnt)) as sumcnt, sum(coalesce(requests.ds_cnt, 0)) as sumdscnt, "+
                     "  sum(coalesce(requests.lcnt, 0)) as lastsumcnt, sum(coalesce(requests.lds_cnt, 0)) as lastsumdscnt"  +
@@ -181,7 +177,6 @@ public class GoodRequestsReport extends BasicReport {
                     "      join cf_products on cf_products.idofproducts=cf_goods_requests_positions.idofproducts and cf_goods_requests_positions.idofproducts is not null"+
                     "      " + (suppliersCondition.length() < 1 ? "" : "join cf_menuexchangerules on idofdestorg=cf_orgs.idoforg ") +
                     "      where cf_orgs.officialname<> '' and " +
-                    "            cf_goods_requests_positions.totalCount <> 0 and "+
                     "            " + stateCondition +
                     "            (cf_goods_requests.donedate>=" + startDateLong + " and cf_goods_requests.donedate<" + endDateLong + ") "+
                     "            " + notCreatedAtConfition +
@@ -218,8 +213,8 @@ public class GoodRequestsReport extends BasicReport {
 
                 //RequestItem item = findItemByOrgAndGood(items, org, good);
                 RequestItem item = findItemByOrgAndGood(items, org, idOfGood);
-                final String name = (StringUtils.isEmpty(StringUtils.trimToNull(good))? shortGood: good);
                 if (item == null) {
+                    final String name = (StringUtils.isEmpty(good)? shortGood: good);
                     item = new RequestItem(idOfOrg, org, orgFull, idOfGood, name, report);
                     items.add(item);
                 }
@@ -241,7 +236,7 @@ public class GoodRequestsReport extends BasicReport {
                 if(isWriteTotalRow){
                     RequestItem totalItem = totalItems.get(idOfGood);
                     if (totalItem == null) {
-                        totalItem = new TotalItem(-1L,OVERALL_TITLE, "", idOfGood, name, report);
+                        totalItem = new TotalItem(-1L,OVERALL_TITLE, "", idOfGood, good, report);
                         //totalItems.put(good, totalItem);
                         totalItems.put(idOfGood, totalItem);
                     }
@@ -302,7 +297,7 @@ public class GoodRequestsReport extends BasicReport {
     }
 
     public GoodRequestsReport(Date generateTime, long generateDuration, boolean hideMissedColumns,
-                              Date startDate, Date endDate, List<RequestItem> items) {
+            Date startDate, Date endDate, List<RequestItem> items) {
         super(generateTime, generateDuration);
         this.items = items;
         this.hideMissedColumns = hideMissedColumns;
@@ -527,8 +522,8 @@ public class GoodRequestsReport extends BasicReport {
         }
 
         public String getRowValue(String colName, int dailySamplesMode) {
-           String dailySample = getDailySample(colName);
-           return getValue(colName) + (dailySamplesMode == 1 && !dailySample.equals("0") ? ("/" + dailySample) : "");
+            String dailySample = getDailySample(colName);
+            return getValue(colName) + (dailySamplesMode == 1 && !dailySample.equals("0") ? ("/" + dailySample) : "");
         }
 
         public String getRowLastValue(String colName, int dailySamplesMode) {
@@ -544,7 +539,7 @@ public class GoodRequestsReport extends BasicReport {
             }
 
             try
-                {
+            {
                 Calendar cal = getColumnDate (colName);
 
                 //return "" + new BigDecimal(values.get(cal.getTimeInMillis()).getValue()).setScale(1, BigDecimal.ROUND_HALF_DOWN);
