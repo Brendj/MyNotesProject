@@ -2405,10 +2405,11 @@ public class Processor implements SyncProcessor,
 
                         processReqAssortment(persistenceSession, organization, menuDate, item.getReqAssortments());
 
+                        processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos(),
+                                localIdsToMenuDetailMap);
+
                         processReqMenuDetails(persistenceSession, menu, item, item.getReqMenuDetails(),localIdsToMenuDetailMap);
 
-                        processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos(),
-                            localIdsToMenuDetailMap);
                     }
 
                     bFirstMenuItem = false;
