@@ -65,8 +65,8 @@
                                  stopControlLabel="Остановить" stopEntryControlLabel="Остановить"
                                  addControlLabel="Добавить файл" clearControlLabel="Очистить"
                                  clearAllControlLabel="Очистить все" doneLabel="Готово" cancelEntryControlLabel="Отменить"
-                                 transferErrorLabel="Ошибка передачи" uploadControlLabel="Загрузка файла"
-                                 progressLabel="Загрузка" listHeight="70px" maxFilesQuantity="1"
+                                 transferErrorLabel="Ошибка передачи" uploadControlLabel="Загрузка файлов"
+                                 progressLabel="Загрузка" listHeight="150px" maxFilesQuantity="7"
                                  fileUploadListener="#{reconciliationPage.uploadFileListener}">
                     <f:facet name="label">
                         <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]" />
@@ -83,7 +83,7 @@
                     !sum=3<br/>
                     !date=0
                     <pre/>--%>
-                    <h:inputTextarea rows="8" cols="30" value="#{reconciliationPage.settings}"
+                    <h:inputTextarea rows="10" cols="30" value="#{reconciliationPage.settings}"
                                      styleClass="input-text" />
                 </h:panelGrid>
             </h:panelGrid>

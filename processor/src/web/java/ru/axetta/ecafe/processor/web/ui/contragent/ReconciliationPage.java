@@ -21,7 +21,9 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.regex.Pattern;
 
 @Component
@@ -36,13 +38,14 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
     private String caReceiverName;
     private String registryProcessingError;
     private Date dtFrom = new Date(), dtTo = new Date();
-    private List<PaymentReconciliationManager.RegistryItem> registryItems;
+    private List<PaymentReconciliationManager.RegistryItem> registryItems = new ArrayList<PaymentReconciliationManager.RegistryItem>();
     private List<PaymentReconciliationManager.Difference> differencesList;
     private String differencesInfo;
     private String settings;
-    private UploadItem item;
+    private List<UploadItem> fileItems = new ArrayList<UploadItem>();
     private int exportType = 0;
     private DateFormat localDateFormat = CalendarUtils.getDateFormatLocal();
+    private LineConfig defaultLineConfig;
 
     @Override
     public String getPageFilename() {
@@ -55,29 +58,29 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
     }
     
     public Object processData() {
-        readFile();
-        if (registryProcessingError != null) {
-            printError(registryProcessingError);
-            return null;
-        }
-        if (registryItems == null) {
-            printError("Не загружен реестр платежей");
-            return null;
-        }
         if (caAgent == null) {
-            printError("Не указан агент");
+            printErrorAndClear("Не указан агент");
+            return null;
+        }
+        defaultLineConfig = fillDefaultLineConfig();
+        if (defaultLineConfig == null) {
+            return null;
+        }
+        for (UploadItem item : fileItems) {
+            readFile(item);
+        }
+        if (registryProcessingError != null) {
+            printErrorAndClear(registryProcessingError);
+            return null;
+        }
+        if (registryItems.isEmpty()) {
+            printErrorAndClear("Не загружен реестр платежей");
             return null;
         }
         RuntimeContext.getInstance().setOptionValueWithSave(Option.OPTION_RECONCILIATION_SETTING, settings);
         PaymentReconciliationManager reconciliationManager = RuntimeContext.getAppContext().getBean(PaymentReconciliationManager.class);
-        GregorianCalendar gc = new GregorianCalendar();
-        gc.setTime(dtFrom);
-        resetTime(gc);
-        Date dtFrom = gc.getTime();
-        gc.setTime(dtTo);
-        gc.add(Calendar.HOUR_OF_DAY, 24);
-        resetTime(gc);
-        Date dtTo = gc.getTime();
+        Date dtFrom = CalendarUtils.truncateToDayOfMonth(this.dtFrom);
+        Date dtTo = CalendarUtils.addDays(CalendarUtils.truncateToDayOfMonth(this.dtTo), 1);
         this.differencesInfo = null;
         this.differencesList = null;
         DateFormat df = CalendarUtils.getDateFormatLocal();
@@ -87,15 +90,11 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
                     + ": записей в реестре - " + registryItems.size() + ", различий - " + differencesList.size();
         } catch (Exception e) {
             logAndPrintMessage("Ошибка при обработке", e);
+        } finally {
+            registryItems.clear();
+            fileItems.clear();
         }
         return null;
-    }
-
-    private void resetTime(GregorianCalendar gc) {
-        gc.set(Calendar.MILLISECOND, 0);
-        gc.set(Calendar.SECOND, 0);
-        gc.set(Calendar.MINUTE, 0);
-        gc.set(Calendar.HOUR_OF_DAY, 0);
     }
 
     @Override
@@ -124,10 +123,10 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
     }
 
     public void uploadFileListener(UploadEvent event) {
-        item = event.getUploadItem();
+        fileItems.add(event.getUploadItem());
     }
 
-    private void readFile() {
+    private void readFile(UploadItem item) {
         InputStream inputStream = null;
         long dataSize;
         try {
@@ -143,7 +142,8 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
             loadRegistry(inputStream, dataSize);
             registryProcessingError = null;
         } catch (Exception e) {
-            registryProcessingError = "Ошибка при обработке файла реестра: " + e.getMessage();
+            registryProcessingError = String
+                    .format("Ошибка при обработке файла реестра %s: %s", item.getFileName(), e.getMessage());
             logAndPrintMessage("Ошибка при обработке файла реестра", e);
         } finally {
             if (inputStream != null) {
@@ -156,24 +156,25 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
     }
 
     public void loadRegistry(InputStream inputStream, long dataSize) throws Exception {
-        List<PaymentReconciliationManager.RegistryItem> registryItems = new ArrayList<PaymentReconciliationManager.RegistryItem>();
         DateFormat df = new SimpleDateFormat("ddMMyyyy");
         df.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));
         int lineNo = 0;
-        LineConfig lineConfig = new LineConfig();
-        String[] rows = StringUtils.split(settings, "\n");
-        for (String row : rows) {
-            parseLineConfig(lineConfig, row);
-        }
+        LineConfig lineConfig = defaultLineConfig;
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1251"));
         String currLine;
         int infoLineCount = 0;
+        boolean customLineConfig = false;
         do {
             currLine = reader.readLine();
             if (currLine != null) {
                 ++lineNo;
                 try {
+                    // Если у файла есть свои настройки - используем их.
                     if (currLine.startsWith("!")) {
+                        if (!customLineConfig) {
+                            lineConfig = new LineConfig();
+                            customLineConfig = true;
+                        }
                         parseLineConfig(lineConfig, currLine);
                     } else {
                         infoLineCount++;
@@ -195,7 +196,6 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
                 }
             }
         } while (null != currLine);
-        this.registryItems = registryItems;
     }
 
     private PaymentReconciliationManager.RegistryItem parseLine(LineConfig lineConfig, String currLine, DateFormat df)
@@ -274,6 +274,26 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
         } else {
             return "";
         }
+    }
+
+    private LineConfig fillDefaultLineConfig() {
+        LineConfig lineConfig = new LineConfig();
+        try {
+            String[] rows = StringUtils.split(settings, "\n");
+            for (String row : rows) {
+                parseLineConfig(lineConfig, row);
+            }
+        } catch (Exception ex) {
+            printErrorAndClear("Ошибка при обработке конфигурации по-умолчанию.");
+            return null;
+        }
+        return lineConfig;
+    }
+
+    private void printErrorAndClear(String error) {
+        printError(error);
+        registryItems.clear();
+        fileItems.clear();
     }
 
     public Long getCaAgent() {
