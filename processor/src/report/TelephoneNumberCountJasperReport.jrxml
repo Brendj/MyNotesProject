@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="StatisticsPaymentPreferentialSupplyJasperReport" printOrder="Horizontal" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="1008564f-743d-417d-aa3e-20e71d69871d">
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.2" value="rowGroup"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
+	<property name="ireport.zoom" value="1.4641000000000093"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<field name="district" class="java.lang.String"/>
+	<field name="shortName" class="java.lang.String"/>
+	<field name="group" class="java.lang.String"/>
+	<field name="countTelephone" class="java.lang.Long"/>
+	<field name="countActiveTelephone" class="java.lang.Long"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<columnHeader>
+		<band height="82">
+			<staticText>
+				<reportElement uuid="0bfb6a35-b51b-4364-bffb-c9841bec09c6" style="table" x="0" y="30" width="66" height="38"/>
+				<textElement verticalAlignment="Bottom" markup="none"/>
+				<text><![CDATA[Округ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6f754485-03e1-4442-a570-0a7852ce6819" style="table" x="66" y="30" width="183" height="38"/>
+				<textElement verticalAlignment="Bottom" markup="none"/>
+				<text><![CDATA[Наименование ОО]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f79d5f15-079c-40b2-9fe1-bc57cbdba5b2" style="table" x="249" y="30" width="81" height="38"/>
+				<textElement verticalAlignment="Bottom" markup="none"/>
+				<text><![CDATA[Класс]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1fe8d5bc-8067-4573-86ed-3d00abf3e0b7" style="table" x="330" y="30" width="199" height="38"/>
+				<textElement verticalAlignment="Bottom" markup="none"/>
+				<text><![CDATA[Кол-во заведенных в ИС ПП номеров тел]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1fe8d5bc-8067-4573-86ed-3d00abf3e0b7" style="table" x="529" y="30" width="199" height="38"/>
+				<textElement verticalAlignment="Bottom" markup="none"/>
+				<text><![CDATA[Кол-во активированных для проведения информирования номеров тел]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1fe8d5bc-8067-4573-86ed-3d00abf3e0b7" style="table" x="728" y="30" width="74" height="38"/>
+				<textElement verticalAlignment="Bottom" markup="none"/>
+				<text><![CDATA[Комментарии]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="50">
+			<textField>
+				<reportElement uuid="bc808de9-2f4a-4024-9eb5-36f0685f7958" style="table" x="249" y="11" width="81" height="31"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{group}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="0db04a10-0379-44ed-9beb-0ab52f50cba8" style="table" x="66" y="11" width="183" height="31"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{shortName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="f50cffec-2754-45c2-a1bf-ef6c72d04ad4" style="table" x="330" y="11" width="199" height="31"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{countTelephone}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="c42a2876-1813-4678-bce3-7443e25e20d9" style="table" x="0" y="11" width="66" height="31"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{district}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="f50cffec-2754-45c2-a1bf-ef6c72d04ad4" style="table" x="529" y="11" width="199" height="31"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{countActiveTelephone}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="1fe8d5bc-8067-4573-86ed-3d00abf3e0b7" style="table" x="728" y="11" width="74" height="31"/>
+				<textElement verticalAlignment="Bottom" markup="none"/>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+	</detail>
+	<summary>
+		<band/>
+	</summary>
+</jasperReport>

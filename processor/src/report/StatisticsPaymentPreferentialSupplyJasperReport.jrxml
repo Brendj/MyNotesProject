@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="StatisticsPaymentPreferentialSupplyJasperReport" printOrder="Horizontal" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="1008564f-743d-417d-aa3e-20e71d69871d">
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.2" value="rowGroup"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
+	<property name="ireport.zoom" value="2.5937424601000174"/>
+	<property name="ireport.x" value="1054"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<field name="district" class="java.lang.String"/>
+	<field name="orderedCount" class="java.lang.Long"/>
+	<field name="actualPresenceCount" class="java.lang.Long"/>
+	<field name="paymentDate" class="java.util.Date"/>
+	<field name="shortName" class="java.lang.String"/>
+	<field name="type" class="java.lang.String"/>
+	<field name="number" class="java.lang.String"/>
+	<field name="address" class="java.lang.String"/>
+	<variable name="SumOrderedCount" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{orderedCount}]]></variableExpression>
+	</variable>
+	<variable name="SumActualPresenceCount" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{actualPresenceCount}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<columnHeader>
+		<band height="82">
+			<staticText>
+				<reportElement uuid="0bfb6a35-b51b-4364-bffb-c9841bec09c6" style="table" x="430" y="30" width="66" height="38"/>
+				<textElement verticalAlignment="Bottom" markup="none"/>
+				<text><![CDATA[Округ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e9a7e63a-129c-4e6a-b02b-82c419e4e08a" style="table" x="583" y="30" width="72" height="38"/>
+				<textElement verticalAlignment="Bottom" markup="none"/>
+				<text><![CDATA[Число заказов]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6f754485-03e1-4442-a570-0a7852ce6819" style="table" x="0" y="30" width="144" height="38"/>
+				<textElement verticalAlignment="Bottom" markup="none"/>
+				<text><![CDATA[Наименование ОО]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f79d5f15-079c-40b2-9fe1-bc57cbdba5b2" style="table" x="144" y="30" width="52" height="38"/>
+				<textElement verticalAlignment="Bottom" markup="none"/>
+				<text><![CDATA[№ ОО]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1fe8d5bc-8067-4573-86ed-3d00abf3e0b7" style="table" x="196" y="30" width="234" height="38"/>
+				<textElement verticalAlignment="Bottom" markup="none"/>
+				<text><![CDATA[Адрес ОО	]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4e81e871-9ff6-4b66-9b6d-edf869df7e8c" style="table" x="496" y="30" width="87" height="38"/>
+				<textElement verticalAlignment="Bottom" markup="none"/>
+				<text><![CDATA[Текущая дата]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0b5903e8-219e-420d-8bfb-72d210cf09ac" style="table" x="655" y="30" width="86" height="38"/>
+				<textElement verticalAlignment="Bottom" markup="none"/>
+				<text><![CDATA[Факт присутствия]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4201ac21-305d-46ad-ab7d-c23995239a23" style="table" x="741" y="30" width="61" height="38"/>
+				<textElement verticalAlignment="Bottom" markup="none"/>
+				<text><![CDATA[% несоответствия]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="50">
+			<textField>
+				<reportElement uuid="bc808de9-2f4a-4024-9eb5-36f0685f7958" style="table" x="144" y="11" width="52" height="31"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{number}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="5a8a1e1e-1a6c-49bf-a4d0-f2d45b578c87" style="table" x="583" y="11" width="72" height="31"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{orderedCount}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd.MM.yyyy">
+				<reportElement uuid="2e2b32a7-c3c1-4df2-ac60-4648cbb21eda" style="table" x="496" y="11" width="87" height="31"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{paymentDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="0db04a10-0379-44ed-9beb-0ab52f50cba8" style="table" x="0" y="11" width="144" height="31"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{shortName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="f50cffec-2754-45c2-a1bf-ef6c72d04ad4" style="table" x="196" y="11" width="234" height="31"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="ef8c14ae-c0f2-4545-a250-8334eec096b8" style="table" x="655" y="11" width="86" height="31"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{actualPresenceCount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="c42a2876-1813-4678-bce3-7443e25e20d9" style="table" x="430" y="11" width="66" height="31"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{district}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="3d6b39e2-75df-4ae2-84ef-0d4aeff4b4c6" style="table" x="741" y="11" width="61" height="31"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[(($F{orderedCount}==null ||
+    $F{actualPresenceCount}==null || $F{orderedCount}==0)?0:
+(($F{orderedCount}-$F{actualPresenceCount})*100) / $F{orderedCount})]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band/>
+	</summary>
+</jasperReport>
