@@ -46,6 +46,7 @@ public class GoodRequest extends ConsumerRequestDistributedObject {
     private String guidOfStaff;
     private Staff staff;
     private DocumentState state;
+    private Integer requestType;
     private Set<StateChange> stateChangeInternal;
     private Set<GoodRequestPosition> goodRequestPositionInternal;
 
@@ -60,6 +61,7 @@ public class GoodRequest extends ConsumerRequestDistributedObject {
         projectionList.add(Projections.property("state"), "state");
         projectionList.add(Projections.property("doneDate"), "doneDate");
         projectionList.add(Projections.property("comment"), "comment");
+        projectionList.add(Projections.property("requestType"), "requestType");
         projectionList.add(Projections.property("s.guid"), "guidOfStaff");
         criteria.setProjection(projectionList);
     }
@@ -79,6 +81,7 @@ public class GoodRequest extends ConsumerRequestDistributedObject {
         XMLUtils.setAttributeIfNotNull(element, "State", state.ordinal());
         XMLUtils.setAttributeIfNotNull(element, "DoneDate", CalendarUtils.toStringFullDateTimeWithLocalTimeZone(doneDate));
         XMLUtils.setAttributeIfNotNull(element, "Comment", comment);
+        XMLUtils.setAttributeIfNotNull(element, "Type", requestType);
         XMLUtils.setAttributeIfNotNull(element, "GuidOfStaff", guidOfStaff);
     }
 
@@ -88,7 +91,7 @@ public class GoodRequest extends ConsumerRequestDistributedObject {
         if (longOrgOwner != null) {
             if (DAOService.getInstance().isMenuExchange(getIdOfSyncOrg())) {
                 /* случай когда требование создает поставщик */
-                throw new DistributedObjectException("NOT_CREATED_A_GOOD_REQUEST_BECAUSE_YOU_HAVE_NO_RIGHT");
+                throw new DistributedObjectException("NOT_HAVE_RIGHTS_TO_CREATE_OR_MODIFY_A_GOOD_REQUEST");
             }
             setOrgOwner(longOrgOwner);
         } else {
@@ -109,6 +112,9 @@ public class GoodRequest extends ConsumerRequestDistributedObject {
         String stringComment = XMLUtils.getStringAttributeValue(node, "Comment", 128);
         if (stringComment != null)
             setComment(stringComment);
+        Integer typeComment = XMLUtils.getIntegerAttributeValue(node, "Type");
+        if (typeComment != null)
+            setRequestType(typeComment);
         guidOfStaff = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);
         setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;
@@ -123,6 +129,7 @@ public class GoodRequest extends ConsumerRequestDistributedObject {
         setState(((GoodRequest) distributedObject).getState());
         setDoneDate(((GoodRequest) distributedObject).getDoneDate());
         setComment(((GoodRequest) distributedObject).getComment());
+        setRequestType(((GoodRequest) distributedObject).getRequestType());
     }
 
     public DocumentState getState() {
@@ -209,4 +216,11 @@ public class GoodRequest extends ConsumerRequestDistributedObject {
         this.dateOfGoodsRequest = dateOfGoodsRequest;
     }
 
+    public Integer getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(Integer requestType) {
+        this.requestType = requestType;
+    }
 }

@@ -42,6 +42,9 @@
         <property name="doneDate" column="DoneDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="comment" column="Comment" type="string" length="512"/>
 
+        <property name="requestType" column="RequestType" type="int"/>
+
+
         <many-to-one name="staff" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
             <column name="IdOfStaff" not-null="false" />
         </many-to-one>
