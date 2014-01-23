@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.Go
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
