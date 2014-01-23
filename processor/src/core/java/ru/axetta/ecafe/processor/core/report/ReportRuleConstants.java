@@ -12,9 +12,7 @@ import ru.axetta.ecafe.processor.core.report.feeding.SubscriptionFeedingJasperRe
 import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
-import ru.axetta.ecafe.processor.core.report.msc.BeneficiarySummaryReport;
-import ru.axetta.ecafe.processor.core.report.msc.HalfYearSummaryReport;
-import ru.axetta.ecafe.processor.core.report.msc.MscSalesReport;
+import ru.axetta.ecafe.processor.core.report.msc.*;
 import ru.axetta.ecafe.processor.core.report.summarySalesToSchools.SSTSReport;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -213,6 +211,8 @@ public class ReportRuleConstants {
             new ReportHint(SSTSReport.class.getCanonicalName(), new int[]{30}),
             new ReportHint(BudgetMealsShippingReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(ActiveClientsReport.class.getCanonicalName(), new int[]{}),
+            new ReportHint(StatisticsPaymentPreferentialSupplyJasperReport.class.getCanonicalName(), new int[]{3, -20}),
+            new ReportHint(TelephoneNumberCountJasperReport.class.getCanonicalName(), new int[]{3, -20}),
             //new ReportHint(ReferReport.class.getCanonicalName(), new int[]{-3}),
             //new ReportHint(DailyReferReport.class.getCanonicalName(), new int[]{-3, -33})
             // отрицательное значение - обязательное
