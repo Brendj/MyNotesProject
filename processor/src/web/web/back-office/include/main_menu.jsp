@@ -800,6 +800,13 @@
                             binding="#{mainPage.orgDiscountsReportPage.mainMenuComponent}" label="Отчет по организации"
                             action="#{mainPage.showOrgDiscountsReportPage}" reRender="workspaceForm" />
 
+        <%--@elvariable id="statisticsPaymentPreferentialSupplyReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.StatisticsPaymentPreferentialSupplyReportPage"--%>
+        <rich:panelMenuItem id="statisticsPaymentPreferentialSupplyReportMenuItem"
+                            binding="#{statisticsPaymentPreferentialSupplyReportPage.mainMenuComponent}"
+                            label="Статистика оплаты льготного питания"
+                            action="#{statisticsPaymentPreferentialSupplyReportPage.show}"
+                            reRender="workspaceForm" rendered="false"/>
+
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="goodRequestsGroupMenu" binding="#{mainPage.goodRequestsGroupMenu.mainMenuComponent}"
@@ -884,15 +891,19 @@
                         binding="#{mainPage.clientsBenefitsReportPage.mainMenuComponent}"
                         label="Расчет комплексов по льготным правилам"
                         action="#{mainPage.showClientsBenefitsReportPage}" reRender="workspaceForm" />
+    <%--@elvariable id="activeClientsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ActiveClientsReportPage"--%>
     <rich:panelMenuItem id="activeClientsMenuItem" binding="#{activeClientsReportPage.mainMenuComponent}"
                         label="Отчет по доступным клиентам" action="#{activeClientsReportPage.show}"
                         reRender="workspaceForm" />
+    <%--@elvariable id="activeDiscountClientsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ActiveDiscountClientsReportPage"--%>
     <rich:panelMenuItem id="activeDiscountClientsMenuItem" binding="#{activeDiscountClientsReportPage.mainMenuComponent}"
                         label="Отчет по питающимся льготникам" action="#{activeDiscountClientsReportPage.show}"
                         reRender="workspaceForm" />
+    <%--@elvariable id="referReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ReferReportPage"--%>
     <rich:panelMenuItem id="referReportMenuItem" binding="#{referReportPage.mainMenuComponent}"
                         label="Справки расходования средств" action="#{referReportPage.show}"
                         reRender="workspaceForm" />
+
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
     <rich:panelMenuItem id="manualReportRunnerMenuItem" binding="#{manualReportRunnerPage.mainMenuComponent}"
                         label="Ручной запуск отчетов" action="#{manualReportRunnerPage.show}"
@@ -916,15 +927,16 @@
 
 <rich:panelMenuGroup id="optionsGroupMenu" label="Настройки" binding="#{mainPage.optionsGroupPage.mainMenuComponent}"
                      rendered="true">
+    <%--@elvariable id="optionPage" type="ru.axetta.ecafe.processor.web.ui.option.OptionPage"--%>
     <rich:panelMenuItem id="showOptionMenuItem" binding="#{optionPage.mainMenuComponent}" label="Настройки"
                         action="#{optionPage.show}" reRender="workspaceForm" />
-
+    <%--@elvariable id="messageConfigurePage" type="ru.axetta.ecafe.processor.web.ui.option.MessageConfigurePage"--%>
     <rich:panelMenuItem id="showMessageConfigureMenuItem" binding="#{messageConfigurePage.mainMenuComponent}"
                         label="Шаблоны уведомлений" action="#{messageConfigurePage.show}" reRender="workspaceForm" />
 
     <rich:panelMenuItem id="showConfigurationMenuItem" binding="#{mainPage.configurationPage.mainMenuComponent}"
                         label="Конфигурация" action="#{mainPage.showConfigurationPage}" reRender="workspaceForm" />
-
+    <%--@elvariable id="licInfoPage" type="ru.axetta.ecafe.processor.web.ui.option.LicInfoPage"--%>
     <rich:panelMenuItem id="showLicInfoMenuItem" binding="#{licInfoPage.mainMenuComponent}" label="Лицензии"
                         action="#{licInfoPage.show}" reRender="workspaceForm" />
 
