@@ -22,3 +22,7 @@ CREATE TABLE cf_temporary_orders (
   CONSTRAINT cf_temporary_orders_org FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg),
   CONSTRAINT cf_temporary_orders_client FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
 );
+
+-- Признак типа заявки
+-- по умолчнию обычная (по умолчанию), 1 – заявка по суточной пробе
+ALTER TABLE cf_goods_requests ADD COLUMN RequestType integer NOT NULL DEFAULT 0;
