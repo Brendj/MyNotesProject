@@ -1519,6 +1519,7 @@ CREATE TABLE  cf_goods_requests (
   DoneDate bigint,
   Comment  character varying(512) DEFAULT NULL,
   SendAll integer DEFAULT 0,
+  RequestType integer NOT NULL DEFAULT 0, --v55 тип заявки
   CONSTRAINT cf_goods_requests_pk PRIMARY KEY (IdOfGoodsRequest ),
   CONSTRAINT cf_goods_requests_staff_fk FOREIGN KEY (IdOfStaff)
   REFERENCES cf_staffs (IdOfStaff),
