@@ -213,8 +213,8 @@ public class GoodRequestsReport extends BasicReport {
 
                 //RequestItem item = findItemByOrgAndGood(items, org, good);
                 RequestItem item = findItemByOrgAndGood(items, org, idOfGood);
+                final String name = (StringUtils.isEmpty(good)? shortGood: good);
                 if (item == null) {
-                    final String name = (StringUtils.isEmpty(good)? shortGood: good);
                     item = new RequestItem(idOfOrg, org, orgFull, idOfGood, name, report);
                     items.add(item);
                 }
@@ -236,7 +236,7 @@ public class GoodRequestsReport extends BasicReport {
                 if(isWriteTotalRow){
                     RequestItem totalItem = totalItems.get(idOfGood);
                     if (totalItem == null) {
-                        totalItem = new TotalItem(-1L,OVERALL_TITLE, "", idOfGood, good, report);
+                        totalItem = new TotalItem(-1L,OVERALL_TITLE, "", idOfGood, name, report);
                         //totalItems.put(good, totalItem);
                         totalItems.put(idOfGood, totalItem);
                     }
