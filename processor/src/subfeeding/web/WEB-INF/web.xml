@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+		  http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+           version="2.5">
+
+    <servlet>
+        <servlet-name>SubFeedingServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.subfeeding.SubFeedingServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SubFeedingServlet</servlet-name>
+        <url-pattern>/office/*</url-pattern>
+    </servlet-mapping>
+
+    <filter>
+        <filter-name>SubFeedingAuthFilter</filter-name>
+        <filter-class>ru.axetta.ecafe.processor.web.subfeeding.SubFeedingAuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>SubFeedingAuthFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <context-param>
+        <param-name>appProperties</param-name>
+        <param-value>/WEB-INF/app.properties</param-value>
+    </context-param>
+
+    <!--<security-constraint>-->
+        <!--<web-resource-collection>-->
+            <!--<web-resource-name>Restrict direct access to include-only JSPs</web-resource-name>-->
+            <!--<url-pattern>/subfeeding/pages/*</url-pattern>-->
+        <!--</web-resource-collection>-->
+        <!--<auth-constraint/>-->
+    <!--</security-constraint>-->
+
+    <!--<security-constraint>-->
+        <!--<web-resource-collection>-->
+            <!--<web-resource-name>Restrict transport safety for client room</web-resource-name>-->
+            <!--<url-pattern>/*</url-pattern>-->
+        <!--</web-resource-collection>-->
+        <!--<user-data-constraint>-->
+            <!--<transport-guarantee>CONFIDENTIAL</transport-guarantee>-->
+        <!--</user-data-constraint>-->
+    <!--</security-constraint>-->
+
+    <security-role>
+        <role-name>AuthorizedUser</role-name>
+    </security-role>
+
+    <session-config>
+        <session-timeout>15</session-timeout>
+    </session-config>
+
+</web-app>

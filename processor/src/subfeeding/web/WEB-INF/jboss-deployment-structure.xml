@@ -1,0 +1,17 @@
+<!--
+  ~ Copyright (c) 2014. Axetta LLC. All Rights Reserved.
+  -->
+
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.0">
+    <deployment>
+        <dependencies>
+            <module name="org.apache.commons.logging"/>
+            <module name="org.apache.commons.collections"/>
+            <module name="org.slf4j"/>
+            <module name="org.apache.cxf"/>
+            <module name="javax.servlet.api"/>
+            <module name="ecafe"/>
+        </dependencies>
+    </deployment>
+</jboss-deployment-structure>
+
