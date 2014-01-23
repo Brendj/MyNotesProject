@@ -2370,7 +2370,6 @@ public class Processor implements SyncProcessor,
                     }
                     ///
                     Date menuDate = item.getDate();
-
                     ////
                     Menu menu = DAOUtils.findMenu(persistenceSession, organization, Menu.ORG_MENU_SOURCE, menuDate);
                     Integer detailsHashCode = null;
@@ -2400,21 +2399,18 @@ public class Processor implements SyncProcessor,
                         }
                     }
                     // проверяем спомощью хеш-кода изменилось ли меню, в случае если изменилось то перезаписываем
-                    HashMap<Long, MenuDetail> localIdsToMenuDetailMap = new HashMap<Long, MenuDetail>();
                     if(detailsHashCode==null || !detailsHashCode.equals(detailsHashCode1)){
 
                         processReqAssortment(persistenceSession, organization, menuDate, item.getReqAssortments());
-
+                        HashMap<Long, MenuDetail> localIdsToMenuDetailMap = new HashMap<Long, MenuDetail>();
+                        processReqMenuDetails(persistenceSession, menu, item, item.getReqMenuDetails(),
+                                localIdsToMenuDetailMap);
                         processReqComplexInfos(persistenceSession, organization, menuDate, menu, item.getReqComplexInfos(),
                                 localIdsToMenuDetailMap);
-
-                        processReqMenuDetails(persistenceSession, menu, item, item.getReqMenuDetails(),localIdsToMenuDetailMap);
 
                     }
 
                     bFirstMenuItem = false;
-
-
                     //  Подтверждаем транзакцию для каждого дня
                     persistenceSession.flush();
                     persistenceTransaction.commit();
@@ -3263,41 +3259,6 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
                 guardianName};
     }
 
-  /*  private String[] generateNotificationParams(Session session, Client client, int passDirection, Date eventDate,
-            Long guardianId) throws Exception {
-        final String enterEvent = "Вход";
-        final String exitEvent = "Выход";
-        String eventName = "";
-        if (passDirection == EnterEvent.ENTRY) {
-            eventName = enterEvent;
-        } else if (passDirection == EnterEvent.EXIT) {
-            eventName = exitEvent;
-        } else if (passDirection == EnterEvent.RE_ENTRY) {
-            eventName = enterEvent;
-        } else if (passDirection == EnterEvent.RE_EXIT) {
-            eventName = exitEvent;
-        }
-        // Если представитель не пуст, то значит вход/выход в детский сад. Иначе - в школу.
-        eventName = eventName + (guardianId == null ? (eventName.equals(enterEvent) ? " в школу"
-                : eventName.equals(exitEvent) ? " из школы" : "") : "");
-        String guardianName = "";
-        if (guardianId != null) {
-            Person guardPerson = ((Client) session.load(Client.class, guardianId)).getPerson();
-            guardianName = StringUtils.join(new Object[]{guardPerson.getSurname(), guardPerson.getFirstName()}, ' ');
-        }
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(eventDate);
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
-        String time = (hour < 10 ? "0" + hour : hour) + ":" + (minute < 10 ? "0" + minute : minute);
-        //String clientName = client.getPerson().getSurname() + " " + client.getPerson().getFirstName();
-        return new String[]{
-                "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()), "contractId",
-                ContractIdFormat.format(client.getContractId()), "surname", client.getPerson().getSurname(),
-                "firstName", client.getPerson().getFirstName(), "eventName", eventName, "eventTime", time, "guardian",
-                guardianName};
-    }*/
-
     private String[] generatePaymentNotificationParams(Session session, Client client, Payment payment) {
         long complexes = 0L;
         long others = 0L;
@@ -3338,3 +3299,39 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
     }
 
 }
+
+
+  /*  private String[] generateNotificationParams(Session session, Client client, int passDirection, Date eventDate,
+            Long guardianId) throws Exception {
+        final String enterEvent = "Вход";
+        final String exitEvent = "Выход";
+        String eventName = "";
+        if (passDirection == EnterEvent.ENTRY) {
+            eventName = enterEvent;
+        } else if (passDirection == EnterEvent.EXIT) {
+            eventName = exitEvent;
+        } else if (passDirection == EnterEvent.RE_ENTRY) {
+            eventName = enterEvent;
+        } else if (passDirection == EnterEvent.RE_EXIT) {
+            eventName = exitEvent;
+        }
+        // Если представитель не пуст, то значит вход/выход в детский сад. Иначе - в школу.
+        eventName = eventName + (guardianId == null ? (eventName.equals(enterEvent) ? " в школу"
+                : eventName.equals(exitEvent) ? " из школы" : "") : "");
+        String guardianName = "";
+        if (guardianId != null) {
+            Person guardPerson = ((Client) session.load(Client.class, guardianId)).getPerson();
+            guardianName = StringUtils.join(new Object[]{guardPerson.getSurname(), guardPerson.getFirstName()}, ' ');
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(eventDate);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        String time = (hour < 10 ? "0" + hour : hour) + ":" + (minute < 10 ? "0" + minute : minute);
+        //String clientName = client.getPerson().getSurname() + " " + client.getPerson().getFirstName();
+        return new String[]{
+                "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()), "contractId",
+                ContractIdFormat.format(client.getContractId()), "surname", client.getPerson().getSurname(),
+                "firstName", client.getPerson().getFirstName(), "eventName", eventName, "eventTime", time, "guardian",
+                guardianName};
+    }*/
