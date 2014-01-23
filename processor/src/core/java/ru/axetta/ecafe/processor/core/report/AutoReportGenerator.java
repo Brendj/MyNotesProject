@@ -11,9 +11,7 @@ import ru.axetta.ecafe.processor.core.report.feeding.SubscriptionFeedingJasperRe
 import ru.axetta.ecafe.processor.core.report.kzn.SalesReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderCategoryReport;
 import ru.axetta.ecafe.processor.core.report.maussp.ContragentOrderReport;
-import ru.axetta.ecafe.processor.core.report.msc.BeneficiarySummaryReport;
-import ru.axetta.ecafe.processor.core.report.msc.HalfYearSummaryReport;
-import ru.axetta.ecafe.processor.core.report.msc.MscSalesReport;
+import ru.axetta.ecafe.processor.core.report.msc.*;
 import ru.axetta.ecafe.processor.core.report.summarySalesToSchools.SSTSReport;
 import ru.axetta.ecafe.processor.core.utils.ExecutorServiceWrappedJob;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -891,6 +889,51 @@ public class AutoReportGenerator {
                 return jobDetail;
             }
         }));
+
+        REPORT_DEFS.add(new ReportDef(StatisticsPaymentPreferentialSupplyJasperReport.class, StatisticsPaymentPreferentialSupplyJasperReport.AutoReportBuildJob.class, new JobDetailCreator() {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
+                Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + StatisticsPaymentPreferentialSupplyJasperReport.class.getSimpleName() + ".jasper";
+
+                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName,
+                        new StatisticsPaymentPreferentialSupplyJasperReport(),
+                        autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
+                        autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
+                        reportTemplate, (Calendar) autoReportGenerator.getCalendar().clone(),
+                        (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                        (DateFormat) autoReportGenerator.getTimeFormat().clone());
+
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
+                jobDetail.getJobDataMap()
+                        .put(StatisticsPaymentPreferentialSupplyJasperReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                return jobDetail;
+            }
+        }));
+
+        REPORT_DEFS.add(new ReportDef(TelephoneNumberCountJasperReport.class, TelephoneNumberCountJasperReport.AutoReportBuildJob.class, new JobDetailCreator() {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
+                Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + TelephoneNumberCountJasperReport.class.getSimpleName() + ".jasper";
+
+                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName,
+                        new TelephoneNumberCountJasperReport(),
+                        autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
+                        autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
+                        reportTemplate, (Calendar) autoReportGenerator.getCalendar().clone(),
+                        (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                        (DateFormat) autoReportGenerator.getTimeFormat().clone());
+
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
+                jobDetail.getJobDataMap()
+                        .put(TelephoneNumberCountJasperReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                return jobDetail;
+            }
+        }));
+
     } // static
 
 
