@@ -1,0 +1,26 @@
+.loginDiv {
+    border: solid 2px #4f81bd;
+    border-radius: 10px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    background-color: white;
+    z-index: 100;
+    height: auto;
+    width: 250px;
+    margin-top: -75px;
+    margin-left: -125px;
+    padding: 20px 20px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.leftcol {
+    float: left;
+    width: 170px;
+    padding-right: 5px;
+}
+.rightcol {
+    float: left;
+    width: 100px;
+}

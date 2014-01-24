@@ -1,0 +1,9 @@
+.bodyDiv {
+    margin: 0 auto;
+    width: 1000px;
+}
+
+body {
+    font-family: "PT Serif", Georgia, "Times New Roman", Times, serif;
+    font-size: 14px;
+}

@@ -9,53 +9,44 @@
 <head>
     <title>Абонементное питание</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/styles.css"/>
+    <link rel="stylesheet" type="text/css"
+          href="${pageContext.request.contextPath}/WebContent/css/custom/jquery-ui-1.10.4.custom.min.css" />
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/common.css" />
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/index.css" />
+    <script src="${pageContext.request.contextPath}/WebContent/js/jquery-1.10.2.min.js"></script>
+    <script src="${pageContext.request.contextPath}/WebContent/js/jquery-ui-1.10.4.custom.min.js"></script>
+    <script src="${pageContext.request.contextPath}/WebContent/js/tools.js"></script>
+    <script>
+        $(function () {
+            $("#submit").button().css({
+                'margin-top': '10px'
+            });
+            $('input:text, input:password').button().css({
+                'font': 'inherit',
+                'color': 'inherit',
+                'text-align': 'left',
+                'outline': 'none',
+                'cursor': 'text'
+            });
+            $('#accordition').accordion();
+        });
+    </script>
 </head>
 <body>
-<form method="post" enctype="application/x-www-form-urlencoded" action="${pageContext.request.contextPath}/office/login"
-      class="borderless-form-login">
-    <table id="login-form">
-        <tr class="login-form-input-tr">
-            <td align="center">
-                <div align="center">
-                    <table>
-                        <tr>
-                            <td>
-                                <div class="output-text">Номер лицевого счета</div>
-                            </td>
-                            <td>
-                                <input type="text" name="contractId" size="16" maxlength="64" class="input-text" />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="output-text">Пароль</div>
-                            </td>
-                            <td>
-                                <input type="password" name="password" size="16" maxlength="64" class="input-text" />
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </td>
-        </tr>
-        <tr class="login-form-button-tr">
-            <td align="center">
-                <input type="submit" name="authorize" value="Войти" class="command-button" />
-            </td>
-        </tr>
-<%
-    if (request.getAttribute("subFeedingError") != null) {
-%>
-        <tr valign="middle">
-            <td align="center">
-                <div class="output-text" style="color: red;"><%=request.getAttribute("subFeedingError")%></div>
-            </td>
-        </tr>
-<%
-    }
-%>
-    </table>
-</form>
+<div class="loginDiv" id="accordition">
+    <h3><a href="#">Авторизация</a></h3>
+    <div>
+        <form method="post" enctype="application/x-www-form-urlencoded"
+              action="${pageContext.request.contextPath}/office/login">
+            <input type="text" name="contractId" size="25" maxlength="64" placeholder="Номер лицевого счета" />
+            <input type="password" name="password" size="25" maxlength="64" placeholder="Пароль" />
+            <input id="submit" type="submit" name="authorize" value="Войти" />
+            <%if (request.getAttribute("subFeedingError") != null) {%>
+            <div class="ui-state-error"><%=request.getAttribute("subFeedingError")%>
+            </div>
+            <%}%>
+        </form>
+    </div>
+</div>
 </body>
 </html>
