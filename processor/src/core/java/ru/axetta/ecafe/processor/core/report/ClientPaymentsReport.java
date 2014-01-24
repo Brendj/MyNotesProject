@@ -5,13 +5,15 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -28,29 +30,30 @@ public class ClientPaymentsReport extends BasicReport {
                       + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
                       + "cf_contragents.contragentname, "
                       + "int8(sum(cf_orders.rsum)) as sales, "
-                      + "int8(sum(cf_orders.socdiscount)) as discounts "
+                      + "int8(sum(cf_orders.socdiscount)) as discounts, "
+                      + "cf_orgs.officialname "
                       + "from cf_orgs "
                       + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg and "
                       + "                       cf_orders.createddate between :fromCreatedDate and :toCreatedDate "
-                      + "left join cf_contragents on cf_orders.idofcontragent=cf_contragents.idofcontragent and cf_contragents.classid=%CONTRAGENT_TYPE% "
-                      + "where %ORGS_LIST% "
+                      + "left join cf_contragents on cf_orders.idofcontragent=cf_contragents.idofcontragent and cf_contragents.classid = :contragentType "
+                      + "where cf_orgs.idOfOrg in (:ids) "
                       + "group by cf_orgs.officialname, cf_contragents.contragentname "
                       + "order by cf_orgs.officialname, cf_contragents.contragentname";
     private static final String TRANSACTIONS_SQL =
                         "select "
                       + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
                       + "cf_contragents.contragentname, "
-                      + "int8(sum(cf_clientpayments.paysum)) as payments "
+                      + "int8(sum(cf_clientpayments.paysum)) as payments, "
+                      + "cf_orgs.officialname "
                       + "from cf_orgs "
                       + "left join cf_clients on cf_orgs.idoforg=cf_clients.idoforg "
                       + "left join cf_transactions on cf_clients.idofclient=cf_transactions.idofclient and "
                       + "                             cf_transactions.transactiondate between :fromCreatedDate and :toCreatedDate "
                       + "join cf_clientpayments on cf_clientpayments.idoftransaction=cf_transactions.idoftransaction "
-                      + "left join cf_contragents on cf_orgs.defaultSupplier=cf_contragents.idofcontragent and cf_contragents.classid=%CONTRAGENT_TYPE% "
-                      + "where %ORGS_LIST% "
+                      + "left join cf_contragents on cf_orgs.defaultSupplier=cf_contragents.idofcontragent and cf_contragents.classid = :contragentType "
+                      + "where cf_orgs.idOfOrg in (:ids) "
                       + "group by cf_orgs.officialname, cf_contragents.contragentname "
                       + "order by cf_orgs.officialname";
-
 
     private final List<ClientPaymentItem> items;
 
@@ -61,43 +64,28 @@ public class ClientPaymentsReport extends BasicReport {
             Date generateTime = new Date();
             List<ClientPaymentItem> items = new LinkedList<ClientPaymentItem>();
             if (!idOfOrgList.isEmpty()) {
-                // Обработать лист с организациями
-                String orgCondition = " cf_orgs.idOfOrg in (";
-                for (Long idOfOrg : idOfOrgList) {
-                    if (!orgCondition.endsWith("(")) {
-                        orgCondition = orgCondition.concat(", ");
-                    }
-                    orgCondition = orgCondition.concat("" +idOfOrg);
-                }
-                orgCondition = orgCondition + ") ";
-
-
-                long startDateLong = startDate.getTime();
-                long endDateLong = endDate.getTime();
-
-                parseSales(items, executeSQL(session, SALES_SQL, startDateLong, endDateLong, orgCondition));
+                parseSales(items, executeSQL(session, SALES_SQL, startDate.getTime(), endDate.getTime(), idOfOrgList));
                 parseTransactions(items,
-                        executeSQL(session, TRANSACTIONS_SQL, startDateLong, endDateLong, orgCondition));
+                        executeSQL(session, TRANSACTIONS_SQL, startDate.getTime(), endDate.getTime(), idOfOrgList));
             }
             return new ClientPaymentsReport(generateTime, new Date().getTime() - generateTime.getTime(), items);
         }
 
-
-        private List executeSQL (Session session, String sql, long startDate, long endDate, String orgCondition) {
-            sql = sql.replaceAll("%CONTRAGENT_TYPE%", "" + Contragent.TSP);
-            sql = sql.replaceAll("%ORGS_LIST%", orgCondition);
+        private List executeSQL(Session session, String sql, long startDate, long endDate, List<Long> idOfOrgList) {
             Query query = session.createSQLQuery(sql);
             query.setLong("fromCreatedDate", startDate);
             query.setLong("toCreatedDate", endDate);
+            query.setParameter("contragentType", Contragent.TSP);
+            query.setParameterList("ids", idOfOrgList);
             return query.list();
         }
-
 
         private void parseSales (List<ClientPaymentItem> items, List res) {
             for (Object result : res) {
                 Object[] o = (Object[]) result;
-                String orgName = (String) o[0];
+                String orgNumber = (String) o[0];
                 String agent = (String) o[1];
+                String orgFullName = (String) o[4];
                 Long sales = null;
                 Long discounts = null;
                 if (o[2] != null) {
@@ -112,9 +100,10 @@ public class ClientPaymentsReport extends BasicReport {
                 if (sales == null) {
                     sales = 0L;
                 }
-                if (discounts== null) {
+                if (discounts == null) {
                     discounts = 0L;
                 }
+                String orgName = orgNumber == null ? orgFullName : orgNumber;
                 ClientPaymentItem item = new ClientPaymentItem(orgName, agent, 0L, sales, discounts);
                 items.add(item);
             }
@@ -123,8 +112,9 @@ public class ClientPaymentsReport extends BasicReport {
         private void parseTransactions (List<ClientPaymentItem> items, List res) {
             for (Object result : res) {
                 Object[] o = (Object[]) result;
-                String orgName = (String) o[0];
+                String orgNumber = (String) o[0];
                 String agent = (String) o[1];
+                String orgFullName = (String) o[3];
                 Long payments = null;
                 if (o[2] != null) {
                     payments = ((BigInteger) o[2]).longValue();
@@ -132,8 +122,7 @@ public class ClientPaymentsReport extends BasicReport {
                 if (payments == null) {
                     continue;
                 }
-
-
+                String orgName = orgNumber == null ? orgFullName : orgNumber;
                 ClientPaymentItem item = lookupOrgByName(items, orgName);
                 if (item == null) {
                     item = new ClientPaymentItem(orgName, agent, payments, 0L, 0L);
