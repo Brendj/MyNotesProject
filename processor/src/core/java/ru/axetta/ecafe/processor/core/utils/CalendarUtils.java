@@ -156,7 +156,7 @@ public class CalendarUtils {
     }
 
     public static String dayInWeekToString(Long timeMillis) {
-        return timeFormat.format(timeMillis);
+        return dayInWeekFormat.format(timeMillis);
     }
 
     public static String dayInWeekToString(Date date) {
