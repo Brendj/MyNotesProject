@@ -38,6 +38,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
     private final static Logger logger = LoggerFactory.getLogger(ActiveDiscountClientsReport.class);
 
     private List<ActiveDiscountClientsItem> items;
+    protected List<ActiveDiscountClientsJasperItem> jasperItems;
     private Date startDate;
     private Date endDate;
     private String htmlReport;
@@ -71,6 +72,9 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
 
 
     public List<ActiveDiscountClientsItem> getItems() {
+        if (items == null || items.size() < 1) {
+            return (List) jasperItems;
+        }
         return items;
     }
 
@@ -83,14 +87,20 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
     public static class Builder extends BasicReportForAllOrgJob.Builder {
         private final String templateFilename;
         private boolean exportToHTML = false;
+        private boolean exportToObjects = false;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
         }
 
         public Builder() {
-            templateFilename = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath() + ActiveClientsReport.class.getSimpleName() + ".jasper";
+            templateFilename = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath() + ActiveDiscountClientsReport.class.getSimpleName() + ".jasper";
             exportToHTML = true;
+        }
+
+        public Builder setExportToObjects(boolean exportToObjects) {
+            this.exportToObjects = exportToObjects;
+            return this;
         }
 
         @Override
@@ -114,12 +124,16 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             Date generateEndTime = new Date();
             List<ActiveDiscountClientsItem> items = findActiveDiscountClients(session, startTime, endTime);
             //  Если имя шаблона присутствует, значит строится для джаспера
-            if (exportToHTML) {
+            if (exportToObjects) {
+                return new ActiveDiscountClientsReport(startTime, endTime, items);
+            }
+            List<ActiveDiscountClientsJasperItem> jasperItems = splitItems(items);
+            JasperPrint jasperPrint = JasperFillManager.fillReport
+                    (templateFilename, parameterMap, createDataSource(jasperItems));
+            if (!exportToHTML) {
                 return new ActiveDiscountClientsReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
-                                                       startTime, endTime, items);
+                                                       jasperPrint, startTime, endTime, jasperItems);
             } else {
-                JasperPrint jasperPrint = JasperFillManager
-                        .fillReport(templateFilename, parameterMap, createDataSource(items));
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 JRHtmlExporter exporter = new JRHtmlExporter();
                 exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
@@ -131,7 +145,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                 exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
                 exporter.exportReport();
                 return new ActiveDiscountClientsReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
-                        startTime, endTime, items).setHtmlReport(os.toString("UTF-8"));
+                        startTime, endTime, jasperItems).setHtmlReport(os.toString("UTF-8"));
             }
         }
 
@@ -173,11 +187,15 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             long prevIdOfClient = -1L;
             long prevIdOfOrg = -1L;
             int position = 1;
+            long uniqueId = 0;
             String prevDistrict = null;
             ActiveDiscountClientsItem item = null;
             ActiveDiscountOrgItem orgItem = null;
             ActiveDiscountOrgItem districtItem = null;
-            ActiveDiscountOrgItem overallItem = new ActiveDiscountOrgItem(null, null);
+            ActiveDiscountOrgItem overallItem = new ActiveDiscountOrgItem(Long.MAX_VALUE, null, null);
+            long orgCount = 0;
+            long districtCount = 0;
+            long totalCount = 0;
             for (Object entry : res) {
                 Object e[]          = (Object[]) entry;
                 long idoforg        = ((BigInteger) e[0]).longValue();
@@ -203,26 +221,37 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                 if (idoforg != prevIdOfOrg) {
                     if (!district.equals(prevDistrict)) {
                         if (districtItem != null) {
+                            districtItem.setUniqueId(uniqueId);
+                            districtItem.setPosition(districtCount);
                             result.add(districtItem);
+                            uniqueId++;
                         }
-                        districtItem = new ActiveDiscountOrgItem(district, null);
+                        districtItem = new ActiveDiscountOrgItem(uniqueId, district, null);
                     }
 
                     if (orgItem != null){
+                        orgItem.setUniqueId(uniqueId);
+                        orgItem.setPosition(districtCount);
                         result.add(orgItem);
+                        uniqueId++;
                     }
-                    orgItem = new ActiveDiscountOrgItem(null, name);
+                    orgItem = new ActiveDiscountOrgItem(uniqueId, null, name);
                     position = 1;
                 }
                 if (idofclient != prevIdOfClient) {
                     item = new ActiveDiscountClientsItem
-                            (!district.equals(prevDistrict) ? district : "",
+                            (uniqueId, !district.equals(prevDistrict) ? district : "",
                              idoforg != prevIdOfOrg ? name : "",
                              idoforg != prevIdOfOrg ? address : "", surname,
                              firstname, secondname, groupName);
                     item.setPosition(position);
                     result.add(item);
+                    uniqueId++;
                     position++;
+
+                    orgCount++;
+                    districtCount++;
+                    totalCount++;
                 }
                 item.addCategory(categoryname);
                 item.addGood(goodName, price);
@@ -243,12 +272,44 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                 prevDistrict = district;
             }
             if (orgItem != null) {
+                orgItem.setUniqueId(uniqueId);
+                orgItem.setPosition(districtCount);
                 result.add(orgItem);
+                uniqueId++;
             }
             if (districtItem != null) {
+                districtItem.setUniqueId(uniqueId);
+                districtItem.setPosition(districtCount);
                 result.add(districtItem);
             }
+            overallItem.setPosition(totalCount);
             result.add(overallItem);
+
+
+            //  Beautify items
+            List<String> categories = new ArrayList<String>();
+            List<String> goods = new ArrayList<String>();
+            for (ActiveDiscountClientsItem i : result) {
+                if (i instanceof ActiveDiscountOrgItem) {
+                    continue;
+                }
+                for (String cat : i.getCategories().keySet()) {
+                    if (!categories.contains(cat)) {
+                        categories.add(cat);
+                    }
+                }
+                for (String good : i.getGoods().keySet()) {
+                    if (!goods.contains(good)) {
+                        goods.add(good);
+                    }
+                }
+            }
+            for (ActiveDiscountClientsItem i : result) {
+                i.beautifyCategories(categories);
+                i.beautifyGoods(goods);
+            }
+
+
             return result;
         }
 
@@ -260,8 +321,57 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             this.exportToHTML = exportToHTML;
         }
 
-        private JRDataSource createDataSource(List<ActiveDiscountClientsItem> items) throws Exception {
+        private JRDataSource createDataSource(List<ActiveDiscountClientsJasperItem> items) throws Exception {
             return new JRBeanCollectionDataSource(items);
+        }
+
+        private List<ActiveDiscountClientsJasperItem> splitItems(List<ActiveDiscountClientsItem> items) {
+            List<ActiveDiscountClientsJasperItem> result = new ArrayList<ActiveDiscountClientsJasperItem>();
+            for (ActiveDiscountClientsItem i : items) {
+                long columnId = 0;
+
+                ActiveDiscountOrgItem orgI = null;
+                if (i instanceof ActiveDiscountOrgItem) {
+                    orgI = (ActiveDiscountOrgItem) i;
+                }
+                
+                Map cValues = orgI == null ? i.getCategories() : orgI.getCategoriesClients();
+                columnId = addActiveDiscountClientsJasperItem(i, cValues, columnId, result);
+                Map gValues = orgI == null ? i.getGoods() : orgI.getGoodsClients();
+                columnId = addActiveDiscountClientsJasperItem(i, gValues, columnId, result);
+
+                //  total
+                ActiveDiscountClientsJasperItem ji = new ActiveDiscountClientsJasperItem
+                        (i.getUniqueId(), columnId, i.getDistrict(), i.getName(),
+                         i.getAddress(), i.getPosition(), i.getSurname(), i.getFirstname(),
+                         i.getSecondname(), i.getGroupName(), "Итого", "" + i.getTotal());
+                result.add(ji);
+            }
+            return result;
+        }
+
+        protected long addActiveDiscountClientsJasperItem(ActiveDiscountClientsItem item, Map data, long columnId,
+                List<ActiveDiscountClientsJasperItem> result) {
+            Set<String> keys = data.keySet();
+            for(String k : keys) {
+                if (k == null || k.length() < 1 || item.getUniqueId() == null) {
+                    continue;
+                }
+
+                String val = "";
+                try {
+                    val = data.get(k).toString();
+                } catch (Exception e) {
+
+                }
+                ActiveDiscountClientsJasperItem ji = new ActiveDiscountClientsJasperItem
+                        (item.getUniqueId(), columnId, item.getDistrict(), item.getName(),
+                                item.getAddress(), item.getPosition(), item.getSurname(), item.getFirstname(),
+                                item.getSecondname(), item.getGroupName(), k, val == null ? "0" : "" + val);
+                result.add(ji);
+                columnId++;
+            }
+            return columnId;
         }
     }
 
@@ -270,10 +380,20 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
         items = Collections.emptyList();
     }
 
+    public ActiveDiscountClientsReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
+            Date endTime, List<ActiveDiscountClientsJasperItem> items) {
+        super(generateTime, generateDuration, print, startTime, endTime);
+        this.jasperItems = items;
+    }
+
+    public ActiveDiscountClientsReport(Date startTime,
+            Date endTime, List<ActiveDiscountClientsItem> items) {
+        this.items = items;
+    }
 
     public ActiveDiscountClientsReport(Date generateTime, long generateDuration, Date startTime,
-                                       Date endTime, List<ActiveDiscountClientsItem> items) {
-        this.items = items;
+                                       Date endTime, List<ActiveDiscountClientsJasperItem> items) {
+        this.jasperItems = items;
     }
 
     private List <ReportColumn> cols;
@@ -296,12 +416,12 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             if (i instanceof ActiveDiscountOrgItem) {
                 continue;
             }
-            for (String cat : i.getCategories()) {
+            for (String cat : i.getCategories().keySet()) {
                 if (!categoriesSet.contains(cat)) {
                     categoriesSet.add(cat);
                 }
             }
-            for (String good : i.getGoods()) {
+            for (String good : i.getGoods().keySet()) {
                 if (!goodsSet.contains(good)) {
                     goodsSet.add(good);
                 }
@@ -347,12 +467,64 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
         return this;
     }
 
+    public static class ActiveDiscountClientsJasperItem extends ActiveDiscountClientsItem {
+        protected Long columnId;
+        protected String columnName;
+        protected String columnValue;
+
+
+        public ActiveDiscountClientsJasperItem(Long uniqueId, Long columnId, String district, String name, String address, 
+                Long position, String surname, String firstname, String secondname, String groupName,
+                String columnName, String columnValue) {
+            this.uniqueId = uniqueId;
+            this.columnId = columnId;
+            this.district = district;
+            this.name = name;
+            this.address = address;
+            this.position = position;
+            this.surname = surname;
+            this.firstname = firstname;
+            this.secondname = secondname;
+            this.groupName = groupName;
+            this.columnName = columnName;
+            this.columnValue = columnValue;
+            this.categories = new HashMap<String, String>();
+            this.goods = new HashMap<String, Long>();
+            this.total = 0L;
+        }
+
+        public Long getColumnId() {
+            return columnId;
+        }
+
+        public void setColumnId(Long columnId) {
+            this.columnId = columnId;
+        }
+
+        public String getColumnValue() {
+            return columnValue;
+        }
+
+        public void setColumnValue(String columnValue) {
+            this.columnValue = columnValue;
+        }
+
+        public String getColumnName() {
+            return columnName;
+        }
+
+        public void setColumnName(String columnName) {
+            this.columnName = columnName;
+        }
+    }
+
     public static class ActiveDiscountOrgItem extends ActiveDiscountClientsItem {
         protected int totalClients;
         protected Map<String, Integer> categoriesClients;
         protected Map<String, Long> goodsClients;
 
-        public ActiveDiscountOrgItem(String district, String name) {
+        public ActiveDiscountOrgItem(Long uniqueId, String district, String name) {
+            this.uniqueId = uniqueId;
             if (district != null && district.length() > 0) {
                 this.district = "Итого по " + district;
                 this.name = "";
@@ -389,6 +561,14 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             goodsClients.put(category, gc + price);
         }
 
+        public Map<String, Integer> getCategoriesClients() {
+            return categoriesClients;
+        }
+
+        public Map<String, Long> getGoodsClients() {
+            return goodsClients;
+        }
+
         @Override
         public String getRowValue(Object columnObj) {
             ReportColumn col = (ReportColumn) columnObj;
@@ -401,7 +581,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     case ADDRESS_COL:
                         return "";
                     case POS_COL:
-                        return "";
+                        return "" + position;
                     case FIO_COL:
                         return "";
                     case CLASS_COL:
@@ -427,24 +607,38 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
     }
 
     public static class ActiveDiscountClientsItem {
+        protected Long uniqueId;
         protected String district;
         protected String name;
         protected String address;
-        protected int position;
+        protected long position;
         protected String surname;
         protected String firstname;
         protected String secondname;
         protected String groupName;
-        protected List<String> categories;
+        protected Map<String, String> categories;
         protected Map<String, Long> goods;
         protected Long total;
+
+
+        protected String group = "hello";
+        public String getGroup() {
+            return group;
+        }
+        public void setGroup(String group) {
+            this.group = group;
+        }
+
+
+
 
         public ActiveDiscountClientsItem() {
 
         }
 
-        public ActiveDiscountClientsItem(String district, String name, String address, String surname, String firstname,
+        public ActiveDiscountClientsItem(Long uniqueId, String district, String name, String address, String surname, String firstname,
                 String secondname, String groupName) {
+            this.uniqueId   = uniqueId;
             this.district   = district;
             this.name       = name;
             this.address    = address;
@@ -452,9 +646,25 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             this.firstname  = firstname;
             this.secondname = secondname;
             this.groupName  = groupName;
-            categories      = new ArrayList<String>();
-            goods           = new HashMap<String,Long>();
+            categories      = new TreeMap<String,String>();
+            goods           = new TreeMap<String,Long>();
             total           = 0L;
+        }
+
+        public Long getUniqueId() {
+            return uniqueId;
+        }
+
+        public void setUniqueId(Long uniqueId) {
+            this.uniqueId = uniqueId;
+        }
+
+        public String getGroupName() {
+            return groupName;
+        }
+
+        public void setGroupName(String groupName) {
+            this.groupName = groupName;
         }
 
         public void addTotal(long total) {
@@ -465,8 +675,12 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             return total;
         }
 
-        public void setPosition(int position) {
+        public void setPosition(long position) {
             this.position = position;
+        }
+
+        public long getPosition() {
+            return position;
         }
 
         public void addGood(String good, long price) {
@@ -481,13 +695,13 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
         }
 
         public void addCategory(String category) {
-            if (categories.contains(category)) {
+            if (categories.containsKey(category)) {
                 return;
             }
-            categories.add(category);
+            categories.put(category, "X");
         }
 
-        public List<String> getCategories() {
+        public Map<String, String> getCategories() {
             return categories;
         }
 
@@ -498,8 +712,18 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             return goods.get(good);
         }
         
-        public Set<String> getGoods() {
-            return goods.keySet();
+        public Map<String, Long> getGoods() {
+            return goods;
+        }
+        
+        public List<String> getGoodNamesList() {
+            List<String> res = new ArrayList<String>();
+            res.addAll(goods.keySet());
+            return res;
+        }
+        
+        public Long getGoodValue(String good) {
+            return goods.get(good);
         }
 
         public String getFullName() {
@@ -530,6 +754,28 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             return secondname;
         }
 
+        public void beautifyCategories(List<String> categories) {
+            if (this.categories == null) {
+                this.categories = new HashMap<String, String>();
+            }
+            for (String c : categories) {
+                if (!this.categories.containsKey(c)) {
+                    this.categories.put(c, "");
+                }
+            }
+        }
+
+        public void beautifyGoods(List<String> goods) {
+            if (this.goods == null) {
+                this.goods = new HashMap<String, Long>();
+            }
+            for (String c : goods) {
+                if (!this.goods.containsKey(c)) {
+                    this.goods.put(c, 0L);
+                }
+            }
+        }
+
         public String getRowValue(Object columnObj) {
             ReportColumn col = (ReportColumn) columnObj;
             if (col.getType() != CATEGORY_COL && col.getType() != GOOD_COL) {
@@ -550,10 +796,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                         return "" + total;
                 }
             } else if (col.getType() == CATEGORY_COL) {
-                if (categories.contains(col.getName())) {
-                    return "X";
-                }
-                return "";
+                return categories.get(col.getName());
             } else if (col.getType() == GOOD_COL) {
                 Long val = goods.get(col.getName());
                 if (val == null) {

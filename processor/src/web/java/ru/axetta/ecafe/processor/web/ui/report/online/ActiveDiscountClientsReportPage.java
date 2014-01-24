@@ -94,7 +94,7 @@ public class ActiveDiscountClientsReportPage extends OnlineReportPage {
     }
 
     public void buildReport (Session session) throws Exception {
-        ActiveDiscountClientsReport.Builder reportBuilder = new ActiveDiscountClientsReport.Builder();
+        ActiveDiscountClientsReport.Builder reportBuilder = new ActiveDiscountClientsReport.Builder().setExportToObjects(true);
         if (idOfOrg != null) {
             Org org = null;
             if (idOfOrg != null && idOfOrg > -1) {

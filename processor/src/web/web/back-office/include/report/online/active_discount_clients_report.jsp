@@ -46,6 +46,23 @@
             </f:facet>
         </a4j:status>
     </h:panelGrid>
+    <%--<h:panelGrid styleClass="borderless-grid" id="reportPanel">
+        <c:if test="${not empty activeDiscountClientsReportPage.report && not empty activeDiscountClientsReportPage.report.htmlReport}" >
+            <h:outputText escape="true" value="Отчет по питающимся льготникам" styleClass="output-text" />
+
+            <f:verbatim>
+                <style type="text/css">
+                    div.htmlReportContent :empty {
+                        display: none;
+                    }
+                </style>
+                <div class="htmlReportContent">
+                        ${activeDiscountClientsReportPage.report.htmlReport}
+                </div>
+            </f:verbatim>
+
+        </c:if>
+    </h:panelGrid>--%>
     <h:panelGrid styleClass="borderless-grid" id="reportPanel">
         <c:if test="${!empty activeDiscountClientsReportPage.report && !empty activeDiscountClientsReportPage.report.items && !empty activeDiscountClientsReportPage.report.columnNames}" >
             <h:outputText escape="true" value="Отчет по питающимся льготникам" styleClass="output-text" />
