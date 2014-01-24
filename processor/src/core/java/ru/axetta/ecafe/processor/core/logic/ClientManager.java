@@ -655,7 +655,7 @@ public class ClientManager {
                     ClientGroup clientGroup = DAOUtils
                             .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, idOfOrg, clientGroupName);
                     if (clientGroup == null) {
-                        clientGroup = DAOUtils.createNewClientGroup(persistenceSession, idOfOrg, clientGroupName);
+                        clientGroup = DAOUtils.createClientGroup(persistenceSession, idOfOrg, clientGroupName);
                     }
                     client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                 } else {

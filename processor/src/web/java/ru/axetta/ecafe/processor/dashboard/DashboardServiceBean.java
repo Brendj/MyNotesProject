@@ -10,6 +10,10 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.dashboard.data.DashboardResponse;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -187,10 +191,38 @@ public class DashboardServiceBean {
                 statItem.setLastSuccessfulBalanceSyncTime((Date) result[n++]);
             }
             ////
-            queryText = "SELECT cl.org.idOfOrg, count(*) FROM Client cl WHERE cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup <:studentsMaxValue GROUP BY cl.org.idOfOrg";
-            query = entityManager.createQuery(queryText);
-            query.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            queryResult = query.getResultList();
+            //queryText = "SELECT cl.org.idOfOrg, count(*) FROM Client cl WHERE cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup <:studentsMaxValue GROUP BY cl.org.idOfOrg";
+            //query = entityManager.createQuery(queryText);
+            //query.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            //queryResult = query.getResultList();
+            //for (Object object : queryResult) {
+            //    Object[] result = (Object[]) object;
+            //    Long curIdOfOrg = (Long) result[0];
+            //    DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
+            //    if (statItem == null) {
+            //        continue;
+            //    }
+            //    statItem.setNumberOfStudentClients((Long) result[1]);
+            //}
+
+            //// Статистика по Детям
+            Session session = entityManager.unwrap(Session.class);
+            Criteria groupChildrenCriteria = session.createCriteria(ClientGroup.class);
+            groupChildrenCriteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
+            groupChildrenCriteria.add(Restrictions.not(Restrictions.in("groupName",ClientGroup.predefinedGroupNames())));
+            groupChildrenCriteria.add(Restrictions.lt("compositeIdOfClientGroup.idOfClientGroup", ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES));
+            groupChildrenCriteria.setProjection(Projections.property("compositeIdOfClientGroup.idOfClientGroup"));
+            List<Long> clientChildrenGroups = groupChildrenCriteria.list();
+            Criteria childrenCount = session.createCriteria(Client.class);
+            if(!clientChildrenGroups.isEmpty()){
+                childrenCount.add(Restrictions.not(Restrictions.in("idOfClientGroup", clientChildrenGroups)));
+            }
+            childrenCount.setProjection(Projections.projectionList()
+                    .add(Projections.property("org.idOfOrg"))
+                    .add(Projections.rowCount())
+                    .add(Projections.groupProperty("org.idOfOrg"))
+            );
+            queryResult = childrenCount.list();
             for (Object object : queryResult) {
                 Object[] result = (Object[]) object;
                 Long curIdOfOrg = (Long) result[0];
@@ -198,14 +230,70 @@ public class DashboardServiceBean {
                 if (statItem == null) {
                     continue;
                 }
-                statItem.setNumberOfStudentClients((Long) result[1]);
+                statItem.setNumberOfChildrenClients((Long) result[1]);
             }
-            ////
-            queryText = "SELECT cl.org.idOfOrg, count(*) FROM Client cl WHERE cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup>=:nonStudentGroups AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup<:leavingClientGroup GROUP BY cl.org.idOfOrg";
-            query = entityManager.createQuery(queryText);
-            query.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            query.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-            queryResult = query.getResultList();
+            //// Статистика по Родителям
+            ClientGroup.Predefined parent = ClientGroup.Predefined.CLIENT_PARENTS;
+            Criteria parentGroupCriteria = session.createCriteria(ClientGroup.class);
+            parentGroupCriteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
+            parentGroupCriteria.add(Restrictions.or(
+                    Restrictions.eq("groupName", parent.getNameOfGroup()),
+                    Restrictions.eq("compositeIdOfClientGroup.idOfClientGroup", parent.getValue())
+            ));
+            parentGroupCriteria.setProjection(Projections.property("compositeIdOfClientGroup.idOfClientGroup"));
+            List<Long> clientGroups = parentGroupCriteria.list();
+            Criteria parentsCount = session.createCriteria(Client.class);
+            if(!clientGroups.isEmpty()) parentsCount.add(Restrictions.not(Restrictions.in("idOfClientGroup", clientGroups)));
+            parentsCount.setProjection(Projections.projectionList()
+                    .add(Projections.property("org.idOfOrg"))
+                    .add(Projections.rowCount())
+                    .add(Projections.groupProperty("org.idOfOrg"))
+            );
+            queryResult = parentsCount.list();
+            for (Object object : queryResult) {
+                Object[] result = (Object[]) object;
+                Long curIdOfOrg = (Long) result[0];
+                DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
+                if (statItem == null) {
+                    continue;
+                }
+                statItem.setNumberOfParentsClients((Long) result[1]);
+            }
+
+
+            //// Старая логика по сотрудникам
+            //queryText = "SELECT cl.org.idOfOrg, count(*) FROM Client cl WHERE cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup>=:nonStudentGroups AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup<:leavingClientGroup GROUP BY cl.org.idOfOrg";
+            //query = entityManager.createQuery(queryText);
+            //query.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            //query.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+            //queryResult = query.getResultList();
+            //for (Object object : queryResult) {
+            //    Object[] result = (Object[]) object;
+            //    Long curIdOfOrg = (Long) result[0];
+            //    DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
+            //    if (statItem == null) {
+            //        continue;
+            //    }
+            //    statItem.setNumberOfNonStudentClients((Long) result[1]);
+            //}
+
+            /// Обновление логики по сотрудникам
+            Criteria groupEmployeesCriteria = session.createCriteria(ClientGroup.class);
+            groupEmployeesCriteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
+            groupEmployeesCriteria.add(Restrictions.in("groupName",ClientGroup.predefinedGroupNames()));
+            groupEmployeesCriteria.add(Restrictions.lt("compositeIdOfClientGroup.idOfClientGroup", ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES));
+            groupEmployeesCriteria.add(Restrictions.ne("compositeIdOfClientGroup.idOfClientGroup", parent.getValue()));
+            groupEmployeesCriteria.add(Restrictions.ne("groupName", parent.getNameOfGroup()));
+            groupEmployeesCriteria.setProjection(Projections.property("compositeIdOfClientGroup.idOfClientGroup"));
+            List<Long> groupEmployees =  groupEmployeesCriteria.list();
+            Criteria employeesCount = session.createCriteria(Client.class);
+            employeesCount.add(Restrictions.not(Restrictions.in("idOfClientGroup", groupEmployees)));
+            employeesCount.setProjection(Projections.projectionList()
+                    .add(Projections.property("org.idOfOrg"))
+                    .add(Projections.rowCount())
+                    .add(Projections.groupProperty("org.idOfOrg"))
+            );
+            queryResult = employeesCount.list();
             for (Object object : queryResult) {
                 Object[] result = (Object[]) object;
                 Long curIdOfOrg = (Long) result[0];
@@ -359,14 +447,24 @@ public class DashboardServiceBean {
                 if (employeesEntersCount != null && statItem.getNumberOfEnterEvents() != 0) {
                     per2 = (double) employeesEntersCount / (double) statItem.getNumberOfEnterEvents();
                 }
-                if(statItem.getNumberOfStudentClients()+statItem.getNumberOfNonStudentClients()!=0){
+                //if(statItem.getNumberOfStudentClients()+statItem.getNumberOfNonStudentClients()!=0){
+                //    if (studentsPayOrdersCount != null && statItem.getNumberOfPayOrders() != 0) {
+                //        per3 = (double) studentsPayOrdersCount / (double) (statItem.getNumberOfStudentClients() +
+                //                statItem.getNumberOfNonStudentClients());
+                //    }
+                //    if (employeePayOrdersCount != null && statItem.getNumberOfPayOrders() != 0) {
+                //        per4 = (double) employeePayOrdersCount / (double) (statItem.getNumberOfNonStudentClients() +
+                //                statItem.getNumberOfStudentClients());
+                //    }
+                //}
+                if(statItem.getNumberOfChildrenClients()+statItem.getNumberOfNonStudentClients()!=0){
                     if (studentsPayOrdersCount != null && statItem.getNumberOfPayOrders() != 0) {
-                        per3 = (double) studentsPayOrdersCount / (double) (statItem.getNumberOfStudentClients() +
+                        per3 = (double) studentsPayOrdersCount / (double) (statItem.getNumberOfChildrenClients() +
                                 statItem.getNumberOfNonStudentClients());
                     }
                     if (employeePayOrdersCount != null && statItem.getNumberOfPayOrders() != 0) {
                         per4 = (double) employeePayOrdersCount / (double) (statItem.getNumberOfNonStudentClients() +
-                                statItem.getNumberOfStudentClients());
+                                statItem.getNumberOfChildrenClients());
                     }
                 }
                 if (studentsUniqueCount != null && studentsDiscountsCount != 0) {

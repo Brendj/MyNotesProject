@@ -4,9 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,6 +17,19 @@ public class ClientGroup {
     public static final long PREDEFINED_ID_OF_GROUP_OTHER = 1200000000;
     public static final long PREDEFINED_ID_OF_GROUP_EMPLOYEES = 1100000000;
     public static final long TEMPORARY_GROUP_MAX_ID = -100000;
+
+    private static List<String> names = new LinkedList<String>();
+
+    public static List<String> predefinedGroupNames(){
+        if(names.isEmpty()){
+            for (Predefined p: Predefined.values()){
+                if(p.getValue()>=1100000000L){
+                    names.add(p.getNameOfGroup());
+                }
+            }
+        }
+        return names;
+    }
 
     public enum Predefined{
         CLIENT_STUDENTS_CLASS_BEGIN(1000000000L,"Ученики"),

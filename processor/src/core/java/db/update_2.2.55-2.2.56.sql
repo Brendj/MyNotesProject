@@ -26,3 +26,4 @@ CREATE TABLE cf_temporary_orders (
 -- Признак типа заявки
 -- по умолчнию обычная (по умолчанию), 1 – заявка по суточной пробе
 ALTER TABLE cf_goods_requests ADD COLUMN RequestType integer NOT NULL DEFAULT 0;
+

@@ -90,7 +90,9 @@ public class DashboardResponse {
         private Date firstDiscountOrderDate;
         long numberOfPayOrders;
         private Date firstPayOrderDate;
-        long numberOfStudentClients;
+        //long numberOfStudentClients;
+        long numberOfChildrenClients;
+        long numberOfParentsClients;
         long numberOfNonStudentClients;
         double numberOfStudentsWithEnterEventsPercent;
         double numberOfEmployeesWithEnterEventsPercent;
@@ -189,12 +191,29 @@ public class DashboardResponse {
             this.firstPayOrderDate = firstPayOrderDate;
         }
 
-        public long getNumberOfStudentClients() {
-            return numberOfStudentClients;
+        //public long getNumberOfStudentClients() {
+        //    return numberOfStudentClients;
+        //}
+        //
+        //public void setNumberOfStudentClients(long numberOfStudentClients) {
+        //    this.numberOfStudentClients = numberOfStudentClients;
+        //}
+
+
+        public long getNumberOfChildrenClients() {
+            return numberOfChildrenClients;
         }
 
-        public void setNumberOfStudentClients(long numberOfStudentClients) {
-            this.numberOfStudentClients = numberOfStudentClients;
+        public void setNumberOfChildrenClients(long numberOfChildrenClients) {
+            this.numberOfChildrenClients = numberOfChildrenClients;
+        }
+
+        public long getNumberOfParentsClients() {
+            return numberOfParentsClients;
+        }
+
+        public void setNumberOfParentsClients(long numberOfParentsClients) {
+            this.numberOfParentsClients = numberOfParentsClients;
         }
 
         public long getNumberOfNonStudentClients() {

@@ -71,13 +71,25 @@
                      </f:facet>
                      <h:outputText value="#{item.lastSuccessfulBalanceSyncTime}" converter="timeMinuteConverter"/>
                  </rich:column>
-                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfStudentClients}" width="120px">
+                 <%--<rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfStudentClients}" width="120px">
                      <f:facet name="header">
                          <h:outputText value="Учащихся" styleClass="output-text" escape="true"/>
                      </f:facet>
                      <h:outputText value="#{item.numberOfStudentClients}"/>
+                 </rich:column>--%>
+                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfChildrenClients}" width="120px">
+                     <f:facet name="header">
+                         <h:outputText value="Дети" styleClass="output-text" escape="true"/>
+                     </f:facet>
+                     <h:outputText value="#{item.numberOfChildrenClients}"/>
                  </rich:column>
-                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfStudentClients}" width="120px">
+                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfParentsClients}" width="120px">
+                     <f:facet name="header">
+                         <h:outputText value="Родители" styleClass="output-text" escape="true"/>
+                     </f:facet>
+                     <h:outputText value="#{item.numberOfParentsClients}"/>
+                 </rich:column>
+                 <rich:column headerClass="column-header" sortable="true" sortBy="#{item.numberOfNonStudentClients}" width="120px">
                      <f:facet name="header">
                          <h:outputText value="Сотруд. и др." styleClass="output-text" escape="true"/>
                      </f:facet>
@@ -199,8 +211,7 @@
              <a4j:commandButton value="Обновить" action="#{dashboardPage.updatePaySysStatus}" reRender="dashboardPanelGrid"/>
 
              <rich:extendedDataTable id="paySysStatusTable" value="#{dashboardPage.psStatus.paymentSystemItemInfos}" var="item"
-                                     rows="500"
-                                     sortMode="multi" selectionMode="single" width="1500" height="900"
+                                     rows="500" sortMode="multi" selectionMode="single" width="1500" height="900"
                                      footerClass="data-table-footer">
                  <rich:column headerClass="column-header" sortable="true" sortBy="#{item.idOfContragent}"  width="30px" filterBy="#{item.idOfContragent}" filterEvent="onkeyup">
                      <f:facet name="header">
