@@ -9,6 +9,8 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.ClientReportItem;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import org.hibernate.Query;
@@ -32,87 +34,6 @@ public class ClientOrderDetailsByOneOrgReport extends BasicReportForOrgJob {
     }
 
     public static class Builder extends BasicReportJob.Builder {
-
-        public static HashMap<Integer, String> values = new HashMap<Integer, String>();
-        static {
-            values.put(0,"Собственное");
-            values.put(1,"Централизованное");
-            values.put(2, "Централизованное с доготовкой");
-            values.put(10,"Закупленное");
-        }
-           /* КонтракИД, ЗаказИД, Название Блюда, ФИО клиента, Тип производсва, сумма */
-        public static class ClientReportItem {
-               // ЗаказИД
-               private Long idOfOrderDetail;
-               // КонтракИД
-               private Long contractId;
-               //  ФИО клиента
-               private String fio;
-               //Название Блюда
-               private String menuName;
-               // Тип производсва
-               private String menuOrigin;
-               // Cумма
-               private Float price;
-
-               public ClientReportItem(Long idOfOrderDetail, Long contracId, String fio, String menuName,
-                       String menuOrigin, Float totalDetailSum) {
-                   this.idOfOrderDetail = idOfOrderDetail;
-                   this.contractId = contracId;
-                   this.fio = fio;
-                   this.menuName = menuName;
-                   this.menuOrigin = menuOrigin;
-                   this.price = totalDetailSum;
-               }
-
-               public Long getIdOfOrderDetail() {
-                   return idOfOrderDetail;
-               }
-
-               public void setIdOfOrderDetail(Long idOfOrderDetail) {
-                   this.idOfOrderDetail = idOfOrderDetail;
-               }
-
-               public Long getContractId() {
-                   return contractId;
-               }
-
-               public void setContractId(Long contractId) {
-                   this.contractId = contractId;
-               }
-
-               public String getFio() {
-                   return fio;
-               }
-
-               public void setFio(String fio) {
-                   this.fio = fio;
-               }
-
-               public String getMenuName() {
-                   return menuName;
-               }
-
-               public void setMenuName(String menuName) {
-                   this.menuName = menuName;
-               }
-
-               public String getMenuOrigin() {
-                   return menuOrigin;
-               }
-
-               public void setMenuOrigin(String menuOrigin) {
-                   this.menuOrigin = menuOrigin;
-               }
-
-               public Float getPrice() {
-                   return price;
-               }
-
-               public void setPrice(Float price) {
-                   this.price = price;
-               }
-           }
 
         private final String templateFilename;
 
@@ -144,31 +65,10 @@ public class ClientOrderDetailsByOneOrgReport extends BasicReportForOrgJob {
 
         private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
-            List<ClientReportItem> resultRows = new LinkedList<ClientReportItem>();
-            Query query = session.createSQLQuery("SELECT cf_orderdetails.idoforderdetail, cf_clients.contractid, cf_persons.firstname || ' ' || cf_persons.secondname || ' ' || cf_persons.surname, "
-                    + " cf_orderdetails.menuorigin, cf_orderdetails.menudetailname, cf_orderdetails.rprice, cf_orderdetails.discount, cf_orderdetails.qty"
-                    + " FROM  public.cf_clients, public.cf_persons, public.cf_orders, public.cf_orderdetails "
-                    + " WHERE (cf_orderdetails.idoforg=:idoforg AND cf_orders.createddate>=:startTime AND cf_orders.createddate<=:endTime AND cf_orders.idoforg=cf_orderdetails.idoforg  AND"
-                    + " cf_orders.idoforder = cf_orderdetails.idoforder AND cf_orders.idofclient = cf_clients.idofclient AND cf_persons.idofperson = cf_clients.idofperson );"
-                    + " ");
-            query.setParameter("startTime", startTime.getTime());
-            query.setParameter("endTime", endTime.getTime());
-            query.setParameter("idoforg", org.getIdOfOrg());
-            List list = query.list();
-            for (Object result : list) {
-                Object[] sale = (Object[]) result;
-                Long idOfOrderDetail = Long.parseLong(sale[0].toString());
-                Long contractId = Long.parseLong(sale[1].toString());
-                String fullName = sale[2].toString();
-                Integer menuOrigin = (Integer) sale[3];
-                String menuName = sale[4].toString();
-                Float price = Float.parseFloat(sale[5].toString()) / 100;
-                Float discount = Float.parseFloat(sale[6].toString()) / 100;
-                Integer quantity = (Integer) sale[7];
-                Float totalDetailSum = (price - discount) * quantity;
-                resultRows.add(new ClientReportItem(idOfOrderDetail, contractId, fullName, menuName, values.get(menuOrigin), totalDetailSum));
-            }
-            return new JRBeanCollectionDataSource(resultRows);
+            OrderDetailsDAOService service = new OrderDetailsDAOService();
+            service.setSession(session);
+            List<ClientReportItem> clientReportItems = service.fetchClientReportItem(startTime, endTime, org. getIdOfOrg());
+            return new JRBeanCollectionDataSource(clientReportItems);
         }
 
     }

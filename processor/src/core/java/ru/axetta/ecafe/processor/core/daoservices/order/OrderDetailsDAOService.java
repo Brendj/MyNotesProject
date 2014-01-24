@@ -114,9 +114,12 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         return  (List<GoodItem>) query.list();
     }
 
-    public List<ClientReportItem> fetchClientReportItem(Date startDate, Date endDate){
+    public List<ClientReportItem> fetchClientReportItem(Date startDate, Date endDate, Long idOfOrg){
         List<ClientReportItem> clientReportItems = new LinkedList<ClientReportItem>();
         Criteria criteriaOrder = getSession().createCriteria(Order.class);
+        if(idOfOrg!=null) {
+            criteriaOrder.add(Restrictions.eq("compositeIdOfOrder.idOfOrg", idOfOrg));
+        }
         criteriaOrder.add(Restrictions.between("createTime", startDate, endDate));
         criteriaOrder.add(Restrictions.gt("sumByCard", 0L));
         criteriaOrder.addOrder(org.hibernate.criterion.Order.asc("compositeIdOfOrder.idOfOrder"));

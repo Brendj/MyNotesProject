@@ -79,7 +79,7 @@ public class ReportControllerWS extends HttpServlet implements ReportController 
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             service.setSession(persistenceSession);
-            List<ClientReportItem> clientReportItems = service.fetchClientReportItem(startDate, endDate);
+            List<ClientReportItem> clientReportItems = service.fetchClientReportItem(startDate, endDate, null);
             ClientOrderDetailsByAllOrgList clientOrderDetailsByAllOrgList = new ClientOrderDetailsByAllOrgList();
             clientOrderDetailsByAllOrgList.setC(clientReportItems);
             result.setClientOrderDetailsByAllOrgList(clientOrderDetailsByAllOrgList);

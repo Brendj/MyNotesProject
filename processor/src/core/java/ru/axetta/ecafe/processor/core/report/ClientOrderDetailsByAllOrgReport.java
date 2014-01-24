@@ -69,7 +69,7 @@ public class ClientOrderDetailsByAllOrgReport extends BasicReportForAllOrgJob {
 
             OrderDetailsDAOService service = new OrderDetailsDAOService();
             service.setSession(session);
-            List<ClientReportItem> clientReportItems = service.fetchClientReportItem(startTime, endTime);
+            List<ClientReportItem> clientReportItems = service.fetchClientReportItem(startTime, endTime, null);
             return new JRBeanCollectionDataSource(clientReportItems);
         }
 
