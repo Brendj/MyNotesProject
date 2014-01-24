@@ -41,7 +41,7 @@ import java.util.*;
 @Scope("singleton")
 public class ProjectStateReportService {
 
-    @PersistenceContext(unitName = "reportsPU")
+    @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
     private static final int ACTIVE_CHART_DATA = 100;
