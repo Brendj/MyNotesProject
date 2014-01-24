@@ -234,16 +234,22 @@ public class DashboardServiceBean {
             }
             //// Статистика по Родителям
             ClientGroup.Predefined parent = ClientGroup.Predefined.CLIENT_PARENTS;
-            Criteria parentGroupCriteria = session.createCriteria(ClientGroup.class);
-            parentGroupCriteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
-            parentGroupCriteria.add(Restrictions.or(
-                    Restrictions.eq("groupName", parent.getNameOfGroup()),
-                    Restrictions.eq("compositeIdOfClientGroup.idOfClientGroup", parent.getValue())
-            ));
-            parentGroupCriteria.setProjection(Projections.property("compositeIdOfClientGroup.idOfClientGroup"));
-            List<Long> clientGroups = parentGroupCriteria.list();
+            //Criteria parentGroupCriteria = session.createCriteria(ClientGroup.class);
+            //parentGroupCriteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
+            //parentGroupCriteria.add(Restrictions.or(
+            //        Restrictions.eq("groupName", parent.getNameOfGroup()),
+            //        Restrictions.eq("compositeIdOfClientGroup.idOfClientGroup", parent.getValue())
+            //));
+            //parentGroupCriteria.setProjection(Projections.property("compositeIdOfClientGroup.idOfClientGroup"));
+            //List<Long> clientGroups = parentGroupCriteria.list();
             Criteria parentsCount = session.createCriteria(Client.class);
-            if(!clientGroups.isEmpty()) parentsCount.add(Restrictions.not(Restrictions.in("idOfClientGroup", clientGroups)));
+            parentsCount.createCriteria("clientGroup").add(
+                    Restrictions.or(
+                            Restrictions.eq("groupName", parent.getNameOfGroup()),
+                            Restrictions.eq("compositeIdOfClientGroup.idOfClientGroup", parent.getValue())
+                    )
+            );
+
             parentsCount.setProjection(Projections.projectionList()
                     .add(Projections.property("org.idOfOrg"))
                     .add(Projections.rowCount())
@@ -287,7 +293,14 @@ public class DashboardServiceBean {
             groupEmployeesCriteria.setProjection(Projections.property("compositeIdOfClientGroup.idOfClientGroup"));
             List<Long> groupEmployees =  groupEmployeesCriteria.list();
             Criteria employeesCount = session.createCriteria(Client.class);
-            employeesCount.add(Restrictions.not(Restrictions.in("idOfClientGroup", groupEmployees)));
+            if(groupEmployees.isEmpty()){
+                employeesCount.add(Restrictions.ge("idOfClientGroup", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()));
+                employeesCount.add(Restrictions.ne("idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue()));
+                //query.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+                //query.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+            } else {
+                employeesCount.add(Restrictions.in("idOfClientGroup", groupEmployees));
+            }
             employeesCount.setProjection(Projections.projectionList()
                     .add(Projections.property("org.idOfOrg"))
                     .add(Projections.rowCount())
