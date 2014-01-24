@@ -163,7 +163,7 @@ public class GoodRequestsReport extends BasicReport {
                     "            " + orgCondition +
                     "            " + suppliersCondition + ") as requests "+
                     "group by requests.idorg, requests.org, requests.orgFull, requests.idofgood, requests.shortGood, requests.good, requests.d "+
-                    "order by requests.org, requests.idofgood, requests.d";
+                    "order by requests.idorg, requests.org, requests.idofgood, requests.d";
 
             String sqlProduct = "select requests.idorg, requests.org, requests.orgFull, requests.shortGood, requests.good, requests.idofgood, requests.d, int8(sum(requests.cnt)) as sumcnt, sum(coalesce(requests.ds_cnt, 0)) as sumdscnt, "+
                     "  sum(coalesce(requests.lcnt, 0)) as lastsumcnt, sum(coalesce(requests.lds_cnt, 0)) as lastsumdscnt"  +
@@ -184,7 +184,7 @@ public class GoodRequestsReport extends BasicReport {
                     "            " + orgCondition +
                     "            " + suppliersCondition + ") as requests "+
                     "group by requests.idorg, requests.org, requests.orgFull, requests.idofgood, requests.shortGood, requests.good, requests.d "+
-                    "order by requests.org, requests.idofgood, requests.d";
+                    "order by requests.idorg, requests.org, requests.idofgood, requests.d";
 
             //Map <String, RequestItem> totalItems = new TreeMap <String, RequestItem>();
             Map <Long, RequestItem> totalItems = new TreeMap <Long, RequestItem>();
@@ -212,7 +212,7 @@ public class GoodRequestsReport extends BasicReport {
 
 
                 //RequestItem item = findItemByOrgAndGood(items, org, good);
-                RequestItem item = findItemByOrgAndGood(items, org, idOfGood);
+                RequestItem item = findItemByOrgAndGood(items, idOfOrg, idOfGood);
                 final String name = (StringUtils.isEmpty(good)? shortGood: good);
                 if (item == null) {
                     item = new RequestItem(idOfOrg, org, orgFull, idOfGood, name, report);
@@ -281,9 +281,9 @@ public class GoodRequestsReport extends BasicReport {
             return null;
         }
 
-        public RequestItem findItemByOrgAndGood(List<RequestItem>  list, String org, Long good) {
+        public RequestItem findItemByOrgAndGood(List<RequestItem> list, Long idOfOrg, Long good) {
             for (RequestItem i : list) {
-                if (i.getOrg().equals(org) && i.getIdOfGood().equals(good)) {
+                if (i.getIdOfOrg().equals(idOfOrg) && i.getIdOfGood().equals(good)) {
                     return i;
                 }
             }
