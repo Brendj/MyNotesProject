@@ -2551,6 +2551,17 @@ public class Processor implements SyncProcessor,
         // Удаляем "лишние" элементы меню
         for (MenuDetail menuDetail : superfluousMenuDetails) {
             menu.removeMenuDetail(menuDetail);
+
+            String deldetSql = "delete ComplexInfoDetail  where menuDetail=:md";
+            Query query = persistenceSession.createQuery(deldetSql);
+            query.setParameter("md", menuDetail);
+            query.executeUpdate();
+
+            String delSql = "delete ComplexInfo  where menuDetail=:md";
+            query = persistenceSession.createQuery(delSql);
+            query.setParameter("md", menuDetail);
+            query.executeUpdate();
+
             persistenceSession.delete(menuDetail);
         }
 
