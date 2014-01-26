@@ -14,13 +14,23 @@
 <head>
     <title>Абонементное питание</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/complexTable.css"/>
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/flick/jquery-ui-1.10.3.custom.min.css"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/view.css"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/complexTable.css"/>
     <script src="${pageContext.request.contextPath}/WebContent/js/jquery-1.10.2.min.js"></script>
     <script src="${pageContext.request.contextPath}/WebContent/js/jquery-ui-1.10.3.custom.min.js"></script>
     <script src="${pageContext.request.contextPath}/WebContent/js/jquery.ui.datepicker-ru.js"></script>
     <script>
         $(function () {
+            $('button').button();
+            $('input:text').button().css({
+                'font': 'inherit',
+                'color': 'inherit',
+                'text-align': 'left',
+                'outline': 'none',
+                'cursor': 'text'
+            });
             var datepickerBegin = $("#datepickerBegin").datepicker({
                 onSelect: function (selected) {
                     $("#datepickerEnd").datepicker("option", "minDate", selected);
@@ -30,27 +40,9 @@
             datepickerEnd.datepicker("option", "minDate", datepickerBegin.datepicker("getDate"));
         });
     </script>
-    <style type="text/css">
-        #container {
-            font-size: 10pt;
-        }
-        .leftcol {
-            float: left;
-            width: 250px;
-        }
-        .rightcol {
-            float: left;
-            width: 750px;
-        }
-    </style>
 </head>
 <body>
 <div class="bodyDiv">
-<div class="textDiv" style="position: relative; text-align: right; padding-right: 200px;">
-    <form method="post" action="${pageContext.request.contextPath}/office/logout">
-        <input type="submit" name="logout" value="Выход" />
-    </form>
-</div>
 <%
     DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
     df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
@@ -63,118 +55,103 @@
     String subBalance0 = CurrencyStringUtils.copecksToRubles(client.getSubBalance0());
     boolean wasSuspended = sf.getSuspended() != null && sf.getSuspended();
 %>
-<div class="textDiv" style="font-weight: bold;"><%=client.getFullName()%>
+<div class="header">
+    <span class="contract"><%=ContractIdFormat.format(client.getContractId())%></span>
+    <span class="contract" style="padding-left: 20px;"><%=client.getFullName()%></span>
+    <span style="float: right;">
+        <button onclick="location.href = '${pageContext.request.contextPath}/office/logout'" name="logout">Выход
+            </button>
+    </span>
 </div>
-<div id="container">
-    <div class="leftcol">Номер контракта:</div>
-    <div class="rightcol"><%=ContractIdFormat.format(client.getContractId())%>
+<div id="content">
+    <div id="infoHeader">
+        <div class="colRow">
+            <div class="leftcol">Баланс основного счета:</div>
+            <div class="rightcol"><%=subBalance0%> руб.</div>
+        </div>
+        <div class="colRow">
+            <div class="leftcol">Баланс субсчета АП:</div>
+            <div class="rightcol"><%=subBalance1%> руб.</div>
+        </div>
+        <div class="colRow">
+            <div class="leftcol">Дата активации услуги:</div>
+            <div class="rightcol"><%=tf.format(sf.getDateActivate())%></div>
+        </div>
+        <div class="colRow">
+            <div class="leftcol">Дата отключения услуги:</div>
+            <div class="rightcol"><%=sf.getDateDeactivate() == null ? "услуга бессрочная"
+                    : df.format(sf.getDateDeactivate())%>
+            </div>
+        </div>
+        <%
+            if (wasSuspended) {
+                String suspendDate = df.format(sf.getLastDatePause());
+        %>
+        <div class="colRow">
+            <div class="leftcol">Услуга приостанавливается</div>
+            <div class="rightcol">c <%=suspendDate%></div>
+        </div>
+        <%
+            }
+        %>
+        <c:if test="${not empty requestScope.subFeedingError}">
+            <div class="messageDiv errorMessage">${requestScope.subFeedingError}</div>
+        </c:if>
+        <c:if test="${not empty requestScope.subFeedingSuccess}">
+            <div class="messageDiv successMessage">${requestScope.subFeedingSuccess}</div>
+        </c:if>
+        <div class="colRow">
+            <%
+                if (!wasSuspended) {
+            %>
+            <div class="leftcol">
+                <button type="submit" onclick="location.href = '${pageContext.request.contextPath}/office/suspend'">
+                    Приостановить услугу
+                </button>
+            </div>
+            <%
+            } else {
+            %>
+            <div class="leftcol">
+                <button type="submit" onclick="location.href = '${pageContext.request.contextPath}/office/reopen'">
+                    Возобновить услугу
+                </button>
+            </div>
+            <%
+                }
+            %>
+             <div class="rightcol">
+                 <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/plan'">
+                     Просмотр циклограммы
+                 </button>
+             </div>
+        </div>
     </div>
-    <div class="leftcol">Текущий баланс основного счета:</div>
-    <div class="rightcol"><%=subBalance0%> руб.</div>
-    <div class="leftcol">Баланс субсчета АП:</div>
-    <div class="rightcol"><%=subBalance1%> руб.</div>
-    <div class="leftcol">Дата активации услуги:</div>
-    <div class="rightcol"><%=tf.format(sf.getDateActivate())%>
-    </div>
-    <div class="leftcol">Дата отключения услуги:</div>
-    <div class="rightcol"><%=sf.getDateDeactivate() == null ? "услуга бессрочная" : df.format(sf.getDateDeactivate())%>
+    <%
+        String startDate = (String) request.getAttribute("startDate");
+        String endDate = (String) request.getAttribute("endDate");
+        PaymentListResult payments = (PaymentListResult) request.getAttribute("payments");
+        PurchaseListResult purchases = (PurchaseListResult) request.getAttribute("purchases");
+        boolean purchasesExist = purchases != null && purchases.purchaseList != null && !purchases.purchaseList.getP().isEmpty();
+        boolean paymentsExist = payments != null && payments.paymentList != null && !payments.paymentList.getP().isEmpty();
+    %>
+    <div id="history">
+        <div style="font-weight: bold; margin: 20px 0;">История операций</div>
+        <div>
+            <form method="post" enctype="application/x-www-form-urlencoded"
+                  action="${pageContext.request.contextPath}/office/view">
+                <span style="padding-right: 10px;">Начальная дата:</span>
+                <input type="text" name="startDate" value="<%=StringEscapeUtils.escapeHtml(startDate)%>"
+                       id="datepickerBegin" maxlength="10" required />
+                <span style="padding: 10px;">Конечная дата:</span>
+                <input type="text" name="endDate" value="<%=StringEscapeUtils.escapeHtml(endDate)%>" id="datepickerEnd"
+                       maxlength="10" required />
+                <button type="submit">Показать</button>
+            </form>
+        </div>
     </div>
 </div>
-<%
-    if (wasSuspended) {
-        String suspendDate = df.format(sf.getLastDatePause());
-        String status = "Услуга приостанавливается с " + suspendDate + ".";
-%>
-<div class="textDiv"><%=status%></div>
-<%
-    }
-%>
-<c:if test="${not empty requestScope.subFeedingError}">
-    <div class="textDiv" style="color: red">${requestScope.subFeedingError}</div>
-</c:if>
-<c:if test="${not empty requestScope.subFeedingSuccess}">
-    <div class="textDiv" style="color: green">${requestScope.subFeedingSuccess}</div>
-</c:if>
 
-<div style="margin-top: 100px;">
-<table class="customTable">
-    <tr>
-<%
-    if (!wasSuspended) {
-%>
-        <td align="center" colspan="2">
-            <form method="post" action="${pageContext.request.contextPath}/office/suspend">
-                <input type="submit" name="deactivate" class="deactivateButton" value="Приостановить услугу" />
-            </form>
-        </td>
-<%
-    } else {
-%>
-        <td align="center" colspan="2">
-            <form method="post" action="${pageContext.request.contextPath}/office/reopen">
-                <div>
-                    <input type="submit" class="reopenButton" name="reopen" value="Возобновить услугу" />
-                </div>
-            </form>
-        </td>
-<%
-    }
-%>
-        <td align="left" colspan="6">
-            <form method="post" action="${pageContext.request.contextPath}/office/plan">
-                <div>
-                    <input type="submit" class="reopenButton" name="plan" value="Просмотр циклограммы" />
-                </div>
-            </form>
-        </td>
-    </tr>
-</table>
-</div>
-<%
-    String startDate = (String) request.getAttribute("startDate");
-    String endDate = (String) request.getAttribute("endDate");
-    PaymentListResult payments = (PaymentListResult) request.getAttribute("payments");
-    PurchaseListResult purchases = (PurchaseListResult) request.getAttribute("purchases");
-    boolean purchasesExist = purchases != null && purchases.purchaseList != null && !purchases.purchaseList.getP().isEmpty();
-    boolean paymentsExist = payments != null && payments.paymentList != null && !payments.paymentList.getP().isEmpty();
-%>
-
-<div class="history">
-<div class="textDiv" style="font-weight: bold; margin-top: 20px;">История операций</div>
-<form method="post" enctype="application/x-www-form-urlencoded"
-      action="${pageContext.request.contextPath}/office/view">
-    <table class="customTable">
-        <tr class="paymentEvenLine">
-            <td>Начальная дата</td>
-            <td>
-                <div class="textDiv">
-                    <input type="text" name="startDate" value="<%=StringEscapeUtils.escapeHtml(startDate)%>"
-                           id="datepickerBegin" maxlength="10" required />
-                </div>
-            </td>
-        </tr>
-        <tr class="paymentEvenLine">
-            <td>Конечная дата</td>
-            <td>
-                <div class="textDiv">
-                    <input type="text" name="endDate" value="<%=StringEscapeUtils.escapeHtml(endDate)%>"
-                           id="datepickerEnd" maxlength="10" required />
-                </div>
-            </td>
-        </tr>
-        <tr class="paymentUnevenLine">
-            <td colspan="2" align="center">
-                <div class="output-text">(формат даты - ДД.ММ.ГГГГ)</div>
-            </td>
-        </tr>
-        <tr class="paymentUnevenLine">
-            <td colspan="2" align="center">
-                <input type="submit" class="textDiv" name="payments" value="Показать"/>
-            </td>
-        </tr>
-    </table>
-</form>
-</div>
 
 <div class="purchases">
 <div class="textDiv" style="margin-top: 30px;">

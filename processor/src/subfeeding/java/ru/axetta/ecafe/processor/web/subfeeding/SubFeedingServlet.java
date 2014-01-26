@@ -201,7 +201,7 @@ public class SubFeedingServlet extends HttpServlet {
                 return;
             }
         } else {
-            req.setAttribute(ERROR_MESSAGE, "Для сохранения плана АП необходимо заполнить циклограмму.");
+            req.setAttribute(ERROR_MESSAGE, "Для сохранения циклограммы необходимо ее заполнить.");
         }
         showSubscriptionFeedingPlan(req, resp);
     }

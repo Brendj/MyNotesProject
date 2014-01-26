@@ -1,0 +1,42 @@
+#infoHeader {
+    background-image: linear-gradient(to bottom, #fafbfc 0, #e6ecef 100%);
+    padding: 20px 0;
+    color: #1D3E52;
+    line-height: 2em;
+    display: table;
+    caption-side: bottom;
+    width: 100%;
+    border: solid 1px rgba(2, 2, 9, 0.5);
+    border-radius: 10px 10px 0 0;
+}
+
+.leftcol {
+    width: 50%;
+    text-align: right;
+    padding-right: 10px;
+    display: table-cell;
+}
+
+.rightcol {
+    padding-left: 10px;
+    text-align: left;
+    display: table-cell;
+}
+
+.colRow {
+    font-size: 1.1em;
+    display: table-row;
+}
+
+.messageDiv {
+    display: table-caption;
+}
+
+#history {
+    text-align: center;
+    background: #ffffff;
+    vertical-align: middle;
+    border-bottom: solid 1px rgba(2, 2, 9, 0.28);
+    border-left: solid 1px rgba(2, 2, 9, 0.5);
+    border-right: solid 1px rgba(2, 2, 9, 0.5);
+}

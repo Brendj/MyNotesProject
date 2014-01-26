@@ -1,9 +1,33 @@
 .bodyDiv {
     margin: 0 auto;
-    width: 1000px;
+    width: 880px;
+    padding: 0 0;
+    /*border: 2px solid #000000;*/
 }
 
 body {
-    font-family: "PT Serif", Georgia, "Times New Roman", Times, serif;
+    /*font-family: "PT Serif", Georgia, "Times New Roman", Times, serif;*/
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;;
     font-size: 14px;
+    color: #292e31;
+}
+
+.header {
+    line-height: 50px;
+    width: inherit;
+    vertical-align: middle;
+}
+
+.contract {
+    /*font-family: "Lucida Grande", "Lucida Sans Unicode", Geneva, sans-serif;*/
+    font-size: 1.5em;
+    color: rgba(3, 3, 25, 0.60);
+}
+
+.errorMessage {
+    color: red;
+}
+
+.successMessage {
+    color: green;
 }
