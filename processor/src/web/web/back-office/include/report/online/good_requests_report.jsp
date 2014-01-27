@@ -26,7 +26,7 @@
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;" >
                     <f:setPropertyActionListener value="2" target="#{mainPage.orgListSelectPage.filterMode}" />
-                    <f:setPropertyActionListener value="#{mainPage.goodRequestReportPage.getContragentStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                    <f:setPropertyActionListener value="#{mainPage.goodRequestReportPage.contragentStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
                 </a4j:commandButton>
                 <h:outputText styleClass="output-text" escape="true" value="{#{mainPage.goodRequestReportPage.contragentFilter}}" />
             </h:panelGroup>

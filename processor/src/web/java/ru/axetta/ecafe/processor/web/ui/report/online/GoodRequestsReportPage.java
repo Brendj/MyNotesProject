@@ -160,4 +160,9 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
         }
         return startDate.getTime() + tsIncrement;
     }
+
+    @Override
+    public String getContragentStringIdOfOrgList() {
+        return idOfContragentOrgList.toString().replaceAll("[^0-9,]","");
+    }
 }
