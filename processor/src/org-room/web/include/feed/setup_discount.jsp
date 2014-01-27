@@ -117,7 +117,7 @@ function updateWidth() {
         </h:panelGrid>
 
         <rich:panel id="emptyClients" style="margin: 0px; padding: 0px; border-bottom: none">
-            <rich:dataTable value="#{setupDiscountPage.emptyClients}" var="cl" id="table_head" rowKeyVar="row"styleClass="clientsTableHead"
+            <rich:dataTable value="#{setupDiscountPage.emptyClients}" var="cl" id="table_head" rowKeyVar="row" styleClass="clientsTableHead"
                             headerClass="clientsgrid_col1,clientsgrid_col2,clientsgrid_col3,clientsgrid_col4,clientsgrid_col5,clientsgrid_col6,clientsgrid_col7,clientsgrid_col8,clientsgrid_col9,clientsgrid_col10,clientsgrid_col11,clientsgrid_col12,clientsgrid_col13,clientsgrid_col14,clientsgrid_col15"
                             columnClasses="clientsgrid_col1,clientsgrid_col2,clientsgrid_col3,clientsgrid_col4,clientsgrid_col5,clientsgrid_col6,clientsgrid_col7,clientsgrid_col8,clientsgrid_col9,clientsgrid_col10,clientsgrid_col11,clientsgrid_col12,clientsgrid_col13,clientsgrid_col14,clientsgrid_col15">
                 <rich:column headerClass="center-aligned-column">

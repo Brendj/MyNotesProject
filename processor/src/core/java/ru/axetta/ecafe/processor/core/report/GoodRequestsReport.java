@@ -44,6 +44,7 @@ public class GoodRequestsReport extends BasicReport {
     private String prevOrg = "";     //  Все 3 переменных хранят в себе значения от предыдущих строк, используется для
     private String prevOrgFull = ""; //  определения надо ли отображать название Орга или Товара в отчете
     private String pregGood = "";    //
+    private boolean isNewOrg = true;
 
     private static final String ORG_NUM = "Номер ОУ";
     private static final String ORG_NAME = "Наименование ОУ";
@@ -261,6 +262,9 @@ public class GoodRequestsReport extends BasicReport {
             items.add(overallItem);
 
 
+            normalizeDates(items, startDate, endDate);
+
+
             /*items.add(new RequestItem("1477", "ГБОУ СОШ 1477", "Школа / СД / 1-4 / Завтрак 2", report).
                     addValue(1356998400000L, new RequestValue(Math.random())).
                     addValue(1357084800000L, new RequestValue(Math.random())).
@@ -291,6 +295,17 @@ public class GoodRequestsReport extends BasicReport {
         }
     }
 
+    public static void normalizeDates(List<RequestItem> items, Date startDate, Date endDate) {
+        Set <Date> dates = buildDatesFromLimits(startDate, endDate);
+        for(Date d : dates) {
+            for(RequestItem i : items) {
+                if(i.getValue(d.getTime()) == null) {
+                    i.addValue(d.getTime(), new RequestValue(0));
+                }
+            }
+        }
+    }
+
     public GoodRequestsReport() {
         super();
         this.items = Collections.emptyList();
@@ -303,6 +318,10 @@ public class GoodRequestsReport extends BasicReport {
         this.hideMissedColumns = hideMissedColumns;
         this.startDate = startDate;
         this.endDate = endDate;
+    }
+    
+    public List<RequestItem> getEmptyGoodRequestItems() {
+        return Collections.EMPTY_LIST;
     }
 
     public List<RequestItem> getGoodRequestItems() {
@@ -319,11 +338,12 @@ public class GoodRequestsReport extends BasicReport {
             cols.add(c.getName());
         }
 
-        //  Если надо исключать те даты, в которых отсутствуют значения, исключаем их из списка столбцов
+
         if (items == null || items.size() < 1) {
             return cols.toArray();
         }
         Set <Date> dates = new TreeSet <Date> ();
+        //  Если надо исключать те даты, в которых отсутствуют значения, исключаем их из списка столбцов
         if (hideMissedColumns) {
             for (RequestItem it : items) {
                 for (Date d : it.getDates()) {
@@ -331,10 +351,7 @@ public class GoodRequestsReport extends BasicReport {
                 }
             }
         } else {
-            for (long ts=startDate.getTime(); ts<endDate.getTime(); ts+=86400000){
-                Date tmp = new Date(ts);
-                dates.add (tmp);
-            }
+            dates = buildDatesFromLimits(startDate, endDate);
         }
         //  Анализируем месяц, если у первой и последней даты он разный, значит надо будет выводить даты с месяцами
         //boolean showMonths = ((Date) dates.toArray()[0]).getMonth() != ((Date) dates.toArray()[dates.size() - 1]).getMonth();
@@ -354,6 +371,15 @@ public class GoodRequestsReport extends BasicReport {
             cols.add(YEAR_DATE_FORMAT.format(d));
         }
         return cols.toArray();
+    }
+    
+    protected static Set buildDatesFromLimits(Date startDate, Date endDate) {
+        Set <Date> dates = new TreeSet <Date> ();
+        for (long ts=startDate.getTime(); ts<endDate.getTime(); ts+=86400000){
+            Date tmp = new Date(ts);
+            dates.add (tmp);
+        }
+        return dates;
     }
 
     public boolean isHideMissedColumns() {
@@ -453,6 +479,10 @@ public class GoodRequestsReport extends BasicReport {
             this.report = report;
         }
 
+        public RequestValue getValue(long ts) {
+            return values.get(ts);
+        }
+
         public Long getIdOfOrg() {
             return idOfOrg;
         }
@@ -520,6 +550,15 @@ public class GoodRequestsReport extends BasicReport {
                 return "";
             }
         }
+        
+        public String getRowBorderStyle() {
+            if (report.isNewOrg) {
+                return "border-top: 2px solid #000000";
+            } else if(!report.prevOrg.equals(org)) {
+                return "border-top: 2px solid #000000";
+            }
+            return "";
+        }
 
         public String getRowValue(String colName, int dailySamplesMode) {
             String dailySample = getDailySample(colName);
@@ -541,6 +580,17 @@ public class GoodRequestsReport extends BasicReport {
             try
             {
                 Calendar cal = getColumnDate (colName);
+
+                if (report.isNewOrg) {
+                    Set<Long> keys = values.keySet();
+                    int col = 0;
+                    for (Long k : keys) {
+                        if(k.equals(cal.getTimeInMillis()) && col == keys.size() - 1) {
+                            report.isNewOrg = false;
+                        }
+                        col++;
+                    }
+                }
 
                 //return "" + new BigDecimal(values.get(cal.getTimeInMillis()).getValue()).setScale(1, BigDecimal.ROUND_HALF_DOWN);
                 return "" + new BigDecimal(values.get(cal.getTimeInMillis()).getValue()).setScale(0, BigDecimal.ROUND_HALF_DOWN);
@@ -582,7 +632,10 @@ public class GoodRequestsReport extends BasicReport {
         public String getDefaultValue (String colName, GoodRequestsReport report) {
             if (colName.equals(ORG_NUM)) {
                 if (report.prevOrg.equals(org)) {
+                    report.isNewOrg = false;
                     return "";
+                } else {
+                    report.isNewOrg = true;
                 }
                 report.prevOrg = org;
                 return org;
@@ -597,8 +650,8 @@ public class GoodRequestsReport extends BasicReport {
             if (colName.equals(GOOD_NAME)) {
                 /*if (report.pregGood.equals(good)) {
                     return "";
-                }
-                report.pregGood= good;*/
+                }*/
+                report.pregGood = good;
                 return good;
             }
             return null;
