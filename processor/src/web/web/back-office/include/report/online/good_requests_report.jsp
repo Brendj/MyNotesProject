@@ -27,6 +27,7 @@
                                    styleClass="command-link" style="width: 25px;" >
                     <f:setPropertyActionListener value="2" target="#{mainPage.orgListSelectPage.filterMode}" />
                     <f:setPropertyActionListener value="#{mainPage.goodRequestReportPage.contragentStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                    <f:setPropertyActionListener value="Выбор контрагента" target="#{mainPage.orgFilterPageName}"/>
                 </a4j:commandButton>
                 <h:outputText styleClass="output-text" escape="true" value="{#{mainPage.goodRequestReportPage.contragentFilter}}" />
             </h:panelGroup>

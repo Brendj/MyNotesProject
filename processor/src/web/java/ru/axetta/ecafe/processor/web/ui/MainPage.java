@@ -1635,6 +1635,22 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         this.orgFilterOfSelectOrgListSelectPage = orgFilterOfSelectOrgListSelectPage;
     }
 
+
+    private String DEFAULT_ORG_FILTER_PAGE_NAME = "Выбор организаций";
+    private String orgFilterPageName = DEFAULT_ORG_FILTER_PAGE_NAME;
+
+    public void resetOrgFilterPageName() {
+        orgFilterPageName = DEFAULT_ORG_FILTER_PAGE_NAME;
+    }
+
+    public String getOrgFilterPageName() {
+        return orgFilterPageName;
+    }
+
+    public void setOrgFilterPageName(String orgFilterPageName) {
+        this.orgFilterPageName = orgFilterPageName;
+    }
+
     /*public Object showContragentOrgListSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {

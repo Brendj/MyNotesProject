@@ -12,7 +12,7 @@
 <rich:modalPanel id="modalOrgListSelectorPanel" autosized="true" headerClass="modal-panel-header">
     <rich:hotKey key="esc" handler="#{rich:component('modalOrgListSelectorPanel')}.hide();return false;"/>
     <f:facet name="header">
-        <h:outputText escape="true" value="Выбор организаций" />
+        <h:outputText escape="true" value="#{mainPage.orgFilterPageName}" />
     </f:facet>
     <a4j:form id="modalOrgListSelectorForm" binding="#{mainPage.orgListSelectPage.pageComponent}" styleClass="borderless-form"
               eventsQueue="modalOrgListSelectorFormEventsQueue">

@@ -53,6 +53,7 @@ public class OrgListSelectPage extends BasicPage {
     private boolean supplierFilterDisabled = false;
     private Map<Long, String> selectedOrgs = new HashMap<Long, String>();
 
+
     public void pushCompleteHandlerList(CompleteHandlerList handlerList) {
         completeHandlerLists.push(handlerList);
     }
@@ -75,6 +76,7 @@ public class OrgListSelectPage extends BasicPage {
             completeHandlerLists.peek().completeOrgListSelection(orgMap);
             completeHandlerLists.pop();
         }
+        MainPage.getSessionInstance().resetOrgFilterPageName();
     }
 
     public List<OrgShortItem> getItems() {
