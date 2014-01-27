@@ -163,7 +163,7 @@ public class GoodRequestsReport extends BasicReport {
                     "            " + orgCondition +
                     "            " + suppliersCondition + ") as requests "+
                     "group by requests.idorg, requests.org, requests.orgFull, requests.idofgood, requests.shortGood, requests.good, requests.d "+
-                    "order by requests.idorg, requests.org, requests.idofgood, requests.d";
+                    "order by requests.org, requests.idorg, requests.idofgood, requests.d";
 
             String sqlProduct = "select requests.idorg, requests.org, requests.orgFull, requests.shortGood, requests.good, requests.idofgood, requests.d, int8(sum(requests.cnt)) as sumcnt, sum(coalesce(requests.ds_cnt, 0)) as sumdscnt, "+
                     "  sum(coalesce(requests.lcnt, 0)) as lastsumcnt, sum(coalesce(requests.lds_cnt, 0)) as lastsumdscnt"  +
@@ -184,7 +184,7 @@ public class GoodRequestsReport extends BasicReport {
                     "            " + orgCondition +
                     "            " + suppliersCondition + ") as requests "+
                     "group by requests.idorg, requests.org, requests.orgFull, requests.idofgood, requests.shortGood, requests.good, requests.d "+
-                    "order by requests.idorg, requests.org, requests.idofgood, requests.d";
+                    "order by requests.org, requests.idorg, requests.idofgood, requests.d";
 
             //Map <String, RequestItem> totalItems = new TreeMap <String, RequestItem>();
             Map <Long, RequestItem> totalItems = new TreeMap <Long, RequestItem>();
