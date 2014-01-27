@@ -225,7 +225,13 @@ public class DashboardServiceBean {
             //    //childrenCount.add(Restrictions.not(Restrictions.in("idOfClientGroup", clientChildrenGroups)));
             //}
             Criteria childrenCount = session.createCriteria(Client.class);
-            childrenCount.add(Restrictions.in("idOfClientGroup", clientChildrenGroups));
+            if(clientChildrenGroups.isEmpty()){
+                for (ClientGroup.Predefined predefined: ClientGroup.Predefined.values()){
+                    groupChildrenCriteria.add(Restrictions.ne("idOfClientGroup", predefined.getValue()));
+                }
+            }  else {
+                childrenCount.add(Restrictions.in("idOfClientGroup", clientChildrenGroups));
+            }
             childrenCount.setProjection(Projections.projectionList()
                     .add(Projections.property("org.idOfOrg"))
                     .add(Projections.rowCount())
@@ -316,7 +322,13 @@ public class DashboardServiceBean {
             List<Long> groupEmployees =  groupEmployeesCriteria.list();
 
             Criteria employeesCount = session.createCriteria(Client.class);
-            employeesCount.add(Restrictions.in("idOfClientGroup", groupEmployees));
+            if(groupEmployees.isEmpty()){
+                for (ClientGroup.Predefined predefined: predefineds){
+                    employeesCount.add(Restrictions.eq("idOfClientGroup", predefined.getValue()));
+                }
+            } else {
+                employeesCount.add(Restrictions.in("idOfClientGroup", groupEmployees));
+            }
 
             employeesCount.setProjection(Projections.projectionList()
                     .add(Projections.property("org.idOfOrg"))
