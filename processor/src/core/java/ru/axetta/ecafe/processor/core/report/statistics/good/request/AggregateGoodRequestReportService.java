@@ -1,14 +1,14 @@
-package ru.axetta.ecafe.processor.web.ui.report.online.services;
+package ru.axetta.ecafe.processor.core.report.statistics.good.request;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
-import ru.axetta.ecafe.processor.web.ui.org.OrgShortItem;
-import ru.axetta.ecafe.processor.web.ui.report.online.items.good.request.AggregateGoodRequestReportItem;
-import ru.axetta.ecafe.processor.web.ui.report.online.items.good.request.Commodity;
+import ru.axetta.ecafe.processor.core.report.BasicReportForOrgJob;
 
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.springframework.context.annotation.Scope;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +23,6 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 @Component
-@Scope("session")
 @Transactional
 public class AggregateGoodRequestReportService {
 
@@ -32,41 +31,59 @@ public class AggregateGoodRequestReportService {
 
     public List<AggregateGoodRequestReportItem> fetchAggregateGoodRequestReportItems(List<Long> idOfSourceOrgList,List<Long> idOfEduList, Date startDate, Date endDate){
         List<AggregateGoodRequestReportItem> aggregateGoodRequestReportItems = new ArrayList<AggregateGoodRequestReportItem>();
-        Session session = ((Session) entityManager.getDelegate());
-        String sql = "select org.idOfOrg, org.shortName, org.officialName, org.address "
-                + "sourceMenu.idOfOrg, sourceMenu.shortName, sourceMenu.officialName, sourceMenu.address "
-                + "from Org org join org.sourceMenuOrgs sourceMenu "
-                + "where sourceMenu.idOfOrg in (:idOfSourceOrgList) and org.idOfOrg in (:idOfEduList) "
-                + "order by sourceMenu.idOfOrg , org.idOfOrg";
-        Query query = session.createQuery(sql);
-        query.setParameterList("idOfSourceOrgList",idOfSourceOrgList);
-        query.setParameterList("idOfEduList",idOfEduList);
-        List list = query.list();
-        HashMap<OrgShortItem, List<OrgShortItem>> map = new HashMap<OrgShortItem, List<OrgShortItem>>();
+        Session session = entityManager.unwrap(Session.class);
+        String sql;
+        //String sql = "select org.idOfOrg, org.shortName, org.officialName, org.address, "
+        //        + " sourceMenu.idOfOrg, sourceMenu.shortName, sourceMenu.officialName, sourceMenu.address "
+        //        + "from Org org join org.sourceMenuOrgs sourceMenu "
+        //        + "where sourceMenu.idOfOrg in (:idOfSourceOrgList) and org.idOfOrg in (:idOfEduList) "
+        //        + "order by sourceMenu.idOfOrg , org.idOfOrg";
+        Query query;
+        //query.setParameterList("idOfSourceOrgList",idOfSourceOrgList);
+        //query.setParameterList("idOfEduList",idOfEduList);
+        //List list = query.list();
+
+        Criteria orgCriteria = session.createCriteria(Org.class);
+        orgCriteria.createAlias("sourceMenuOrgs", "sm").add(Restrictions.in("sm.idOfOrg", idOfSourceOrgList));
+        orgCriteria.add(Restrictions.in("idOfOrg", idOfEduList));
+        orgCriteria.setProjection(Projections.projectionList()
+                .add(Projections.property("idOfOrg"))
+                .add(Projections.property("shortName"))
+                .add(Projections.property("officialName"))
+                .add(Projections.property("address"))
+                .add(Projections.property("sm.idOfOrg"))
+                .add(Projections.property("sm.shortName"))
+                .add(Projections.property("sm.officialName"))
+                .add(Projections.property("sm.address"))
+        );
+        List list = orgCriteria.list();
+
+        HashMap<BasicReportForOrgJob.OrgShortItem, List<BasicReportForOrgJob.OrgShortItem>> map = new HashMap<BasicReportForOrgJob.OrgShortItem, List<BasicReportForOrgJob.OrgShortItem>>();
         /* Строим отображения ключ (Поставшик) -> значения (Образовательные учереждения) */
         for (Object entity: list){
             Object[] row = (Object[]) entity;
-            OrgShortItem educationItem = new OrgShortItem(Long.parseLong(row[0].toString()),row[1].toString(),row[2].toString(),row[3].toString());
-            OrgShortItem sourceItem = new OrgShortItem(Long.parseLong(row[4].toString()),row[5].toString(),row[6].toString(),row[7].toString());
+            BasicReportForOrgJob.OrgShortItem educationItem = new BasicReportForOrgJob.OrgShortItem(Long.parseLong(row[0].toString()), row[1].toString(), row[2].toString(), row[3].toString());
+            BasicReportForOrgJob.OrgShortItem sourceItem = new BasicReportForOrgJob.OrgShortItem(Long.parseLong(row[4].toString()),row[5].toString(),row[6].toString(),row[7].toString());
             if(map.keySet().contains(sourceItem)){
-                List<OrgShortItem> l = map.get(sourceItem);
+                List<BasicReportForOrgJob.OrgShortItem> l = map.get(sourceItem);
                 if(l==null || l.isEmpty()){
-                    l = new ArrayList<OrgShortItem>();
+                    l = new ArrayList<BasicReportForOrgJob.OrgShortItem>();
                 }
                 l.add(educationItem);
                 map.put(sourceItem,l);
             } else {
-                List<OrgShortItem> l = new ArrayList<OrgShortItem>();
+                List<BasicReportForOrgJob.OrgShortItem> l = new ArrayList<BasicReportForOrgJob.OrgShortItem>();
                 l.add(educationItem);
                 map.put(sourceItem,l);
             }
         }
-        for (OrgShortItem item: map.keySet()){
-            for (OrgShortItem edu: map.get(item)){
+        for (BasicReportForOrgJob.OrgShortItem item: map.keySet()){
+            for (BasicReportForOrgJob.OrgShortItem edu: map.get(item)){
                 /* Строим отображения ключ (Требования-заявка) -> значения (Позиции заявок) */
-                HashMap<HashMap.SimpleEntry<String,Date>, List<HashMap.SimpleEntry<String,Long>>> requestMap = new HashMap<AbstractMap.SimpleEntry<String, Date>, List<AbstractMap.SimpleEntry<String, Long>>>();
+                HashMap<HashMap.SimpleEntry<String,Date>, List<HashMap.SimpleEntry<String,HashMap.SimpleEntry<Long, Long>>>> requestMap =
+                        new HashMap<AbstractMap.SimpleEntry<String, Date>, List<AbstractMap.SimpleEntry<String, HashMap.SimpleEntry<Long, Long>>>>();
                 List requests = new ArrayList();
-                sql = "select request.number, request.doneDate, position.totalCount/1000, product.productName"
+                sql = "select request.number, request.doneDate, position.totalCount/1000, position.dailySampleCount/1000, product.productName"
                         + "                from GoodRequest request"
                         + "                join request.goodRequestPositionInternal position"
                         + "                right join position.product product"
@@ -79,10 +96,11 @@ public class AggregateGoodRequestReportService {
                 query.setParameter("startDate", startDate);
                 query.setParameter("endDate", endDate);
                 List requestsGoods = query.list();
+
                 if(!(requestsGoods==null || requestsGoods.isEmpty())){
                     requests.addAll(requestsGoods);
                 }
-                sql = "select request.number, request.doneDate, position.totalCount/1000, good.nameOfGood"
+                sql = "select request.number, request.doneDate, position.totalCount/1000, position.dailySampleCount/1000, good.nameOfGood"
                         + "                from GoodRequest request"
                         + "                join request.goodRequestPositionInternal position"
                         + "                right join position.good good"
@@ -102,24 +120,33 @@ public class AggregateGoodRequestReportService {
                     for (Object o: requests){
                         Object[] row = (Object[]) o;
                         HashMap.SimpleEntry<String,Date> request = new HashMap.SimpleEntry<String,Date>(row[0].toString(), (Date) row[1]);
-                        HashMap.SimpleEntry<String,Long> position = new HashMap.SimpleEntry<String,Long>(row[3].toString(), Long.parseLong(row[2].toString()));
+                        Long dcount = null;
+                        if(row[3]!=null){
+                            dcount = Long.parseLong(row[3].toString());
+                        }
+                        HashMap.SimpleEntry<Long, Long> counts =
+                                new HashMap.SimpleEntry<Long, Long>(Long.parseLong(row[2].toString()), dcount);
+                        HashMap.SimpleEntry<String, HashMap.SimpleEntry<Long, Long>> position =
+                                new HashMap.SimpleEntry<String,HashMap.SimpleEntry<Long, Long>>(row[4].toString(), counts);
                         if(requestMap.keySet().contains(request)){
-                            List<HashMap.SimpleEntry<String,Long>> p = requestMap.get(request);
+                            List<HashMap.SimpleEntry<String,HashMap.SimpleEntry<Long, Long>>> p = requestMap.get(request);
                             if(p==null || p.isEmpty()){
-                                p = new ArrayList<HashMap.SimpleEntry<String,Long>>();
+                                p = new ArrayList<HashMap.SimpleEntry<String,HashMap.SimpleEntry<Long, Long>>>();
                             }
                             p.add(position);
                             requestMap.put(request,p);
                         } else {
-                            List<HashMap.SimpleEntry<String,Long>> p = new ArrayList<HashMap.SimpleEntry<String,Long>>();
+                            List<HashMap.SimpleEntry<String,HashMap.SimpleEntry<Long, Long>>> p
+                                    = new ArrayList<HashMap.SimpleEntry<String,HashMap.SimpleEntry<Long, Long>>>();
                             p.add(position);
                             requestMap.put(request,p);
                         }
                     }
                     for (HashMap.SimpleEntry<String,Date> requestEntity: requestMap.keySet()){
                         List<Commodity> commodityList = new ArrayList<Commodity>();
-                        for (HashMap.SimpleEntry<String,Long> positionEntity: requestMap.get(requestEntity)){
-                            Commodity commodity = new Commodity(positionEntity.getKey(), positionEntity.getValue());
+                        for (HashMap.SimpleEntry<String,HashMap.SimpleEntry<Long, Long>> positionEntity: requestMap.get(requestEntity)){
+                            Commodity commodity = new Commodity(positionEntity.getKey(), positionEntity.getValue().getKey(),
+                                    positionEntity.getValue().getValue());
                             commodityList.add(commodity);
                         }
                         AggregateGoodRequestReportItem aggregateGoodRequestReportItem = new AggregateGoodRequestReportItem(
@@ -157,27 +184,27 @@ public class AggregateGoodRequestReportService {
         query.setParameterList("idOfSourceOrgList",idOfSourceOrgList);
 
         List list = query.list();
-        HashMap<OrgShortItem, List<OrgShortItem>> map = new HashMap<OrgShortItem, List<OrgShortItem>>();
+        HashMap<BasicReportForOrgJob.OrgShortItem, List<BasicReportForOrgJob.OrgShortItem>> map = new HashMap<BasicReportForOrgJob.OrgShortItem, List<BasicReportForOrgJob.OrgShortItem>>();
         /* Строим отображения ключ (Поставшик) -> значения (Образовательные учереждения) */
         for (Object entity: list){
             Object[] row = (Object[]) entity;
-            OrgShortItem educationItem = new OrgShortItem(Long.parseLong(row[0].toString()),row[1].toString(),row[2].toString(),row[3].toString());
-            OrgShortItem sourceItem = new OrgShortItem(Long.parseLong(row[4].toString()),row[5].toString(),row[6].toString(),row[7].toString());
+            BasicReportForOrgJob.OrgShortItem educationItem = new BasicReportForOrgJob.OrgShortItem(Long.parseLong(row[0].toString()),row[1].toString(),row[2].toString(),row[3].toString());
+            BasicReportForOrgJob.OrgShortItem sourceItem = new BasicReportForOrgJob.OrgShortItem(Long.parseLong(row[4].toString()),row[5].toString(),row[6].toString(),row[7].toString());
             if(map.keySet().contains(sourceItem)){
-                List<OrgShortItem> l = map.get(sourceItem);
+                List<BasicReportForOrgJob.OrgShortItem> l = map.get(sourceItem);
                 if(l==null || l.isEmpty()){
-                    l = new ArrayList<OrgShortItem>();
+                    l = new ArrayList<BasicReportForOrgJob.OrgShortItem>();
                 }
                 l.add(educationItem);
                 map.put(sourceItem,l);
             } else {
-                List<OrgShortItem> l = new ArrayList<OrgShortItem>();
+                List<BasicReportForOrgJob.OrgShortItem> l = new ArrayList<BasicReportForOrgJob.OrgShortItem>();
                 l.add(educationItem);
                 map.put(sourceItem,l);
             }
         }
-        for (OrgShortItem item: map.keySet()){
-            for (OrgShortItem edu: map.get(item)){
+        for (BasicReportForOrgJob.OrgShortItem item: map.keySet()){
+            for (BasicReportForOrgJob.OrgShortItem edu: map.get(item)){
                 /* Строим отображения ключ (Требования-заявка) -> значения (Позиции заявок) */
                 HashMap<HashMap.SimpleEntry<String,Date>, List<HashMap.SimpleEntry<String,Long>>> requestMap = new HashMap<AbstractMap.SimpleEntry<String, Date>, List<AbstractMap.SimpleEntry<String, Long>>>();
                 List requests = new ArrayList();
@@ -234,7 +261,8 @@ public class AggregateGoodRequestReportService {
                     for (HashMap.SimpleEntry<String,Date> requestEntity: requestMap.keySet()){
                         List<Commodity> commodityList = new ArrayList<Commodity>();
                         for (HashMap.SimpleEntry<String,Long> positionEntity: requestMap.get(requestEntity)){
-                            Commodity commodity = new Commodity(positionEntity.getKey(), positionEntity.getValue());
+                            Commodity commodity = new Commodity(positionEntity.getKey(), positionEntity.getValue(),
+                                    null);
                             commodityList.add(commodity);
                         }
                         AggregateGoodRequestReportItem aggregateGoodRequestReportItem = new AggregateGoodRequestReportItem(

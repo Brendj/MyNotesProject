@@ -76,6 +76,9 @@
                         <h:outputText value="Количество заказов"/>
                     </rich:column>
                     <rich:column rowspan="2">
+                        <h:outputText value="Количество суточной пробы"/>
+                    </rich:column>
+                    <rich:column rowspan="2">
                         <h:outputText value="Дата к исполнению"/>
                     </rich:column>
                     <rich:column breakBefore="true">
@@ -117,6 +120,8 @@
             </rich:column>
             <rich:column rowspan="1" style="height: 0 !important; line-height: 0;padding: 0;margin: 0; border: 0">
             </rich:column>
+            <rich:column rowspan="1" style="height: 0 !important; line-height: 0;padding: 0;margin: 0; border: 0">
+            </rich:column>
             <rich:column rowspan="#{items.commoditiesCounts}">
                 <h:outputText value="#{items.doneDate}" converter="dateConverter"/>
             </rich:column>
@@ -127,6 +132,9 @@
                 </rich:column>
                 <rich:column>
                     <h:outputText value="#{commodity.totalCount}"/>
+                </rich:column>
+                <rich:column>
+                    <h:outputText value="#{commodity.dailySampleCount}"/>
                 </rich:column>
             </rich:subTable>
             <f:facet name="footer">

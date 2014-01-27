@@ -91,10 +91,18 @@ public abstract class BasicReportJob extends BasicJasperReport {
         private Long idOfOrg;
         private String shortName;
         private String officialName;
+        private String address;
         private Boolean selected = false;
 
         public OrgShortItem() {
             selected = false;
+        }
+
+        public OrgShortItem(Long idOfOrg, String shortName, String officialName, String address) {
+            this.idOfOrg = idOfOrg;
+            this.shortName = shortName;
+            this.officialName = officialName;
+            this.address = address;
         }
 
         public OrgShortItem(Long idOfOrg, String shortName, String officialName) {

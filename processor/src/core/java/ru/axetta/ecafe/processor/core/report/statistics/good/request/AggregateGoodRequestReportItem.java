@@ -1,4 +1,4 @@
-package ru.axetta.ecafe.processor.web.ui.report.online.items.good.request;
+package ru.axetta.ecafe.processor.core.report.statistics.good.request;
 
 import java.util.Date;
 import java.util.List;

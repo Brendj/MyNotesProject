@@ -1,4 +1,4 @@
-package ru.axetta.ecafe.processor.web.ui.report.online.items.good.request;
+package ru.axetta.ecafe.processor.core.report.statistics.good.request;
 
 /**
  * Created with IntelliJ IDEA.
@@ -10,10 +10,12 @@ package ru.axetta.ecafe.processor.web.ui.report.online.items.good.request;
 public class Commodity {
     private final String name;
     private final Long totalCount;
+    private final Long dailySampleCount;
 
-    public Commodity(String name, Long totalCount) {
+    public Commodity(String name, Long totalCount, Long dailySampleCount) {
         this.name = name;
         this.totalCount = totalCount;
+        this.dailySampleCount = dailySampleCount;
     }
 
     public String getName() {
@@ -22,5 +24,9 @@ public class Commodity {
 
     public Long getTotalCount() {
         return totalCount;
+    }
+
+    public Long getDailySampleCount() {
+        return dailySampleCount;
     }
 }

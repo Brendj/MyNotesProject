@@ -1,14 +1,11 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgShortItem;
-import ru.axetta.ecafe.processor.web.ui.report.online.items.good.request.AggregateGoodRequestReportItem;
-import ru.axetta.ecafe.processor.web.ui.report.online.services.AggregateGoodRequestReportService;
+import ru.axetta.ecafe.processor.core.report.statistics.good.request.AggregateGoodRequestReportItem;
+import ru.axetta.ecafe.processor.core.report.statistics.good.request.AggregateGoodRequestReportService;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -81,7 +78,7 @@ public class AggregateGoodRequestReportPage extends OnlineReportWithContragentPa
 
     public Object generateReport(){
         if(idOfContragentOrgList==null || idOfContragentOrgList.isEmpty()){
-            printError("Выберите список контрагентов");
+            printError("Выберите список поставщиков");
             return null;
         }
         //  пределяем на какой лимит дней необходимо увеличить дату
@@ -99,19 +96,21 @@ public class AggregateGoodRequestReportPage extends OnlineReportWithContragentPa
         return aggregateGoodRequestReportItems;
     }
 
-    public void showEducationListSelectPage () {
+    public Object showEducationListSelectPage () {
         setSelectIdOfOrgList(true);
         MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
     }
 
-    public void showSourceListSelectPage () {
+    public Object showSourceListSelectPage () {
         setSelectIdOfOrgList(false);
         MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
     }
 
 
-    public String getGetStringIdOfOrgList() {
-        return idOfContragentOrgList.toString().replaceAll("[^0-9,]","");
-    }
+    //public String getGetStringIdOfOrgList() {
+    //    return idOfContragentOrgList.toString().replaceAll("[^0-9,]","");
+    //}
 
 }
