@@ -11,11 +11,17 @@
 <%--@elvariable id="orgListSelectPage" type="ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage"--%>
 <rich:modalPanel id="modalOrgListSelectorPanel" autosized="true" headerClass="modal-panel-header">
     <rich:hotKey key="esc" handler="#{rich:component('modalOrgListSelectorPanel')}.hide();return false;"/>
+    <rich:hotKey key="ctrl+a" handler="selectAll();return false;"/>
+    <rich:hotKey key="ctrl+d" handler="selectAll();return false;"/>
+
     <f:facet name="header">
         <h:outputText escape="true" value="#{mainPage.orgFilterPageName}" />
     </f:facet>
     <a4j:form id="modalOrgListSelectorForm" binding="#{mainPage.orgListSelectPage.pageComponent}" styleClass="borderless-form"
               eventsQueue="modalOrgListSelectorFormEventsQueue">
+        <a4j:jsFunction name="selectAll" action="#{mainPage.selectAllOrgListSelectedItemsList}" reRender="modalOrgListSelectorForm"/>
+        <a4j:jsFunction name="deselectAll" action="#{mainPage.clearOrgListSelectedItemsList}" reRender="modalOrgListSelectorForm"/>
+
         <table class="borderless-grid" width="100%">
             <tr>
                 <td style="text-align: left;">

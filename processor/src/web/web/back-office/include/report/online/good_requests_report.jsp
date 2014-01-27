@@ -16,6 +16,7 @@
 </style>
 
 <h:panelGrid id="goodRequestReportPanelGrid" binding="#{mainPage.goodRequestReportPage.pageComponent}" styleClass="borderless-grid">
+
     <rich:simpleTogglePanel label="Настройки отчета" switchType="client" style="width: 800px;"
                             opened="true" headerClass="filter-panel-header">
         <h:panelGrid styleClass="borderless-grid" columns="2">
@@ -80,6 +81,12 @@
                 <f:selectItem itemValue="3" itemLabel="Отображать все заявки"/>
                 <f:selectItem itemValue="-1" itemLabel="Отображать организации с отсутствием заявкок за последние дни"/>
             </h:selectOneMenu>
+
+
+
+            <rich:hotKey key="return" handler="search();return false;"/>
+            <a4j:jsFunction name="search" action="#{mainPage.buildGoodRequestReport}" status="reportGenerateStatus"
+                            reRender="mainMenu, workspaceTogglePanel, goodRequestsReportTable"/>
 
             <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildGoodRequestReport}"
                                reRender="mainMenu, workspaceTogglePanel, goodRequestsReportTable"
