@@ -307,13 +307,13 @@ public class DashboardResponse {
 
     public static class OrgBasicStats {
 
-        LinkedList<OrgBasicStatItem> orgBasicStatItems = new LinkedList<OrgBasicStatItem>();
+        List<OrgBasicStatItem> orgBasicStatItems = new ArrayList<OrgBasicStatItem>();
 
-        public LinkedList<OrgBasicStatItem> getOrgBasicStatItems() {
+        public List<OrgBasicStatItem> getOrgBasicStatItems() {
             return orgBasicStatItems;
         }
 
-        public void setOrgBasicStatItems(LinkedList<OrgBasicStatItem> orgBasicStatItems) {
+        public void setOrgBasicStatItems(List<OrgBasicStatItem> orgBasicStatItems) {
             this.orgBasicStatItems = orgBasicStatItems;
         }
     }

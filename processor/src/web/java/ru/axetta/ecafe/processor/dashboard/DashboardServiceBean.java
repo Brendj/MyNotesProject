@@ -12,6 +12,8 @@ import ru.axetta.ecafe.processor.dashboard.data.DashboardResponse;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -206,17 +208,24 @@ public class DashboardServiceBean {
             //}
 
             //// Статистика по Детям
+            // ид групп которые входят в группу предопредленые
             Session session = entityManager.unwrap(Session.class);
             Criteria groupChildrenCriteria = session.createCriteria(ClientGroup.class);
             groupChildrenCriteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
-            groupChildrenCriteria.add(Restrictions.not(Restrictions.in("groupName",ClientGroup.predefinedGroupNames())));
-            groupChildrenCriteria.add(Restrictions.lt("compositeIdOfClientGroup.idOfClientGroup", ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES));
+            // исключаем предопределенные круппы
+            for (ClientGroup.Predefined predefined: ClientGroup.Predefined.values()){
+                groupChildrenCriteria.add(Restrictions.ne("groupName", predefined.getNameOfGroup()).ignoreCase());
+                groupChildrenCriteria.add(Restrictions.ne("compositeIdOfClientGroup.idOfClientGroup", predefined.getValue()));
+            }
+            groupChildrenCriteria.add(Restrictions.ne("groupName", "Сотрудники").ignoreCase());
             groupChildrenCriteria.setProjection(Projections.property("compositeIdOfClientGroup.idOfClientGroup"));
             List<Long> clientChildrenGroups = groupChildrenCriteria.list();
+            //if(!clientChildrenGroups.isEmpty()){
+            //    clientPredefinedGroup.addAll(clientChildrenGroups);
+            //    //childrenCount.add(Restrictions.not(Restrictions.in("idOfClientGroup", clientChildrenGroups)));
+            //}
             Criteria childrenCount = session.createCriteria(Client.class);
-            if(!clientChildrenGroups.isEmpty()){
-                childrenCount.add(Restrictions.not(Restrictions.in("idOfClientGroup", clientChildrenGroups)));
-            }
+            childrenCount.add(Restrictions.in("idOfClientGroup", clientChildrenGroups));
             childrenCount.setProjection(Projections.projectionList()
                     .add(Projections.property("org.idOfOrg"))
                     .add(Projections.rowCount())
@@ -284,23 +293,31 @@ public class DashboardServiceBean {
             //}
 
             /// Обновление логики по сотрудникам
+            // соберем все группы которые должны попасть в выборку
+            List<ClientGroup.Predefined> predefineds = new ArrayList<ClientGroup.Predefined>(4);
+            predefineds.add(ClientGroup.Predefined.CLIENT_EMPLOYEES);
+            predefineds.add(ClientGroup.Predefined.CLIENT_ADMINISTRATION);
+            predefineds.add(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES);
+            //predefineds.add(ClientGroup.Predefined.CLIENT_OTHERS);
+
             Criteria groupEmployeesCriteria = session.createCriteria(ClientGroup.class);
             groupEmployeesCriteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
-            groupEmployeesCriteria.add(Restrictions.in("groupName",ClientGroup.predefinedGroupNames()));
-            groupEmployeesCriteria.add(Restrictions.lt("compositeIdOfClientGroup.idOfClientGroup", ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES));
-            groupEmployeesCriteria.add(Restrictions.ne("compositeIdOfClientGroup.idOfClientGroup", parent.getValue()));
-            groupEmployeesCriteria.add(Restrictions.ne("groupName", parent.getNameOfGroup()));
-            groupEmployeesCriteria.setProjection(Projections.property("compositeIdOfClientGroup.idOfClientGroup"));
-            List<Long> groupEmployees =  groupEmployeesCriteria.list();
-            Criteria employeesCount = session.createCriteria(Client.class);
-            if(groupEmployees.isEmpty()){
-                employeesCount.add(Restrictions.ge("idOfClientGroup", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()));
-                employeesCount.add(Restrictions.ne("idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue()));
-                //query.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-                //query.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-            } else {
-                employeesCount.add(Restrictions.in("idOfClientGroup", groupEmployees));
+
+            Disjunction or = Restrictions.disjunction();
+            for (ClientGroup.Predefined predefined: predefineds){
+                or.add(Restrictions.eq("groupName", predefined.getNameOfGroup()).ignoreCase());
+                or.add(Restrictions.eq("compositeIdOfClientGroup.idOfClientGroup", predefined.getValue()));
             }
+            /* В старых версия Пед. Состав назывался  Сотрудники*/
+            or.add(Restrictions.eq("groupName", "Сотрудники").ignoreCase());
+            groupEmployeesCriteria.add(or);
+            groupEmployeesCriteria.setProjection(Projections.property("compositeIdOfClientGroup.idOfClientGroup"));
+
+            List<Long> groupEmployees =  groupEmployeesCriteria.list();
+
+            Criteria employeesCount = session.createCriteria(Client.class);
+            employeesCount.add(Restrictions.in("idOfClientGroup", groupEmployees));
+
             employeesCount.setProjection(Projections.projectionList()
                     .add(Projections.property("org.idOfOrg"))
                     .add(Projections.rowCount())
