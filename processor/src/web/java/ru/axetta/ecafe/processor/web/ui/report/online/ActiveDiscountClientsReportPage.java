@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -61,7 +62,8 @@ public class ActiveDiscountClientsReportPage extends OnlineReportPage {
 
     public void executeReport ()
     {
-        FacesContext facesContext = FacesContext.getCurrentInstance ();
+        RuntimeContext.getAppContext().getBean(ActiveDiscountClientsReportPage.class).execute();
+        /*FacesContext facesContext = FacesContext.getCurrentInstance ();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -90,6 +92,20 @@ public class ActiveDiscountClientsReportPage extends OnlineReportPage {
             } catch (Exception e) {
                 logger.error("Failed to build active clients report", e);
             }
+        }*/
+    }
+
+
+    @Transactional
+    public void execute() {
+        Session session = null;
+        try {
+            session = (Session) entityManager.getDelegate();
+            buildReport (session);
+        } catch (Exception e) {
+            logger.error("Failed to process report " + this.getClass().getSimpleName(), e);
+        } finally {
+            //HibernateUtils.close(session, logger);
         }
     }
 
