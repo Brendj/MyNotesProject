@@ -15,7 +15,7 @@ import ru.axetta.ecafe.processor.core.report.RegisterStampReport;
 import ru.axetta.ecafe.processor.core.report.ReportDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
-import ru.axetta.ecafe.processor.web.ui.org.OrgShortItem;
+import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
 import ru.axetta.ecafe.processor.web.ui.report.online.items.stamp.RegisterStampPageItem;
 import ru.axetta.ecafe.processor.web.ui.report.online.items.stamp.Tree;
 import ru.axetta.ecafe.processor.web.ui.report.online.items.stamp.Visitor;

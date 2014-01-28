@@ -30,6 +30,8 @@ import java.util.*;
  */
 public class StatisticsPaymentPreferentialSupplyJasperReport extends BasicReportForContragentJob {
 
+    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {}
+
     public StatisticsPaymentPreferentialSupplyJasperReport(Date generateTime, long generateDuration, JasperPrint print,
             Date startTime, Date endTime, Long idOfContragent) {
         super(generateTime, generateDuration, print, startTime, endTime, idOfContragent);
@@ -60,8 +62,6 @@ public class StatisticsPaymentPreferentialSupplyJasperReport extends BasicReport
     public int getDefaultReportPeriod (){
         return REPORT_PERIOD_LAST_WEEK;
     }
-
-    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {}
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StatisticsPaymentPreferentialSupplyJasperReport.class);
 }

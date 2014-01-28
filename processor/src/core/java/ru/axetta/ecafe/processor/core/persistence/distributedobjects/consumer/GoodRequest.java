@@ -113,8 +113,11 @@ public class GoodRequest extends ConsumerRequestDistributedObject {
         if (stringComment != null)
             setComment(stringComment);
         Integer typeComment = XMLUtils.getIntegerAttributeValue(node, "Type");
-        if (typeComment != null)
+        if (typeComment != null){
             setRequestType(typeComment);
+        } else {
+            setRequestType(0);
+        }
         guidOfStaff = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);
         setSendAll(SendToAssociatedOrgs.SendToMain);
         return this;

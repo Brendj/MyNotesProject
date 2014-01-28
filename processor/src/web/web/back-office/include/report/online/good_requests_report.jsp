@@ -70,8 +70,8 @@ updateWidth();
                 <f:selectItem itemValue="2" itemLabel="2 недели"/>
                 <f:selectItem itemValue="1" itemLabel="1 неделя"/>
             </h:selectOneMenu>
-            <%--<rich:calendar value="#{mainPage.goodRequestReportPage.endDate}" datePattern="dd.MM.yyyy"
-                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />--%>
+            <rich:calendar value="#{mainPage.goodRequestReportPage.endDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" rendered="false"/>
 
             <h:outputText escape="true" value="Скрывать даты с пустыми значениями"
                           styleClass="output-text" />
@@ -86,7 +86,8 @@ updateWidth();
             </h:selectOneMenu>
 
             <h:outputText escape="true" value="Суточная проба" styleClass="output-text" />
-            <h:selectOneMenu value="#{mainPage.goodRequestReportPage.dailySamplesMode}" styleClass="output-text">
+            <h:selectBooleanCheckbox value="#{mainPage.goodRequestReportPage.showDailySamplesCount}" styleClass="output-text" />
+            <h:selectOneMenu value="#{mainPage.goodRequestReportPage.dailySamplesMode}" rendered="false" styleClass="output-text">
                 <f:selectItem itemValue="0" itemLabel="Не выводить"/>
                 <f:selectItem itemValue="1" itemLabel="Выводить"/>
             </h:selectOneMenu>

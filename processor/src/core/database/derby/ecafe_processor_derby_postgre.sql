@@ -266,7 +266,7 @@ create table CF_UserContragents (
 
 CREATE TABLE CF_Functions (
   IdOfFunction  BIGINT        NOT NULL,
-  FunctionName  VARCHAR(10)   NOT NULL,
+  FunctionName  VARCHAR(64)   NOT NULL,
   CONSTRAINT CF_Functions_pk PRIMARY KEY (IdOfFunction)
 );
 

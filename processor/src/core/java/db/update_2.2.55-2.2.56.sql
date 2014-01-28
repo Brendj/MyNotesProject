@@ -27,3 +27,7 @@ CREATE TABLE cf_temporary_orders (
 -- по умолчнию обычная (по умолчанию), 1 – заявка по суточной пробе
 ALTER TABLE cf_goods_requests ADD COLUMN RequestType integer NOT NULL DEFAULT 0;
 
+--! расщирим длину колонки до от 10 до 64 символов
+ALTER TABLE cf_functions ALTER COLUMN functionname TYPE character varying(64);
+
+--! ФИНАЛИЗИРОВАН (Кадыров, 140128) НЕ МЕНЯТЬ

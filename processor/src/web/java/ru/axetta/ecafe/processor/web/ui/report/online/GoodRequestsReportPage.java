@@ -57,9 +57,8 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
     private int orgsFilter = 1;
     private String goodName;
     private int daysLimit;
-    private int dailySamplesMode;
-    @PersistenceContext(unitName = "processorPU")
-    private EntityManager entityManager;
+    private int dailySamplesMode = 1;
+    private Boolean showDailySamplesCount = true;
 
     public String getPageFilename() {
         return "report/online/good_requests_report";
@@ -147,6 +146,16 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
         this.dailySamplesMode = dailySamplesMode;
     }
 
+    public Boolean getShowDailySamplesCount() {
+        showDailySamplesCount = (dailySamplesMode == 1);
+        return showDailySamplesCount;
+    }
+
+    public void setShowDailySamplesCount(Boolean showDailySamplesCount) {
+        dailySamplesMode = (showDailySamplesCount?1:0);
+        this.showDailySamplesCount = showDailySamplesCount;
+    }
+
     public boolean isShowAll() {
         return showAll;
     }
@@ -155,14 +164,16 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
         this.showAll = showAll;
     }
 
-    public void showOrgListSelectPage () {
+    public Object showOrgListSelectPage () {
         setSelectIdOfOrgList(true);
         MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
     }
 
-    public void showContragentListSelectPage () {
+    public Object showContragentListSelectPage () {
         setSelectIdOfOrgList(false);
         MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
     }
 
     public void buildReport(Session session) throws Exception {
@@ -207,7 +218,7 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
             logger.error("Failed to load claims data", e);
         } finally {
             //HibernateUtils.close(session, logger);
-        }
+}
     }
 
     public void export(Session session) throws Exception {

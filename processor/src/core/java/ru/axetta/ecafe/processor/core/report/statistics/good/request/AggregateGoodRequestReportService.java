@@ -33,19 +33,13 @@ public class AggregateGoodRequestReportService {
         List<AggregateGoodRequestReportItem> aggregateGoodRequestReportItems = new ArrayList<AggregateGoodRequestReportItem>();
         Session session = entityManager.unwrap(Session.class);
         String sql;
-        //String sql = "select org.idOfOrg, org.shortName, org.officialName, org.address, "
-        //        + " sourceMenu.idOfOrg, sourceMenu.shortName, sourceMenu.officialName, sourceMenu.address "
-        //        + "from Org org join org.sourceMenuOrgs sourceMenu "
-        //        + "where sourceMenu.idOfOrg in (:idOfSourceOrgList) and org.idOfOrg in (:idOfEduList) "
-        //        + "order by sourceMenu.idOfOrg , org.idOfOrg";
         Query query;
-        //query.setParameterList("idOfSourceOrgList",idOfSourceOrgList);
-        //query.setParameterList("idOfEduList",idOfEduList);
-        //List list = query.list();
 
         Criteria orgCriteria = session.createCriteria(Org.class);
         orgCriteria.createAlias("sourceMenuOrgs", "sm").add(Restrictions.in("sm.idOfOrg", idOfSourceOrgList));
-        orgCriteria.add(Restrictions.in("idOfOrg", idOfEduList));
+        if(!(idOfEduList==null || idOfEduList.isEmpty())) {
+            orgCriteria.add(Restrictions.in("idOfOrg", idOfEduList));
+        }
         orgCriteria.setProjection(Projections.projectionList()
                 .add(Projections.property("idOfOrg"))
                 .add(Projections.property("shortName"))
@@ -170,7 +164,7 @@ public class AggregateGoodRequestReportService {
         return aggregateGoodRequestReportItems;
     }
 
-    public List<AggregateGoodRequestReportItem> fetchAggregateGoodRequestReportItems(List<Long> idOfSourceOrgList, Date startDate, Date endDate){
+   /* public List<AggregateGoodRequestReportItem> fetchAggregateGoodRequestReportItems(List<Long> idOfSourceOrgList, Date startDate, Date endDate){
         List<AggregateGoodRequestReportItem> aggregateGoodRequestReportItems = new ArrayList<AggregateGoodRequestReportItem>();
         Random random = new Random(System.currentTimeMillis());
         Session session = ((Session) entityManager.getDelegate());
@@ -185,7 +179,7 @@ public class AggregateGoodRequestReportService {
 
         List list = query.list();
         HashMap<BasicReportForOrgJob.OrgShortItem, List<BasicReportForOrgJob.OrgShortItem>> map = new HashMap<BasicReportForOrgJob.OrgShortItem, List<BasicReportForOrgJob.OrgShortItem>>();
-        /* Строим отображения ключ (Поставшик) -> значения (Образовательные учереждения) */
+        *//* Строим отображения ключ (Поставшик) -> значения (Образовательные учереждения) *//*
         for (Object entity: list){
             Object[] row = (Object[]) entity;
             BasicReportForOrgJob.OrgShortItem educationItem = new BasicReportForOrgJob.OrgShortItem(Long.parseLong(row[0].toString()),row[1].toString(),row[2].toString(),row[3].toString());
@@ -205,7 +199,7 @@ public class AggregateGoodRequestReportService {
         }
         for (BasicReportForOrgJob.OrgShortItem item: map.keySet()){
             for (BasicReportForOrgJob.OrgShortItem edu: map.get(item)){
-                /* Строим отображения ключ (Требования-заявка) -> значения (Позиции заявок) */
+                *//* Строим отображения ключ (Требования-заявка) -> значения (Позиции заявок) *//*
                 HashMap<HashMap.SimpleEntry<String,Date>, List<HashMap.SimpleEntry<String,Long>>> requestMap = new HashMap<AbstractMap.SimpleEntry<String, Date>, List<AbstractMap.SimpleEntry<String, Long>>>();
                 List requests = new ArrayList();
                 sql = "select request.number, request.doneDate, position.totalCount/1000, product.productName"
@@ -287,7 +281,7 @@ public class AggregateGoodRequestReportService {
         return aggregateGoodRequestReportItems;
     }
 
-
+*/
     public class ReportComparator implements Comparator
     {
         public int compare ( Object object1 , Object object2 )

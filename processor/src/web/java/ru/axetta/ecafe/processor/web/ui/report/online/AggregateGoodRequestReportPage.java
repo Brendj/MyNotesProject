@@ -3,7 +3,7 @@ package ru.axetta.ecafe.processor.web.ui.report.online;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
-import ru.axetta.ecafe.processor.web.ui.org.OrgShortItem;
+import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
 import ru.axetta.ecafe.processor.core.report.statistics.good.request.AggregateGoodRequestReportItem;
 import ru.axetta.ecafe.processor.core.report.statistics.good.request.AggregateGoodRequestReportService;
 
@@ -85,7 +85,7 @@ public class AggregateGoodRequestReportPage extends OnlineReportWithContragentPa
         endDate = new Date(GoodRequestsReportPage.getDaysLimitTS(daysLimit, startDate));
 
         if(idOfOrgList==null || idOfOrgList.isEmpty()){
-            aggregateGoodRequestReportItems = service.fetchAggregateGoodRequestReportItems(idOfContragentOrgList, startDate, endDate);
+            aggregateGoodRequestReportItems = service.fetchAggregateGoodRequestReportItems(idOfContragentOrgList, null, startDate, endDate);
         } else {
             aggregateGoodRequestReportItems = service.fetchAggregateGoodRequestReportItems(idOfContragentOrgList, idOfOrgList, startDate, endDate);
         }

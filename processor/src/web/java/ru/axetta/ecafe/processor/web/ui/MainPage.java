@@ -5469,7 +5469,7 @@ public Long getSelectedIdOfReportRule() {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            goodRequestsReportPage.export(persistenceSession);
+            //goodRequestsReportPage.export(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             facesContext.addMessage(null,
