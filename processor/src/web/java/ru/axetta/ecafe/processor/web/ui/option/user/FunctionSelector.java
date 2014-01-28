@@ -56,7 +56,25 @@ public class FunctionSelector {
         }
     }
 
+    public static class FunctionItemComparator implements Comparator<Item> {
+
+        @Override
+        public int compare(Item o1, Item o2) {
+            int res = o1.getFunctionName().compareTo(o2.getFunctionName());
+            if (res == 0) {
+                res = o1.getIdOfFunction().compareTo(o2.getIdOfFunction());
+            }
+            return res;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return false;
+        }
+    }
+
     private List<Item> items = Collections.emptyList();
+    private Comparator<Item> itemComparator = new FunctionItemComparator();
 
     public List<Item> getItems() {
         return items;
@@ -114,6 +132,7 @@ public class FunctionSelector {
             items.add(item);
         }
         this.items = items;
+        Collections.sort(items, itemComparator);
     }
 
     public void fill(Session session, Set<Function> selectedFunctions) throws Exception {
@@ -129,6 +148,7 @@ public class FunctionSelector {
             items.add(item);
         }
         this.items = items;
+        Collections.sort(items, itemComparator);
     }
 
     public Set<Function> getSelected(Session session) throws HibernateException {
