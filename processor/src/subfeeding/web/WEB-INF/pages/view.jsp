@@ -17,7 +17,7 @@
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/flick/jquery-ui-1.10.3.custom.min.css"/>
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/common.css"/>
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/view.css"/>
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/complexTable.css"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/tables.css"/>
     <script src="${pageContext.request.contextPath}/WebContent/js/jquery-1.10.2.min.js"></script>
     <script src="${pageContext.request.contextPath}/WebContent/js/jquery-ui-1.10.3.custom.min.js"></script>
     <script src="${pageContext.request.contextPath}/WebContent/js/jquery.ui.datepicker-ru.js"></script>
@@ -65,66 +65,54 @@
 </div>
 <div id="content">
     <div id="infoHeader">
-        <div class="colRow">
-            <div class="leftcol">Баланс основного счета:</div>
-            <div class="rightcol"><%=subBalance0%> руб.</div>
-        </div>
-        <div class="colRow">
-            <div class="leftcol">Баланс субсчета АП:</div>
-            <div class="rightcol"><%=subBalance1%> руб.</div>
-        </div>
-        <div class="colRow">
-            <div class="leftcol">Дата активации услуги:</div>
-            <div class="rightcol"><%=tf.format(sf.getDateActivate())%></div>
-        </div>
-        <div class="colRow">
-            <div class="leftcol">Дата отключения услуги:</div>
-            <div class="rightcol"><%=sf.getDateDeactivate() == null ? "услуга бессрочная"
-                    : df.format(sf.getDateDeactivate())%>
+        <div id="infoTable">
+            <div class="colRow headerFont">
+                <div class="leftcol">Баланс основного счета:</div>
+                <div class="rightcol"><%=subBalance0%> руб.</div>
             </div>
-        </div>
-        <%
-            if (wasSuspended) {
-                String suspendDate = df.format(sf.getLastDatePause());
-        %>
-        <div class="colRow">
-            <div class="leftcol">Услуга приостанавливается</div>
-            <div class="rightcol">c <%=suspendDate%></div>
-        </div>
-        <%
-            }
-        %>
-        <c:if test="${not empty requestScope.subFeedingError}">
-            <div class="messageDiv errorMessage">${requestScope.subFeedingError}</div>
-        </c:if>
-        <c:if test="${not empty requestScope.subFeedingSuccess}">
-            <div class="messageDiv successMessage">${requestScope.subFeedingSuccess}</div>
-        </c:if>
-        <div class="colRow">
-            <%
-                if (!wasSuspended) {
-            %>
-            <div class="leftcol">
-                <button type="submit" onclick="location.href = '${pageContext.request.contextPath}/office/suspend'">
-                    Приостановить услугу
-                </button>
+            <div class="colRow headerFont">
+                <div class="leftcol">Баланс субсчета АП:</div>
+                <div class="rightcol"><%=subBalance1%> руб.</div>
             </div>
-            <%
-            } else {
-            %>
-            <div class="leftcol">
-                <button type="submit" onclick="location.href = '${pageContext.request.contextPath}/office/reopen'">
-                    Возобновить услугу
-                </button>
+            <div class="colRow headerFont">
+                <div class="leftcol">Дата активации услуги:</div>
+                <div class="rightcol"><%=tf.format(sf.getDateActivate())%>
+                </div>
             </div>
-            <%
-                }
-            %>
-             <div class="rightcol">
-                 <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/plan'">
-                     Просмотр циклограммы
-                 </button>
-             </div>
+            <div class="colRow headerFont">
+                <div class="leftcol">Дата отключения услуги:</div>
+                <div class="rightcol"><%=sf.getDateDeactivate() == null ? "услуга бессрочная"
+                        : df.format(sf.getDateDeactivate())%>
+                </div>
+            </div>
+            <%if (wasSuspended) {
+                String suspendDate = df.format(sf.getLastDatePause());%>
+            <div class="colRow headerFont">
+                <div class="leftcol">Услуга приостанавливается</div>
+                <div class="rightcol">c <%=suspendDate%>
+                </div>
+            </div>
+            <%}%>
+            <c:if test="${not empty requestScope.subFeedingError}">
+                <div class="messageDiv errorMessage">${requestScope.subFeedingError}</div>
+            </c:if>
+            <c:if test="${not empty requestScope.subFeedingSuccess}">
+                <div class="messageDiv successMessage">${requestScope.subFeedingSuccess}</div>
+            </c:if>
+        </div>
+        <div id="manageButtons">
+            <%if (!wasSuspended) {%>
+            <button type="submit" onclick="location.href = '${pageContext.request.contextPath}/office/suspend'">
+                Приостановить услугу
+            </button>
+            <%} else {%>
+            <button type="submit" onclick="location.href = '${pageContext.request.contextPath}/office/reopen'">
+                Возобновить услугу
+            </button>
+            <%}%>
+            <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/plan'">
+                Просмотр циклограммы
+            </button>
         </div>
     </div>
     <%
@@ -136,8 +124,8 @@
         boolean paymentsExist = payments != null && payments.paymentList != null && !payments.paymentList.getP().isEmpty();
     %>
     <div id="history">
-        <div style="font-weight: bold; margin: 20px 0;">История операций</div>
-        <div>
+        <div style="font-weight: bold;">История операций</div>
+        <div style="margin-top: 20px;">
             <form method="post" enctype="application/x-www-form-urlencoded"
                   action="${pageContext.request.contextPath}/office/view">
                 <span style="padding-right: 10px;">Начальная дата:</span>
@@ -149,110 +137,97 @@
                 <button type="submit">Показать</button>
             </form>
         </div>
-    </div>
-</div>
-
-
-<div class="purchases">
-<div class="textDiv" style="margin-top: 30px;">
-    <span style="font-weight: bold;">Покупки:</span>
-    <span><%=!purchasesExist ? " за данный период по субсчету АП покупок не было." : ""%></span>
-</div>
-<%
-    if (purchasesExist) {
-%>
-<table class="output-text customTable">
-    <tr>
-        <th>Дата</th>
-        <th>Сумма покупки</th>
-        <th>Торговая скидка</th>
-        <th>Наличными</th>
-        <th>По карте</th>
-        <th>
-            <div style="width: 200px;">Состав</div>
-        </th>
-    </tr>
-<%
-        int i = 1;
-        for (PurchaseExt purchase : purchases.purchaseList.getP()) {
-            boolean even = i % 2 == 0;
-            String date = tf.format(purchase.getTime().toGregorianCalendar().getTime());
-            String sum = CurrencyStringUtils.copecksToRubles(purchase.getSum());
-            String tradeDiscount = CurrencyStringUtils.copecksToRubles(purchase.getTrdDiscount());
-            String sumByCash = CurrencyStringUtils.copecksToRubles(purchase.getByCash());
-            String sumByCard = CurrencyStringUtils.copecksToRubles(purchase.getByCard());
-            OrderDetailViewInfo viewInfo = new OrderDetailViewInfo();
-            for (PurchaseElementExt pe : purchase.getE()) {
-                int type = pe.getType();
-                if (type == 1) {
-                    viewInfo.createComplexViewInfo(pe.getMenuType(), pe.getName(), pe.getSum(), true);
-                } else if (type == 2) {
-                    int complexMenuType = pe.getMenuType() - 100;
-                    OrderDetailViewInfo.ComplexViewInfo cvi = viewInfo.complexesByType.get(complexMenuType);
-                    if (cvi == null) {
-                        cvi = viewInfo.createComplexViewInfo(complexMenuType, "", 0L, false);
+        <div id="purchases">
+            <div style="font-weight: bold;">Покупки</div>
+            <div style="line-height: 3em;">
+                <span><%=!purchasesExist ? " За данный период по субсчету АП покупок не было." : ""%></span>
+            </div>
+            <%
+                if (purchasesExist) {
+            %>
+            <div class="simpleTable purchaseTable">
+                <div class="simpleTableHeader purchaseRow">
+                    <div class="simpleCell purchaseHeaderCell">Дата</div>
+                    <div class="simpleCell purchaseHeaderCell">Сумма покупки</div>
+                    <div class="simpleCell purchaseHeaderCell">Торговая скидка</div>
+                    <div class="simpleCell purchaseHeaderCell">Наличными</div>
+                    <div class="simpleCell purchaseHeaderCell">По карте</div>
+                    <div class="simpleCell purchaseHeaderCell">Состав</div>
+                </div>
+                <%
+                    for (PurchaseExt purchase : purchases.purchaseList.getP()) {
+                        String date = tf.format(purchase.getTime().toGregorianCalendar().getTime());
+                        String sum = CurrencyStringUtils.copecksToRubles(purchase.getSum());
+                        String tradeDiscount = CurrencyStringUtils.copecksToRubles(purchase.getTrdDiscount());
+                        String sumByCash = CurrencyStringUtils.copecksToRubles(purchase.getByCash());
+                        String sumByCard = CurrencyStringUtils.copecksToRubles(purchase.getByCard());
+                        OrderDetailViewInfo viewInfo = new OrderDetailViewInfo();
+                        for (PurchaseElementExt pe : purchase.getE()) {
+                            int type = pe.getType();
+                            if (type == 1) {
+                                viewInfo.createComplexViewInfo(pe.getMenuType(), pe.getName(), pe.getSum(), true);
+                            } else if (type == 2) {
+                                int complexMenuType = pe.getMenuType() - 100;
+                                OrderDetailViewInfo.ComplexViewInfo cvi = viewInfo.complexesByType.get(complexMenuType);
+                                if (cvi == null) {
+                                    cvi = viewInfo.createComplexViewInfo(complexMenuType, "", 0L, false);
+                                }
+                                cvi.addComplexDetail(pe.getName());
+                            } else if (type == 0) {
+                                viewInfo.createSeparateDish(pe.getName(), pe.getSum(), pe.getAmount());
+                            }
+                        }
+                        String consistence = viewInfo.toString();
+                %>
+                <div class="simpleRow purchaseRow">
+                    <div class="purchaseCell simpleCell"><%=date%></div>
+                    <div class="purchaseCell simpleCell sum"><%=sum%></div>
+                    <div class="purchaseCell simpleCell sum"><%=tradeDiscount%></div>
+                    <div class="purchaseCell simpleCell sum"><%=sumByCash%></div>
+                    <div class="purchaseCell simpleCell sum"><%=sumByCard%></div>
+                    <div class="purchaseCell simpleCell complexName"><%=consistence%></div>
+                </div>
+                <%
                     }
-                    cvi.addComplexDetail(pe.getName());
-                } else if (type == 0) {
-                    viewInfo.createSeparateDish(pe.getName(), pe.getSum(), pe.getAmount());
+                %>
+            </div>
+            <%
                 }
-            }
-            String consistence = viewInfo.toString();
-%>
-    <tr style="vertical-align: top;" class="<%=even ? "paymentEvenLine" : "paymentUnevenLine"%>">
-        <td><%=date%></td>
-        <td align="right"><%=sum%></td>
-        <td align="right"><%=tradeDiscount%></td>
-        <td align="right"><%=sumByCash%></td>
-        <td align="right"><%=sumByCard%></td>
-        <td><%=consistence%></td>
-    </tr>
-<%
-            i++;
-        }
-%>
-</table>
-<%
-    }
-%>
-</div>
-
-<div class="payments">
-<div class="textDiv" style="margin-top: 20px;">
-    <span style="font-weight: bold">Платежи:</span>
-    <span><%=!paymentsExist ? " за данный период по субсчету АП платежей не было." : ""%></span>
-</div>
-<%
-    if (paymentsExist) {
-%>
-<table class="output-text customTable">
-    <tr>
-        <th>Дата</th>
-        <th>Сумма</th>
-        <th>
-            <div style="width: 200px;">Информация о платеже</div>
-        </th>
-    </tr>
-    <%
-        int i = 1;
-        for (Payment payment : payments.paymentList.getP()) {
-            boolean even = i % 2 == 0;
-            String date = tf.format(payment.getTime().toGregorianCalendar().getTime());
-            String sum = CurrencyStringUtils.copecksToRubles(payment.getSum());
-    %>
-    <tr style="vertical-align: top;" class="<%=even ? "paymentEvenLine" : "paymentUnevenLine"%>">
-        <td><%=date%></td>
-        <td align="right"><%=sum%></td>
-        <td><%=payment.getOrigin()%></td>
-    </tr>
-    <%
-            i++;
-        }
-    %>
-</table>
-<%
-    }
-%>
+            %>
+        </div>
+        <div id="payments">
+            <div style="font-weight: bold;">Платежи</div>
+            <div style="line-height: 3em;">
+                <span><%=!paymentsExist ? " За данный период по субсчету АП платежей не было." : ""%></span>
+            </div>
+            <%
+                if (paymentsExist) {
+            %>
+            <div class="simpleTable purchaseTable">
+                <div class="simpleTableHeader purchaseRow">
+                    <div class="simpleCell purchaseHeaderCell">Дата</div>
+                    <div class="simpleCell purchaseHeaderCell">Сумма</div>
+                    <div class="simpleCell purchaseHeaderCell">Информация о платеже</div>
+                </div>
+                <%
+                    for (Payment payment : payments.paymentList.getP()) {
+                        String date = tf.format(payment.getTime().toGregorianCalendar().getTime());
+                        String sum = CurrencyStringUtils.copecksToRubles(payment.getSum());
+                %>
+                <div class="simpleRow purchaseRow">
+                    <div class="purchaseCell simpleCell"><%=date%></div>
+                    <div class="purchaseCell simpleCell sum"><%=sum%></div>
+                    <div class="purchaseCell simpleCell complexName"><%=payment.getOrigin()%></div>
+                </div>
+                <%
+                    }
+                %>
+            </div>
+            <%
+                }
+            %>
+        </div>
+    </div>
 </div>
 </div>
 </body>

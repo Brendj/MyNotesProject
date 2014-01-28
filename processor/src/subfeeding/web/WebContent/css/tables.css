@@ -1,0 +1,75 @@
+/*
+ * Copyright (c) 2014. Axetta LLC. All Rights Reserved.
+ */
+
+.simpleTable {
+    display: table;
+    margin: 0 auto;
+    caption-side: bottom;
+    border-collapse: collapse;
+}
+
+.simpleRow {
+    background-color: white;
+    display: table-row;
+    border-bottom: 1px solid rgba(24, 22, 20, 0.18);
+    border-top: 1px solid rgba(24, 22, 20, 0.18);
+}
+
+.simpleTableHeader {
+    height: 40px;
+    background: #e6ecef;
+    font-weight: bold;
+    display: table-row;
+    text-align: center;
+}
+
+.simpleCell {
+    padding: 10px;
+    width: 100px;
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.simpleTableFooter {
+    background: #e6ecef;
+    padding: 20px;
+    line-height: 30px;
+    display: table-caption;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.complexName {
+    text-align: left;
+    width: 250px;
+    color: rgba(3, 3, 25, 0.60);
+}
+
+.purchaseTable {
+    font-size: 0.8em;
+    margin-top: 10px;
+    border: 1px solid #000000;
+}
+
+.purchaseHeaderCell {
+    border: 1px solid #000000;
+    vertical-align: top;
+}
+
+.purchaseCell {
+    border-left: 1px dashed #000000;
+    border-right: 1px dashed #000000;
+    vertical-align: top;
+}
+
+.purchaseRow {
+    border-bottom: 1px dashed #000000;
+    border-top: 1px dashed #000000;
+    color: rgba(3, 3, 25, 0.60);
+}
+
+.sum {
+    text-align: right;
+}

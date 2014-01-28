@@ -18,7 +18,7 @@
           href="${pageContext.request.contextPath}/WebContent/css/flick/jquery-ui-1.10.3.custom.min.css" />
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/common.css" />
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/plan.css"/>
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/complexTable.css"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/tables.css"/>
     <script src="${pageContext.request.contextPath}/WebContent/js/jquery-1.10.2.min.js"></script>
     <script src="${pageContext.request.contextPath}/WebContent/js/jquery-ui-1.10.3.custom.min.js"></script>
     <script src="${pageContext.request.contextPath}/WebContent/js/tools.js"></script>
@@ -68,15 +68,15 @@
         <div id="cycleDiagram">
             <form method="post" enctype="application/x-www-form-urlencoded" id="complexForm"
                   action="${pageContext.request.contextPath}/office/<%=action%>">
-                <div class="newTable">
-                    <div class="tableHeader">
-                        <div class="tableCell" style="text-align: center;">Комплекс</div>
-                        <div class="tableCell">ПН</div>
-                        <div class="tableCell">ВТ</div>
-                        <div class="tableCell">СР</div>
-                        <div class="tableCell">ЧТ</div>
-                        <div class="tableCell">ПТ</div>
-                        <div class="tableCell">СБ</div>
+                <div class="simpleTable">
+                    <div class="simpleRow simpleTableHeader">
+                        <div class="simpleCell">Комплекс</div>
+                        <div class="simpleCell">ПН</div>
+                        <div class="simpleCell">ВТ</div>
+                        <div class="simpleCell">СР</div>
+                        <div class="simpleCell">ЧТ</div>
+                        <div class="simpleCell">ПТ</div>
+                        <div class="simpleCell">СБ</div>
                     </div>
             <%
                 @SuppressWarnings("unchecked")
@@ -88,8 +88,8 @@
                 Map<Integer, List<String>> activeComplexes = (Map<Integer, List<String>>) request.getAttribute("activeComplexes");
                 for (ComplexInfoExt complex : complexes) {
             %>
-                    <div class="tableRow">
-                        <div class="tableCell complexName">
+                    <div class="simpleRow">
+                        <div class="simpleCell complexName">
                             <%=complex.getComplexName() + " - " + CurrencyStringUtils
                                     .copecksToRubles(complex.getCurrentPrice()) + " руб"%>
                         </div>
@@ -99,7 +99,7 @@
                         boolean checked = activeComplexes != null && activeComplexes.get(i)
                                 .contains(String.valueOf(complex.getIdOfComplex()));
                 %>
-                        <div class="tableCell">
+                        <div class="simpleCell">
                             <input type="checkbox" name="complex_option_<%=key%>" value="<%=key%>" title=""
                                     <%=checked ? "checked" : ""%> />
                         </div>
@@ -110,7 +110,7 @@
             <%
                 }
             %>
-                    <div class="tableFooter">
+                    <div class="simpleTableFooter">
             <%
                 if (sf.getIdOfSubscriptionFeeding() == null) {
             %>
