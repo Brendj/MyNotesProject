@@ -110,6 +110,14 @@ white-space: nowrap;
      text-align: right;
  }
 </style>
+<script type="text/javascript">
+    function onstartloading(){
+        jQuery(".command-button").attr('disabled', 'disabled');
+    }
+    function onstoploading(){
+        jQuery(".command-button").attr('disabled', '');
+    }
+</script>
 
 <%--@elvariable id="feedPlanPage" type="ru.axetta.ecafe.processor.web.ui.feed.FeedPlanPage"--%>
 <%--@elvariable id="yesNoConfirmPanel" type="ru.axetta.ecafe.processor.web.ui.modal.YesNoConfirmPanel"--%>
@@ -127,7 +135,7 @@ white-space: nowrap;
                 </rich:calendar>
                 <a4j:commandButton value=">" action="#{feedPlanPage.doIncreaseDay}" reRender="planDateCalendar,planGrid,groupsGrid,messages,totalMessage" status="feedPlanStatus"/>
             </h:panelGrid>
-            <a4j:status id="feedPlanStatus">
+            <a4j:status id="feedPlanStatus" onstart="onstartloading()" onstop="onstoploading()">
                 <f:facet name="start">
                     <h:panelGrid columns="2">
                         <h:outputText value="Загрузка... " styleClass="output-text-mod"/>

@@ -460,7 +460,11 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
 
             ru.axetta.ecafe.processor.core.persistence.Client dbClient = DAOService.getInstance().findClientById(client.getIdofclient());
             long discountPrice = DAOService.getInstance().getComplexPrice(org.getIdOfOrg(), client.getComplex());
-            OrderPurchaseItem opi = getOrderPurchaseItem(client, session);
+            OrderPurchaseItem opi = getOrderPurchaseItem(client, org.getIdOfOrg(), session);
+            if (opi == null) {
+                result.put(client, "Не удалось осуществить оплату: Произошла внутренняя ошибка");
+                continue;
+            }
             XMLGregorianCalendar paymentDate = getPaymentDate();
             PosPayment payment = new PosPayment();
             payment.setIdOfClient(client.getIdofclient());
@@ -543,9 +547,28 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
         return result;
     }
     
-    protected OrderPurchaseItem getOrderPurchaseItem(Client client, Session session) {
-        //client.get
-        return new OrderPurchaseItem("", "", "", client.getIdofrule(), "", OrderDetail.TYPE_COMPLEX_0, 0, 0L);
+    protected OrderPurchaseItem getOrderPurchaseItem(Client client, long idOfOrg, Session session) {
+        int complex = client.getComplex();
+        org.hibernate.Query query = session.createSQLQuery(
+                "select distinct(cf_goods.idofgood), cf_goods.nameofgood, cf_goods_groups.nameofgoodsgroup, cf_goods.guid, menuorigin "
+                + "from cf_complexinfo "
+                + "join cf_goods on cf_complexinfo.idofgood=cf_goods.idofgood "
+                + "join cf_goods_groups on cf_goods.idofgoodsgroup=cf_goods_groups.idofgoodsgroup "
+                + "left join cf_complexinfodetail on cf_complexinfo.idofcomplexinfo=cf_complexinfodetail.idofcomplexinfo "
+                + "join cf_menudetails on cf_complexinfodetail.idofmenudetail=cf_menudetails.idofmenudetail "
+                + "where idoforg=" + idOfOrg + " and idofcomplex=" + complex);
+        List data = query.list();
+        for (Object entry : data) {
+            Object o[] = (Object[]) entry;
+            Long idofgood = HibernateUtils.getDbLong(o[0]);
+            String good = HibernateUtils.getDbString(o[1]);
+            String groupName = HibernateUtils.getDbString(o[2]);
+            String guid = HibernateUtils.getDbString(o[3]);
+            int menuorigin = HibernateUtils.getDbInt(o[4]);
+            return new OrderPurchaseItem(good, groupName, "", client.getIdofrule(),
+                                         guid, complex + OrderDetail.TYPE_COMPLEX_MIN, menuorigin);
+        }
+        return null;
     }
 
     protected XMLGregorianCalendar getPaymentDate() {
@@ -1472,7 +1495,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
     }
 
     public class OrderPurchaseItem {
-        
+
         protected String name;
         protected String menuGroup;
         protected String rootMenu;
@@ -1480,10 +1503,9 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
         protected String goodGuid;
         protected int type;
         protected int menuOrigin;
-        protected long idOfOrderDetail;
 
         public OrderPurchaseItem(String name, String menuGroup, String rootMenu,
-                long idOfRule, String goodGuid, int type, int menuOrigin, long idOfOrderDetail) {
+                long idOfRule, String goodGuid, int type, int menuOrigin) {
             this.name = name;
             this.menuGroup = menuGroup;
             this.rootMenu = rootMenu;
@@ -1491,7 +1513,6 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             this.goodGuid = goodGuid;
             this.type = type;
             this.menuOrigin = menuOrigin;
-            this.idOfOrderDetail = idOfOrderDetail;
         }
 
         public String getName() {
@@ -1520,10 +1541,6 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
 
         public int getMenuOrigin() {
             return menuOrigin;
-        }
-
-        public long getIdOfOrderDetail() {
-            return idOfOrderDetail;
         }
     }
 }

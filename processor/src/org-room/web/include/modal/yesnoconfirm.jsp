@@ -8,6 +8,14 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
+<script type="text/javascript">
+    function onstartloading(){
+        jQuery(".command-button").attr('disabled', 'disabled');
+    }
+    function onstoploading(){
+        jQuery(".command-button").attr('disabled', '');
+    }
+</script>
 
 <%--@elvariable id="yesNoConfirmPanel" type="ru.axetta.ecafe.processor.web.ui.modal.YesNoConfirmPanel"--%>
 <rich:modalPanel id="yesNoConfirmPanel" width="250" height="150" resizeable="false" moveable="false">
@@ -30,18 +38,26 @@
             <h:panelGrid>
                 <h:outputText styleClass="output-text" value="#{yesNoConfirmPanel.message}" />
             </h:panelGrid>
-            <h:panelGrid columns="2">
-                <a4j:commandButton value="Да" action="#{yesNoConfirmPanel.doYes}"
+            <h:panelGrid columns="4">
+                <a4j:commandButton value="Да" action="#{yesNoConfirmPanel.doYes}" status="yesNoModalStatus"
                                    reRender="#{mainPage.currentWorkspacePage.pageComponent.id}"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.hide();"
                                    styleClass="command-button" style="width: 80px;" rendered="#{empty yesNoConfirmPanel.nodePanel}"/>
-                <a4j:commandButton value="Да" action="#{yesNoConfirmPanel.doYes}"
+                <a4j:commandButton value="Да" action="#{yesNoConfirmPanel.doYes}" status="yesNoModalStatus"
                                    reRender="#{yesNoConfirmPanel.nodePanel}"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) { #{rich:component('yesNoConfirmPanel')}.hide(); #{rich:component(yesNoConfirmPanel.nodePanel)}.show(); }"
                                    styleClass="command-button" style="width: 80px;" rendered="#{not empty yesNoConfirmPanel.nodePanel}"/>
-                <a4j:commandButton value="Нет" action="#{yesNoConfirmPanel.doNo}"
+                <a4j:commandButton value="Нет" action="#{yesNoConfirmPanel.doNo}" status="yesNoModalStatus"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('yesNoConfirmPanel')}.hide();"
                                    styleClass="command-button" style="width: 80px;"/>
+
+                <a4j:status id="yesNoModalStatus" onstart="onstartloading()" onstop="onstoploading()">
+                    <f:facet name="start">
+                        <h:panelGrid columns="2">
+                            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+                        </h:panelGrid>
+                    </f:facet>
+                </a4j:status>
             </h:panelGrid>
         </h:panelGrid>
         </a4j:region>
