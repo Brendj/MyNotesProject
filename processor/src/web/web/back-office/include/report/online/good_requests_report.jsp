@@ -14,6 +14,18 @@
     border-top: 2px solid #000000;
     }
 </style>
+<script type="text/javascript">
+function onstartloading(){
+    jQuery(".command-button").attr('disabled', 'disabled');
+    }
+function onstoploading(){
+    jQuery(".command-button").attr('disabled', '');
+    updateWidth();
+    }
+jQuery(document).ready(function(){
+updateWidth();
+});
+</script>
 
 <h:panelGrid id="goodRequestReportPanelGrid" binding="#{mainPage.goodRequestReportPage.pageComponent}" styleClass="borderless-grid">
 
@@ -99,7 +111,7 @@
             <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildGoodRequestReport}"
                                reRender="mainMenu, workspaceTogglePanel, goodRequestsReportTable"
                                styleClass="command-button" status="reportGenerateStatus" />
-            <a4j:status id="reportGenerateStatus">
+            <a4j:status id="reportGenerateStatus" onstart="onstartloading()" onstop="onstoploading()">
                 <f:facet name="start">
                     <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
                 </f:facet>
