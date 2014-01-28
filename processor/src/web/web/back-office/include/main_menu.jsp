@@ -855,6 +855,23 @@
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
+    <rich:panelMenuGroup id="activityReportsGroupMenu" binding="#{mainPage.activityReportsGroupMenu.mainMenuComponent}"
+                         label="Отчеты по активности">
+        <a4j:support event="onclick" action="#{mainPage.showActivityReportsGroupMenu}" reRender="workspaceForm" />
+        <%--@elvariable id="activeClientsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ActiveClientsReportPage"--%>
+        <rich:panelMenuItem id="activeClientsMenuItem" binding="#{activeClientsReportPage.mainMenuComponent}"
+                            label="Отчет по активным клиентам" action="#{activeClientsReportPage.show}"
+                            reRender="workspaceForm" />
+        <%--@elvariable id="commonStatsPage" type="ru.axetta.ecafe.processor.web.ui.report.online.CommonStatsPage"--%>
+        <rich:panelMenuItem id="commonStatsMenuItem" binding="#{commonStatsPage.mainMenuComponent}"
+                            label="Общая статистика" action="#{commonStatsPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="activeDiscountClientsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ActiveDiscountClientsReportPage"--%>
+        <rich:panelMenuItem id="activeDiscountClientsMenuItem"
+                            binding="#{activeDiscountClientsReportPage.mainMenuComponent}"
+                            label="Отчет по питающимся льготникам" action="#{activeDiscountClientsReportPage.show}"
+                            reRender="workspaceForm" />
+    </rich:panelMenuGroup>
+
     <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"
                         label="Отчет по продажам" action="#{mainPage.showSalesReportPage}" reRender="workspaceForm" />
 
@@ -874,9 +891,6 @@
                         binding="#{mainPage.currentPositionsReportPage.mainMenuComponent}"
                         label="Просмотр текущих позиций" action="#{mainPage.showCurrentPositionsReportPage}"
                         reRender="workspaceForm" />
-    <%--@elvariable id="commonStatsPage" type="ru.axetta.ecafe.processor.web.ui.report.online.CommonStatsPage"--%>
-    <rich:panelMenuItem id="commonStatsMenuItem" binding="#{commonStatsPage.mainMenuComponent}" label="Общая статистика"
-                        action="#{commonStatsPage.show}" reRender="workspaceForm" />
     <%--@elvariable id="totalServicesReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalServicesReportPage"--%>
     <rich:panelMenuItem id="totalServicesReportPage" binding="#{totalServicesReportPage.mainMenuComponent}"
                         label="Свод по услугам" action="#{totalServicesReportPage.show}" reRender="workspaceForm" />
@@ -891,14 +905,6 @@
                         binding="#{mainPage.clientsBenefitsReportPage.mainMenuComponent}"
                         label="Расчет комплексов по льготным правилам"
                         action="#{mainPage.showClientsBenefitsReportPage}" reRender="workspaceForm" />
-    <%--@elvariable id="activeClientsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ActiveClientsReportPage"--%>
-    <rich:panelMenuItem id="activeClientsMenuItem" binding="#{activeClientsReportPage.mainMenuComponent}"
-                        label="Отчет по доступным клиентам" action="#{activeClientsReportPage.show}"
-                        reRender="workspaceForm" />
-    <%--@elvariable id="activeDiscountClientsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ActiveDiscountClientsReportPage"--%>
-    <rich:panelMenuItem id="activeDiscountClientsMenuItem" binding="#{activeDiscountClientsReportPage.mainMenuComponent}"
-                        label="Отчет по питающимся льготникам" action="#{activeDiscountClientsReportPage.show}"
-                        reRender="workspaceForm" />
     <%--@elvariable id="referReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ReferReportPage"--%>
     <rich:panelMenuItem id="referReportMenuItem" binding="#{referReportPage.mainMenuComponent}"
                         label="Справки расходования средств" action="#{referReportPage.show}"
