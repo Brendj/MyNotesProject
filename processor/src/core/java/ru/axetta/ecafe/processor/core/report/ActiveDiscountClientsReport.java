@@ -160,7 +160,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     + "       cf_orgs.address, "
                     + "       cf_persons.surname, cf_persons.firstname, cf_persons.secondname, "
                     + "       cf_clientgroups.groupname, cf_categorydiscounts.categoryname, "
-                    + "       cf_complexroles.rolename, sum(cf_orders.socdiscount) "
+                    + "       cf_complexroles.rolename, sum(cf_orders.socdiscount / 100) "
                     + "from cf_clients "
                     + "join cf_orgs on cf_clients.idoforg=cf_orgs.idoforg "
                     + "join cf_persons on cf_clients.idofperson=cf_persons.idofperson "
