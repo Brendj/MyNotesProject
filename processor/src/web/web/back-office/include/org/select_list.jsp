@@ -12,7 +12,7 @@
 <rich:modalPanel id="modalOrgListSelectorPanel" autosized="true" headerClass="modal-panel-header">
     <rich:hotKey key="esc" handler="#{rich:component('modalOrgListSelectorPanel')}.hide();return false;"/>
     <rich:hotKey key="ctrl+a" handler="selectAll();return false;"/>
-    <rich:hotKey key="ctrl+d" handler="selectAll();return false;"/>
+    <rich:hotKey key="ctrl+d" handler="deselectAll();return false;"/>
 
     <f:facet name="header">
         <h:outputText escape="true" value="#{mainPage.orgFilterPageName}" />

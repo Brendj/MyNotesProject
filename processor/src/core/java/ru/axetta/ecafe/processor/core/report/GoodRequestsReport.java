@@ -266,7 +266,7 @@ public class GoodRequestsReport extends BasicReport {
             }
 
 
-            if(!(idOfOrgList==null || idOfOrgList.isEmpty())) {
+            if(!(idOfOrgList==null || idOfOrgList.isEmpty()) && orgsFilter != null) {
                 if (orgsFilter == 0) {
                     insertMissingOrgs(idOfOrgList, insertedOrgs, items, totalItems, report);
                 } else if (orgsFilter == 2) {
