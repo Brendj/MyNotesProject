@@ -4,7 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -36,7 +38,7 @@ public class GoodRequestsReport extends BasicReport {
     private static final DateFormat YEAR_DATE_FORMAT = new SimpleDateFormat(STR_YEAR_DATE_FORMAT, new Locale("ru"));
     //private static final DateFormat MONTHLY_DATE_FORMAT = new SimpleDateFormat(STR_MONTHLY_DATE_FORMAT, new Locale("ru"));
     //private static final DateFormat DAILY_DATE_FORMAT = new SimpleDateFormat(STR_DAILY_DATE_FORMAT, new Locale("ru"));
-    private final List<RequestItem> items;
+    private List<RequestItem> items;
     private boolean hideMissedColumns;
     private List <String> cols;
     private Date startDate;
@@ -62,24 +64,31 @@ public class GoodRequestsReport extends BasicReport {
 
         public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
                 Date startDate, Date endDate, Long idOfOrg) throws Exception{
-            return build(session, hideMissedColumns,startDate,endDate, Arrays.asList(idOfOrg),null,3, "", false);
+            return build(session, hideMissedColumns,startDate,endDate, Arrays.asList(idOfOrg),null,3, "", false, null);
         }
 
         public GoodRequestsReport build(Session session,
                 Date startDate, Date endDate, List<Long> idOfSupplierList) throws Exception{
-            return build(session, false,startDate,endDate, new ArrayList<Long>(0),idOfSupplierList,3, "", true);
+            return build(session, false,startDate,endDate, new ArrayList<Long>(0),idOfSupplierList,3, "", true, null);
         }
 
         public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
                 Date startDate, Date endDate, List<Long> idOfOrgList, List<Long> idOfSupplierList,
                 int requestsFilter, String goodName)
                 throws Exception {
-            return build(session, hideMissedColumns,startDate,endDate, idOfOrgList ,idOfSupplierList, requestsFilter, goodName, true);
+            return build(session, hideMissedColumns,startDate,endDate, idOfOrgList ,idOfSupplierList, requestsFilter, goodName, true, null);
+        }
+
+        public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
+                Date startDate, Date endDate, List<Long> idOfOrgList, List<Long> idOfSupplierList,
+                int requestsFilter, String goodName, Integer orgsFilter)
+                throws Exception {
+            return build(session, hideMissedColumns,startDate,endDate, idOfOrgList ,idOfSupplierList, requestsFilter, goodName, true, orgsFilter);
         }
 
         private GoodRequestsReport build(Session session, Boolean hideMissedColumns,
                 Date startDate, Date endDate, List<Long> idOfOrgList, List <Long> idOfSupplierList,
-                int requestsFilter, String goodName, Boolean isWriteTotalRow)
+                int requestsFilter, String goodName, Boolean isWriteTotalRow, Integer orgsFilter)
                 throws Exception {
             Date generateTime = new Date();
             List<RequestItem> items = new LinkedList<RequestItem>();
@@ -190,6 +199,7 @@ public class GoodRequestsReport extends BasicReport {
             //Map <String, RequestItem> totalItems = new TreeMap <String, RequestItem>();
             Map <Long, RequestItem> totalItems = new TreeMap <Long, RequestItem>();
             RequestItem overallItem = new TotalItem(-1L,OVERALL_TITLE, "", -1L,OVERALL_ALL_TITLE, report);
+            List<Long> insertedOrgs = new ArrayList<Long>();
 
             List res = new ArrayList();
             Query queryGood = session.createSQLQuery(sqlGood);
@@ -218,6 +228,7 @@ public class GoodRequestsReport extends BasicReport {
                 if (item == null) {
                     item = new RequestItem(idOfOrg, org, orgFull, idOfGood, name, report);
                     items.add(item);
+                    insertedOrgs.add(idOfOrg);
                 }
                 item.addValue(date, new RequestValue(value));
                 item.addDailySample(date, new RequestValue(dailySample));
@@ -252,6 +263,18 @@ public class GoodRequestsReport extends BasicReport {
                 //overallItem.addLastDailySample(date, new RequestValue(lastDailySample));
             }
 
+
+            if(!(idOfOrgList==null || idOfOrgList.isEmpty())) {
+                if (orgsFilter == 0) {
+                    insertMissingOrgs(idOfOrgList, insertedOrgs, items, totalItems, report);
+                } else if (orgsFilter == 2) {
+                    List<RequestItem> newItems = new ArrayList<RequestItem>();
+                    insertMissingOrgs(idOfOrgList, insertedOrgs, newItems, totalItems, report);
+                    items = newItems;
+                    resetTotalValues(totalItems, overallItem);
+                }
+            }
+
             //  Добавляем строки с общими значениями в список товаров
             if(isWriteTotalRow){
                 for (Long key : totalItems.keySet()) {
@@ -260,20 +283,44 @@ public class GoodRequestsReport extends BasicReport {
             }
 
             items.add(overallItem);
-
-
+            report.setGoodRequestItems(items);
             normalizeDates(items, startDate, endDate);
-
-
-            /*items.add(new RequestItem("1477", "ГБОУ СОШ 1477", "Школа / СД / 1-4 / Завтрак 2", report).
-                    addValue(1356998400000L, new RequestValue(Math.random())).
-                    addValue(1357084800000L, new RequestValue(Math.random())).
-                    addValue(1357257600000L, new RequestValue(Math.random())).
-                    addValue(1357430400000L, new RequestValue(Math.random())));
-            items.add(new RequestItem("1477", "ГБОУ СОШ 1477", "Школа / СД / 1-4 / Завтрак 2", report).
-                    addValue(1356998400000L, new RequestValue(Math.random())).
-                    addValue(1357430400000L, new RequestValue(Math.random())));*/
             return report;
+        }
+
+        protected void insertMissingOrgs(List<Long> idOfOrgList, List<Long> insertedOrgs,
+                                        List<RequestItem> items, Map <Long, RequestItem> totalItems,
+                                        GoodRequestsReport report) {
+            for(Long idOfOrg : idOfOrgList) {
+                if (insertedOrgs.contains(idOfOrg)) {
+                    continue;
+                }
+                Org org = DAOService.getInstance().findOrById(idOfOrg);
+                Set<Long> tmpItems = totalItems.keySet();
+                for (Long id : tmpItems) {
+                    RequestItem i = totalItems.get(id);
+
+                    RequestItem newItem = new RequestItem(idOfOrg, org.getOrgNumberInName(), org.getOfficialName(),
+                            i.getIdOfGood(), i.getGood(), report);
+                    items.add(newItem);
+                }
+            }
+        }
+
+        protected void resetTotalValues(Map <Long, RequestItem> totalItems, RequestItem overallItem) {
+            Set<Long> keys = totalItems.keySet();
+            for(Long k : keys) {
+                RequestItem i = totalItems.get(k);
+                resetValues(i);
+            }
+            resetValues(overallItem);
+        }
+
+        protected void resetValues(RequestItem i) {
+            Map<Long, RequestValue> values = i.getValues();
+            for(Long ts : values.keySet()) {
+                values.put(ts, new RequestValue(0));
+            }
         }
 
         public RequestItem findItemByOrgAndGood(List<RequestItem>  list, String org, String good) {
@@ -322,6 +369,10 @@ public class GoodRequestsReport extends BasicReport {
     
     public List<RequestItem> getEmptyGoodRequestItems() {
         return Collections.EMPTY_LIST;
+    }
+
+    public void setGoodRequestItems(List<RequestItem> items) {
+        this.items = items;
     }
 
     public List<RequestItem> getGoodRequestItems() {
@@ -477,6 +528,10 @@ public class GoodRequestsReport extends BasicReport {
             this.good = good;
             this.idOfGood = idOfGood;
             this.report = report;
+        }
+
+        public Map<Long, RequestValue> getValues() {
+            return values;
         }
 
         public RequestValue getValue(long ts) {

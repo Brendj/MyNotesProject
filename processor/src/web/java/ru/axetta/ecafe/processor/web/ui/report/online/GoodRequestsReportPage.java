@@ -34,6 +34,7 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
     private Boolean hideMissedColumns;
     private boolean showAll = true;
     private int requestsFilter = 3;
+    private int orgsFilter = 1;
     private String goodName;
     private int daysLimit;
     private int dailySamplesMode;
@@ -82,6 +83,14 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
 
     public void setDaysLimit(int daysLimit) {
         this.daysLimit = daysLimit;
+    }
+
+    public int getOrgsFilter() {
+        return orgsFilter;
+    }
+
+    public void setOrgsFilter(int orgsFilter) {
+        this.orgsFilter = orgsFilter;
     }
 
     public void setRequestsFilter(int requestsFilter) {
@@ -141,7 +150,7 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
         //  Запускаем отчет
         GoodRequestsReport.Builder reportBuilder = new GoodRequestsReport.Builder();
         this.goodRequests = reportBuilder.build(session, hideMissedColumns, startDate, endDate,
-                                                idOfOrgList, idOfContragentOrgList, requestsFilter, goodName);
+                                                idOfOrgList, idOfContragentOrgList, requestsFilter, goodName, orgsFilter);
     }
 
     public static long getDaysLimitTS(int daysLimit, Date startDate) {

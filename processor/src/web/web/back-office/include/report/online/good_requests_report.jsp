@@ -65,6 +65,14 @@
                           styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{mainPage.goodRequestReportPage.hideMissedColumns}" styleClass="output-text" />
 
+            <h:outputText escape="true" value="Отображать выбранные организации" styleClass="output-text" />
+            <h:selectOneMenu value="#{mainPage.goodRequestReportPage.orgsFilter}" converter="javax.faces.Integer"
+            styleClass="output-text" >
+                <f:selectItem itemValue="0" itemLabel="Все"/>
+                <f:selectItem itemValue="1" itemLabel="Только с данными"/>
+                <f:selectItem itemValue="2" itemLabel="Только пустые"/>
+            </h:selectOneMenu>
+
             <h:outputText escape="true" value="Суточная проба" styleClass="output-text" />
             <h:selectOneMenu value="#{mainPage.goodRequestReportPage.dailySamplesMode}" styleClass="output-text">
                 <f:selectItem itemValue="0" itemLabel="Не выводить"/>
