@@ -13,6 +13,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
@@ -435,6 +437,26 @@ public class GoodRequestsReport extends BasicReport {
 
     public boolean isHideMissedColumns() {
         return hideMissedColumns;
+    }
+
+
+    public static void writeToFile(GoodRequestsReport report, Writer writer) throws IOException {
+        Object[] columns = report.getColumnNames();
+        StringBuilder str = new StringBuilder("");
+        for(Object col : columns) {
+            str.append(col.toString()).append(";");
+        }
+        str.append('\r').append('\n');
+        writer.write(str.toString());
+
+        for(RequestItem item : report.getGoodRequestItems()) {
+            str.delete(0, str.length());
+            for(Object col : columns) {
+                str.append(item.getValue(col.toString())).append(";");
+            }
+            str.append('\r').append('\n');
+            writer.write(str.toString());
+        }
     }
 
 

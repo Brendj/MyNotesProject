@@ -4,13 +4,33 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
+import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
+
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.report.DeliveredServicesReport;
 import ru.axetta.ecafe.processor.core.report.GoodRequestsReport;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -38,6 +58,8 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
     private String goodName;
     private int daysLimit;
     private int dailySamplesMode;
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager entityManager;
 
     public String getPageFilename() {
         return "report/online/good_requests_report";
@@ -174,4 +196,45 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
     public String getContragentStringIdOfOrgList() {
         return idOfContragentOrgList.toString().replaceAll("[^0-9,]","");
     }
+
+    @Transactional
+    public void export() {
+        Session session = null;
+        try {
+            session = (Session) entityManager.getDelegate();
+            export(session);
+        } catch (Exception e) {
+            logger.error("Failed to load claims data", e);
+        } finally {
+            //HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void export(Session session) throws Exception {
+        //  пределяем на какой лимит дней необходимо увеличить дату
+        endDate = new Date(getDaysLimitTS(daysLimit, startDate));
+
+        //  Запускаем отчет
+        GoodRequestsReport.Builder reportBuilder = new GoodRequestsReport.Builder();
+        this.goodRequests = reportBuilder.build(session, hideMissedColumns, startDate, endDate,
+                idOfOrgList, idOfContragentOrgList, requestsFilter, goodName, orgsFilter);
+
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+        facesContext.responseComplete();
+        response.setContentType("text/csv");
+        response.setHeader("Content-disposition", "inline;filename=" + this.getClass().getSimpleName() + ".csv");
+
+        final ServletOutputStream responseOutputStream = response.getOutputStream();
+        try {
+            Writer writer = new OutputStreamWriter(responseOutputStream);
+            GoodRequestsReport.writeToFile(goodRequests, writer);
+            writer.flush();
+            responseOutputStream.flush();
+        } finally {
+            responseOutputStream.close();
+        }
+        facesContext.responseComplete();
+    }
+
 }

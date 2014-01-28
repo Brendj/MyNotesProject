@@ -111,6 +111,8 @@ updateWidth();
             <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildGoodRequestReport}"
                                reRender="mainMenu, workspaceTogglePanel, goodRequestsReportTable"
                                styleClass="command-button" status="reportGenerateStatus" />
+
+            <h:commandButton value="Генерировать отчет в Excel" actionListener="#{mainPage.exportGoodRequestReport}" styleClass="command-button" />
             <a4j:status id="reportGenerateStatus" onstart="onstartloading()" onstop="onstoploading()">
                 <f:facet name="start">
                     <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
