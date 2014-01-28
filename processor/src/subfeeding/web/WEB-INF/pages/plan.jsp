@@ -124,7 +124,13 @@
                         <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/view'" name="back">
                             Вернуться к подписке
                         </button>
+                        <%
+                            if (!sf.getSuspended()) {
+                        %>
                         <button type="submit" name="edit">Сохранить изменения</button>
+                        <%
+                            }
+                        %>
             <%  } %>
                     </div>
                 </div>

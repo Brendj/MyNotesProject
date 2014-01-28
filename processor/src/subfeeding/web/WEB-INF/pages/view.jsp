@@ -8,6 +8,7 @@
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="java.text.DateFormat" %>
 <%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Date" %>
 <%@ page import="java.util.TimeZone" %>
 <!DOCTYPE html>
 <html>
@@ -30,6 +31,14 @@
                 'text-align': 'left',
                 'outline': 'none',
                 'cursor': 'text'
+            });
+            $('#pauseButton').button().css({
+                'background':'rgba(240, 26, 26, 0.55)',
+                'color': 'white'
+            });
+            $('#reopenButton').button().css({
+                'background':'rgb(104, 153, 104)',
+                'color':'white'
             });
             var datepickerBegin = $("#datepickerBegin").datepicker({
                 onSelect: function (selected) {
@@ -66,33 +75,38 @@
 <div id="content">
     <div id="infoHeader">
         <div id="infoTable">
-            <div class="colRow headerFont">
+            <div class="colRow">
                 <div class="leftcol">Баланс основного счета:</div>
                 <div class="rightcol"><%=subBalance0%> руб.</div>
             </div>
-            <div class="colRow headerFont">
+            <div class="colRow">
                 <div class="leftcol">Баланс субсчета АП:</div>
                 <div class="rightcol"><%=subBalance1%> руб.</div>
             </div>
-            <div class="colRow headerFont">
+            <div class="colRow">
                 <div class="leftcol">Дата активации услуги:</div>
-                <div class="rightcol"><%=tf.format(sf.getDateActivate())%>
+                <div class="rightcol"><%=df.format(sf.getDateActivate())%>
                 </div>
             </div>
-            <div class="colRow headerFont">
+            <div class="colRow">
                 <div class="leftcol">Дата отключения услуги:</div>
                 <div class="rightcol"><%=sf.getDateDeactivate() == null ? "услуга бессрочная"
                         : df.format(sf.getDateDeactivate())%>
                 </div>
             </div>
-            <%if (wasSuspended) {
-                String suspendDate = df.format(sf.getLastDatePause());%>
-            <div class="colRow headerFont">
-                <div class="leftcol">Услуга приостанавливается</div>
-                <div class="rightcol">c <%=suspendDate%>
+            <div class="colRow">
+                <div class="leftcol">Состояние услуги:</div>
+                <div class="rightcol">
+                    <%
+                        String status = "услуга активна";
+                        if (wasSuspended) {
+                            boolean reallySuspended = sf.getLastDatePause().after(new Date());
+                            status = "услуга " + (reallySuspended ? "приостанавливается" : "приостановлена") + " с " + df.format(sf.getLastDatePause());
+                        }
+                        out.print(status);
+                    %>
                 </div>
             </div>
-            <%}%>
             <c:if test="${not empty requestScope.subFeedingError}">
                 <div class="messageDiv errorMessage">${requestScope.subFeedingError}</div>
             </c:if>
@@ -102,11 +116,11 @@
         </div>
         <div id="manageButtons">
             <%if (!wasSuspended) {%>
-            <button type="submit" onclick="location.href = '${pageContext.request.contextPath}/office/suspend'">
+            <button type="submit" id="pauseButton" onclick="location.href = '${pageContext.request.contextPath}/office/suspend'">
                 Приостановить услугу
             </button>
             <%} else {%>
-            <button type="submit" onclick="location.href = '${pageContext.request.contextPath}/office/reopen'">
+            <button type="submit" id="reopenButton" onclick="location.href = '${pageContext.request.contextPath}/office/reopen'">
                 Возобновить услугу
             </button>
             <%}%>
