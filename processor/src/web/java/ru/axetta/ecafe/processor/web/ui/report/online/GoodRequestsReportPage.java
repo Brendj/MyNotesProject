@@ -220,7 +220,7 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
         facesContext.responseComplete();
-        response.setContentType("text/csv");
+        response.setContentType("text/csv; charset=windows-1251");
         response.setHeader("Content-disposition", "inline;filename=" + this.getClass().getSimpleName() + ".csv");
 
         final ServletOutputStream responseOutputStream = response.getOutputStream();
