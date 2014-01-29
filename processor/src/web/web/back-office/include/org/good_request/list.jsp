@@ -38,9 +38,6 @@
                     <f:selectItems value="#{goodRequestListPage.stateSelectItemList}"/>
                 </h:selectManyListbox>
 
-                <h:outputText value="Номер" styleClass="output-text" escape="true"/>
-                <h:inputText value="#{goodRequestListPage.requestNumber}" styleClass="input-text"/>
-
             </h:panelGrid>
 
             <h:panelGrid columns="2" styleClass="borderless-grid">
