@@ -304,6 +304,7 @@ public class GoodRequestsReport extends BasicReport {
 
                     RequestItem newItem = new RequestItem(idOfOrg, org.getOrgNumberInName(), org.getOfficialName(),
                             i.getIdOfGood(), i.getGood(), report);
+                    newItem.dailySamples = new TreeMap<Long, RequestValue>();
                     items.add(newItem);
                 }
             }
@@ -320,8 +321,14 @@ public class GoodRequestsReport extends BasicReport {
 
         protected void resetValues(RequestItem i) {
             Map<Long, RequestValue> values = i.getValues();
+            Map<Long, RequestValue> dsvalues = i.getDailySamples();
+            Map<Long, RequestValue> lvalues = i.getLastValues();
+            Map<Long, RequestValue> ldsvalues = i.getLastDailySamples();
             for(Long ts : values.keySet()) {
                 values.put(ts, new RequestValue(0));
+                dsvalues.put(ts, new RequestValue(0));
+                lvalues.put(ts, new RequestValue(0));
+                ldsvalues.put(ts, new RequestValue(0));
             }
         }
 
@@ -350,6 +357,9 @@ public class GoodRequestsReport extends BasicReport {
             for(RequestItem i : items) {
                 if(i.getValue(d.getTime()) == null) {
                     i.addValue(d.getTime(), new RequestValue(0));
+                    i.addDailySample(d.getTime(), new RequestValue(0));
+                    i.addLastValue(d.getTime(), new RequestValue(0));
+                    i.addLastDailySample(d.getTime(), new RequestValue(0));
                 }
             }
         }
@@ -550,6 +560,18 @@ public class GoodRequestsReport extends BasicReport {
             this.good = good;
             this.idOfGood = idOfGood;
             this.report = report;
+        }
+
+        public Map<Long, RequestValue> getDailySamples() {
+            return dailySamples;
+        }
+
+        public Map<Long, RequestValue> getLastValues() {
+            return lastValues;
+        }
+
+        public Map<Long, RequestValue> getLastDailySamples() {
+            return lastDailySamples;
         }
 
         public Map<Long, RequestValue> getValues() {
