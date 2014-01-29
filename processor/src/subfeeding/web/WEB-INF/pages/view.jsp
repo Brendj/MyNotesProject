@@ -127,6 +127,9 @@
             <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/plan'">
                 Просмотр циклограммы
             </button>
+            <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/transfer'">
+                Перевод средств
+            </button>
         </div>
     </div>
     <%

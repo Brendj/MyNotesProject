@@ -17,3 +17,15 @@ jQuery.fn.preventDoubleSubmission = function() {
     // Keep chainability
     return this;
 };
+
+function validateTransferForm() {
+    var amountField = $('#transferAmountField').val();
+    if (amountField.indexOf(',') > 0) {
+        amountField.replace(',', '.');
+    }
+    if (!$.isNumeric(amountField)) {
+        $('#errorDiv').html("Размер перевода имеет неправильный числовой формат.");
+        return true;
+    }
+    return false;
+}

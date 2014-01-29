@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
+import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.web.ClientAuthToken;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomController;
@@ -101,6 +102,8 @@ public class SubFeedingServlet extends HttpServlet {
                 editSubscriptionFeedingPlan(req, resp);
             } else if (path.equals("/logout")) {
                 logout(req, resp);
+            } else if (path.equals("/transfer")) {
+                processBalanceTransfer(req, resp);
             } else {
                 sendRedirect(req, resp, "/index");
             }
@@ -294,6 +297,34 @@ public class SubFeedingServlet extends HttpServlet {
             req.setAttribute(ERROR_MESSAGE, res.description);
         }
         showSubscriptionFeeding(req, resp);
+    }
+
+    private void processBalanceTransfer(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
+        String action = req.getParameter("stage");
+        if ("createTransfer".equals(action)) {
+            String transferAmount = req.getParameter("transferAmount");
+            String transferDirection = req.getParameter("transferDirection");
+            Result result;
+            if ("toSub".equals(transferDirection)) {
+                result = clientRoomController
+                        .transferBalance(contractId, 0, 1, CurrencyStringUtils.rublesToCopecks(transferAmount));
+            } else if ("fromSub".equals(transferDirection)) {
+                result = clientRoomController
+                        .transferBalance(contractId, 1, 0, CurrencyStringUtils.rublesToCopecks(transferAmount));
+            } else {
+                outputPage("transfer", req, resp);
+                return;
+            }
+            if (result.resultCode == 0) {
+                req.setAttribute(SUCCESS_MESSAGE, "Перевод средств прошел успешно.");
+            } else {
+                req.setAttribute(ERROR_MESSAGE, result.description);
+            }
+        }
+        ClientSummaryResult client = clientRoomController.getSummary(contractId);
+        req.setAttribute("client", client.clientSummary);
+        outputPage("transfer", req, resp);
     }
 
     private void logout(HttpServletRequest req, HttpServletResponse resp) throws Exception {
