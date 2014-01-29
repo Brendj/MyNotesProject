@@ -36,13 +36,8 @@
                 }
             });
             $("button").button();
-            $('input:text').button().css({
-                'font': 'inherit',
-                'color': 'inherit',
-                'text-align': 'left',
-                'outline': 'none',
-                'cursor': 'text'
-            });
+            $('input:text').button().addClass('ui-textfield');
+            $('#transferMenu').menu().addClass('ui-textfield');
         });
     </script>
 </head>
@@ -56,10 +51,12 @@
     <div class="header">
         <span class="contract"><%=ContractIdFormat.format(client.getContractId())%></span>
         <span class="contract" style="padding-left: 20px;"><%=client.getFullName()%></span>
-    <span style="float: right;">
-        <button onclick="location.href = '${pageContext.request.contextPath}/office/logout'" name="logout">Выход
+        <span style="float: right;">
+        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/view'">Вернуться
         </button>
-    </span>
+        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/logout'" name="logout">Выход
+        </button>
+        </span>
     </div>
     <div id="content">
         <div id="infoHeader">
@@ -77,7 +74,7 @@
                     </div>
                     <div class="colRow">
                         <div class="leftcol">Направление перевода:</div>
-                        <div class="rightcol">
+                        <div class="rightcol" style="padding-left: 12px;">
                             <select name="transferDirection" id="transferMenu" size="1" required>
                                 <option value="toSub">с основного счета на субсчет АП</option>
                                 <option value="fromSub">с субсчета АП на основной счет</option>
@@ -92,9 +89,6 @@
                     </div>
                     <div class="messageDiv">
                         <button type="submit">Совершить перевод</button>
-                        <button type="button"
-                                onclick="location.href = '${pageContext.request.contextPath}/office/view'">Вернуться назад
-                        </button>
                     </div>
                     <div class="messageDiv errorMessage" id="errorDiv">
                         <c:if test="${not empty requestScope.subFeedingError}">

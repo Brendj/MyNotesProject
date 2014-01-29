@@ -30,3 +30,13 @@ body {
 .successMessage {
     color: green;
 }
+
+.ui-textfield {
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    outline: none;
+    cursor: text;
+    background: #f6f6f6 url(flick/images/ui-bg_highlight-soft_100_f6f6f6_1x100.png) 50% 50% repeat-x;
+    padding: 0.25em 0.5em;
+}

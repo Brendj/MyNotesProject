@@ -25,13 +25,7 @@
     <script>
         $(function () {
             $('button').button();
-            $('input:text').button().css({
-                'font': 'inherit',
-                'color': 'inherit',
-                'text-align': 'left',
-                'outline': 'none',
-                'cursor': 'text'
-            });
+            $('input:text').button().addClass('ui-textfield');
             $('#pauseButton').button().css({
                 'background':'rgba(240, 26, 26, 0.55)',
                 'color': 'white'
@@ -169,7 +163,7 @@
                     <div class="simpleCell purchaseHeaderCell">Торговая скидка</div>
                     <div class="simpleCell purchaseHeaderCell">Наличными</div>
                     <div class="simpleCell purchaseHeaderCell">По карте</div>
-                    <div class="simpleCell purchaseHeaderCell">Состав</div>
+                    <div class="simpleCell purchaseHeaderCell wideCell">Состав</div>
                 </div>
                 <%
                     for (PurchaseExt purchase : purchases.purchaseList.getP()) {
@@ -224,7 +218,7 @@
                 <div class="simpleTableHeader purchaseRow">
                     <div class="simpleCell purchaseHeaderCell">Дата</div>
                     <div class="simpleCell purchaseHeaderCell">Сумма</div>
-                    <div class="simpleCell purchaseHeaderCell">Информация о платеже</div>
+                    <div class="simpleCell purchaseHeaderCell wideCell">Информация о платеже</div>
                 </div>
                 <%
                     for (Payment payment : payments.paymentList.getP()) {

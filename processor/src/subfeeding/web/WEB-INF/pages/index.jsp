@@ -21,13 +21,7 @@
             $("#submit").button().css({
                 'margin-top': '10px'
             });
-            $('input:text, input:password').button().css({
-                'font': 'inherit',
-                'color': 'inherit',
-                'text-align': 'left',
-                'outline': 'none',
-                'cursor': 'text'
-            });
+            $('input:text, input:password').button().addClass('ui-textfield');
         });
     </script>
 </head>

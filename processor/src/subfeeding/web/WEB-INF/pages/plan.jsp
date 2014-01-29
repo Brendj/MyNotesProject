@@ -42,6 +42,14 @@
             <%=ContractIdFormat.format(client.getContractId())%></span>
         <span class="contract" style="padding-left: 20px;"><%=client.getFullName()%></span>
         <span style="float: right;">
+        <%
+            if (sf.getIdOfSubscriptionFeeding() != null) {
+        %>
+            <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/view'">Вернуться
+            </button>
+        <%
+            }
+        %>
             <button onclick="location.href = '${pageContext.request.contextPath}/office/logout'" name="logout">Выход
             </button>
         </span>
@@ -70,7 +78,7 @@
                   action="${pageContext.request.contextPath}/office/<%=action%>">
                 <div class="simpleTable">
                     <div class="simpleRow simpleTableHeader">
-                        <div class="simpleCell">Комплекс</div>
+                        <div class="simpleCell wideCell">Комплекс</div>
                         <div class="simpleCell">ПН</div>
                         <div class="simpleCell">ВТ</div>
                         <div class="simpleCell">СР</div>
@@ -121,9 +129,6 @@
             <%  } else {
 
             %>
-                        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/view'" name="back">
-                            Вернуться к подписке
-                        </button>
                         <%
                             if (!sf.getSuspended()) {
                         %>

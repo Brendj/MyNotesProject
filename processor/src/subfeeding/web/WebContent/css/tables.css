@@ -43,8 +43,11 @@
 
 .complexName {
     text-align: left;
-    width: 250px;
     color: rgba(3, 3, 25, 0.60);
+}
+
+.wideCell {
+    width: 250px;
 }
 
 .purchaseTable {
