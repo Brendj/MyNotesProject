@@ -208,19 +208,6 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
         return idOfContragentOrgList.toString().replaceAll("[^0-9,]","");
     }
 
-    @Transactional
-    public void export() {
-        Session session = null;
-        try {
-            session = (Session) entityManager.getDelegate();
-            export(session);
-        } catch (Exception e) {
-            logger.error("Failed to load claims data", e);
-        } finally {
-            //HibernateUtils.close(session, logger);
-}
-    }
-
     public void export(Session session) throws Exception {
         //  пределяем на какой лимит дней необходимо увеличить дату
         endDate = new Date(getDaysLimitTS(daysLimit, startDate));

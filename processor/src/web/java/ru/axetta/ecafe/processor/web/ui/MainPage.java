@@ -5460,7 +5460,7 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    public Object exportGoodRequestReport(javax.faces.event.ActionEvent event) {
+    public void exportGoodRequestReport(javax.faces.event.ActionEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -5469,7 +5469,7 @@ public Long getSelectedIdOfReportRule() {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            //goodRequestsReportPage.export(persistenceSession);
+            goodRequestsReportPage.export(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             facesContext.addMessage(null,
@@ -5481,10 +5481,7 @@ public Long getSelectedIdOfReportRule() {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-
-
         }
-        return null;
     }
 
     public Object showClientPaymentsReportPage () {
