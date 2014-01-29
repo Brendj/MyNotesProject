@@ -56,6 +56,7 @@ public class StatisticsPaymentPreferentialSupplyBuilder extends BasicReportForCo
     @Override
     public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
         if(StringUtils.isEmpty(this.templateFilename)) throw new Exception("templateFilename not found");
+        String idOfContragent1 = getReportProperties().getProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID); // ищем контргентов ТСП
         String idOfContragent = getReportProperties().getProperty("idOfContragent"); // ищем контргентов ТСП
         String idOfOrgs = getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_ORG); // ищем организации
         Long validId = null;
@@ -70,6 +71,8 @@ public class StatisticsPaymentPreferentialSupplyBuilder extends BasicReportForCo
             if (contragent == null) {
                 throw new Exception("Контрагент не найден: " + idOfContragent);
             }
+        } else {
+            throw new Exception("Контрагент не найден ");
         }
 
         List<Long> idOfOrg = new ArrayList<Long>();

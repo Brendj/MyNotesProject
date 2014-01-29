@@ -11,7 +11,7 @@
 <rich:modalPanel id="reportJobDeletePanel" autosized="true" width="200" headerClass="modal-panel-header">
     <rich:hotKey key="esc" handler="#{rich:component('reportJobDeletePanel')}.hide();return false;"/>
     <f:facet name="header">
-        <h:outputText value="Удаление задачи на формирование отчета" styleClass="output-text" />
+        <h:outputText value="Удаление задачи на формирование отчета" />
     </f:facet>
     <a4j:form styleClass="borderless-form">
         <table class="borderless-grid" width="100%">
