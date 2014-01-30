@@ -37,10 +37,14 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
     private String discountRules;
     private String description;
     private Integer categoryType;
+    private Integer discountRate = 100;
     private final CategoryDiscountEnumTypeMenu categoryDiscountEnumTypeMenu = new CategoryDiscountEnumTypeMenu();
     private String filter = "-";
     private List<Long> idOfRuleList = new ArrayList<Long>();
     private Set<DiscountRule> discountRuleSet;
+    
+    public static final String DISCOUNT_START = "Платное питание[";
+    public static final String DISCOUNT_END = "%]";
 
     public Integer getCategoryType() {
         return categoryType;
@@ -114,8 +118,19 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
         this.discountRules = discountRules;
     }
 
+    public Integer getDiscountRate() {
+        return discountRate;
+    }
+
+    public void setDiscountRate(Integer discountRate) {
+        this.discountRate = discountRate;
+    }
+
     @Transactional
     public Object save() {
+        if (discountRate != null && discountRate != 100) {
+            description = DISCOUNT_START + discountRate + DISCOUNT_END;
+        }
         CategoryDiscount categoryDiscount = DAOUtils.findCategoryDiscountById(entityManager, idOfCategoryDiscount);
         categoryDiscount.setIdOfCategoryDiscount(idOfCategoryDiscount);
         categoryDiscount.setCategoryName(categoryName);
@@ -150,6 +165,16 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
                 sb.append("; ");
             }
             this.setFilter(sb.substring(0, sb.length()-1));
+        }
+
+        if(description.indexOf(DISCOUNT_START) == 0) {
+            String discount = description.substring(
+                    description.indexOf(DISCOUNT_START) + DISCOUNT_START.length(),
+                    description.indexOf(DISCOUNT_END));
+            discountRate = Integer.parseInt(discount);
+            description = "";
+        } else {
+            discountRate = 100;
         }
     }
 

@@ -20,6 +20,11 @@
     <h:inputText value="#{categoryDiscountEditPage.categoryName}" maxlength="32" styleClass="input-text" />
     <h:outputText escape="true" value="Описание" styleClass="output-text" />
     <h:inputText value="#{categoryDiscountEditPage.description}" maxlength="32" styleClass="input-text" />
+    <h:outputText escape="true" value="Ставка дисконтирования" styleClass="output-text" />
+    <h:panelGrid columns="2">
+        <h:inputText value="#{categoryDiscountEditPage.discountRate}" maxlength="3" styleClass="input-text" />
+        <h:outputText escape="true" value="%" styleClass="output-text" />
+    </h:panelGrid>
     <h:outputText escape="true" value="Тип категории" styleClass="output-text" />
     <h:selectOneMenu value="#{categoryDiscountEditPage.categoryType}" styleClass="input-text">
         <f:selectItems value="#{categoryDiscountEditPage.categoryDiscountEnumTypeMenu.items}" />

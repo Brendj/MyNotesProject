@@ -47,6 +47,11 @@
 
     <h:outputText escape="true" value="Описание" styleClass="output-text required-field" />
     <h:inputText value="#{ruleEditPage.description}" maxlength="99" size="40" styleClass="input-text" />
+    <h:outputText escape="true" value="Ставка дисконтирования" styleClass="output-text" />
+    <h:panelGrid columns="2">
+        <h:inputText value="#{ruleEditPage.discountRate}" maxlength="3" styleClass="input-text" />
+        <h:outputText escape="true" value="%" styleClass="output-text" />
+    </h:panelGrid>
     <h:outputText escape="true" value="Приоритет" styleClass="output-text required-field" />
     <h:inputText value="#{ruleEditPage.priority}" maxlength="11" styleClass="input-text" />
     <h:outputText escape="true" value="Объединение комплексов" styleClass="output-text" />

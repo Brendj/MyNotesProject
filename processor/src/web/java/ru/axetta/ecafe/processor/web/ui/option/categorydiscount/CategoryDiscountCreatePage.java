@@ -37,10 +37,19 @@ public class CategoryDiscountCreatePage extends BasicWorkspacePage {
     private String categoryName;
     private String description;
     private Integer categoryType;
+    private Integer discountRate = 100;
     private final CategoryDiscountEnumTypeMenu categoryDiscountEnumTypeMenu = new CategoryDiscountEnumTypeMenu();
 
     public CategoryDiscountEnumTypeMenu getCategoryDiscountEnumTypeMenu() {
         return categoryDiscountEnumTypeMenu;
+    }
+
+    public Integer getDiscountRate() {
+        return discountRate;
+    }
+
+    public void setDiscountRate(Integer discountRate) {
+        this.discountRate = discountRate;
     }
 
     public Integer getCategoryType() {
@@ -114,6 +123,9 @@ public class CategoryDiscountCreatePage extends BasicWorkspacePage {
             return;
         } */
         try {
+            if(discountRate != null && discountRate != 100) {
+                description = "Платное питание[" + discountRate + "%]";
+            }
             DefaultTransactionDefinition def = new DefaultTransactionDefinition();
             TransactionStatus status = transactionManager.getTransaction(def);
             Date createdDate = new Date();

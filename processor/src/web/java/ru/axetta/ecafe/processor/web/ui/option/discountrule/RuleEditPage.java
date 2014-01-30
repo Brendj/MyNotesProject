@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryDiscountEditPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
 
@@ -38,6 +39,7 @@ import java.util.*;
 public class RuleEditPage extends BasicWorkspacePage implements CategoryListSelectPage.CompleteHandlerList, CategoryOrgListSelectPage.CompleteHandlerList{
 
     private String description;
+    private Integer discountRate = 100;
     private int priority;
     private boolean operationor;
     private String categoryDiscounts;
@@ -80,6 +82,14 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
 
     public String getIdOfCategoryListString() {
         return idOfCategoryList.toString().replaceAll("[^(0-9-),]","");
+    }
+
+    public Integer getDiscountRate() {
+        return discountRate;
+    }
+
+    public void setDiscountRate(Integer discountRate) {
+        this.discountRate = discountRate;
     }
 
     public Set<CategoryDiscount> getCategoryDiscountSet() {
@@ -185,7 +195,11 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
     public void updateRule() throws Exception {
         entity = (DiscountRule) em.merge(entity);
         //CategoryDiscount categoryDiscount = (CategoryDiscount) persistenceSession.load(CategoryDiscount.class, this.categorydiscount.getIdOfCategory());
-       // entity.setCategoryDiscount(categoryDiscount);
+        // entity.setCategoryDiscount(categoryDiscount);
+        if (discountRate != null && discountRate != 100) {
+            description = CategoryDiscountEditPage.DISCOUNT_START + discountRate +
+                          CategoryDiscountEditPage.DISCOUNT_END;
+        }
         entity.setDescription(description);
 
         List<Integer> selectedComplex = Arrays.asList(selectedComplexIds);
@@ -281,6 +295,17 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
 
     private void fill(DiscountRule discountRule) throws Exception {
         this.description = discountRule.getDescription();
+        if(description.indexOf(CategoryDiscountEditPage.DISCOUNT_START) == 0) {
+            String discount = description.substring(
+                    description.indexOf(CategoryDiscountEditPage.DISCOUNT_START) +
+                            CategoryDiscountEditPage.DISCOUNT_START.length(),
+                    description.indexOf(CategoryDiscountEditPage.DISCOUNT_END));
+            discountRate = Integer.parseInt(discount);
+            description = "";
+        } else {
+            discountRate = 100;
+        }
+
 
         List<Integer> comls = new ArrayList<Integer>();
         if(StringUtils.isEmpty(discountRule.getComplexesMap())){
