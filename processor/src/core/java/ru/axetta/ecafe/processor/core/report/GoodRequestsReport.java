@@ -341,15 +341,23 @@ public class GoodRequestsReport extends BasicReport {
                 }
                 Org org = DAOService.getInstance().findOrById(idOfOrg);
                 Set<Long> tmpItems = totalItems.keySet();
-                for (Long id : tmpItems) {
-                    RequestItem i = totalItems.get(id);
-
-                    RequestItem newItem = new RequestItem(idOfOrg, org.getOrgNumberInName(), org.getOfficialName(),
-                            i.getIdOfGood(), i.getGood(), report);
-                    newItem.dailySamples = new TreeMap<Long, RequestValue>();
-                    items.add(newItem);
+                if(tmpItems.size() > 0) {
+                    for (Long id : tmpItems) {
+                        addMissionOrg(totalItems.get(id), org, report, items);
+                    }
+                } else {
+                    addMissionOrg(null, org, report, items);
                 }
             }
+        }
+
+        protected void addMissionOrg(RequestItem reqItem, Org org, GoodRequestsReport report, List<RequestItem> items) {
+            RequestItem newItem = new RequestItem
+                                    (org.getIdOfOrg(), org.getOrgNumberInName(), org.getOfficialName(),
+                                     reqItem == null ? -1 : reqItem.getIdOfGood(),
+                                     reqItem == null ? "" : reqItem.getGood(), report);
+            newItem.dailySamples = new TreeMap<Long, RequestValue>();
+            items.add(newItem);
         }
 
         protected void resetTotalValues(Map <Long, RequestItem> totalItems, RequestItem overallItem) {
