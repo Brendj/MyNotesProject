@@ -130,7 +130,9 @@ public class Circulation extends LibraryDistributedObject {
         setRealRefundDate(((Circulation) distributedObject).getRealRefundDate());
         setStatus(((Circulation) distributedObject).getStatus());
         setParentCirculation(((Circulation) distributedObject).getParentCirculation());
+        setGuidParentCirculation(((Circulation) distributedObject).getGuidParentCirculation());
         setIssuable(((Circulation) distributedObject).getIssuable());
+        setGuidIssuable(((Circulation) distributedObject).getGuidIssuable());
         setClient(((Circulation) distributedObject).getClient());
         setIdOfClient(((Circulation) distributedObject).getIdOfClient());
     }
@@ -205,5 +207,21 @@ public class Circulation extends LibraryDistributedObject {
 
     public void setCirculationInternal(Set<Circulation> circulationInternal) {
         this.circulationInternal = circulationInternal;
+    }
+
+    public String getGuidParentCirculation() {
+        return guidParentCirculation;
+    }
+
+    public void setGuidParentCirculation(String guidParentCirculation) {
+        this.guidParentCirculation = guidParentCirculation;
+    }
+
+    public String getGuidIssuable() {
+        return guidIssuable;
+    }
+
+    public void setGuidIssuable(String guidIssuable) {
+        this.guidIssuable = guidIssuable;
     }
 }

@@ -15,6 +15,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -55,16 +56,16 @@ public class Issuable extends LibraryDistributedObject {
 
     @Override
     public void createProjections(Criteria criteria) {
-        //criteria.createAlias("journalItem","ji", JoinType.LEFT_OUTER_JOIN);
-        //criteria.createAlias("instance", "i", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("journalItem","ji", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("instance", "i", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);
 
-        //projectionList.add(Projections.property("barcode"), "barcode");
-        //projectionList.add(Projections.property("type"), "type");
+        projectionList.add(Projections.property("barcode"), "barcode");
+        projectionList.add(Projections.property("type"), "type");
 
-        //projectionList.add(Projections.property("i.guid"), "guidInstance");
-        //projectionList.add(Projections.property("ji.guid"), "guidJournalItem");
+        projectionList.add(Projections.property("i.guid"), "guidInstance");
+        projectionList.add(Projections.property("ji.guid"), "guidJournalItem");
 
         criteria.setProjection(projectionList);
     }
@@ -94,8 +95,10 @@ public class Issuable extends LibraryDistributedObject {
         setOrgOwner(distributedObject.getOrgOwner());
         setBarcode(((Issuable) distributedObject).getBarcode());
         setType(((Issuable) distributedObject).getType());
-        setBarcode(((Issuable) distributedObject).getBarcode());
-        setType((((Issuable) distributedObject).getType()));
+        setInstance(((Issuable) distributedObject).getInstance());
+        setGuidInstance(((Issuable) distributedObject).getGuidInstance());
+        setJournalItem(((Issuable) distributedObject).getJournalItem());
+        setGuidJournalItem(((Issuable) distributedObject).getGuidJournalItem());
     }
 
     public Long getBarcode() {
@@ -142,5 +145,21 @@ public class Issuable extends LibraryDistributedObject {
 
     public void setCirculationInternal(Set<Circulation> circulationInternal) {
         this.circulationInternal = circulationInternal;
+    }
+
+    public String getGuidInstance() {
+        return guidInstance;
+    }
+
+    public void setGuidInstance(String guidInstance) {
+        this.guidInstance = guidInstance;
+    }
+
+    public String getGuidJournalItem() {
+        return guidJournalItem;
+    }
+
+    public void setGuidJournalItem(String guidJournalItem) {
+        this.guidJournalItem = guidJournalItem;
     }
 }

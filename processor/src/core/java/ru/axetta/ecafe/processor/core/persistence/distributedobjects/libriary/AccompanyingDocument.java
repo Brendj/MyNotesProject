@@ -94,9 +94,11 @@ public class AccompanyingDocument extends LibraryDistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
-        setSource(((AccompanyingDocument) distributedObject).getSource());
-        setTypeOfAccompanyingDocument(((AccompanyingDocument) distributedObject).getTypeOfAccompanyingDocument());
         setAccompanyingDocumentNumber(((AccompanyingDocument) distributedObject).getAccompanyingDocumentNumber());
+        setTypeOfAccompanyingDocument(((AccompanyingDocument) distributedObject).getTypeOfAccompanyingDocument());
+        setGuidTypeOfAccompanyingDocument(((AccompanyingDocument) distributedObject).getGuidTypeOfAccompanyingDocument());
+        setSource(((AccompanyingDocument) distributedObject).getSource());
+        setGuidSource(((AccompanyingDocument) distributedObject).getGuidSource());
     }
 
     public TypeOfAccompanyingDocument getTypeOfAccompanyingDocument() {
@@ -129,5 +131,21 @@ public class AccompanyingDocument extends LibraryDistributedObject {
 
     public void setKsu1RecordInternal(Set<Ksu1Record> ksu1RecordInternal) {
         this.ksu1RecordInternal = ksu1RecordInternal;
+    }
+
+    public String getGuidTypeOfAccompanyingDocument() {
+        return guidTypeOfAccompanyingDocument;
+    }
+
+    public void setGuidTypeOfAccompanyingDocument(String guidTypeOfAccompanyingDocument) {
+        this.guidTypeOfAccompanyingDocument = guidTypeOfAccompanyingDocument;
+    }
+
+    public String getGuidSource() {
+        return guidSource;
+    }
+
+    public void setGuidSource(String guidSource) {
+        this.guidSource = guidSource;
     }
 }

@@ -15,6 +15,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -43,16 +44,16 @@ public class Ksu1Record extends LibraryDistributedObject {
 
     @Override
     public void createProjections(Criteria criteria) {
-        //criteria.createAlias("fund", "f", JoinType.LEFT_OUTER_JOIN);
-        //criteria.createAlias("accompanyingDocument","a", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("fund", "f", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("accompanyingDocument","a", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);
 
-        //projectionList.add(Projections.property("recordNumber"), "recordNumber");
-        //projectionList.add(Projections.property("incomeDate"), "incomeDate");
+        projectionList.add(Projections.property("recordNumber"), "recordNumber");
+        projectionList.add(Projections.property("incomeDate"), "incomeDate");
 
-        //projectionList.add(Projections.property("f.guid"), "guidFund");
-        //projectionList.add(Projections.property("a.guid"), "guidAccompanyingDocument");
+        projectionList.add(Projections.property("f.guid"), "guidFund");
+        projectionList.add(Projections.property("a.guid"), "guidAccompanyingDocument");
 
         criteria.setProjection(projectionList);
     }
@@ -89,9 +90,12 @@ public class Ksu1Record extends LibraryDistributedObject {
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(((Ksu1Record) distributedObject).getOrgOwner());
         setRecordNumber(((Ksu1Record) distributedObject).getRecordNumber());
-        setFund(((Ksu1Record) distributedObject).getFund());
-        setAccompanyingDocument(((Ksu1Record) distributedObject).getAccompanyingDocument());
         setIncomeDate(((Ksu1Record) distributedObject).getIncomeDate());
+        setFund(((Ksu1Record) distributedObject).getFund());
+        setGuidFund(((Ksu1Record) distributedObject).getGuidFund());
+        setAccompanyingDocument(((Ksu1Record) distributedObject).getAccompanyingDocument());
+        setGuidAccompanyingDocument(((Ksu1Record) distributedObject).getGuidAccompanyingDocument());
+
     }
 
     public Set<Instance> getInstanceInternal() {
@@ -140,6 +144,22 @@ public class Ksu1Record extends LibraryDistributedObject {
 
     public void setAccompanyingDocument(AccompanyingDocument accompanyingDocument) {
         this.accompanyingDocument = accompanyingDocument;
+    }
+
+    public String getGuidFund() {
+        return guidFund;
+    }
+
+    public void setGuidFund(String guidFund) {
+        this.guidFund = guidFund;
+    }
+
+    public String getGuidAccompanyingDocument() {
+        return guidAccompanyingDocument;
+    }
+
+    public void setGuidAccompanyingDocument(String guidAccompanyingDocument) {
+        this.guidAccompanyingDocument = guidAccompanyingDocument;
     }
 
     @Override

@@ -74,6 +74,7 @@ public class Fund extends LibraryDistributedObject {
     @Override
     public void fill(DistributedObject distributedObject) {
         setFundName(((Fund) distributedObject).getFundName());
+        setStud(((Fund) distributedObject).getStud());
     }
 
     public String getFundName() {

@@ -15,6 +15,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -48,21 +49,21 @@ public class JournalItem extends LibraryDistributedObject {
 
     @Override
     public void createProjections(Criteria criteria) {
-        //criteria.createAlias("fund", "f", JoinType.LEFT_OUTER_JOIN);
-        //criteria.createAlias("journal","j", JoinType.LEFT_OUTER_JOIN);
-        //criteria.createAlias("ksu1Record", "k1", JoinType.LEFT_OUTER_JOIN);
-        //criteria.createAlias("ksu2Record", "k2", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("fund", "f", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("journal","j", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("ksu1Record", "k1", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("ksu2Record", "k2", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);
 
-        //projectionList.add(Projections.property("date"), "date");
-        //projectionList.add(Projections.property("number"), "number");
-        //projectionList.add(Projections.property("cost"), "cost");
+        projectionList.add(Projections.property("date"), "date");
+        projectionList.add(Projections.property("number"), "number");
+        projectionList.add(Projections.property("cost"), "cost");
 
-        //projectionList.add(Projections.property("f.guid"), "guidFund");
-        //projectionList.add(Projections.property("j.guid"), "guidJournal");
-        //projectionList.add(Projections.property("k1.guid"), "guidKsu1Record");
-        //projectionList.add(Projections.property("k2.guid"), "guidKsu2Record");
+        projectionList.add(Projections.property("f.guid"), "guidFund");
+        projectionList.add(Projections.property("j.guid"), "guidJournal");
+        projectionList.add(Projections.property("k1.guid"), "guidKsu1Record");
+        projectionList.add(Projections.property("k2.guid"), "guidKsu2Record");
 
         criteria.setProjection(projectionList);
     }
@@ -109,9 +110,13 @@ public class JournalItem extends LibraryDistributedObject {
     public void fill(DistributedObject distributedObject) {
         setOrgOwner((distributedObject).getOrgOwner());
         setFund(((JournalItem) distributedObject).getFund());
+        setGuidFund(((JournalItem) distributedObject).getGuidFund());
         setJournal(((JournalItem) distributedObject).getJournal());
+        setGuidJournal(((JournalItem) distributedObject).getGuidJournal());
         setKsu1Record(((JournalItem) distributedObject).getKsu1Record());
+        setGuidKsu1Record(((JournalItem) distributedObject).getGuidKsu1Record());
         setKsu2Record(((JournalItem) distributedObject).getKsu2Record());
+        setGuidKsu2Record(((JournalItem) distributedObject).getGuidKsu2Record());
         setDate(((JournalItem) distributedObject).getDate());
         setNumber(((JournalItem) distributedObject).getNumber());
         setCost(((JournalItem) distributedObject).getCost());
@@ -180,6 +185,38 @@ public class JournalItem extends LibraryDistributedObject {
 
     public void setCost(int cost) {
         this.cost = cost;
+    }
+
+    public String getGuidJournal() {
+        return guidJournal;
+    }
+
+    public void setGuidJournal(String guidJournal) {
+        this.guidJournal = guidJournal;
+    }
+
+    public String getGuidFund() {
+        return guidFund;
+    }
+
+    public void setGuidFund(String guidFund) {
+        this.guidFund = guidFund;
+    }
+
+    public String getGuidKsu1Record() {
+        return guidKsu1Record;
+    }
+
+    public void setGuidKsu1Record(String guidKsu1Record) {
+        this.guidKsu1Record = guidKsu1Record;
+    }
+
+    public String getGuidKsu2Record() {
+        return guidKsu2Record;
+    }
+
+    public void setGuidKsu2Record(String guidKsu2Record) {
+        this.guidKsu2Record = guidKsu2Record;
     }
 
     @Override

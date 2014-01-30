@@ -93,8 +93,6 @@ public class Publication extends LibraryDistributedObject {
                 throw  distributedObjectException;
             }
         }
-        //if(getTagName().equals("C")){
-        //}
     }
 
     @Override

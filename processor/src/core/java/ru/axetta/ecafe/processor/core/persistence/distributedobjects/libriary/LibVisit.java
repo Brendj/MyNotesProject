@@ -16,6 +16,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -38,14 +39,14 @@ public class LibVisit extends LibraryDistributedObject {
 
     @Override
     public void createProjections(Criteria criteria) {
-        //criteria.createAlias("client", "c", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("client", "c", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);
 
-        //projectionList.add(Projections.property("date"), "date");
-        //projectionList.add(Projections.property("source"), "source");
+        projectionList.add(Projections.property("date"), "date");
+        projectionList.add(Projections.property("source"), "source");
 
-        //projectionList.add(Projections.property("c.idOfClient"), "idOfClient");
+        projectionList.add(Projections.property("c.idOfClient"), "idOfClient");
 
         criteria.setProjection(projectionList);
     }
@@ -81,6 +82,7 @@ public class LibVisit extends LibraryDistributedObject {
     @Override
     public void fill(DistributedObject distributedObject) {
         setClient(((LibVisit) distributedObject).getClient());
+        setIdOfClient(((LibVisit) distributedObject).getIdOfClient());
         setDate(((LibVisit) distributedObject).getDate());
         setSource(((LibVisit) distributedObject).getSource());
     }
@@ -107,6 +109,14 @@ public class LibVisit extends LibraryDistributedObject {
 
     public void setSource(int source) {
         this.source = source;
+    }
+
+    public Long getIdOfClient() {
+        return idOfClient;
+    }
+
+    public void setIdOfClient(Long idOfClient) {
+        this.idOfClient = idOfClient;
     }
 
     @Override

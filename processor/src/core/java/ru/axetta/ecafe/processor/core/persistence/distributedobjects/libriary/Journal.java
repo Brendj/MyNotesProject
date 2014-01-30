@@ -15,6 +15,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -42,17 +43,17 @@ public class Journal extends LibraryDistributedObject {
 
     @Override
     public void createProjections(Criteria criteria) {
-        //criteria.createAlias("fund","f", JoinType.LEFT_OUTER_JOIN);
-        //criteria.createAlias("publication", "p", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("fund","f", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("publication", "p", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);
 
-        //projectionList.add(Projections.property("isNewspaper"), "isNewspaper");
-        //projectionList.add(Projections.property("monthCount"), "monthCount");
-        //projectionList.add(Projections.property("count"), "count");
+        projectionList.add(Projections.property("isNewspaper"), "isNewspaper");
+        projectionList.add(Projections.property("monthCount"), "monthCount");
+        projectionList.add(Projections.property("count"), "count");
 
-        //projectionList.add(Projections.property("f.guid"), "guidFund");
-        //projectionList.add(Projections.property("p.guid"), "guidPublication");
+        projectionList.add(Projections.property("f.guid"), "guidFund");
+        projectionList.add(Projections.property("p.guid"), "guidPublication");
 
         criteria.setProjection(projectionList);
     }
@@ -93,11 +94,13 @@ public class Journal extends LibraryDistributedObject {
     @Override
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(((Journal) distributedObject).getOrgOwner());
-        setFund(((Journal) distributedObject).getFund());
-        setPublication(((Journal) distributedObject).getPublication());
         setNewspaper(((Journal) distributedObject).isNewspaper());
         setMonthCount(((Journal) distributedObject).getMonthCount());
         setCount(((Journal) distributedObject).getCount());
+        setFund(((Journal) distributedObject).getFund());
+        setGuidFund(((Journal) distributedObject).getGuidFund());
+        setPublication(((Journal) distributedObject).getPublication());
+        setGuidPublication(((Journal) distributedObject).getGuidPublication());
     }
 
     public Fund getFund() {
@@ -152,5 +155,21 @@ public class Journal extends LibraryDistributedObject {
 
     public void setJournalItemInternal(Set<JournalItem> journalItemInternal) {
         this.journalItemInternal = journalItemInternal;
+    }
+
+    public String getGuidFund() {
+        return guidFund;
+    }
+
+    public void setGuidFund(String guidFund) {
+        this.guidFund = guidFund;
+    }
+
+    public String getGuidPublication() {
+        return guidPublication;
+    }
+
+    public void setGuidPublication(String guidPublication) {
+        this.guidPublication = guidPublication;
     }
 }

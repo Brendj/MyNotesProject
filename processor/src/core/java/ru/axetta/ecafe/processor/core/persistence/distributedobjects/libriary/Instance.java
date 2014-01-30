@@ -15,6 +15,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -32,26 +33,41 @@ public class Instance extends LibraryDistributedObject {
 
     private Set<Issuable> issuableInternal;
     private Publication publication;
-    private Fund fund;
-    private InventoryBook inventoryBook;
-    private Ksu1Record ksu1Record;
     private String guidPublication;
+    private Fund fund;
     private String guidFund;
+    private InventoryBook inventoryBook;
     private String guidInventaryBook;
+    private Ksu1Record ksu1Record;
     private String guidKsu1Record;
-
-    private String guidKsu2Record;
     private Ksu2Record ksu2Record;
-    private boolean inGroup;
+    private String guidKsu2Record;
 
+    private boolean inGroup;
     private String invNumber;
     private int cost;
 
 
     @Override
     public void createProjections(Criteria criteria) {
+        criteria.createAlias("publication","p", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("fund","f", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("inventoryBook","ib", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("ksu1Record","k1r", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("ksu2Record","k2r", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);
+
+        projectionList.add(Projections.property("inGroup"), "inGroup");
+        projectionList.add(Projections.property("invNumber"), "invNumber");
+        projectionList.add(Projections.property("cost"), "cost");
+
+        projectionList.add(Projections.property("p.guid"), "guidPublication");
+        projectionList.add(Projections.property("f.guid"), "guidFund");
+        projectionList.add(Projections.property("ib.guid"), "guidInventaryBook");
+        projectionList.add(Projections.property("k1r.guid"), "guidKsu1Record");
+        projectionList.add(Projections.property("k2r.guid"), "guidKsu2Record");
+
         criteria.setProjection(projectionList);
     }
 

@@ -37,7 +37,7 @@ public class InventoryBook extends LibraryDistributedObject {
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);
 
-        //projectionList.add(Projections.property("bookName"), "bookName");
+        projectionList.add(Projections.property("bookName"), "bookName");
 
         criteria.setProjection(projectionList);
     }

@@ -15,6 +15,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -44,15 +45,15 @@ public class Ksu2Record extends LibraryDistributedObject {
 
     @Override
     public void createProjections(Criteria criteria) {
-        //criteria.createAlias("fund", "f", JoinType.LEFT_OUTER_JOIN);
-        //criteria.createAlias("retirementReason","r", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("fund", "f", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("retirementReason","r", JoinType.LEFT_OUTER_JOIN);
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);
-        //projectionList.add(Projections.property("recordNumber"), "recordNumber");
-        //projectionList.add(Projections.property("retirementDate"), "retirementDate");
+        projectionList.add(Projections.property("recordNumber"), "recordNumber");
+        projectionList.add(Projections.property("retirementDate"), "retirementDate");
 
-        //projectionList.add(Projections.property("f.guid"), "guidFund");
-        //projectionList.add(Projections.property("r.guid"), "guidRetirementReason");
+        projectionList.add(Projections.property("f.guid"), "guidFund");
+        projectionList.add(Projections.property("r.guid"), "guidRetirementReason");
 
         criteria.setProjection(projectionList);
     }
@@ -99,7 +100,9 @@ public class Ksu2Record extends LibraryDistributedObject {
         setOrgOwner(distributedObject.getOrgOwner());
         setRecordNumber(((Ksu2Record) distributedObject).getRecordNumber());
         setFund(((Ksu2Record) distributedObject).getFund());
+        setGuidFund(((Ksu2Record) distributedObject).getGuidFund());
         setRetirementReason(((Ksu2Record) distributedObject).getRetirementReason());
+        setGuidRetirementReason(((Ksu2Record) distributedObject).getGuidRetirementReason());
         setRetirementDate(((Ksu2Record) distributedObject).getRetirementDate());
     }
 
@@ -149,6 +152,22 @@ public class Ksu2Record extends LibraryDistributedObject {
 
     public void setRetirementReason(RetirementReason retirementReason) {
         this.retirementReason = retirementReason;
+    }
+
+    public String getGuidFund() {
+        return guidFund;
+    }
+
+    public void setGuidFund(String guidFund) {
+        this.guidFund = guidFund;
+    }
+
+    public String getGuidRetirementReason() {
+        return guidRetirementReason;
+    }
+
+    public void setGuidRetirementReason(String guidRetirementReason) {
+        this.guidRetirementReason = guidRetirementReason;
     }
 
     @Override
