@@ -57,18 +57,6 @@ public class Function {
     public static final String FUNCD_WORK_OPTION = "Редактирование настроек";
     public static final String FUNC_WORK_ONLINE_REPORT = "onlineRprt";
     public static final String FUNCD_WORK_ONLINE_REPORT = "Онлайн отчеты";
-    //public static final String FUNC_WORK_ONLINE_REPORT_COMPLEX = "onlineRprtComplex";
-    //public static final String FUNCD_WORK_ONLINE_REPORT_COMPLEX = "Закрыть раздел 'Отчет по комплексам'";
-    //public static final String FUNC_WORK_ONLINE_REPORT_BENEFIT = "onlineRprtBenefit";
-    //public static final String FUNCD_WORK_ONLINE_REPORT_BENEFIT = "Закрыть раздел 'Отчет по льготам'";
-    //public static final String FUNC_WORK_ONLINE_REPORT_REQUEST = "onlineRprtRequest";
-    //public static final String FUNCD_WORK_ONLINE_REPORT_REQUEST = "Закрыть раздел 'Отчет по заявкам'";
-    //public static final String FUNC_WORK_ONLINE_REPORT_MEALS = "onlineRprtMeals";
-    //public static final String FUNCD_WORK_ONLINE_REPORT_MEALS = "Закрыть раздел 'Льготное питание'";
-    //public static final String FUNC_WORK_ONLINE_REPORT_REFILL = "onlineRprtRefill";
-    //public static final String FUNCD_WORK_ONLINE_REPORT_REFILL = "Закрыть раздел 'Отчеты по пополнениям'";
-    //public static final String FUNC_WORK_ONLINE_REPORT_ACTIVITY = "onlineRprtActivity";
-    //public static final String FUNCD_WORK_ONLINE_REPORT_ACTIVITY = "Закрыть раздел 'Отчеты по активности'";
     public static final String FUNC_COUNT_CURRENT_POSITIONS = "countCP";
     public static final String FUNCD_COUNT_CURRENT_POSITIONS = "Рассчитать текущие позиции";
     public static final String FUNC_POS_VIEW = "posView";
@@ -93,9 +81,22 @@ public class Function {
     public static final String FUNCD_SUPPLIER = "Поставщик";
     public static final String FUNC_COMMODITY_ACCOUNTING = "commAcc";
     public static final String FUNCD_COMMODITY_ACCOUNTING = "Товарный учет";
+    public static final String FUNC_RESTRICT_ONLINE_REPORT_COMPLEX = "onlineRprtComplex";
+    public static final String FUNCD_RESTRICT_ONLINE_REPORT_COMPLEX = "Закрыть раздел 'Отчет по комплексам'";
+    public static final String FUNC_RESTRICT_ONLINE_REPORT_BENEFIT = "onlineRprtBenefit";
+    public static final String FUNCD_RESTRICT_ONLINE_REPORT_BENEFIT = "Закрыть раздел 'Отчет по льготам'";
+    public static final String FUNC_RESTRICT_ONLINE_REPORT_REQUEST = "onlineRprtRequest";
+    public static final String FUNCD_RESTRICT_ONLINE_REPORT_REQUEST = "Закрыть раздел 'Отчет по заявкам'";
+    public static final String FUNC_RESTRICT_ONLINE_REPORT_MEALS = "onlineRprtMeals";
+    public static final String FUNCD_RESTRICT_ONLINE_REPORT_MEALS = "Закрыть раздел 'Льготное питание'";
+    public static final String FUNC_RESTRICT_ONLINE_REPORT_REFILL = "onlineRprtRefill";
+    public static final String FUNCD_RESTRICT_ONLINE_REPORT_REFILL = "Закрыть раздел 'Отчеты по пополнениям'";
+    public static final String FUNC_RESTRICT_ONLINE_REPORT_ACTIVITY = "onlineRprtActivity";
+    public static final String FUNCD_RESTRICT_ONLINE_REPORT_ACTIVITY = "Закрыть раздел 'Отчеты по активности'";
 
     private Long idOfFunction;
     private String functionName;
+    private boolean restrict;
     private Set<User> users = new HashSet<User>();
 
     protected Function() {
@@ -138,6 +139,14 @@ public class Function {
         return Collections.unmodifiableSet(getUsersInternal());
     }
 
+    public boolean isRestrict() {
+        return restrict;
+    }
+
+    public void setRestrict(boolean restrict) {
+        this.restrict = restrict;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -160,22 +169,23 @@ public class Function {
         return "Function{" + "idOfFunction=" + idOfFunction + ", functionName='" + functionName + '\'' + '}';
     }
 
-    static HashMap<String, String> functionDesc=null;
+    private static HashMap<String, String> functionDesc = new HashMap<String, String>();
 
-    static public String getFunctionDesc(String funcName) {
+    public static String getFunctionDesc(String funcName) {
         return functionDesc.get(funcName);
     }
-    static public List<Function> getFuncList() throws Exception {
-        functionDesc=new HashMap<String, String>();
-        LinkedList<Function> list=new LinkedList<Function>();
-        long nFunc=1;
+
+    public static List<Function> getFuncList() throws Exception {
+        LinkedList<Function> list = new LinkedList<Function>();
+        long nFunc = 1;
         for (Field f : Function.class.getFields()) {
             if (f.getName().startsWith("FUNC_")) {
-                Function func=new Function();
-                func.setFunctionName((String)f.get(func));
+                Function func = new Function();
+                func.setFunctionName((String) f.get(func));
                 func.setIdOfFunction(nFunc);
+                func.setRestrict(f.getName().startsWith("FUNC_RESTRICT"));
                 list.addLast(func);
-                String funcDesc=(String)Function.class.getField(f.getName().replace("FUNC_", "FUNCD_")).get(func);
+                String funcDesc = (String) Function.class.getField(f.getName().replace("FUNC_", "FUNCD_")).get(func);
                 functionDesc.put(func.getFunctionName(), funcDesc);
                 nFunc++;
             }

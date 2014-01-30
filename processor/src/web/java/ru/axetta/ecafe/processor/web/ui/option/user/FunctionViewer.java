@@ -21,7 +21,7 @@ import java.util.Set;
  */
 public class FunctionViewer {
 
-    public static class Item implements Comparable {
+    public static class Item implements Comparable<Item> {
 
         private final String functionName;
         private final String functionDesc;
@@ -41,8 +41,13 @@ public class FunctionViewer {
             this.functionDesc = Function.getFunctionDesc(functionName);
         }
 
-        public int compareTo(Object o) {
-            return (int)(functionId-((Item)o).functionId);
+        @Override
+        public int compareTo(Item o) {
+            int res = this.functionName.compareTo(o.functionName);
+            if (res == 0) {
+                res = this.functionId.compareTo(o.functionId);
+            }
+            return res;
         }
     }
 

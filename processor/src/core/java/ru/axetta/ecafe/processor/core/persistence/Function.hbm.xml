@@ -8,15 +8,8 @@
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.Function" table="CF_Functions">
         <id name="idOfFunction" column="IdOfFunction" type="long"/>
-            <!--<generator class="identity"/>-->
-        <!--</id>-->
-<!--            <generator class="hilo">
-                <param name="table">CF_Generators</param>
-                <param name="column">IdOfFunction</param>
-                <param name="max_lo">3</param>
-            </generator>
-        </id> -->
         <property name="functionName" column="FunctionName" type="string" not-null="true"/>
+        <property name="restrict" column="IsRestrict" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <set name="usersInternal" table="CF_Permissions" inverse="true" cascade="all">
             <key column="IdOfFunction"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.User" column="IdOfUser"/>

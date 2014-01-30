@@ -7491,6 +7491,30 @@ public User getCurrentUser() throws Exception {
         return getCurrentUser().hasFunction(Function.FUNC_RULE_EDIT);
     }
 
+    public boolean isEligibleToViewComplexReports() throws Exception {
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ONLINE_REPORT_COMPLEX);
+    }
+
+    public boolean isEligibleToViewBenefitReports() throws Exception {
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ONLINE_REPORT_BENEFIT);
+    }
+
+    public boolean isEligibleToViewRequestReports() throws Exception {
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ONLINE_REPORT_REQUEST);
+    }
+
+    public boolean isEligibleToViewMealsReports() throws Exception {
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ONLINE_REPORT_MEALS);
+    }
+
+    public boolean isEligibleToViewRefillReports() throws Exception {
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ONLINE_REPORT_REFILL);
+    }
+
+    public boolean isEligibleToViewActivityReports() throws Exception {
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ONLINE_REPORT_ACTIVITY);
+    }
+
     public Object removeClient() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;

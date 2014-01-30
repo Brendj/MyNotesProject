@@ -12,9 +12,9 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Criteria;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,7 +109,7 @@ public class ClientAuthenticator {
                 } else {
                     f=(Function)session.merge(f);
                 }           
-                if (!adminUser.getFunctions().contains(f)) adminUser.getFunctions().add(f);
+                if (!adminUser.getFunctions().contains(f) && !f.isRestrict()) adminUser.getFunctions().add(f);
             }
             session.saveOrUpdate(adminUser);
             /////

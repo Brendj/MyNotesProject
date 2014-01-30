@@ -21,7 +21,7 @@ import java.util.*;
  */
 public class FunctionSelector {
 
-    public static class Item {
+    public static class Item implements Comparable<Item> {
 
         private boolean selected;
         private final Long idOfFunction;
@@ -54,27 +54,18 @@ public class FunctionSelector {
             this.functionName = function.getFunctionName();
             this.functionDesc = Function.getFunctionDesc(functionName);
         }
-    }
-
-    public static class FunctionItemComparator implements Comparator<Item> {
 
         @Override
-        public int compare(Item o1, Item o2) {
-            int res = o1.getFunctionName().compareTo(o2.getFunctionName());
+        public int compareTo(Item o) {
+            int res = this.functionName.compareTo(o.functionName);
             if (res == 0) {
-                res = o1.getIdOfFunction().compareTo(o2.getIdOfFunction());
+                res = this.idOfFunction.compareTo(o.idOfFunction);
             }
             return res;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return false;
         }
     }
 
     private List<Item> items = Collections.emptyList();
-    private Comparator<Item> itemComparator = new FunctionItemComparator();
 
     public List<Item> getItems() {
         return items;
@@ -132,7 +123,7 @@ public class FunctionSelector {
             items.add(item);
         }
         this.items = items;
-        Collections.sort(items, itemComparator);
+        Collections.sort(items);
     }
 
     public void fill(Session session, Set<Function> selectedFunctions) throws Exception {
@@ -148,7 +139,7 @@ public class FunctionSelector {
             items.add(item);
         }
         this.items = items;
-        Collections.sort(items, itemComparator);
+        Collections.sort(items);
     }
 
     public Set<Function> getSelected(Session session) throws HibernateException {
