@@ -124,7 +124,7 @@ public class TelephoneNumberCountBuilder extends BasicReportForContragentJob.Bui
         for (Object obj: orgList){
             Object[] orgRow = (Object[]) obj;
             Long idOfOrg  = Long.valueOf(orgRow[0].toString());
-            String district  = orgRow[1].toString();
+            String district  = (orgRow[1]==null?"": orgRow[1].toString());
             String shortName  = orgRow[2].toString();
             Criteria groupCriteria = session.createCriteria(ClientGroup.class);
             groupCriteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
