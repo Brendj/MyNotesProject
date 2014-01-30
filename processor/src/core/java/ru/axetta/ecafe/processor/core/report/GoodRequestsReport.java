@@ -153,7 +153,7 @@ public class GoodRequestsReport extends BasicReport {
                 //  Если выбрано отображение тех школ, у которых были
                 // заявки указанный период, но не было заявок последнии дни
                 long limit = System.currentTimeMillis() - REQUESTS_MONITORING_TIMEOUT;
-                notCreatedAtConfition = "and (cf_goods_requests.createddate < " + (limit) + ") ";
+                notCreatedAtConfition = "and (cf_goods_requests.donedate < " + (limit) + ") ";
             }
 
             String sqlGood = "select requests.idorg, requests.org, requests.orgFull, requests.shortGood, requests.good, requests.idofgood, requests.d, int8(sum(requests.cnt)) as sumcnt, sum(coalesce(requests.ds_cnt, 0)) as sumdscnt, "+
@@ -266,15 +266,19 @@ public class GoodRequestsReport extends BasicReport {
             }
 
 
-            if(!(idOfOrgList==null || idOfOrgList.isEmpty()) && orgsFilter != null) {
-                if (orgsFilter == 0) {
-                    insertMissingOrgs(idOfOrgList, insertedOrgs, items, totalItems, report);
-                } else if (orgsFilter == 2) {
-                    List<RequestItem> newItems = new ArrayList<RequestItem>();
-                    insertMissingOrgs(idOfOrgList, insertedOrgs, newItems, totalItems, report);
-                    items = newItems;
-                    resetTotalValues(totalItems, overallItem);
+            if (orgsFilter == 0) {
+                if(idOfOrgList==null || idOfOrgList.isEmpty()) {
+                    idOfOrgList = loadEmptyOrgs(session, startDateLong, endDateLong, idOfSupplierList);
                 }
+                insertMissingOrgs(idOfOrgList, insertedOrgs, items, totalItems, report);
+            } else if (orgsFilter == 2) {
+                if(idOfOrgList==null || idOfOrgList.isEmpty()) {
+                    idOfOrgList = loadEmptyOrgs(session, startDateLong, endDateLong, idOfSupplierList);
+                }
+                List<RequestItem> newItems = new ArrayList<RequestItem>();
+                insertMissingOrgs(idOfOrgList, insertedOrgs, newItems, totalItems, report);
+                items = newItems;
+                resetTotalValues(totalItems, overallItem);
             }
 
             //  Добавляем строки с общими значениями в список товаров
@@ -288,6 +292,44 @@ public class GoodRequestsReport extends BasicReport {
             report.setGoodRequestItems(items);
             normalizeDates(items, startDate, endDate);
             return report;
+        }
+        
+        protected List<Long> loadEmptyOrgs(Session session, long startDateLong,
+                                           long endDateLong, List<Long> idOfSupplierList) {
+            String suppliersCondition = "";
+            if(idOfSupplierList != null && idOfSupplierList.size() > 0) {
+                for (Long idOfOrg : idOfSupplierList) {
+                    if (suppliersCondition.length() > 0) {
+                        suppliersCondition = suppliersCondition.concat(", ");
+                    }
+                    suppliersCondition = suppliersCondition.concat("" +idOfOrg);
+                }
+                if(suppliersCondition.length() > 0) {
+                    suppliersCondition = " and defaultsupplier in (" + suppliersCondition + ") ";
+                }
+            }
+
+            String sql =
+                    "select distinct(idoforg) "
+                    + "from cf_orgs "
+                    + "where idoforg not in (select distinct(orgowner) "
+                    + "                      from cf_goods_requests "
+                    + "                      where cf_goods_requests.donedate>=" + startDateLong
+                    + "                            and cf_goods_requests.donedate<" + endDateLong + " ) "
+                    + suppliersCondition
+                    + "order by idoforg";
+            Query query = session.createSQLQuery(sql);
+            List res = query.list();
+            if(res == null || res.size() < 1) {
+                return Collections.EMPTY_LIST;
+            } else {
+                List<Long> result = new ArrayList<Long>();
+                List<BigInteger> ids = (List<BigInteger>) res;
+                for(BigInteger bi : ids) {
+                    result.add(bi.longValue());
+                }
+                return result;
+            }
         }
 
         protected void insertMissingOrgs(List<Long> idOfOrgList, List<Long> insertedOrgs,
