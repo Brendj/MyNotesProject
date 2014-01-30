@@ -1415,6 +1415,10 @@ public class RuntimeContext implements ApplicationContextAware {
             String dn = cert.getSubjectDN().getName();
             dataInfo.dn = dn;
             dataInfo.org = getDNField(dn, "O");
+            dataInfo.id = getDNField(dn, "OU");
+            dataInfo.location = getDNField(dn, "L");
+            dataInfo.issued = cert.getNotBefore();
+            dataInfo.validTo = cert.getNotAfter();
             for (DataInfo di : dataInfos) {
                 // проверяем не был ли сертификат уже загружен
                 if (di.dn.equals(dn)) {
@@ -1428,10 +1432,6 @@ public class RuntimeContext implements ApplicationContextAware {
                     return;
                 }
             }
-            dataInfo.id = getDNField(dn, "OU");
-            dataInfo.location = getDNField(dn, "L");
-            dataInfo.issued = cert.getNotBefore();
-            dataInfo.validTo = cert.getNotAfter();
             dataInfo.valid = isValid;
             if (isValid) {
                 String cn = getDNField(dn, "CN");
