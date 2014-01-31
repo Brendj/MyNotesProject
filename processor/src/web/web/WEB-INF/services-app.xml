@@ -118,6 +118,12 @@
         <task:scheduled ref="subscriptionFeedingService" method="notifyClientsAboutSubscriptionFeeding" cron="0 0 16 * * ?"/>
     </task:scheduled-tasks>
 
+    <!-- Активация клиентских циклограмм питания. Срабатывает каждый день в 0:30 часа ночи. -->
+    <task:scheduler id="cycleDiagramActivationSchedule"/>
+    <task:scheduled-tasks scheduler="cycleDiagramActivationSchedule">
+        <task:scheduled ref="subscriptionFeedingService" method="activateCycleDiagrams" cron="0 30 0 * * ?"/>
+    </task:scheduled-tasks>
+
     <!--<task:scheduler id="clientBalanceRefillSchedule"/>-->
     <!--<task:scheduled-tasks scheduler="clientBalanceRefillSchedule">-->
         <!--<task:scheduled ref="clientBalanceRefillService" method="checkClientBalances"-->

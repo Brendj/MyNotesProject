@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -348,28 +347,32 @@ public class SubscriptionFeedingService {
     @SuppressWarnings("unchecked")
     @Transactional(propagation = Propagation.REQUIRED)
     public void activateCycleDiagrams() {
-        if (!RuntimeContext.getInstance().isMainNode()) {
-            return;
-        }
+        DAOService daoService = DAOService.getInstance();
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
         Date tomorrow = CalendarUtils.addDays(today, 1);
         Query updateQuery = entityManager.createQuery(
-                "update CycleDiagram cd set cd.stateDiagram = :active where cd.stateDiagram = :wait and cd.deletedState = false and "
+                "update CycleDiagram cd set cd.stateDiagram = :active, cd.globalVersion = :newVersion "
+                        + "where cd.stateDiagram = :wait and cd.deletedState = false and "
                         + "cd.dateActivationDiagram >= :today and cd.dateActivationDiagram < :tomorrow and cd.client.idOfClient = :id");
         Query deleteQuery = entityManager.createQuery(
-                "update CycleDiagram cd set cd.stateDiagram = :block, cd.deletedState = true where cd.client.idOfClient = :id and cd.dateActivationDiagram < :today");
+                "update CycleDiagram cd set cd.stateDiagram = :block, cd.deletedState = true, cd.globalVersion = :newVersion"
+                        + " where cd.client.idOfClient = :id and cd.dateActivationDiagram < :today and cd.stateDiagram = :active");
         Query query = entityManager.createQuery(
                 "select cd.client.idOfClient from CycleDiagram cd where cd.stateDiagram = :active and cd.deletedState = false")
                 .setParameter("active", StateDiagram.ACTIVE);
         List<Long> clientIds = (List<Long>) query.getResultList();
         int activatedCount = 0;
         int blockedCount = 0;
+        long version = daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
         for (Long clientId : clientIds) {
-            int count = updateQuery.setParameter("active", StateDiagram.ACTIVE).setParameter("wait", StateDiagram.WAIT)
-                    .setParameter("today", today).setParameter("tomorrow", tomorrow).setParameter("id", clientId)
-                    .executeUpdate();
+            int count = updateQuery.setParameter("active", StateDiagram.ACTIVE).setParameter("newVersion", version)
+                    .setParameter("wait", StateDiagram.WAIT).setParameter("today", today)
+                    .setParameter("tomorrow", tomorrow).setParameter("id", clientId).executeUpdate();
             if (count != 0) {
-                blockedCount += deleteQuery.setParameter("id", clientId).setParameter("today", today).executeUpdate();
+                blockedCount += deleteQuery.setParameter("block", StateDiagram.BLOCK)
+                        .setParameter("newVersion", version).setParameter("id", clientId).setParameter("today", today)
+                        .setParameter("active", StateDiagram.ACTIVE).executeUpdate();
+                activatedCount += count;
             }
         }
         LOGGER.info("Today activated cycle diagrams count: {}", activatedCount);
