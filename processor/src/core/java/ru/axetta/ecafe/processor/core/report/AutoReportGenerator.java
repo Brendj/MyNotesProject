@@ -907,7 +907,7 @@ public class AutoReportGenerator {
                         (DateFormat) autoReportGenerator.getDateFormat().clone(),
                         (DateFormat) autoReportGenerator.getTimeFormat().clone());
                 JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
-                jobDetail.getJobDataMap().put(SSTSReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                jobDetail.getJobDataMap().put(BudgetMealsShippingReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
             }
         }));
@@ -953,6 +953,24 @@ public class AutoReportGenerator {
                 JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
                 jobDetail.getJobDataMap()
                         .put(TelephoneNumberCountJasperReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                return jobDetail;
+            }
+        }));
+
+        REPORT_DEFS.add(new ReportDef(DiscrepanciesDataOnOrdersAndPaymentJasperReport.class, DiscrepanciesDataOnOrdersAndPaymentJasperReport.AutoReportBuildJob.class, new JobDetailCreator() {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName)
+                    throws Exception {
+                Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + "DiscrepanciesDataOnOrdersAndPaymentJasperReport.jasper";
+                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobName, new DiscrepanciesDataOnOrdersAndPaymentJasperReport(), autoReportGenerator.getExecutorService(),
+                        autoReportGenerator.getSessionFactory(), autoReportGenerator.getAutoReportProcessor(),
+                        autoReportGenerator.getReportPath(), reportTemplate,
+                        (Calendar) autoReportGenerator.getCalendar().clone(),
+                        (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                        (DateFormat) autoReportGenerator.getTimeFormat().clone());
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
+                jobDetail.getJobDataMap().put(DiscrepanciesDataOnOrdersAndPaymentJasperReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
                 return jobDetail;
             }
         }));

@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.core.report.statistics.discrepancies.payment.orders;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -9,14 +10,32 @@ import java.util.Date;
  * Time: 14:54
  * To change this template use File | Settings | File Templates.
  */
-public class DiscrepanciesDataOnOrdersAndPaymentItem {
 
+public class Item {
+
+    private Long idOfOrg;
     private String orgShortName;
     private String address;
     private String orgTypeCategory;
     private Integer countActs;
-    private Long differentSum;
+    private BigDecimal differentSum;
     private Date currentDate;
+
+    public Item() {
+    }
+
+    public Item(Long idOfOrg, Date currentDate) {
+        this.idOfOrg = idOfOrg;
+        this.currentDate = currentDate;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
+    }
 
     public String getOrgShortName() {
         return orgShortName;
@@ -50,11 +69,11 @@ public class DiscrepanciesDataOnOrdersAndPaymentItem {
         this.countActs = countActs;
     }
 
-    public Long getDifferentSum() {
+    public BigDecimal getDifferentSum() {
         return differentSum;
     }
 
-    public void setDifferentSum(Long differentSum) {
+    public void setDifferentSum(BigDecimal differentSum) {
         this.differentSum = differentSum;
     }
 
@@ -64,5 +83,24 @@ public class DiscrepanciesDataOnOrdersAndPaymentItem {
 
     public void setCurrentDate(Date currentDate) {
         this.currentDate = currentDate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Item item = (Item) o;
+        return currentDate.equals(item.currentDate) && idOfOrg.equals(item.idOfOrg);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = idOfOrg.hashCode();
+        result = 31 * result + currentDate.hashCode();
+        return result;
     }
 }
