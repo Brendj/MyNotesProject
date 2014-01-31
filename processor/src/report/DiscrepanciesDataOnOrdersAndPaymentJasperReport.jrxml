@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DiscrepanciesDataOnOrdersAndPaymentJasperReport" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="716ced14-f7b3-4bb2-a948-9b5cfd7d7894">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<parameter name="beginDate" class="java.lang.String"/>
+	<parameter name="endDate" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="idOfOrg" class="java.lang.Long"/>
+	<field name="orgShortName" class="java.lang.String"/>
+	<field name="address" class="java.lang.String"/>
+	<field name="orgTypeCategory" class="java.lang.String"/>
+	<field name="countActs" class="java.lang.Integer"/>
+	<field name="currentDate" class="java.util.Date"/>
+	<field name="differentSum" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="44" splitType="Stretch">
+			<textField>
+				<reportElement uuid="571e7f1b-b8e0-48b8-a703-5d7bbbbec024" x="0" y="0" width="802" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Статистика о расхождении данных по заказам и оплате"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="729cd781-a5b1-4538-b323-8d10702949f1" x="0" y="20" width="802" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["За " + ($P{beginDate}.equals($P{endDate}) ? $P{beginDate} : $P{beginDate} + " - " + $P{endDate})]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="350" splitType="Immediate">
+			<crosstab>
+				<reportElement uuid="5c2abfd4-2588-4ed6-bda7-afee38011106" x="0" y="0" width="802" height="350"/>
+				<crosstabHeaderCell>
+					<cellContents>
+						<textField>
+							<reportElement uuid="aa9216dc-335b-4603-a881-b7565b652d6a" style="Crosstab Data Text" x="296" y="0" width="97" height="138"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA["Тип ОО"]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="9068d4f7-4bed-4b60-b182-c036230de3f6" style="Crosstab Data Text" x="140" y="0" width="156" height="138"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA["Адрес"]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="b42b9862-80ad-422c-bdc4-da9a7fbb01aa" style="Crosstab Data Text" x="0" y="0" width="140" height="138"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA["Наименование ГБОУ"]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabHeaderCell>
+				<rowGroup name="idOfOrg" width="0">
+					<bucket class="java.lang.Long">
+						<bucketExpression><![CDATA[$F{idOfOrg}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<staticText>
+								<reportElement uuid="873445fc-e111-4701-a165-c0125bb2bd14" x="0" y="0" width="140" height="25" forecolor="#FFFFFF"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Total idOfOrg]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="orgShortName" width="0">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{orgShortName}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents backcolor="#FFBFBF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<staticText>
+								<reportElement uuid="46369892-29a8-4ec9-9a4e-159774fc8b57" x="0" y="0" width="70" height="25"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Total orgShortName]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="address" width="0">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{address}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents/>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="orgTypeCategory" width="393">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{orgTypeCategory}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="da27900e-29a2-40e9-bb1e-545ad1f03ff2" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="296" y="0" width="97" height="20"/>
+								<box leftPadding="5" bottomPadding="2" rightPadding="5">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Bottom">
+									<font size="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{orgTypeCategory}]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="64bea27d-11a9-4d66-b998-eb962d93792e" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="140" height="20"/>
+								<box leftPadding="5" bottomPadding="2" rightPadding="5">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Left" verticalAlignment="Bottom">
+									<font size="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{orgShortName}]]></textFieldExpression>
+							</textField>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="d61edd45-1e22-4472-9a17-f515af29601b" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="140" y="0" width="156" height="20"/>
+								<box leftPadding="5" bottomPadding="2" rightPadding="5">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Left" verticalAlignment="Bottom">
+									<font size="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{address}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="currentDate" height="138">
+					<bucket class="java.util.Date">
+						<bucketExpression><![CDATA[$F{currentDate}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement uuid="e6c0d7fa-30e5-4cd5-98a8-562c903b7afd" style="Crosstab Data Text" x="0" y="0" width="200" height="16"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Bottom"/>
+								<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($V{currentDate})]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="82d86e49-40b5-4f3e-bb53-82a8e1f27bc1" style="Crosstab Data Text" x="0" y="16" width="100" height="122"/>
+								<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Left" verticalAlignment="Top"/>
+								<text><![CDATA[0 - при отсутствии актов расхождений данных в системе;
+1 - при наличии актов расхождений данных в системе]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="a27b98de-8d67-4865-9b5c-775c05b7b529" style="Crosstab Data Text" x="100" y="16" width="100" height="122"/>
+								<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Left"/>
+								<text><![CDATA[сумма расхождений, руб.]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+							</box>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="countActsMeasure" class="java.lang.Integer" calculation="Sum">
+					<measureExpression><![CDATA[$F{countActs}]]></measureExpression>
+				</measure>
+				<measure name="differentSumMeasure" class="java.math.BigDecimal" calculation="Sum">
+					<measureExpression><![CDATA[$F{differentSum}]]></measureExpression>
+				</measure>
+				<crosstabCell width="200" height="20">
+					<cellContents>
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField isStretchWithOverflow="true" pattern="#,##0" isBlankWhenNull="true">
+							<reportElement uuid="f6e4289d-0b59-4b3d-b7f0-4f741c7c5a76" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="20"/>
+							<box bottomPadding="2">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement textAlignment="Right" verticalAlignment="Bottom">
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{countActsMeasure}]]></textFieldExpression>
+						</textField>
+						<textField isStretchWithOverflow="true" pattern="#,##0.00;-#,##0.00" isBlankWhenNull="true">
+							<reportElement uuid="d9515b0e-aafd-421b-9e4d-5598dfe2516f" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="100" y="0" width="100" height="20">
+								<printWhenExpression><![CDATA[$V{countActsMeasure} > 0]]></printWhenExpression>
+							</reportElement>
+							<box bottomPadding="2">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement textAlignment="Right" verticalAlignment="Bottom">
+								<font size="9"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{differentSumMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="200" height="25" rowTotalGroup="idOfOrg">
+					<cellContents backcolor="#FFFFFF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement uuid="cbb5415b-0276-4c3f-939c-94fbe5158d38" style="Crosstab Data Text" x="0" y="0" width="50" height="25" forecolor="#FFFFFF"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{countActsMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="0" height="63" columnTotalGroup="currentDate">
+					<cellContents backcolor="#FFFFFF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="0" height="25" rowTotalGroup="idOfOrg" columnTotalGroup="currentDate">
+					<cellContents backcolor="#FFFFFF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="86" height="25" rowTotalGroup="orgShortName">
+					<cellContents backcolor="#FFBFBF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement uuid="15d7e1ab-4de4-4de5-8dd8-86946dc41ac6" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{countActsMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="72" rowTotalGroup="orgShortName" columnTotalGroup="currentDate">
+					<cellContents backcolor="#FFBFBF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+						<textField>
+							<reportElement uuid="155298bf-b76b-403d-9906-760af6ab2fac" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{countActsMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="address">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="address" columnTotalGroup="currentDate">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="orgTypeCategory">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="orgTypeCategory" columnTotalGroup="currentDate">
+					<cellContents/>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+</jasperReport>
