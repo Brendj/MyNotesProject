@@ -265,21 +265,22 @@ public class GoodRequestsReport extends BasicReport {
                 //overallItem.addLastDailySample(date, new RequestValue(lastDailySample));
             }
 
-
-            if (orgsFilter == 0) {
-                if(idOfOrgList==null || idOfOrgList.isEmpty()) {
-                    idOfOrgList = loadEmptyOrgs(session, startDateLong, endDateLong, idOfSupplierList);
-                }
-                insertMissingOrgs(idOfOrgList, insertedOrgs, items, totalItems, report);
-            } else if (orgsFilter == 2) {
-                if(idOfOrgList==null || idOfOrgList.isEmpty()) {
-                    idOfOrgList = loadEmptyOrgs(session, startDateLong, endDateLong, idOfSupplierList);
-                }
-                List<RequestItem> newItems = new ArrayList<RequestItem>();
-                insertMissingOrgs(idOfOrgList, insertedOrgs, newItems, totalItems, report);
-                items = newItems;
-                resetTotalValues(totalItems, overallItem);
-            }
+               if(orgsFilter!=null){
+                   if (orgsFilter == 0) {
+                       if(idOfOrgList==null || idOfOrgList.isEmpty()) {
+                           idOfOrgList = loadEmptyOrgs(session, startDateLong, endDateLong, idOfSupplierList);
+                       }
+                       insertMissingOrgs(idOfOrgList, insertedOrgs, items, totalItems, report);
+                   } else if (orgsFilter == 2) {
+                       if(idOfOrgList==null || idOfOrgList.isEmpty()) {
+                           idOfOrgList = loadEmptyOrgs(session, startDateLong, endDateLong, idOfSupplierList);
+                       }
+                       List<RequestItem> newItems = new ArrayList<RequestItem>();
+                       insertMissingOrgs(idOfOrgList, insertedOrgs, newItems, totalItems, report);
+                       items = newItems;
+                       resetTotalValues(totalItems, overallItem);
+                   }
+               }
 
             //  Добавляем строки с общими значениями в список товаров
             if(isWriteTotalRow){
