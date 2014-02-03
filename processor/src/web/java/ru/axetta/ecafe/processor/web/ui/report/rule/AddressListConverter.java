@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.rule;
 
+import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +41,7 @@ public class AddressListConverter implements Converter {
                 String address = (String) currObject;
                 if (StringUtils.isNotEmpty(address)) {
                     if (!first) {
-                        stringBuffer.append(", ");
+                        stringBuffer.append(ReportHandleRule.DELIMETER).append(" ");
                     }
                     stringBuffer.append(address);
                     first = false;

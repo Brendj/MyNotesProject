@@ -277,7 +277,7 @@ public class ReportRuleCreatePage  extends OnlineReportPage
 
 
     public void createReportRule(Session session) throws Exception {
-        String[] addressList = this.routeAddresses.split(ReportRuleEditPage.DELIMETER);
+        String[] addressList = this.routeAddresses.split(ReportHandleRule.DELIMETER);
 
         ReportHandleRule reportHandleRule = new ReportHandleRule(this.documentFormat, this.subject, addressList[0],
                 this.enabled);
@@ -389,7 +389,7 @@ public class ReportRuleCreatePage  extends OnlineReportPage
 
         this.ruleConditionItems = newCondition.toString();
         reportHandleRule.addRuleCondition(ReportRuleConstants.buildTypeCondition(reportHandleRule, this.reportType));
-        String[] textRuleConditions = this.ruleConditionItems.split(ReportRuleEditPage.DELIMETER);
+        String[] textRuleConditions = this.ruleConditionItems.split(ReportHandleRule.DELIMETER);
         for (String textRuleCondition : textRuleConditions) {
             String trimmedTextRuleCondition = StringUtils.trim(textRuleCondition);
             if (StringUtils.isNotEmpty(trimmedTextRuleCondition)) {

@@ -43,7 +43,6 @@ public class ReportRuleEditPage  extends OnlineReportPage
         implements ContragentSelectPage.CompleteHandler, ContractSelectPage.CompleteHandler {
 
     Logger logger = LoggerFactory.getLogger(ReportRuleEditPage.class);
-    public static String DELIMETER = ";";
 
     public void setTag(String tag) {
         this.tag = tag;
@@ -266,7 +265,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
 
         reportHandleRule.setTemplateFileName(this.reportTemplateFileName);
 
-        String[] addressList = this.routeAddresses.split(DELIMETER);
+        String[] addressList = this.routeAddresses.split(ReportHandleRule.DELIMETER);
 
         for (String addr : addressList) {
             if (addr.trim().startsWith("{") && addr.trim().endsWith("}")) {
@@ -395,7 +394,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
 
 
         this.ruleConditionItems = newCondition.toString();
-        String[] textRuleConditions = this.ruleConditionItems.split(DELIMETER);
+        String[] textRuleConditions = this.ruleConditionItems.split(ReportHandleRule.DELIMETER);
         for (String textRuleCondition : textRuleConditions) {
             String trimmedTextRuleCondition = StringUtils.trim(textRuleCondition);
             if (StringUtils.isNotEmpty(trimmedTextRuleCondition)) {
@@ -633,7 +632,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
     private static void appendNotEmpty(StringBuilder stringBuilder, String value) {
         if (StringUtils.isNotEmpty(value)) {
             if (0 != stringBuilder.length()) {
-                stringBuilder.append(DELIMETER).append(' ');
+                stringBuilder.append(ReportHandleRule.DELIMETER).append(' ');
             }
             stringBuilder.append(value);
         }

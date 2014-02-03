@@ -62,6 +62,7 @@ public class ReportHandleRule {
     public static final String[] MAIL_LIST_NAMES = {
             "{Список рассылки отчетов по питанию}", "{Список рассылки отчетов по посещению}", "{Список рассылки №1}",
             "{Список рассылки №2}"};
+    public static String DELIMETER = ";";
     public static final int HTML_FORMAT = 0;
     public static final int XLS_FORMAT  = 1;
     public static final int CSV_FORMAT  = 2;
@@ -366,7 +367,7 @@ public class ReportHandleRule {
     public static String getMailListNames() {
         StringBuilder sb = new StringBuilder();
         for (String name : MAIL_LIST_NAMES) {
-            sb.append(name).append(", ");
+            sb.append(name).append(DELIMETER).append(" ");
         }
         return sb.toString().substring(0, sb.length() - 2);
     }
