@@ -205,7 +205,22 @@
                      </f:facet>
                      <h:outputText value="#{item.orgTag}"/>
                  </rich:column>
+                 <f:facet name="footer">
+                     <rich:datascroller for="orgBasicStatsTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                                        stepControls="auto" boundaryControls="hide">
+                         <f:facet name="previous">
+                             <h:graphicImage value="/images/16x16/left-arrow.png" />
+                         </f:facet>
+                         <f:facet name="next">
+                             <h:graphicImage value="/images/16x16/right-arrow.png" />
+                         </f:facet>
+                     </rich:datascroller>
+                 </f:facet>
              </rich:extendedDataTable>
+
+             <h:commandButton value="Выгрузить в CSV" action="#{dashboardPage.showOrgBasicStatsCSVList}"
+                              styleClass="command-button" />
+
          </rich:tab>
          <rich:tab label="Платежные системы">
              <a4j:commandButton value="Обновить" action="#{dashboardPage.updatePaySysStatus}" reRender="dashboardPanelGrid"/>
@@ -243,6 +258,17 @@
                      </f:facet>
                      <h:outputText value="#{item.error}" />
                  </rich:column>
+                 <f:facet name="footer">
+                     <rich:datascroller for="paySysStatusTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                                        stepControls="auto" boundaryControls="hide">
+                         <f:facet name="previous">
+                             <h:graphicImage value="/images/16x16/left-arrow.png" />
+                         </f:facet>
+                         <f:facet name="next">
+                             <h:graphicImage value="/images/16x16/right-arrow.png" />
+                         </f:facet>
+                     </rich:datascroller>
+                 </f:facet>
              </rich:extendedDataTable>
 
          </rich:tab>

@@ -15,6 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.context.FacesContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.Date;
 
 @Component
@@ -59,6 +65,11 @@ public class DashboardPage extends BasicWorkspacePage implements OrgSelectPage.C
         }
         return null;
     }
+
+    public String showOrgBasicStatsCSVList() {
+        return "showOrgBasicStatsCSVList";
+    }
+
 
     public Object updatePaySysStatus() {
         try {
