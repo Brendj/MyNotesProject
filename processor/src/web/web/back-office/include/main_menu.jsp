@@ -872,6 +872,13 @@
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
+    <%--@elvariable id="statisticsDiscrepanciesOnOrdersAndAttendanceReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage"--%>
+    <rich:panelMenuItem id="statisticsDiscrepanciesOnOrdersAndAttendanceReportMenuItem"
+                        binding="#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.mainMenuComponent}"
+                        label="Статистика расходения данных по заказам и посещаемости"
+                        action="#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.show}"
+                        reRender="workspaceForm"/>
+
     <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"
                         label="Отчет по продажам" action="#{mainPage.showSalesReportPage}" reRender="workspaceForm" />
 
