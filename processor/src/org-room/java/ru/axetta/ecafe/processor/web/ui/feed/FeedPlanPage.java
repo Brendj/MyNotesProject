@@ -462,7 +462,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             long discountPrice = DAOService.getInstance().getComplexPrice(org.getIdOfOrg(), client.getComplex());
             OrderPurchaseItem opi = getOrderPurchaseItem(client, org.getIdOfOrg(), session);
             if (opi == null) {
-                result.put(client, "Не удалось осуществить оплату: Произошла внутренняя ошибка");
+                result.put(client, "Не удалось осуществить оплату: отсутствует информация о стоимости комплекса");
                 continue;
             }
             XMLGregorianCalendar paymentDate = getPaymentDate();
