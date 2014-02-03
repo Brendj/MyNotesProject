@@ -916,7 +916,11 @@
     <rich:panelMenuItem id="referReportMenuItem" binding="#{referReportPage.mainMenuComponent}"
                         label="Справки расходования средств" action="#{referReportPage.show}"
                         reRender="workspaceForm" />
-
+    <%--@elvariable id="discrepanciesDataOnOrdersAndPaymentReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.DiscrepanciesDataOnOrdersAndPaymentReportPage"--%>
+    <rich:panelMenuItem id="discrepanciesDataOnOrdersAndPaymentReportMenuItem"
+                        binding="#{discrepanciesDataOnOrdersAndPaymentReportPage.mainMenuComponent}"
+                        label="Статистика о расхождении данных по заказам и оплате"
+                        action="#{discrepanciesDataOnOrdersAndPaymentReportPage.show}" reRender="workspaceForm" />
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
     <rich:panelMenuItem id="manualReportRunnerMenuItem" binding="#{manualReportRunnerPage.mainMenuComponent}"
                         label="Ручной запуск отчетов" action="#{manualReportRunnerPage.show}"
