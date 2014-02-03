@@ -53,7 +53,6 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
     private GoodRequestsReport goodRequests;
     private Boolean hideMissedColumns;
     private boolean showAll = true;
-    private int requestsFilter = 3;
     private int orgsFilter = 1;
     private String goodName;
     private int daysLimit;
@@ -94,10 +93,6 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
         this.goodName = goodName;
     }
 
-    public int getRequestsFilter() {
-        return requestsFilter;
-    }
-
     public int getDaysLimit() {
         return daysLimit;
     }
@@ -112,10 +107,6 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
 
     public void setOrgsFilter(int orgsFilter) {
         this.orgsFilter = orgsFilter;
-    }
-
-    public void setRequestsFilter(int requestsFilter) {
-        this.requestsFilter = requestsFilter;
     }
 
     public GoodRequestsReport getGoodRequestsReport() {
@@ -183,7 +174,7 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
         //  Запускаем отчет
         GoodRequestsReport.Builder reportBuilder = new GoodRequestsReport.Builder();
         this.goodRequests = reportBuilder.build(session, hideMissedColumns, startDate, endDate,
-                                                idOfOrgList, idOfContragentOrgList, requestsFilter, goodName, orgsFilter);
+                                                idOfOrgList, idOfContragentOrgList, goodName, orgsFilter);
     }
 
     public static long getDaysLimitTS(int daysLimit, Date startDate) {
@@ -215,7 +206,7 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
         //  Запускаем отчет
         GoodRequestsReport.Builder reportBuilder = new GoodRequestsReport.Builder();
         this.goodRequests = reportBuilder.build(session, hideMissedColumns, startDate, endDate,
-                idOfOrgList, idOfContragentOrgList, requestsFilter, goodName, orgsFilter);
+                idOfOrgList, idOfContragentOrgList, goodName, orgsFilter);
 
         FacesContext facesContext = FacesContext.getCurrentInstance();
         HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();

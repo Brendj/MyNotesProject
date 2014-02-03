@@ -66,31 +66,31 @@ public class GoodRequestsReport extends BasicReport {
 
         public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
                 Date startDate, Date endDate, Long idOfOrg) throws Exception{
-            return build(session, hideMissedColumns,startDate,endDate, Arrays.asList(idOfOrg),null,3, "", false, null);
+            return build(session, hideMissedColumns,startDate,endDate, Arrays.asList(idOfOrg),null, "", false, null);
         }
 
         public GoodRequestsReport build(Session session,
                 Date startDate, Date endDate, List<Long> idOfSupplierList) throws Exception{
-            return build(session, false,startDate,endDate, new ArrayList<Long>(0),idOfSupplierList,3, "", true, null);
+            return build(session, false,startDate,endDate, new ArrayList<Long>(0),idOfSupplierList, "", true, null);
         }
 
         public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
                 Date startDate, Date endDate, List<Long> idOfOrgList, List<Long> idOfSupplierList,
                 int requestsFilter, String goodName)
                 throws Exception {
-            return build(session, hideMissedColumns,startDate,endDate, idOfOrgList ,idOfSupplierList, requestsFilter, goodName, true, null);
+            return build(session, hideMissedColumns,startDate,endDate, idOfOrgList ,idOfSupplierList, goodName, true, null);
         }
 
         public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
                 Date startDate, Date endDate, List<Long> idOfOrgList, List<Long> idOfSupplierList,
-                int requestsFilter, String goodName, Integer orgsFilter)
+                String goodName, Integer orgsFilter)
                 throws Exception {
-            return build(session, hideMissedColumns,startDate,endDate, idOfOrgList ,idOfSupplierList, requestsFilter, goodName, true, orgsFilter);
+            return build(session, hideMissedColumns,startDate,endDate, idOfOrgList ,idOfSupplierList, goodName, true, orgsFilter);
         }
 
         private GoodRequestsReport build(Session session, Boolean hideMissedColumns,
                 Date startDate, Date endDate, List<Long> idOfOrgList, List <Long> idOfSupplierList,
-                int requestsFilter, String goodName, Boolean isWriteTotalRow, Integer orgsFilter)
+                String goodName, Boolean isWriteTotalRow, Integer orgsFilter)
                 throws Exception {
             Date generateTime = new Date();
             List<RequestItem> items = new LinkedList<RequestItem>();
@@ -111,7 +111,7 @@ public class GoodRequestsReport extends BasicReport {
             }
 
             String stateCondition = " cf_goods_requests.deletedstate<>true and ";
-            switch (requestsFilter) {
+            /*switch (requestsFilter) {
                 case 0:
                     stateCondition = " cf_goods_requests.state=" + DocumentState.CREATED.ordinal() + " AND ";
                     break;
@@ -123,7 +123,7 @@ public class GoodRequestsReport extends BasicReport {
                     break;
                 default:
                     break;
-            }
+            }*/
             String orgCondition = "";
             if (!(idOfOrgList==null || idOfOrgList.isEmpty())) {
                 // Обработать лист с организациями
@@ -149,7 +149,7 @@ public class GoodRequestsReport extends BasicReport {
                 suppliersCondition = suppliersCondition + ")) ";
             }
             String notCreatedAtConfition = "";
-            if (requestsFilter == -1) {
+            if (orgsFilter == -1) {
                 //  Если выбрано отображение тех школ, у которых были
                 // заявки указанный период, но не было заявок последнии дни
                 long limit = System.currentTimeMillis() - REQUESTS_MONITORING_TIMEOUT;

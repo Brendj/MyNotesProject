@@ -77,12 +77,13 @@ updateWidth();
                           styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{mainPage.goodRequestReportPage.hideMissedColumns}" styleClass="output-text" />
 
-            <h:outputText escape="true" value="Отображать выбранные организации" styleClass="output-text" />
+            <h:outputText escape="true" value="Фильтры по заявкам" styleClass="output-text" />
             <h:selectOneMenu value="#{mainPage.goodRequestReportPage.orgsFilter}" converter="javax.faces.Integer"
             styleClass="output-text" >
                 <f:selectItem itemValue="0" itemLabel="Все"/>
                 <f:selectItem itemValue="1" itemLabel="Только с данными"/>
                 <f:selectItem itemValue="2" itemLabel="Только пустые"/>
+                <f:selectItem itemValue="-1" itemLabel="Отображать организации с отсутствием заявок за последние 2 дня"/>
             </h:selectOneMenu>
 
             <h:outputText escape="true" value="Суточная проба" styleClass="output-text" />
@@ -90,17 +91,6 @@ updateWidth();
             <h:selectOneMenu value="#{mainPage.goodRequestReportPage.dailySamplesMode}" rendered="false" styleClass="output-text">
                 <f:selectItem itemValue="0" itemLabel="Не выводить"/>
                 <f:selectItem itemValue="1" itemLabel="Выводить"/>
-            </h:selectOneMenu>
-
-            <h:outputText escape="true" value="Фильтр по заявкам"
-                          styleClass="output-text" />
-            <h:selectOneMenu value="#{mainPage.goodRequestReportPage.requestsFilter}" converter="javax.faces.Integer"
-                              styleClass="output-text" >
-                <f:selectItem itemValue="0" itemLabel="Отображать созданные заявки"/>
-                <f:selectItem itemValue="1" itemLabel="Отображать заявки к исполнению"/>
-                <f:selectItem itemValue="2" itemLabel="Отображать закрытые заявки"/>
-                <f:selectItem itemValue="3" itemLabel="Отображать все заявки"/>
-                <f:selectItem itemValue="-1" itemLabel="Отображать организации с отсутствием заявкок за последние 2 дня"/>
             </h:selectOneMenu>
 
 
