@@ -583,6 +583,27 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                                             } catch (Exception e) {
                                                 logger.error("Failed to post report", e);
                                             }
+                                            //List<String> addresses1 = new ArrayList<String>(Arrays.asList(StringUtils.split(address, ";")));
+                                            //for (String addrFromList : addresses1) {
+                                            //    try {
+                                            //        if(!StringUtils.trim(address).equalsIgnoreCase(StringUtils.trim(addrFromList))){
+                                            //            autoReportPostman
+                                            //                    .postReport(addrFromList, subject, reportDocument);
+                                            //        }
+                                            //    } catch (Exception e) {
+                                            //        logger.error("Failed to post report", e);
+                                            //    }
+                                            //}
+                                            //List<String> addresses2 = new ArrayList<String>(Arrays.asList(StringUtils.split(address, ",")));
+                                            //for (String addrFromList : addresses2) {
+                                            //    try {
+                                            //        if(!StringUtils.trim(address).equalsIgnoreCase(StringUtils.trim(addrFromList))){
+                                            //            autoReportPostman.postReport(addrFromList, subject, reportDocument);
+                                            //        }
+                                            //    } catch (Exception e) {
+                                            //        logger.error("Failed to post report", e);
+                                            //    }
+                                            //}
                                         }
                                     }
                                 }
