@@ -198,7 +198,6 @@
         </navigation-case>
     </navigation-rule>
 
-    <!--Kadyrov Damir (21.12.2011)-->
     <navigation-rule>
         <from-view-id>/back-office/index.jsp</from-view-id>
         <navigation-case>
@@ -375,6 +374,15 @@
         <navigation-case>
             <from-outcome>reconciliationPageMissingXml</from-outcome>
             <to-view-id>/back-office/reconciliation_page_missing_xml.jsp</to-view-id>
+            <redirect/>
+        </navigation-case>
+    </navigation-rule>
+
+    <navigation-rule>
+        <from-view-id>/back-office/index.jsp</from-view-id>
+        <navigation-case>
+            <from-outcome>showOrgBasicStatsCSVList</from-outcome>
+            <to-view-id>/back-office/org_basic_stats_csv_list.jsp</to-view-id>
             <redirect/>
         </navigation-case>
     </navigation-rule>

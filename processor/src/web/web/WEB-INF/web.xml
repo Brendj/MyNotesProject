@@ -287,6 +287,7 @@
             <url-pattern>/back-office/currentposition_csv_list.jsp</url-pattern>
             <url-pattern>/back-office/enter_event_csv_list.jsp</url-pattern>
             <url-pattern>/back-office/menu_data_xml.jsp</url-pattern>
+            <url-pattern>/back-office/org_basic_stats_csv_list.jsp</url-pattern>
         </web-resource-collection>
         <auth-constraint/>
     </security-constraint>
@@ -338,6 +339,7 @@
             <url-pattern>/back-office/enter_event_csv_list.jsp</url-pattern>
             <url-pattern>/back-office/menu_data_xml.jsp</url-pattern>
             <url-pattern>/repository/download</url-pattern>
+            <url-pattern>/back-office/org_basic_stats_csv_list.jsp</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>AuthorizedUser</role-name>
