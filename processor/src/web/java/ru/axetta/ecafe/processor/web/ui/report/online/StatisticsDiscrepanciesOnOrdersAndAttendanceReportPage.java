@@ -29,23 +29,20 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope("session")
-public class StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage extends OnlineReportPage implements ContragentSelectPage.CompleteHandler {
+public class StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage extends OnlineReportWithContragentPage{
 
     private DiscrepanciesOnOrdersAndAttendanceReport report;
-    private final CCAccountFilter contragentFilter = new CCAccountFilter();
 
-    public CCAccountFilter getContragentFilter() {
-        return contragentFilter;
-    }
-
-    public Object showContractSelectPage () {
-        MainPage.getSessionInstance().showContractSelectPage (this.contragentFilter.getContragent().getContragentName(),
-                this.contragentFilter.getContragent().getIdOfContragent());
+    public Object showSourceListSelectPage () {
+        setSelectIdOfOrgList(false);
+        MainPage.getSessionInstance().showOrgListSelectPage();
         return null;
     }
 
-    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes) throws Exception {
-        contragentFilter.completeContragentSelection(session, idOfContragent);
+    public Object showEducationListSelectPage () {
+        setSelectIdOfOrgList(true);
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
     }
 
     public String getPageFilename() {
@@ -57,15 +54,14 @@ public class StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage extends Onli
     }
 
     public Object buildReport(){
-        //CCAccountFilter.ContragentItem contragentItem = contragentFilter.getContragent();
-        //if(contragentItem == null) {
-        //    printError("Не указан контрагент");
-        //    return null;
-        //}
-        if(idOfOrgList==null || idOfOrgList.isEmpty()){
-            printError("Выберите хотя бы одну организацию");
+        if(idOfContragentOrgList==null || idOfContragentOrgList.isEmpty()){
+            printError("Выберите список поставщиков");
             return null;
         }
+        //if(idOfOrgList==null || idOfOrgList.isEmpty()){
+        //    printError("Выберите хотя бы одну организацию");
+        //    return null;
+        //}
         RuntimeContext runtimeContext = null;
         Session session = null;
         Transaction transaction = null;
@@ -75,7 +71,7 @@ public class StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage extends Onli
             transaction = session.beginTransaction();
             DiscrepanciesOnOrdersAndAttendanceBuilder builder = new DiscrepanciesOnOrdersAndAttendanceBuilder();
             //Contragent contragent = (Contragent) session.load(Contragent.class, contragentItem.getIdOfContragent());
-            this.report = builder.build(session,/* contragent,*/ idOfOrgList, localCalendar, startDate, endDate);
+            this.report = builder.build(session, idOfContragentOrgList, idOfOrgList, localCalendar, startDate, endDate);
             transaction.commit();
             transaction = null;
             printMessage("Отчет успешно сгенерирован");

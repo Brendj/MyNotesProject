@@ -149,7 +149,7 @@ public class GoodRequestsReport extends BasicReport {
                 suppliersCondition = suppliersCondition + ")) ";
             }
             String notCreatedAtConfition = "";
-            if (orgsFilter == -1) {
+            if (orgsFilter!=null && orgsFilter == -1) {
                 //  Если выбрано отображение тех школ, у которых были
                 // заявки указанный период, но не было заявок последнии дни
                 long limit = System.currentTimeMillis() - REQUESTS_MONITORING_TIMEOUT;

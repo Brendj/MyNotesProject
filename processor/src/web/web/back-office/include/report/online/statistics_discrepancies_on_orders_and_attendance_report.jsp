@@ -20,31 +20,29 @@
         <rich:calendar value="#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
-        <h:outputText escape="true" value="Контрагент" styleClass="output-text required-field" rendered="false"/>
-        <h:panelGroup styleClass="borderless-div" rendered="false">
-            <h:inputText value="#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.contragentFilter.contragent.contragentName}" readonly="true"
-                         styleClass="input-text long-field" style="margin-right: 2px;" />
-            <a4j:commandButton value="..." action="#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.showContractSelectPage}"
-                               reRender="modalContragentSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="0"
-                                             target="#{mainPage.multiContrFlag}" />
-                <f:setPropertyActionListener value="2"
-                                             target="#{mainPage.classTypes}" />
-            </a4j:commandButton>
-        </h:panelGroup>
 
-        <h:outputText styleClass="output-text required-field" escape="true" value="Организация" />
-
+        <h:outputText styleClass="output-text required-field" escape="true" value="Поставщик" />
         <h:panelGroup>
-            <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+            <a4j:commandButton value="..." action="#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.showSourceListSelectPage}" reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" >
+                <f:setPropertyActionListener value="2" target="#{mainPage.orgListSelectPage.filterMode}" />
+                <f:setPropertyActionListener value="#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.getContragentStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+            </a4j:commandButton>
+            <h:outputText styleClass="output-text" escape="true" value="{#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.contragentFilter}}" />
+        </h:panelGroup>
+
+        <h:outputText styleClass="output-text" escape="true" value="Организация" />
+        <h:panelGroup>
+            <a4j:commandButton value="..." action="#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.showEducationListSelectPage}" reRender="modalOrgListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;" >
+                <f:setPropertyActionListener value="0" target="#{mainPage.orgListSelectPage.filterMode}" />
                 <f:setPropertyActionListener value="#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" value=" {#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.filter}}" />
         </h:panelGroup>
+
 
         <a4j:commandButton value="Генерировать отчет" action="#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.buildReport}"
                            reRender="mainMenu, workspaceTogglePanel, statisticsDiscrepanciesOnOrdersAndAttendanceReportPageReportPanelGrid"
@@ -84,6 +82,9 @@
                         <h:outputText value="Заказ факт"/>
                     </rich:column>
                     <rich:column>
+                        <h:outputText value="Рекомендуемое кол-во для заказа"/>
+                    </rich:column>
+                    <rich:column>
                         <h:outputText value="Посещение - факт"/>
                     </rich:column>
                     <rich:column>
@@ -111,6 +112,9 @@
             </rich:column>
             <rich:column>
                 <h:outputText value="#{item.requestCount==null?0:item.requestCount}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{item.forecastQty==null?0:item.forecastQty}"/>
             </rich:column>
             <rich:column>
                 <h:outputText value="#{item.enterEventCount==null?0:item.enterEventCount}"/>

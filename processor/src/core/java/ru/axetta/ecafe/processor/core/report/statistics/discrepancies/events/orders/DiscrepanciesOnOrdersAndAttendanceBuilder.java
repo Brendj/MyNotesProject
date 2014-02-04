@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.report.statistics.discrepancies.events.orders;
 
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -15,12 +12,13 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 
 import java.util.*;
+
+import static org.hibernate.criterion.Order.asc;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,22 +29,19 @@ import java.util.*;
  */
 public class DiscrepanciesOnOrdersAndAttendanceBuilder {
 
-    public DiscrepanciesOnOrdersAndAttendanceReport build(Session session, /*Contragent contragent,*/ List<Long> idOfOrgs,
+    public DiscrepanciesOnOrdersAndAttendanceReport build(Session session, List<Long> idOfSupplier, List<Long> idOfOrgs,
             Calendar calendar, Date startTime, Date endTime) throws  Exception{
 
         Criteria catCriteria = session.createCriteria(Org.class)
                 .createAlias("categoriesInternal", "cat", JoinType.LEFT_OUTER_JOIN)
+                .createAlias("sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN)
                 //.add(Restrictions.eq("defaultSupplier", contragent))
-                .setProjection(Projections.projectionList()
-                        .add(Projections.property("idOfOrg"))
-                        .add(Projections.property("type"))
-                        .add(Projections.property("shortName"))
-                        .add(Projections.property("address"))
-                        .add(Projections.property("cat.idOfCategoryOrg"))
-                        .add(Projections.property("cat.categoryName"))
-                        .add(Projections.property("district"))
-                )
-                .addOrder(Order.asc("idOfOrg"));
+                .add(Restrictions.in("sm.idOfOrg", idOfSupplier))
+                .setProjection(Projections.projectionList().add(Projections.property("idOfOrg"))
+                        .add(Projections.property("type")).add(Projections.property("shortName"))
+                        .add(Projections.property("address")).add(Projections.property("cat.idOfCategoryOrg"))
+                        .add(Projections.property("cat.categoryName")).add(Projections.property("district")))
+                .addOrder(asc("idOfOrg"));
         if (!idOfOrgs.isEmpty()) {
             catCriteria.add(Restrictions.in("idOfOrg", idOfOrgs));
         }
@@ -72,8 +67,11 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder {
             }
         }
 
+        final ArrayList<Long> orgs = new ArrayList<Long>(orgItems.keySet());
+
         Criteria goodRequestPosCrit = session.createCriteria(GoodRequestPosition.class);
         goodRequestPosCrit.createCriteria("goodRequest", "gr");
+        goodRequestPosCrit.add(Restrictions.in("orgOwner", orgs));
         goodRequestPosCrit.add(Restrictions.ge("gr.doneDate", startTime));
         goodRequestPosCrit.add(Restrictions.lt("gr.doneDate", endTime));
         goodRequestPosCrit.add(Restrictions.eq("gr.state", DocumentState.FOLLOW));
@@ -83,8 +81,7 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder {
                 .add(Projections.groupProperty("orgOwner"))
                 .add(Projections.groupProperty("gr.doneDate"))
         );
-        goodRequestPosCrit.addOrder(Order.asc("orgOwner"));
-        goodRequestPosCrit.add(Restrictions.in("orgOwner", orgItems.keySet()));
+        goodRequestPosCrit.addOrder(asc("orgOwner"));
 
 
         List<Object[]> goodRes = (List<Object[]>) goodRequestPosCrit.list();
@@ -111,7 +108,111 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder {
             }
         }
 
+        Date orderBeginDate = CalendarUtils.truncateToDayOfMonth(startTime);
+        orderBeginDate = CalendarUtils.addDays(orderBeginDate, -21);
+        Date orderEndDate = CalendarUtils.truncateToDayOfMonth(endTime);
+        orderEndDate = CalendarUtils.addDays(orderEndDate, -21);
+
+        Criteria enterEventForecastCrit = session.createCriteria(EnterEvent.class);
+        enterEventForecastCrit.createAlias("org", "o")
+                .createAlias("o.sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN)
+                .add(Restrictions.in("sm.idOfOrg", idOfSupplier));
+        if (!idOfOrgs.isEmpty()) {
+            enterEventForecastCrit.add(Restrictions.in("compositeIdOfEnterEvent.idOfOrg", idOfOrgs));
+        }
+        enterEventForecastCrit.add(Restrictions.ge("evtDateTime", orderBeginDate));
+        enterEventForecastCrit.add(Restrictions.lt("evtDateTime", orderEndDate));
+        enterEventForecastCrit.setProjection(Projections.projectionList()
+                .add(Projections.count("client"))
+                .add(Projections.groupProperty("compositeIdOfEnterEvent.idOfOrg"))
+                .add(Projections.groupProperty("evtDateTime"))
+        );
+
+        enterEventForecastCrit.addOrder(asc("compositeIdOfEnterEvent.idOfOrg"));
+
+        List<Object[]>  enterEventForecastRes = (List<Object[]>) enterEventForecastCrit.list();
+
+        Map<Long, Map<Date, EnterEventCountItem>> orderQtyCountMap = new HashMap<Long, Map<Date, EnterEventCountItem>>();
+        for (Object[] row: enterEventForecastRes){
+            Long idOfOrg = (Long) row[1];
+            Long totalCount = row[0] == null ? 0L : ((Long) row[0]);
+            Date date = CalendarUtils.truncateToDayOfMonth((Date) row[2]);
+            Map<Date, EnterEventCountItem> dateEventCountItemMap = orderQtyCountMap.get(idOfOrg);
+            if(dateEventCountItemMap == null){
+                HashMap<Date, EnterEventCountItem> value = new HashMap<Date, EnterEventCountItem>();
+                value.put(date, new EnterEventCountItem(totalCount, date));
+                orderQtyCountMap.put(idOfOrg, value);
+            } else {
+                EnterEventCountItem item = dateEventCountItemMap.get(date);
+                if(item==null){
+                    HashMap<Date, EnterEventCountItem> value = new HashMap<Date, EnterEventCountItem>();
+                    value.put(date, new EnterEventCountItem(totalCount, date));
+                    orderQtyCountMap.put(idOfOrg, value);
+                } else {
+                    item.setTotalCount(item.getTotalCount()+totalCount);
+                }
+            }
+        }
+
+        Map<Long, Map<Date, EnterEventCountItem>> eventForecastCountMap = new HashMap<Long, Map<Date, EnterEventCountItem>>();
+        for (Long idOfOrg: orderQtyCountMap.keySet()){
+            Map<Date, EnterEventCountItem> dateOrderCountItemMap = orderQtyCountMap.get(idOfOrg);
+            Date beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
+            Date endDate = CalendarUtils.truncateToDayOfMonth(endTime);
+            orderBeginDate = CalendarUtils.addDays(beginDate, -21);
+            orderEndDate = CalendarUtils.addDays(endDate, -21);
+            Map<Date, EnterEventCountItem> dateOrderForecastCountItemMap = new HashMap<Date, EnterEventCountItem>();
+
+            while (orderBeginDate.getTime() <= orderEndDate.getTime()) {
+                EnterEventCountItem m = dateOrderCountItemMap.get(orderBeginDate);
+                long total =0L;
+                if(m!=null) total = m.getTotalCount();
+                Date forecastDate = CalendarUtils.addDays(orderBeginDate, 21);
+                while (forecastDate.getTime() <= beginDate.getTime()) {
+                    EnterEventCountItem forecastItem = dateOrderForecastCountItemMap.get(forecastDate);
+                    if(forecastItem==null){
+                        dateOrderForecastCountItemMap.put(forecastDate, new EnterEventCountItem(total, forecastDate));
+                    } else {
+                        forecastItem.setTotalCount(forecastItem.getTotalCount() + total);
+                    }
+                    forecastDate = CalendarUtils.addDays(forecastDate, 1);
+                }
+
+                orderBeginDate = CalendarUtils.addDays(orderBeginDate, 1);
+            }
+            eventForecastCountMap.put(idOfOrg, dateOrderForecastCountItemMap);
+        }
+
+        //for (Object[] row: orderRes){
+        //    Long idOfOrg = (Long) row[1];
+        //    Long totalCount = row[0] == null ? 0L : ((Long) row[0]);
+        //    Date date = CalendarUtils.truncateToDayOfMonth((Date) row[2]);
+        //    Map<Date, OrderDetailQtyCountItem> dateOrderCountItemMap = orderQtyCountMap.get(idOfOrg);
+        //    if(dateOrderCountItemMap == null){
+        //        HashMap<Date, OrderDetailQtyCountItem> value = new HashMap<Date, OrderDetailQtyCountItem>();
+        //        value.put(date, new OrderDetailQtyCountItem(totalCount, date));
+        //        orderQtyCountMap.put(idOfOrg, value);
+        //    } else {
+        //        OrderDetailQtyCountItem item = dateOrderCountItemMap.get(date);
+        //        if(item==null){
+        //            HashMap<Date, OrderDetailQtyCountItem> value = new HashMap<Date, OrderDetailQtyCountItem>();
+        //            value.put(date, new OrderDetailQtyCountItem(totalCount, date));
+        //            orderQtyCountMap.put(idOfOrg, value);
+        //        } else {
+        //            item.setTotalCount(item.getTotalCount()+totalCount);
+        //        }
+        //    }
+        //}
+
+
+
         Criteria enterEventCrit = session.createCriteria(EnterEvent.class);
+        enterEventCrit.createAlias("org", "o")
+                .createAlias("o.sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN)
+                .add(Restrictions.in("sm.idOfOrg", idOfSupplier));
+        if (!idOfOrgs.isEmpty()) {
+            enterEventCrit.add(Restrictions.in("compositeIdOfEnterEvent.idOfOrg", idOfOrgs));
+        }
         enterEventCrit.add(Restrictions.ge("evtDateTime", startTime));
         enterEventCrit.add(Restrictions.lt("evtDateTime", endTime));
         enterEventCrit.setProjection(Projections.projectionList()
@@ -119,7 +220,8 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder {
                 .add(Projections.groupProperty("compositeIdOfEnterEvent.idOfOrg"))
                 .add(Projections.groupProperty("evtDateTime"))
         );
-        enterEventCrit.add(Restrictions.in("compositeIdOfEnterEvent.idOfOrg", orgItems.keySet()));
+
+        enterEventCrit.addOrder(asc("compositeIdOfEnterEvent.idOfOrg"));
 
         List<Object[]> eventRes = (List<Object[]>) enterEventCrit.list();
 
@@ -146,12 +248,14 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder {
         }
 
         List<Item> items = new ArrayList<Item>();
-        Date beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
-        Date endDate = CalendarUtils.truncateToDayOfMonth(endTime);
-        for (Long id: orgItems.keySet()){
+        for (Long id: orgs){
             OrgItem orgItem = orgItems.get(id);
             Map<Date, RequestCountItem> dateRequestCountItemMap = requestCountMap.get(id);
             Map<Date, EnterEventCountItem> dateEventCountItemMap = eventCountMap.get(id);
+            //Map<Date, OrderDetailQtyCountItem> orderDetailQtyCountItemMap = orderQtyForecastCountMap.get(id);
+            Map<Date, EnterEventCountItem> dateForecastEventCountItemMap = eventForecastCountMap.get(id);
+            Date beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
+            Date endDate = CalendarUtils.truncateToDayOfMonth(endTime);
             while (beginDate.getTime() <= endDate.getTime()) {
                 final Item e = new Item();
                 e.fillOrgInfo(orgItem);
@@ -167,6 +271,15 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder {
                         e.setEnterEventCount(item.getTotalCount());
                     } else e.setEnterEventCount(0L);
                 } else e.setEnterEventCount(0L);
+
+                if(dateForecastEventCountItemMap!=null){
+                    EnterEventCountItem item = dateForecastEventCountItemMap.get(beginDate);
+                    if(item!=null){
+                        //e.setForecastQty(item.getTotalCount()*103/2100);
+                        e.setForecastQty(item.getTotalCount());
+                    } else e.setForecastQty(0L);
+                } else e.setForecastQty(0L);
+
                 e.setCurrentDate(beginDate);
                 items.add(e);
                 beginDate = CalendarUtils.addDays(beginDate, 1);
@@ -177,3 +290,22 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder {
     }
 
 }
+
+
+//Criteria orderDetailCrit = session.createCriteria(OrderDetail.class)
+//    .createAlias("org", "o")
+//        .createAlias("o.sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN)
+//            .add(Restrictions.in("sm.idOfOrg", idOfSupplier))
+//    //.add(Restrictions.in("compositeIdOfOrderDetail.idOfOrg", orgs))
+//    .createAlias("order", "ord")
+//        .add(Restrictions.eq("ord.orderType", OrderTypeEnumType.PAY_PLAN))
+//        .add(Restrictions.between("ord.createTime", orderBeginDate, orderEndDate))
+//    .setProjection(Projections.projectionList()
+//            .add(Projections.sum("qty"))
+//            .add(Projections.groupProperty("compositeIdOfOrderDetail.idOfOrg"))
+//            .add(Projections.groupProperty("ord.createTime"))
+//    )
+//    .addOrder(asc("compositeIdOfOrderDetail.idOfOrg"));
+//if (!idOfOrgs.isEmpty()) {
+//    orderDetailCrit.add(Restrictions.in("compositeIdOfOrderDetail.idOfOrg", idOfOrgs));
+//}

@@ -24,6 +24,7 @@ public class Item {
     private String address;
     private Date currentDate;
     private Long requestCount;
+    private Long forecastQty;
     private Long enterEventCount;
     private Long idOfOrg;
 
@@ -106,5 +107,13 @@ public class Item {
 
     public void setEnterEventCount(Long enterEventCount) {
         this.enterEventCount = enterEventCount;
+    }
+
+    public Long getForecastQty() {
+        return forecastQty;
+    }
+
+    public void setForecastQty(Long forecastQty) {
+        this.forecastQty = forecastQty;
     }
 }
