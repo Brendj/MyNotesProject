@@ -921,6 +921,10 @@
                         binding="#{discrepanciesDataOnOrdersAndPaymentReportPage.mainMenuComponent}"
                         label="Статистика о расхождении данных по заказам и оплате"
                         action="#{discrepanciesDataOnOrdersAndPaymentReportPage.show}" reRender="workspaceForm" />
+    <rich:panelMenuItem id="SentSmsReportPageMenuItem"
+                        binding="#{sentSmsReportPage.mainMenuComponent}"
+                        label="Статистика отправки СМС"
+                        action="#{sentSmsReportPage.show}" reRender="workspaceForm" />
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
     <rich:panelMenuItem id="manualReportRunnerMenuItem" binding="#{manualReportRunnerPage.mainMenuComponent}"
                         label="Ручной запуск отчетов" action="#{manualReportRunnerPage.show}"
