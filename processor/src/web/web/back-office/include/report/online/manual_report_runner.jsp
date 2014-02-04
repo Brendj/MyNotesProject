@@ -193,12 +193,7 @@
         <c:if test="${not empty manualReportRunnerPage.htmlResult}" >
 
             <f:verbatim>
-                <style type="text/css">
-                    div.htmlReportContent :empty {
-                        display: none;
-                    }
-                </style>
-                <div class="htmlReportContent">
+                <div>
                         ${manualReportRunnerPage.htmlResult}
                 </div>
             </f:verbatim>

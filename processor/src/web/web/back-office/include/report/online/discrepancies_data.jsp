@@ -15,27 +15,27 @@
         <rich:calendar value="#{discrepanciesDataOnOrdersAndPaymentReportPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
-        <h:outputText escape="true" value="Контрагент" styleClass="output-text" />
-        <h:panelGroup styleClass="borderless-div">
-            <h:inputText value="#{discrepanciesDataOnOrdersAndPaymentReportPage.contragentFilter.contragent.contragentName}" readonly="true"
-                         styleClass="input-text long-field" style="margin-right: 2px;" />
-            <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
-                               reRender="modalContragentSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+        <h:outputText escape="true" value="Поставщик меню" styleClass="output-text" />
+        <h:panelGroup>
+            <a4j:commandButton value="..." action="#{discrepanciesDataOnOrdersAndPaymentReportPage.showOrgSelectPage}"
+                               reRender="modalOrgSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="0"
-                                             target="#{mainPage.multiContrFlag}" />
-                <f:setPropertyActionListener value="2,"
-                                             target="#{mainPage.classTypes}" />
+                <f:setPropertyActionListener value="2" target="#{mainPage.orgSelectPage.supplierFilter}" />
             </a4j:commandButton>
+            <h:outputText styleClass="output-text" escape="true"
+                          value=" {#{discrepanciesDataOnOrdersAndPaymentReportPage.sourceMenuOrgFilter}}" />
         </h:panelGroup>
 
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
         <h:panelGroup>
-            <a4j:commandButton value="..." action="#{discrepanciesDataOnOrdersAndPaymentReportPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+            <a4j:commandButton value="..."
+                               action="#{discrepanciesDataOnOrdersAndPaymentReportPage.showOrgListSelectPage}"
+                               reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" />
-            <h:outputText styleClass="output-text" escape="true" value=" {#{discrepanciesDataOnOrdersAndPaymentReportPage.filter}}" />
+            <h:outputText styleClass="output-text" escape="true"
+                          value=" {#{discrepanciesDataOnOrdersAndPaymentReportPage.orgFilter}}" />
         </h:panelGroup>
 
         <a4j:commandButton value="Генерировать отчет" action="#{discrepanciesDataOnOrdersAndPaymentReportPage.buildReportHTML}"

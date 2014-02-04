@@ -2,11 +2,10 @@ package ru.axetta.ecafe.processor.core.report.msc;
 
 import net.sf.jasperreports.engine.JasperPrint;
 
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportForContragentJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.payment.orders.DiscrepanciesDataOnOrdersAndPaymentBuilder;
-import ru.axetta.ecafe.processor.core.report.statistics.payment.preferential.supply.StatisticsPaymentPreferentialSupplyBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,18 +19,13 @@ import java.util.Date;
  * Time: 14:49
  * To change this template use File | Settings | File Templates.
  */
-public class DiscrepanciesDataOnOrdersAndPaymentJasperReport extends BasicReportForContragentJob{
+public class DiscrepanciesDataOnOrdersAndPaymentJasperReport extends BasicReportForAllOrgJob {
 
     public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {}
 
     public DiscrepanciesDataOnOrdersAndPaymentJasperReport(Date generateTime, long generateDuration, JasperPrint print,
-            Date startTime, Date endTime, Long idOfContragent) {
-        super(generateTime, generateDuration, print, startTime, endTime, idOfContragent);
-    }
-
-    @Override
-    protected Integer getContragentSelectClass() {
-        return Contragent.TSP;
+            Date startTime, Date endTime) {
+        super(generateTime, generateDuration, print, startTime, endTime);
     }
 
     public DiscrepanciesDataOnOrdersAndPaymentJasperReport() {}
@@ -46,7 +40,7 @@ public class DiscrepanciesDataOnOrdersAndPaymentJasperReport extends BasicReport
     }
 
     @Override
-    protected Logger getLogger() {
+    public Logger getLogger() {
         return LOGGER;
     }
 

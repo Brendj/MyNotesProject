@@ -2,19 +2,18 @@ package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
-import ru.axetta.ecafe.processor.core.report.BasicReportForContragentJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.msc.DiscrepanciesDataOnOrdersAndPaymentJasperReport;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.payment.orders.DiscrepanciesDataOnOrdersAndPaymentBuilder;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
-import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
-import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.context.annotation.Scope;
@@ -25,6 +24,7 @@ import javax.faces.event.ActionEvent;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -35,11 +35,11 @@ import java.util.Properties;
 
 @Component
 @Scope(value = "session")
-public class DiscrepanciesDataOnOrdersAndPaymentReportPage extends OnlineReportPage
-        implements ContragentSelectPage.CompleteHandler {
+public class DiscrepanciesDataOnOrdersAndPaymentReportPage extends OnlineReportPage {
 
+    private String sourceMenuOrgFilter = "Не выбрано";
+    private String orgFilter = "Не выбрано";
     private String htmlReport;
-    private final CCAccountFilter contragentFilter = new CCAccountFilter();
 
     @Override
     public String getPageFilename() {
@@ -50,23 +50,34 @@ public class DiscrepanciesDataOnOrdersAndPaymentReportPage extends OnlineReportP
         return htmlReport;
     }
 
-    public void setHtmlReport(String htmlReport) {
-        this.htmlReport = htmlReport;
+    public String getSourceMenuOrgFilter() {
+        return sourceMenuOrgFilter;
     }
 
-    public CCAccountFilter getContragentFilter() {
-        return contragentFilter;
+    public String getOrgFilter() {
+        return orgFilter;
+    }
+
+    public Object showOrgListSelectPage() {
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
+    }
+
+    public Object showOrgSelectPage() {
+        MainPage.getSessionInstance().showOrgSelectPage();
+        return null;
     }
 
     @Override
-    public void completeContragentSelection(Session session, Long idOfContragent, int multiContrFlag, String classTypes)
-            throws Exception {
-        contragentFilter.completeContragentSelection(session, idOfContragent);
+    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
+        super.completeOrgSelection(session, idOfOrg);
+        sourceMenuOrgFilter = filter;
     }
 
-    public Object showOrgListSelectPage () {
-        MainPage.getSessionInstance().showOrgListSelectPage();
-        return null;
+    @Override
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws HibernateException {
+        super.completeOrgListSelection(orgMap);
+        orgFilter = filter;
     }
 
     private DiscrepanciesDataOnOrdersAndPaymentJasperReport buildReport() {
@@ -82,9 +93,9 @@ public class DiscrepanciesDataOnOrdersAndPaymentReportPage extends OnlineReportP
             DiscrepanciesDataOnOrdersAndPaymentBuilder builder = new DiscrepanciesDataOnOrdersAndPaymentBuilder(
                     templateFilename);
             builder.setReportProperties(new Properties());
-            builder.getReportProperties().put(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID, contragentFilter.getContragent().getIdOfContragent().toString());
+            builder.getReportProperties().setProperty("idOfMenuSourceOrg", idOfOrg == null ? null : idOfOrg.toString());
             String idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
-            builder.getReportProperties().put(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
+            builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
             report = builder.build(session, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
         } catch (Exception e) {

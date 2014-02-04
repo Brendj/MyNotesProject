@@ -214,7 +214,7 @@ public class ReportRuleConstants {
             new ReportHint(StatisticsPaymentPreferentialSupplyJasperReport.class.getCanonicalName(), new int[]{3, -20}),
             new ReportHint(TelephoneNumberCountJasperReport.class.getCanonicalName(), new int[]{3, -20}),
             new ReportHint(ActiveDiscountClientsReport.class.getCanonicalName(), new int[]{3}),
-            new ReportHint(DiscrepanciesDataOnOrdersAndPaymentJasperReport.class.getCanonicalName(), new int[]{3, -30})
+            new ReportHint(DiscrepanciesDataOnOrdersAndPaymentJasperReport.class.getCanonicalName(), new int[]{3, -23})
             //new ReportHint(ReferReport.class.getCanonicalName(), new int[]{-3}),
             //new ReportHint(DailyReferReport.class.getCanonicalName(), new int[]{-3, -33})
             // отрицательное значение - обязательное

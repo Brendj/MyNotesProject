@@ -5,11 +5,10 @@ import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
-import ru.axetta.ecafe.processor.core.report.BasicReportForContragentJob;
+import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.msc.DiscrepanciesDataOnOrdersAndPaymentJasperReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -35,7 +34,7 @@ import java.util.*;
  * Отчет "Статистика о расхождении данных по заказам и оплате"
  */
 
-public class DiscrepanciesDataOnOrdersAndPaymentBuilder extends BasicReportForContragentJob.Builder {
+public class DiscrepanciesDataOnOrdersAndPaymentBuilder extends BasicReportForAllOrgJob.Builder {
 
     private final String templateFilename;
 
@@ -52,9 +51,10 @@ public class DiscrepanciesDataOnOrdersAndPaymentBuilder extends BasicReportForCo
         if (StringUtils.isEmpty(this.templateFilename)) {
             throw new Exception("Не найден файл шаблона.");
         }
-        Long idOfContragent = Long
-                .parseLong(getReportProperties().getProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID));
-        Contragent contragent = (Contragent) session.get(Contragent.class, idOfContragent);
+        if (StringUtils.isEmpty(getReportProperties().getProperty("idOfMenuSourceOrg"))) {
+            throw new Exception("Не указана организация-поставщик меню.");
+        }
+        Long sourceMenuOrgId = Long.parseLong(getReportProperties().getProperty("idOfMenuSourceOrg"));
         String idOfOrgs = StringUtils.trimToEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
         List<Long> idOfOrgList = new ArrayList<Long>();
         for (String idOfOrg : Arrays.asList(StringUtils.split(idOfOrgs, ','))) {
@@ -65,28 +65,29 @@ public class DiscrepanciesDataOnOrdersAndPaymentBuilder extends BasicReportForCo
         parameterMap.put("beginDate", CalendarUtils.dateToString(startTime));
         parameterMap.put("endDate", CalendarUtils.dateToString(endTime));
         parameterMap.put("IS_IGNORE_PAGINATION", true);
-        JRDataSource dataSource = buildDataSource(session, contragent, idOfOrgList, startTime, endTime);
+        JRDataSource dataSource = buildDataSource(session, sourceMenuOrgId, idOfOrgList, startTime, endTime);
         JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
         Date generateEndTime = new Date();
         final long generateDuration = generateEndTime.getTime() - generateBeginTime.getTime();
         return new DiscrepanciesDataOnOrdersAndPaymentJasperReport(generateBeginTime, generateDuration, jasperPrint,
-                startTime, endTime, contragent.getIdOfContragent());
+                startTime, endTime);
     }
 
     @SuppressWarnings("unchecked")
-    public JRDataSource buildDataSource(Session session, Contragent contragent, List<Long> idOfOrgList, Date startTime,
+    public JRDataSource buildDataSource(Session session, Long sourceMenuOrgId, List<Long> idOfOrgList, Date startTime,
             Date endTime) throws Exception {
         List<Item> items = new ArrayList<Item>();
         Criteria catCriteria = session.createCriteria(Org.class)
+                .createAlias("sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN)
                 .createAlias("categoriesInternal", "cat", JoinType.LEFT_OUTER_JOIN)
-                .add(Restrictions.eq("defaultSupplier", contragent))
+                .add(Restrictions.eq("sm.idOfOrg", sourceMenuOrgId))
                 .setProjection(Projections.projectionList()
-                        .add(Projections.property("idOfOrg"))
-                        .add(Projections.property("type"))
-                        .add(Projections.property("shortName"))
-                        .add(Projections.property("address"))
-                        .add(Projections.property("cat.idOfCategoryOrg"))
-                        .add(Projections.property("cat.categoryName")))
+                        .add(Projections.groupProperty("idOfOrg"))
+                        .add(Projections.groupProperty("type"))
+                        .add(Projections.groupProperty("shortName"))
+                        .add(Projections.groupProperty("address"))
+                        .add(Projections.groupProperty("cat.idOfCategoryOrg"))
+                        .add(Projections.groupProperty("cat.categoryName")))
                 .addOrder(Order.asc("idOfOrg"));
         if (!idOfOrgList.isEmpty()) {
             catCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
@@ -109,21 +110,20 @@ public class DiscrepanciesDataOnOrdersAndPaymentBuilder extends BasicReportForCo
                 orgItem.setOrgTypeCategory(orgItem.getOrgTypeCategory() + ", " + category);
             }
         }
+        // Если нет организаций, удовлетворяющих входным условиям, останавливаем выполнение отчета.
+        if (orgItems.isEmpty()) {
+            return new JRBeanCollectionDataSource(Collections.emptyList());
+        }
         Criteria orderCriteria = session.createCriteria(Org.class)
                 .createAlias("ordersInternal", "ord")
-                .add(Restrictions.eq("defaultSupplier", contragent))
                 .add(Restrictions.eq("ord.orderType", OrderTypeEnumType.CORRECTION_TYPE))
                 .add(Restrictions.ge("ord.createTime", startTime))
                 .add(Restrictions.lt("ord.createTime", endTime))
-                .setProjection(Projections.projectionList()
-                        .add(Projections.count("ord.compositeIdOfOrder.idOfOrder"))
-                        .add(Projections.sum("ord.RSum"))
-                        .add(Projections.groupProperty("idOfOrg"))
+                .add(Restrictions.in("idOfOrg", orgItems.keySet()))
+                .setProjection(Projections.projectionList().add(Projections.count("ord.compositeIdOfOrder.idOfOrder"))
+                        .add(Projections.sum("ord.RSum")).add(Projections.groupProperty("idOfOrg"))
                         .add(Projections.groupProperty("ord.createTime")))
                 .addOrder(Order.asc("idOfOrg"));
-        if (!idOfOrgList.isEmpty()) {
-            orderCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
-        }
         List<Object[]> orderRes = (List<Object[]>) orderCriteria.list();
         for (Object[] row : orderRes) {
             Item item = new Item();
