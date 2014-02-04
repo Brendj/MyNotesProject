@@ -91,7 +91,7 @@ public class SentSmsReportPage extends OnlineReportPage {
     }
 
     @Transactional
-    protected void doBuidXLS() {
+    public void doBuidXLS() {
         Session session = null;
         try {
             session = (Session) entityManager.getDelegate();
@@ -101,7 +101,7 @@ public class SentSmsReportPage extends OnlineReportPage {
         }
     }
 
-    protected void doBuidXLS(Session session) {
+    public void doBuidXLS(Session session) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
