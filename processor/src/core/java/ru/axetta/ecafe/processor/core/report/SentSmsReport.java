@@ -132,14 +132,19 @@ public class SentSmsReport extends BasicReportForAllOrgJob {
             if (org != null) {
                 orgRestrict = " and cf_orgs.idoforg=" + org.getIdOfOrg() + " ";
             }
-            String sql = "select sms_data.org, substring(sms_data.org from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
-                    + "     EXTRACT(EPOCH FROM sms_data.d) * 1000, count(sms) " + "from ("
-                    + "select IdOfSms as sms, date_trunc('day', to_timestamp(SendDate/1000)) as d, cf_orgs.shortname as org "
-                    + "from CF_ClientSms " + "join cf_clients on CF_ClientSms.IdOfClient=cf_clients.idofclient "
-                    + "join cf_orgs on cf_clients.idoforg=cf_orgs.idoforg " + "where SendDate >= :startDate and "
-                    + "      SendDate <= :endDate and "
-                    + "      DeliveryStatus in (:sentStatus, :sendStatus, :deliveredStatus) " + orgRestrict
-                    + ") as sms_data " + "group by sms_data.d, sms_data.org order by 1";
+            String sql =
+                      "select sms_data.org, substring(sms_data.org from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
+                    + "     EXTRACT(EPOCH FROM sms_data.d) * 1000, count(sms) "
+                    + "from ("
+                        + "select IdOfSms as sms, date_trunc('day', to_timestamp(servicesenddate/1000)) as d, cf_orgs.shortname as org "
+                        + "from CF_ClientSms "
+                        + "join cf_clients on CF_ClientSms.IdOfClient=cf_clients.idofclient "
+                        + "join cf_orgs on cf_clients.idoforg=cf_orgs.idoforg "
+                        + "where servicesenddate >= :startDate and "
+                        + "      servicesenddate <= :endDate and "
+                        + "      DeliveryStatus in (:sentStatus, :sendStatus, :deliveredStatus) " + orgRestrict
+                        + ") as sms_data "
+                    + "group by sms_data.d, sms_data.org order by 1";
             Query query = session.createSQLQuery(sql);
             query.setLong("startDate", start.getTime());
             query.setLong("endDate", end.getTime());
