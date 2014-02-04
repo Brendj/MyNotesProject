@@ -82,7 +82,7 @@
                         <h:outputText value="Заказ факт"/>
                     </rich:column>
                     <rich:column>
-                        <h:outputText value="Рекомендуемое кол-во для заказа"/>
+                        <h:outputText value="Рекомендуемое кол-во для заказа" rendered="false"/>
                     </rich:column>
                     <rich:column>
                         <h:outputText value="Посещение - факт"/>
@@ -113,7 +113,7 @@
             <rich:column>
                 <h:outputText value="#{item.requestCount==null?0:item.requestCount}"/>
             </rich:column>
-            <rich:column>
+            <rich:column rendered="false">
                 <h:outputText value="#{item.forecastQty==null?0:item.forecastQty}"/>
             </rich:column>
             <rich:column>

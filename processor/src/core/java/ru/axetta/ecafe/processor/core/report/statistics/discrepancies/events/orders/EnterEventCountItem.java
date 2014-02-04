@@ -17,14 +17,21 @@ class EnterEventCountItem {
 
     private Long totalCount;
     private final Date doneDate;
+    private Long count;
 
     EnterEventCountItem(Long totalCount, Date doneDate) {
         this.totalCount = totalCount;
         this.doneDate = doneDate;
+        count=1L;
     }
 
     public Long getTotalCount() {
         return totalCount;
+    }
+
+    public void setTotalCountAndCount(Long totalCount) {
+        count++;
+        this.totalCount = totalCount;
     }
 
     public void setTotalCount(Long totalCount) {
@@ -33,5 +40,9 @@ class EnterEventCountItem {
 
     Date getDoneDate() {
         return doneDate;
+    }
+
+    Long getCount() {
+        return count;
     }
 }

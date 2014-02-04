@@ -122,7 +122,7 @@ public class DiscrepanciesDataOnOrdersAndPaymentBuilder extends BasicReportForAl
                 .add(Restrictions.in("idOfOrg", orgItems.keySet()))
                 .setProjection(Projections.projectionList()
                         .add(Projections.count("ord.compositeIdOfOrder.idOfOrder"))
-                        .add(Projections.sum("ord.RSum"))
+                        .add(Projections.sum("ord.socDiscount"))
                         .add(Projections.groupProperty("idOfOrg"))
                         .add(Projections.groupProperty("ord.createTime")))
                 .addOrder(Order.asc("idOfOrg"));
