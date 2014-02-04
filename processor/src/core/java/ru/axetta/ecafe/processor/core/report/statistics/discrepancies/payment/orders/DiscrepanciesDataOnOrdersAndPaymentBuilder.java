@@ -120,14 +120,16 @@ public class DiscrepanciesDataOnOrdersAndPaymentBuilder extends BasicReportForAl
                 .add(Restrictions.ge("ord.createTime", startTime))
                 .add(Restrictions.lt("ord.createTime", endTime))
                 .add(Restrictions.in("idOfOrg", orgItems.keySet()))
-                .setProjection(Projections.projectionList().add(Projections.count("ord.compositeIdOfOrder.idOfOrder"))
-                        .add(Projections.sum("ord.RSum")).add(Projections.groupProperty("idOfOrg"))
+                .setProjection(Projections.projectionList()
+                        .add(Projections.count("ord.compositeIdOfOrder.idOfOrder"))
+                        .add(Projections.sum("ord.RSum"))
+                        .add(Projections.groupProperty("idOfOrg"))
                         .add(Projections.groupProperty("ord.createTime")))
                 .addOrder(Order.asc("idOfOrg"));
         List<Object[]> orderRes = (List<Object[]>) orderCriteria.list();
         for (Object[] row : orderRes) {
             Item item = new Item();
-            item.setCountActs(row[0] == null ? 0 : ((Long) row[0]).intValue());
+            item.setCountActs(row[0] == null || ((Long) row[0]).intValue() == 0 ? 0 : 1);
             item.setDifferentSum(row[1] == null ? BigDecimal.ZERO :
                     new BigDecimal(CurrencyStringUtils.copecksToRubles((Long) row[1], 0)));
             item.setIdOfOrg((Long) row[2]);
