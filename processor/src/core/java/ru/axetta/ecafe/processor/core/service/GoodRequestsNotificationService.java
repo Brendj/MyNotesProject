@@ -186,13 +186,16 @@ public class GoodRequestsNotificationService {
                             Criteria clientCriteria = session.createCriteria(Client.class);
                             clientCriteria.add(Property.forName("idOfClient").in(staffClientQuery));
                             clientCriteria.setProjection(Property.forName("email"));
-                            String address = (String) clientCriteria.uniqueResult();
-                            addresses.add(address);
+                            //String address = (String) clientCriteria.uniqueResult();
+                            List<String> address = clientCriteria.list();
+                            addresses.addAll(address);
                         }
 
                         boolean sended = false;
                         for (String address: addresses){
-                            sended |= eventNotificationService.sendEmail(address, notificationType, values);
+                            if(StringUtils.trimToNull(address)!=null){
+                                sended |= eventNotificationService.sendEmail(address, notificationType, values);
+                            }
                         }
                         if(sended){
                             for (DOCurrentOrgVersion version: currentOrgVersions){
