@@ -19,12 +19,14 @@
         <rich:calendar value="#{sentSmsReportPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
-        <h:outputText escape="true" value="Организация" styleClass="output-text" />
+        <h:outputText styleClass="output-text" escape="true" value="Организация" />
         <h:panelGroup>
-            <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" />
-            <h:outputText styleClass="output-text" escape="true" value=" {#{sentSmsReportPage.filter}}" />
+            <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;" >
+                <f:setPropertyActionListener value="#{sentSmsReportPage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+            </a4j:commandButton>
+            <h:outputText styleClass="output-text" escape="true" value=" {#{sentSmsReportPage.  filter}}" />
         </h:panelGroup>
 
         <a4j:commandButton value="Генерировать отчет" action="#{sentSmsReportPage.buildReport}"
@@ -39,7 +41,7 @@
     <h:panelGrid styleClass="borderless-grid">
         <%-- не показывать пустую таблицу --%>
         <c:if test="${not empty sentSmsReportPage.report && not empty sentSmsReportPage.report.htmlReport}" >
-            <h:outputText escape="true" value="Отчет по оказанным услугам" styleClass="output-text" />
+            <h:outputText escape="true" value="Статистика отправки СМС" styleClass="output-text" />
 
             <f:verbatim>
                 <style type="text/css">
