@@ -129,8 +129,19 @@ public class SentSmsReport extends BasicReportForAllOrgJob {
         public List<SentSmsItem> findSentSms(Session session, Date start, Date end) {
             List<SentSmsItem> result = new ArrayList<SentSmsItem>();
             String orgRestrict = "";
-            if (org != null) {
-                orgRestrict = " and cf_orgs.idoforg=" + org.getIdOfOrg() + " ";
+            if (reportProperties != null && reportProperties.get("idOfOrg") != null) {
+                String orgIdsStr = (String) reportProperties.get("idOfOrg");
+                String orgIds [] = orgIdsStr.split(",");
+                StringBuilder str = new StringBuilder("");
+                for(String id : orgIds) {
+                    if(str.length() > 0) {
+                        str.append(",");
+                    }
+                    str.append(id);
+                }
+                if(str.length() > 0) {
+                    orgRestrict = " and cf_orgs.idoforg in (" + str.toString() + ") ";
+                }
             }
             String sql =
                       "select sms_data.org, substring(sms_data.org from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
@@ -182,7 +193,7 @@ public class SentSmsReport extends BasicReportForAllOrgJob {
                 }
 
                 result.add(
-                        new SentSmsItem(uniqueId, orgNum, YEAR_DATE_FORMAT.format(target), target.getTime(), "" + value));
+                        new SentSmsItem(uniqueId, org, YEAR_DATE_FORMAT.format(target), target.getTime(), "" + value));
             }
 
             long columnId = 0;
