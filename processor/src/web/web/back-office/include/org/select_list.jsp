@@ -44,25 +44,14 @@
                             <f:setPropertyActionListener value="" target="#{mainPage.orgListSelectPage.filter}" />
                         </a4j:commandLink>
                     </h:panelGrid>
-
-
-                    <h:selectOneMenu value="#{mainPage.orgListSelectPage.supplierFilter}" converter="javax.faces.Integer"
-                                     styleClass="output-text" >
-                        <a4j:support event="onchange" action="#{mainPage.updateOrgListSelectPageWithItemDeselection}" reRender="modalOrgListSelectorForm"/>
-                        <f:selectItem itemValue="0" itemLabel="Школы и детские сады"/>
-                        <f:selectItem itemValue="1" itemLabel="Только школы"/>
-                        <f:selectItem itemValue="3" itemLabel="Только детские сады"/>
-                        <f:selectItem itemValue="2" itemLabel="Только поставщики"/>
-                    </h:selectOneMenu>
-
-                    <%--%><h:selectOneRadio value="#{mainPage.orgListSelectPage.supplierFilter}" converter="javax.faces.Integer"
+                    <h:selectOneRadio value="#{mainPage.orgListSelectPage.supplierFilter}" converter="javax.faces.Integer"
                                       styleClass="output-text" >
                         <a4j:support event="onclick" action="#{mainPage.updateOrgListSelectPageWithItemDeselection}" reRender="modalOrgListSelectorForm"/>
 
                         <f:selectItem itemValue="0" itemLabel="Любые организации" itemDisabled="#{mainPage.orgListSelectPage.allOrgFilterDisabled}"/>
                         <f:selectItem itemValue="1" itemLabel="Только ОУ" itemDisabled="#{mainPage.orgListSelectPage.schoolFilterDisabled}"/>
                         <f:selectItem itemValue="2" itemLabel="Только поставщики" itemDisabled="#{mainPage.orgListSelectPage.supplierFilterDisabled}"/>
-                    </h:selectOneRadio>--%>
+                    </h:selectOneRadio>
                     <h:panelGrid columns="2" styleClass="borderless-grid">
                         <a4j:commandButton action="#{mainPage.selectAllOrgListSelectedItemsList}" reRender="modalOrgListSelectorForm"
                                          styleClass="command-link" value="Выбрать все" />

@@ -81,8 +81,8 @@
                     <rich:column>
                         <h:outputText value="Заказ факт"/>
                     </rich:column>
-                    <rich:column>
-                        <h:outputText value="Рекомендуемое кол-во для заказа" rendered="false"/>
+                    <rich:column rendered="false">
+                        <h:outputText value="Рекомендуемое кол-во для заказа"/>
                     </rich:column>
                     <rich:column>
                         <h:outputText value="Посещение - факт"/>

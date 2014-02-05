@@ -34,7 +34,6 @@ import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.util.GregorianCalendar;
-import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -77,26 +76,13 @@ public class SentSmsReportPage extends OnlineReportPage {
     public void buildReport(Session session) throws Exception {
         this.report = new SentSmsReport ();
         SentSmsReport.Builder reportBuilder = new SentSmsReport.Builder();
-        /*if (idOfOrg != null) {
+        if (idOfOrg != null) {
             Org org = null;
             if (idOfOrg != null && idOfOrg > -1) {
                 org = DAOService.getInstance().findOrById(idOfOrg);
             }
             reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
-        }*/
-
-        StringBuilder str = new StringBuilder();
-        if(idOfOrgList != null && idOfOrgList.size() > 0) {
-            for(Long id : idOfOrgList) {
-                if(str.length() > 0) {
-                    str.append(",");
-                }
-                str.append(id);
-            }
         }
-        Properties props = new Properties();
-        props.setProperty("idOfOrg", str.toString());
-        reportBuilder.setReportProperties(props);
         this.report = reportBuilder.build (session, startDate, endDate, new GregorianCalendar());
     }
 

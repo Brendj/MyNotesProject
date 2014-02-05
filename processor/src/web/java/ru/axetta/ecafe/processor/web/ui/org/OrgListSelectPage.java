@@ -8,7 +8,6 @@ import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
 import ru.axetta.ecafe.processor.core.persistence.MenuExchangeRule;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
@@ -17,7 +16,6 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.*;
-import org.hibernate.metamodel.relational.IllegalIdentifierException;
 import org.hibernate.transform.Transformers;
 
 import java.util.*;
@@ -227,24 +225,7 @@ public class OrgListSelectPage extends BasicPage {
             criteria.add(Restrictions.like("tag", tagFilter, MatchMode.ANYWHERE));
         }
         if (supplierFilter != 0) {
-            switch (supplierFilter) {
-                case 1:
-                    criteria.add(Restrictions.eq("type", OrganizationType.SCHOOL));
-                    break;
-                case 2:
-                    criteria.add(Restrictions.eq("type", OrganizationType.SUPPLIER));
-                    break;
-                case 3:
-                    criteria.add(Restrictions.eq("type", OrganizationType.KINDERGARTEN));
-                    break;
-                case 0:
-                    criteria.add(Restrictions.in("type", new OrganizationType [] { OrganizationType.SCHOOL,
-                                                                                   OrganizationType.KINDERGARTEN }));
-                    break;
-                default:
-                    throw new IllegalIdentifierException("wrong type value" + supplierFilter);
-            }
-            /*Criteria destMenuExchangeCriteria = session.createCriteria(MenuExchangeRule.class);
+            Criteria destMenuExchangeCriteria = session.createCriteria(MenuExchangeRule.class);
             List menuExchangeRuleList = destMenuExchangeCriteria.list();
             HashSet<Long> idOfSourceOrgSet = new HashSet<Long>();
             for (Object object : menuExchangeRuleList) {
@@ -258,7 +239,7 @@ public class OrgListSelectPage extends BasicPage {
             if (supplierFilter == 1) {
                 criterion = Restrictions.not(criterion);
             }
-            criteria.add(criterion);*/
+            criteria.add(criterion);
         }
 
         criteria.setProjection(Projections.projectionList()
