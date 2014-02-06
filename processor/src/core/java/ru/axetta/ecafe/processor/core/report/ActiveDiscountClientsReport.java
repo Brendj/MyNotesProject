@@ -156,7 +156,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                 orgRestrict = " and cf_clients.idoforg=" + org.getIdOfOrg() + " ";
             }
             String sql =
-                    "select cf_orgs.idoforg, cf_clients.idofclient, cf_orgs.district, cf_orgs.shortname, "
+                    /*"select cf_orgs.idoforg, cf_clients.idofclient, cf_orgs.district, cf_orgs.shortname, "
                     + "       cf_orgs.address, "
                     + "       cf_persons.surname, cf_persons.firstname, cf_persons.secondname, "
                     + "       cf_clientgroups.groupname, cf_categorydiscounts.categoryname, "
@@ -179,10 +179,32 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     + "       cf_clientgroups.groupname, cf_categorydiscounts.categoryname, "
                     + "       cf_complexroles.rolename "
                     + "order by cf_orgs.district, cf_orgs.shortname, cf_clientgroups.groupname, "
-                    + "         cf_persons.surname, cf_persons.firstname, cf_clients.idofclient";
+                    + "         cf_persons.surname, cf_persons.firstname, cf_clients.idofclient";*/
+                    "SELECT org.idoforg, c.idofclient, org.district, org.shortname, org.address, "
+                            + "       p.surname, p.firstname, p.secondname, grp.groupname, dis.categoryname, "
+                            + "       od.menuDetailName, cast(od.socdiscount as double precision) / 100 "
+                            + "FROM cf_orders o "
+                            + "join cf_orderdetails od  on o.idOfOrg=od.idOfOrg and o.IdOfOrder=od.IdOfOrder "
+                            + "join cf_orgs org on org.idoforg=o.idOfOrg "
+                            + "join cf_clients c on c.idofclient=o.idofclient and c.idoforg=o.idoforg "
+                            + "join cf_persons p on c.idofperson=p.idofperson "
+                            + "join cf_clientgroups grp on grp.idoforg=c.idoforg and grp.idofclientgroup=c.idofclientgroup "
+                            + "left join cf_clients_categorydiscounts cdis on c.idofclient=cdis.idofclient "
+                            + "left join cf_categorydiscounts dis on dis.idofcategorydiscount=cdis.idofcategorydiscount "
+                            + "WHERE (o.idOfOrg=:idOfOrg) AND "
+                            + "      (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.RPrice=0 AND od.Discount>0) AND "
+                            + "      (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) "
+                            + "GROUP BY org.idoforg, c.idofclient, org.district, org.shortname, org.address, "
+                            + "       p.surname, p.firstname, p.secondname, grp.groupname, dis.categoryname, "
+                            + "       od.menuDetailName, od.socdiscount "
+                            + "order by org.district, org.shortname, grp.groupname, "
+                            + "         p.surname, p.firstname, c.idofclient";
             Query query = session.createSQLQuery(sql);
-            query.setLong("startDate", start.getTime());
-            query.setLong("endDate", end.getTime());
+            query.setParameter("idOfOrg", org.getIdOfOrg());
+            query.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
+            query.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
+            query.setParameter("startTime", start.getTime());
+            query.setParameter("endTime", end.getTime());
             List res = query.list();
             long prevIdOfClient = -1L;
             long prevIdOfOrg = -1L;
@@ -209,9 +231,9 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                 String groupName    = (String) e[8];
                 String categoryname = (String) e[9];
                 String goodName     = (String) e[10];
-                long price          = 0L;
+                double price          = 0D;
                 if (e[11] != null) {
-                    price = ((BigDecimal) e[11]).longValue();
+                    price = ((Double) e[11]).doubleValue();
                 }
                 if (goodName == null || goodName.length() < 1) {
                     goodName = "- Без льготы -";
@@ -344,7 +366,8 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                 ActiveDiscountClientsJasperItem ji = new ActiveDiscountClientsJasperItem
                         (i.getUniqueId(), columnId, i.getDistrict(), i.getName(),
                          i.getAddress(), i.getPosition(), i.getSurname(), i.getFirstname(),
-                         i.getSecondname(), i.getGroupName(), "Итого", "" + i.getTotal());
+                         i.getSecondname(), i.getGroupName(), "Итого",
+                         new BigDecimal(i.getTotal()).setScale(2, BigDecimal.ROUND_HALF_DOWN).toString());
                 result.add(ji);
             }
             return result;
@@ -360,7 +383,12 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
 
                 String val = "";
                 try {
-                    val = data.get(k).toString();
+                    Object dVal = data.get(k);
+                    if(dVal instanceof Double) {
+                        val = new BigDecimal((Double) dVal).setScale(2, BigDecimal.ROUND_HALF_DOWN).toString();
+                    } else {
+                        val = dVal.toString();
+                    }
                 } catch (Exception e) {
 
                 }
@@ -489,8 +517,8 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             this.columnName = columnName;
             this.columnValue = columnValue;
             this.categories = new HashMap<String, String>();
-            this.goods = new HashMap<String, Long>();
-            this.total = 0L;
+            this.goods = new HashMap<String, Double>();
+            this.total = 0D;
         }
 
         public Long getColumnId() {
@@ -521,7 +549,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
     public static class ActiveDiscountOrgItem extends ActiveDiscountClientsItem {
         protected int totalClients;
         protected Map<String, Integer> categoriesClients;
-        protected Map<String, Long> goodsClients;
+        protected Map<String, Double> goodsClients;
 
         public ActiveDiscountOrgItem(Long uniqueId, String district, String name) {
             this.uniqueId = uniqueId;
@@ -541,8 +569,8 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             this.secondname = "";
             this.groupName  = "";
             categoriesClients      = new HashMap<String, Integer>();
-            goodsClients           = new HashMap<String, Long>();
-            total           = 0L;
+            goodsClients           = new HashMap<String, Double>();
+            total           = 0D;
         }
 
         public void addCategoryClient(String category) {
@@ -553,10 +581,10 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             categoriesClients.put(category, cc + 1);
         }
 
-        public void addGoodClient(String category, long price) {
-            Long gc = goodsClients.get(category);
+        public void addGoodClient(String category, Double price) {
+            Double gc = goodsClients.get(category);
             if (gc == null) {
-                gc = 0L;
+                gc = 0D;
             }
             goodsClients.put(category, gc + price);
         }
@@ -565,7 +593,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             return categoriesClients;
         }
 
-        public Map<String, Long> getGoodsClients() {
+        public Map<String, Double> getGoodsClients() {
             return goodsClients;
         }
 
@@ -596,11 +624,11 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                 }
                 return "" + val;
             } else if (col.getType() == GOOD_COL) {
-                Long val = goodsClients.get(col.getName());
+                Double val = goodsClients.get(col.getName());
                 if (val == null) {
-                    return "0";
+                    return "" + 0D;
                 }
-                return "" + val;
+                return new BigDecimal(val).setScale(2, BigDecimal.ROUND_HALF_DOWN).toString();
             }
             return "";
         }
@@ -617,11 +645,11 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
         protected String secondname;
         protected String groupName;
         protected Map<String, String> categories;
-        protected Map<String, Long> goods;
-        protected Long total;
+        protected Map<String, Double> goods;
+        protected Double total;
 
 
-        protected String group = "hello";
+        protected String group = "";
         public String getGroup() {
             return group;
         }
@@ -647,8 +675,8 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             this.secondname = secondname;
             this.groupName  = groupName;
             categories      = new TreeMap<String,String>();
-            goods           = new TreeMap<String,Long>();
-            total           = 0L;
+            goods           = new TreeMap<String,Double>();
+            total           = 0D;
         }
 
         public Long getUniqueId() {
@@ -667,12 +695,12 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             this.groupName = groupName;
         }
 
-        public void addTotal(long total) {
+        public void addTotal(Double total) {
             this.total += total;
         }
 
-        public long getTotal() {
-            return total;
+        public Double getTotal() {
+            return new BigDecimal(total).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
         }
 
         public void setPosition(long position) {
@@ -683,18 +711,21 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             return position;
         }
 
-        public void addGood(String good, long price) {
+        public void addGood(String good, double price) {
             if (good == null || price < 0) {
                 return;
             }
-            Long current = goods.get(good);
+            Double current = goods.get(good);
             if (current == null) {
-                current = 0L;
+                current = 0D;
             }
             goods.put(good, current + price);
         }
 
         public void addCategory(String category) {
+            if(category == null) {
+                return;
+            }
             if (categories.containsKey(category)) {
                 return;
             }
@@ -705,14 +736,15 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             return categories;
         }
 
-        public long getGood(String good) {
+        public double getGood(String good) {
             if (goods.size() < 1) {
-                return 0L;
+                return 0D;
             }
-            return goods.get(good);
+            double val = goods.get(good);
+            return new BigDecimal(val).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
         }
         
-        public Map<String, Long> getGoods() {
+        public Map<String, Double> getGoods() {
             return goods;
         }
         
@@ -722,8 +754,9 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             return res;
         }
         
-        public Long getGoodValue(String good) {
-            return goods.get(good);
+        public Double getGoodValue(String good) {
+            double val = goods.get(good);
+            return new BigDecimal(val).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
         }
 
         public String getFullName() {
@@ -767,11 +800,11 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
 
         public void beautifyGoods(List<String> goods) {
             if (this.goods == null) {
-                this.goods = new HashMap<String, Long>();
+                this.goods = new HashMap<String, Double>();
             }
             for (String c : goods) {
                 if (!this.goods.containsKey(c)) {
-                    this.goods.put(c, 0L);
+                    this.goods.put(c, 0D);
                 }
             }
         }
@@ -798,11 +831,11 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             } else if (col.getType() == CATEGORY_COL) {
                 return categories.get(col.getName());
             } else if (col.getType() == GOOD_COL) {
-                Long val = goods.get(col.getName());
+                Double val = goods.get(col.getName());
                 if (val == null) {
                     return "";
                 }
-                return "" + val;
+                return "" + new BigDecimal(val).setScale(2, BigDecimal.ROUND_HALF_DOWN).toString();
             }
             return "";
         }
