@@ -303,8 +303,9 @@ public class SyncResponse {
             private final int discountMode;
             private final String guid;
             private boolean tempClient;
+            private int clientType;
 
-            public Item(Client client) {
+            public Item(Client client, int clientType) {
                 this.idOfClient = client.getIdOfClient();
                 this.version = client.getClientRegistryVersion();
                 this.firstName = client.getPerson().getFirstName();
@@ -327,11 +328,12 @@ public class SyncResponse {
                 this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
                 this.discountMode = client.getDiscountMode();
                 this.guid = client.getClientGUID();
+                this.clientType = clientType;
                 if (this.clientGroup!=null) this.clientGroup.getGroupName(); // lazy load
             }
 
-            public Item(Client client, boolean tempClient) {
-                this(client);
+            public Item(Client client, int clientType, boolean tempClient) {
+                this(client, clientType);
                 this.tempClient = tempClient;
             }
 
@@ -434,6 +436,7 @@ public class SyncResponse {
                 if (this.clientGroup != null) {
 			        element.setAttribute("GroupName", this.clientGroup.getGroupName());
                 }
+                element.setAttribute("ClientType", Integer.toString(this.clientType));
                 return element;
             }
 

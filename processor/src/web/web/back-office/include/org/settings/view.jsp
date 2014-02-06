@@ -36,7 +36,7 @@
 
     </h:panelGrid>
 
-    <h:panelGrid columns="2" id="settingsEditCashierCheckPrinterPanelGrid"
+    <h:panelGrid columns="2" id="settingsViewCashierCheckPrinterPanelGrid"
                  rendered="#{settingViewPage.setting.settingsId.id==0}">
 
         <h:outputText escape="true" value="Наименование принтера" styleClass="output-text" />
@@ -71,7 +71,7 @@
                      styleClass="input-text"/>
     </h:panelGrid>
 
-    <h:panelGrid columns="2" id="settingsEditSalesReportPrinterPanelGrid"
+    <h:panelGrid columns="2" id="settingsViewSalesReportPrinterPanelGrid"
                  rendered="#{settingViewPage.setting.settingsId.id==1}">
 
         <h:outputText escape="true" value="Наименование принтера" styleClass="output-text" />
@@ -103,7 +103,7 @@
 
     </h:panelGrid>
 
-    <h:panelGrid columns="2" id="settingsEditCardBalanceReportPrinterPanelGrid"
+    <h:panelGrid columns="2" id="settingsViewCardBalanceReportPrinterPanelGrid"
                  rendered="#{settingViewPage.setting.settingsId.id==2}">
 
         <h:outputText escape="true" value="Наименование принтера" styleClass="output-text" />
@@ -134,7 +134,7 @@
                      styleClass="input-text"/>
     </h:panelGrid>
 
-    <h:panelGrid columns="2" id="settingsAutoPlanPaymentSettingPanelGrid"
+    <h:panelGrid columns="2" id="settingsViewAutoPlanPaymentSettingPanelGrid"
                  rendered="#{settingViewPage.setting.settingsId.id==3}" >
 
         <h:outputText escape="true" value="Включить/Выключить устройство" styleClass="output-text" />
@@ -152,7 +152,7 @@
                      styleClass="output-text" />
     </h:panelGrid>
 
-    <h:panelGrid columns="2" id="settingsCreateSubscriberFeedingPanelGrid"
+    <h:panelGrid columns="2" id="settingsViewSubscriberFeedingPanelGrid"
                  rendered="#{settingViewPage.setting.settingsId.id==4}">
 
         <h:outputText escape="true" value="Количество дней, на которые оформляются заявки на поставку" styleClass="output-text" />
@@ -167,6 +167,18 @@
         <h:outputText escape="true" value="Количество дней, в течение которых запрещено редактировать заявки" styleClass="output-text" />
         <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.dayForbidChange}" styleClass="input-text" style="width: 207px" />
 
+    </h:panelGrid>
+
+    <h:panelGrid columns="2" id="settingsViewReplacingMissingBeneficiariesSettingPanelGrid"
+                 rendered="#{settingViewPage.setting.settingsId.id==5}" >
+
+        <h:outputText escape="true" value="Группа" styleClass="output-text" />
+        <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.value}"
+                     styleClass="output-text" />
+
+        <h:outputText escape="true" value="Копуса (1 - только свой корпус / 2 - все корпуса)" styleClass="output-text" />
+        <h:inputText readonly="true" value="#{settingViewPage.setting.splitSettingValue.orgParam}"
+                     styleClass="output-text" />
     </h:panelGrid>
 
     <h:panelGrid columns="2">

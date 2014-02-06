@@ -18,6 +18,7 @@ public class SettingValueParser {
             case CardBalanceReportPrinter: parserBySettingValue = new CardBalanceReportPrinterSettingValue(values); break;
             case AutoPlanPaymentSetting: parserBySettingValue = new AutoPlanPaymentSettingSettingValue(values); break;
             case SubscriberFeeding: parserBySettingValue = new SubscriberFeedingSettingSettingValue(values); break;
+            case ReplacingMissingBeneficiaries: parserBySettingValue = new ReplacingMissingBeneficiariesSettingSettingValue(values); break;
         }
     }
 

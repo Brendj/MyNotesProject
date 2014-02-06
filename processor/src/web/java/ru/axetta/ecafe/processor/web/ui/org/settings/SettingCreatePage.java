@@ -72,6 +72,7 @@ public class SettingCreatePage extends BasicWorkspacePage implements OrgSelectPa
                 case 2: setting.setSettingValue("Microsoft XPS Document Writer;42;1;16;12;12;Спасибо;"); break;
                 case 3: setting.setSettingValue("0;0:00;100;");break;
                 case 4: setting.setSettingValue("5;2;0;2;");break;
+                case 5: setting.setSettingValue("Резерв;2;");break;
             }
             setting.setSettingsId(SettingsIds.fromInteger(settingsIds));
             parserBySettingValue = setting.getSplitSettingValue();

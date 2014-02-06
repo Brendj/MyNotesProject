@@ -2286,7 +2286,11 @@ public class Processor implements SyncProcessor,
             orgList.add(organization);
             List<Client> clients = DAOUtils.findNewerClients(persistenceSession, orgList, clientRegistryRequest.getCurrentVersion());
             for (Client client : clients) {
-                clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client));
+                if(client.getOrg().getIdOfOrg().equals(idOfOrg)){
+                    clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0));
+                } else {
+                    clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 1));
+                }
             }
             List<Long> activeClientsId = DAOUtils.findActiveClientsId(persistenceSession, orgList);
             // Получаем чужих клиентов.
@@ -2295,7 +2299,7 @@ public class Processor implements SyncProcessor,
                 boolean isTempClient = entry.getKey().equals("TemporaryClients");
                 for (Client cl : entry.getValue()) {
                     if (cl.getClientRegistryVersion() > clientRegistryRequest.getCurrentVersion()) {
-                        clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(cl, isTempClient));
+                        clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(cl, 2, isTempClient));
                     }
                     activeClientsId.add(cl.getIdOfClient());
                 }
@@ -2318,7 +2322,11 @@ public class Processor implements SyncProcessor,
                 for (Object object : errorClients) {
                     Client client = (Client) object;
                     client.setClientGroup(clientGroup);
-                    clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client));
+                    if(client.getOrg().getIdOfOrg().equals(idOfOrg)){
+                        clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 0));
+                    } else {
+                        clientRegistry.addItem(new SyncResponse.ClientRegistry.Item(client, 1));
+                    }
                 }
             }
 

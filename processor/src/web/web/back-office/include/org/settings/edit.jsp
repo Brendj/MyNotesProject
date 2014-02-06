@@ -243,7 +243,7 @@
 
         </h:panelGrid>
 
-        <h:panelGrid columns="2" id="settingsAutoPlanPaymentSettingPanelGrid"
+        <h:panelGrid columns="2" id="settingsEditAutoPlanPaymentSettingPanelGrid"
                      rendered="#{settingEditPage.settingsIds==3}" >
             <h:outputText escape="true" value="Включить/Выключить устройство" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{settingEditPage.parserBySettingValue.offOnFlag}">
@@ -262,7 +262,7 @@
                                     step="1" showToolTip="true" />
         </h:panelGrid>
 
-        <h:panelGrid columns="2" id="settingsCreateSubscriberFeedingPanelGrid"
+        <h:panelGrid columns="2" id="settingsEditSubscriberFeedingPanelGrid"
                      rendered="#{settingEditPage.settingsIds==4}">
 
             <h:outputText escape="true" value="Количество дней, на которые оформляются заявки на поставку" styleClass="output-text" />
@@ -279,6 +279,25 @@
 
             <h:outputText escape="true" value="Количество дней, в течение которых запрещено редактировать заявки" styleClass="output-text" />
             <h:inputText value="#{settingEditPage.parserBySettingValue.dayForbidChange}" styleClass="input-text" style="width: 207px"/>
+        </h:panelGrid>
+
+        <h:panelGrid columns="2" id="settingsEditReplacingMissingBeneficiariesSettingPanelGrid"
+                     rendered="#{settingEditPage.settingsIds==5}" >
+            <h:outputText escape="true" value="Группа" styleClass="output-text" />
+            <rich:comboBox width="230" enableManualInput="false" inputClass="input-text" itemClass="output-text"
+                           defaultLabel="#{settingEditPage.parserBySettingValue.value}"
+                           value="#{settingEditPage.parserBySettingValue.value}" itemSelectedClass="output-text-font">
+                <f:selectItem itemValue="Резерв" itemLabel="Резерв"/>
+                <f:selectItem itemValue="Все" itemLabel="Все"/>
+            </rich:comboBox>
+
+            <h:outputText escape="true" value="Копуса (1 - только свой корпус / 2 - все корпуса)" styleClass="output-text" />
+            <rich:comboBox width="230" enableManualInput="false" inputClass="input-text" itemClass="output-text"
+                           defaultLabel="#{settingEditPage.parserBySettingValue.orgParam}"
+                           value="#{settingEditPage.parserBySettingValue.orgParam}" itemSelectedClass="output-text-font">
+                <f:selectItem itemValue="1" itemLabel="Только свой корпус"/>
+                <f:selectItem itemValue="2" itemLabel="Все корпуса"/>
+            </rich:comboBox>
         </h:panelGrid>
 
     </h:panelGrid>

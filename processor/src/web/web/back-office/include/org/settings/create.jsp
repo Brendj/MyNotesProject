@@ -282,6 +282,25 @@
             <h:inputText value="#{settingCreatePage.parserBySettingValue.dayForbidChange}" styleClass="input-text" style="width: 207px"/>
         </h:panelGrid>
 
+        <h:panelGrid columns="2" id="settingsCreateReplacingMissingBeneficiariesSettingPanelGrid" rendered="#{settingCreatePage.settingsIds==5}" >
+            <h:outputText escape="true" value="Группа" styleClass="output-text" />
+            <rich:comboBox width="230" inputClass="input-text" itemClass="output-text"
+                           defaultLabel="#{settingCreatePage.parserBySettingValue.value}"
+                           value="#{settingCreatePage.parserBySettingValue.value}" itemSelectedClass="output-text-font">
+                <f:selectItem itemValue="Резерв" itemLabel="Резерв"/>
+                <f:selectItem itemValue="Все" itemLabel="Все"/>
+            </rich:comboBox>
+
+            <h:outputText escape="true" value="Копуса (1 - только свой корпус / 2 - все корпуса)" styleClass="output-text" />
+            <rich:comboBox width="230" enableManualInput="false" inputClass="input-text" itemClass="output-text"
+                           defaultLabel="#{settingCreatePage.parserBySettingValue.orgParam}"
+                           value="#{settingCreatePage.parserBySettingValue.orgParam}" itemSelectedClass="output-text-font">
+                <f:selectItem itemValue="1" itemLabel="Только свой корпус"/>
+                <f:selectItem itemValue="2" itemLabel="Все корпуса"/>
+            </rich:comboBox>
+
+        </h:panelGrid>
+
     </h:panelGrid>
 
     <h:panelGrid columns="2">

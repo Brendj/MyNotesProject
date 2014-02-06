@@ -63,7 +63,7 @@ public class AggregateGoodRequestReportPage extends OnlineReportWithContragentPa
         Session session = null;
         try {
             session = (Session) entityManager.getDelegate();
-            List<OrgShortItem> orgs = OrgListSelectPage.retrieveOrgs(session, "", "", 2);
+            List<OrgShortItem> orgs = OrgListSelectPage.retrieveOrgs(session, "", "", 2, null);
             Map<Long, String> contragentsMap = new HashMap<Long, String>();
             selectIdOfOrgList = false;
             for (OrgShortItem i : orgs) {

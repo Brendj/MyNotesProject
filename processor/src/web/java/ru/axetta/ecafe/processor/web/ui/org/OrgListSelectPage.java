@@ -153,7 +153,7 @@ public class OrgListSelectPage extends BasicPage {
         return supplierFilterDisabled;
     }
 
-    public void fill(Session session, String orgFilter, Boolean isUpdate) throws Exception {
+    public void fill(Session session, String orgFilter, Boolean isUpdate, List<Long> idOfSupplier) throws Exception {
         if(isUpdate) {
             updateSelectedOrgs();
         } else {
@@ -171,7 +171,7 @@ public class OrgListSelectPage extends BasicPage {
             } catch (Exception e){}
         }
         ///
-        List<OrgShortItem> items = retrieveOrgs(session);
+        List<OrgShortItem> items = retrieveOrgs(session, idOfSupplier);
         for (OrgShortItem orgShortItem: items){
             orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
         }
@@ -179,13 +179,13 @@ public class OrgListSelectPage extends BasicPage {
         this.items = items;
     }
     
-    public void fill(Session session, Boolean isUpdate) throws Exception {
+    public void fill(Session session, Boolean isUpdate, List<Long> idOfSupplier) throws Exception {
         if(isUpdate) {
             updateSelectedOrgs();
         } else {
             selectedOrgs.clear();
         }
-        List<OrgShortItem> items = retrieveOrgs(session);
+        List<OrgShortItem> items = retrieveOrgs(session, idOfSupplier);
         for (OrgShortItem orgShortItem: items){
             orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
         }
@@ -202,13 +202,13 @@ public class OrgListSelectPage extends BasicPage {
         }
     }
 
-    private List<OrgShortItem> retrieveOrgs(Session session) throws HibernateException {
+    private List<OrgShortItem> retrieveOrgs(Session session, List<Long> idOfSupplier) throws HibernateException {
         deselectAllItems();
-        return retrieveOrgs(session, filter, tagFilter, supplierFilter);
+        return retrieveOrgs(session, filter, tagFilter, supplierFilter, idOfSupplier);
     }
 
     @SuppressWarnings("unchecked")
-    public static List<OrgShortItem> retrieveOrgs(Session session, String filter, String tagFilter, int supplierFilter) throws HibernateException {
+    public static List<OrgShortItem> retrieveOrgs(Session session, String filter, String tagFilter, int supplierFilter, List<Long> idOfSupplier) throws HibernateException {
         Criteria criteria = session.createCriteria(Org.class);
         criteria.addOrder(Order.asc("idOfOrg"));
         //  Ограничение оргов, которые позволено видеть пользователю
@@ -223,6 +223,9 @@ public class OrgListSelectPage extends BasicPage {
         }
         if (StringUtils.isNotEmpty(tagFilter)) {
             criteria.add(Restrictions.like("tag", tagFilter, MatchMode.ANYWHERE));
+        }
+        if(idOfSupplier!=null && !idOfSupplier.isEmpty()){
+            criteria.createAlias("sourceMenuOrgs","sm").add(Restrictions.in("sm.idOfOrg", idOfSupplier));
         }
         if (supplierFilter != 0) {
             Criteria destMenuExchangeCriteria = session.createCriteria(MenuExchangeRule.class);
@@ -246,6 +249,7 @@ public class OrgListSelectPage extends BasicPage {
                 .add(Projections.distinct(Projections.property("idOfOrg")),"idOfOrg")
                 .add(Projections.property("shortName"),"shortName")
                 .add(Projections.property("officialName"),"officialName")
+                .add(Projections.property("address"),"address")
         );
 
         criteria.setResultTransformer(Transformers.aliasToBean(OrgShortItem.class));

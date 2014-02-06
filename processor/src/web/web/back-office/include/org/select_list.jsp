@@ -78,6 +78,10 @@
                             <h:outputText escape="true" value="#{item.shortName} (#{item.officialName})"
                                           styleClass="output-text" />
                         </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="#{item.address}"
+                                          styleClass="output-text" />
+                        </rich:column>
                         <f:facet name="footer">
                             <rich:datascroller for="modalOrgListSelectorOrgTable" renderIfSinglePage="false" maxPages="5"
                                                fastControls="hide" stepControls="auto" boundaryControls="hide">
