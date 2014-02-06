@@ -1257,6 +1257,7 @@
       <module fileurl="file://$PROJECT_DIR$/pubkey.iml" filepath="$PROJECT_DIR$/pubkey.iml" />
       <module fileurl="file://$PROJECT_DIR$/registry-import.iml" filepath="$PROJECT_DIR$/registry-import.iml" />
       <module fileurl="file://$PROJECT_DIR$/smpp/smpp.iml" filepath="$PROJECT_DIR$/smpp/smpp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/subfeeding.iml" filepath="$PROJECT_DIR$/subfeeding.iml" />
       <module fileurl="file://$PROJECT_DIR$/synctest.iml" filepath="$PROJECT_DIR$/synctest.iml" />
       <module fileurl="file://$PROJECT_DIR$/testmodule/testmodule.iml" filepath="$PROJECT_DIR$/testmodule/testmodule.iml" />
       <module fileurl="file://$PROJECT_DIR$/util.iml" filepath="$PROJECT_DIR$/util.iml" />
@@ -1384,6 +1385,7 @@
     <mapping directory="" vcs="svn" />
     <mapping directory="$PROJECT_DIR$/../../src/client-room" vcs="svn" />
     <mapping directory="$PROJECT_DIR$/../../src/org-room" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../../src/subfeeding" vcs="svn" />
     <mapping directory="$PROJECT_DIR$/../../src/testmodule" vcs="svn" />
   </component>
   <component name="WebServicesPlugin" addRequiredLibraries="true" />
