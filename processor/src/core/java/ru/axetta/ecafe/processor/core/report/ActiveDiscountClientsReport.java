@@ -181,24 +181,24 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     + "order by cf_orgs.district, cf_orgs.shortname, cf_clientgroups.groupname, "
                     + "         cf_persons.surname, cf_persons.firstname, cf_clients.idofclient";*/
                     "SELECT org.idoforg, c.idofclient, org.district, org.shortname, org.address, "
-                            + "       p.surname, p.firstname, p.secondname, grp.groupname, dis.categoryname, "
-                            + "       od.menuDetailName, cast(od.socdiscount as double precision) / 100 "
-                            + "FROM cf_orders o "
-                            + "join cf_orderdetails od  on o.idOfOrg=od.idOfOrg and o.IdOfOrder=od.IdOfOrder "
-                            + "join cf_orgs org on org.idoforg=o.idOfOrg "
-                            + "join cf_clients c on c.idofclient=o.idofclient and c.idoforg=o.idoforg "
-                            + "join cf_persons p on c.idofperson=p.idofperson "
-                            + "join cf_clientgroups grp on grp.idoforg=c.idoforg and grp.idofclientgroup=c.idofclientgroup "
-                            + "left join cf_clients_categorydiscounts cdis on c.idofclient=cdis.idofclient "
-                            + "left join cf_categorydiscounts dis on dis.idofcategorydiscount=cdis.idofcategorydiscount "
-                            + "WHERE (o.idOfOrg=:idOfOrg) AND "
-                            + "      (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.RPrice=0 AND od.Discount>0) AND "
-                            + "      (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) "
-                            + "GROUP BY org.idoforg, c.idofclient, org.district, org.shortname, org.address, "
-                            + "       p.surname, p.firstname, p.secondname, grp.groupname, dis.categoryname, "
-                            + "       od.menuDetailName, od.socdiscount "
-                            + "order by org.district, org.shortname, grp.groupname, "
-                            + "         p.surname, p.firstname, c.idofclient";
+                    + "       p.surname, p.firstname, p.secondname, grp.groupname, dis.categoryname, "
+                    + "       od.menuDetailName, cast(SUM(od.Qty*(od.RPrice+od.socdiscount)) as double precision) / 100 "
+                    + "FROM cf_orders o "
+                    + "join cf_orderdetails od  on o.idOfOrg=od.idOfOrg and o.IdOfOrder=od.IdOfOrder "
+                    + "join cf_orgs org on org.idoforg=o.idOfOrg "
+                    + "join cf_clients c on c.idofclient=o.idofclient and c.idoforg=o.idoforg "
+                    + "join cf_persons p on c.idofperson=p.idofperson "
+                    + "left join cf_clientgroups grp on grp.idoforg=c.idoforg and grp.idofclientgroup=c.idofclientgroup "
+                    + "left join cf_clients_categorydiscounts cdis on c.idofclient=cdis.idofclient "
+                    + "left join cf_categorydiscounts dis on dis.idofcategorydiscount=cdis.idofcategorydiscount "
+                    + "WHERE (o.idOfOrg=:idOfOrg) AND "
+                    + "      (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.RPrice=0 AND od.Discount>0) AND "
+                    + "      (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) "
+                    + "GROUP BY org.idoforg, c.idofclient, org.district, org.shortname, org.address, "
+                    + "       p.surname, p.firstname, p.secondname, grp.groupname, dis.categoryname, "
+                    + "       od.menuDetailName, od.socdiscount "
+                    + "order by org.district, org.shortname, grp.groupname, "
+                    + "         p.surname, p.firstname, c.idofclient";
             Query query = session.createSQLQuery(sql);
             query.setParameter("idOfOrg", org.getIdOfOrg());
             query.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
@@ -615,7 +615,11 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     case CLASS_COL:
                         return "";
                     case TOTAL_COL:
-                        return "" + total;
+                        if(total == null) {
+                            return "0";
+                        } else {
+                            return "" + new BigDecimal(total).setScale(2, BigDecimal.ROUND_HALF_DOWN).toString();
+                        }
                 }
             } else if (col.getType() == CATEGORY_COL) {
                 Integer val = categoriesClients.get(col.getName());
