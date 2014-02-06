@@ -77,6 +77,8 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
     private static final String HIGH_CLASSES_TYPE_NAME       = "Старшие";
     private static final String ORDER_TYPE_NAME              = "Заказ";
     private static final String ALL_TYPE_NAME                = "Все";
+    public static final String DISCOUNT_START = "Платное питание[";
+    public static final String DISCOUNT_END = "%]";
     private static final Logger logger = LoggerFactory.getLogger(FeedPlanPage.class);
 
     @PersistenceContext(unitName = "processorPU")
@@ -96,6 +98,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
     private Map<Integer, Boolean> disabledComplexes;
     private boolean clearPlan;
     private boolean orderRegistrationResult;
+    private boolean displayDiscountClients = true;
 
 
 
@@ -203,6 +206,12 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
         List<Complex> allComplexes = new ArrayList<Complex>();
         List<Complex> superComlexGroups = new ArrayList<Complex>();
         Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
+        String feedTypeRestrict = " and position('" + DISCOUNT_START + "' in cf_discountrules.description)";
+        if(displayDiscountClients) {
+            feedTypeRestrict += "=0 ";
+        } else {
+            feedTypeRestrict += ">0 ";
+        }
 
 
         String sql = "select cf_clientgroups.idofclientgroup, cf_clientgroups.groupname, cf_clients.idofclient, cf_persons.firstname, "
@@ -221,6 +230,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
                 + "          cf_temporary_orders.idofcomplex=cf_clientscomplexdiscounts.idofcomplex and "
                 + "          cf_temporary_orders.plandate=:plandate "
                 + "where cf_clients.idoforg=:idoforg and CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 " //+ groupFilter
+                +        feedTypeRestrict 
                 + "order by groupNum, groupname, cf_persons.firstname, cf_persons.secondname, cf_persons.surname, cf_clients.idofclient, idofcomplex";
         org.hibernate.Query q = session.createSQLQuery(sql);
         q.setLong("idoforg", org.getIdOfOrg());
@@ -249,12 +259,25 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             if (price == null) {
                 price = 0L;
             }
+            double discountRate = 100D;
+            if(!displayDiscountClients) {
+                if(ruleDescription.indexOf(DISCOUNT_START) == 0) {
+                    String discount = ruleDescription.substring(
+                            ruleDescription.indexOf(DISCOUNT_START) + DISCOUNT_START.length(),
+                            ruleDescription.indexOf(DISCOUNT_END));
+                    discountRate = Integer.parseInt(discount);
+                    //ruleDescription = "";
+                } else {
+                    discountRate = 100;
+                }
+            }
 
 
             //  Добавляем клиента
             Client cl = new Client(idofclientgroup, idofclient, firstName, secondname, surname,
                     idofrule, ruleDescription, idofcomplex, priority, price, action, inBuilding);
             cl.setGroupNum(groupNum);
+            cl.setDiscountRate(discountRate);
             if (action != null) {
                 cl.setTemporarySaved(true);
             }
@@ -770,6 +793,16 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
         RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
     }
 
+    public void doSwitchToDiscountClients() {
+        displayDiscountClients = true;
+        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
+    }
+
+    public void doSwitchToPayPlan() {
+        displayDiscountClients = false;
+        RuntimeContext.getAppContext().getBean(FeedPlanPage.class).fill();
+    }
+
     /*public void onClientFeedActionEvent (ClientFeedActionEvent event) {
         //  Если значение было установлено для всех, то выполняем выбранную операцию для всех отображаемых клиентов
         int actionType = event.getActionType();
@@ -1234,6 +1267,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
         protected Long idoforder;
         protected Long idofReplaceClient;
         protected Integer groupNum;
+        protected double discountRate;
 
         public Client() {
 
@@ -1254,6 +1288,15 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             actionType = action == null ? BLOCK_CLIENT : action;
             this.inBuilding = inBuilding == null ? OUTSIDE_CLIENT : inBuilding;
             this.price = price;
+            this.discountRate = 100D;
+        }
+
+        public double getDiscountRate() {
+            return discountRate;
+        }
+
+        public void setDiscountRate(double discountRate) {
+            this.discountRate = discountRate;
         }
 
         public long getIdofclientgroup() {

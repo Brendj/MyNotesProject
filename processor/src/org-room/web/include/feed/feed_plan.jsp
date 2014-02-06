@@ -97,6 +97,9 @@ white-space: nowrap;
     width: 1%;
     text-align: right;
 }
+.viewControl {
+    width: 1%
+}
 .status {
     width: 49%
 }
@@ -124,7 +127,7 @@ white-space: nowrap;
 <a4j:form id="setupFeedPlanForm">
     <h:panelGrid id="setupFeedPlanGrid" binding="#{feedPlanPage.pageComponent}" styleClass="borderless-grid" style="width: 100%;">
         <a4j:region>
-        <h:panelGrid id="planDateCalendar" columns="3" columnClasses="calendar,status,calendarText">
+        <h:panelGrid id="planDateCalendar" columns="3" columnClasses="calendar,viewControl,status,calendarText">
             <h:panelGrid columns="4">
                 <h:outputText styleClass="output-text-mod" value="План питания:"/>
                 <a4j:commandButton value="<" action="#{feedPlanPage.doDecreaseDay}" reRender="planDateCalendar,planGrid,groupsGrid,messages,totalMessage" status="feedPlanStatus"/>
@@ -134,6 +137,14 @@ white-space: nowrap;
                     <a4j:support event="onchanged" reRender="planGrid,groupsGrid,messages,totalMessage" bypassUpdates="true" />
                 </rich:calendar>
                 <a4j:commandButton value=">" action="#{feedPlanPage.doIncreaseDay}" reRender="planDateCalendar,planGrid,groupsGrid,messages,totalMessage" status="feedPlanStatus"/>
+            </h:panelGrid>
+            <h:panelGrid columns="2">
+                <a4j:commandLink value="Льготный план" action="#{feedPlanPage.doSwitchToDiscountClients}"
+                                 reRender="planDateCalendar,planGrid,groupsGrid,messages,totalMessage"
+                                 styleClass="command-button" status="feedPlanStatus" />
+                <a4j:commandLink value="Платный план" action="#{feedPlanPage.doSwitchToPayPlan}"
+                                 reRender="planDateCalendar,planGrid,groupsGrid,messages,totalMessage"
+                                 styleClass="command-button" status="feedPlanStatus" />
             </h:panelGrid>
             <a4j:status id="feedPlanStatus" onstart="onstartloading()" onstop="onstoploading()">
                 <f:facet name="start">
@@ -234,6 +245,13 @@ white-space: nowrap;
                             <h:outputText styleClass="output-text-mod" value="Цена"/>
                         </f:facet>
                         <h:outputText styleClass="output-text" value="#{client.price} р."/>
+                    </rich:column>
+
+                    <rich:column styleClass="#{client.lineStyleClass}">
+                        <f:facet name="header">
+                            <h:outputText styleClass="output-text-mod" value="Скидка (%)"/>
+                        </f:facet>
+                        <h:outputText styleClass="output-text" value="#{client.discountRate} %"/>
                     </rich:column>
                 </rich:dataTable>
                 </a4j:region>
