@@ -538,15 +538,29 @@
         </library>
       </libraries>
     </data-source>
-    <data-source source="LOCAL" name="Local MoscowDB" product="PostgreSQL" version="9.1.1" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="cedfba61-0f44-4ced-9708-18045311d229">
+    <data-source source="LOCAL" name="Local MoscowDB" product="PostgreSQL" version="9.2.4" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="cedfba61-0f44-4ced-9708-18045311d229">
       <identifier-quote-string>&quot;</identifier-quote-string>
       <synchronize>true</synchronize>
+      <auto-commit>false</auto-commit>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/moscow</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/ecafe_db</jdbc-url>
+      <user-name>postgres</user-name>
+      <user-password>dfdadfcbdfd9dfd9dfdddfc5dfd8dfce</user-password>
+      <schema-pattern>ecafe_db.*</schema-pattern>
+      <default-schemas>moscow.public</default-schemas>
+      <default-dialect>PostgreSQL</default-dialect>
+      <libraries>
+        <library>
+          <url>jar://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar!/</url>
+        </library>
+      </libraries>
+    </data-source>
+    <data-source source="LOCAL" name="Local Stand Data Source" product="" version="" jdbc-version="" driver-name="" driver-version="" uuid="225e21f8-d312-4780-aa94-b5ee2ffc7bbc">
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://corp.axetta-server:5432/amoscow</jdbc-url>
       <user-name>postgres</user-name>
       <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>moscow.public</schema-pattern>
-      <default-schemas>moscow.public</default-schemas>
       <libraries>
         <library>
           <url>jar://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar!/</url>
@@ -1247,6 +1261,7 @@
   </component>
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/client-group-updater.iml" filepath="$PROJECT_DIR$/client-group-updater.iml" />
       <module fileurl="file://$PROJECT_DIR$/client-room/client-room.iml" filepath="$PROJECT_DIR$/client-room/client-room.iml" />
       <module fileurl="file://$PROJECT_DIR$/core.iml" filepath="$PROJECT_DIR$/core.iml" />
       <module fileurl="file://$PROJECT_DIR$/dashboard-ws-client.iml" filepath="$PROJECT_DIR$/dashboard-ws-client.iml" />
@@ -1383,6 +1398,7 @@
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="svn" />
+    <mapping directory="$PROJECT_DIR$/../../src/client-group-updater" vcs="svn" />
     <mapping directory="$PROJECT_DIR$/../../src/client-room" vcs="svn" />
     <mapping directory="$PROJECT_DIR$/../../src/org-room" vcs="svn" />
     <mapping directory="$PROJECT_DIR$/../../src/subfeeding" vcs="svn" />
