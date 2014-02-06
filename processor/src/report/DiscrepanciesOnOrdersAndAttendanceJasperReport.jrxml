@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DiscrepanciesOnOrdersAndAttendanceJasperReport" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="716ced14-f7b3-4bb2-a948-9b5cfd7d7894">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="36"/>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<parameter name="beginDate" class="java.lang.String"/>
+	<parameter name="endDate" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="idOfOrg" class="java.lang.Long"/>
+	<field name="district" class="java.lang.String"/>
+	<field name="orgTypeCategory" class="java.lang.String"/>
+	<field name="shortName" class="java.lang.String"/>
+	<field name="number" class="java.lang.String"/>
+	<field name="address" class="java.lang.String"/>
+	<field name="currentDate" class="java.util.Date"/>
+	<field name="requestCount" class="java.lang.Long"/>
+	<field name="enterEventCount" class="java.lang.Long"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="44" splitType="Stretch">
+			<textField>
+				<reportElement uuid="571e7f1b-b8e0-48b8-a703-5d7bbbbec024" x="0" y="0" width="802" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Статистика расхождения данных по заказам и посещаемости"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="729cd781-a5b1-4538-b323-8d10702949f1" x="0" y="20" width="802" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["За " + ($P{beginDate}.equals($P{endDate}) ? $P{beginDate} : $P{beginDate} + " - " + $P{endDate})]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="350" splitType="Immediate">
+			<crosstab>
+				<reportElement uuid="9ac76f60-9904-450b-a60a-fffbddcbbddd" x="0" y="0" width="802" height="350"/>
+				<crosstabHeaderCell>
+					<cellContents>
+						<staticText>
+							<reportElement uuid="2ec9186e-48ce-4683-9be4-ae199bde732f" style="Crosstab Data Text" x="0" y="0" width="70" height="66"/>
+							<textElement/>
+							<text><![CDATA[Округ]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="08a94f90-2afe-4514-a6c0-4f76832b1be1" style="Crosstab Data Text" x="70" y="0" width="91" height="66"/>
+							<textElement/>
+							<text><![CDATA[Тип ОО]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="a004cc8f-a8f9-48aa-b2a9-7930242fde3f" style="Crosstab Data Text" x="161" y="0" width="133" height="66"/>
+							<textElement/>
+							<text><![CDATA[Наименование ОО]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="b1846757-b7f0-4fcd-a780-a98cfefcc85f" style="Crosstab Data Text" x="294" y="0" width="74" height="66"/>
+							<textElement/>
+							<text><![CDATA[№ ОО]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="a474c0f1-12a9-4eeb-8c13-ca75b15db456" style="Crosstab Data Text" x="368" y="0" width="86" height="64"/>
+							<textElement/>
+							<text><![CDATA[Адрес ОО]]></text>
+						</staticText>
+					</cellContents>
+				</crosstabHeaderCell>
+				<rowGroup name="district" width="0">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{district}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents/>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="orgTypeCategory" width="0">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{orgTypeCategory}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents/>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="shortName" width="0">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{shortName}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents/>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="number" width="0">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{number}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents/>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="address" width="454">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{address}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField>
+								<reportElement uuid="bffb8f70-0cb2-4da2-8619-4ab1732a329c" style="Crosstab Data Text" x="368" y="0" width="86" height="43"/>
+								<textElement verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{address}]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement uuid="24a61c9e-6e5d-42d6-b452-11141d684a66" style="Crosstab Data Text" x="0" y="0" width="70" height="43"/>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{district}]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement uuid="e09c273b-1590-430b-bd2f-0ca55ca41ad3" style="Crosstab Data Text" x="70" y="0" width="91" height="43"/>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{orgTypeCategory}]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement uuid="b244481f-fa60-46e1-b161-d84c8d8b2f02" style="Crosstab Data Text" x="161" y="0" width="133" height="43"/>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{shortName}]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement uuid="6f6cc259-6103-4ad3-849e-55f6e029f91b" style="Crosstab Data Text" x="294" y="0" width="74" height="43"/>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{number}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="currentDate" height="66">
+					<bucket class="java.util.Date">
+						<bucketExpression><![CDATA[$F{currentDate}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
+							<textField>
+								<reportElement uuid="c6822a49-0caa-4b49-b284-78f59396482b" style="Crosstab Data Text" x="0" y="0" width="302" height="16"/>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{currentDate}]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement uuid="307248ed-312a-4c16-a67b-eaaf9ae11a8c" style="Crosstab Data Text" x="0" y="16" width="97" height="48"/>
+								<textElement/>
+								<textFieldExpression><![CDATA["Заказ факт"]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement uuid="5e5d8285-ce5c-4d47-a7c8-6f7a44885296" style="Crosstab Data Text" x="97" y="16" width="96" height="48"/>
+								<textElement/>
+								<textFieldExpression><![CDATA["Посещение - факт"]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement uuid="df716d49-4996-48be-8a27-8c64c0481416" style="Crosstab Data Text" x="193" y="16" width="109" height="48"/>
+								<textElement/>
+								<textFieldExpression><![CDATA["% несоответствия"]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="requestMeasure" class="java.lang.Long">
+					<measureExpression><![CDATA[$F{requestCount}]]></measureExpression>
+				</measure>
+				<measure name="enterEventCount" class="java.lang.Long">
+					<measureExpression><![CDATA[$F{enterEventCount}]]></measureExpression>
+				</measure>
+				<crosstabCell width="308" height="47">
+					<cellContents>
+						<textField>
+							<reportElement uuid="814fb8de-c984-4270-add7-86cdaf2de568" style="Crosstab Data Text" x="0" y="0" width="97" height="43"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{requestMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="ec8a140c-ec9d-4fe2-a812-40f383369181" style="Crosstab Data Text" x="97" y="0" width="96" height="43"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{enterEventCount}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="808644ef-00f8-4a58-843e-d3c9d01a5e5e" style="Crosstab Data Text" x="193" y="0" width="109" height="43"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[($V{requestMeasure} - $V{enterEventCount})*100/$V{requestMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="50" columnTotalGroup="currentDate">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<textField>
+							<reportElement uuid="23831a4b-167a-4150-99cb-82acf1ab1f1a" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{requestMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="district">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="district" columnTotalGroup="currentDate">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="orgTypeCategory">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="orgTypeCategory" columnTotalGroup="currentDate">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="shortName">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="shortName" columnTotalGroup="currentDate">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="number">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="number" columnTotalGroup="currentDate">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="address">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="address" columnTotalGroup="currentDate">
+					<cellContents/>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+</jasperReport>

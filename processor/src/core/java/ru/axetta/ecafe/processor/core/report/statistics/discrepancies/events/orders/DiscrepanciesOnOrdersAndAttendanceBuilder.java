@@ -4,9 +4,22 @@
 
 package ru.axetta.ecafe.processor.core.report.statistics.discrepancies.events.orders;
 
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.JRHtmlExporter;
+import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
+
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
+import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
+import ru.axetta.ecafe.processor.core.report.BasicReportJob;
+import ru.axetta.ecafe.processor.core.report.SentSmsItem;
+import ru.axetta.ecafe.processor.core.report.msc.DiscrepanciesOnOrdersAndAttendanceJasperReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -17,8 +30,10 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.DateFormatSymbols;
 import java.util.*;
 
 import static org.hibernate.criterion.Order.asc;
@@ -30,7 +45,60 @@ import static org.hibernate.criterion.Order.asc;
  * Time: 14:03
  * To change this template use File | Settings | File Templates.
  */
-public class DiscrepanciesOnOrdersAndAttendanceBuilder {
+public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAllOrgJob.Builder{
+
+    private final String templateFilename;
+    private boolean exportToHTML = false;
+
+    public DiscrepanciesOnOrdersAndAttendanceBuilder(String templateFilename) {
+        this.templateFilename = templateFilename;
+    }
+
+    public DiscrepanciesOnOrdersAndAttendanceBuilder() {
+        templateFilename = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath()
+                + DiscrepanciesOnOrdersAndAttendanceJasperReport.class.getSimpleName() + ".jasper";
+        exportToHTML = true;
+    }
+
+
+    @Override
+    public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
+        Date generateTime = new Date();
+            /* Строим параметры для передачи в jasper */
+        Map<String, Object> parameterMap = new HashMap<String, Object>();
+        calendar.setTime(startTime);
+        int month = calendar.get(Calendar.MONTH);
+        parameterMap.put("day", calendar.get(Calendar.DAY_OF_MONTH));
+        parameterMap.put("month", month + 1);
+        parameterMap.put("monthName", new DateFormatSymbols().getMonths()[month]);
+        parameterMap.put("year", calendar.get(Calendar.YEAR));
+        parameterMap.put("startDate", startTime);
+        parameterMap.put("endDate", endTime);
+
+
+        Date generateEndTime = new Date();
+        DiscrepanciesOnOrdersAndAttendanceReport report = build(session, null, null, calendar, startTime, endTime);
+        JRDataSource dataSource = new JRBeanCollectionDataSource(report.getItems());
+        JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
+        //  Если имя шаблона присутствует, значит строится для джаспера
+        if (!exportToHTML) {
+            final long generateDuration = generateEndTime.getTime() - generateTime.getTime();
+            return new DiscrepanciesOnOrdersAndAttendanceJasperReport(generateTime, generateDuration, jasperPrint,startTime, endTime);
+        } else {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            JRHtmlExporter exporter = new JRHtmlExporter();
+            exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+            exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
+            exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
+            exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
+            exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
+            exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
+            exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
+            exporter.exportReport();
+            final long l = generateEndTime.getTime() - generateTime.getTime();
+            return new DiscrepanciesOnOrdersAndAttendanceJasperReport(generateTime, l,jasperPrint, startTime, endTime);
+        }
+    }
 
     public DiscrepanciesOnOrdersAndAttendanceReport build(Session session, List<Long> idOfSupplier, List<Long> idOfOrgs,
             Calendar calendar, Date startTime, Date endTime) throws  Exception{
