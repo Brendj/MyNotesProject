@@ -153,7 +153,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             List<ActiveDiscountClientsItem> result = new ArrayList<ActiveDiscountClientsItem>();
             String orgRestrict = "";
             if (org != null) {
-                orgRestrict = " and cf_clients.idoforg=" + org.getIdOfOrg() + " ";
+                orgRestrict = " (o.idOfOrg=" + org.getIdOfOrg() + ") AND  ";
             }
             String sql =
                     /*"select cf_orgs.idoforg, cf_clients.idofclient, cf_orgs.district, cf_orgs.shortname, "
@@ -191,7 +191,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     + "left join cf_clientgroups grp on grp.idoforg=c.idoforg and grp.idofclientgroup=c.idofclientgroup "
                     + "left join cf_clients_categorydiscounts cdis on c.idofclient=cdis.idofclient "
                     + "left join cf_categorydiscounts dis on dis.idofcategorydiscount=cdis.idofcategorydiscount "
-                    + "WHERE (o.idOfOrg=:idOfOrg) AND "
+                    + "WHERE " + orgRestrict
                     + "      (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.RPrice=0 AND od.Discount>0) AND "
                     + "      (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) "
                     + "GROUP BY org.idoforg, c.idofclient, org.district, org.shortname, org.address, "
@@ -200,7 +200,6 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     + "order by org.district, org.shortname, grp.groupname, "
                     + "         p.surname, p.firstname, c.idofclient";
             Query query = session.createSQLQuery(sql);
-            query.setParameter("idOfOrg", org.getIdOfOrg());
             query.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
             query.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
             query.setParameter("startTime", start.getTime());
