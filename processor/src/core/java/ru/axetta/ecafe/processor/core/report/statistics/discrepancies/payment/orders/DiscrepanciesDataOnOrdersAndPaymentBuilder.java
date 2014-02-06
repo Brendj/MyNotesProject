@@ -116,13 +116,15 @@ public class DiscrepanciesDataOnOrdersAndPaymentBuilder extends BasicReportForAl
         }
         Criteria orderCriteria = session.createCriteria(Org.class)
                 .createAlias("ordersInternal", "ord")
+                .createAlias("ord.orderDetailsInternal", "ord_det")
                 .add(Restrictions.eq("ord.orderType", OrderTypeEnumType.CORRECTION_TYPE))
                 .add(Restrictions.ge("ord.createTime", startTime))
                 .add(Restrictions.lt("ord.createTime", endTime))
                 .add(Restrictions.in("idOfOrg", orgItems.keySet()))
+                .add(Restrictions.lt("ord_det.qty", 0L))
                 .setProjection(Projections.projectionList()
-                        .add(Projections.count("ord.compositeIdOfOrder.idOfOrder"))
-                        .add(Projections.sum("ord.socDiscount"))
+                        .add(Projections.countDistinct("ord.compositeIdOfOrder.idOfOrder"))
+                        .add(Projections.sum("ord_det.socDiscount"))
                         .add(Projections.groupProperty("idOfOrg"))
                         .add(Projections.groupProperty("ord.createTime")))
                 .addOrder(Order.asc("idOfOrg"));
