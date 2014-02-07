@@ -36,7 +36,7 @@ import java.util.*;
 public class OrderDetailsDAOService extends AbstractDAOService {
 
     @SuppressWarnings("unchecked")
-    public Long findNotNullGoodsFullNameByOrgByDayAndGoodEq(Long idOfOrg, Date start, String fullname) {
+    public Long buildRegisterStampBodyValue(Long idOfOrg, Date start, String fullname, boolean withOutActDiscrepancies) {
         String sql ="select sum(orderdetail.qty) from cf_orders cforder" +
                 " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
                 "   and orderdetail.idoforder = cforder.idoforder" +
@@ -44,7 +44,8 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 " where cforder.createddate>=:startDate and cforder.createddate<:endDate and orderdetail.socdiscount>0 and" +
                 " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"' and " +
                 " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
-                " cforder.ordertype in (0,1,4,6,8) " +
+                " (cforder.ordertype in (0,1,4,6) or (cforder.ordertype=8 "
+                + (!withOutActDiscrepancies?" and orderdetail.qty>=0 ":" ") + " )) " +
                 " group by orderdetail.qty ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idoforg",idOfOrg);
@@ -64,7 +65,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
     }
 
     @SuppressWarnings("unchecked")
-    public Long findNotNullGoodsFullNameByOrgByDailySampleAndGoodEq(Long idOfOrg, Date start, Date end, String fullname) {
+    public Long buildRegisterStampDailySampleValue(Long idOfOrg, Date start, Date end, String fullname) {
         String sql ="select sum(orderdetail.qty) from cf_orders cforder" +
                 " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
                 "   and orderdetail.idoforder = cforder.idoforder" +

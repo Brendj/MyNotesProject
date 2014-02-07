@@ -7,9 +7,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
-import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampReportItem;
-import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -28,6 +26,8 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class RegisterStampReport extends BasicReportForOrgJob {
+
+    public static final String PARAM_WITH_OUT_ACT_DISCREPANCIES = "includeActDiscrepancies";
 
     private final static Logger logger = LoggerFactory.getLogger(RegisterStampReport.class);
 
@@ -69,6 +69,13 @@ public class RegisterStampReport extends BasicReportForOrgJob {
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
             OrderDetailsDAOService service = new OrderDetailsDAOService();
             service.setSession(session);
+
+            String withOutActDiscrepanciesParam = (String) getReportProperties().get(PARAM_WITH_OUT_ACT_DISCREPANCIES);
+            boolean withOutActDiscrepancies = false;
+            if (withOutActDiscrepanciesParam!=null) {
+                withOutActDiscrepancies = withOutActDiscrepanciesParam.trim().equalsIgnoreCase("true");
+            }
+
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
             List<GoodItem> allGoods = service.findAllGoods(org.getIdOfOrg());
             List<RegisterStampReportItem> result = new ArrayList<RegisterStampReportItem>();
@@ -76,7 +83,8 @@ public class RegisterStampReport extends BasicReportForOrgJob {
             while (endTime.getTime()>calendar.getTimeInMillis()){
                 String date = timeFormat.format(calendar.getTime());
                 for (GoodItem goodItem: allGoods){
-                    Long val = service.findNotNullGoodsFullNameByOrgByDayAndGoodEq(org.getIdOfOrg(),calendar.getTime(), goodItem.getFullName());
+                    Long val = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
+                            goodItem.getFullName(), withOutActDiscrepancies);
                     RegisterStampReportItem item = new RegisterStampReportItem(goodItem.getPathPart3(),goodItem.getPathPart4(),val,date);
                     RegisterStampReportItem total = new RegisterStampReportItem(goodItem.getPathPart3(),goodItem.getPathPart4(),val,"77777");
                     RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem.getPathPart3(),goodItem.getPathPart4(),val,"99999");
@@ -87,7 +95,8 @@ public class RegisterStampReport extends BasicReportForOrgJob {
                 calendar.add(Calendar.DATE,1);
             }
             for (GoodItem goodItem: allGoods){
-                Long val = service.findNotNullGoodsFullNameByOrgByDailySampleAndGoodEq(org.getIdOfOrg(),startTime, endTime, goodItem.getFullName());
+                Long val = service.buildRegisterStampDailySampleValue(org.getIdOfOrg(), startTime, endTime,
+                        goodItem.getFullName());
                 RegisterStampReportItem dailySampleItem = new RegisterStampReportItem(goodItem.getPathPart3(),goodItem.getPathPart4(),val,"88888");
                 RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem.getPathPart3(),goodItem.getPathPart4(),val,"99999");
                 result.add(allTotal);

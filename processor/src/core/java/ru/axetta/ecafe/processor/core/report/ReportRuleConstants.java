@@ -170,7 +170,8 @@ public class ReportRuleConstants {
             new ParamHint("methodValues", "Какие-то значения из метода").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION + RuleProcessor.METHOD_EXPRESSION + "ru.axetta.ecafe.processor.core.RuleProcessor.testMethodCalling"),
             new ParamHint("radioValues", "Какие-то значения из радио").setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{100}сто,{200}двести,{300}триста"),
             new ParamHint("input", "Какие-то произольное значение").setDefaultRule("= " + RuleProcessor.INPUT_EXPRESSION + RuleProcessor.METHOD_EXPRESSION + "ru.axetta.ecafe.processor.core.RuleProcessor.inputValueMethodCalling"),*/
-
+            new ParamHint(RegisterStampReport.PARAM_WITH_OUT_ACT_DISCREPANCIES, "Показывать без расхождений")
+                    .setDefaultRule("= "+RuleProcessor.CHECKBOX_EXPRESSION+" {true}"), //34
     };
 
     public static final ReportHint[] REPORT_HINTS = {
@@ -191,7 +192,7 @@ public class ReportRuleConstants {
             new ReportHint(DailySalesByGroupsReport.class.getCanonicalName(), new int[]{3, 23, 29, 25, 26, 27, 32}),
             new ReportHint(SubscriptionFeedingJasperReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(ClientOrderDetailsByOneOrgReport.class.getCanonicalName(), new int[]{3, 4, 5}),
-            new ReportHint(RegisterStampReport.class.getCanonicalName(), new int[]{3, 4, 5}),
+            new ReportHint(RegisterStampReport.class.getCanonicalName(), new int[]{3, 4, 5, 34}),
             new ReportHint(ComplaintCountByGoodReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(ComplaintCausesReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(ComplaintIterationsReport.class.getCanonicalName(), new int[]{3, 4, 5}),

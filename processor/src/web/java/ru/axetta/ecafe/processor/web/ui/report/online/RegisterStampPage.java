@@ -97,6 +97,7 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
     private OrgShortItem org;
     private Date start;
     private Date end;
+    private Boolean withOutActDiscrepancies = true;
     private final OrderDetailsDAOService service = new OrderDetailsDAOService();
     private List<RegisterStampPageItem> pageItems = new ArrayList<RegisterStampPageItem>();
     private List<GoodItem> allGoods = new LinkedList<GoodItem>();
@@ -238,7 +239,8 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
             String date = timeFormat.format(localCalendar.getTime());
             RegisterStampPageItem item = new RegisterStampPageItem(date, allGoods);
             for (String l: item.getSetKey()){
-                Long val = service.findNotNullGoodsFullNameByOrgByDayAndGoodEq(org.getIdOfOrg(),localCalendar.getTime(), l);
+                Long val = service.buildRegisterStampBodyValue(org.getIdOfOrg(), localCalendar.getTime(), l,
+                        withOutActDiscrepancies);
                 item.addValue(l, val);
                 total.addValue(l, val);
                 allTotal.addValue(l, val);
@@ -249,7 +251,7 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
         pageItems.add(total);
         RegisterStampPageItem dailySampleItem = new RegisterStampPageItem("Суточная проба", allGoods);
         for (String l: dailySampleItem.getSetKey()){
-            Long val = service.findNotNullGoodsFullNameByOrgByDailySampleAndGoodEq(org.getIdOfOrg(),start, end, l);
+            Long val = service.buildRegisterStampDailySampleValue(org.getIdOfOrg(), start, end, l);
             dailySampleItem.addValue(l, val);
             allTotal.addValue(l, val);
         }
@@ -283,6 +285,14 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
 
     public Date getEnd() {
         return end;
+    }
+
+    public Boolean getWithOutActDiscrepancies() {
+        return withOutActDiscrepancies;
+    }
+
+    public void setWithOutActDiscrepancies(Boolean withOutActDiscrepancies) {
+        this.withOutActDiscrepancies = withOutActDiscrepancies;
     }
 
     public void setEnd(Date end) {

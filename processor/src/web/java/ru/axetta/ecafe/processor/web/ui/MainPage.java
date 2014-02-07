@@ -1688,16 +1688,6 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         return null;
     }*/
 
-    private List<Long> idOfSupplier = new ArrayList<Long>();
-
-    public List<Long> getIdOfSupplier() {
-        return idOfSupplier;
-    }
-
-    public void setIdOfSupplier(List<Long> idOfSupplier) {
-        this.idOfSupplier = idOfSupplier;
-    }
-
     public Object showOrgListSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {
@@ -1710,9 +1700,9 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                    orgListSelectPage.fill(persistenceSession, false, idOfSupplier);
+                    orgListSelectPage.fill(persistenceSession, false);
                 } else {
-                    orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false, idOfSupplier);
+                    orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -1768,9 +1758,9 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                orgListSelectPage.fill(persistenceSession, true, idOfSupplier);
+                orgListSelectPage.fill(persistenceSession, true);
             } else {
-                orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, true, idOfSupplier);
+                orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, true);
             }
             //orgListSelectPage.fill(persistenceSession);
             persistenceTransaction.commit();
