@@ -91,7 +91,7 @@ white-space: nowrap;
     text-align: right;
 }
 .calendar {
-    width: 50%;
+    width: 350px;
 }
 .calendarText {
     width: 1%;
@@ -101,7 +101,7 @@ white-space: nowrap;
     width: 1%
 }
 .status {
-    width: 49%
+    width: 62%
 }
 
 .allButtonsCol1 {
@@ -249,9 +249,16 @@ white-space: nowrap;
 
                     <rich:column styleClass="#{client.lineStyleClass}">
                         <f:facet name="header">
-                            <h:outputText styleClass="output-text-mod" value="Скидка (%)"/>
+                            <h:outputText styleClass="output-text-mod" value="На счете"/>
                         </f:facet>
-                        <h:outputText styleClass="output-text" value="#{client.discountRate} %"/>
+                        <h:outputText styleClass="output-text" value="#{client.balance} р."/>
+                    </rich:column>
+
+                    <rich:column styleClass="#{client.lineStyleClass}">
+                        <f:facet name="header">
+                            <h:outputText styleClass="output-text-mod" value="Скидка"/>
+                        </f:facet>
+                        <h:outputText styleClass="output-text" value="#{client.discountRate}%"/>
                     </rich:column>
                 </rich:dataTable>
                 </a4j:region>

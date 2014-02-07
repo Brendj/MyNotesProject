@@ -218,7 +218,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
                 + "       cf_persons.secondname, cf_persons.surname, cf_clientscomplexdiscounts.idofrule, description, "
                 + "       cf_clientscomplexdiscounts.idofcomplex, cf_discountrules.priority, CAST(substring(groupname FROM '[0-9]+') AS INTEGER) as groupNum, "
                 + "       cf_complexinfo.currentprice, cf_temporary_orders.action, cf_temporary_orders.IdOfOrder, cf_temporary_orders.idofreplaceclient, "
-                + "       cf_temporary_orders.inBuilding "
+                + "       cf_temporary_orders.inBuilding, cf_clients.balance "
                 + "from cf_clients "
                 + "join cf_clientscomplexdiscounts on cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient "
                 + "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "
@@ -256,6 +256,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             Long idoforder = HibernateUtils.getDbLong(o[13]);
             Long idofreplaceclient = HibernateUtils.getDbLong(o[14]);
             Integer inBuilding = HibernateUtils.getDbInt(o[15]);
+            Long balance = HibernateUtils.getDbLong(o[16]);
             if (price == null) {
                 price = 0L;
             }
@@ -278,6 +279,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
                     idofrule, ruleDescription, idofcomplex, priority, price, action, inBuilding);
             cl.setGroupNum(groupNum);
             cl.setDiscountRate(discountRate);
+            cl.setBalance(((double) balance) / 100);
             if (action != null) {
                 cl.setTemporarySaved(true);
             }
@@ -482,7 +484,21 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
 
 
             ru.axetta.ecafe.processor.core.persistence.Client dbClient = DAOService.getInstance().findClientById(client.getIdofclient());
-            long discountPrice = DAOService.getInstance().getComplexPrice(org.getIdOfOrg(), client.getComplex());
+            long fullPrice = DAOService.getInstance().getComplexPrice(org.getIdOfOrg(), client.getComplex());
+            long discountPrice = 0L;
+            long rsumPrice = 0L;
+            if(client.getDiscountRate() != 100) {
+                rsumPrice = client.getDiscountRate() == 0 ? fullPrice : (long)
+                          (fullPrice - (fullPrice * client.getDiscountRate() / 100));
+                discountPrice = fullPrice - rsumPrice;
+            } else {
+                rsumPrice = 0L;
+                discountPrice = fullPrice;
+            }
+            /*if(client.getBalance() * 100 < rsumPrice) {
+                result.put(client, "Не удалось осуществить оплату: у клиента недостаточно средств на счете");
+                continue;
+            }*/
             OrderPurchaseItem opi = getOrderPurchaseItem(client, org.getIdOfOrg(), session);
             if (opi == null) {
                 result.put(client, "Не удалось осуществить оплату: отсутствует информация о стоимости комплекса");
@@ -503,8 +519,8 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             payment.setTime(paymentDate);
             payment.setOrderDate(paymentDate);
             payment.setTrdDiscount(0L);
-            payment.setOrderType(4);
-            payment.setRSum(0L);
+            payment.setOrderType(client.getDiscountRate() != 100 ? 3 : 4);
+            payment.setRSum(rsumPrice);
             payment.setSumByCard(0L);
             payment.setSumByCash(0L);
             payment.setSocDiscount(discountPrice);
@@ -513,7 +529,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             PosPurchase purchase = new PosPurchase();
             purchase.setIdOfOrderDetail(DAOService.getInstance().getNextIdOfOrderDetail(org));
             purchase.setQty(1L);
-            purchase.setRPrice(0L);
+            purchase.setRPrice(rsumPrice);
             purchase.setDiscount(discountPrice);
             purchase.setSocDiscount(discountPrice);
             purchase.setName(opi.getName());
@@ -989,7 +1005,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             if (client.getSaved()) {
                 return "[Без замены]";
             } else {
-                return "[Нажмите для выбора замены]";
+                return "[Выбрать]";
             }
         }
         for (ReplaceClient replaceCl : replaceClients) {
@@ -997,7 +1013,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
                 return replaceCl.getFullName();
             }
         }
-        return "[Нажмите для выбора замены]";
+        return "[Выбрать]";
     }
 
     public List<Client> getClients() {
@@ -1268,6 +1284,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
         protected Long idofReplaceClient;
         protected Integer groupNum;
         protected double discountRate;
+        protected double balance;
 
         public Client() {
 
@@ -1289,6 +1306,15 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
             this.inBuilding = inBuilding == null ? OUTSIDE_CLIENT : inBuilding;
             this.price = price;
             this.discountRate = 100D;
+            this.balance = 0D;
+        }
+
+        public double getBalance() {
+            return balance;
+        }
+
+        public void setBalance(double balance) {
+            this.balance = balance;
         }
 
         public double getDiscountRate() {
