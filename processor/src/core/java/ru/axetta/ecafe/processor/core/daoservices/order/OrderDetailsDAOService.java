@@ -45,8 +45,8 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"' and " +
                 " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
                 " (cforder.ordertype in (0,1,4,6) or (cforder.ordertype=8 "
-                + (!withOutActDiscrepancies?" and orderdetail.qty>=0 ":" ") + " )) " +
-                " group by orderdetail.qty ";
+                + (!withOutActDiscrepancies?" and orderdetail.qty>=0 ":" ") + " )) " ;//+
+              //  " group by orderdetail.qty ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idoforg",idOfOrg);
         query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
@@ -55,9 +55,11 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(start);
         calendar.add(Calendar.DATE, 1);
-        query.setParameter("endDate",calendar.getTimeInMillis()-1);
+        long endTime = calendar.getTimeInMillis()-1;
+        query.setParameter("endDate", endTime);
         List list = query.list();
-        if(list==null || list.isEmpty()){
+
+        if(list==null || list.isEmpty() || list.get(0)==null){
             return  0L;
         } else {
             return new Long(list.get(0).toString());
@@ -74,8 +76,8 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 //" cforder.idoforg=:idoforg and split_part(good.fullname, '/', 4) like '"+part4+"'" +
                 " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
                 " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"' and" +
-                " cforder.ordertype in (5) "+
-                " group by orderdetail.qty ";
+                " cforder.ordertype in (5) "; //+
+                //" group by orderdetail.qty ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idoforg",idOfOrg);
         query.setParameter("startDate",start.getTime());
