@@ -217,6 +217,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             long orgCount = 0;
             long districtCount = 0;
             long totalCount = 0;
+            String prevCategoryname = "";
             for (Object entry : res) {
                 Object e[]          = (Object[]) entry;
                 long idoforg        = ((BigInteger) e[0]).longValue();
@@ -273,24 +274,28 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     orgCount++;
                     districtCount++;
                     totalCount++;
+                    orgItem.addCategoryClient(categoryname);
+                    districtItem.addCategoryClient(categoryname);
+                    overallItem.addCategoryClient(categoryname);
                 }
-                item.addCategory(categoryname);
-                item.addGood(goodName, price);
-                item.addTotal(price);
 
-                orgItem.addCategoryClient(categoryname);
-                orgItem.addGoodClient(goodName, price);
-                orgItem.addTotal(price);
-                districtItem.addCategoryClient(categoryname);
-                districtItem.addGoodClient(goodName, price);
-                districtItem.addTotal(price);
-                overallItem.addCategoryClient(categoryname);
-                overallItem.addGoodClient(goodName, price);
-                overallItem.addTotal(price);
+                //  Фикс от дублирования категорий
+                if(!item.getGoods().containsKey(goodName)) {
+                    orgItem.addGoodClient(goodName, price);
+                    districtItem.addGoodClient(goodName, price);
+                    overallItem.addGoodClient(goodName, price);
+                    item.addTotal(price);
+                    orgItem.addTotal(price);
+                    districtItem.addTotal(price);
+                    overallItem.addTotal(price);
+                }
+                item.addGood(goodName, price);
+                item.addCategory(categoryname);
 
                 prevIdOfClient = idofclient;
                 prevIdOfOrg = idoforg;
                 prevDistrict = district;
+                prevCategoryname = categoryname;
             }
             if (orgItem != null) {
                 orgItem.setUniqueId(uniqueId);
@@ -722,7 +727,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             if (current == null) {
                 current = 0D;
             }
-            goods.put(good, current + price);
+            goods.put(good, price);
         }
 
         public void addCategory(String category) {
