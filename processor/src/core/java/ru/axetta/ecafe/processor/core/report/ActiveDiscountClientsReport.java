@@ -127,6 +127,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             if (exportToObjects) {
                 return new ActiveDiscountClientsReport(startTime, endTime, items);
             }
+            beautifyForJasper(items);
             List<ActiveDiscountClientsJasperItem> jasperItems = splitItems(items);
             JasperPrint jasperPrint = JasperFillManager.fillReport
                     (templateFilename, parameterMap, createDataSource(jasperItems));
@@ -155,6 +156,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             if (org != null) {
                 orgRestrict = " (o.idOfOrg=" + org.getIdOfOrg() + ") AND  ";
             }
+            orgRestrict = " (o.idOfOrg in (0, 71, 3, 4)) AND ";
             String sql =
                     /*"select cf_orgs.idoforg, cf_clients.idofclient, cf_orgs.district, cf_orgs.shortname, "
                     + "       cf_orgs.address, "
@@ -192,6 +194,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     + "left join cf_clients_categorydiscounts cdis on c.idofclient=cdis.idofclient "
                     + "left join cf_categorydiscounts dis on dis.idofcategorydiscount=cdis.idofcategorydiscount "
                     + "WHERE " + orgRestrict
+                    + "      o.rsum=0 and "
                     + "      (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.RPrice=0 AND od.Discount>0) AND "
                     + "      (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) "
                     + "GROUP BY org.idoforg, c.idofclient, org.district, org.shortname, org.address, "
@@ -254,6 +257,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     if (orgItem != null){
                         orgItem.setUniqueId(uniqueId);
                         orgItem.setPosition(districtCount);
+                        orgCount = 0;
                         result.add(orgItem);
                         uniqueId++;
                     }
@@ -351,7 +355,45 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             return new JRBeanCollectionDataSource(items);
         }
 
+        private void beautifyForJasper(List<ActiveDiscountClientsItem> items) {
+            //  Получаем полный список всех льготныз групп
+            Set<String> categories = new TreeSet<String> ();
+            for(ActiveDiscountClientsItem i : items) {
+                if(!(i instanceof ActiveDiscountOrgItem)) {
+                    continue;
+                }
+
+                ActiveDiscountOrgItem iOrg = (ActiveDiscountOrgItem) i;
+                Map<String, Integer> iCats = iOrg.getCategoriesClients();
+                for(String cat : iCats.keySet()) {
+                    if(cat == null) {
+                        continue;
+                    }
+                    if(categories.contains(cat)) {
+                        continue;
+                    }
+                    categories.add(cat);
+                }
+            }
+            if(categories.size() < 1) {
+                return;
+            }
+
+
+            //  В каждый объект добавляем отсутствующую группу, если таковая есть
+            for(ActiveDiscountClientsItem i : items) {
+                if(!(i instanceof ActiveDiscountOrgItem)) {
+                    continue;
+                }
+                ActiveDiscountOrgItem iOrg = (ActiveDiscountOrgItem) i;
+                for(String cat : categories) {
+                    iOrg.setZeroIfNoCategoryClients(cat);
+                }
+            }
+        }
+
         private List<ActiveDiscountClientsJasperItem> splitItems(List<ActiveDiscountClientsItem> items) {
+
             List<ActiveDiscountClientsJasperItem> result = new ArrayList<ActiveDiscountClientsJasperItem>();
             for (ActiveDiscountClientsItem i : items) {
                 long columnId = 0;
@@ -379,6 +421,11 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
 
         protected long addActiveDiscountClientsJasperItem(ActiveDiscountClientsItem item, Map data, long columnId,
                 List<ActiveDiscountClientsJasperItem> result) {
+            return addActiveDiscountClientsJasperItem(item, data, columnId, result, null);
+        }
+
+        protected long addActiveDiscountClientsJasperItem(ActiveDiscountClientsItem item, Map data, long columnId,
+                List<ActiveDiscountClientsJasperItem> result, String replaceWith) {
             Set<String> keys = data.keySet();
             for(String k : keys) {
                 if (k == null || k.length() < 1 || item.getUniqueId() == null) {
@@ -394,7 +441,9 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                         val = dVal.toString();
                     }
                 } catch (Exception e) {
-
+                }
+                if(val == null && replaceWith != null && replaceWith.length() > 0) {
+                    val = replaceWith;
                 }
                 ActiveDiscountClientsJasperItem ji = new ActiveDiscountClientsJasperItem
                         (item.getUniqueId(), columnId, item.getDistrict(), item.getName(),
@@ -583,6 +632,13 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                 cc = 0;
             }
             categoriesClients.put(category, cc + 1);
+        }
+
+        public void setZeroIfNoCategoryClients(String category) {
+            Integer cc = categoriesClients.get(category);
+            if (cc == null) {
+                categoriesClients.put(category, 0);
+            }
         }
 
         public void addGoodClient(String category, Double price) {
@@ -837,7 +893,11 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                         return "" + total;
                 }
             } else if (col.getType() == CATEGORY_COL) {
-                return categories.get(col.getName());
+                String val = categories.get(col.getName());
+                if(val == null) {
+                    return "";
+                }
+                return val;
             } else if (col.getType() == GOOD_COL) {
                 Double val = goods.get(col.getName());
                 if (val == null) {
