@@ -204,6 +204,19 @@
         </element>
       </root>
     </artifact>
+    <artifact name="client-group-updater:jar">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/client_group_updater_jar</output-path>
+      <root id="root">
+        <element id="archive" name="client-group-updater.jar">
+          <element id="directory" name="META-INF">
+            <element id="file-copy" path="$PROJECT_DIR$/../../src/client-group-updater/src/META-INF/MANIFEST.MF" />
+          </element>
+          <element id="module-output" name="client-group-updater" />
+        </element>
+        <element id="library" level="project" name="postgresql-9.1-901.jdbc4" />
+        <element id="file-copy" path="$PROJECT_DIR$/../lib/apache/log4j-1.2.16.jar" />
+      </root>
+    </artifact>
   </component>
   <component name="ClearCaseSharedConfig">
     <option name="myUseUcmModel" value="true" />
@@ -538,15 +551,15 @@
         </library>
       </libraries>
     </data-source>
-    <data-source source="LOCAL" name="Local MoscowDB" product="PostgreSQL" version="9.2.4" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="cedfba61-0f44-4ced-9708-18045311d229">
+    <data-source source="LOCAL" name="Local MoscowDB" product="PostgreSQL" version="9.1.1" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="cedfba61-0f44-4ced-9708-18045311d229">
       <identifier-quote-string>&quot;</identifier-quote-string>
       <synchronize>true</synchronize>
       <auto-commit>false</auto-commit>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/ecafe_db</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/moscow</jdbc-url>
       <user-name>postgres</user-name>
-      <user-password>dfdadfcbdfd9dfd9dfdddfc5dfd8dfce</user-password>
-      <schema-pattern>ecafe_db.*</schema-pattern>
+      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+      <schema-pattern>moscow.public</schema-pattern>
       <default-schemas>moscow.public</default-schemas>
       <default-dialect>PostgreSQL</default-dialect>
       <libraries>

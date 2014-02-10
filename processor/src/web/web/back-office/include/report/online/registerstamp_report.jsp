@@ -52,8 +52,8 @@
             <a4j:support event="onchange" reRender="endDateCalendar" actionListener="#{registerStampPage.onReportPeriodChanged}"/>
         </h:selectOneMenu>
 
-        <h:outputText value="Показывать без расхождений: " styleClass="output-text"/>
-        <h:selectBooleanCheckbox value="#{registerStampPage.withOutActDiscrepancies}"/>
+        <h:outputText value="Показывать с расхождениями: " styleClass="output-text"/>
+        <h:selectBooleanCheckbox value="#{registerStampPage.includeActDiscrepancies}"/>
 
         <a4j:commandButton value="Применить" action="#{registerStampPage.reload}"
                            reRender="registerStampReportPanelGrid" />

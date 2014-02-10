@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Class-Path: lib/postgresql-9.1-901.jdbc4.jar lib/log4j-1.2.16.jar
+Class-Path: postgresql-9.1-901.jdbc4.jar log4j-1.2.16.jar
 Main-Class: ru.axetta.Main
 

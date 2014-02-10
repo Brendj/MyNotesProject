@@ -390,7 +390,7 @@ public class ClientManager {
                                     clientGroupName);
                     if (clientGroup == null) {
                         clientGroup = DAOUtils
-                                .createNewClientGroup(persistenceSession, client.getOrg().getIdOfOrg(), clientGroupName);
+                                .createClientGroup(persistenceSession, client.getOrg().getIdOfOrg(), clientGroupName);
                     }
                     client.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                 } else {

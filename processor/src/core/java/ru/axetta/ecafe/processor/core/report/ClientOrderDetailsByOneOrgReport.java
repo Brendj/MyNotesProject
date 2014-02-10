@@ -46,6 +46,7 @@ public class ClientOrderDetailsByOneOrgReport extends BasicReportForOrgJob {
                 throws Exception {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
+            calendar.setTime(startTime);
             int month = calendar.get(Calendar.MONTH);
             parameterMap.put("orgName", org.getOfficialName());
             parameterMap.put("day", calendar.get(Calendar.DAY_OF_MONTH));
@@ -55,7 +56,6 @@ public class ClientOrderDetailsByOneOrgReport extends BasicReportForOrgJob {
             parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
 
-            calendar.setTime(startTime);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
             Date generateEndTime = new Date();

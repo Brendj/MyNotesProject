@@ -378,42 +378,6 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         printMessage("Данные обновлены.");
     }
 
-
-    /**
-     * Устанавливаем организацию для выбранного списка клиентов
-     * @param session
-     * @throws Exception
-     */
-    public void setOldOrg(Session session) throws Exception {
-        if (this.items.isEmpty())
-            return;
-        Org org = null;
-        OrgItem orgItem = null;
-        if (this.getClientFilter().getOrg().getIdOfOrg() != null) {
-            org = (Org) session.load(Org.class, this.getClientFilter().getOrg().getIdOfOrg());
-        }
-        if (org == null)
-            return;
-        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
-        for (Item item : this.items) {
-            ClientGroup clientGroup = null;
-            org.hibernate.Query q;
-            if (item.getClientGroupName()!=null) {
-                DAOUtils.findClientGroupByGroupNameAndIdOfOrg(session, org.getIdOfOrg(), item.getClientGroupName());
-                if (clientGroup == null) clientGroup = DAOUtils.createNewClientGroup(session, org.getIdOfOrg(), item.getClientGroupName());
-                q = session.createQuery("update Client set org.idOfOrg = :newOrg, clientRegistryVersion=:clientRegistryVersion, idOfClientGroup=:idOfClientGroup where idOfClient=:idOfClient");
-            } else {
-                q = session.createQuery("update Client set org.idOfOrg = :newOrg, clientRegistryVersion=:clientRegistryVersion where idOfClient=:idOfClient");
-            }
-            q.setLong("newOrg", org.getIdOfOrg());
-            if (clientGroup!=null) q.setLong("idOfClientGroup", clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-            q.setLong("idOfClient", item.getIdOfClient());
-            q.setLong("clientRegistryVersion", clientRegistryVersion);
-            q.executeUpdate();
-        }
-        printMessage("Данные обновлены.");
-    }
-
     public void setOrg(Session session) throws Exception{
         Org org = null;
         if (this.getClientFilter().getOrg().getIdOfOrg() != null) {

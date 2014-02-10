@@ -7,23 +7,18 @@ package ru.axetta.ecafe.processor.core.daoservices.order;
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.ClientReportItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
-import ru.axetta.ecafe.processor.core.daoservices.order.items.PartGroupItem;
-import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampItem;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -36,7 +31,7 @@ import java.util.*;
 public class OrderDetailsDAOService extends AbstractDAOService {
 
     @SuppressWarnings("unchecked")
-    public Long buildRegisterStampBodyValue(Long idOfOrg, Date start, String fullname, boolean withOutActDiscrepancies) {
+    public Long buildRegisterStampBodyValue(Long idOfOrg, Date start, String fullname, boolean includeActDiscrepancies) {
         String sql ="select sum(orderdetail.qty) from cf_orders cforder" +
                 " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
                 "   and orderdetail.idoforder = cforder.idoforder" +
@@ -45,8 +40,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"' and " +
                 " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
                 " (cforder.ordertype in (0,1,4,6) or (cforder.ordertype=8 "
-                + (!withOutActDiscrepancies?" and orderdetail.qty>=0 ":" ") + " )) " ;//+
-              //  " group by orderdetail.qty ";
+                + (includeActDiscrepancies ?" ":" and orderdetail.qty>=0 ") + " )) ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idoforg",idOfOrg);
         query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
@@ -73,22 +67,20 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 "   and orderdetail.idoforder = cforder.idoforder" +
                 " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
                 " where cforder.createddate between :startDate and :endDate and orderdetail.socdiscount>0 and" +
-                //" cforder.idoforg=:idoforg and split_part(good.fullname, '/', 4) like '"+part4+"'" +
                 " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
                 " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"' and" +
-                " cforder.ordertype in (5) "; //+
-                //" group by orderdetail.qty ";
+                " cforder.ordertype in (5) ";
         Query query = getSession().createSQLQuery(sql);
         query.setParameter("idoforg",idOfOrg);
         query.setParameter("startDate",start.getTime());
         query.setParameter("endDate",end.getTime());
         query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
-        List list = query.list();
-        if(list==null || list.isEmpty()){
-            return  0L;
+        Object res = query.uniqueResult();
+        if (res==null) {
+            return 0L;
         } else {
-            return new Long(list.get(0).toString());
+            return ((BigInteger) res).longValue();
         }
     }
 

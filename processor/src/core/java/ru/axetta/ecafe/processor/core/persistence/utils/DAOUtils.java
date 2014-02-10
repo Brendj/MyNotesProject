@@ -1100,14 +1100,6 @@ public class DAOUtils {
         return clientGroup;
     }
 
-    public static ClientGroup createNewClientGroup(Session persistenceSession, Long idOfOrg, String clientGroupName) {
-        CompositeIdOfClientGroup compositeIdOfClientGroup = new CompositeIdOfClientGroup(idOfOrg,
-                DAOUtils.getIdForTemporaryClientGroup(persistenceSession, idOfOrg));
-        ClientGroup clientGroup = new ClientGroup(compositeIdOfClientGroup, clientGroupName);
-        persistenceSession.save(clientGroup);
-        return clientGroup;
-    }
-
     public static Contragent findContragentByClass(Session session, int classId) {
         // Оператор
         Criteria criteria = session.createCriteria(Contragent.class);

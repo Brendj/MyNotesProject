@@ -97,7 +97,7 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
     private OrgShortItem org;
     private Date start;
     private Date end;
-    private Boolean withOutActDiscrepancies = true;
+    private Boolean includeActDiscrepancies = true;
     private final OrderDetailsDAOService service = new OrderDetailsDAOService();
     private List<RegisterStampPageItem> pageItems = new ArrayList<RegisterStampPageItem>();
     private List<GoodItem> allGoods = new LinkedList<GoodItem>();
@@ -162,12 +162,14 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + RegisterStampReport.class.getSimpleName() + ".jasper";
         RegisterStampReport.Builder builder = new RegisterStampReport.Builder(templateFilename);
+        Properties properties = new Properties();
+        properties.setProperty(RegisterStampReport.PARAM_WITH_OUT_ACT_DISCREPANCIES, includeActDiscrepancies.toString());
+        builder.setReportProperties(properties);
         Org org = daoService.getOrg(this.org.getIdOfOrg());
         builder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
         Session session = (Session) entityManager.getDelegate();
         try {
             RegisterStampReport registerStampReport = (RegisterStampReport) builder.build(session,start, end, localCalendar);
-
             FacesContext facesContext = FacesContext.getCurrentInstance();
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
 
@@ -240,7 +242,7 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
             RegisterStampPageItem item = new RegisterStampPageItem(date, allGoods);
             for (String l: item.getSetKey()){
                 Long val = service.buildRegisterStampBodyValue(org.getIdOfOrg(), localCalendar.getTime(), l,
-                        withOutActDiscrepancies);
+                        includeActDiscrepancies);
                 item.addValue(l, val);
                 total.addValue(l, val);
                 allTotal.addValue(l, val);
@@ -287,12 +289,12 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
         return end;
     }
 
-    public Boolean getWithOutActDiscrepancies() {
-        return withOutActDiscrepancies;
+    public Boolean getIncludeActDiscrepancies() {
+        return includeActDiscrepancies;
     }
 
-    public void setWithOutActDiscrepancies(Boolean withOutActDiscrepancies) {
-        this.withOutActDiscrepancies = withOutActDiscrepancies;
+    public void setIncludeActDiscrepancies(Boolean includeActDiscrepancies) {
+        this.includeActDiscrepancies = includeActDiscrepancies;
     }
 
     public void setEnd(Date end) {
