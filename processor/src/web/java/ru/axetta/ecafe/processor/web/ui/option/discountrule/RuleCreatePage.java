@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryDiscountEditPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
 
@@ -39,7 +40,14 @@ import java.util.*;
 @Scope("session")
 public class RuleCreatePage extends BasicWorkspacePage
         implements CategoryListSelectPage.CompleteHandlerList, CategoryOrgListSelectPage.CompleteHandlerList {
-
+    public static final String SUB_CATEGORIES [] = new String []
+            { "Многодетные 5-11 кл.(завтрак+обед)",
+              "Шк Здоровья 5-11 кл.(завтрак+обед)",
+              "Начальная школа 1-4 кл (завтрак)",
+              "Соц./незащищ. 1-4 кл.(завтрак+обед)",
+              "Соц./незащищ. 5-11 кл.(завтрак+обед)",
+              "Многодетные 1-4 кл.(завтрак+обед)",
+              "Шк Здоровья 1-4 кл.(завтрак+обед)" };
     private List<Long> idOfCategoryList = new ArrayList<Long>();
     private List<Long> idOfCategoryOrgList = new ArrayList<Long>();
     private String description;
@@ -48,9 +56,13 @@ public class RuleCreatePage extends BasicWorkspacePage
     private String filter = "Не выбрано";
     private String filterOrg = "Не выбрано";
     private int priority;
+    private Integer discountRate = 100;
     private Integer[] selectedComplexIds;
+    private String subCategory = "";
     @Autowired
     private DAOService daoService;
+
+
 
     public List<SelectItem> getAvailableComplexs() {
         final List<ComplexRole> complexRoles = daoService.findComplexRoles();
@@ -66,6 +78,23 @@ public class RuleCreatePage extends BasicWorkspacePage
             list.add(selectItem);
         }
         return list;
+    }
+
+    public List<SelectItem> getSubCategories() throws Exception {
+        List<SelectItem> res = new ArrayList<SelectItem>();
+        res.add(new SelectItem("", ""));
+        for (String group : SUB_CATEGORIES) {
+            res.add(new SelectItem(group, group));
+        }
+        return res;
+    }
+
+    public String getSubCategory() {
+        return subCategory;
+    }
+
+    public void setSubCategory(String subCategory) {
+        this.subCategory = subCategory;
     }
 
     public String getFilterOrg() {
@@ -103,6 +132,14 @@ public class RuleCreatePage extends BasicWorkspacePage
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Integer getDiscountRate() {
+        return discountRate;
+    }
+
+    public void setDiscountRate(Integer discountRate) {
+        this.discountRate = discountRate;
     }
 
     public void completeCategoryListSelection(Map<Long, String> categoryMap) throws HibernateException {
@@ -159,6 +196,11 @@ public class RuleCreatePage extends BasicWorkspacePage
     @Transactional
     public void createRule() throws Exception {
         DiscountRule discountRule = new DiscountRule();
+        if (discountRate != null && discountRate != 100) {
+            description = CategoryDiscountEditPage.DISCOUNT_START + discountRate +
+                    CategoryDiscountEditPage.DISCOUNT_END;
+        }
+        discountRule.setSubCategory(subCategory);
         discountRule.setDescription(description);
         List<Integer> selectedComplex = Arrays.asList(selectedComplexIds);
         discountRule.setComplex0(selectedComplex.contains(0)?1:0);

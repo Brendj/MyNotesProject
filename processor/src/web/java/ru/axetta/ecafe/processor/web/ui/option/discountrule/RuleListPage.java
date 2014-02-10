@@ -60,6 +60,7 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
         private String CategoryOrgs;
         private List<CategoryDiscount> categoryDiscountList;
         private List<CategoryOrg> categoryOrgList;
+        private String subCategory;
         //
 
 
@@ -69,6 +70,14 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
 
         public void setEntity(DiscountRule entity) {
             this.entity = entity;
+        }
+
+        public String getSubCategory() {
+            return subCategory;
+        }
+
+        public void setSubCategory(String subCategory) {
+            this.subCategory = subCategory;
         }
 
         public String getCategoryOrgs() {
@@ -152,7 +161,7 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
             if(!discountRule.getCategoryOrgs().isEmpty()){
                this.categoryOrgList.addAll(discountRule.getCategoryOrgs());
             }
-
+            subCategory = discountRule.getSubCategory();
         }
 
         public long getIdOfRule() {

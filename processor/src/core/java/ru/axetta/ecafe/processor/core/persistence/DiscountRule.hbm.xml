@@ -78,6 +78,7 @@
 
 
         <property name="categoryDiscounts" column="CategoriesDiscounts" type="string" length="64" not-null="true" />
+        <property name="subCategory" column="Subcategory" type="string" length="100" />
 
         <!-- Cвязь многие ко многим между таблицами DiscountRules и CategoryDiscountRule -->
         <set name="categoriesDiscountsInternal" table="CF_DiscountRules_CategoryDiscounts">

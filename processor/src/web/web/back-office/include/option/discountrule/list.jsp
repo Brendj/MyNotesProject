@@ -28,6 +28,9 @@
                     <h:outputText value="Приоритет" escape="true" styleClass="column-header"/>
                 </rich:column>
                 <rich:column headerClass="center-aligned-column" >
+                    <h:outputText value="Супер-категория" escape="true" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="center-aligned-column" >
                     <h:outputText value="Описание" escape="true" styleClass="column-header"/>
                 </rich:column>
                 <rich:column headerClass="center-aligned-column">
@@ -52,6 +55,9 @@
         </rich:column>
         <rich:column>
             <h:outputText styleClass="output-text" value="#{item.priority}" />
+        </rich:column>
+        <rich:column>
+            <h:outputText styleClass="output-text" value="#{item.subCategory}" />
         </rich:column>
         <rich:column>
             <h:outputText styleClass="output-text" value="#{item.description}" />

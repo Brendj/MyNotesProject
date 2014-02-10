@@ -47,6 +47,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
     private String filter = "Не выбрано";
     private Set<CategoryDiscount> categoryDiscountSet;
     private Integer[] selectedComplexIds;
+    private String subCategory;
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
     @Autowired
@@ -144,6 +145,23 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         this.description = description;
     }
 
+    public List<SelectItem> getSubCategories() throws Exception {
+        List<SelectItem> res = new ArrayList<SelectItem>();
+        res.add(new SelectItem("", ""));
+        for (String group : RuleCreatePage.SUB_CATEGORIES) {
+            res.add(new SelectItem(group, group));
+        }
+        return res;
+    }
+
+    public String getSubCategory() {
+        return subCategory;
+    }
+
+    public void setSubCategory(String subCategory) {
+        this.subCategory = subCategory;
+    }
+
     public void completeCategoryListSelection(Map<Long, String> categoryMap) throws Exception {
         //To change body of implemented methods use File | Settings | File Templates.
         if(null != categoryMap) {
@@ -201,6 +219,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
                           CategoryDiscountEditPage.DISCOUNT_END;
         }
         entity.setDescription(description);
+        entity.setSubCategory(subCategory);
 
         List<Integer> selectedComplex = Arrays.asList(selectedComplexIds);
         entity.setComplex0(selectedComplex.contains(0) ? 1 : 0);
@@ -305,6 +324,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         } else {
             discountRate = 100;
         }
+        subCategory = discountRule.getSubCategory();
 
 
         List<Integer> comls = new ArrayList<Integer>();

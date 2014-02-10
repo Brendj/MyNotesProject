@@ -34,8 +34,18 @@
         <h:outputText styleClass="output-text" id="categoryOrgListFilter" escape="true" value=" {#{ruleCreatePage.filterOrg}}" />
     </h:panelGroup>
 
+
+    <h:outputText escape="true" value="Супер-категория" styleClass="output-text required-field" />
+    <h:selectOneMenu id="group" value="#{ruleCreatePage.subCategory}" style="width:300px;" styleClass="groupSelect">
+        <f:selectItems value="#{ruleCreatePage.subCategories}"/>
+    </h:selectOneMenu>
     <h:outputText escape="true" value="Описание" styleClass="output-text required-field" />
     <h:inputText value="#{ruleCreatePage.description}" maxlength="32" styleClass="input-text" />
+    <h:outputText escape="true" value="Ставка дисконтирования" styleClass="output-text" />
+    <h:panelGrid columns="2">
+        <h:inputText value="#{ruleCreatePage.discountRate}" maxlength="3" styleClass="input-text" />
+        <h:outputText escape="true" value="%" styleClass="output-text" />
+    </h:panelGrid>
     <h:outputText escape="true" value="Приоритет" styleClass="output-text required-field" />
     <h:inputText value="#{ruleCreatePage.priority}" maxlength="11" styleClass="input-text" />
     <h:outputText escape="true" value="Тип условия" styleClass="output-text" />

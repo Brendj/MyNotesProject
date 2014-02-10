@@ -45,6 +45,10 @@
                       value=" {#{ruleEditPage.filterOrg}}" />
     </h:panelGroup>
 
+    <h:outputText escape="true" value="Супер-категория" styleClass="output-text required-field" />
+    <h:selectOneMenu id="group" value="#{ruleEditPage.subCategory}" style="width:300px;" styleClass="groupSelect">
+        <f:selectItems value="#{ruleEditPage.subCategories}"/>
+    </h:selectOneMenu>
     <h:outputText escape="true" value="Описание" styleClass="output-text required-field" />
     <h:inputText value="#{ruleEditPage.description}" maxlength="99" size="40" styleClass="input-text" />
     <h:outputText escape="true" value="Ставка дисконтирования" styleClass="output-text" />

@@ -72,6 +72,7 @@ public class DiscountRule {
     private Set<CategoryDiscount> categoriesDiscountsInternal = new HashSet<CategoryDiscount>();
     private Set<CategoryOrg> categoryOrgsInternal = new HashSet<CategoryOrg>();
     private String complexesMap;
+    private String subCategory;
 
     public String getComplexesMap() {
         return complexesMap;
@@ -662,6 +663,14 @@ public class DiscountRule {
 
     public void setComplex49(int complex49) {
         this.complex49 = complex49;
+    }
+
+    public String getSubCategory() {
+        return subCategory;
+    }
+
+    public void setSubCategory(String subCategory) {
+        this.subCategory = subCategory;
     }
 
     @Override
