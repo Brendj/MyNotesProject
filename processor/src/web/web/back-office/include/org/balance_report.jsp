@@ -16,8 +16,13 @@
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildOrgBalanceReport}"
                            reRender="mainMenu, workspaceTogglePanel, orgBalanceReportTable"
-                           styleClass="command-button" />
+                           styleClass="command-button" status="orgBalanceReportGenerateStatus"/>
     </h:panelGrid>
+    <a4j:status id="orgBalanceReportGenerateStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+        </f:facet>
+    </a4j:status>
     <h:panelGrid styleClass="borderless-grid">
         <h:outputText escape="true" value="Отчет по организации \"#{mainPage.orgBalanceReportPage.shortName}\""
                       styleClass="output-text" />
