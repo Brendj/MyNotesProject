@@ -156,7 +156,6 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             if (org != null) {
                 orgRestrict = " (o.idOfOrg=" + org.getIdOfOrg() + ") AND  ";
             }
-            orgRestrict = " (o.idOfOrg in (0, 71, 3, 4)) AND ";
             String sql =
                     /*"select cf_orgs.idoforg, cf_clients.idofclient, cf_orgs.district, cf_orgs.shortname, "
                     + "       cf_orgs.address, "
