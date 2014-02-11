@@ -183,7 +183,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     + "         cf_persons.surname, cf_persons.firstname, cf_clients.idofclient";*/
                     "SELECT org.idoforg, c.idofclient, org.district, org.shortname, org.address, "
                     + "       p.surname, p.firstname, p.secondname, grp.groupname, dis.categoryname, "
-                    + "       od.menuDetailName, cast(SUM(od.Qty*(od.RPrice+od.socdiscount)) as double precision) / 100 "
+                    + "       od.menuDetailName, cast(SUM(od.Qty*od.socdiscount) as double precision) / 100 "
                     + "FROM cf_orders o "
                     + "join cf_orderdetails od  on o.idOfOrg=od.idOfOrg and o.IdOfOrder=od.IdOfOrder "
                     + "join cf_orgs org on org.idoforg=o.idOfOrg "
@@ -193,8 +193,8 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     + "left join cf_clients_categorydiscounts cdis on c.idofclient=cdis.idofclient "
                     + "left join cf_categorydiscounts dis on dis.idofcategorydiscount=cdis.idofcategorydiscount "
                     + "WHERE " + orgRestrict
-                    + "      o.rsum=0 and "
-                    + "      (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.RPrice=0 AND od.Discount>0) AND "
+                    + "      c.discountmode<>0 and "
+                    + "      (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.Discount>0) AND "
                     + "      (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) "
                     + "GROUP BY org.idoforg, c.idofclient, org.district, org.shortname, org.address, "
                     + "       p.surname, p.firstname, p.secondname, grp.groupname, dis.categoryname, "
