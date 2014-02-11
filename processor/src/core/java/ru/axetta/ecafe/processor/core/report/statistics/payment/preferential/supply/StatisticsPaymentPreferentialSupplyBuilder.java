@@ -114,7 +114,9 @@ public class StatisticsPaymentPreferentialSupplyBuilder extends BasicReportForCo
             Calendar calendar, Date startTime, Date endTime) throws  Exception{
         Date generateTime = new Date();
         List<StatisticsPaymentPreferentialSupplyItem> statistics = new LinkedList<StatisticsPaymentPreferentialSupplyItem>();
-
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Start build StatisticsPaymentPreferentialSupplyReport Data");
+        }
         Criteria criteria = session.createCriteria(Org.class);
         criteria.add(Restrictions.eq("defaultSupplier", contragent));
         /* если введены список организаций фильтруеми только по ним */
@@ -134,6 +136,9 @@ public class StatisticsPaymentPreferentialSupplyBuilder extends BasicReportForCo
             //Org org = (Org) session.load(Org.class, idOfOrg);
             Object[] row = (Object[]) obj;
             Long idOfOrg  = Long.valueOf(row[0].toString());
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Start build StatisticsPaymentPreferentialSupplyReport Data by org="+idOfOrg);
+            }
             String district  = row[1].toString();
             String shortName  = row[2].toString();
             String address  = row[3].toString();

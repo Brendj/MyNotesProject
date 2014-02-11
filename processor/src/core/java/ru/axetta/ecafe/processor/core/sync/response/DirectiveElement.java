@@ -6,14 +6,8 @@ package ru.axetta.ecafe.processor.core.sync.response;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.sync.SyncType;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.ProjectionList;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.transform.Transformers;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -41,6 +35,8 @@ public class DirectiveElement {
         }
         Boolean commodityAccounting = org.getCommodityAccounting();
         directiveItemList.add(new DirectiveItem("CommodityAccounting",commodityAccounting?"1":"0"));
+        Boolean usePlanOrders = org.getUsePlanOrders();
+        directiveItemList.add(new DirectiveItem("UsePlanOrders",usePlanOrders?"1":"0"));
     }
 
     public Element toElement(Document document) throws Exception {

@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -45,21 +46,21 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
     public static class Builder extends BasicReportJob.Builder {
 
         public class Event implements Comparable<Event>{
-            private Long time; // время события
+            private long time; // время события
             private int passdirection; // направление (вошел, вышел)
             private String guardianFIO; // ФИО представителя для садиков
 
-            public Event(Long time, int passdirection, String guardianFIO) {
+            public Event(long time, int passdirection, String guardianFIO) {
                 this.time = time;
                 this.passdirection = passdirection;
                 this.guardianFIO = guardianFIO;
             }
 
-            public Long getTime() {
+            public long getTime() {
                 return time;
             }
 
-            public void setTime(Long time) {
+            public void setTime(long time) {
                 this.time = time;
             }
 
@@ -81,7 +82,7 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
 
             @Override
             public int compareTo(Event event) {
-                return this.getTime().compareTo(event.getTime());
+                return (time<event.getTime() ? -1 : (time==event.getTime() ? 0 : 1));
             }
         }
 
@@ -116,9 +117,13 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
                 return fio;
             }
 
-            public NavigableSet<Event> getEvents() {
-                return events;
+            public void addEvent(Event e){
+                events.add(e);
             }
+
+            //public NavigableSet<Event> getEvents() {
+            //    return events;
+            //}
 
             public String getDate() {
                 return date;
@@ -153,13 +158,49 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
                 Integer result = 0;
                 Long exitTime = null;
                 for (Event e : events) {
-                    if (EnterEvent.isEntryOrExitEvent(e.getPassdirection()) && exitTime!=null) {
+                    if (EnterEvent.isEntryOrReEntryEvent(e.getPassdirection()) && exitTime!=null) {
                         result += (int)((e.getTime() - exitTime) / (1000 * 60));
                     }
                     if (EnterEvent.isExitOrReExitEvent(e.getPassdirection()))
                         exitTime = e.getTime();
                 }
                 return result;
+            }
+
+            // время присутствия в течении дня
+            public String getPresenceOfDay() {
+                if (events.isEmpty()) return ""; // событий прохода небыло
+                boolean lastExit = false;
+                long result = 0;
+                long entryTime = 0L;
+                for (Event e: events){
+                    if(EnterEvent.isEntryOrReEntryEvent(e.getPassdirection()) && entryTime<=0){
+                        entryTime = e.getTime();
+                        lastExit = false;
+                    }
+                    if(EnterEvent.isExitOrReExitEvent(e.getPassdirection()) && entryTime>0){
+                        double value = ((e.getTime() * 1.0 - entryTime * 1.0) / (1000.0 * 60.0));
+                        result += Math.round(value);
+                        //result += (int)((e.getTime() - entryTime) / (1000 * 60));
+                        lastExit = true;
+                        entryTime = 0L;
+                    }
+                }
+
+                //if (lastEntry == null)  return ""; // клиент только выходил
+                if (!lastExit)  return ""; // клиент последний раз вошел но не вышел
+                //Calendar calendar = Calendar.getInstance();
+                //calendar.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));
+                //calendar.setTimeInMillis(presenceOfDay);
+                //SimpleDateFormat ft = new SimpleDateFormat("hh:mm:ss");
+                //ft.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));
+                //return ft.format(calendar.getTime());
+                //long h = (presenceOfDay / 60000L) / 60;
+                //long m = (presenceOfDay / 60000L) % 60;
+                if(result == 0L) return "00:00";
+                long h = result / 60;
+                long m = result % 60;
+                return String.format("%02d:%02d", h,m);
             }
 
             // первый вход - последний выход
@@ -308,7 +349,8 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
                     tmpMap.put(day, reportItem);
                     resultRows.add(reportItem);
                 }
-                reportItem.getEvents().add(new Event(time, passdirection, guardianFIO));
+                //reportItem.getEvents().add(new Event(time, passdirection, guardianFIO));
+                reportItem.addEvent(new Event(time, passdirection, guardianFIO));
             }
             return new JRBeanCollectionDataSource(resultRows);
         }

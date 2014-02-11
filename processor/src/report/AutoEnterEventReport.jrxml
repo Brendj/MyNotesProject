@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SalesReport" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="d3711793-d537-4ee3-8081-ac334b64fee4">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AutoEnterEventReport" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="d3711793-d537-4ee3-8081-ac334b64fee4">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
@@ -9,7 +9,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.2100000000000006"/>
-	<property name="ireport.x" value="66"/>
+	<property name="ireport.x" value="90"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
@@ -26,6 +26,7 @@
 	<field name="timeEnterExit" class="java.lang.String"/>
 	<field name="absenceOfDay" class="java.lang.Integer"/>
 	<field name="groupName" class="java.lang.String"/>
+	<field name="presenceOfDay" class="java.lang.String"/>
 	<group name="origin">
 		<groupExpression><![CDATA[$F{groupName}]]></groupExpression>
 		<groupHeader>
@@ -71,14 +72,15 @@
 					<text><![CDATA[Время ухода]]></text>
 				</staticText>
 				<staticText>
-					<reportElement uuid="2c4c768c-6a8e-4a6a-b6e6-3ce0fb68e261" style="table" x="479" y="62" width="97" height="34"/>
+					<reportElement uuid="2c4c768c-6a8e-4a6a-b6e6-3ce0fb68e261" style="table" x="479" y="62" width="103" height="34"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 						<font isBold="true"/>
 					</textElement>
-					<text><![CDATA[Отсутствие в течение дня]]></text>
+					<text><![CDATA[Присутствие
+в течение дня]]></text>
 				</staticText>
 				<staticText>
-					<reportElement uuid="f9f9047b-9db9-4fc9-a329-77972bfe1d05" style="table" stretchType="RelativeToTallestObject" x="576" y="62" width="224" height="34"/>
+					<reportElement uuid="f9f9047b-9db9-4fc9-a329-77972bfe1d05" style="table" stretchType="RelativeToTallestObject" x="582" y="62" width="218" height="34"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 						<font isBold="true"/>
 					</textElement>
@@ -155,14 +157,14 @@
 				<textFieldExpression><![CDATA[$F{timeExit}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true">
-				<reportElement uuid="d0677f31-fe61-4a83-be78-a41be5e00543" style="table" stretchType="RelativeToTallestObject" x="576" y="0" width="224" height="20"/>
+				<reportElement uuid="d0677f31-fe61-4a83-be78-a41be5e00543" style="table" stretchType="RelativeToTallestObject" x="582" y="0" width="218" height="20"/>
 				<textElement verticalAlignment="Middle" markup="none"/>
 				<textFieldExpression><![CDATA[$F{timeEnterExit}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="70d100a0-5381-4476-886a-95c9a70d3978" style="table" stretchType="RelativeToTallestObject" x="479" y="0" width="97" height="20"/>
+				<reportElement uuid="70d100a0-5381-4476-886a-95c9a70d3978" style="table" stretchType="RelativeToTallestObject" x="479" y="0" width="103" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression><![CDATA[$F{absenceOfDay}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{presenceOfDay}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

@@ -1415,6 +1415,12 @@ public class DAOService {
         query.executeUpdate();
     }
 
+    public void applyUsePlanOrdersOperationByOrgList(List<Long> idOfOrgList) throws Exception{
+        Query query = entityManager.createQuery("update Org set usePlanOrders=1 where idOfOrg in :idOfOrgList");
+        query.setParameter("idOfOrgList", idOfOrgList);
+        query.executeUpdate();
+    }
+
     public List<ComplexRole> findComplexRoles() {
         return entityManager.createQuery("from ComplexRole order by idOfRole",ComplexRole.class).getResultList();
     }

@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.utils;
 
+import ru.axetta.ecafe.processor.core.report.BasicReportForContragentJob;
 import ru.axetta.ecafe.processor.core.report.ContragentPaymentReport;
 import ru.axetta.ecafe.processor.core.report.DailySalesByGroupsReport;
 
@@ -35,7 +36,7 @@ public class RuleExpressionUtil {
         "person.abbreviation",
         "phone",
         "mobile",
-        "idOfContragent",
+        BasicReportForContragentJob.PARAM_CONTRAGENT_ID, //"idOfContragent",
         "contragentName",
         "category",
         "idOfMenuSourceOrg",
@@ -47,7 +48,8 @@ public class RuleExpressionUtil {
         DailySalesByGroupsReport.PARAM_MENU_GROUPS,
         ReportPropertiesUtils.P_REPORT_PERIOD,
         ReportPropertiesUtils.P_REPORT_PERIOD_TYPE,
-        ContragentPaymentReport.PARAM_CONTRAGENT_RECEIVER_ID
+        BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID,
+        BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID
     };
 
     public static boolean isPostArgument(String argName) {

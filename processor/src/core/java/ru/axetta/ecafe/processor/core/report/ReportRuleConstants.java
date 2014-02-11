@@ -138,7 +138,7 @@ public class ReportRuleConstants {
             new ParamHint("person.abbreviation", "Фамилия И.О. обслуживаемого физического лица"),
             new ParamHint("phone", "Телефонный номер клиента"),
             new ParamHint("mobile", "Номер мобильного телефона клиента"), new ParamHint("address", "Адрес клиента"),
-            new ParamHint("idOfContragent", "Идентификатор контрагента").setDefaultRule("= contragent: "),    //20
+            new ParamHint(BasicReportForContragentJob.PARAM_CONTRAGENT_ID, "Идентификатор контрагента").setDefaultRule("= contragent: "),    //20
             new ParamHint("contragentName", "Название контрагента"),
             new ParamHint("category", "Категория организации"),
             new ParamHint("idOfMenuSourceOrg", "Организация - источник меню"),

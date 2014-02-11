@@ -819,6 +819,10 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                         }
                     }
                 }
+            } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("currRule.applicatable(properties) is false ");
+                }
             }
         }
     }

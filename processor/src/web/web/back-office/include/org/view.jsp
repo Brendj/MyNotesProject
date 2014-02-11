@@ -101,8 +101,14 @@
     <h:outputText escape="true" value="Идентификатор организации - источника меню" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.menuExchangeSourceOrgName}" styleClass="input-text long-field" />
 
+    <h:outputText escape="true" value="Товарный учет" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.commodityAccountingParam?'Включен':'Выключен'}" styleClass="input-text" />
+
     <h:outputText escape="true" value="Производственная конфигурация" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.configurationProviderName}" styleClass="input-text" />
+
+    <h:outputText escape="true" value="Использование плана питания" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.usePlanOrders?'Включен':'Выключен'}" styleClass="input-text" />
 
     <h:outputText escape="true" value="Корпуса организации" styleClass="output-text" />
     <h:outputText value="{#{mainPage.orgViewPage.friendlyFilterOrgs}}" styleClass="output-text"/>

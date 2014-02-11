@@ -94,6 +94,7 @@ public class Org {
     private String remoteAddress;
     private Set<ClientMigration> clientMigration = new HashSet<ClientMigration>();
     private Boolean fullSyncParam;
+    private Boolean usePlanOrders;
     private Boolean commodityAccounting;
     // тип организации "Школа / ДОУ / Поставщик питания"
     private OrganizationType type;
@@ -125,6 +126,7 @@ public class Org {
         this.mailingListReports2 = mailingListReports2;
         this.fullSyncParam=false;
         this.commodityAccounting=false;
+        this.usePlanOrders = true;  // плана питания включен по умолчаню
         this.type = type;
     }
 
@@ -163,6 +165,14 @@ public class Org {
 
     public void setFullSyncParam(Boolean fullSyncParam) {
         this.fullSyncParam = fullSyncParam;
+    }
+
+    public Boolean getUsePlanOrders() {
+        return usePlanOrders;
+    }
+
+    public void setUsePlanOrders(Boolean payPlanParam) {
+        this.usePlanOrders = payPlanParam;
     }
 
     public Set<ClientMigration> getClientMigration() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2014. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.web.ui.service;
@@ -27,9 +27,9 @@ import java.util.Map;
 
 @Component
 @Scope("session")
-public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList {
+public class UsePlanOrdersRequestPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList {
 
-    private static Logger logger = LoggerFactory.getLogger(FullSyncRequestPage.class);
+    private static Logger logger = LoggerFactory.getLogger(UsePlanOrdersRequestPage.class);
     private List<Long> idOfOrgList = new ArrayList<Long>(0);
 
     @Autowired
@@ -43,13 +43,13 @@ public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSe
         idOfOrgList.clear();
     }
 
-    public Object applyFullSyncOperation(){
+    public Object applyUsePlanOrdersOperation(){
         try {
-            daoService.applyFullSyncOperationByOrgList(idOfOrgList);
+            daoService.applyUsePlanOrdersOperationByOrgList(idOfOrgList);
             printMessage("Запрос отправлен");
         } catch (Exception e){
             printError("Ошибка при сохранении данных: "+e.getMessage());
-            logAndPrintMessage("Error by update full sync param",e);
+            logAndPrintMessage("Error by update pay plan param",e);
         }
         return null;
     }
@@ -73,7 +73,7 @@ public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSe
 
     @Override
     public String getPageFilename() {
-        return "service/full_sync_request";
+        return "service/use_plan_orders_request";
     }
 
     public List<Long> getIdOfOrgList() {

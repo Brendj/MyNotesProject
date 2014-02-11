@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.event.BasicEvent;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.report.BasicReportForContragentJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 
 import org.apache.commons.lang.StringUtils;
@@ -113,7 +114,7 @@ public class ReportPropertiesUtils {
 
     public static void addProperties(Properties properties, Contragent contragent, String prefix) throws Exception {
         String realPrefix = StringUtils.defaultString(prefix);
-        properties.setProperty(realPrefix.concat("idOfContragent"),
+        properties.setProperty(realPrefix.concat(BasicReportForContragentJob.PARAM_CONTRAGENT_ID),
                 StringUtils.defaultString(toString(contragent.getIdOfContragent())));
         properties.setProperty(realPrefix.concat("contragentName"),
                 StringUtils.defaultString(contragent.getContragentName()));

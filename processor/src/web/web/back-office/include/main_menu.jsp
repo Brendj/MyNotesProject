@@ -684,9 +684,11 @@
     <rich:panelMenuItem id="supportEmailMenuItem" binding="#{mainPage.supportEmailPage.mainMenuComponent}"
                         label="Отправка письма" action="#{mainPage.showSupportEmailPage}" reRender="workspaceForm"
                         rendered="#{mainPage.eligibleToServiceSupport}" />
+    <%--@elvariable id="supportSMSPage" type="ru.axetta.ecafe.processor.web.ui.service.SupportSMSPage"--%>
     <rich:panelMenuItem id="supportSMSMenuItem" binding="#{supportSMSPage.mainMenuComponent}" label="Отправка SMS"
                         action="#{supportSMSPage.show}" reRender="workspaceForm"
                         rendered="#{mainPage.eligibleToServiceSupport}" />
+
     <rich:panelMenuItem id="showJournal" label="Очередь выгрузки транзакций"
                         binding="#{journalViewPage.mainMenuComponent}" action="#{journalViewPage.show}"
                         rendered="#{mainPage.eligibleToServiceAdmin}" reRender="workspaceForm" />
@@ -694,6 +696,12 @@
     <rich:panelMenuItem id="fullSyncRequestItem" label="Запрос полной синхронизации"
                         binding="#{fullSyncRequestPage.mainMenuComponent}" action="#{fullSyncRequestPage.show}"
                         reRender="workspaceForm" />
+
+    <%--@elvariable id="usePlanOrdersRequestPage" type="ru.axetta.ecafe.processor.web.ui.service.UsePlanOrdersRequestPage"--%>
+    <rich:panelMenuItem id="usePlanOrdersRequestItem" label="Запрос использования плана питания"
+                        binding="#{usePlanOrdersRequestPage.mainMenuComponent}" action="#{usePlanOrdersRequestPage.show}"
+                        reRender="workspaceForm" />
+
 
     <rich:panelMenuItem id="repositoryReportsRenameMenuItem" binding="#{repositoryReportsRenamePage.mainMenuComponent}"
                         label="Переименование отчетов репозитория" action="#{repositoryReportsRenamePage.show}" reRender="workspaceForm" />

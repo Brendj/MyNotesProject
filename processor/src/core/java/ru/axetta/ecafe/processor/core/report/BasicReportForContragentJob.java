@@ -15,6 +15,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 
@@ -31,6 +32,7 @@ public abstract class BasicReportForContragentJob extends BasicReportJob {
 
     public final static String PARAM_CONTRAGENT_RECEIVER_ID = "idOfContragentReceiver"; // ищем контргентов ТСП
     public final static String PARAM_CONTRAGENT_PAYER_ID = "idOfContragentPayer";   // ищем контргентов агента по платежам
+    public final static String PARAM_CONTRAGENT_ID = "idOfContragent";   // всех контрагентов
 
     protected Class getMyClass() { return getClass(); }
     public abstract BasicReportForContragentJob createInstance();
@@ -61,6 +63,7 @@ public abstract class BasicReportForContragentJob extends BasicReportJob {
                     if (getContragentSelectClass()!=null) {
                         allContragentCriteria.add(Restrictions.eq("classId", getContragentSelectClass()));
                     }
+                    allContragentCriteria.addOrder(Order.asc("idOfContragent"));
                     List allContragents = allContragentCriteria.list();
                     for (Object object: allContragents){
                         Contragent contragent = (Contragent) object;

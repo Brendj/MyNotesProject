@@ -74,6 +74,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private String longitude;
     private Boolean fullSyncParam;
     private Boolean changeCommodityAccounting;
+    private Boolean usePlanOrders;
 
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
     private OrganizationType organizationType;
@@ -174,6 +175,8 @@ public class OrgEditPage extends BasicWorkspacePage
             org.setFullSyncParam(fullSyncParam);
         }
 
+        org.setUsePlanOrders(usePlanOrders);
+
         session.update(org);
         fill(org);
         /////
@@ -215,6 +218,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.mailingListReports2 = org.getMailingListReports2();
         this.guid = org.getGuid();
         this.fullSyncParam = org.getFullSyncParam();
+        this.usePlanOrders = org.getUsePlanOrders();
 
         this.changeCommodityAccounting = org.getCommodityAccounting();
         this.organizationType = org.getType();
@@ -708,6 +712,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public OrganizationTypeMenu getOrganizationTypeMenu() {
         return organizationTypeMenu;
+    }
+
+    public Boolean getUsePlanOrders() {
+        return usePlanOrders;
+    }
+
+    public void setUsePlanOrders(Boolean usePlanOrders) {
+        this.usePlanOrders = usePlanOrders;
     }
 
     public static class ContragentItem {

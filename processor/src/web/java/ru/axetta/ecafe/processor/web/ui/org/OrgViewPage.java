@@ -60,6 +60,8 @@ public class OrgViewPage extends BasicWorkspacePage {
     private String latitude;
     private String longitude;
     private Integer refectoryType;
+    private Boolean commodityAccountingParam;
+    private Boolean usePlanOrders;
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
     private OrganizationType organizationType;
     private String refectoryTypeStringRepresentation;
@@ -111,6 +113,8 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.INN=org.getINN();
         this.OGRN=org.getOGRN();
         this.guid = org.getGuid();
+        this.commodityAccountingParam = org.getCommodityAccounting();
+        this.usePlanOrders = org.getUsePlanOrders();
         this.categoryOrg= new LinkedList<CategoryOrg>();
         if(!org.getCategories().isEmpty()){
            for (CategoryOrg co: org.getCategories()){
@@ -350,6 +354,22 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setGuid(String guid) {
         this.guid = guid;
+    }
+
+    public Boolean getUsePlanOrders() {
+        return usePlanOrders;
+    }
+
+    public void setUsePlanOrders(Boolean usePlanOrders) {
+        this.usePlanOrders = usePlanOrders;
+    }
+
+    public Boolean getCommodityAccountingParam() {
+        return commodityAccountingParam;
+    }
+
+    public void setCommodityAccountingParam(Boolean commodityAccountingParam) {
+        this.commodityAccountingParam = commodityAccountingParam;
     }
 
     public Object updateBalance(){

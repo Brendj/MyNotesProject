@@ -34,10 +34,6 @@ import java.util.*;
  */
 public class ContragentPaymentReport extends BasicReportForContragentJob {
 
-
-    public final static String PARAM_PERIOD_TYPE = "periodType";
-    
-
     @Override
     protected Integer getContragentSelectClass() {
         return Contragent.PAY_AGENT;
