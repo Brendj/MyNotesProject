@@ -155,6 +155,53 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
                 }
                 return timeList;
             }
+
+            // время присутствия в течении дня
+            public String getPresenceOfDay() {
+                if (getEventMap().isEmpty()) return ""; // событий прохода небыло
+                long fullResult = 0;
+                int countDay =0;
+                for (Integer val:getEventMap().keySet()){
+                    boolean lastExit = false;
+                    long result = 0;
+                    long entryTime = 0L;
+                    List<Event> events = getEventMap().get(val);
+                    Collections.sort(events);
+                    for (Event e: events){
+                        if(EnterEvent.isEntryOrReEntryEvent(e.getPassdirection()) && entryTime<=0){
+                            entryTime = e.getTime();
+                            lastExit = false;
+                        }
+                        if(EnterEvent.isExitOrReExitEvent(e.getPassdirection()) && entryTime>0){
+                            double value = ((e.getTime() * 1.0 - entryTime * 1.0) / (1000.0 * 60.0));
+                            result += Math.round(value);
+                            //result += (int)((e.getTime() - entryTime) / (1000 * 60));
+                            lastExit = true;
+                            entryTime = 0L;
+                        }
+                    }
+                    if (!lastExit) continue;
+                    fullResult +=result;
+                    countDay++;
+                }
+
+                //if (lastEntry == null)  return ""; // клиент только выходил
+                //if (!lastExit)  return ""; // клиент последний раз вошел но не вышел
+                //Calendar calendar = Calendar.getInstance();
+                //calendar.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));
+                //calendar.setTimeInMillis(presenceOfDay);
+                //SimpleDateFormat ft = new SimpleDateFormat("hh:mm:ss");
+                //ft.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));
+                //return ft.format(calendar.getTime());
+                //long h = (presenceOfDay / 60000L) / 60;
+                //long m = (presenceOfDay / 60000L) % 60;
+                if(countDay==0) return "";
+                if(fullResult == 0L) return "00:00";
+                long result = fullResult / countDay;
+                long h = result / 60;
+                long m = result % 60;
+                return String.format("%02d:%02d", h,m);
+            }
         }
 
         public Builder(String templateFilename) {
