@@ -156,31 +156,8 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             if (org != null) {
                 orgRestrict = " (o.idOfOrg=" + org.getIdOfOrg() + ") AND  ";
             }
+            /*orgRestrict = " (o.idOfOrg in (0, 71, 3, 4)) AND ";*/
             String sql =
-                    /*"select cf_orgs.idoforg, cf_clients.idofclient, cf_orgs.district, cf_orgs.shortname, "
-                    + "       cf_orgs.address, "
-                    + "       cf_persons.surname, cf_persons.firstname, cf_persons.secondname, "
-                    + "       cf_clientgroups.groupname, cf_categorydiscounts.categoryname, "
-                    + "       cf_complexroles.rolename, sum(cf_orders.socdiscount / 100) "
-                    + "from cf_clients "
-                    + "join cf_orgs on cf_clients.idoforg=cf_orgs.idoforg "
-                    + "join cf_persons on cf_clients.idofperson=cf_persons.idofperson "
-                    + "join cf_clientgroups on cf_clientgroups.idoforg=cf_clients.idoforg and cf_clientgroups.idofclientgroup=cf_clients.idofclientgroup "
-                    + "join cf_clients_categorydiscounts on cf_clients.idofclient=cf_clients_categorydiscounts.idofclient "
-                    + "join cf_categorydiscounts on cf_clients_categorydiscounts.idofcategorydiscount=cf_categorydiscounts.idofcategorydiscount "
-                    + "left join cf_orders on cf_orders.idofclient=cf_clients.idofclient and cf_orders.idoforg=cf_clients.idoforg and cf_orders.socdiscount<>0 and "
-                    + "                       cf_orders.createddate >= :startDate and "
-                    + "                       cf_orders.createddate <= :endDate "
-                    + "left join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
-                    + "left join cf_complexroles on cf_complexroles.idofrole=cf_orderdetails.menutype-" + OrderDetail.TYPE_COMPLEX_MIN + " "
-                    + "where cf_clients.discountmode<>0 and cf_complexroles.rolename<>'' " + orgRestrict
-                    + "group by cf_orgs.idoforg, cf_clients.idofclient, "
-                    + "       cf_orgs.district, cf_orgs.shortname, cf_orgs.address, "
-                    + "       cf_persons.surname, cf_persons.firstname, cf_persons.secondname, "
-                    + "       cf_clientgroups.groupname, cf_categorydiscounts.categoryname, "
-                    + "       cf_complexroles.rolename "
-                    + "order by cf_orgs.district, cf_orgs.shortname, cf_clientgroups.groupname, "
-                    + "         cf_persons.surname, cf_persons.firstname, cf_clients.idofclient";*/
                     "SELECT org.idoforg, c.idofclient, org.district, org.shortname, org.address, "
                     + "       p.surname, p.firstname, p.secondname, grp.groupname, dis.categoryname, "
                     + "       od.menuDetailName, cast(SUM(od.Qty*od.socdiscount) as double precision) / 100 "
@@ -250,16 +227,17 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                             result.add(districtItem);
                             uniqueId++;
                         }
+                        districtCount = 0;
                         districtItem = new ActiveDiscountOrgItem(uniqueId, district, null);
                     }
 
                     if (orgItem != null){
                         orgItem.setUniqueId(uniqueId);
-                        orgItem.setPosition(districtCount);
-                        orgCount = 0;
+                        orgItem.setPosition(orgCount);
                         result.add(orgItem);
                         uniqueId++;
                     }
+                    orgCount = 0;
                     orgItem = new ActiveDiscountOrgItem(uniqueId, null, name);
                     position = 1;
                 }
@@ -620,8 +598,8 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             this.firstname  = "";
             this.secondname = "";
             this.groupName  = "";
-            categoriesClients      = new HashMap<String, Integer>();
-            goodsClients           = new HashMap<String, Double>();
+            categoriesClients      = new TreeMap<String, Integer>();
+            goodsClients           = new TreeMap<String, Double>();
             total           = 0D;
         }
 
