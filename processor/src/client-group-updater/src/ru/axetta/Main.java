@@ -44,6 +44,7 @@ public class Main {
 
   private void initGroups() {
     groups.add(new ClientGroup(null, 1100000000L, "Пед. состав"));
+    groups.add(new ClientGroup(null, 1100000001L, "Сотрудники"));
     groups.add(new ClientGroup(null, 1100000010L, "Администрация"));
     groups.add(new ClientGroup(null, 1100000020L, "Тех. персонал"));
     groups.add(new ClientGroup(null, 1100000030L, "Родители"));
@@ -61,7 +62,7 @@ public class Main {
     main.initProperties();
     main.updateClientVersion();
     // Первоначально надо разобраться с "Сотрудниками".
-    main.preProcessEmployeeGroup();
+    //main.preProcessEmployeeGroup();
     for (ClientGroup clientGroup : main.groups) {
       main.processOneGroup(clientGroup.getIdOfGroup(), clientGroup.getGroupName());
     }
@@ -121,59 +122,59 @@ public class Main {
     }
   }
 
-  private void preProcessEmployeeGroup() {
-    Set<ClientGroup> clientGroups = new HashSet<ClientGroup>();
-    Connection con = null;
-    PreparedStatement st = null;
-    try {
-      con = dbWrapper.getConnection();
-      st = con.prepareStatement("SELECT idoforg, idofclientgroup FROM cf_clientgroups WHERE upper(groupname) LIKE ?");
-      st.setString(1, "%Сотрудники%".toUpperCase());
-      ResultSet rs = st.executeQuery();
-      while (rs.next()) {
-        clientGroups.add(new ClientGroup(rs.getLong("idoforg"), rs.getLong("idofclientgroup"), "Сотрудники"));
-      }
-    } catch (Exception ex) {
-      logger.error(ex.getMessage());
-      throw new RuntimeException(ex.getMessage());
-    } finally {
-      dbWrapper.closeStatement(st);
-      dbWrapper.close(con);
-    }
-    for (ClientGroup clientGroup : clientGroups) {
-      preProcessEmployeeGroupForOneOrg(clientGroup.getIdOfOrg(), clientGroup.getIdOfGroup());
-    }
-  }
+  //private void preProcessEmployeeGroup() {
+  //  Set<ClientGroup> clientGroups = new HashSet<ClientGroup>();
+  //  Connection con = null;
+  //  PreparedStatement st = null;
+  //  try {
+  //    con = dbWrapper.getConnection();
+  //    st = con.prepareStatement("SELECT idoforg, idofclientgroup FROM cf_clientgroups WHERE upper(groupname) LIKE ?");
+  //    st.setString(1, "%Сотрудники%".toUpperCase());
+  //    ResultSet rs = st.executeQuery();
+  //    while (rs.next()) {
+  //      clientGroups.add(new ClientGroup(rs.getLong("idoforg"), rs.getLong("idofclientgroup"), "Сотрудники"));
+  //    }
+  //  } catch (Exception ex) {
+  //    logger.error(ex.getMessage());
+  //    throw new RuntimeException(ex.getMessage());
+  //  } finally {
+  //    dbWrapper.closeStatement(st);
+  //    dbWrapper.close(con);
+  //  }
+  //  for (ClientGroup clientGroup : clientGroups) {
+  //    preProcessEmployeeGroupForOneOrg(clientGroup.getIdOfOrg(), clientGroup.getIdOfGroup());
+  //  }
+  //}
 
-  private void preProcessEmployeeGroupForOneOrg(Long idOfOrg, Long oldGroupId) {
-    Connection con = null;
-    try {
-      con = dbWrapper.getConnection();
-      dbWrapper.setAutoCommit(con, false);
-      // Если ай-ди "Сотрудников" совпадает с ай-ди "Пед. состава", то просто изменим имя.
-      if (oldGroupId.equals(TEACH_GROUP)) {
-        changeGroupName(con, idOfOrg, oldGroupId, "Сотрудники", "Пед. состав");
-      } else {
-        // Иначе, переводим клиентов в "Пед. состав", а старую удаляем.
-        // Первоначально, конечно, проверяем наличие группы "Пед. состав". Если такой группы нет, то создаем.
-        ClientGroup clientGroup = findGroup(con, idOfOrg, TEACH_GROUP, "Пед. состав");
-        if (clientGroup == null) {
-          insertGroup(con, idOfOrg, TEACH_GROUP, "Пед. состав");
-          clientGroup = new ClientGroup(idOfOrg, TEACH_GROUP, "Пед. состав");
-        }
-        updateClients(con, idOfOrg, clientGroup.getIdOfGroup(), oldGroupId, "Пед. состав", "Сотрудники");
-        deleteGroup(con, idOfOrg, oldGroupId, "Сотрудники");
-      }
-      dbWrapper.commit(con);
-    } catch (Exception ex) {
-      logger.error(ex.getMessage());
-      dbWrapper.rollback(con);
-      throw new RuntimeException(ex.getMessage());
-    } finally {
-      dbWrapper.setAutoCommit(con, true);
-      dbWrapper.close(con);
-    }
-  }
+  //private void preProcessEmployeeGroupForOneOrg(Long idOfOrg, Long oldGroupId) {
+  //  Connection con = null;
+  //  try {
+  //    con = dbWrapper.getConnection();
+  //    dbWrapper.setAutoCommit(con, false);
+  //    // Если ай-ди "Сотрудников" совпадает с ай-ди "Пед. состава", то просто изменим имя.
+  //    if (oldGroupId.equals(TEACH_GROUP)) {
+  //      changeGroupName(con, idOfOrg, oldGroupId, "Сотрудники", "Пед. состав");
+  //    } else {
+  //      // Иначе, переводим клиентов в "Пед. состав", а старую удаляем.
+  //      // Первоначально, конечно, проверяем наличие группы "Пед. состав". Если такой группы нет, то создаем.
+  //      ClientGroup clientGroup = findGroup(con, idOfOrg, TEACH_GROUP, "Пед. состав");
+  //      if (clientGroup == null) {
+  //        insertGroup(con, idOfOrg, TEACH_GROUP, "Пед. состав");
+  //        clientGroup = new ClientGroup(idOfOrg, TEACH_GROUP, "Пед. состав");
+  //      }
+  //      updateClients(con, idOfOrg, clientGroup.getIdOfGroup(), oldGroupId, "Пед. состав", "Сотрудники");
+  //      deleteGroup(con, idOfOrg, oldGroupId, "Сотрудники");
+  //    }
+  //    dbWrapper.commit(con);
+  //  } catch (Exception ex) {
+  //    logger.error(ex.getMessage());
+  //    dbWrapper.rollback(con);
+  //    throw new RuntimeException(ex.getMessage());
+  //  } finally {
+  //    dbWrapper.setAutoCommit(con, true);
+  //    dbWrapper.close(con);
+  //  }
+  //}
 
   private int insertGroup(Connection con, Long idOfOrg, Long newGroupId, String newGroupName) throws Exception {
     PreparedStatement insertSt = null;

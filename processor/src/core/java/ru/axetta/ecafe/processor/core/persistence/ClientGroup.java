@@ -34,6 +34,7 @@ public class ClientGroup {
     public enum Predefined{
         CLIENT_STUDENTS_CLASS_BEGIN(1000000000L,"Ученики"),
         CLIENT_EMPLOYEES (1100000000L,"Пед. состав"),
+        CLIENT_EMPLOYEE (1100000001L,"Сотрудники"),
         CLIENT_ADMINISTRATION (1100000010L,"Администрация"),
         CLIENT_TECH_EMPLOYEES (1100000020L,"Тех. персонал"),
         CLIENT_PARENTS (1100000030L,"Родители"),
