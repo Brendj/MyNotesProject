@@ -92,4 +92,11 @@ public class ContragentDAOService extends AbstractDAOService {
         return (List<Org>) criteria.list();
     }
 
+
+    @SuppressWarnings("unchecked")
+    public List<Org> findAllDistributionOrganization(){
+        Criteria criteria = getSession().createCriteria(Org.class);
+        return (List<Org>) criteria.list();
+    }
+
 }

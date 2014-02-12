@@ -81,17 +81,21 @@ public class ContragentCompletionReportPage extends BasicWorkspacePage implement
 
     public Object generate(){
         contragentCompletionItems = new ArrayList<ContragentCompletionItem>();
+        List<Org> orgItems = null;
         if(defaultSupplier!=null) {
-            List<Org> orgItems = contragentDAOService.findDistributionOrganizationByDefaultSupplier(defaultSupplier);
-            if(!orgItems.isEmpty()){
-                ContragentCompletionItem total = new ContragentCompletionItem(contragentList);
-                for (Org org: orgItems){
-                    ContragentCompletionItem contragentCompletionItem = contragentDAOService.generateReportItems(org.getIdOfOrg(),contragentList, this.startDate, this.endDate);
-                    this.contragentCompletionItems.add(contragentCompletionItem);
-                    total.addContragentPayItems(contragentCompletionItem.getContragentPayItems());
-                }
-                this.contragentCompletionItems.add(total);
+            orgItems = contragentDAOService.findDistributionOrganizationByDefaultSupplier(defaultSupplier);
+        } else {
+            orgItems = contragentDAOService.findAllDistributionOrganization();
+        }
+
+        if(!orgItems.isEmpty()){
+            ContragentCompletionItem total = new ContragentCompletionItem(contragentList);
+            for (Org org: orgItems){
+                ContragentCompletionItem contragentCompletionItem = contragentDAOService.generateReportItems(org.getIdOfOrg(),contragentList, this.startDate, this.endDate);
+                this.contragentCompletionItems.add(contragentCompletionItem);
+                total.addContragentPayItems(contragentCompletionItem.getContragentPayItems());
             }
+            this.contragentCompletionItems.add(total);
         }
         return null;
     }
