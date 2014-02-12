@@ -52,21 +52,6 @@ public class InternalDisposingDocument extends SupplierRequestDistributedObject 
     private Set<InternalDisposingDocumentPosition> internalDisposingDocumentPositionInternal;
 
     @Override
-    @SuppressWarnings("unchecked")
-    protected boolean addReceiverRestriction(Criteria criteria, Session session, String supplierOrgId, boolean isReceiver) {
-        final String s = "select distinct ai.globalId from InternalIncomingDocument iid left join iid.wayBill wb left join iid.actOfInventorization ai where ";
-        Query query = session.createQuery(s +(isReceiver?"wb.receiver":"wb.shipper")+"=:idOdOrg");
-        query.setParameter("idOdOrg", supplierOrgId);
-        List<Long> ids = query.list();
-        if(ids!=null && !ids.isEmpty()) {
-            criteria.add(Restrictions.in("a.globalId", ids));
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
     public void createProjections(Criteria criteria) {
         criteria.createAlias("staff","s", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("actOfInventorization","a", JoinType.LEFT_OUTER_JOIN);
@@ -84,12 +69,37 @@ public class InternalDisposingDocument extends SupplierRequestDistributedObject 
     }
 
     @Override
+    protected boolean hasWayBillLinks(Session session) {
+        return false;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected boolean addReceiverRestriction(Criteria criteria, Session session, String supplierOrgId, boolean isReceiver) {
+        final String s = "select distinct ai.globalId from InternalIncomingDocument iid left join iid.wayBill wb left join iid.actOfInventorization ai where ";
+        Query query = session.createQuery(s +(isReceiver?"wb.receiver":"wb.shipper")+"=:idOdOrg");
+        query.setParameter("idOdOrg", supplierOrgId);
+        List<Long> ids = query.list();
+        if(ids!=null && !ids.isEmpty()) {
+            criteria.add(Restrictions.in("a.globalId", ids));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         Staff st = DAOUtils.findDistributedObjectByRefGUID(Staff.class, session, guidOfSt);
         if(st==null) throw new DistributedObjectException("NOT_FOUND_VALUE Staff");
         setStaff(st);
         ActOfInventorization ai = DAOUtils.findDistributedObjectByRefGUID(ActOfInventorization.class, session, guidOfAI);
-        if(ai!=null) setActOfInventorization(ai);
+        if(ai!=null) {
+            if(!ai.getOrgOwner().equals(this.orgOwner)){
+                this.orgOwner = ai.getOrgOwner();
+            }
+            setActOfInventorization(ai);
+        }
     }
 
     @Override
@@ -234,4 +244,6 @@ public class InternalDisposingDocument extends SupplierRequestDistributedObject 
     public void setStateChangeInternal(Set<StateChange> stateChangeInternal) {
         this.stateChangeInternal = stateChangeInternal;
     }
+
+
 }

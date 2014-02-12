@@ -31,7 +31,7 @@ import java.util.Set;
  * Time: 16:33
  * To change this template use File | Settings | File Templates.
  */
-public class ActOfInventorization extends SupplierRequestDistributedObject {
+public class ActOfInventorization extends SupplierRequestDistributedObject /*InventoryRequestDistributedObject*/ {
 
     private Date dateOfAct;
     private String number;
@@ -40,19 +40,30 @@ public class ActOfInventorization extends SupplierRequestDistributedObject {
     private Set<InternalDisposingDocument> InternalDisposingDocumentInternal;
 
     @Override
-    @SuppressWarnings("unchecked")
-    protected boolean addReceiverRestriction(Criteria criteria, Session session, String supplierOrgId, boolean isReceiver) {
-        final String s = "select distinct ai.globalId from InternalIncomingDocument iid left join iid.wayBill wb left join iid.actOfInventorization ai where ";
-        Query query = session.createQuery(s +(isReceiver?"wb.receiver":"wb.shipper")+"=:idOdOrg");
-        query.setParameter("idOdOrg", supplierOrgId);
-        List<Long> ids = query.list();
-        if(ids!=null && !ids.isEmpty()) {
-            criteria.add(Restrictions.in("globalId", ids));
-            return true;
-        } else {
-            return false;
-        }
+    protected boolean addReceiverRestriction(Criteria criteria, Session session, String supplierOrgId,
+            boolean isReceiver) {
+        return false;
     }
+
+    @Override
+    protected boolean hasWayBillLinks(Session session) {
+        return false;
+    }
+
+    //@Override
+    //@SuppressWarnings("unchecked")
+    //protected boolean addReceiverRestriction(Criteria criteria, Session session, String supplierOrgId, boolean isReceiver) {
+    //    final String s = "select distinct ai.globalId from InternalIncomingDocument iid left join iid.wayBill wb left join iid.actOfInventorization ai where ";
+    //    Query query = session.createQuery(s +(isReceiver?"wb.receiver":"wb.shipper")+"=:idOdOrg");
+    //    query.setParameter("idOdOrg", supplierOrgId);
+    //    List<Long> ids = query.list();
+    //    if(ids!=null && !ids.isEmpty()) {
+    //        criteria.add(Restrictions.in("globalId", ids));
+    //        return true;
+    //    } else {
+    //        return false;
+    //    }
+    //}
 
     @Override
     public void createProjections(Criteria criteria) {
@@ -65,18 +76,6 @@ public class ActOfInventorization extends SupplierRequestDistributedObject {
 
         criteria.setProjection(projectionList);
     }
-
-    //@Override
-    //public DistributedObject findByGuid(Session persistenceSession, boolean isCreate) {
-    //    Criteria criteria = persistenceSession.createCriteria(ActOfInventorization.class);
-    //    criteria.add(Restrictions.eq("guid", this.guid));
-    //    List<ActOfInventorization> list = criteria.list();
-    //    if(list==null || list.isEmpty()){
-    //        return null;
-    //    } else {
-    //        return list.get(0);
-    //    }
-    //}
 
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {}
@@ -157,4 +156,6 @@ public class ActOfInventorization extends SupplierRequestDistributedObject {
     public void setDateOfAct(Date dateOfAct) {
         this.dateOfAct = dateOfAct;
     }
+
+
 }

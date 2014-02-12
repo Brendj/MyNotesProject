@@ -622,6 +622,21 @@ public class DAOUtils {
     }
 
     @SuppressWarnings("unchecked")
+    public static List<Long> findMenuExchangeDestOrg(Session persistenceSession, Long idOfOrg) {
+        Criteria criteria = persistenceSession.createCriteria(MenuExchangeRule.class);
+        criteria.add(Restrictions.eq("idOfSourceOrg", idOfOrg));
+        criteria.setProjection(Projections.projectionList()
+                .add(Projections.distinct(Projections.property("idOfDestOrg")))
+        );
+        return criteria.list();
+        //MenuExchangeRule rule = (MenuExchangeRule) criteria.uniqueResult();
+        //if (rule == null) {
+        //    return null;
+        //}
+        //return rule.getIdOfSourceOrg();
+    }
+
+    @SuppressWarnings("unchecked")
     public static List<MenuExchange> findMenuExchangeDataBetweenDatesIncludingSettings(Session persistenceSession, Long idOfSourceOrg, Date startDate,
             Date endDate) {
         // Settings record has date = 0

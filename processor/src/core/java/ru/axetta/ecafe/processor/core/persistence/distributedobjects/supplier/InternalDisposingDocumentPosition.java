@@ -50,6 +50,11 @@ public class InternalDisposingDocumentPosition extends SupplierRequestDistribute
     private Long totalCountMust;
 
     @Override
+    protected boolean hasWayBillLinks(Session session) {
+        return false;
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     protected boolean addReceiverRestriction(Criteria criteria, Session session, String supplierOrgId, boolean isReceiver) {
         final String s = "select distinct ai.globalId from InternalIncomingDocument iid left join iid.wayBill wb left join iid.actOfInventorization ai where ";
@@ -267,4 +272,6 @@ public class InternalDisposingDocumentPosition extends SupplierRequestDistribute
     public void setUnitsScale(UnitScale unitsScale) {
         this.unitsScale = unitsScale;
     }
+
+
 }

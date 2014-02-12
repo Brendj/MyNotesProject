@@ -51,6 +51,17 @@ public class InternalIncomingDocument extends SupplierRequestDistributedObject {
     private Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal;
 
     @Override
+    protected boolean hasWayBillLinks(Session session) {
+        try {
+            WayBill wb  = DAOUtils.findDistributedObjectByRefGUID(WayBill.class, session, guidOfWB);
+            if(wb==null) return false;
+            else return true;
+        } catch (DistributedObjectException e) {
+            return false;
+        }
+    }
+
+    @Override
     protected boolean addReceiverRestriction(Criteria criteria, Session session, String supplierOrgId, boolean isReceiver) {
         criteria.add(Restrictions.eq(isReceiver?"w.receiver":"w.shipper", supplierOrgId));
         return true;
@@ -82,9 +93,24 @@ public class InternalIncomingDocument extends SupplierRequestDistributedObject {
         InternalDisposingDocument idd  = DAOUtils.findDistributedObjectByRefGUID(InternalDisposingDocument.class, session, guidOfIDD);
         ActOfInventorization ai  = DAOUtils.findDistributedObjectByRefGUID(ActOfInventorization.class, session, guidOfAI);
         if(wb==null && idd==null && ai==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
-        if(wb!=null) setWayBill(wb);
-        if(idd!=null) setInternalDisposingDocument(idd);
-        if(ai!=null) setActOfInventorization(ai);
+        if(wb!=null) {
+            if(!wb.getOrgOwner().equals(this.orgOwner)){
+                this.orgOwner = wb.getOrgOwner();
+            }
+            setWayBill(wb);
+        }
+        if(idd!=null){
+            if(!idd.getOrgOwner().equals(this.orgOwner)){
+                this.orgOwner = idd.getOrgOwner();
+            }
+            setInternalDisposingDocument(idd);
+        }
+        if(ai!=null){
+            if(!ai.getOrgOwner().equals(this.orgOwner)){
+                this.orgOwner = ai.getOrgOwner();
+            }
+            setActOfInventorization(ai);
+        }
 
         Staff st  = DAOUtils.findDistributedObjectByRefGUID(Staff.class, session, guidOfS);
         if(st==null) throw new DistributedObjectException("NOT_FOUND_VALUE Staff");

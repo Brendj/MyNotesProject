@@ -361,7 +361,7 @@ public class Manager {
             }
         } catch (Exception e) {
             errorMessage = e.getMessage();
-            LOGGER.error("Error findResponseResult: " + e.getMessage());
+            LOGGER.error("Error findResponseResult: " + e.getMessage(), e);
         } finally {
             HibernateUtils.close(persistenceSession, LOGGER);
             if (StringUtils.isNotEmpty(errorMessage)) {

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -28,19 +29,37 @@ public abstract class SupplierRequestDistributedObject extends DistributedObject
     @Override
     @SuppressWarnings("unchecked")
     public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception {
+        final boolean hasWayBillLinks = hasWayBillLinks(session);
         Boolean isSupplier = DAOUtils.isSupplierByOrg(session, idOfOrg);
         Criteria criteria = session.createCriteria(getClass());
-        boolean result = addReceiverRestriction(criteria, session, String.valueOf(idOfOrg), !isSupplier);
-        if(result){
-            createProjections(criteria);
-            criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
-            criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
-            return criteria.list();
+        if(hasWayBillLinks){
+            boolean result = addReceiverRestriction(criteria, session, String.valueOf(idOfOrg), !isSupplier);
+            if(result){
+                createProjections(criteria);
+                criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
+                criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
+                return criteria.list();
+            } else {
+                return new ArrayList<DistributedObject>(0);
+            }
         } else {
-            return new ArrayList<DistributedObject>(0);
+            List<Long> idOfOrgs = new ArrayList<Long>();
+            idOfOrgs.add(idOfOrg);
+            if(isSupplier){
+                List<Long> sourceMenuOrg = DAOUtils.findMenuExchangeDestOrg(session, idOfOrg);
+                idOfOrgs.addAll(sourceMenuOrg);
+            }
+            criteria.add(Restrictions.in("orgOwner",idOfOrgs));
+            criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
+            //criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
+            return criteria.list();
         }
     }
 
     protected abstract boolean addReceiverRestriction(Criteria criteria, Session session, String supplierOrgId, boolean isReceiver);
+
+    /* часть объектов не имеет прямую ссылку на накладную для них строится другая логика по отправке объектов
+     * отправка идет от клиента к поставщику, реализована отправка только для Инвентаризации. */
+    protected boolean hasWayBillLinks(Session session) throws DistributedObjectException {return true;}
 
 }

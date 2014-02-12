@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
@@ -48,6 +49,12 @@ public class InternalIncomingDocumentPosition extends SupplierRequestDistributed
     private String guidOfTMG;
     private Good good;
     private String guidOfG;
+
+    @Override
+    protected boolean hasWayBillLinks(Session session) throws DistributedObjectException{
+        InternalIncomingDocument iid  = DAOUtils.findDistributedObjectByRefGUID(InternalIncomingDocument.class, session, guidOfIID);
+        return !StringUtils.isEmpty(iid.getGuidOfWB());
+    }
 
     @Override
     protected boolean addReceiverRestriction(Criteria criteria, Session session, String supplierOrgId, boolean isReceiver) {
