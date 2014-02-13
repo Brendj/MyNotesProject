@@ -133,6 +133,7 @@
         PurchaseListResult purchases = (PurchaseListResult) request.getAttribute("purchases");
         boolean purchasesExist = purchases != null && purchases.purchaseList != null && !purchases.purchaseList.getP().isEmpty();
         boolean paymentsExist = payments != null && payments.paymentList != null && !payments.paymentList.getP().isEmpty();
+        //boolean transferExist = transfers != null && transfers.transferList != null && !transfers.transferList.getP().isEmpty();
     %>
     <div id="history">
         <div style="font-weight: bold;">История операций</div>
@@ -238,6 +239,40 @@
                 }
             %>
         </div>
+
+       <%-- <div id="transfers">
+            <div style="font-weight: bold;">Переводы</div>
+            <div style="line-height: 3em;">
+                <span><%=!paymentsExist ? " За данный период по субсчету АП переводов не было." : ""%></span>
+            </div>
+            <%
+                if (paymentsExist) {
+            %>
+            <div class="simpleTable purchaseTable">
+                <div class="simpleTableHeader purchaseRow">
+                    <div class="simpleCell purchaseHeaderCell">Дата</div>
+                    <div class="simpleCell purchaseHeaderCell">Сумма</div>
+                    <div class="simpleCell purchaseHeaderCell wideCell">Информация о платеже</div>
+                </div>
+                <%
+                    for (Payment payment : payments.paymentList.getP()) {
+                        String date = tf.format(payment.getTime().toGregorianCalendar().getTime());
+                        String sum = CurrencyStringUtils.copecksToRubles(payment.getSum());
+                %>
+                <div class="simpleRow purchaseRow">
+                    <div class="purchaseCell simpleCell"><%=date%></div>
+                    <div class="purchaseCell simpleCell sum"><%=sum%></div>
+                    <div class="purchaseCell simpleCell complexName"><%=payment.getOrigin()%></div>
+                </div>
+                <%
+                    }
+                %>
+            </div>
+            <%
+                }
+            %>
+        </div>--%>
+
     </div>
 </div>
 </div>

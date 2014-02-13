@@ -35,8 +35,12 @@
     @SuppressWarnings("unchecked")
     SubFeedingResult sf = (SubFeedingResult) request.getAttribute("subscriptionFeeding");
     ClientSummaryExt client = (ClientSummaryExt) request.getAttribute("client");
+    final Long subBalance0 = client.getSubBalance0();
     String action = sf.getIdOfSubscriptionFeeding() == null ? "activate" : "edit";
 %>
+    <script>
+        var subBalance0 = <%=subBalance0%>;
+    </script>
     <div class="header">
         <span class="contract">
             <%=ContractIdFormat.format(client.getContractId())%></span>
@@ -122,10 +126,20 @@
             <%
                 if (sf.getIdOfSubscriptionFeeding() == null) {
             %>
+                        <%
+                            if(subBalance0 <=0){
+                                %>
+                                    <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/transfer'">
+                                        Перевод средств
+                                    </button>
+                                <%
+                            }
+                        %>
                         <button type="submit" name="activate">Активировать</button>
                         <div style="font-size: 0.8em;">Нажимая на данную кнопку, Вы согласны с условиями предоставления
                             услуги.
                         </div>
+
             <%  } else {
 
             %>
