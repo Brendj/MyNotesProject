@@ -540,6 +540,84 @@ public class Processor implements SyncProcessor,
     }
 
     @Override
+    public void changeCardOwner(Long idOfClient, Long cardNo, Date changeTime, Date validTime)
+            throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            logger.debug("check valid date");
+            if(validTime.after(CalendarUtils.AFTER_DATE)) {
+                throw new Exception("Не верно введена дата");
+            }
+
+            logger.debug("check issue date");
+            if(validTime.before(changeTime)) {
+                throw new Exception("Не верно введена дата");
+            }
+
+            Client newCardOwner = DAOUtils.getClientReference(persistenceSession, idOfClient);
+            if(newCardOwner == null) {
+                throw new Exception("Клиент не найден: "+idOfClient);
+            }
+
+            CardTemp ct = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
+            if(ct!=null){
+                if(ct.getClient()!=null){
+                    final String format = "Карта с таким номером уже зарегистрирована как временная на клиента: %d";
+                    final String message = String.format(format,ct.getClient().getIdOfClient());
+                    throw new Exception(message);
+                }
+                if(ct.getVisitor()!=null){
+                    final String format = "Карта с таким номером уже зарегистрирована как временная на посетителя: %d";
+                    final String message = String.format(format,ct.getVisitor().getIdOfVisitor());
+                    throw new Exception(message);
+                }
+                if(ct.getVisitor()==null && ct.getClient()==null){
+                    final String format = "Карта с таким номером уже зарегистрирована как временная, но не имеет владельца: %d";
+                    final String message = String.format(format, cardNo);
+                    throw new Exception(message);
+                }
+            }
+
+            //Card updatedCard = DAOUtils.getCardReference(persistenceSession, idOfCard);
+            Card updatedCard = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+            if(updatedCard==null){
+                throw new Exception("Неизвестная карта: "+cardNo);
+            }
+
+            //if (state == Card.ACTIVE_STATE) {
+            //    Set<Card> clientCards = new HashSet<Card>(newCardOwner.getCards());
+            //    clientCards.remove(updatedCard);
+            //    lockActiveCards(persistenceSession, clientCards);
+            //}
+
+            lockActiveCards(persistenceSession, newCardOwner.getCards());
+
+            updatedCard.setClient(newCardOwner);
+            //updatedCard.setCardType(cardType);
+            updatedCard.setUpdateTime(new Date());
+            //updatedCard.setState(state);
+            updatedCard.setLockReason("");
+            updatedCard.setValidTime(validTime);
+            updatedCard.setIssueTime(changeTime);
+            //updatedCard.setLifeState(lifeState);
+            //updatedCard.setExternalId(externalId);
+            updatedCard.setUpdateTime(new Date());
+            persistenceSession.update(updatedCard);
+            persistenceSession.flush();
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    @Override
     public void cancelOrder(CompositeIdOfOrder compositeIdOfOrder) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;

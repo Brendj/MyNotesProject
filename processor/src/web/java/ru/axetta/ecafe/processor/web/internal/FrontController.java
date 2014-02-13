@@ -477,8 +477,15 @@ public class FrontController extends HttpServlet {
     @WebMethod(operationName = "changeCardOwner")
     public void changeCardOwner(@WebParam(name = "orgId") Long orgId,@WebParam(name = "newOwnerId") Long newOwnerId,
             @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "changeTime") Date changeTime,
-            @WebParam(name = "validTime") Date validTime){
-
+            @WebParam(name = "validTime") Date validTime) throws FrontControllerException{
+        checkRequestValidity(orgId);
+        ///
+        try {
+            RuntimeContext.getInstance().getCardManager().changeCardOwner(newOwnerId, cardNo, changeTime, validTime);
+        } catch (Exception e) {
+            logger.error("Failed registerCard", e);
+            throw new FrontControllerException(String.format("Ошибка при регистрации карты: %s", e.getMessage()), e);
+        }
     }
 
 
