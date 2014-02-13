@@ -67,6 +67,12 @@ public class DashboardPage extends BasicWorkspacePage implements OrgSelectPage.C
     }
 
     public String showOrgBasicStatsCSVList() {
+        try {
+            orgBasicStats = dashboardServiceBean
+                    .getOrgBasicStats(reportDate, filterOrg == null ? null : filterOrg.getIdOfOrg(), orgStatus);
+        } catch (Exception e) {
+            logAndPrintMessage("Ошибка подготовки данных", e);
+        }
         return "showOrgBasicStatsCSVList";
     }
 

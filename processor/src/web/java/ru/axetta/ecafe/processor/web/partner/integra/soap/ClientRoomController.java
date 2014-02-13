@@ -264,4 +264,12 @@ public interface ClientRoomController {
     @WebMethod(operationName = "findComplexesWithSubFeedingBySan")
     ComplexInfoResult findComplexesWithSubFeeding(@WebParam(name = "san") String san);
 
+    @WebMethod(operationName = "getTransferSubBalanceList")
+    TransferSubBalanceListResult getTransferSubBalanceList(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);
+
+    @WebMethod(operationName = "getTransferSubBalanceListBySan")
+    TransferSubBalanceListResult getTransferSubBalanceList(@WebParam(name = "san") String san, @WebParam(name = "startDate") Date startDate,
+            @WebParam(name = "endDate") Date endDate);
+
 }

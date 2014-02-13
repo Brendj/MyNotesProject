@@ -4085,6 +4085,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 res.description = RC_SUBSCRIPTION_FEEDING_DUPLICATE_DESC;
                 return res;
             }
+            // активация подписки при 0 балансе
             if (client.getSubBalance(1) <= 0) {
                 res.resultCode = RC_LACK_OF_SUBBALANCE1;
                 res.description = RC_LACK_OF_SUBBALANCE1_DESC;
@@ -4366,4 +4367,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return clientList.get(0);
     }
 
+
+    @Override
+    public TransferSubBalanceListResult getTransferSubBalanceList(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public TransferSubBalanceListResult getTransferSubBalanceList(@WebParam(name = "san") String san,
+            @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }
