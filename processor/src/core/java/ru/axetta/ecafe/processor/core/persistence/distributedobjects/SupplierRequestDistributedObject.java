@@ -51,7 +51,8 @@ public abstract class SupplierRequestDistributedObject extends DistributedObject
             }
             criteria.add(Restrictions.in("orgOwner",idOfOrgs));
             criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
-            //criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
+            createProjections(criteria);
+            criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
             return criteria.list();
         }
     }
