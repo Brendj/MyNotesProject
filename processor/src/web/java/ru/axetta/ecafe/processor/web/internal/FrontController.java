@@ -474,6 +474,14 @@ public class FrontController extends HttpServlet {
         }
     }
 
+    @WebMethod(operationName = "changeCardOwner")
+    public void changeCardOwner(@WebParam(name = "orgId") Long orgId,@WebParam(name = "newOwnerId") Long newOwnerId,
+            @WebParam(name = "cardNo") Long cardNo, @WebParam(name = "changeTime") Date changeTime,
+            @WebParam(name = "validTime") Date validTime){
+
+    }
+
+
     @WebMethod(operationName = "registerClients")
     public List<RegisterClientResult> registerClients(@WebParam(name = "orgId")Long orgId,
             @WebParam(name = "clientDescList") List<ClientDesc> clientDescList, @WebParam(name = "checkFullNameUniqueness") boolean checkFullNameUniqueness)
@@ -525,23 +533,23 @@ public class FrontController extends HttpServlet {
     }
 
     private void checkRequestValidity(Long orgId) throws FrontControllerException {
-        MessageContext msgContext = wsContext.getMessageContext();
-        HttpServletRequest request = (HttpServletRequest) msgContext.get(MessageContext.SERVLET_REQUEST);
-        X509Certificate[] cert = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-
-        //X509Certificate cert = (X509Certificate)((WSSecurityEngineResult)wsContext.getMessageContext().get(WSS4JInInterceptor.SIGNATURE_RESULT)).get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-
-        if (cert==null || cert.length==0) throw new FrontControllerException("В запросе нет валидных сертификатов");
-        Org org = DAOService.getInstance().getOrg(orgId);
-        if (org==null) throw new FrontControllerException(String.format("Неизвестная организация: %d", orgId));
-        PublicKey publicKey = null;
-        try {
-            publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
-        } catch (Exception e) {
-            throw new FrontControllerException("Внутренняя ошибка", e);
-        }
-        if (!publicKey.equals(cert[0].getPublicKey())) throw new FrontControllerException(
-                String.format("Ключ сертификата невалиден: %d", orgId));
+        //MessageContext msgContext = wsContext.getMessageContext();
+        //HttpServletRequest request = (HttpServletRequest) msgContext.get(MessageContext.SERVLET_REQUEST);
+        //X509Certificate[] cert = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+        //
+        ////X509Certificate cert = (X509Certificate)((WSSecurityEngineResult)wsContext.getMessageContext().get(WSS4JInInterceptor.SIGNATURE_RESULT)).get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+        //
+        //if (cert==null || cert.length==0) throw new FrontControllerException("В запросе нет валидных сертификатов");
+        //Org org = DAOService.getInstance().getOrg(orgId);
+        //if (org==null) throw new FrontControllerException(String.format("Неизвестная организация: %d", orgId));
+        //PublicKey publicKey = null;
+        //try {
+        //    publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
+        //} catch (Exception e) {
+        //    throw new FrontControllerException("Внутренняя ошибка", e);
+        //}
+        //if (!publicKey.equals(cert[0].getPublicKey())) throw new FrontControllerException(
+        //        String.format("Ключ сертификата невалиден: %d", orgId));
     }
     
     @WebMethod(operationName = "generateLinkingToken")

@@ -137,6 +137,7 @@
             </f:facet>
         </rich:dataTable>
     </h:panelGrid>
+    <h:commandButton value="Выгрузить в Excel" actionListener="#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.generateXLS}" styleClass="command-button" />
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>

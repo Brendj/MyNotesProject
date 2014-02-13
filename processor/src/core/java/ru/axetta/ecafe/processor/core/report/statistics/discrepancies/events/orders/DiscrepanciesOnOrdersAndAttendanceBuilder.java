@@ -21,6 +21,7 @@ import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.SentSmsItem;
 import ru.axetta.ecafe.processor.core.report.msc.DiscrepanciesOnOrdersAndAttendanceJasperReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -72,12 +73,32 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         parameterMap.put("month", month + 1);
         parameterMap.put("monthName", new DateFormatSymbols().getMonths()[month]);
         parameterMap.put("year", calendar.get(Calendar.YEAR));
-        parameterMap.put("startDate", startTime);
-        parameterMap.put("endDate", endTime);
+        //parameterMap.put("startDate", startTime);
+        //parameterMap.put("beginDate", startTime);
+        //parameterMap.put("endDate", endTime);
+        parameterMap.put("beginDate", CalendarUtils.dateToString(startTime));
+        parameterMap.put("endDate", CalendarUtils.dateToString(endTime));
+
+
+        if (StringUtils.isEmpty(getReportProperties().getProperty("idOfMenuSourceOrg"))) {
+            throw new Exception("Не указана организация-поставщик меню.");
+        }
+        //String sourceMenuOrgId = getReportProperties().getProperty("idOfMenuSourceOrg");
+        String sourceMenuOrgId = StringUtils.trimToEmpty(getReportProperties().getProperty("idOfMenuSourceOrg"));
+        List<Long> sourceMenuList = new ArrayList<Long>();
+        for (String idOfOrg : Arrays.asList(StringUtils.split(sourceMenuOrgId, ','))) {
+            sourceMenuList.add(Long.parseLong(idOfOrg));
+        }
+
+        String idOfOrgs = StringUtils.trimToEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
+        List<Long> idOfOrgList = new ArrayList<Long>();
+        for (String idOfOrg : Arrays.asList(StringUtils.split(idOfOrgs, ','))) {
+            idOfOrgList.add(Long.parseLong(idOfOrg));
+        }
 
 
         Date generateEndTime = new Date();
-        DiscrepanciesOnOrdersAndAttendanceReport report = build(session, null, null, calendar, startTime, endTime);
+        DiscrepanciesOnOrdersAndAttendanceReport report = build(session, sourceMenuList, idOfOrgList, calendar, startTime, endTime);
         JRDataSource dataSource = new JRBeanCollectionDataSource(report.getItems());
         JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
         //  Если имя шаблона присутствует, значит строится для джаспера

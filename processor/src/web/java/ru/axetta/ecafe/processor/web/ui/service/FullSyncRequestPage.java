@@ -4,9 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.ui.service;
 
+import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.org.OrganizationListSelect;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +29,7 @@ import java.util.Map;
 
 @Component
 @Scope("session")
-public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList {
+public class FullSyncRequestPage extends BasicWorkspacePage implements OrganizationListSelect /*implements OrgListSelectPage.CompleteHandlerList*/ {
 
     private static Logger logger = LoggerFactory.getLogger(FullSyncRequestPage.class);
     private List<Long> idOfOrgList = new ArrayList<Long>(0);
@@ -55,21 +57,34 @@ public class FullSyncRequestPage extends BasicWorkspacePage implements OrgListSe
     }
 
     @Override
-    public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
-        if (orgMap != null) {
-            idOfOrgList = new ArrayList<Long>(orgMap.size());
-            if (orgMap.isEmpty())
-                filter = "Не выбрано";
-            else {
-                filter = "";
-                for(Long idOfOrg : orgMap.keySet()) {
-                    idOfOrgList.add(idOfOrg);
-                    filter = filter.concat(orgMap.get(idOfOrg) + "; ");
-                }
-                filter = filter.substring(0, filter.length() - 2);
+    public void select(List<OrgShortItem> orgShortItem) {
+        idOfOrgList.clear();
+        if(orgShortItem.isEmpty()){
+            filter = "Не выбрано";
+        } else {
+            for (OrgShortItem item: orgShortItem){
+                idOfOrgList.add(item.getIdOfOrg());
+                filter = filter.concat(item.getShortName() + "; ");
             }
         }
     }
+
+    //@Override
+    //public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
+    //    if (orgMap != null) {
+    //        idOfOrgList = new ArrayList<Long>(orgMap.size());
+    //        if (orgMap.isEmpty())
+    //            filter = "Не выбрано";
+    //        else {
+    //            filter = "";
+    //            for(Long idOfOrg : orgMap.keySet()) {
+    //                idOfOrgList.add(idOfOrg);
+    //                filter = filter.concat(orgMap.get(idOfOrg) + "; ");
+    //            }
+    //            filter = filter.substring(0, filter.length() - 2);
+    //        }
+    //    }
+    //}
 
     @Override
     public String getPageFilename() {

@@ -103,6 +103,10 @@
         <c:import url="include/org/select_list.jsp" />
     </f:subview>
 
+    <f:subview id="orgsListSelectSubView">
+        <c:import url="include/org/selectlist.jsp" />
+    </f:subview>
+
     <f:subview id="contragentSelectSubView">
         <c:import url="include/contragent/select.jsp" />
     </f:subview>
