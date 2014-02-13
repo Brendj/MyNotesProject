@@ -347,6 +347,11 @@ private Long selectedIdOfMenu;
     private final GoodRequestsReportPage goodRequestsReportPage = new GoodRequestsReportPage();
     private final DeliveredServicesReportPage deliveredServicesReportPage = new DeliveredServicesReportPage ();
     private final ClientsBenefitsReportPage clientsBenefitsReportPage = new ClientsBenefitsReportPage ();
+    private final StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage discrepanciesOnOrdersAndAttendanceReportPage
+            = new StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage();
+    private final AggregateGoodRequestReportPage aggregateGoodRequestReportPage = new AggregateGoodRequestReportPage();
+    private final DiscrepanciesDataOnOrdersAndPaymentReportPage discrepanciesDataOnOrdersAndPaymentReportPage
+            = new DiscrepanciesDataOnOrdersAndPaymentReportPage();
 
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
 
@@ -486,7 +491,7 @@ private Long selectedIdOfMenu;
         } catch (Exception e) {
             logger.error("Failed to set manul report runner page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы для ручного запуска отчетов",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы для ручного запуска отчетов: " + e.getMessage(),
                             null));
         }
         updateSelectedMainMenu();
@@ -501,7 +506,7 @@ private Long selectedIdOfMenu;
         } catch (Exception e) {
             logger.error("Failed to set all orgs discount report page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы отчета по льготам всех организаций", null));
+                    "Ошибка при подготовке страницы отчета по льготам всех организаций: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -520,7 +525,7 @@ private Long selectedIdOfMenu;
         } catch (Exception e) {
             logger.error("Failed to set orgs discounts report page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы отчета по льготам организации", null));
+                    "Ошибка при подготовке страницы отчета по льготам организации: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -543,7 +548,7 @@ private Long selectedIdOfMenu;
         } catch (Exception e) {
             logger.error("Failed to build all orgs discounts report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -568,7 +573,7 @@ private Long selectedIdOfMenu;
         } catch (Exception e) {
             logger.error("Failed to build org discounts report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -592,6 +597,7 @@ private Long selectedIdOfMenu;
 
     public void updateSelectedMainMenu() {
         UIComponent mainMenuComponent = currentWorkspacePage.getMainMenuComponent();
+        idOfContragentOrgList = null;
         if (null != mainMenuComponent) {
             mainMenu.setValue(mainMenuComponent.getId());
         }
@@ -655,7 +661,7 @@ private Long selectedIdOfMenu;
         } catch (Exception e) {
             logger.error("Failed to fill user list page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка пользователей",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка пользователей: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -681,7 +687,7 @@ private Long selectedIdOfMenu;
         } catch (Exception e) {
             logger.error("Failed to clear filter for user list page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка пользователей",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка пользователей: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -711,7 +717,7 @@ private Long selectedIdOfMenu;
         } catch (Exception e) {
             logger.error("Failed to remove user", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении пользователя", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении пользователя: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -755,7 +761,7 @@ private Long selectedIdOfMenu;
         } catch (Exception e) {
             logger.error("Failed to fill selected user group page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы пользователя",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы пользователя: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -787,7 +793,7 @@ private Long selectedIdOfMenu;
         } catch (Exception e) {
             logger.error("Failed to fill user view page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы просмотра данных пользователя", null));
+                    "Ошибка при подготовке страницы просмотра данных пользователя: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -820,7 +826,7 @@ private Long selectedIdOfMenu;
         } catch (Exception e) {
             logger.error("Failed to fill user edit page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы редактирования данных пользователя", null));
+                    "Ошибка при подготовке страницы редактирования данных пользователя: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -854,7 +860,7 @@ private Long selectedIdOfMenu;
             } catch (Exception e) {
                 logger.error("Failed to update user", e);
                 facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных пользователя",
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных пользователя: " + e.getMessage(),
                                 null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
@@ -886,7 +892,7 @@ private Long selectedIdOfMenu;
         } catch (Exception e) {
             logger.error("Failed to show user create page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы создания пользователя", null));
+                    "Ошибка при подготовке страницы создания пользователя: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -918,7 +924,7 @@ private Long selectedIdOfMenu;
             } catch (Exception e) {
                 logger.error("Failed to create user", e);
                 facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании пользователя", null));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании пользователя: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -959,7 +965,7 @@ private Long selectedIdOfMenu;
         } catch (Exception e) {
             logger.error("Failed to fill org list page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка организаций",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка организаций: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -987,7 +993,7 @@ private Long selectedIdOfMenu;
         } catch (Exception e) {
             logger.error("Failed to set filter for org list page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка организаций",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка организаций: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -1015,7 +1021,7 @@ private Long selectedIdOfMenu;
         } catch (Exception e) {
             logger.error("Failed to clear filter for client list page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка клиентов",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка клиентов: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -1053,7 +1059,7 @@ private Long selectedIdOfMenu;
         } catch (Exception e) {
             logger.error("Failed to fill selected org group page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы организации",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы организации: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -1087,7 +1093,7 @@ private Long selectedIdOfMenu;
         } catch (Exception e) {
             logger.error("Failed to fill org view page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы просмотра данных организации", null));
+                    "Ошибка при подготовке страницы просмотра данных организации: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1131,7 +1137,7 @@ private Long selectedIdOfMenu;
         } catch (Exception e) {
             logger.error("Failed to load menu exchange from table", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по мастера меню", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по мастера меню: " + e.getMessage(), null));
         } finally {
 
         }
@@ -1172,7 +1178,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to load menu from table", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по меню", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по меню: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1195,7 +1201,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to load menu from table", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по меню", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по меню: " + e.getMessage(), null));
         }
         return null;
     }
@@ -1222,7 +1228,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             currentWorkspacePage = orgEditPage;
         } catch (Exception e) {
             logger.error("Failed to fill org edit page", e);
-            final String summary = "Ошибка при подготовке страницы редактирования данных организации";
+            final String summary = "Ошибка при подготовке страницы редактирования данных организации: " + e.getMessage();
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -1305,7 +1311,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show org create page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы регистрации организации", null));
+                    "Ошибка при подготовке страницы регистрации организации: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1370,7 +1376,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show org balance report page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы отчета по балансу организации", null));
+                    "Ошибка при подготовке страницы отчета по балансу организации: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1398,7 +1404,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to build org balance report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1430,7 +1436,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show org order report page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы отчета по покупкам по организации", null));
+                    "Ошибка при подготовке страницы отчета по покупкам по организации: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1458,7 +1464,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to build org order report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1517,7 +1523,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             } catch (Exception e) {
                 logger.error("Failed to fill client group selection page", e);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Ошибка при подготовке страницы выбора группы клиента", null));
+                        "Ошибка при подготовке страницы выбора группы клиента: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -1548,7 +1554,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill client group selection page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы выбора группы клиента", null));
+                    "Ошибка при подготовке страницы выбора группы клиента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1577,7 +1583,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill client group selection page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы выбора группы клиента", null));
+                    "Ошибка при подготовке страницы выбора группы клиента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1609,7 +1615,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             } catch (Exception e) {
                 logger.error("Failed to fill org selection page", e);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Ошибка при подготовке страницы выбора организации", null));
+                        "Ошибка при подготовке страницы выбора организации: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -1688,6 +1694,40 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         return null;
     }*/
 
+    private Object showOrgListSelectPage(List<Long> idOfContragentOrgList) {
+        BasicPage currentTopMostPage = getTopMostPage();
+        if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
+                    orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList);
+                } else {
+                    orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false, idOfContragentOrgList);
+                }
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                orgListSelectPage.pushCompleteHandlerList((OrgListSelectPage.CompleteHandlerList) currentTopMostPage);
+                modalPages.push(orgListSelectPage);
+            } catch (Exception e) {
+                logger.error("Failed to fill org selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора организации", null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+
+
+            }
+        }
+        return null;
+    }
+
     public Object showOrgListSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {
@@ -1700,9 +1740,9 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                    orgListSelectPage.fill(persistenceSession, false);
+                    orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList);
                 } else {
-                    orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false);
+                    orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false, idOfContragentOrgList);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -1711,7 +1751,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             } catch (Exception e) {
                 logger.error("Failed to fill org selection page", e);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Ошибка при подготовке страницы выбора организации", null));
+                        "Ошибка при подготовке страницы выбора организации: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -1737,7 +1777,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill org selection page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора организации",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора организации: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -1746,6 +1786,16 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
 
         }
         return null;
+    }
+
+    private List<Long> idOfContragentOrgList = null;
+
+    public void setIdOfContragentOrgList(List<Long> idOfContragentOrgList) {
+        this.idOfContragentOrgList = idOfContragentOrgList;
+    }
+
+    public List<Long> getIdOfContragentOrgList() {
+        return idOfContragentOrgList;
     }
 
     public Object updateOrgListSelectPage() {
@@ -1758,9 +1808,9 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                orgListSelectPage.fill(persistenceSession, true);
+                orgListSelectPage.fill(persistenceSession, true, idOfContragentOrgList);
             } else {
-                orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, true);
+                orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, true, idOfContragentOrgList);
             }
             //orgListSelectPage.fill(persistenceSession);
             persistenceTransaction.commit();
@@ -1768,7 +1818,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill org selection page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора организации",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора организации: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -1818,7 +1868,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to complete org selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора организации", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора организации: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -1840,7 +1890,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to complete org selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора организации", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора организации: " + e.getMessage(), null));
         }
         return null;
     }
@@ -1858,7 +1908,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to complete orgs selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора организаций", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора организаций: " + e.getMessage(), null));
         }
         return null;
     }
@@ -1876,7 +1926,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to complete orgs selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора организаций", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора организаций: " + e.getMessage(), null));
         }
         return null;
     }
@@ -1911,7 +1961,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill contragent list page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка контрагентов",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка контрагентов: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -1951,7 +2001,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill selected contragent group page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы контрагента",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы контрагента: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -1985,7 +2035,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill contragent view page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы просмотра данных контрагента", null));
+                    "Ошибка при подготовке страницы просмотра данных контрагента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2018,7 +2068,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill contragent edit page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы редактирования данных контрагента", null));
+                    "Ошибка при подготовке страницы редактирования данных контрагента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2056,7 +2106,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to update contragent", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных контрагента", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных контрагента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2086,7 +2136,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show contragent create page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы регистрации контрагента", null));
+                    "Ошибка при подготовке страницы регистрации контрагента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2119,7 +2169,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to create contragent", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации контрагента", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации контрагента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2151,7 +2201,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show contragent client payment report page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы отчета по платежам клиентов", null));
+                    "Ошибка при подготовке страницы отчета по платежам клиентов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2179,7 +2229,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to build contragent balance report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2234,7 +2284,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             } catch (Exception e) {
                 logger.error("Failed to fill contragents list selection page", e);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Ошибка при подготовке страницы выбора списка контрагентов", null));
+                        "Ошибка при подготовке страницы выбора списка контрагентов: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -2280,7 +2330,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             } catch (Exception e) {
                 logger.error("Failed to fill contract selection page", e);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Ошибка при подготовке страницы выбора контракта", null));
+                        "Ошибка при подготовке страницы выбора контракта: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -2313,7 +2363,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             } catch (Exception e) {
                 logger.error("Failed to fill contragent selection page", e);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Ошибка при подготовке страницы выбора контрагента", null));
+                        "Ошибка при подготовке страницы выбора контрагента: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -2369,7 +2419,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to complete contragent list selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора списка контрагентов", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора списка контрагентов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2392,7 +2442,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("{}", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора списка контрагентов",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора списка контрагентов: " + e.getMessage(),
                             null));
         }
         return null;
@@ -2418,7 +2468,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to complete contract selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора контракта", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора контракта: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2449,7 +2499,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to complete contragent selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора контрагента", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора контрагента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2511,7 +2561,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill client list page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка клиентов",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка клиентов: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -2538,7 +2588,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to set filter for client list page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка клиентов",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка клиентов: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -2565,7 +2615,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to clear filter for client list page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка клиентов",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка клиентов: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -2604,7 +2654,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill selected client group page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы клиента",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы клиента: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -2638,7 +2688,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill client view page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы просмотра данных клиента", null));
+                    "Ошибка при подготовке страницы просмотра данных клиента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2671,7 +2721,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill client edit page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы редактирования данных клиента", null));
+                    "Ошибка при подготовке страницы редактирования данных клиента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2736,7 +2786,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show client operation list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы просмотра списка операций по клиенту", null));
+                    "Ошибка при подготовке страницы просмотра списка операций по клиенту: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2767,7 +2817,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show client create page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы регистрации клиента",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы регистрации клиента: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -2800,7 +2850,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             } catch (Exception e) {
                 logger.error("Failed to create client", e);
                 facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации клиента", null));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации клиента: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -2836,7 +2886,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show client file load page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы загрузки регистрационного списка клиентов", null));
+                    "Ошибка при подготовке страницы загрузки регистрационного списка клиентов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2863,7 +2913,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show client update file load page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы загрузки списка обновлений клиентов", null));
+                    "Ошибка при подготовке страницы загрузки списка обновлений клиентов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -2900,7 +2950,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to load clients from file", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при загрузке/регистрации данных по клиентам: " + e, null));
+                    "Ошибка при загрузке/регистрации данных по клиентам: : " + e.getMessage(), null));
         } finally {
             close(inputStream);
         }
@@ -2927,7 +2977,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to update clients from file", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при загрузке/регистрации данных по клиентам",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при загрузке/регистрации данных по клиентам: " + e.getMessage(),
                             null));
         } finally {
             close(inputStream);
@@ -2991,7 +3041,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             } catch (Exception e) {
                 logger.error("Failed to fill client selection page", e);
                 facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора клиента",
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора клиента: " + e.getMessage(),
                                 null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
@@ -3018,7 +3068,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill client selection page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора клиента",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора клиента: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -3049,7 +3099,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to complete client selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора клиента", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора клиента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3075,7 +3125,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to clear filter for client select page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора клиента",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора клиента: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -3110,7 +3160,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show contract build page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы подготовки договора",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы подготовки договора: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -3139,7 +3189,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to generate client contract number", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при генерации номера договора клиента",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при генерации номера договора клиента: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -3174,7 +3224,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show client limit batch edit page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы изменения лимита овердрафта", null));
+                    "Ошибка при подготовке страницы изменения лимита овердрафта: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3201,7 +3251,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show card expire batch edit page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы изменения даты валидности карты", null));
+                    "Ошибка при подготовке страницы изменения даты валидности карты: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3229,7 +3279,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to batch update client limit", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Операция завершена c ошибками", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Операция завершена c ошибками: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3256,7 +3306,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to batch update card expire date", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Операция завершена c ошибками", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Операция завершена c ошибками: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3286,7 +3336,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show client sms page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы работы с клиентскими SMS", null));
+                    "Ошибка при подготовке страницы работы с клиентскими SMS: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3314,7 +3364,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to send client negative balance sms", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Отправка SMS завершена с ошибками", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Отправка SMS завершена с ошибками: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3339,7 +3389,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show client sms page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы работы с клиентскими SMS", null));
+                    "Ошибка при подготовке страницы работы с клиентскими SMS: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3365,7 +3415,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show client sms page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы работы с клиентскими SMS", null));
+                    "Ошибка при подготовке страницы работы с клиентскими SMS: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3391,7 +3441,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show client sms page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы работы с клиентскими SMS", null));
+                    "Ошибка при подготовке страницы работы с клиентскими SMS: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3431,7 +3481,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill card list page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка карт", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка карт: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3457,7 +3507,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to set filter for card list page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка карт", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка карт: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3483,7 +3533,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to clear filter for card list page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка карт", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы списка карт: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3517,7 +3567,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill selected card group page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы клиента",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы клиента: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -3551,7 +3601,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill card view page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы просмотра данных карты", null));
+                    "Ошибка при подготовке страницы просмотра данных карты: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3584,7 +3634,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill card edit page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы редактирования данных карты", null));
+                    "Ошибка при подготовке страницы редактирования данных карты: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3613,7 +3663,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to update card", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных карты", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных карты: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3643,7 +3693,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show card create page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы регистрации карты",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы регистрации карты: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -3703,7 +3753,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show card operation list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы просмотра списка операций по карте", null));
+                    "Ошибка при подготовке страницы просмотра списка операций по карте: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3734,7 +3784,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show card file load page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы загрузки списка карт на регистрацию", null));
+                    "Ошибка при подготовке страницы загрузки списка карт на регистрацию: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3766,7 +3816,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to load cards from file", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при загрузке/регистрации данных по картам",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при загрузке/регистрации данных по картам: " + e.getMessage(),
                             null));
         } finally {
             close(inputStream);
@@ -3821,7 +3871,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill contragent client account list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы списка счетов клиентов у контрагентов", null));
+                    "Ошибка при подготовке страницы списка счетов клиентов у контрагентов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3847,7 +3897,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill contragent client account list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы списка счетов клиентов у контрагентов", null));
+                    "Ошибка при подготовке страницы списка счетов клиентов у контрагентов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3873,7 +3923,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to clear filter for contragent client account list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы списка счетов клиентов у контрагентов", null));
+                    "Ошибка при подготовке страницы списка счетов клиентов у контрагентов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3911,7 +3961,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to remove contragent client account", e);
             facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении счета", null));
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении счета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3945,7 +3995,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show contragent client account create page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы регистрации счета клиента у контрагента", null));
+                    "Ошибка при подготовке страницы регистрации счета клиента у контрагента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -3973,7 +4023,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to create ccAccount", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации счета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации счета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4003,7 +4053,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to show contragent client account file load page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы загрузки списка счетов", null));
+                    "Ошибка при подготовке страницы загрузки списка счетов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4030,7 +4080,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to load ccAccounts from file", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при загрузке/регистрации данных по счетам",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при загрузке/регистрации данных по счетам: " + e.getMessage(),
                             null));
         } finally {
             close(inputStream);
@@ -4053,7 +4103,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to load file", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при добавлении файла", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при добавлении файла: " + e.getMessage(), null));
         }
     }
 
@@ -4104,7 +4154,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill support email page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы отправки электронного письма", null));
+                    "Ошибка при подготовке страницы отправки электронного письма: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4132,7 +4182,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to send support email", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при отправке электронного письма", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при отправке электронного письма: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4172,7 +4222,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to fill report discountrule list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы списка правил обработки отчетов", null));
+                    "Ошибка при подготовке страницы списка правил обработки отчетов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4201,7 +4251,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         } catch (Exception e) {
             logger.error("Failed to remove report discountrule", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении правила обработки отчетов",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении правила обработки отчетов: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -4248,7 +4298,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill selected report discountrule group page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке общей страницы правила обработки отчетов", null));
+                    "Ошибка при подготовке общей страницы правила обработки отчетов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4281,7 +4331,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill report discountrule view page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы просмотра правила обработки отчетов", null));
+                    "Ошибка при подготовке страницы просмотра правила обработки отчетов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4314,7 +4364,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill report discountrule edit page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы редактирования правила обработки отчетов", null));
+                    "Ошибка при подготовке страницы редактирования правила обработки отчетов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4375,7 +4425,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to show report discountrule create page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы создания правила обработки отчетов", null));
+                    "Ошибка при подготовке страницы создания правила обработки отчетов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4444,7 +4494,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill event notification list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы списка правил уведомлений", null));
+                    "Ошибка при подготовке страницы списка правил уведомлений: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4474,7 +4524,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to remove event notification", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении правила обработки уведомлений",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении правила обработки уведомлений: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -4521,7 +4571,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill selected event notification group page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке общей страницы правила уведомлений", null));
+                    "Ошибка при подготовке общей страницы правила уведомлений: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4554,7 +4604,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill event notification view page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы просмотра правила уведомлений", null));
+                    "Ошибка при подготовке страницы просмотра правила уведомлений: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4587,7 +4637,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill event notification edit page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы редактирования правила уведомлений", null));
+                    "Ошибка при подготовке страницы редактирования правила уведомлений: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4617,7 +4667,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to update report discountrule", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении правила", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении правила: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4647,7 +4697,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to show event notification create page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы создания правила уведомлений", null));
+                    "Ошибка при подготовке страницы создания правила уведомлений: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4676,7 +4726,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to create report discountrule", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании правила", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании правила: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4706,7 +4756,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to show log ru.axetta.ecafe.processor.core.test page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы тестирования лога",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы тестирования лога: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -4734,7 +4784,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to ru.axetta.ecafe.processor.core.test log", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при тестировании лога", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при тестировании лога: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4764,7 +4814,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to show sign keys build page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы генерации ключей подписи", null));
+                    "Ошибка при подготовке страницы генерации ключей подписи: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4791,7 +4841,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to build sign keys", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при генерации ключей", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при генерации ключей: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4821,7 +4871,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to show order remove page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы удаления покупки",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы удаления покупки: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -4877,7 +4927,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill report job list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы списка задач по формированию отчетов", null));
+                    "Ошибка при подготовке страницы списка задач по формированию отчетов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4895,7 +4945,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to remove report job", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении задачи", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении задачи: " + e.getMessage(), null));
         }
         return null;
     }
@@ -4936,7 +4986,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill selected report job group page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке общей страницы задач формирования отчетов", null));
+                    "Ошибка при подготовке общей страницы задач формирования отчетов: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4969,7 +5019,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill report job view page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы просмотра задачи",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы просмотра задачи: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -5003,7 +5053,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill report job edit page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы редактирования задачи", null));
+                    "Ошибка при подготовке страницы редактирования задачи: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5039,7 +5089,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to update report job", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении задачи", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении задачи: " + e.getMessage(), null));
         }
         return null;
     }
@@ -5064,7 +5114,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to show report job create page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы создания задачи",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы создания задачи: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -5084,7 +5134,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to create report job", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании задачи", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при создании задачи: " + e.getMessage(), null));
         }
         return null;
     }
@@ -5225,7 +5275,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to set free complex report page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы отчета по бесплатным комплексам", null));
+                    "Ошибка при подготовке страницы отчета по бесплатным комплексам: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -5249,7 +5299,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to build free complex report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5275,7 +5325,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to set pay complex report page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы отчета по платным комплексам", null));
+                    "Ошибка при подготовке страницы отчета по платным комплексам: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -5299,7 +5349,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to build pay complex report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5334,7 +5384,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по количеству льгот",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по количеству льгот: " + e.getMessage(),
                             null));
         }
         updateSelectedMainMenu();
@@ -5358,7 +5408,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to build sales report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5375,7 +5425,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to set delivered report page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по предоставленным услугам",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по предоставленным услугам: " + e.getMessage(),
                             null));
         }
         updateSelectedMainMenu();
@@ -5405,7 +5455,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to build sales report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5413,9 +5463,20 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (06.10.2011)
     public GoodRequestsReportPage getGoodRequestReportPage() {
         return goodRequestsReportPage;
+    }
+
+    public StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage getDiscrepanciesOnOrdersAndAttendanceReportPage() {
+        return discrepanciesOnOrdersAndAttendanceReportPage;
+    }
+
+    public AggregateGoodRequestReportPage getAggregateGoodRequestReportPage() {
+        return aggregateGoodRequestReportPage;
+    }
+
+    public DiscrepanciesDataOnOrdersAndPaymentReportPage getDiscrepanciesDataOnOrdersAndPaymentReportPage() {
+        return discrepanciesDataOnOrdersAndPaymentReportPage;
     }
 
     public Object showGoodRequestReportPage () {
@@ -5426,7 +5487,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по запрошенным товарам",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по запрошенным товарам: " + e.getMessage(),
                             null));
         }
         updateSelectedMainMenu();
@@ -5450,7 +5511,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to build sales report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5477,7 +5538,181 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to build sales report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    public Object showDiscrepanciesOnOrdersAndAttendanceReportPage () {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            discrepanciesOnOrdersAndAttendanceReportPage.fill();
+            currentWorkspacePage = discrepanciesOnOrdersAndAttendanceReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set sales report page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по запрошенным товарам: " + e.getMessage(),
+                            null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object buildDiscrepanciesOnOrdersAndAttendanceReport() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            discrepanciesOnOrdersAndAttendanceReportPage.buildReport(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to build DiscrepanciesOnOrdersAndAttendanceReport report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
+    }
+
+
+    public void exportDiscrepanciesOnOrdersAndAttendanceReport(javax.faces.event.ActionEvent event) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            discrepanciesOnOrdersAndAttendanceReportPage.export(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to build DiscrepanciesOnOrdersAndAttendanceReport report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    public Object showAggregateGoodRequestReportPage () {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            //aggregateGoodRequestReportPage.fill();
+            currentWorkspacePage = aggregateGoodRequestReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set sales report page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы: " + e.getMessage(),
+                            null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object buildAggregateGoodRequestReport() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            aggregateGoodRequestReportPage.buildReport(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to build DiscrepanciesOnOrdersAndAttendanceReport report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        return null;
+    }
+
+    public Object showDiscrepanciesDataOnOrdersAndPaymentReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            //aggregateGoodRequestReportPage.fill();
+            currentWorkspacePage = discrepanciesDataOnOrdersAndPaymentReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set sales report page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы: " + e.getMessage(),
+                            null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+
+    public Object buildDiscrepanciesDataOnOrdersAndPaymentReport() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            //discrepanciesDataOnOrdersAndPaymentReportPage.buildReport(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to build DiscrepanciesOnOrdersAndAttendanceReport report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+    }
+
+    public void exportDiscrepanciesDataOnOrdersAndPaymentReport(javax.faces.event.ActionEvent event) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            //discrepanciesDataOnOrdersAndPaymentReportPage.export(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+        } catch (Exception e) {
+            logger.error("Failed to build DiscrepanciesOnOrdersAndAttendanceReport report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5491,7 +5726,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по продажам",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по продажам: " + e.getMessage(),
                             null));
         }
         updateSelectedMainMenu();
@@ -5515,7 +5750,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to build sales report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5533,7 +5768,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по продажам",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по продажам: " + e.getMessage(),
                             null));
         }
         updateSelectedMainMenu();
@@ -5558,7 +5793,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to build sales report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5596,7 +5831,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to set sync report page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы отчета по синхронизации", null));
+                    "Ошибка при подготовке страницы отчета по синхронизации: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -5620,7 +5855,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to build sync report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5643,7 +5878,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to set status sync report page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы статуса синхронизации", null));
+                    "Ошибка при подготовке страницы статуса синхронизации: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -5667,7 +5902,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to build status sync report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5690,7 +5925,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error(" Failed to set enter event report page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчет по турникетам",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчет по турникетам: " + e.getMessage(),
                             null));
         }
         updateSelectedMainMenu();
@@ -5715,7 +5950,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to build enter event report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5743,7 +5978,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to set client report page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчет по учащимся",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчет по учащимся: " + e.getMessage(),
                             null));
         }
         updateSelectedMainMenu();
@@ -5768,7 +6003,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to build client report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5820,7 +6055,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill configuration page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы конфигурации", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы конфигурации: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5856,7 +6091,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to save configurations", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при сохранении конфигурации", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при сохранении конфигурации: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5916,7 +6151,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to set current positions report page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы просмотра текущих позиций", null));
+                    "Ошибка при подготовке страницы просмотра текущих позиций: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -5938,7 +6173,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to build current positions report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -5997,7 +6232,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to count current positions", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при расчете текущих позиций", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при расчете текущих позиций: " + e.getMessage(), null));
         } finally {
 
         }
@@ -6042,7 +6277,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill contragent POS list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы справочника точек продаж", null));
+                    "Ошибка при подготовке страницы справочника точек продаж: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6075,7 +6310,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to show contragent POS create page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы регистрации точки продажи", null));
+                    "Ошибка при подготовке страницы регистрации точки продажи: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6104,7 +6339,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to create ccAccount", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации точки продажи", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации точки продажи: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6131,7 +6366,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to clear filter for contragent client account list page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке справочника точек продаж",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке справочника точек продаж: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -6174,7 +6409,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to remove POS", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении точки продажи", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении точки продажи: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6208,7 +6443,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill POS edit page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы редактирования точки продажи", null));
+                    "Ошибка при подготовке страницы редактирования точки продажи: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6243,7 +6478,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to update POS", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных точки продажи", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных точки продажи: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6274,7 +6509,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill selected POS group page", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы точки продажи",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке общей страницы точки продажи: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -6323,7 +6558,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill contragent settlement list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы платежей между контрагентами", null));
+                    "Ошибка при подготовке страницы платежей между контрагентами: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6356,7 +6591,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to show contragent settlement create page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы регистрации платежа между контрагентами", null));
+                    "Ошибка при подготовке страницы регистрации платежа между контрагентами: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6386,11 +6621,11 @@ public Long getSelectedIdOfReportRule() {
         } catch (SettlementCreatePage.WrongContragentsException e) {
             logger.error("Failed to create settlement", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Платеж между указанными контрагентами не может быть осуществлен", null));
+                    "Платеж между указанными контрагентами не может быть осуществлен: " + e.getMessage(), null));
         } catch (Exception e) {
             logger.error("Failed to create settlement", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации платежа между контрагентами",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации платежа между контрагентами: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -6418,7 +6653,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to clear filter for contragent client account list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке справочника платежей между контрагентами", null));
+                    "Ошибка при подготовке справочника платежей между контрагентами: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6460,7 +6695,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to remove settlement", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении платежа", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении платежа: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6494,7 +6729,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill settlement edit page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы редактирования платежа", null));
+                    "Ошибка при подготовке страницы редактирования платежа: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6528,7 +6763,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to update settlement", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных платежа", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных платежа: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6558,7 +6793,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill selected settlement group page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке общей страницы платежа между контрагентами", null));
+                    "Ошибка при подготовке общей страницы платежа между контрагентами: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6606,7 +6841,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill contragent addPayment list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы платежей между контрагентами", null));
+                    "Ошибка при подготовке страницы платежей между контрагентами: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6639,7 +6874,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to show contragent addPayment create page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы регистрации платежа между контрагентами", null));
+                    "Ошибка при подготовке страницы регистрации платежа между контрагентами: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6669,11 +6904,11 @@ public Long getSelectedIdOfReportRule() {
         } catch (AddPaymentCreatePage.WrongContragentsException e) {
             logger.error("Failed to create addPayment", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Платеж между указанными контрагентами не может быть осуществлен", null));
+                    "Платеж между указанными контрагентами не может быть осуществлен: " + e.getMessage(), null));
         } catch (Exception e) {
             logger.error("Failed to create addPayment", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации платежа между контрагентами",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при регистрации платежа между контрагентами: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -6701,7 +6936,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to clear filter for contragent client account list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке справочника платежей между контрагентами", null));
+                    "Ошибка при подготовке справочника платежей между контрагентами: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6743,7 +6978,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to remove addPayment", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении платежа", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении платежа: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6777,7 +7012,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill addPayment edit page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы редактирования платежа", null));
+                    "Ошибка при подготовке страницы редактирования платежа: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6811,7 +7046,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to update addPayment", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных платежа", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении данных платежа: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6841,7 +7076,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to fill selected addPayment group page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке общей страницы платежа между контрагентами", null));
+                    "Ошибка при подготовке общей страницы платежа между контрагентами: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6896,7 +7131,7 @@ public Long getSelectedIdOfReportRule() {
             } catch (Exception e) {
                 logger.error("Failed to complete  discountrule selection", e);
                 facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора правила", null));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора правила: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -6923,7 +7158,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to complete  discountrule selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора правила", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора правила: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -6946,7 +7181,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to complete  discountrule selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора правила", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора правила: " + e.getMessage(), null));
         }
         return null;
     }
@@ -6964,7 +7199,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to complete  discountrule selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора правила", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора правила: " + e.getMessage(), null));
         }
         return null;
     }
@@ -7010,7 +7245,7 @@ public Long getSelectedIdOfReportRule() {
             } catch (Exception e) {
                 logger.error("Failed to complete  categorydiscount org selection", e);
                 facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Ошибка при обработке выбора категории организации", null));
+                        "Ошибка при обработке выбора категории организации: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -7035,7 +7270,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to complete categorydiscount org selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации: " + e.getMessage(),
                             null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -7057,7 +7292,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to complete  categorydiscount org selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации: " + e.getMessage(),
                             null));
         }
         return null;
@@ -7075,7 +7310,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to complete  categorydiscount org selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации",
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории организации: " + e.getMessage(),
                             null));
         }
         return null;
@@ -7128,7 +7363,7 @@ public Long getSelectedIdOfReportRule() {
             } catch (Exception e) {
                 logger.error("Failed to complete  categorydiscount selection", e);
                 facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории", null));
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории: " + e.getMessage(), null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
@@ -7160,7 +7395,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to complete  categorydiscount selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7183,7 +7418,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to complete  categorydiscount selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории: " + e.getMessage(), null));
         }
         return null;
     }
@@ -7201,7 +7436,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to complete  categorydiscount selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории: " + e.getMessage(), null));
         }
         return null;
     }
@@ -7234,7 +7469,7 @@ public Long getSelectedIdOfReportRule() {
             } catch (Exception e) {
                 logger.error("Failed to fill categorydiscount selection page", e);
                 facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора категории",
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора категории: " + e.getMessage(),
                                 null));
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
@@ -7267,7 +7502,7 @@ public Long getSelectedIdOfReportRule() {
         } catch (Exception e) {
             logger.error("Failed to complete categorydiscount selection", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при обработке выбора категории: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7566,7 +7801,7 @@ public User getCurrentUser() throws Exception {
         } catch (Exception e) {
             logger.error("Failed to set all complex report page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы отчета по всем комплексам", null));
+                    "Ошибка при подготовке страницы отчета по всем комплексам: " + e.getMessage(), null));
         }
         updateSelectedMainMenu();
         return null;
@@ -7590,7 +7825,7 @@ public User getCurrentUser() throws Exception {
         } catch (Exception e) {
             logger.error("Failed to build all complex report", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7625,7 +7860,7 @@ public User getCurrentUser() throws Exception {
         } catch (Exception e) {
             logger.error("Failed to set new limit", e);
             facesContext
-                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при смене лимита", null));
+                    .addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при смене лимита: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7649,7 +7884,7 @@ public User getCurrentUser() throws Exception {
         } catch (Exception e) {
             logger.error("Failed to set new org", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при смене организации", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при смене организации: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7673,7 +7908,7 @@ public User getCurrentUser() throws Exception {
         } catch (Exception e) {
             logger.error("Failed to set new expenditure limit", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при смене лимита дневных трат", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при смене лимита дневных трат: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7696,7 +7931,7 @@ public User getCurrentUser() throws Exception {
         } catch (Exception e) {
             logger.error("Failed to set new expenditure limit", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении параметров уведомления", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при изменении параметров уведомления: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -7719,7 +7954,7 @@ public User getCurrentUser() throws Exception {
         } catch (Exception e) {
             logger.error("Error on deleting report template file.", e);
             facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении шаблона.", null));
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при удалении шаблона: " + e.getMessage(), null));
         }
         return null;
     }

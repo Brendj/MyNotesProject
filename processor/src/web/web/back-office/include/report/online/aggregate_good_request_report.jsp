@@ -8,17 +8,16 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<%--@elvariable id="aggregateGoodRequestReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.AggregateGoodRequestReportPage"--%>
-<h:panelGrid id="aggregateGoodRequestReportPanelGrid" binding="#{aggregateGoodRequestReportPage.pageComponent}" styleClass="borderless-grid">
+<h:panelGrid id="aggregateGoodRequestReportPanelGrid" binding="#{mainPage.aggregateGoodRequestReportPage.pageComponent}" styleClass="borderless-grid">
     <rich:simpleTogglePanel label="Настройки отчета" switchType="client" opened="true"
                             headerClass="filter-panel-header">
 
         <h:panelGrid id="goodRequestReportParamPanelGrid" styleClass="borderless-grid" columns="2">
             <h:outputText escape="true" value="Начальная дата" styleClass="output-text" />
-            <rich:calendar value="#{aggregateGoodRequestReportPage.startDate}" datePattern="dd.MM.yyyy"
+            <rich:calendar value="#{mainPage.aggregateGoodRequestReportPage.startDate}" datePattern="dd.MM.yyyy"
                            converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
             <h:outputText escape="true" value="Конечная дата" styleClass="output-text" />
-            <h:selectOneMenu value="#{aggregateGoodRequestReportPage.daysLimit}" converter="javax.faces.Integer"
+            <h:selectOneMenu value="#{mainPage.aggregateGoodRequestReportPage.daysLimit}" converter="javax.faces.Integer"
                              styleClass="output-text" >
                 <f:selectItem itemValue="0" itemLabel="1 месяц"/>
                 <f:selectItem itemValue="2" itemLabel="2 недели"/>
@@ -29,26 +28,27 @@
 
             <h:outputText styleClass="output-text required-field" escape="true" value="Поставщик" />
             <h:panelGroup>
-                <a4j:commandButton value="..." action="#{aggregateGoodRequestReportPage.showSourceListSelectPage}" reRender="modalOrgListSelectorPanel"
+                <a4j:commandButton value="..." action="#{mainPage.aggregateGoodRequestReportPage.showContragentListSelectPage}" reRender="modalOrgListSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;" >
                     <f:setPropertyActionListener value="2" target="#{mainPage.orgListSelectPage.filterMode}" />
-                    <f:setPropertyActionListener value="#{aggregateGoodRequestReportPage.getContragentStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                    <f:setPropertyActionListener value="#{mainPage.aggregateGoodRequestReportPage.contragentStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                    <f:setPropertyActionListener value="Выбор контрагента" target="#{mainPage.orgFilterPageName}"/>
                 </a4j:commandButton>
-                <h:outputText styleClass="output-text" escape="true" value="{#{aggregateGoodRequestReportPage.contragentFilter}}" />
+                <h:outputText styleClass="output-text" escape="true" value="{#{mainPage.aggregateGoodRequestReportPage.contragentFilter}}" />
             </h:panelGroup>
 
             <h:outputText styleClass="output-text" escape="true" value="Организация" />
             <h:panelGroup>
-                <a4j:commandButton value="..." action="#{aggregateGoodRequestReportPage.showEducationListSelectPage}" reRender="modalOrgListSelectorPanel"
+                <a4j:commandButton value="..." action="#{mainPage.aggregateGoodRequestReportPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;" >
-                    <f:setPropertyActionListener value="0" target="#{mainPage.orgListSelectPage.filterMode}" />
-                    <f:setPropertyActionListener value="#{aggregateGoodRequestReportPage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                    <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />
+                    <f:setPropertyActionListener value="#{mainPage.aggregateGoodRequestReportPage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
                 </a4j:commandButton>
-                <h:outputText styleClass="output-text" escape="true" value=" {#{aggregateGoodRequestReportPage.filter}}" />
+                <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.aggregateGoodRequestReportPage.filter}}" />
             </h:panelGroup>
-            <a4j:commandButton value="Генерировать отчет" action="#{aggregateGoodRequestReportPage.generateReport}"
+            <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildAggregateGoodRequestReport}"
                                reRender="mainMenu, workspaceTogglePanel, aggregateGoodRequestTable"
                                styleClass="command-button" status="sReportGenerateStatus" />
         </h:panelGrid>
@@ -63,7 +63,7 @@
 
     <h:panelGrid styleClass="borderless-div">
         <rich:dataTable id="aggregateGoodRequestTable" var="items"
-                        value="#{aggregateGoodRequestReportPage.aggregateGoodRequestReportItems}"
+                        value="#{mainPage.aggregateGoodRequestReportPage.aggregateGoodRequestReportItems}"
                         footerClass="data-table-footer">
             <f:facet name="header">
                 <rich:columnGroup>
@@ -146,7 +146,7 @@
             </rich:subTable>
             <f:facet name="footer">
                 <rich:datascroller for="aggregateGoodRequestTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
-                                   stepControls="auto" boundaryControls="hide" rendered="#{not empty aggregateGoodRequestReportPage.aggregateGoodRequestReportItems}">
+                                   stepControls="auto" boundaryControls="hide" rendered="#{not empty mainPage.aggregateGoodRequestReportPage.aggregateGoodRequestReportItems}">
                     <f:facet name="previous">
                         <h:graphicImage value="/images/16x16/left-arrow.png" />
                     </f:facet>

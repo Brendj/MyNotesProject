@@ -825,10 +825,9 @@
                             label="Сводный отчет по заявкам" action="#{mainPage.showGoodRequestReportPage}"
                             reRender="workspaceForm" />
 
-        <%--@elvariable id="aggregateGoodRequestReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.AggregateGoodRequestReportPage"--%>
         <rich:panelMenuItem id="aggregateGoodRequestReportMenuItem"
-                            binding="#{aggregateGoodRequestReportPage.mainMenuComponent}"
-                            label="Детальный отчет по заявкам" action="#{aggregateGoodRequestReportPage.show}"
+                            binding="#{mainPage.aggregateGoodRequestReportPage.mainMenuComponent}"
+                            label="Детальный отчет по заявкам" action="#{mainPage.showAggregateGoodRequestReportPage}"
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
@@ -880,11 +879,10 @@
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
-    <%--@elvariable id="statisticsDiscrepanciesOnOrdersAndAttendanceReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage"--%>
     <rich:panelMenuItem id="statisticsDiscrepanciesOnOrdersAndAttendanceReportMenuItem"
-                        binding="#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.mainMenuComponent}"
+                        binding="#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.mainMenuComponent}"
                         label="Статистика расхождения данных по заказам и посещаемости"
-                        action="#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.show}"
+                        action="#{mainPage.showDiscrepanciesOnOrdersAndAttendanceReportPage}"
                         reRender="workspaceForm"/>
 
     <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"

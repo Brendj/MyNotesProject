@@ -84,7 +84,7 @@ public class Main {
         oldGroups.add(new ClientGroup(rs.getLong("idoforg"), rs.getLong("idofclientgroup"), rs.getString("groupname")));
       }
     } catch (Exception ex) {
-      logger.error(ex.getMessage());
+      logger.error(ex.getMessage(), ex);
       throw new RuntimeException(ex.getMessage());
     } finally {
       dbWrapper.closeStatement(st);
@@ -136,7 +136,7 @@ public class Main {
         clientGroups.add(new ClientGroup(rs.getLong("idoforg"), rs.getLong("idofclientgroup"), "Сотрудники"));
       }
     } catch (Exception ex) {
-      logger.error(ex.getMessage());
+      logger.error(ex.getMessage(), ex);
       throw new RuntimeException(ex.getMessage());
     } finally {
       dbWrapper.closeStatement(st);
@@ -177,7 +177,7 @@ public class Main {
 
       dbWrapper.commit(con);
     } catch (Exception ex) {
-      logger.error(ex.getMessage());
+      logger.error(ex.getMessage(), ex);
       dbWrapper.rollback(con);
       throw new RuntimeException(ex.getMessage());
     } finally {
@@ -286,7 +286,7 @@ public class Main {
       }
       dbWrapper.commit(con);
     } catch (Exception ex) {
-      logger.error(ex.getMessage());
+      logger.error(ex.getMessage(), ex);
       dbWrapper.rollback(con);
       throw new RuntimeException(ex.getMessage());
     } finally {

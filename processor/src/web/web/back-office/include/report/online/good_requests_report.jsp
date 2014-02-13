@@ -50,7 +50,7 @@ updateWidth();
                 <a4j:commandButton value="..." action="#{mainPage.goodRequestReportPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;" >
-                    <f:setPropertyActionListener value="0" target="#{mainPage.orgListSelectPage.filterMode}" />
+                    <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />
                     <f:setPropertyActionListener value="#{mainPage.goodRequestReportPage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
                 </a4j:commandButton>
                 <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.goodRequestReportPage.filter}}" />

@@ -34,6 +34,7 @@ import java.io.Writer;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -155,17 +156,35 @@ public class GoodRequestsReportPage extends OnlineReportWithContragentPage {
         this.showAll = showAll;
     }
 
-    public Object showOrgListSelectPage () {
-        setSelectIdOfOrgList(true);
-        MainPage.getSessionInstance().showOrgListSelectPage();
-        return null;
-    }
+    //public Object showOrgListSelectPage () {
+    //    setSelectIdOfOrgList(true);
+    //    final List<Long> oldIdOfContragentOrgList1 = MainPage.getSessionInstance().getIdOfContragentOrgList();
+    //    if(oldIdOfContragentOrgList1 !=null && !oldIdOfContragentOrgList1.equals(idOfContragentOrgList)){
+    //        MainPage.getSessionInstance().updateOrgListSelectPageWithItemDeselection();
+    //        filter = "Не выбрано";
+    //    }
+    //    MainPage.getSessionInstance().setIdOfContragentOrgList(idOfContragentOrgList);
+    //    MainPage.getSessionInstance().showOrgListSelectPage();
+    //    return null;
+    //}
+    //
+    //public Object showContragentListSelectPage () {
+    //    setSelectIdOfOrgList(false);
+    //    MainPage.getSessionInstance().showOrgListSelectPage();
+    //    return null;
+    //}
 
-    public Object showContragentListSelectPage () {
-        setSelectIdOfOrgList(false);
-        MainPage.getSessionInstance().showOrgListSelectPage();
-        return null;
-    }
+    //public Object showOrgListSelectPage () {
+    //    setSelectIdOfOrgList(true);
+    //    MainPage.getSessionInstance().showOrgListSelectPage();
+    //    return null;
+    //}
+    //
+    //public Object showContragentListSelectPage () {
+    //    setSelectIdOfOrgList(false);
+    //    MainPage.getSessionInstance().showOrgListSelectPage();
+    //    return null;
+    //}
 
     public void buildReport(Session session) throws Exception {
         //  пределяем на какой лимит дней необходимо увеличить дату

@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
+import ru.axetta.ecafe.processor.web.ui.MainPage;
+
 import org.hibernate.HibernateException;
 
 import java.util.ArrayList;
@@ -69,5 +71,37 @@ public class OnlineReportWithContragentPage extends OnlineReportPage {
 
     public String getContragentStringIdOfOrgList() {
         return idOfContragentOrgList.toString().replaceAll("[^0-9,]","");
+    }
+
+    public Object showOrgListSelectPage () {
+        MainPage.getSessionInstance().getOrgListSelectPage().setFilter("");
+        MainPage.getSessionInstance().getOrgListSelectPage().setTagFilter("");
+        setSelectIdOfOrgList(true);
+        final List<Long> oldIdOfContragentOrgList1 = MainPage.getSessionInstance().getIdOfContragentOrgList();
+        if(oldIdOfContragentOrgList1 !=null && !oldIdOfContragentOrgList1.containsAll(idOfContragentOrgList)){
+            MainPage.getSessionInstance().updateOrgListSelectPageWithItemDeselection();
+            filter = "Не выбрано";
+        }
+        MainPage.getSessionInstance().setIdOfContragentOrgList(idOfContragentOrgList);
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
+    }
+
+    @Override
+    public String getFilter() {
+        final List<Long> oldIdOfContragentOrgList1 = MainPage.getSessionInstance().getIdOfContragentOrgList();
+        if(oldIdOfContragentOrgList1 !=null && !oldIdOfContragentOrgList1.containsAll(idOfContragentOrgList)){
+            idOfOrgList.clear();
+            filter = "Не выбрано";
+        }
+        return super.getFilter();
+    }
+
+    public Object showContragentListSelectPage () {
+        MainPage.getSessionInstance().getOrgListSelectPage().setFilter("");
+        MainPage.getSessionInstance().getOrgListSelectPage().setTagFilter("");
+        setSelectIdOfOrgList(false);
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
     }
 }

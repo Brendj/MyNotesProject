@@ -19,24 +19,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.*;
 
-@Component
-@Scope("session")
+//@Component
+//@Scope("session")
 public class AggregateGoodRequestReportPage extends OnlineReportWithContragentPage {
 
     private static final Logger logger = LoggerFactory.getLogger(AggregateGoodRequestReportPage.class);
     private int daysLimit;
     private List<AggregateGoodRequestReportItem> aggregateGoodRequestReportItems = new ArrayList<AggregateGoodRequestReportItem>();
-
-    @PersistenceContext(unitName = "reportsPU")
-    private EntityManager entityManager;
-
-    @Autowired
-    private AggregateGoodRequestReportService service;
-
-    AggregateGoodRequestReportPage() {
-        super();
-    }
-
 
     public String getPageFilename() {
         return "report/online/aggregate_good_request_report";
@@ -50,63 +39,87 @@ public class AggregateGoodRequestReportPage extends OnlineReportWithContragentPa
         this.daysLimit = daysLimit;
     }
 
-    @Override
-    public void onShow() throws Exception {
-        RuntimeContext.getAppContext().getBean(AggregateGoodRequestReportPage.class).loadPredefinedContragents();
+    public List<AggregateGoodRequestReportItem> getAggregateGoodRequestReportItems() {
+        return aggregateGoodRequestReportItems;
     }
 
-    @Transactional
-    public void loadPredefinedContragents () {
-        if (idOfContragentOrgList.size() > 0) {
-            return;
-        }
-        Session session = null;
-        try {
-            session = (Session) entityManager.getDelegate();
-            List<OrgShortItem> orgs = OrgListSelectPage.retrieveOrgs(session, "", "", 2);
-            Map<Long, String> contragentsMap = new HashMap<Long, String>();
-            selectIdOfOrgList = false;
-            for (OrgShortItem i : orgs) {
-                contragentsMap.put(i.getIdOfOrg(), i.getOfficialName());
-            }
-            completeOrgListSelection(contragentsMap);
-            selectIdOfOrgList = true;
-        } catch (Exception e) {
-            logger.error("Failed to predefine allowed contragents list", e);
-        }
-    }
-
-    public Object generateReport(){
+    public void buildReport(Session persistenceSession) throws Exception{
         if(idOfContragentOrgList==null || idOfContragentOrgList.isEmpty()){
-            printError("Выберите список поставщиков");
-            return null;
+            throw new Exception("Выберите список поставщиков");
         }
         //  пределяем на какой лимит дней необходимо увеличить дату
         endDate = new Date(GoodRequestsReportPage.getDaysLimitTS(daysLimit, startDate));
-
+        AggregateGoodRequestReportService service = RuntimeContext.getAppContext().getBean(AggregateGoodRequestReportService.class);
         if(idOfOrgList==null || idOfOrgList.isEmpty()){
             aggregateGoodRequestReportItems = service.fetchAggregateGoodRequestReportItems(idOfContragentOrgList, null, startDate, endDate);
         } else {
             aggregateGoodRequestReportItems = service.fetchAggregateGoodRequestReportItems(idOfContragentOrgList, idOfOrgList, startDate, endDate);
         }
-        return null;
     }
 
-    public List<AggregateGoodRequestReportItem> getAggregateGoodRequestReportItems() {
-        return aggregateGoodRequestReportItems;
-    }
+    //@PersistenceContext(unitName = "reportsPU")
+    //private EntityManager entityManager;
+    //
+    //@Autowired
+    //private AggregateGoodRequestReportService service;
 
-    public Object showEducationListSelectPage () {
-        setSelectIdOfOrgList(true);
-        MainPage.getSessionInstance().showOrgListSelectPage();
-        return null;
-    }
+    //AggregateGoodRequestReportPage() {
+    //    super();
+    //}
 
-    public Object showSourceListSelectPage () {
-        setSelectIdOfOrgList(false);
-        MainPage.getSessionInstance().showOrgListSelectPage();
-        return null;
-    }
+    //@Override
+    //public void onShow() throws Exception {
+    //    RuntimeContext.getAppContext().getBean(AggregateGoodRequestReportPage.class).loadPredefinedContragents();
+    //}
+
+    //@Transactional
+    //public void loadPredefinedContragents () {
+    //    if (idOfContragentOrgList.size() > 0) {
+    //        return;
+    //    }
+    //    Session session = null;
+    //    try {
+    //        session = (Session) entityManager.getDelegate();
+    //        List<OrgShortItem> orgs = OrgListSelectPage.retrieveOrgs(session, "", "", 2, idOfContragentOrgList);
+    //        Map<Long, String> contragentsMap = new HashMap<Long, String>();
+    //        selectIdOfOrgList = false;
+    //        for (OrgShortItem i : orgs) {
+    //            contragentsMap.put(i.getIdOfOrg(), i.getOfficialName());
+    //        }
+    //        completeOrgListSelection(contragentsMap);
+    //        selectIdOfOrgList = true;
+    //    } catch (Exception e) {
+    //        logger.error("Failed to predefine allowed contragents list", e);
+    //    }
+    //}
+
+    //public Object generateReport(){
+    //    if(idOfContragentOrgList==null || idOfContragentOrgList.isEmpty()){
+    //        printError("Выберите список поставщиков");
+    //        return null;
+    //    }
+    //    //  пределяем на какой лимит дней необходимо увеличить дату
+    //    endDate = new Date(GoodRequestsReportPage.getDaysLimitTS(daysLimit, startDate));
+    //
+    //    if(idOfOrgList==null || idOfOrgList.isEmpty()){
+    //        aggregateGoodRequestReportItems = service.fetchAggregateGoodRequestReportItems(idOfContragentOrgList, null, startDate, endDate);
+    //    } else {
+    //        aggregateGoodRequestReportItems = service.fetchAggregateGoodRequestReportItems(idOfContragentOrgList, idOfOrgList, startDate, endDate);
+    //    }
+    //    return null;
+    //}
+
+    //public Object showEducationListSelectPage () {
+    //    setSelectIdOfOrgList(true);
+    //    MainPage.getSessionInstance().showOrgListSelectPage();
+    //    return null;
+    //}
+    //
+    //public Object showSourceListSelectPage () {
+    //    setSelectIdOfOrgList(false);
+    //    MainPage.getSessionInstance().showOrgListSelectPage();
+    //    return null;
+    //}
 
 
     //public String getGetStringIdOfOrgList() {

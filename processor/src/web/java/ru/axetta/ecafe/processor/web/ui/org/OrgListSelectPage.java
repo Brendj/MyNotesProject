@@ -153,7 +153,7 @@ public class OrgListSelectPage extends BasicPage {
         return supplierFilterDisabled;
     }
 
-    public void fill(Session session, String orgFilter, Boolean isUpdate) throws Exception {
+    private void fill(Session session, String orgFilter, Boolean isUpdate) throws Exception {
         if(isUpdate) {
             updateSelectedOrgs();
         } else {
@@ -171,21 +171,60 @@ public class OrgListSelectPage extends BasicPage {
             } catch (Exception e){}
         }
         ///
-        List<OrgShortItem> items = retrieveOrgs(session);
+        List<OrgShortItem> items = retrieveOrgs(session, null);
         for (OrgShortItem orgShortItem: items){
             orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
         }
 
         this.items = items;
     }
-    
-    public void fill(Session session, Boolean isUpdate) throws Exception {
+
+    public void fill(Session session, String orgFilter, Boolean isUpdate, List<Long> idOfContragentOrgList) throws Exception {
         if(isUpdate) {
             updateSelectedOrgs();
         } else {
             selectedOrgs.clear();
         }
-        List<OrgShortItem> items = retrieveOrgs(session);
+        String[] idOfOrgs = orgFilter.split(",");
+        Set<String> longSet = new HashSet<String>(Arrays.asList(idOfOrgs));
+        ///
+        for (String sId : longSet) {
+            try{
+                Long id = Long.parseLong(sId.trim());
+                if (selectedOrgs.containsKey(id)) continue;
+                Org org = (Org)session.get(Org.class, id);
+                selectedOrgs.put(id, org.getShortName());
+            } catch (Exception e){}
+        }
+        ///
+        List<OrgShortItem> items = retrieveOrgs(session, idOfContragentOrgList);
+        for (OrgShortItem orgShortItem: items){
+            orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
+        }
+
+        this.items = items;
+    }
+
+    private void fill(Session session, Boolean isUpdate) throws Exception {
+        if(isUpdate) {
+            updateSelectedOrgs();
+        } else {
+            selectedOrgs.clear();
+        }
+        List<OrgShortItem> items = retrieveOrgs(session, null);
+        for (OrgShortItem orgShortItem: items){
+            orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
+        }
+        this.items = items;
+    }
+
+    public void fill(Session session, Boolean isUpdate, List<Long> idOfContragentOrgList) throws Exception {
+        if(isUpdate) {
+            updateSelectedOrgs();
+        } else {
+            selectedOrgs.clear();
+        }
+        List<OrgShortItem> items = retrieveOrgs(session, idOfContragentOrgList);
         for (OrgShortItem orgShortItem: items){
             orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
         }
@@ -202,13 +241,14 @@ public class OrgListSelectPage extends BasicPage {
         }
     }
 
-    private List<OrgShortItem> retrieveOrgs(Session session) throws HibernateException {
+    private List<OrgShortItem> retrieveOrgs(Session session, List<Long> idOfContragentOrgList) throws HibernateException {
         deselectAllItems();
-        return retrieveOrgs(session, filter, tagFilter, supplierFilter);
+        return retrieveOrgs(session, filter, tagFilter, supplierFilter, idOfContragentOrgList);
     }
 
     @SuppressWarnings("unchecked")
-    public static List<OrgShortItem> retrieveOrgs(Session session, String filter, String tagFilter, int supplierFilter) throws HibernateException {
+    public static List<OrgShortItem> retrieveOrgs(Session session, String filter, String tagFilter,
+            int supplierFilter, List<Long> idOfContragentOrgList) throws HibernateException {
         Criteria criteria = session.createCriteria(Org.class);
         criteria.addOrder(Order.asc("idOfOrg"));
         //  Ограничение оргов, которые позволено видеть пользователю
@@ -223,6 +263,9 @@ public class OrgListSelectPage extends BasicPage {
         }
         if (StringUtils.isNotEmpty(tagFilter)) {
             criteria.add(Restrictions.like("tag", tagFilter, MatchMode.ANYWHERE));
+        }
+        if(supplierFilter==1 &&  idOfContragentOrgList!=null && !idOfContragentOrgList.isEmpty() && idOfContragentOrgList.get(0)!=null){
+            criteria.createAlias("sourceMenuOrgs", "sm").add(Restrictions.in("sm.idOfOrg", idOfContragentOrgList));
         }
         if (supplierFilter != 0) {
             Criteria destMenuExchangeCriteria = session.createCriteria(MenuExchangeRule.class);
