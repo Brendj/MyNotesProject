@@ -73,9 +73,6 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         parameterMap.put("month", month + 1);
         parameterMap.put("monthName", new DateFormatSymbols().getMonths()[month]);
         parameterMap.put("year", calendar.get(Calendar.YEAR));
-        //parameterMap.put("startDate", startTime);
-        //parameterMap.put("beginDate", startTime);
-        //parameterMap.put("endDate", endTime);
         parameterMap.put("beginDate", CalendarUtils.dateToString(startTime));
         parameterMap.put("endDate", CalendarUtils.dateToString(endTime));
 
@@ -83,7 +80,6 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         if (StringUtils.isEmpty(getReportProperties().getProperty("idOfMenuSourceOrg"))) {
             throw new Exception("Не указана организация-поставщик меню.");
         }
-        //String sourceMenuOrgId = getReportProperties().getProperty("idOfMenuSourceOrg");
         String sourceMenuOrgId = StringUtils.trimToEmpty(getReportProperties().getProperty("idOfMenuSourceOrg"));
         List<Long> sourceMenuList = new ArrayList<Long>();
         for (String idOfOrg : Arrays.asList(StringUtils.split(sourceMenuOrgId, ','))) {
@@ -95,8 +91,6 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         for (String idOfOrg : Arrays.asList(StringUtils.split(idOfOrgs, ','))) {
             idOfOrgList.add(Long.parseLong(idOfOrg));
         }
-
-
         Date generateEndTime = new Date();
         DiscrepanciesOnOrdersAndAttendanceReport report = build(session, sourceMenuList, idOfOrgList, calendar, startTime, endTime);
         JRDataSource dataSource = new JRBeanCollectionDataSource(report.getItems());
@@ -127,7 +121,6 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         Criteria catCriteria = session.createCriteria(Org.class)
                 .createAlias("categoriesInternal", "cat", JoinType.LEFT_OUTER_JOIN)
                 .createAlias("sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN)
-                //.add(Restrictions.eq("defaultSupplier", contragent))
                 .add(Restrictions.in("sm.idOfOrg", idOfSupplier))
                 .setProjection(Projections.projectionList().add(Projections.property("idOfOrg"))
                         .add(Projections.property("type")).add(Projections.property("shortName"))
@@ -161,164 +154,6 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
 
         final ArrayList<Long> orgs = new ArrayList<Long>(orgItems.keySet());
 
-        //Date orderBeginDate = CalendarUtils.truncateToDayOfMonth(startTime);
-        //orderBeginDate = CalendarUtils.addDays(orderBeginDate, -21);
-        //Date orderEndDate = CalendarUtils.truncateToDayOfMonth(endTime);
-        //orderEndDate = CalendarUtils.addDays(orderEndDate, -21);
-        //
-        //Criteria enterEventForecastCrit = session.createCriteria(EnterEvent.class);
-        //enterEventForecastCrit.createAlias("org", "o")
-        //        .createAlias("o.sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN)
-        //        .add(Restrictions.in("sm.idOfOrg", idOfSupplier));
-        //if (!idOfOrgs.isEmpty()) {
-        //    enterEventForecastCrit.add(Restrictions.in("compositeIdOfEnterEvent.idOfOrg", idOfOrgs));
-        //}
-        //enterEventForecastCrit.add(Restrictions.ge("evtDateTime", orderBeginDate));
-        //enterEventForecastCrit.add(Restrictions.lt("evtDateTime", orderEndDate));
-        //enterEventForecastCrit.setProjection(
-        //        Projections.projectionList().add(Projections.distinct(Projections.count("client")))
-        //                .add(Projections.groupProperty("compositeIdOfEnterEvent.idOfOrg"))
-        //        //.add(Projections.groupProperty("evtDateTime"))
-        //);
-        //
-        //enterEventForecastCrit.addOrder(asc("compositeIdOfEnterEvent.idOfOrg"));
-        //
-        //List<Object[]>  enterEventForecastRes = (List<Object[]>) enterEventForecastCrit.list();
-
-        //Map<Long, Map<Date, EnterEventCountItem>> eventForecastCountMap = new HashMap<Long, Map<Date, EnterEventCountItem>>();
-        //for (Object[] row: enterEventForecastRes){
-        //    Long idOfOrg = (Long) row[1];
-        //    Long totalCount = row[0] == null ? 0L : ((Long) row[0]);
-            //Date date = CalendarUtils.truncateToDayOfMonth((Date) row[2]);
-            //Map<Date, EnterEventCountItem> dateEventCountItemMap = eventForecastCountMap.get(idOfOrg);
-
-
-            //if(dateEventCountItemMap == null){
-            //    HashMap<Date, EnterEventCountItem> value = new HashMap<Date, EnterEventCountItem>();
-            //    value.put(date, new EnterEventCountItem(totalCount, date));
-            //    eventForecastCountMap.put(idOfOrg, value);
-            //} else {
-            //    EnterEventCountItem item = dateEventCountItemMap.get(date);
-            //    if(item==null){
-            //        //HashMap<Date, EnterEventCountItem> value = new HashMap<Date, EnterEventCountItem>();
-            //        //value.put(date, new EnterEventCountItem(totalCount, date));
-            //        //eventForecastCountMap.put(idOfOrg, value);
-            //        dateEventCountItemMap.put(date, new EnterEventCountItem(totalCount, date));
-            //    } else {
-            //        item.setTotalCount(item.getTotalCount()+totalCount);
-            //    }
-            //}
-        //}
-
-        //Map<Long, Map<Date, EnterEventCountItem>> eventForecastCountMap = new HashMap<Long, Map<Date, EnterEventCountItem>>();
-        //for (Long idOfOrg: eventForecastCountMap.keySet()){
-        //    Map<Date, EnterEventCountItem> dateOrderCountItemMap = eventForecastCountMap.get(idOfOrg);
-        //    Date beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
-        //    Date endDate = CalendarUtils.truncateToDayOfMonth(endTime);
-        //    orderBeginDate = CalendarUtils.addDays(beginDate, -21);
-        //    orderEndDate = CalendarUtils.addDays(endDate, -21);
-        //    Map<Date, EnterEventCountItem> dateOrderForecastCountItemMap = new HashMap<Date, EnterEventCountItem>();
-        //
-        //    while (orderBeginDate.getTime() <= orderEndDate.getTime()) {
-        //        EnterEventCountItem m = dateOrderCountItemMap.get(orderBeginDate);
-        //        long total =0L;
-        //        if(m!=null) total = m.getTotalCount();
-        //        Date forecastBeginDate = CalendarUtils.addDays(orderBeginDate, 21);
-        //        //Date forecastEndDate = CalendarUtils.addDays(orderEndDate, 21);
-        //        while (forecastBeginDate.getTime() <= endDate.getTime() ) {
-        //            EnterEventCountItem forecastItem = dateOrderForecastCountItemMap.get(forecastBeginDate);
-        //            if(forecastItem==null){
-        //                dateOrderForecastCountItemMap.put(forecastBeginDate, new EnterEventCountItem(total, forecastBeginDate));
-        //            } else {
-        //                forecastItem.setTotalCountAndCount(forecastItem.getTotalCount() + total);
-        //            }
-        //            forecastBeginDate = CalendarUtils.addDays(forecastBeginDate, 1);
-        //        }
-        //
-        //        orderBeginDate = CalendarUtils.addDays(orderBeginDate, 1);
-        //    }
-        //    for (Date d: dateOrderForecastCountItemMap.keySet()){
-        //        EnterEventCountItem item = dateOrderForecastCountItemMap.get(d);
-        //        if(item.getCount()!=null && item.getCount()>0) item.setTotalCount(item.getTotalCount()/item.getCount());
-        //    }
-        //    eventForecastCountMap.put(idOfOrg, dateOrderForecastCountItemMap);
-        //}
-
-        //for (Object[] row: orderRes){
-        //    Long idOfOrg = (Long) row[1];
-        //    Long totalCount = row[0] == null ? 0L : ((Long) row[0]);
-        //    Date date = CalendarUtils.truncateToDayOfMonth((Date) row[2]);
-        //    Map<Date, OrderDetailQtyCountItem> dateOrderCountItemMap = eventForecastCountMap.get(idOfOrg);
-        //    if(dateOrderCountItemMap == null){
-        //        HashMap<Date, OrderDetailQtyCountItem> value = new HashMap<Date, OrderDetailQtyCountItem>();
-        //        value.put(date, new OrderDetailQtyCountItem(totalCount, date));
-        //        eventForecastCountMap.put(idOfOrg, value);
-        //    } else {
-        //        OrderDetailQtyCountItem item = dateOrderCountItemMap.get(date);
-        //        if(item==null){
-        //            HashMap<Date, OrderDetailQtyCountItem> value = new HashMap<Date, OrderDetailQtyCountItem>();
-        //            value.put(date, new OrderDetailQtyCountItem(totalCount, date));
-        //            eventForecastCountMap.put(idOfOrg, value);
-        //        } else {
-        //            item.setTotalCount(item.getTotalCount()+totalCount);
-        //        }
-        //    }
-        //}
-
-
-        //String sql =
-        //        "select sms_data.org, substring(sms_data.org from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
-        //                + "     EXTRACT(EPOCH FROM sms_data.d) * 1000, count(sms) "
-        //                + "from ("
-        //                + "select IdOfSms as sms, date_trunc('day', to_timestamp(servicesenddate/1000)) as d, cf_orgs.shortname as org "
-        //                + "from CF_ClientSms "
-        //                + "join cf_clients on CF_ClientSms.IdOfClient=cf_clients.idofclient "
-        //                + "join cf_orgs on cf_clients.idoforg=cf_orgs.idoforg "
-        //                + "where servicesenddate >= :startDate and "
-        //                + "      servicesenddate <= :endDate and "
-        //                + "      DeliveryStatus in (:sentStatus, :sendStatus, :deliveredStatus) " + orgRestrict
-        //                + ") as sms_data "
-        //                + "group by sms_data.d, sms_data.org order by 1";
-
-        //Query query = session.createSQLQuery();
-
-
-
-        //Criteria enterEventCrit = session.createCriteria(EnterEvent.class);
-        //enterEventCrit.createAlias("org", "o")
-        //        .createAlias("o.sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN)
-        //        .add(Restrictions.in("sm.idOfOrg", idOfSupplier));
-        //if (!idOfOrgs.isEmpty()) {
-        //    enterEventCrit.add(Restrictions.in("compositeIdOfEnterEvent.idOfOrg", idOfOrgs));
-        //}
-        //enterEventCrit.add(Restrictions.ge("evtDateTime", startTime));
-        //enterEventCrit.add(Restrictions.lt("evtDateTime", endTime));
-        //enterEventCrit.setProjection(Projections.projectionList()
-        //        .add(Projections.distinct(Projections.count("client")))
-        //        .add(Projections.groupProperty("compositeIdOfEnterEvent.idOfOrg"))
-        //        .add(Projections.groupProperty("evtDateTime"))
-        //);
-        //
-        //enterEventCrit.addOrder(asc("compositeIdOfEnterEvent.idOfOrg"));
-
-        //List<Object[]> eventRes = (List<Object[]>) enterEventCrit.list();
-
-        //Criteria goodRequestPosCrit = session.createCriteria(GoodRequestPosition.class);
-        //goodRequestPosCrit.createCriteria("goodRequest", "gr");
-        //goodRequestPosCrit.add(Restrictions.in("orgOwner", orgs));
-        //goodRequestPosCrit.add(Restrictions.ge("gr.doneDate", startTime));
-        //goodRequestPosCrit.add(Restrictions.lt("gr.doneDate", endTime));
-        //goodRequestPosCrit.add(Restrictions.eq("gr.state", DocumentState.FOLLOW));
-        //goodRequestPosCrit.add(Restrictions.eq("deletedState", false));
-        //goodRequestPosCrit.setProjection(Projections.projectionList()
-        //        .add(Projections.sum("totalCount"))
-        //        .add(Projections.groupProperty("orgOwner"))
-        //        .add(Projections.groupProperty("gr.doneDate"))
-        //);
-        //goodRequestPosCrit.addOrder(asc("orgOwner"));
-        //
-        //
-        //List<Object[]> goodRes = (List<Object[]>) goodRequestPosCrit.list();
 
         String goodSQL = "select sum(this_.TotalCount)/1000, this_.OrgOwner, gr1_.DoneDate "
                 + " from cf_goods_requests_positions this_ "
@@ -445,6 +280,166 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
     }
 
 }
+
+
+//Date orderBeginDate = CalendarUtils.truncateToDayOfMonth(startTime);
+//orderBeginDate = CalendarUtils.addDays(orderBeginDate, -21);
+//Date orderEndDate = CalendarUtils.truncateToDayOfMonth(endTime);
+//orderEndDate = CalendarUtils.addDays(orderEndDate, -21);
+//
+//Criteria enterEventForecastCrit = session.createCriteria(EnterEvent.class);
+//enterEventForecastCrit.createAlias("org", "o")
+//        .createAlias("o.sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN)
+//        .add(Restrictions.in("sm.idOfOrg", idOfSupplier));
+//if (!idOfOrgs.isEmpty()) {
+//    enterEventForecastCrit.add(Restrictions.in("compositeIdOfEnterEvent.idOfOrg", idOfOrgs));
+//}
+//enterEventForecastCrit.add(Restrictions.ge("evtDateTime", orderBeginDate));
+//enterEventForecastCrit.add(Restrictions.lt("evtDateTime", orderEndDate));
+//enterEventForecastCrit.setProjection(
+//        Projections.projectionList().add(Projections.distinct(Projections.count("client")))
+//                .add(Projections.groupProperty("compositeIdOfEnterEvent.idOfOrg"))
+//        //.add(Projections.groupProperty("evtDateTime"))
+//);
+//
+//enterEventForecastCrit.addOrder(asc("compositeIdOfEnterEvent.idOfOrg"));
+//
+//List<Object[]>  enterEventForecastRes = (List<Object[]>) enterEventForecastCrit.list();
+
+//Map<Long, Map<Date, EnterEventCountItem>> eventForecastCountMap = new HashMap<Long, Map<Date, EnterEventCountItem>>();
+//for (Object[] row: enterEventForecastRes){
+//    Long idOfOrg = (Long) row[1];
+//    Long totalCount = row[0] == null ? 0L : ((Long) row[0]);
+//Date date = CalendarUtils.truncateToDayOfMonth((Date) row[2]);
+//Map<Date, EnterEventCountItem> dateEventCountItemMap = eventForecastCountMap.get(idOfOrg);
+
+
+//if(dateEventCountItemMap == null){
+//    HashMap<Date, EnterEventCountItem> value = new HashMap<Date, EnterEventCountItem>();
+//    value.put(date, new EnterEventCountItem(totalCount, date));
+//    eventForecastCountMap.put(idOfOrg, value);
+//} else {
+//    EnterEventCountItem item = dateEventCountItemMap.get(date);
+//    if(item==null){
+//        //HashMap<Date, EnterEventCountItem> value = new HashMap<Date, EnterEventCountItem>();
+//        //value.put(date, new EnterEventCountItem(totalCount, date));
+//        //eventForecastCountMap.put(idOfOrg, value);
+//        dateEventCountItemMap.put(date, new EnterEventCountItem(totalCount, date));
+//    } else {
+//        item.setTotalCount(item.getTotalCount()+totalCount);
+//    }
+//}
+//}
+
+//Map<Long, Map<Date, EnterEventCountItem>> eventForecastCountMap = new HashMap<Long, Map<Date, EnterEventCountItem>>();
+//for (Long idOfOrg: eventForecastCountMap.keySet()){
+//    Map<Date, EnterEventCountItem> dateOrderCountItemMap = eventForecastCountMap.get(idOfOrg);
+//    Date beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
+//    Date endDate = CalendarUtils.truncateToDayOfMonth(endTime);
+//    orderBeginDate = CalendarUtils.addDays(beginDate, -21);
+//    orderEndDate = CalendarUtils.addDays(endDate, -21);
+//    Map<Date, EnterEventCountItem> dateOrderForecastCountItemMap = new HashMap<Date, EnterEventCountItem>();
+//
+//    while (orderBeginDate.getTime() <= orderEndDate.getTime()) {
+//        EnterEventCountItem m = dateOrderCountItemMap.get(orderBeginDate);
+//        long total =0L;
+//        if(m!=null) total = m.getTotalCount();
+//        Date forecastBeginDate = CalendarUtils.addDays(orderBeginDate, 21);
+//        //Date forecastEndDate = CalendarUtils.addDays(orderEndDate, 21);
+//        while (forecastBeginDate.getTime() <= endDate.getTime() ) {
+//            EnterEventCountItem forecastItem = dateOrderForecastCountItemMap.get(forecastBeginDate);
+//            if(forecastItem==null){
+//                dateOrderForecastCountItemMap.put(forecastBeginDate, new EnterEventCountItem(total, forecastBeginDate));
+//            } else {
+//                forecastItem.setTotalCountAndCount(forecastItem.getTotalCount() + total);
+//            }
+//            forecastBeginDate = CalendarUtils.addDays(forecastBeginDate, 1);
+//        }
+//
+//        orderBeginDate = CalendarUtils.addDays(orderBeginDate, 1);
+//    }
+//    for (Date d: dateOrderForecastCountItemMap.keySet()){
+//        EnterEventCountItem item = dateOrderForecastCountItemMap.get(d);
+//        if(item.getCount()!=null && item.getCount()>0) item.setTotalCount(item.getTotalCount()/item.getCount());
+//    }
+//    eventForecastCountMap.put(idOfOrg, dateOrderForecastCountItemMap);
+//}
+
+//for (Object[] row: orderRes){
+//    Long idOfOrg = (Long) row[1];
+//    Long totalCount = row[0] == null ? 0L : ((Long) row[0]);
+//    Date date = CalendarUtils.truncateToDayOfMonth((Date) row[2]);
+//    Map<Date, OrderDetailQtyCountItem> dateOrderCountItemMap = eventForecastCountMap.get(idOfOrg);
+//    if(dateOrderCountItemMap == null){
+//        HashMap<Date, OrderDetailQtyCountItem> value = new HashMap<Date, OrderDetailQtyCountItem>();
+//        value.put(date, new OrderDetailQtyCountItem(totalCount, date));
+//        eventForecastCountMap.put(idOfOrg, value);
+//    } else {
+//        OrderDetailQtyCountItem item = dateOrderCountItemMap.get(date);
+//        if(item==null){
+//            HashMap<Date, OrderDetailQtyCountItem> value = new HashMap<Date, OrderDetailQtyCountItem>();
+//            value.put(date, new OrderDetailQtyCountItem(totalCount, date));
+//            eventForecastCountMap.put(idOfOrg, value);
+//        } else {
+//            item.setTotalCount(item.getTotalCount()+totalCount);
+//        }
+//    }
+//}
+
+
+//String sql =
+//        "select sms_data.org, substring(sms_data.org from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
+//                + "     EXTRACT(EPOCH FROM sms_data.d) * 1000, count(sms) "
+//                + "from ("
+//                + "select IdOfSms as sms, date_trunc('day', to_timestamp(servicesenddate/1000)) as d, cf_orgs.shortname as org "
+//                + "from CF_ClientSms "
+//                + "join cf_clients on CF_ClientSms.IdOfClient=cf_clients.idofclient "
+//                + "join cf_orgs on cf_clients.idoforg=cf_orgs.idoforg "
+//                + "where servicesenddate >= :startDate and "
+//                + "      servicesenddate <= :endDate and "
+//                + "      DeliveryStatus in (:sentStatus, :sendStatus, :deliveredStatus) " + orgRestrict
+//                + ") as sms_data "
+//                + "group by sms_data.d, sms_data.org order by 1";
+
+//Query query = session.createSQLQuery();
+
+
+
+//Criteria enterEventCrit = session.createCriteria(EnterEvent.class);
+//enterEventCrit.createAlias("org", "o")
+//        .createAlias("o.sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN)
+//        .add(Restrictions.in("sm.idOfOrg", idOfSupplier));
+//if (!idOfOrgs.isEmpty()) {
+//    enterEventCrit.add(Restrictions.in("compositeIdOfEnterEvent.idOfOrg", idOfOrgs));
+//}
+//enterEventCrit.add(Restrictions.ge("evtDateTime", startTime));
+//enterEventCrit.add(Restrictions.lt("evtDateTime", endTime));
+//enterEventCrit.setProjection(Projections.projectionList()
+//        .add(Projections.distinct(Projections.count("client")))
+//        .add(Projections.groupProperty("compositeIdOfEnterEvent.idOfOrg"))
+//        .add(Projections.groupProperty("evtDateTime"))
+//);
+//
+//enterEventCrit.addOrder(asc("compositeIdOfEnterEvent.idOfOrg"));
+
+//List<Object[]> eventRes = (List<Object[]>) enterEventCrit.list();
+
+//Criteria goodRequestPosCrit = session.createCriteria(GoodRequestPosition.class);
+//goodRequestPosCrit.createCriteria("goodRequest", "gr");
+//goodRequestPosCrit.add(Restrictions.in("orgOwner", orgs));
+//goodRequestPosCrit.add(Restrictions.ge("gr.doneDate", startTime));
+//goodRequestPosCrit.add(Restrictions.lt("gr.doneDate", endTime));
+//goodRequestPosCrit.add(Restrictions.eq("gr.state", DocumentState.FOLLOW));
+//goodRequestPosCrit.add(Restrictions.eq("deletedState", false));
+//goodRequestPosCrit.setProjection(Projections.projectionList()
+//        .add(Projections.sum("totalCount"))
+//        .add(Projections.groupProperty("orgOwner"))
+//        .add(Projections.groupProperty("gr.doneDate"))
+//);
+//goodRequestPosCrit.addOrder(asc("orgOwner"));
+//
+//
+//List<Object[]> goodRes = (List<Object[]>) goodRequestPosCrit.list();
 
 
 //Criteria orderDetailCrit = session.createCriteria(OrderDetail.class)

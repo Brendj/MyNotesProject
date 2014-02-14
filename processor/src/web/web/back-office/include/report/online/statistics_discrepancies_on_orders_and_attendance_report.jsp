@@ -18,30 +18,6 @@
         <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
         <rich:calendar value="#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
-
-
-       <%-- <h:outputText styleClass="output-text required-field" escape="true" value="Поставщик" />
-        <h:panelGroup>
-            <a4j:commandButton value="..." action="#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.showSourceListSelectPage}" reRender="modalOrgListSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" >
-                <f:setPropertyActionListener value="2" target="#{mainPage.orgListSelectPage.filterMode}" />
-                <f:setPropertyActionListener value="#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.getContragentStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
-            </a4j:commandButton>
-            <h:outputText styleClass="output-text" escape="true" value="{#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.contragentFilter}}" />
-        </h:panelGroup>
-
-        <h:outputText styleClass="output-text" escape="true" value="Организация" />
-        <h:panelGroup>
-            <a4j:commandButton value="..." action="#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.showEducationListSelectPage}" reRender="modalOrgListSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" >
-                <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />
-                <f:setPropertyActionListener value="#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
-            </a4j:commandButton>
-            <h:outputText styleClass="output-text" escape="true" value=" {#{statisticsDiscrepanciesOnOrdersAndAttendanceReportPage.filter}}" />
-        </h:panelGroup>--%>
-
         <h:outputText styleClass="output-text required-field" escape="true" value="Поставщик" />
         <h:panelGroup>
             <a4j:commandButton value="..." action="#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.showContragentListSelectPage}" reRender="modalOrgListSelectorPanel"

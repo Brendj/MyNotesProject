@@ -15,7 +15,7 @@
         <rich:calendar value="#{discrepanciesDataOnOrdersAndPaymentReportPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
-        <h:outputText escape="true" value="Поставщик меню" styleClass="output-text" />
+        <h:outputText escape="true" value="Поставщик меню" styleClass="output-text required-field" />
         <h:panelGroup>
             <a4j:commandButton value="..." action="#{discrepanciesDataOnOrdersAndPaymentReportPage.showOrgSelectPage}"
                                reRender="modalOrgSelectorPanel"

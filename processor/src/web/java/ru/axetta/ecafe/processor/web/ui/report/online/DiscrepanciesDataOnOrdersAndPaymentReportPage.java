@@ -81,6 +81,7 @@ public class DiscrepanciesDataOnOrdersAndPaymentReportPage extends OnlineReportP
     }
 
     private DiscrepanciesDataOnOrdersAndPaymentJasperReport buildReport() {
+
         BasicReportJob report = null;
         Session session = null;
         Transaction persistenceTransaction = null;
@@ -93,14 +94,16 @@ public class DiscrepanciesDataOnOrdersAndPaymentReportPage extends OnlineReportP
             DiscrepanciesDataOnOrdersAndPaymentBuilder builder = new DiscrepanciesDataOnOrdersAndPaymentBuilder(
                     templateFilename);
             builder.setReportProperties(new Properties());
-            builder.getReportProperties().setProperty("idOfMenuSourceOrg", idOfOrg == null ? null : idOfOrg.toString());
+            builder.getReportProperties().setProperty("idOfMenuSourceOrg", idOfOrg == null ? "" : idOfOrg.toString());
             String idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
             builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
             report = builder.build(session, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
         } catch (Exception e) {
             HibernateUtils.rollback(persistenceTransaction, getLogger());
-            logAndPrintMessage("Ошибка при построении отчета:", e);
+            getLogger().error("Filed build DiscrepanciesDataOnOrdersAndPaymentJasperReport", e);
+            printError("Ошибка при построении отчета: "+ e.getMessage());
+            //logAndPrintMessage("Ошибка при построении отчета:", e.getMessage());
         } finally {
             HibernateUtils.close(session, getLogger());
         }
