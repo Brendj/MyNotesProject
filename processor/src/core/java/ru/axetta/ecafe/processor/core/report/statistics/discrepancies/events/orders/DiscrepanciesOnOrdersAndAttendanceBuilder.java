@@ -198,10 +198,16 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
 
         String sql = "SELECT count(client), EXTRACT(EPOCH FROM sms_data.d) * 1000, sms_data.org "
                 + "FROM ("
-                + "  SELECT idofclient AS client, date_trunc('day', to_timestamp(evtdatetime/1000)) AS d, idoforg AS org"
+                + "  SELECT cf_enterevents.idofclient AS client, "
+                + "   date_trunc('day', to_timestamp(cf_enterevents.evtdatetime/1000)) AS d, "
+                + "   cf_enterevents.idoforg AS org "
                 + "  FROM cf_enterevents "
+                + "  join cf_clients on cf_clients.idofclient=cf_enterevents.idofclient "  /* берем только детей */
                 + "  join cf_menuexchangerules on cf_menuexchangerules.idofdestorg=cf_enterevents.idoforg "
-                + "  WHERE evtdatetime >= :startDate AND evtdatetime <= :endDate AND passdirection = 0 and cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS sms_data "
+                + "  WHERE evtdatetime >= :startDate AND evtdatetime <= :endDate AND passdirection = 0 and "
+                /*+ "  cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
+                + "  cf_clients.discountmode=3 and "  /* берем только льготников */
+                + "  cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS sms_data "
                 + "  GROUP BY sms_data.d, sms_data.org";
 
         Query query = session.createSQLQuery(sql);
