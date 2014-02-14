@@ -177,7 +177,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     + "       p.surname, p.firstname, p.secondname, grp.groupname, dis.categoryname, "
                     + "       od.menuDetailName, od.socdiscount "
                     + "order by org.district, org.shortname, grp.groupname, "
-                    + "         p.surname, p.firstname, c.idofclient";
+                    + "         p.surname, p.firstname, c.idofclient, dis.categoryname";
             Query query = session.createSQLQuery(sql);
             query.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
             query.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
@@ -255,9 +255,6 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     orgCount++;
                     districtCount++;
                     totalCount++;
-                    orgItem.addCategoryClient(categoryname);
-                    districtItem.addCategoryClient(categoryname);
-                    overallItem.addCategoryClient(categoryname);
                 }
 
                 //  Фикс от дублирования категорий
@@ -270,6 +267,15 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     districtItem.addTotal(price);
                     overallItem.addTotal(price);
                 }
+
+                if((prevCategoryname == null && categoryname != null) ||
+                   (prevCategoryname != null && (!prevCategoryname.equals(categoryname) ||
+                                                 prevIdOfClient != idofclient))) {
+                    orgItem.addCategoryClient(categoryname);
+                    districtItem.addCategoryClient(categoryname);
+                    overallItem.addCategoryClient(categoryname);
+                }
+
                 item.addGood(goodName, price);
                 item.addCategory(categoryname);
 
@@ -604,16 +610,20 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
         }
 
         public void addCategoryClient(String category) {
-            Integer cc = categoriesClients.get(category);
-            if (cc == null) {
+            if(category == null) {
+                return;
+            }
+            Integer cc = null;
+            if (!categoriesClients.containsKey(category)) {
                 cc = 0;
+            } else {
+                cc = categoriesClients.get(category);
             }
             categoriesClients.put(category, cc + 1);
         }
 
         public void setZeroIfNoCategoryClients(String category) {
-            Integer cc = categoriesClients.get(category);
-            if (cc == null) {
+            if (!categoriesClients.containsKey(category)) {
                 categoriesClients.put(category, 0);
             }
         }
