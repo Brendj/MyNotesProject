@@ -483,8 +483,8 @@ public class FrontController extends HttpServlet {
         try {
             RuntimeContext.getInstance().getCardManager().changeCardOwner(newOwnerId, cardNo, changeTime, validTime);
         } catch (Exception e) {
-            logger.error("Failed registerCard", e);
-            throw new FrontControllerException(String.format("Ошибка при регистрации карты: %s", e.getMessage()), e);
+            logger.error("Failed changeCardOwner", e);
+            throw new FrontControllerException(String.format("Ошибка при смене владельца карты: %s", e.getMessage()), e);
         }
     }
 
