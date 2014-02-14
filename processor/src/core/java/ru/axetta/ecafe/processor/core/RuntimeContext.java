@@ -685,7 +685,7 @@ public class RuntimeContext implements ApplicationContextAware {
                     entityManager.persist(possibleCauses);
                 }
 
-                Session session = entityManager.unwrap(Session.class);
+                /*Session session = entityManager.unwrap(Session.class);
                 List<Long> cardno = Arrays.asList(76877938L,
                         78243442L,
                         79956602L,
@@ -744,7 +744,7 @@ public class RuntimeContext implements ApplicationContextAware {
                 while (cardIterator.hasNext()){
                     Card card = cardIterator.next();
                     session.delete(card);
-                }
+                }*/
 
                 /**
                  * Инициализируем список ролей для комплексов
