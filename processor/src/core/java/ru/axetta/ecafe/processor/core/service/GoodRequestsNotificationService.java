@@ -62,17 +62,27 @@ public class GoodRequestsNotificationService {
                         final Long idOfOrg = org.getIdOfOrg();
                         query.setParameter("orgOwner", idOfOrg);
                         List<DOCurrentOrgVersion> currentOrgVersions = query.list();
-                        if(currentOrgVersions.isEmpty()) continue;
-                        Date currentDate = new Date();
                         List<GoodRequestPosition> positions = new ArrayList<GoodRequestPosition>();
-                        for (DOCurrentOrgVersion version: currentOrgVersions){
+                        Date currentDate = new Date();
+                        if(currentOrgVersions.isEmpty()){
                             sql = "from GoodRequestPosition p where p.globalVersion>:v and p.orgOwner=:orgOwner group by p.goodRequest, p.globalId order by lastUpdate";
                             Query q = session.createQuery(sql);
-                            q.setParameter("v", version.getLastVersion());
-                            q.setParameter("orgOwner", version.getIdOfOrg());
+                            q.setParameter("v", 0L);
+                            q.setParameter("orgOwner", idOfOrg);
                             List<GoodRequestPosition> goodRequestPositionList = q.list();
                             if(!goodRequestPositionList.isEmpty()){
                                 positions.addAll(goodRequestPositionList);
+                            }
+                        } else {
+                            for (DOCurrentOrgVersion version: currentOrgVersions){
+                                sql = "from GoodRequestPosition p where p.globalVersion>:v and p.orgOwner=:orgOwner group by p.goodRequest, p.globalId order by lastUpdate";
+                                Query q = session.createQuery(sql);
+                                q.setParameter("v", version.getLastVersion());
+                                q.setParameter("orgOwner", version.getIdOfOrg());
+                                List<GoodRequestPosition> goodRequestPositionList = q.list();
+                                if(!goodRequestPositionList.isEmpty()){
+                                    positions.addAll(goodRequestPositionList);
+                                }
                             }
                         }
                         if(positions.isEmpty()){
@@ -198,16 +208,32 @@ public class GoodRequestsNotificationService {
                             }
                         }
                         if(sended){
-                            for (DOCurrentOrgVersion version: currentOrgVersions){
+                            if(currentOrgVersions.isEmpty()){
                                 sql = "select max(globalVersion) from GoodRequestPosition p where p.orgOwner=:orgOwner";
                                 query = session.createQuery(sql);
-                                query.setParameter("orgOwner", version.getIdOfOrg());
+                                query.setParameter("orgOwner", idOfOrg);
                                 List maxVersions = query.list();
                                 if(!(maxVersions.isEmpty() || maxVersions.get(0)==null)){
                                     Object o = maxVersions.get(0);
                                     Long maxval =  Long.valueOf(o.toString());
+                                    DOCurrentOrgVersion version = new DOCurrentOrgVersion();
+                                    version.setObjectId(DOCurrentOrgVersion.GOOD_REQUEST_POSITION);
+                                    version.setIdOfOrg(idOfOrg);
                                     version.setLastVersion(maxval);
-                                    session.update(version);
+                                    session.persist(version);
+                                }
+                            } else {
+                                for (DOCurrentOrgVersion version: currentOrgVersions){
+                                    sql = "select max(globalVersion) from GoodRequestPosition p where p.orgOwner=:orgOwner";
+                                    query = session.createQuery(sql);
+                                    query.setParameter("orgOwner", version.getIdOfOrg());
+                                    List maxVersions = query.list();
+                                    if(!(maxVersions.isEmpty() || maxVersions.get(0)==null)){
+                                        Object o = maxVersions.get(0);
+                                        Long maxval =  Long.valueOf(o.toString());
+                                        version.setLastVersion(maxval);
+                                        session.update(version);
+                                    }
                                 }
                             }
                         }
