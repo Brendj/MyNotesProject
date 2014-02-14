@@ -22,8 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -43,6 +45,8 @@ public class ActiveDiscountClientsReportPage extends OnlineReportPage {
     private ru.axetta.ecafe.processor.core.report.ActiveDiscountClientsReport report;
     @PersistenceContext(unitName = "processorPU")
     public EntityManager entityManager;
+
+    public String district;
 
 
     public String getPageFilename ()
@@ -124,5 +128,22 @@ public class ActiveDiscountClientsReportPage extends OnlineReportPage {
     
     public List<ActiveDiscountClientsReport.ActiveDiscountClientsItem> getItems() {
         return report.getItems();
+    }
+
+    public String getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(String district) {
+        this.district = district;
+    }
+
+    public SelectItem[] getDistricts() {
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        String districts [] = DAOService.getInstance().getDistricts();
+        for(String d : districts) {
+            items.add(new SelectItem(d, d));
+        }
+        return items.toArray(new SelectItem [items.size()]);
     }
 }

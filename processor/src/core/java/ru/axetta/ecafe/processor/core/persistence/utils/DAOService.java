@@ -1635,4 +1635,12 @@ public class DAOService {
         q.setLong("idoforg", org.getIdOfOrg());
         return ((BigInteger) q.uniqueResult()).longValue() + 1;
     }
+
+    public String [] getDistricts() {
+        Session session = (Session) entityManager.getDelegate();
+        org.hibernate.Query q = session.createSQLQuery(
+                "select distinct district from cf_orgs where district<>'' order by district");
+        List<String> list = (List<String>) q.list();
+        return list.toArray(new String[list.size()]);
+    }
 }

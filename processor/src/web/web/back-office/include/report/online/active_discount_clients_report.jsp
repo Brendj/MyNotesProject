@@ -29,6 +29,11 @@
         <rich:calendar value="#{activeDiscountClientsReportPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
+        <%--<h:outputText escape="true" value="Округ" styleClass="output-text" />
+        <h:selectOneMenu value="#{activeDiscountClientsReportPage.district}" styleClass="input-text">
+            <f:selectItems value="#{activeDiscountClientsReportPage.districts}" />
+        </h:selectOneMenu>--%>
+
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
         <h:panelGroup>
             <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
