@@ -879,6 +879,19 @@
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
+    <rich:panelMenuGroup id="informReportsGroupMenu" binding="#{mainPage.informReportsGroupMenu.mainMenuComponent}"
+                         label="Отчеты по информированию" rendered="#{mainPage.eligibleToViewActivityReports}">
+        <rich:panelMenuItem id="SentSmsReportPageMenuItem"
+                            binding="#{sentSmsReportPage.mainMenuComponent}"
+                            label="Статистика отправки СМС по дням"
+                            action="#{sentSmsReportPage.show}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="OrgSmsStatsReportPageMenuItem"
+                            binding="#{orgSmsStatsReportPage.mainMenuComponent}"
+                            label="Общая статистика"
+                            action="#{orgSmsStatsReportPage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
+
+
     <rich:panelMenuItem id="statisticsDiscrepanciesOnOrdersAndAttendanceReportMenuItem"
                         binding="#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.mainMenuComponent}"
                         label="Статистика расхождения данных по заказам и посещаемости"
@@ -927,10 +940,6 @@
                         binding="#{discrepanciesDataOnOrdersAndPaymentReportPage.mainMenuComponent}"
                         label="Статистика о расхождении данных по заказам и оплате"
                         action="#{discrepanciesDataOnOrdersAndPaymentReportPage.show}" reRender="workspaceForm" />
-    <rich:panelMenuItem id="SentSmsReportPageMenuItem"
-                        binding="#{sentSmsReportPage.mainMenuComponent}"
-                        label="Статистика отправки СМС"
-                        action="#{sentSmsReportPage.show}" reRender="workspaceForm" />
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
     <rich:panelMenuItem id="manualReportRunnerMenuItem" binding="#{manualReportRunnerPage.mainMenuComponent}"
                         label="Ручной запуск отчетов" action="#{manualReportRunnerPage.show}"

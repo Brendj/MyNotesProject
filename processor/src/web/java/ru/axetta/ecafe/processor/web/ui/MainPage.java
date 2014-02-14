@@ -305,6 +305,8 @@ private Long selectedIdOfMenu;
     private final BasicWorkspacePage budgetFoodGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage paymentReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage activityReportsGroupMenu = new BasicWorkspacePage();
+    private final BasicWorkspacePage informReportsGroupMenu = new BasicWorkspacePage();
+
 
 
     // Levadny (11.02.2012)
@@ -5223,6 +5225,10 @@ public Long getSelectedIdOfReportRule() {
 
     public BasicWorkspacePage getActivityReportsGroupMenu() {
         return activityReportsGroupMenu;
+    }
+
+    public BasicWorkspacePage getInformReportsGroupMenu() {
+        return informReportsGroupMenu;
     }
 
     public Object showGoodRequestsGroupMenu () {
