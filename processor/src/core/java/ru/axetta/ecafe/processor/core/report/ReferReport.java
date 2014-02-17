@@ -241,9 +241,13 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 if (!i.getName().equals(cat)) {
                     continue;
                 }
-                if (i.getGroup2() != null && !i.getGroup2().equals(LUNCH)) {
+                if (i.getGroup2() != null &&
+                    (!i.getGroup2().equals(LUNCH) && cat.indexOf("(завтрак)") < 1)) {
                     continue;
                 }
+                /*if (i.getGroup2() != null && !i.getGroup2().equals(LUNCH)) {
+                    continue;
+                }*/
 
                 tmp.setTimeInMillis(i.getTs());
                 //  Если запись относится к рабочему дню, то обновляем итог по рабочим
