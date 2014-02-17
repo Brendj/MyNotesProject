@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RegisterStampReport" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RegisterStampReport" pageWidth="540" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="500" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
@@ -8,7 +8,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
-	<property name="ireport.zoom" value="0.9090909090909151"/>
+	<property name="ireport.zoom" value="1.2100000000000082"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
@@ -96,30 +96,30 @@
 	<lastPageFooter>
 		<band height="47">
 			<staticText>
-				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="0" y="0" width="268" height="20"/>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="0" y="0" width="243" height="20"/>
 				<textElement>
 					<font size="10"/>
 				</textElement>
 				<text><![CDATA[Составил_________________( Исполнитель)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c60a78d9-5fe5-40a1-9c40-c3f67161c809" x="268" y="0" width="287" height="20"/>
+				<reportElement uuid="c60a78d9-5fe5-40a1-9c40-c3f67161c809" x="243" y="0" width="253" height="20"/>
 				<textElement>
 					<font size="10"/>
 				</textElement>
 				<text><![CDATA[Проверил ________________ (Получатель услуг)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="93d15a6e-b020-4510-b4c7-843c0e7dacfa" x="0" y="20" width="555" height="20"/>
+				<reportElement uuid="93d15a6e-b020-4510-b4c7-843c0e7dacfa" x="0" y="20" width="496" height="20"/>
 				<textElement/>
 				<text><![CDATA[      М.П.]]></text>
 			</staticText>
 		</band>
 	</lastPageFooter>
 	<summary>
-		<band height="802">
+		<band height="282">
 			<crosstab>
-				<reportElement uuid="c05f0635-bc65-44c7-a7bb-562e36a68d6b" x="0" y="0" width="555" height="268"/>
+				<reportElement uuid="c05f0635-bc65-44c7-a7bb-562e36a68d6b" x="0" y="0" width="496" height="268"/>
 				<rowGroup name="date" width="70">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{date}]]></bucketExpression>
