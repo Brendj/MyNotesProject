@@ -4,14 +4,18 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
+import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.DailyReferReport;
-import ru.axetta.ecafe.processor.core.report.ReferReport;
+import ru.axetta.ecafe.processor.core.report.*;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.report.online.items.stamp.RegisterStampPageItem;
 
@@ -22,9 +26,14 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 /**
@@ -117,37 +126,52 @@ public class ReferReportPage extends OnlineReportPage {
     private static final int DAILY_REPORT   = 2;
 
     public void doGenerateMonthly() {
-        RuntimeContext.getAppContext().getBean(ReferReportPage.class).generate(MONTHLY_REPORT);
+        RuntimeContext.getAppContext().getBean(ReferReportPage.class).generateHTML(MONTHLY_REPORT);
     }
 
     public void doGenerateDaily() {
-        RuntimeContext.getAppContext().getBean(ReferReportPage.class).generate(DAILY_REPORT);
+        RuntimeContext.getAppContext().getBean(ReferReportPage.class).generateHTML(DAILY_REPORT);
+    }
+
+    public void doGenerateMonthlyExcel(ActionEvent actionEvent) {
+        RuntimeContext.getAppContext().getBean(ReferReportPage.class).generateXLS(MONTHLY_REPORT);
+    }
+
+    public void doGenerateDailyExcel(ActionEvent actionEvent) {
+        RuntimeContext.getAppContext().getBean(ReferReportPage.class).generateXLS(DAILY_REPORT);
+    }
+
+    public Calendar preprocessReport() {
+        monthlyReport = null;
+        dailyReport = null;
+
+        endDate = updateEndDate(endDate);
+
+        Calendar cal = new GregorianCalendar();
+        cal.setTimeInMillis(System.currentTimeMillis());
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal;
     }
 
     @Transactional
-    public void generate(int reportType) {
+    public void generateHTML(int reportType) {
         Session session = null;
         try {
-            monthlyReport = null;
-            dailyReport = null;
-
-            Calendar cal = new GregorianCalendar();
-            cal.setTimeInMillis(System.currentTimeMillis());
-            cal.set(Calendar.HOUR_OF_DAY, 0);
-            cal.set(Calendar.MINUTE, 0);
-            cal.set(Calendar.SECOND, 0);
-            cal.set(Calendar.MILLISECOND, 0);
-
-            endDate = updateEndDate(endDate);
+            Calendar cal = preprocessReport();
 
             session = (Session) entityManager.getDelegate();
             BasicReportJob.OrgShortItem orgItem = getOrgItem();
             switch (reportType) {
                 case MONTHLY_REPORT:
-                    generateMonthlyReport(session, orgItem, cal);
+                    generateMonthlyReport(session, orgItem, cal, null);
+                    htmlReport = monthlyReport.getHtmlReport();
                     break;
                 case DAILY_REPORT:
-                    generateDailyReport(session, orgItem, cal);
+                    generateDailyReport(session, orgItem, cal, null);
+                    htmlReport = dailyReport.getHtmlReport();
                     break;
             }
         } catch (Exception e) {
@@ -157,28 +181,101 @@ public class ReferReportPage extends OnlineReportPage {
         }
     }
 
-    public void generateMonthlyReport(Session session, BasicReportJob.OrgShortItem orgItem, Calendar cal) {
-        ReferReport.Builder reportBuilder = new ReferReport.Builder();
+    @Transactional
+    public void generateXLS(int reportType) {
+        Session session = null;
+        try {
+            Calendar cal = preprocessReport();
+
+            session = (Session) entityManager.getDelegate();
+            BasicReportJob.OrgShortItem orgItem = getOrgItem();
+            switch (reportType) {
+                case MONTHLY_REPORT:
+                    generateMonthlyReport(session, orgItem, cal, getTemplateFileName(ReferReport.class));
+                    exportToExcel(monthlyReport);
+                    break;
+                case DAILY_REPORT:
+                    generateDailyReport(session, orgItem, cal, getTemplateFileName(DailyReferReport.class));
+                    exportToExcel(dailyReport);
+                    break;
+            }
+        } catch (Exception e) {
+            logger.error("Failed to load clients data", e);
+        } finally {
+            //HibernateUtils.close(session, logger);
+        }
+    }
+
+    protected String getTemplateFileName(Class clazz) {
+        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + clazz.getSimpleName() + ".jasper";
+        return templateFilename;
+    }
+
+    public void generateMonthlyReport(Session session, BasicReportJob.OrgShortItem orgItem, Calendar cal, String templateName) {
+        ReferReport.Builder reportBuilder = null;
+        if(templateName != null) {
+            reportBuilder = new ReferReport.Builder(templateName);
+        } else {
+            reportBuilder = new ReferReport.Builder();
+        }
         reportBuilder.setOrg(orgItem);
         try {
             monthlyReport = reportBuilder.build(session, start, end, cal);
-            htmlReport = monthlyReport.getHtmlReport();
         } catch (Exception e) {
             logger.error("Failed to generate monthly report", e);
         }
     }
 
-    public void generateDailyReport(Session session, BasicReportJob.OrgShortItem orgItem, Calendar cal) {
-        DailyReferReport.Builder reportBuilder = new DailyReferReport.Builder();
+    public void generateDailyReport(Session session, BasicReportJob.OrgShortItem orgItem, Calendar cal, String templateName) {
+        DailyReferReport.Builder reportBuilder = null;
+        if(templateName != null) {
+            reportBuilder = new DailyReferReport.Builder(templateName);
+        } else {
+            reportBuilder = new DailyReferReport.Builder();
+        }
         Properties props = new Properties();
         props.setProperty(DailyReferReport.SUBCATEGORY_PARAMETER, category);
         reportBuilder.setReportProperties(props);
         reportBuilder.setOrg(orgItem);
         try {
             dailyReport = reportBuilder.build(session, start, end, cal);
-            htmlReport = dailyReport.getHtmlReport();
         } catch (Exception e) {
             logger.error("Failed to generate daily report", e);
+        }
+    }
+
+    public void exportToExcel(BasicReportForAllOrgJob report) {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+
+            ServletOutputStream servletOutputStream = response.getOutputStream();
+
+            facesContext.responseComplete();
+            response.setContentType("application/xls");
+            response.setHeader("Content-disposition", "inline;filename=refer_report.xls");
+
+            JRXlsExporter xlsExport = new JRXlsExporter();
+            //JRCsvExporter csvExporter = new JRCsvExporter();
+            xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
+            xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+            xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+            xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+            xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+            //xlsExport.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ";");
+            xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+            xlsExport.exportReport();
+
+            servletOutputStream.flush();
+            servletOutputStream.close();
+        } catch (JRException fnfe) {
+            String message = (fnfe.getCause()==null?fnfe.getMessage():fnfe.getCause().getMessage());
+            logAndPrintMessage(String.format("Ошибка при подготовке отчета не найден файл шаблона: %s", message),fnfe);
+        } catch (Exception e) {
+            getLogger().error("Failed to build sales report", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", e.getMessage()));
         }
     }
 

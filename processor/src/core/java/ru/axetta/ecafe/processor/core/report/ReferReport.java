@@ -249,6 +249,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 //  Если запись относится к рабочему дню, то обновляем итог по рабочим
                 if (tmp.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY &&
                     tmp.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
+                    workdayItem.setChildren(workdayItem.getChildren() + i.getChildren());
                     workdayItem.setTotal(workdayItem.getTotal() + i.getChildren());
                     workdayItem.setSummary(workdayItem.getSummary() + i.getPrice() * i.getChildren());
                 }
@@ -258,6 +259,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
                     weekendItem.setSummary(weekendItem.getSummary() + i.getPrice() * i.getChildren());
                 }
             }
+            workdayItem.setChildren(Math.round(workdayItem.getChildren() / workDaysCount));
             id++;
         }
 

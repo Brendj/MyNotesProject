@@ -48,6 +48,8 @@
         <a4j:commandButton value="Генерировать дневной отчет" action="#{referReportPage.doGenerateDaily}"
                            reRender="mainMenu, workspaceTogglePanel"
                            styleClass="command-button" status="reportGenerateStatus" />
+        <h:commandButton value="Генерировать месячный отчет в Excel" actionListener="#{referReportPage.doGenerateMonthlyExcel}" styleClass="command-button" />
+        <h:commandButton value="Генерировать дневной отчет в Excel" actionListener="#{referReportPage.doGenerateDailyExcel}" styleClass="command-button" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
