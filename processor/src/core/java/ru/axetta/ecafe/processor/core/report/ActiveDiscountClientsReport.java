@@ -156,7 +156,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             if (org != null) {
                 orgRestrict = " (o.idOfOrg=" + org.getIdOfOrg() + ") AND  ";
             }
-            /*orgRestrict = " (o.idOfOrg in (0, 71, 3, 4)) AND ";*/
+            orgRestrict = " (o.idOfOrg in (7, 51)) AND ";
             String sql =
                     "SELECT org.idoforg, c.idofclient, org.district, org.shortname, org.address, "
                     + "       p.surname, p.firstname, p.secondname, grp.groupname, dis.categoryname, "
@@ -341,6 +341,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
         private void beautifyForJasper(List<ActiveDiscountClientsItem> items) {
             //  Получаем полный список всех льготныз групп
             Set<String> categories = new TreeSet<String> ();
+            Set<String> goods = new TreeSet<String> ();
             for(ActiveDiscountClientsItem i : items) {
                 if(!(i instanceof ActiveDiscountOrgItem)) {
                     continue;
@@ -357,8 +358,18 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     }
                     categories.add(cat);
                 }
+                Map<String, Double> iGoods = iOrg.getGoods();
+                for(String good : iGoods.keySet()) {
+                    if(good == null) {
+                        continue;
+                    }
+                    if(goods.contains(good)) {
+                        continue;
+                    }
+                    goods.add(good);
+                }
             }
-            if(categories.size() < 1) {
+            if(categories.size() < 1 && goods.size() < 1) {
                 return;
             }
 
@@ -369,8 +380,15 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     continue;
                 }
                 ActiveDiscountOrgItem iOrg = (ActiveDiscountOrgItem) i;
-                for(String cat : categories) {
-                    iOrg.setZeroIfNoCategoryClients(cat);
+                if(categories.size() > 1) {
+                    for(String cat : categories) {
+                        iOrg.setZeroIfNoCategoryClients(cat);
+                    }
+                }
+                if(goods.size() > 1) {
+                    for(String good : goods) {
+                        iOrg.setZeroIfNoGoodClients(good);
+                    }
                 }
             }
         }
@@ -625,6 +643,12 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
         public void setZeroIfNoCategoryClients(String category) {
             if (!categoriesClients.containsKey(category)) {
                 categoriesClients.put(category, 0);
+            }
+        }
+
+        public void setZeroIfNoGoodClients(String good) {
+            if (!goodsClients.containsKey(good)) {
+                goodsClients.put(good, 0D);
             }
         }
 
