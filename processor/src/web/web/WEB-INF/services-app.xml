@@ -140,7 +140,7 @@
     <task:scheduler id="goodRequestsSchedule"/>
     <task:scheduled-tasks scheduler="goodRequestsSchedule">
         <task:scheduled ref="goodRequestsNotificationService" method="notifyGoodRequestsReport"
-                        cron="0 0-59/1 * * * ?"/>
+                        cron="0 0-59/30 * * * ?"/>
     </task:scheduled-tasks>
 
 </beans>
