@@ -99,7 +99,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 + " from OrderDetail details "
                 + " left join details.good good left join details.order ord left join ord.org o "
                 + " where ord.orderType in :orderType and details.good is not null and o.idOfOrg=:idOfOrg and "
-                + " details.menuType >= :mintype and details.menuType <=:maxtype ";
+                + " details.menuType >= :mintype and details.menuType <=:maxtype order by fullName";
         Query query = getSession().createQuery(sql);
         query.setParameterList("orderType",orderTypeEnumTypeSet);
         query.setParameter("idOfOrg",idOfOrg);

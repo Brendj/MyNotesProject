@@ -154,13 +154,15 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
 
         final ArrayList<Long> orgs = new ArrayList<Long>(orgItems.keySet());
 
-
         String goodSQL = "select sum(this_.TotalCount)/1000, this_.OrgOwner, gr1_.DoneDate "
                 + " from cf_goods_requests_positions this_ "
                 + " inner join cf_goods_requests gr1_ on this_.IdOfGoodsRequest=gr1_.IdOfGoodsRequest "
                 + "  join cf_menuexchangerules on cf_menuexchangerules.idofdestorg=this_.OrgOwner "
-                + " where gr1_.DoneDate>=:startDate and gr1_.DoneDate<:endDate "
+                + "  join cf_goods on cf_goods.idofgood=this_.idofgood "
+                + " where gr1_.DoneDate>=:startDate and gr1_.DoneDate<=:endDate "
                 + " and cf_menuexchangerules.idofsourceorg in (:idOfSupplier)"
+                + " and cf_goods.nameofgood ilike '%завтрак%' or cf_goods.nameofgood ilike '%обед%' "
+                + " or cf_goods.nameofgood ilike '%полдник%' "
                 + " and gr1_.State=1 and this_.DeletedState=false group by this_.OrgOwner, gr1_.DoneDate "
                 + " order by this_.OrgOwner asc ";
         Query goodQuery = session.createSQLQuery(goodSQL);
@@ -196,7 +198,7 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         }
 
 
-        String sql = "SELECT count(client), EXTRACT(EPOCH FROM sms_data.d) * 1000, sms_data.org "
+        String sql = "SELECT count(client), EXTRACT(EPOCH FROM enter_event_data.d) * 1000, enter_event_data.org "
                 + "FROM ("
                 + "  SELECT cf_enterevents.idofclient AS client, "
                 + "   date_trunc('day', to_timestamp(cf_enterevents.evtdatetime/1000)) AS d, "
@@ -207,8 +209,8 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
                 + "  WHERE evtdatetime >= :startDate AND evtdatetime <= :endDate AND passdirection = 0 and "
                 /*+ "  cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
                 + "  cf_clients.discountmode=3 and "  /* берем только льготников */
-                + "  cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS sms_data "
-                + "  GROUP BY sms_data.d, sms_data.org";
+                + "  cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS enter_event_data "
+                + "  GROUP BY enter_event_data.d, enter_event_data.org";
 
         Query query = session.createSQLQuery(sql);
         query.setLong("startDate", startTime.getTime());

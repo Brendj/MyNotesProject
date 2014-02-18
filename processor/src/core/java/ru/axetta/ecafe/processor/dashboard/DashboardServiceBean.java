@@ -367,7 +367,7 @@ public class DashboardServiceBean {
                 statItem.setNumberOfClientsWithoutCard(Long.parseLong("" + result[1]));
             }
             ////
-            queryText = "SELECT eev.org.idOfOrg, count(*), min(eev.evtDateTime) FROM EnterEvent eev WHERE eev.evtDateTime BETWEEN :dayStart AND :dayEnd GROUP BY eev.org.idOfOrg";
+            queryText = "SELECT eev.org.idOfOrg, count(*), min(eev.evtDateTime) FROM EnterEvent eev WHERE  (eev.idOfCard!=null or eev.idOfTempCard!=null) and eev.evtDateTime BETWEEN :dayStart AND :dayEnd GROUP BY eev.org.idOfOrg";
             query = entityManager.createQuery(queryText);
             query.setParameter("dayStart", dayStartDate);
             query.setParameter("dayEnd", dayEndDate);

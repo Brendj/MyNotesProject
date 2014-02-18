@@ -8,6 +8,18 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
+<script type="text/javascript">
+    function onstartloading(){
+        jQuery(".command-button").attr('disabled', 'disabled');
+    }
+    function onstoploading(){
+        jQuery(".command-button").attr('disabled', '');
+        updateWidth();
+    }
+    jQuery(document).ready(function(){
+        updateWidth();
+    });
+</script>
 
 <h:panelGrid id="statisticsDiscrepanciesOnOrdersAndAttendanceReportPageReportPanelGrid"
              binding="#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.pageComponent}" styleClass="borderless-grid">
@@ -44,7 +56,8 @@
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildDiscrepanciesOnOrdersAndAttendanceReport}"
                            reRender="mainMenu, workspaceTogglePanel, statisticsDiscrepanciesOnOrdersAndAttendanceReportPageReportPanelGrid"
                            styleClass="command-button" status="statisticsDiscrepanciesOnOrdersAndAttendanceReportGenerateStatus" />
-        <a4j:status id="statisticsDiscrepanciesOnOrdersAndAttendanceReportGenerateStatus">
+        <a4j:status id="statisticsDiscrepanciesOnOrdersAndAttendanceReportGenerateStatus"
+                    onstart="onstartloading()" onstop="onstoploading()">
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
             </f:facet>
@@ -134,7 +147,8 @@
             </f:facet>
         </rich:dataTable>
     </h:panelGrid>
-    <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.exportDiscrepanciesOnOrdersAndAttendanceReport}" styleClass="command-button" />
+    <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.exportDiscrepanciesOnOrdersAndAttendanceReport}"
+                     styleClass="command-button" />
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>

@@ -59,8 +59,6 @@ public class StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage extends Onli
 
     public void buildReport(Session session) throws Exception{
         if(idOfContragentOrgList==null || idOfContragentOrgList.isEmpty()){
-            //printError("Выберите список поставщиков");
-            //return;
             throw new Exception("Выберите список поставщиков");
         }
         DiscrepanciesOnOrdersAndAttendanceBuilder builder = new DiscrepanciesOnOrdersAndAttendanceBuilder();
@@ -69,15 +67,12 @@ public class StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage extends Onli
 
     public void export(Session session) throws Exception{
         if(idOfContragentOrgList==null || idOfContragentOrgList.isEmpty()){
-            //printError("Выберите список поставщиков");
-            //return;
             throw new Exception("Выберите список поставщиков");
         }
         DiscrepanciesOnOrdersAndAttendanceBuilder builder = new DiscrepanciesOnOrdersAndAttendanceBuilder();
         builder.setReportProperties(new Properties());
         String sourceMenuOrgId = StringUtils.join(idOfContragentOrgList.iterator(), ",");
         builder.getReportProperties().setProperty("idOfMenuSourceOrg", sourceMenuOrgId);
-        //builder.getReportProperties().setProperty("idOfMenuSourceOrg", idOfContragentOrgList == null ? null : idOfOrg.toString());
         String idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
         builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
         BasicReportJob report = builder.build(session, startDate, endDate, localCalendar);
@@ -101,74 +96,5 @@ public class StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage extends Onli
     }
 
     public void fill() {}
-
-    //public Object showSourceListSelectPage () {
-    //    setSelectIdOfOrgList(false);
-    //    MainPage.getSessionInstance().showOrgListSelectPage();
-    //    return null;
-    //}
-    //
-    //public Object showEducationListSelectPage () {
-    //    setSelectIdOfOrgList(true);
-    //    MainPage.getSessionInstance().showOrgListSelectPage(idOfContragentOrgList);
-    //    return null;
-    //}
-
-    //private DiscrepanciesOnOrdersAndAttendanceJasperReport buildReport1() {
-    //    BasicReportJob report = null;
-    //    Session session = null;
-    //    Transaction persistenceTransaction = null;
-    //    try {
-    //        session = RuntimeContext.getInstance().createReportPersistenceSession();
-    //        persistenceTransaction = session.beginTransaction();
-    //        //AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-    //        //String templateFilename = autoReportGenerator.getReportsTemplateFilePath()
-    //        //        + "DiscrepanciesOnOrdersAndAttendanceJasperReport.jasper";
-    //        DiscrepanciesOnOrdersAndAttendanceBuilder builder = new DiscrepanciesOnOrdersAndAttendanceBuilder();
-    //        builder.setReportProperties(new Properties());
-    //        String sourceMenuOrgId = StringUtils.join(idOfContragentOrgList.iterator(), ",");
-    //        builder.getReportProperties().setProperty("idOfMenuSourceOrg", sourceMenuOrgId);
-    //        //builder.getReportProperties().setProperty("idOfMenuSourceOrg", idOfContragentOrgList == null ? null : idOfOrg.toString());
-    //        String idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
-    //        builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
-    //        report = builder.build(session, startDate, endDate, localCalendar);
-    //        persistenceTransaction.commit();
-    //    } catch (Exception e) {
-    //        HibernateUtils.rollback(persistenceTransaction, getLogger());
-    //        logAndPrintMessage("Ошибка при построении отчета:", e);
-    //    } finally {
-    //        HibernateUtils.close(session, getLogger());
-    //    }
-    //    return (DiscrepanciesOnOrdersAndAttendanceJasperReport) report;
-    //}
-
-    //public void export(ActionEvent event) {
-    //    if(idOfContragentOrgList==null || idOfContragentOrgList.isEmpty()){
-    //        printError("Выберите список поставщиков");
-    //        return;
-    //    }
-    //    FacesContext facesContext = FacesContext.getCurrentInstance();
-    //    try {
-    //        BasicReportJob report = buildReport1();
-    //        if (report != null) {
-    //            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
-    //            ServletOutputStream servletOutputStream = response.getOutputStream();
-    //            facesContext.responseComplete();
-    //            response.setContentType("application/xls");
-    //            response.setHeader("Content-disposition", "inline;filename=DiscrepanciesOnOrdersAndAttendanceReport.xls");
-    //            JRXlsExporter xlsExport = new JRXlsExporter();
-    //            xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
-    //            xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
-    //            xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
-    //            xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
-    //            xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-    //            xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
-    //            xlsExport.exportReport();
-    //            servletOutputStream.close();
-    //        }
-    //    } catch (Exception e) {
-    //        logAndPrintMessage("Ошибка при выгрузке отчета:", e);
-    //    }
-    //}
 
 }
