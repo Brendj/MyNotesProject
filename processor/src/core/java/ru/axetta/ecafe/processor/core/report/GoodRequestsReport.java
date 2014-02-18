@@ -461,7 +461,10 @@ public class GoodRequestsReport extends BasicReport {
         if (hideMissedColumns) {
             for (RequestItem it : items) {
                 for (Date d : it.getDates()) {
-                    dates.add(d);
+                    RequestValue val = it.getValue(d.getTime());
+                    if(val != null && val.getValue() != 0) {
+                        dates.add(d);
+                    }
                 }
             }
         } else {
