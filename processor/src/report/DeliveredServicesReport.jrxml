@@ -8,9 +8,9 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
-	<property name="ireport.zoom" value="0.826446280991736"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.zoom" value="1.210000000000001"/>
+	<property name="ireport.x" value="57"/>
+	<property name="ireport.y" value="172"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -470,7 +470,7 @@
 								<rightPen lineWidth="0.5"/>
 							</box>
 							<textField>
-								<reportElement uuid="aad9e225-5c15-4a16-95c1-65ebc6fd721a" style="Crosstab Data Text" x="0" y="0" width="273" height="30"/>
+								<reportElement uuid="aad9e225-5c15-4a16-95c1-65ebc6fd721a" style="Crosstab Data Text" x="0" y="0" width="346" height="30"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -555,6 +555,20 @@
 									<font isBold="true"/>
 								</textElement>
 								<text><![CDATA[ИТОГО]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="70f8df3f-4676-4775-a0e0-2a2ee42418b9" style="Crosstab Data Text" x="73" y="0" width="73" height="170"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Кол-во рационов]]></text>
 							</staticText>
 						</cellContents>
 					</crosstabTotalColumnHeader>
@@ -786,7 +800,7 @@
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="73" height="39" columnTotalGroup="level3">
+				<crosstabCell width="146" height="39" columnTotalGroup="level3">
 					<cellContents>
 						<box>
 							<pen lineWidth="0.5"/>
@@ -805,9 +819,23 @@
 								<rightPen lineWidth="0.5"/>
 							</box>
 							<textElement textAlignment="Right" verticalAlignment="Middle">
-								<font size="8" isBold="true"/>
+								<font isBold="true"/>
 							</textElement>
 							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
+						</textField>
+						<textField pattern="###0">
+							<reportElement uuid="578be2cd-b18e-418b-8888-3ba256d74d3a" style="Crosstab Data Text" x="73" y="0" width="73" height="39"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement textAlignment="Right" verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{countMeasure}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -1133,7 +1161,7 @@
 						</box>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell height="39" rowTotalGroup="unique" columnTotalGroup="level3">
+				<crosstabCell width="146" height="39" rowTotalGroup="unique" columnTotalGroup="level3">
 					<cellContents>
 						<box>
 							<pen lineWidth="0.5"/>
@@ -1152,9 +1180,23 @@
 								<rightPen lineWidth="0.5"/>
 							</box>
 							<textElement textAlignment="Right" verticalAlignment="Middle">
-								<font size="8" isBold="true"/>
+								<font isBold="true"/>
 							</textElement>
 							<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($V{summaryMeasure}).movePointLeft(2)]]></textFieldExpression>
+						</textField>
+						<textField pattern="###0">
+							<reportElement uuid="260b9b29-e04c-4195-80ba-0ab305cbf3da" style="Crosstab Data Text" mode="Opaque" x="73" y="0" width="73" height="39" backcolor="#CCFFFF"/>
+							<box>
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement textAlignment="Right" verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{countMeasure}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
