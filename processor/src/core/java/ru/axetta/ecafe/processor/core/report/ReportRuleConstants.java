@@ -162,6 +162,10 @@ public class ReportRuleConstants {
                     + "{Многодетные 5-11 кл.(завтрак+обед)}Многодетные 5-11 кл.(завтрак+обед),"
                     + "{Соц./незащищ. 5-11 кл.(завтрак+обед)}Соц./незащищ. 5-11 кл.(завтрак+обед),"
                     + "{Соц./незащищ. 1-4 кл.(завтрак+обед)}Соц./незащищ. 1-4 кл.(завтрак+обед)"),
+            new ParamHint("goodName", "Наименование товара").setDefaultRule("= " + RuleProcessor.INPUT_EXPRESSION),
+            new ParamHint("hideMissedColumns", "Скрывать даты с пустыми значениями").setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}Не скрывать,{true}Скрывать"), //35
+            new ParamHint("goodsFilter", "Фильтры по заявкам").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION + "{3}Отображать организации с отсутствием заявок за последние 2 дня,{2}Только пустые,{0}Все,{1}Только с данными"),
+            new ParamHint("dailySample", "Суточная проба").setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}Не выводить,{true}Выводить"), //30
             // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
             /*new ParamHint("idOfContract", "Контракт"),
             new ParamHint("listValue", "Какое-то значение из списка").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION + "{111}один,{222}два,{333}три"),
@@ -216,7 +220,8 @@ public class ReportRuleConstants {
             new ReportHint(StatisticsPaymentPreferentialSupplyJasperReport.class.getCanonicalName(), new int[]{3, -20}),
             new ReportHint(TelephoneNumberCountJasperReport.class.getCanonicalName(), new int[]{3, -20}),
             new ReportHint(ActiveDiscountClientsReport.class.getCanonicalName(), new int[]{3}),
-            new ReportHint(DiscrepanciesDataOnOrdersAndPaymentJasperReport.class.getCanonicalName(), new int[]{3, -23})
+            new ReportHint(DiscrepanciesDataOnOrdersAndPaymentJasperReport.class.getCanonicalName(), new int[]{3, -23}),
+            new ReportHint(GoodRequestsReport.class.getCanonicalName(), new int[]{3, 20, 34, 35, 36, 37}),
             //new ReportHint(ReferReport.class.getCanonicalName(), new int[]{-3}),
             //new ReportHint(DailyReferReport.class.getCanonicalName(), new int[]{-3, -33})
             // отрицательное значение - обязательное

@@ -4,6 +4,15 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.export.JRHtmlExporter;
+import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
+
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -12,13 +21,17 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -30,7 +43,9 @@ import java.util.*;
  * Time: 16:45
  * To change this template use File | Settings | File Templates.
  */
-public class GoodRequestsReport extends BasicReport {
+public class GoodRequestsReport extends BasicReportForAllOrgJob {
+
+    private final static Logger logger = LoggerFactory.getLogger(GoodRequestsReport.class);
     public static final long REQUESTS_MONITORING_TIMEOUT = 172800000;          //  2 дня
     public static final String OVERALL_TITLE = "ИТОГО";
     public static final String OVERALL_ALL_TITLE = "ВСЕГО";
@@ -49,6 +64,7 @@ public class GoodRequestsReport extends BasicReport {
     private String prevOrgFull = ""; //  определения надо ли отображать название Орга или Товара в отчете
     private String pregGood = "";    //
     private boolean isNewOrg = true;
+    private String htmlReport;
 
     private static final String ORG_NUM = "Номер ОУ";
     private static final String ORG_NAME = "Наименование ОУ";
@@ -62,7 +78,59 @@ public class GoodRequestsReport extends BasicReport {
     }
 
 
-    public static class Builder {
+    public static class Builder extends BasicReportForAllOrgJob.Builder {
+
+        private final String templateFilename;
+        private boolean exportToObjects = false;
+
+        public Builder(String templateFilename) {
+            this.templateFilename = templateFilename;
+        }
+
+        public Builder() {
+            templateFilename = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath() + ActiveDiscountClientsReport.class.getSimpleName() + ".jasper";
+            exportToObjects = true;
+        }
+
+        @Override
+        public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
+            boolean hideMissedColumns = false;
+            try {
+                hideMissedColumns = Boolean.parseBoolean(reportProperties.getProperty("hideMissedColumns"));
+            } catch (Exception e) { }
+            String goodName = reportProperties.getProperty("goodName");
+            goodName = goodName == null ? "" : goodName;
+            int orgFilter = 1;
+            try {
+                orgFilter = Integer.parseInt(reportProperties.getProperty("goodsFilter"));
+                if(orgFilter == 3) {
+                    orgFilter = -1;
+                }
+            } catch (Exception e) { }
+            boolean dailySample = false;
+            try {
+                dailySample = Boolean.parseBoolean(reportProperties.getProperty("showDailySample"));
+            } catch (Exception e) { }
+
+            List<Long> idOfOrgList = new ArrayList<Long>();
+            String idOfOrgListStr = reportProperties.getProperty("idOfOrg");
+            try {
+                String ids [] = idOfOrgListStr.split(",");
+                for(String id : ids) {
+                    idOfOrgList.add(Long.parseLong(id));
+                }
+            } catch (Exception e) { }
+
+            List<Long> idOfContragentList = new ArrayList<Long>();
+            String idOfContragentListStr = reportProperties.getProperty("idOfContragent");
+            try {
+                String ids [] = idOfContragentListStr.split(",");
+                for(String id : ids) {
+                    idOfContragentList.add(Long.parseLong(id));
+                }
+            } catch (Exception e) { }
+            return build(session, hideMissedColumns, startTime, endTime,idOfOrgList, idOfContragentList, goodName, true, orgFilter);
+        }
 
         public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
                 Date startDate, Date endDate, Long idOfOrg) throws Exception{
@@ -93,9 +161,77 @@ public class GoodRequestsReport extends BasicReport {
                 String goodName, Boolean isWriteTotalRow, Integer orgsFilter)
                 throws Exception {
             Date generateTime = new Date();
-            List<RequestItem> items = new LinkedList<RequestItem>();
+
+
+            /* Строим параметры для передачи в jasper */
+            Calendar calendar = new GregorianCalendar();
+            Map<String, Object> parameterMap = new HashMap<String, Object>();
+            calendar.setTime(startDate);
+            int month = calendar.get(Calendar.MONTH);
+            parameterMap.put("day", calendar.get(Calendar.DAY_OF_MONTH));
+            parameterMap.put("month", month + 1);
+            parameterMap.put("monthName", new DateFormatSymbols().getMonths()[month]);
+            parameterMap.put("year", calendar.get(Calendar.YEAR));
+            parameterMap.put("startDate", startDate);
+            parameterMap.put("endDate", endDate);
+
+
             GoodRequestsReport report = new GoodRequestsReport(generateTime, new Date().getTime() - generateTime.getTime(),
-                    hideMissedColumns, startDate, endDate, items);
+                    hideMissedColumns, startDate, endDate, null);
+            List<RequestItem> items = findItems(session, hideMissedColumns, startDate, endDate, idOfOrgList, idOfSupplierList,
+                    goodName, isWriteTotalRow, orgsFilter, report);
+            if(!exportToObjects) {
+                List<JasperRequestItem> jasperItems = toJasperItems(hideMissedColumns, items, startDate, endDate);
+                JasperPrint jasperPrint = JasperFillManager
+                        .fillReport(templateFilename, parameterMap, createDataSource(jasperItems));
+                report.setPrint(jasperPrint);
+            }
+            report.setGoodRequestItems(items);
+            return report;
+
+
+            /*if (!exportToObjects) {
+                return report;
+            } else {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                JRHtmlExporter exporter = new JRHtmlExporter();
+                exporter.setParameter(JRExporterParameter.JASPER_PRINT, report.getPrint());
+                exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
+                exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
+                exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
+                exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
+                exporter.exportReport();
+                return report.setHtmlReport(os.toString("UTF-8"));
+            }*/
+        }
+
+        private List<JasperRequestItem> toJasperItems(boolean hideMissedColumns, List<RequestItem> items,
+                Date startDate, Date endDate) {
+            Set <Date> dates = GoodRequestsReport.buildColumnDatesList(hideMissedColumns, items, startDate, endDate);
+            List<JasperRequestItem> result = new ArrayList<JasperRequestItem>();
+            for(RequestItem i : items) {
+                int c = 0;
+                for(Date d : dates) {
+                    String date = YEAR_DATE_FORMAT.format(d);
+                    JasperRequestItem jI = new JasperRequestItem(i, (long) c, date, i.getValue(date));
+                    result.add(jI);
+                    c++;
+                }
+            }
+            return result;
+        }
+
+        private JRDataSource createDataSource(List<JasperRequestItem> items) throws Exception {
+            return new JRBeanCollectionDataSource(items);
+        }
+
+        private List<RequestItem> findItems(Session session, Boolean hideMissedColumns,
+                Date startDate, Date endDate, List<Long> idOfOrgList, List <Long> idOfSupplierList,
+                String goodName, Boolean isWriteTotalRow, Integer orgsFilter, GoodRequestsReport report)
+                throws Exception {
+            List<RequestItem> items = new LinkedList<RequestItem>();
 
             long startDateLong = startDate.getTime();
             long endDateLong = endDate.getTime();
@@ -290,9 +426,8 @@ public class GoodRequestsReport extends BasicReport {
             }
 
             items.add(overallItem);
-            report.setGoodRequestItems(items);
             normalizeDates(items, startDate, endDate);
-            return report;
+            return items;
         }
         
         protected List<Long> loadEmptyOrgs(Session session, long startDateLong,
@@ -423,7 +558,10 @@ public class GoodRequestsReport extends BasicReport {
 
     public GoodRequestsReport(Date generateTime, long generateDuration, boolean hideMissedColumns,
             Date startDate, Date endDate, List<RequestItem> items) {
-        super(generateTime, generateDuration);
+        //super(generateTime, generateDuration);
+        /*super(generateTime, generateDuration, print, startTime, endTime);*/
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.items = items;
         this.hideMissedColumns = hideMissedColumns;
         this.startDate = startDate;
@@ -442,20 +580,8 @@ public class GoodRequestsReport extends BasicReport {
         return items;
     }
 
-    public Object [] getColumnNames () {
-        if (cols != null) {
-            return cols.toArray();
-        } else {
-            cols = new ArrayList<String>();
-        }
-        for (ReportColumn c : DEFAULT_COLUMNS) {
-            cols.add(c.getName());
-        }
-
-
-        if (items == null || items.size() < 1) {
-            return cols.toArray();
-        }
+    protected static Set<Date> buildColumnDatesList(boolean hideMissedColumns, List<RequestItem> items,
+                                                    Date startDate, Date endDate) {
         Set <Date> dates = new TreeSet <Date> ();
         //  Если надо исключать те даты, в которых отсутствуют значения, исключаем их из списка столбцов
         if (hideMissedColumns) {
@@ -470,6 +596,25 @@ public class GoodRequestsReport extends BasicReport {
         } else {
             dates = buildDatesFromLimits(startDate, endDate);
         }
+        return dates;
+    }
+
+    public Object [] getColumnNames () {
+        if (cols != null) {
+            return cols.toArray();
+        } else {
+            cols = new ArrayList<String>();
+        }
+        for (ReportColumn c : DEFAULT_COLUMNS) {
+            cols.add(c.getName());
+        }
+
+
+        if (items == null || items.size() < 1) {
+            return cols.toArray();
+        }
+
+        Set<Date> dates = buildColumnDatesList(hideMissedColumns, items, startDate, endDate);
         //  Анализируем месяц, если у первой и последней даты он разный, значит надо будет выводить даты с месяцами
         //boolean showMonths = ((Date) dates.toArray()[0]).getMonth() != ((Date) dates.toArray()[dates.size() - 1]).getMonth();
         //boolean showMonths = startDate.getMonth() != endDate.getMonth();
@@ -503,6 +648,20 @@ public class GoodRequestsReport extends BasicReport {
         return hideMissedColumns;
     }
 
+    @Override
+    public BasicReportForAllOrgJob createInstance() {
+        return new GoodRequestsReport();  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public BasicReportJob.Builder createBuilder(String templateFilename) {
+        return new Builder(templateFilename);
+    }
+
+    @Override
+    public Logger getLogger() {
+        return logger;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 
     public static void writeToFile(GoodRequestsReport report, Writer writer) throws IOException {
         Object[] columns = report.getColumnNames();
@@ -523,6 +682,14 @@ public class GoodRequestsReport extends BasicReport {
         }
     }
 
+    public String getHtmlReport() {
+        return htmlReport;
+    }
+
+    public GoodRequestsReport setHtmlReport(String htmlReport) {
+        this.htmlReport = htmlReport;
+        return this;
+    }
 
     public static class TotalItem extends RequestItem {
 
@@ -589,6 +756,60 @@ public class GoodRequestsReport extends BasicReport {
                 lastDailySamples.put(cal.getTimeInMillis(), value);
             }
 
+        }
+    }
+
+    public static class JasperRequestItem {
+        protected final Long idOfOrg; // Идетификатор организации
+        protected final String org; // Наименование организации
+        protected final String orgFull; // Полное наименование организации
+        protected final Long idOfGood; // Идентификатор  товара
+        protected final String good; // Наименование товара
+        protected final Long columnId;
+        protected final String columnName;
+        protected final String columnValue;
+
+        public JasperRequestItem(RequestItem item, Long columnId, String columnName, String columnValue) {
+            this.idOfOrg = item.getIdOfOrg();
+            this.org = item.getOrg();
+            this.orgFull = item.getOrgFull();
+            this.idOfGood = item.getIdOfGood();
+            this.good = item.getGood();
+            this.columnId = columnId;
+            this.columnName = columnName;
+            this.columnValue = columnValue;
+        }
+
+        public Long getIdOfOrg() {
+            return idOfOrg;
+        }
+
+        public String getOrg() {
+            return org;
+        }
+
+        public String getOrgFull() {
+            return orgFull;
+        }
+
+        public Long getIdOfGood() {
+            return idOfGood;
+        }
+
+        public String getGood() {
+            return good;
+        }
+
+        public Long getColumnId() {
+            return columnId;
+        }
+
+        public String getColumnValue() {
+            return columnValue;
+        }
+
+        public String getColumnName() {
+            return columnName;
         }
     }
 

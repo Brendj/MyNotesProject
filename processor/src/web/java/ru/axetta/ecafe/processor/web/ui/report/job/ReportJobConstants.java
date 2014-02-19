@@ -122,6 +122,12 @@ public class ReportJobConstants {
             new ParamHint("enterEventType", "Тип отчета по посещаемости: все/учащиеся/все_без_учащихся"),
             new ParamHint("groupByMenuGroup", "Группировка отчета по товарным группам"),//25
             new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE, "Тип периода"),
+            new ParamHint("goodName", "Наименование товара").setDefaultRule("= " + RuleProcessor.INPUT_EXPRESSION),
+            new ParamHint("hideMissedColumns", "Скрывать даты с пустыми значениями").setDefaultRule("= " + RuleProcessor.CHECKBOX_EXPRESSION + "{false}Не скрывать,{true}Скрывать"),
+            new ParamHint("goodsFilter", "Фильтры по заявкам").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION + "{3}Отображать организации с отсутствием заявок за последние 2 дня,{2}Только пустые,{0}Все,{1}Только с данными"),
+            new ParamHint("showDailySample", "Суточная проба").setDefaultRule("= " + RuleProcessor.CHECKBOX_EXPRESSION + "{false}Не выводить,{true}Выводить"), //30
+
+
             // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
             /*new ParamHint("idOfContract", "Контракт"),
             new ParamHint("listValue", "Какое-то значение из списка").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION + "{111}один,{222}два,{333}три"),
@@ -165,7 +171,8 @@ public class ReportJobConstants {
             new ReportHint(ContragentCompletionReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(HalfYearSummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(BeneficiarySummaryReport.class.getCanonicalName(), new int[]{}),
-            new ReportHint(DeliveredServicesReport.class.getCanonicalName(), new int[]{20/*, 26, 27, 28, 29, 30, 31, 32*/})
+            new ReportHint(DeliveredServicesReport.class.getCanonicalName(), new int[]{20/*, 26, 27, 28, 29, 30, 31, 32*/}),
+            new ReportHint(GoodRequestsReport.class.getCanonicalName(), new int[]{20, 3, 27, 28, 29, 30/*, 26, 27, 28, 29, 30, 31, 32*/})
     };
 
     private ReportJobConstants() {
