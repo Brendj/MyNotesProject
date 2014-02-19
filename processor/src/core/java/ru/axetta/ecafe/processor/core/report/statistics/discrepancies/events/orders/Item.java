@@ -105,6 +105,10 @@ public class Item {
         return enterEventCount;
     }
 
+    public Double getPercent() {
+        return Math.abs((requestCount==null || enterEventCount==null || requestCount==0)?0.0:(requestCount-enterEventCount)*100.0/requestCount);
+    }
+
     public void setEnterEventCount(Long enterEventCount) {
         this.enterEventCount = enterEventCount;
     }
