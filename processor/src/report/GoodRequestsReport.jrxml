@@ -9,7 +9,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.3310000000000015"/>
-	<property name="ireport.x" value="25"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
@@ -207,7 +207,7 @@
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<rowGroup name="good" width="284">
-					<bucket class="java.lang.String">
+					<bucket order="Descending" class="java.lang.String">
 						<bucketExpression><![CDATA[$F{good}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
