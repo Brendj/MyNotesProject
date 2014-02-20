@@ -180,9 +180,9 @@
 						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
-				<rowGroup name="org" width="354">
+				<rowGroup name="orgFull" width="354">
 					<bucket class="java.lang.String">
-						<bucketExpression><![CDATA[$F{org}]]></bucketExpression>
+						<bucketExpression><![CDATA[$F{orgFull}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents>
@@ -242,8 +242,8 @@
 						<cellContents/>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
-				<measure name="orgFull" class="java.lang.String">
-					<measureExpression><![CDATA[$F{orgFull}]]></measureExpression>
+				<measure name="org" class="java.lang.String">
+					<measureExpression><![CDATA[$F{org}]]></measureExpression>
 				</measure>
 				<measure name="columnName" class="java.lang.String">
 					<measureExpression><![CDATA[$F{columnName}]]></measureExpression>
@@ -263,13 +263,13 @@
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell rowTotalGroup="org">
+				<crosstabCell rowTotalGroup="orgFull">
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell columnTotalGroup="columnId">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell rowTotalGroup="org" columnTotalGroup="columnId">
+				<crosstabCell rowTotalGroup="orgFull" columnTotalGroup="columnId">
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell rowTotalGroup="good">
