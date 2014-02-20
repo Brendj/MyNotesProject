@@ -88,7 +88,7 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
         }
 
         public Builder() {
-            templateFilename = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath() + ActiveDiscountClientsReport.class.getSimpleName() + ".jasper";
+            templateFilename = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath() + GoodRequestsReport.class.getSimpleName() + ".jasper";
             exportToObjects = true;
         }
 
