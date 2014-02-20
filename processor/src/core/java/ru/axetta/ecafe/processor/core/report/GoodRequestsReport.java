@@ -211,14 +211,22 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
                 Date startDate, Date endDate) {
             Set <Date> dates = GoodRequestsReport.buildColumnDatesList(hideMissedColumns, items, startDate, endDate);
             List<JasperRequestItem> result = new ArrayList<JasperRequestItem>();
+            long r = 0;
+            String prevOrg = "";
             for(RequestItem i : items) {
                 int c = 0;
+                boolean showOrg = false;
+                if(prevOrg.equals("") || !prevOrg.equals(i.getOrgFull())) {
+                    showOrg = true;
+                }
                 for(Date d : dates) {
                     String date = YEAR_DATE_FORMAT.format(d);
-                    JasperRequestItem jI = new JasperRequestItem(i, (long) c, date, i.getValue(date));
+                    JasperRequestItem jI = new JasperRequestItem(i, r, (long) c, date, i.getValue(date), showOrg);
                     result.add(jI);
                     c++;
                 }
+                prevOrg = i.getOrgFull();
+                r++;
             }
             return result;
         }
@@ -766,18 +774,20 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
         protected final Long idOfGood; // Идентификатор  товара
         protected final String good; // Наименование товара
         protected final Long columnId;
+        protected final Long rowId;
         protected final String columnName;
-        protected final String columnValue;
+        protected final Double columnValue;
 
-        public JasperRequestItem(RequestItem item, Long columnId, String columnName, String columnValue) {
+        public JasperRequestItem(RequestItem item, Long rowId, Long columnId, String columnName, String columnValue, boolean showOrg) {
             this.idOfOrg = item.getIdOfOrg();
-            this.org = item.getOrg();
-            this.orgFull = item.getOrgFull();
+            this.org = item.getOrg();//showOrg ? item.getOrg() : "";
+            this.orgFull = showOrg ? item.getOrgFull() : "";
             this.idOfGood = item.getIdOfGood();
             this.good = item.getGood();
+            this.rowId = rowId;
             this.columnId = columnId;
             this.columnName = columnName;
-            this.columnValue = columnValue;
+            this.columnValue = columnValue == null || columnValue.length() < 1 ? 0D : Double.parseDouble(columnValue);
         }
 
         public Long getIdOfOrg() {
@@ -804,7 +814,11 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
             return columnId;
         }
 
-        public String getColumnValue() {
+        public Long getRowId() {
+            return rowId;
+        }
+
+        public Double getColumnValue() {
             return columnValue;
         }
 
