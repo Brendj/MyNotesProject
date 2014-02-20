@@ -78,7 +78,6 @@ public class BasicReport {
 
     }
 
-
     public static abstract class ManualDocumentBuilder extends DailyFileCreator implements ReportDocumentBuilder {
 
 

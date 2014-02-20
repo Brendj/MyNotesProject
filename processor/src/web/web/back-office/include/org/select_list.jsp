@@ -8,7 +8,6 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<%--@elvariable id="orgListSelectPage" type="ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage"--%>
 <rich:modalPanel id="modalOrgListSelectorPanel" autosized="true" headerClass="modal-panel-header">
     <rich:hotKey key="esc" handler="#{rich:component('modalOrgListSelectorPanel')}.hide();return false;"/>
     <rich:hotKey key="ctrl+a" handler="selectAll();return false;"/>
@@ -22,7 +21,7 @@
         <a4j:jsFunction name="selectAll" action="#{mainPage.selectAllOrgListSelectedItemsList}" reRender="modalOrgListSelectorForm"/>
         <a4j:jsFunction name="deselectAll" action="#{mainPage.clearOrgListSelectedItemsList}" reRender="modalOrgListSelectorForm"/>
 
-        <table class="borderless-grid" width="100%">
+        <table class="borderless-grid" width="750">
             <tr>
                 <td style="text-align: left;">
                     <h:panelGrid columns="3" styleClass="borderless-grid">

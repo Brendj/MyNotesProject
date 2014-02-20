@@ -206,58 +206,8 @@ public class DashboardServiceBean {
                 statItem.setNumberOfChildrenClients((Long) result[1]);
             }
 
-            //// Статистика по Детям
-            // ид групп которые входят в группу предопредленые
-            //for (Long idOfOrgKey: orgStats.keySet()){
-            //    Criteria groupChildrenCriteria = session.createCriteria(ClientGroup.class);
-            //    groupChildrenCriteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrgKey));
-            //    // исключаем предопределенные круппы
-            //    for (ClientGroup.Predefined predefined: ClientGroup.Predefined.values()){
-            //        groupChildrenCriteria.add(Restrictions.ne("groupName", predefined.getNameOfGroup()).ignoreCase());
-            //        groupChildrenCriteria.add(Restrictions.ne("compositeIdOfClientGroup.idOfClientGroup", predefined.getValue()));
-            //    }
-            //    groupChildrenCriteria.add(Restrictions.ne("groupName", "Сотрудники").ignoreCase());
-            //    groupChildrenCriteria.setProjection(Projections.property("compositeIdOfClientGroup.idOfClientGroup"));
-            //    List<Long> clientChildrenGroups = groupChildrenCriteria.list();
-            //    //if(!clientChildrenGroups.isEmpty()){
-            //    //    clientPredefinedGroup.addAll(clientChildrenGroups);
-            //    //    //childrenCount.add(Restrictions.not(Restrictions.in("idOfClientGroup", clientChildrenGroups)));
-            //    //}
-            //    Criteria childrenCount = session.createCriteria(Client.class);
-            //    if(clientChildrenGroups.isEmpty()){
-            //        for (ClientGroup.Predefined predefined: ClientGroup.Predefined.values()){
-            //            groupChildrenCriteria.add(Restrictions.ne("idOfClientGroup", predefined.getValue()));
-            //        }
-            //    }  else {
-            //        childrenCount.add(Restrictions.in("idOfClientGroup", clientChildrenGroups));
-            //    }
-            //    childrenCount.setProjection(Projections.projectionList()
-            //            .add(Projections.property("org.idOfOrg"))
-            //            .add(Projections.rowCount())
-            //            .add(Projections.groupProperty("org.idOfOrg"))
-            //    );
-            //    queryResult = childrenCount.list();
-            //    for (Object object : queryResult) {
-            //        Object[] result = (Object[]) object;
-            //        Long curIdOfOrg = (Long) result[0];
-            //        DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
-            //        if (statItem == null) {
-            //            continue;
-            //        }
-            //        statItem.setNumberOfChildrenClients((Long) result[1]);
-            //    }
-            //}
-
             //// Статистика по Родителям
             ClientGroup.Predefined parent = ClientGroup.Predefined.CLIENT_PARENTS;
-            //Criteria parentGroupCriteria = session.createCriteria(ClientGroup.class);
-            //parentGroupCriteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
-            //parentGroupCriteria.add(Restrictions.or(
-            //        Restrictions.eq("groupName", parent.getNameOfGroup()),
-            //        Restrictions.eq("compositeIdOfClientGroup.idOfClientGroup", parent.getValue())
-            //));
-            //parentGroupCriteria.setProjection(Projections.property("compositeIdOfClientGroup.idOfClientGroup"));
-            //List<Long> clientGroups = parentGroupCriteria.list();
             Criteria parentsCount = session.createCriteria(Client.class);
             parentsCount.createCriteria("clientGroup").add(
                     Restrictions.or(
@@ -299,58 +249,6 @@ public class DashboardServiceBean {
                 }
                 statItem.setNumberOfNonStudentClients((Long) result[1]);
             }
-
-            /// Статистика по сотрудникам
-            //for (Long idOfOrgKey: orgStats.keySet()){
-            //    // соберем все группы которые должны попасть в выборку
-            //    List<ClientGroup.Predefined> predefineds = new ArrayList<ClientGroup.Predefined>(4);
-            //    predefineds.add(ClientGroup.Predefined.CLIENT_EMPLOYEES);
-            //    predefineds.add(ClientGroup.Predefined.CLIENT_ADMINISTRATION);
-            //    predefineds.add(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES);
-            //    //predefineds.add(ClientGroup.Predefined.CLIENT_OTHERS);
-            //
-            //    Criteria groupEmployeesCriteria = session.createCriteria(ClientGroup.class);
-            //    groupEmployeesCriteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrgKey));
-            //
-            //    Disjunction or = Restrictions.disjunction();
-            //    for (ClientGroup.Predefined predefined: predefineds){
-            //        or.add(Restrictions.eq("groupName", predefined.getNameOfGroup()).ignoreCase());
-            //        or.add(Restrictions.eq("compositeIdOfClientGroup.idOfClientGroup", predefined.getValue()));
-            //    }
-            ///* В старых версия Пед. Состав назывался  Сотрудники*/
-            //    or.add(Restrictions.eq("groupName", "Сотрудники").ignoreCase());
-            //    groupEmployeesCriteria.add(or);
-            //    groupEmployeesCriteria.setProjection(Projections.property("compositeIdOfClientGroup.idOfClientGroup"));
-            //
-            //    List<Long> groupEmployees =  groupEmployeesCriteria.list();
-            //
-            //    Criteria employeesCount = session.createCriteria(Client.class);
-            //    if(groupEmployees.isEmpty()){
-            //        for (ClientGroup.Predefined predefined: predefineds){
-            //            employeesCount.add(Restrictions.eq("idOfClientGroup", predefined.getValue()));
-            //        }
-            //    } else {
-            //        employeesCount.add(Restrictions.in("idOfClientGroup", groupEmployees));
-            //    }
-            //
-            //    employeesCount.setProjection(Projections.projectionList()
-            //            .add(Projections.property("org.idOfOrg"))
-            //            .add(Projections.rowCount())
-            //            .add(Projections.groupProperty("org.idOfOrg"))
-            //    );
-            //    queryResult = employeesCount.list();
-            //    for (Object object : queryResult) {
-            //        Object[] result = (Object[]) object;
-            //        Long curIdOfOrg = (Long) result[0];
-            //        DashboardResponse.OrgBasicStatItem statItem = orgStats.get(curIdOfOrg);
-            //        if (statItem == null) {
-            //            continue;
-            //        }
-            //        statItem.setNumberOfNonStudentClients((Long) result[1]);
-            //    }
-            //}
-
-
 
             ////
             query = entityManager.createNativeQuery(

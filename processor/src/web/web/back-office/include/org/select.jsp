@@ -15,7 +15,7 @@
     </f:facet>
     <a4j:form id="modalOrgSelectorForm" binding="#{mainPage.orgSelectPage.pageComponent}" styleClass="borderless-form"
               eventsQueue="modalOrgSelectorFormEventsQueue">
-        <table class="borderless-grid" width="100%">
+        <table class="borderless-grid" width="750">
             <tr>
                 <td style="text-align: left;">
                     <h:panelGrid styleClass="borderless-grid" columns="2">
