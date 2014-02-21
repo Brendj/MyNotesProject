@@ -82,6 +82,7 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
 
         private final String templateFilename;
         private boolean exportToObjects = false;
+        protected boolean dailySample;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
@@ -107,9 +108,9 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
                     orgFilter = -1;
                 }
             } catch (Exception e) { }
-            boolean dailySample = false;
+            dailySample = false;
             try {
-                dailySample = Boolean.parseBoolean(reportProperties.getProperty("showDailySample"));
+                dailySample = Boolean.parseBoolean(reportProperties.getProperty("dailySample"));
             } catch (Exception e) { }
 
             List<Long> idOfOrgList = new ArrayList<Long>();
@@ -181,7 +182,7 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
             List<RequestItem> items = findItems(session, hideMissedColumns, startDate, endDate, idOfOrgList, idOfSupplierList,
                     goodName, isWriteTotalRow, orgsFilter, report);
             if(!exportToObjects) {
-                List<JasperRequestItem> jasperItems = toJasperItems(hideMissedColumns, items, startDate, endDate);
+                List<JasperRequestItem> jasperItems = toJasperItems(hideMissedColumns, dailySample, items, startDate, endDate);
                 JasperPrint jasperPrint = JasperFillManager
                         .fillReport(templateFilename, parameterMap, createDataSource(jasperItems));
                 report.setPrint(jasperPrint);
@@ -207,7 +208,7 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
             }*/
         }
 
-        private List<JasperRequestItem> toJasperItems(boolean hideMissedColumns, List<RequestItem> items,
+        private List<JasperRequestItem> toJasperItems(boolean hideMissedColumns, boolean dailySample, List<RequestItem> items,
                 Date startDate, Date endDate) {
             Set <Date> dates = GoodRequestsReport.buildColumnDatesList(hideMissedColumns, items, startDate, endDate);
             List<JasperRequestItem> result = new ArrayList<JasperRequestItem>();
@@ -221,7 +222,8 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
                 }
                 for(Date d : dates) {
                     String date = YEAR_DATE_FORMAT.format(d);
-                    JasperRequestItem jI = new JasperRequestItem(i, r, (long) c, date, i.getValue(date), showOrg);
+                    String val = i.getRowValue(date, dailySample ? 1 : 0);
+                    JasperRequestItem jI = new JasperRequestItem(i, r, (long) c, date, val, showOrg);
                     result.add(jI);
                     c++;
                 }
@@ -776,7 +778,7 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
         protected final Long columnId;
         protected final Long rowId;
         protected final String columnName;
-        protected final Double columnValue;
+        protected final String columnValue;
 
         public JasperRequestItem(RequestItem item, Long rowId, Long columnId, String columnName, String columnValue, boolean showOrg) {
             this.idOfOrg = item.getIdOfOrg();
@@ -787,7 +789,7 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
             this.rowId = rowId;
             this.columnId = columnId;
             this.columnName = columnName;
-            this.columnValue = columnValue == null || columnValue.length() < 1 ? 0D : Double.parseDouble(columnValue);
+            this.columnValue = columnValue;
         }
 
         public Long getIdOfOrg() {
@@ -818,7 +820,7 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
             return rowId;
         }
 
-        public Double getColumnValue() {
+        public String getColumnValue() {
             return columnValue;
         }
 
