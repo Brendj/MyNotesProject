@@ -105,13 +105,22 @@ public class OrgSmsStatsReport extends BasicReportForAllOrgJob {
             String sql =
                         "select o.idoforg, o.shortname, c.idofclient, count(g.idofclientguardian) cnt "
                         + "from cf_clients c "
+                        + "left join cf_client_guardian g on g.idofchildren=c.idofclient and g.idofclientguardian<>0 "
+                        + "join cf_orgs o on c.idoforg=o.idoforg "
+                        + "where c.idOfClientGroup>=:groupStart AND c.idOfClientGroup<:groupEnd "
+                        + "group by o.idoforg, o.shortname, c.idofclient "
+                        + "order by o.shortname, o.idoforg "
+
+
+                        /*"select o.idoforg, o.shortname, c.idofclient, count(g.idofclientguardian) cnt "
+                        + "from cf_clients c "
                         + "left join cf_client_guardian g on g.idofchildren=c.idofclient "
                         + "join cf_orgs o on c.idoforg=o.idoforg "
                         + "where c.idOfClientGroup>=:groupStart AND c.idOfClientGroup<:groupEnd "
                         + "group by o.idoforg, o.shortname, c.idofclient "
-                        + "order by o.shortname, o.idoforg";
+                        + "order by o.shortname, o.idoforg"*/;
             Query query = session.createSQLQuery(sql);
-            query.setParameter("groupStart", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            query.setParameter("groupStart", ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue());
             query.setParameter("groupEnd", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
             List res = query.list();
             long prevIdoOfOrg = -1L;
@@ -127,6 +136,9 @@ public class OrgSmsStatsReport extends BasicReportForAllOrgJob {
                 if(prevIdoOfOrg != idoforg) {
                     item = new OrgSmsStatsItem(idoforg, org);
                     items.add(item);
+                }
+                if(guardiansCount > 0) {
+                    int few = 1;
                 }
                 int count = count = guardiansCount > 0 ? guardiansCount : 1;
                 parseCount(count, item);

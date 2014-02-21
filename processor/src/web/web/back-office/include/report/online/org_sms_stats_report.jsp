@@ -45,7 +45,7 @@
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" id="reportPanel">
         <c:if test="${not empty orgSmsStatsReportPage.report && not empty orgSmsStatsReportPage.report.htmlReport}" >
-            <h:outputText escape="true" value="Отчет по питающимся льготникам" styleClass="output-text" />
+            <h:outputText escape="true" value="Общая статистика по информированию" styleClass="output-text" />
 
             <f:verbatim>
                 <style type="text/css">
