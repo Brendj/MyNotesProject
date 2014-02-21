@@ -97,7 +97,7 @@
 	<field name="good" class="java.lang.String"/>
 	<field name="columnId" class="java.lang.Long"/>
 	<field name="columnName" class="java.lang.String"/>
-	<field name="columnValue" class="java.lang.Double"/>
+	<field name="columnValue" class="java.lang.String"/>
 	<field name="rowId" class="java.lang.Long"/>
 	<background>
 		<band splitType="Stretch"/>
@@ -253,7 +253,7 @@
 				<measure name="columnName" class="java.lang.String">
 					<measureExpression><![CDATA[$F{columnName}]]></measureExpression>
 				</measure>
-				<measure name="columnValue" class="java.lang.Double">
+				<measure name="columnValue" class="java.lang.String">
 					<measureExpression><![CDATA[$F{columnValue}]]></measureExpression>
 				</measure>
 				<measure name="org" class="java.lang.String">
