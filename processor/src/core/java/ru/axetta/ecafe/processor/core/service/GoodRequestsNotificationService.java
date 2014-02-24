@@ -48,6 +48,7 @@ public class GoodRequestsNotificationService {
         if (!runtimeContext.isMainNode()) {
             return;
         }
+        Long duration = System.currentTimeMillis();
         boolean isHideMissedColumns = runtimeContext.getOptionValueBool(Option.OPTION_HIDE_MISSED_COL_NOTIFICATION_GOOD_REQUEST_CHANGE);
         int maxNumDays = runtimeContext.getOptionValueInt(Option.OPTION_MAX_NUM_DAYS_NOTIFICATION_GOOD_REQUEST_CHANGE);
         if(runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATION_GOOD_REQUEST_CHANGE)){
@@ -205,9 +206,8 @@ public class GoodRequestsNotificationService {
                         String[] values = {"address", org.getAddress(),
                                            "shortOrgName", org.getShortName(), "reportValues",
                                            newValueHistory.toString()};
-                        //String addresses[] =  StringUtils.split(requestNotifyEmailAddress, ";");
-                        List<String> addresses = new ArrayList<String>(Arrays.asList(StringUtils.split(requestNotifyEmailAddress, ";")));
-                        //addresses.addAll(Arrays.asList(StringUtils.split(org.getRequestNotifyMailList(), ";")));
+                        List<String> strings = Arrays.asList(StringUtils.split(requestNotifyEmailAddress, ";"));
+                        List<String> addresses = new ArrayList<String>(strings);
 
                         DetachedCriteria staffClientQuery = DetachedCriteria.forClass(Staff.class);
                         staffClientQuery.add(Restrictions.eq("orgOwner", org.getIdOfOrg()));
@@ -219,7 +219,6 @@ public class GoodRequestsNotificationService {
                             Criteria clientCriteria = session.createCriteria(Client.class);
                             clientCriteria.add(Property.forName("idOfClient").in(staffClientQuery));
                             clientCriteria.setProjection(Property.forName("email"));
-                            //String address = (String) clientCriteria.uniqueResult();
                             List<String> address = clientCriteria.list();
                             addresses.addAll(address);
                         }
@@ -268,152 +267,8 @@ public class GoodRequestsNotificationService {
         } else {
             LOGGER.debug("Disable option notification good request change");
         }
-    }
-
-    @Transactional
-    public void notifyAllOrgGoodRequestsReport() throws Exception{
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        if(runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATION_GOOD_REQUEST_CHANGE)){
-            Session session = entityManager.unwrap(Session.class);
-            Criteria criteria = session.createCriteria(Contragent.class);
-            criteria.add(Restrictions.eq("classId", Contragent.TSP));
-            List<Contragent> contragentTSPList = criteria.list();
-            for (Contragent contragent: contragentTSPList){
-                final String requestNotifyEmailAddress = contragent.getRequestNotifyMailList();
-                if(StringUtils.isNotEmpty(requestNotifyEmailAddress)){
-                    Set<Org> orgSet = contragent.getOrgs();
-                    List<Long> idOfOrgs = new ArrayList<Long>(orgSet.size());
-                    TreeSet<Long>  idOfSuplOrg = new TreeSet<Long>();
-                    for (Org org: orgSet){
-                        idOfOrgs.add(org.getIdOfOrg());
-                        Long menuExchangeSourceOrgId = DAOUtils.findMenuExchangeSourceOrg(session, org.getIdOfOrg());
-                        if(menuExchangeSourceOrgId!=null){
-                            idOfSuplOrg.add(menuExchangeSourceOrgId);
-                        }
-                    }
-                    if(idOfOrgs.isEmpty()) break;
-                    String sql = "from DOCurrentOrgVersion where idOfOrg in :orgOwner";
-                    Query query = session.createQuery(sql);
-                    query.setParameterList("orgOwner", idOfOrgs);
-                    List<DOCurrentOrgVersion> currentOrgVersions = query.list();
-                    List<Long> currOrg = new ArrayList<Long>(currentOrgVersions.size());
-                    for (DOCurrentOrgVersion version: currentOrgVersions){
-                        currOrg.add(version.getIdOfOrg());
-                    }
-                    // Создадим записи если имеются максимальные значения
-                    if(currOrg.size()!=idOfOrgs.size()){
-                        for (Long orgOwner: idOfOrgs){
-                            if(!currOrg.contains(orgOwner)){
-                                sql = "select max(globalVersion) from GoodRequestPosition p where p.orgOwner=:orgOwner";
-                                query = session.createQuery(sql);
-                                query.setParameter("orgOwner", orgOwner);
-                                List list = query.list();
-                                if(!(list.isEmpty() || list.get(0)==null)){
-                                    Object o = list.get(0);
-                                    Long maxVal =  Long.valueOf(o.toString());
-                                    DOCurrentOrgVersion doCurrentOrgVersion = new DOCurrentOrgVersion();
-                                    doCurrentOrgVersion.setIdOfOrg(orgOwner);
-                                    doCurrentOrgVersion.setLastVersion(maxVal);
-                                    doCurrentOrgVersion.setObjectId(DOCurrentOrgVersion.GOOD_REQUEST_POSITION);
-                                    session.persist(doCurrentOrgVersion);
-                                }
-                            }
-                        }
-                    }
-                    if(currentOrgVersions.isEmpty())break;
-                    Date currentDate = new Date();
-                    List<GoodRequestPosition> positions = new ArrayList<GoodRequestPosition>();
-                    for (DOCurrentOrgVersion version: currentOrgVersions){
-                        sql = "from GoodRequestPosition p where p.globalVersion>:v and p.orgOwner=:orgOwner group by p.goodRequest, p.globalId";
-                        Query q = session.createQuery(sql);
-                        q.setParameter("v", version.getLastVersion());
-                        q.setParameter("orgOwner", version.getIdOfOrg());
-                        List<GoodRequestPosition> list = q.list();
-                        if(!list.isEmpty()){
-                            positions.addAll(list);
-                        }
-                    }
-                    if(positions.isEmpty()){
-                        LOGGER.debug("GoodRequest change list is empty");
-                        break;
-                    }
-                    GoodRequestsReport.Builder reportBuilder = new GoodRequestsReport.Builder();
-                    currentDate = CalendarUtils.truncateToDayOfMonth(currentDate);
-                    GoodRequestsReport goodRequests = reportBuilder.build(session,currentDate,
-                            CalendarUtils.addDays(currentDate, 31), new ArrayList<Long>(idOfSuplOrg));
-                    if(goodRequests.getGoodRequestItems().size()<2){
-                        LOGGER.debug("GoodRequests Report is empty");
-                        break; // Строка итого всегда присутсвует
-                    }
-                    Object[] columnNames = goodRequests.getColumnNames();
-                    StringBuilder newValueHistory = new StringBuilder();
-                    newValueHistory.append("<table border=1 cellpadding=0 cellspacing=0><tr>");
-                    for (Object o: columnNames){
-                        newValueHistory.append("<th align=center>");
-                        newValueHistory.append(o.toString()).append("</th>");
-                    }
-                    List<GoodRequestsReport.RequestItem> items = goodRequests.getGoodRequestItems();
-                    newValueHistory.append("</tr>");
-                    for (GoodRequestsReport.RequestItem item: items){
-                        newValueHistory.append("<tr>");
-                        for (Object o: columnNames){
-                            final String colName = o.toString();
-                            boolean isGood = false;
-                            final String rowValue = item.getRowValue(colName, 1);
-                            if(!(StringUtils.isAlphanumeric(colName) || StringUtils.isAlphaSpace(colName))){
-                                for (GoodRequestPosition position: positions){
-                                    if(position.getCurrentElementId()!=null){
-                                        final boolean b = position.getCurrentElementId().equals(item.getIdOfGood());
-                                        Calendar calendarDoneDate = Calendar.getInstance();
-                                        calendarDoneDate.setTime(position.getGoodRequest().getDoneDate());
-                                        CalendarUtils.truncateToDayOfMonth(calendarDoneDate);
-                                        Date doneDate = calendarDoneDate.getTime();
-                                        Calendar calendar = item.getColumnDate(colName);
-                                        CalendarUtils.truncateToDayOfMonth(calendar);
-                                        Date day = calendar.getTime();
-                                        final boolean c = day.equals(doneDate);
-                                        final boolean d = position.getOrgOwner().equals(item.getIdOfOrg());
-                                        if(b && c && d){
-                                            isGood = true; break;
-                                        }
-                                    }
-                                }
-                            }
-                            newValueHistory.append("<td style='text-align: center;"+(isGood?"background-color: palevioletred; color: #fff;":"")+"'>");
-                            newValueHistory.append(rowValue);
-                            newValueHistory.append("</td>");
-                        }
-                        newValueHistory.append("</tr>");
-                    }
-                    newValueHistory.append("</table>");
-                    final String fio = contragent.getContactPerson().getSurnameAndFirstLetters();
-                    String[] values = {"contactPerson", fio, "reportValues", newValueHistory.toString()};
-                    String addresses[] =  StringUtils.split(requestNotifyEmailAddress, ";");
-                    boolean sended = false;
-                    for (String address: addresses){
-                         sended |= eventNotificationService.sendEmail(address, notificationType, values);
-                    }
-                    if(sended){
-                        for (DOCurrentOrgVersion version: currentOrgVersions){
-                            sql = "select max(globalVersion) from GoodRequestPosition p where p.orgOwner=:orgOwner";
-                            query = session.createQuery(sql);
-                            query.setParameter("orgOwner", version.getIdOfOrg());
-                            List list = query.list();
-                            if(!(list.isEmpty() || list.get(0)==null)){
-                                Object o = list.get(0);
-                                Long maxval =  Long.valueOf(o.toString());
-                                version.setLastVersion(maxval);
-                                session.update(version);
-                            }
-                        }
-                    }
-                } else {
-                    LOGGER.debug("Contragent mail list is empty: {"+contragent.getRequestNotifyMailList()+"}");
-                }
-            }
-        } else {
-            LOGGER.debug("Disable option notification good request change");
-        }
+        duration = System.currentTimeMillis() - duration;
+        LOGGER.info("GoodRequestsNotificationService generateTime: "+ duration);
     }
 
     private final static String notificationType = EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE;
