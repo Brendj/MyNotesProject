@@ -351,7 +351,7 @@ private Long selectedIdOfMenu;
     private final ClientsBenefitsReportPage clientsBenefitsReportPage = new ClientsBenefitsReportPage ();
     private final StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage discrepanciesOnOrdersAndAttendanceReportPage
             = new StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage();
-    private final AggregateGoodRequestReportPage aggregateGoodRequestReportPage = new AggregateGoodRequestReportPage();
+    private final DetailedGoodRequestReportPage detailedGoodRequestReportPage = new DetailedGoodRequestReportPage();
     private final DiscrepanciesDataOnOrdersAndPaymentReportPage discrepanciesDataOnOrdersAndPaymentReportPage
             = new DiscrepanciesDataOnOrdersAndPaymentReportPage();
 
@@ -5477,8 +5477,8 @@ public Long getSelectedIdOfReportRule() {
         return discrepanciesOnOrdersAndAttendanceReportPage;
     }
 
-    public AggregateGoodRequestReportPage getAggregateGoodRequestReportPage() {
-        return aggregateGoodRequestReportPage;
+    public DetailedGoodRequestReportPage getDetailedGoodRequestReportPage() {
+        return detailedGoodRequestReportPage;
     }
 
     public DiscrepanciesDataOnOrdersAndPaymentReportPage getDiscrepanciesDataOnOrdersAndPaymentReportPage() {
@@ -5621,8 +5621,7 @@ public Long getSelectedIdOfReportRule() {
     public Object showAggregateGoodRequestReportPage () {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
-            //aggregateGoodRequestReportPage.fill();
-            currentWorkspacePage = aggregateGoodRequestReportPage;
+            currentWorkspacePage = detailedGoodRequestReportPage;
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
             facesContext.addMessage(null,
@@ -5633,7 +5632,7 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    public Object buildAggregateGoodRequestReport() {
+    public Object buildDetailedGoodRequestReport() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -5642,7 +5641,7 @@ public Long getSelectedIdOfReportRule() {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            aggregateGoodRequestReportPage.buildReport(persistenceSession);
+            detailedGoodRequestReportPage.buildReport(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             facesContext.addMessage(null,
