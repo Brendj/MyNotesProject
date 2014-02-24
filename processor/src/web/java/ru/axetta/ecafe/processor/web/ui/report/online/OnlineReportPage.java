@@ -55,10 +55,14 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
     }
 
     public void setEndDate(Date endDate) {
-        localCalendar.setTime(endDate);
-        localCalendar.add(Calendar.DAY_OF_MONTH,1);
-        localCalendar.add(Calendar.SECOND, -1);
-        this.endDate = localCalendar.getTime();
+        if(endDate!=null){
+            localCalendar.setTime(endDate);
+            localCalendar.add(Calendar.DAY_OF_MONTH,1);
+            localCalendar.add(Calendar.SECOND, -1);
+            this.endDate = localCalendar.getTime();
+        } else {
+            endDate=null;
+        }
     }
 
     public List<Long> getIdOfOrgList() {
