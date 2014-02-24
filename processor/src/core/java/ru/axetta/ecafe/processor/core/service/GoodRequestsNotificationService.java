@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -47,6 +48,8 @@ public class GoodRequestsNotificationService {
         if (!runtimeContext.isMainNode()) {
             return;
         }
+        boolean isHideMissedColumns = runtimeContext.getOptionValueBool(Option.OPTION_HIDE_MISSED_COL_NOTIFICATION_GOOD_REQUEST_CHANGE);
+        int maxNumDays = runtimeContext.getOptionValueInt(Option.OPTION_MAX_NUM_DAYS_NOTIFICATION_GOOD_REQUEST_CHANGE);
         if(runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATION_GOOD_REQUEST_CHANGE)){
             Session session = entityManager.unwrap(Session.class);
             Criteria criteria = session.createCriteria(Contragent.class);
@@ -91,10 +94,9 @@ public class GoodRequestsNotificationService {
                         }
                         GoodRequestsReport.Builder reportBuilder = new GoodRequestsReport.Builder();
                         currentDate = CalendarUtils.truncateToDayOfMonth(currentDate);
-                        boolean isHideMissedColumns = runtimeContext.getOptionValueBool(
-                                Option.OPTION_HIDE_MISSED_COL_NOTIFICATION_GOOD_REQUEST_CHANGE);
+                        //boolean isHideMissedColumns = false;
                         GoodRequestsReport goodRequests = reportBuilder.build(session, isHideMissedColumns,
-                                currentDate, CalendarUtils.addDays(currentDate, 31), idOfOrg);
+                                currentDate, CalendarUtils.addDays(currentDate, maxNumDays), idOfOrg);
                         if(goodRequests.getGoodRequestItems().size()<2){
                             LOGGER.debug("GoodRequests Report is empty " + org.toString());
                             continue; // Строка итого всегда присутсвует
@@ -122,19 +124,37 @@ public class GoodRequestsNotificationService {
 
                         Object[] columnNames = goodRequests.getColumnNames();
                         StringBuilder newValueHistory = new StringBuilder();
+                        Query q = session.createQuery("select max(sh.syncEndTime) from SyncHistory as sh where sh.org <= :org ");
+                        q.setParameter("org", org);
+                        Date maxSyncEndTime = (Date) q.uniqueResult();
+                        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy EE HH:mm:ss", new Locale("ru"));
+                        newValueHistory.append("<p>Время последней выгрузки заявок: "+format.format(maxSyncEndTime)+"</p>");
                         newValueHistory.append("<table border=1 cellpadding=0 cellspacing=0><tr>");
+                        int i =0 ;
                         for (Object o: columnNames){
-                            newValueHistory.append("<th align=center>");
-                            newValueHistory.append(o.toString()).append("</th>");
+                            if(++i<3){
+                                continue;
+                            }
+                            String colName = o.toString();
+                            if(StringUtils.countMatches(colName,"Вс")>0){
+                                newValueHistory.append("<th align=center style='background-color: #DFDFDF;'>");
+                            } else {
+                                newValueHistory.append("<th align=center>");
+                            }
+                            newValueHistory.append(colName).append("</th>");
                         }
                         List<GoodRequestsReport.RequestItem> items = goodRequests.getGoodRequestItems();
                         newValueHistory.append("</tr>");
                         for (GoodRequestsReport.RequestItem item: items){
                             newValueHistory.append("<tr>");
+                            i = 0;
                             for (Object o: columnNames){
                                 final String colName = o.toString();
                                 boolean isGood = false;
                                 String rowValue = item.getRowValue(colName, 1);
+                                if(++i<3){
+                                    continue;
+                                }
                                 if(!(StringUtils.isAlphanumeric(colName) || StringUtils.isAlphaSpace(colName))){
                                     for (GoodRequestPosition position: positions){
                                         if(position.getCurrentElementId()!=null){
@@ -155,6 +175,9 @@ public class GoodRequestsNotificationService {
                                     }
                                 }
                                 newValueHistory.append("<td style='text-align: center;");
+                                if(StringUtils.countMatches(colName,"Вс")>0){
+                                    newValueHistory.append("background-color: #DFDFDF;");
+                                }
                                 if(isGood){
                                     boolean isCreate = StringUtils.isEmpty(item.getRowLastValue(colName, 1));
                                     if(!isCreate){

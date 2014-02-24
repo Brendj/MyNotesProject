@@ -315,7 +315,7 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
                     "      " + (suppliersCondition.length() < 1 ? "" : "join cf_menuexchangerules on idofdestorg=cf_orgs.idoforg ") +
                     "      where cf_orgs.officialname<> '' and " +
                     "            " + stateCondition +
-                    "            (cf_goods_requests.donedate>=" + startDateLong + " and cf_goods_requests.donedate<" + endDateLong + ") "+
+                    "            (cf_goods_requests.donedate>=" + startDateLong + " and cf_goods_requests.donedate<=" + endDateLong + ") "+
                     "            " + notCreatedAtConfition +
                     "            " + goodCondition +
                     "            " + orgCondition +
@@ -336,7 +336,7 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
                     "      " + (suppliersCondition.length() < 1 ? "" : "join cf_menuexchangerules on idofdestorg=cf_orgs.idoforg ") +
                     "      where cf_orgs.officialname<> '' and " +
                     "            " + stateCondition +
-                    "            (cf_goods_requests.donedate>=" + startDateLong + " and cf_goods_requests.donedate<" + endDateLong + ") "+
+                    "            (cf_goods_requests.donedate>=" + startDateLong + " and cf_goods_requests.donedate<=" + endDateLong + ") "+
                     "            " + notCreatedAtConfition +
                     "            " + productCondition +
                     "            " + orgCondition +
