@@ -825,8 +825,8 @@
                             label="Сводный отчет по заявкам" action="#{mainPage.showGoodRequestReportPage}"
                             reRender="workspaceForm" />
 
-        <rich:panelMenuItem id="aggregateGoodRequestReportMenuItem"
-                            binding="#{mainPage.aggregateGoodRequestReportPage.mainMenuComponent}"
+        <rich:panelMenuItem id="detailedGoodRequestReportMenuItem"
+                            binding="#{mainPage.detailedGoodRequestReportPage.mainMenuComponent}"
                             label="Детальный отчет по заявкам" action="#{mainPage.showAggregateGoodRequestReportPage}"
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
