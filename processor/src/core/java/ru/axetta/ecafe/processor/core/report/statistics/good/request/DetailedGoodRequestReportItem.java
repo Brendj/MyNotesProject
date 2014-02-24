@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.core.report.statistics.good.request;
 
+import ru.axetta.ecafe.processor.core.persistence.Org;
+
 import java.util.Date;
 import java.util.List;
 
@@ -10,7 +12,7 @@ import java.util.List;
  * Time: 13:07
  * To change this template use File | Settings | File Templates.
  */
-public class AggregateGoodRequestReportItem {
+public class DetailedGoodRequestReportItem {
 
     private final String number;
     private final Long idOfSupplier;
@@ -20,9 +22,12 @@ public class AggregateGoodRequestReportItem {
     private final String educationName;
     private final List<Commodity> commodities;
     private final Date doneDate;
+    private final Date lastCreate;
+    private final Date lastUpdate;
 
-    public AggregateGoodRequestReportItem(String number, Long idOfSupplier, String supplierName, Long idOfEducation,
-            String educationNumber, String educationName, List<Commodity> commodities, Date doneDate) {
+    public DetailedGoodRequestReportItem(String number, Long idOfSupplier, String supplierName, Long idOfEducation,
+            String educationNumber, String educationName, List<Commodity> commodities, Date doneDate, Date lastCreate,
+            Date lastUpdate) {
         this.number = number;
         this.idOfSupplier = idOfSupplier;
         this.supplierName = supplierName;
@@ -31,6 +36,22 @@ public class AggregateGoodRequestReportItem {
         this.educationName = educationName;
         this.commodities = commodities;
         this.doneDate = doneDate;
+        this.lastCreate = lastCreate;
+        this.lastUpdate = lastUpdate;
+    }
+
+    public DetailedGoodRequestReportItem(String number, Long idOfSupplier, String supplierName, Long idOfEducation,
+            String educationName, List<Commodity> commodities, RequestItem requestItem) {
+        this.number = number;
+        this.idOfSupplier = idOfSupplier;
+        this.supplierName = supplierName;
+        this.idOfEducation = idOfEducation;
+        this.educationNumber = Org.extractOrgNumberFromName(educationName);
+        this.educationName = educationName;
+        this.commodities = commodities;
+        this.doneDate = requestItem.doneDate;
+        this.lastCreate = requestItem.lastCreate;
+        this.lastUpdate = requestItem.lastUpdate;
     }
 
     public String getNumber() {
@@ -69,4 +90,11 @@ public class AggregateGoodRequestReportItem {
         return doneDate;
     }
 
+    public Date getLastCreate() {
+        return lastCreate;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
 }
