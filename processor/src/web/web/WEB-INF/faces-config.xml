@@ -23,7 +23,6 @@
         </variable-resolver>
     </application>
 
-
     <managed-bean>
         <display-name>mainPage</display-name>
         <managed-bean-name>mainPage</managed-bean-name>
@@ -170,16 +169,28 @@
     </converter>
 
     <converter>
+        <description>Period Type Converter</description>
+        <converter-id>periodTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.PeriodTypeConverter</converter-class>
+    </converter>
+
+    <converter>
+        <description>Document State Filter Converter</description>
+        <converter-id>documentStateFilterConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.DocumentStateFilterConverter</converter-class>
+    </converter>
+
+    <converter>
         <description>Organization Type Converter</description>
         <converter-id>organizationTypeConverter</converter-id>
         <converter-class>ru.axetta.ecafe.processor.web.ui.converter.OrganizationTypeConverter</converter-class>
     </converter>
 
-		<converter>
+    <converter>
         <converter-id>rublesStringConverter</converter-id>
         <converter-class>ru.axetta.ecafe.processor.web.ui.converter.RublesStringConverter</converter-class>
     </converter>
-    
+
     <navigation-rule>
         <from-view-id>/back-office/index.jsp</from-view-id>
         <navigation-case>
