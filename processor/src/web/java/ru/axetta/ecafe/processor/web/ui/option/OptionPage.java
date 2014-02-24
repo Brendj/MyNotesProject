@@ -95,6 +95,7 @@ public class OptionPage extends BasicWorkspacePage {
     private String lastBIDataUpdate;
     private Boolean enableNotificationGoodRequestChange;
     private Boolean hideMissedColumnsNotificationGoodRequestChange;
+    private Integer maxNumDaysNotificationGoodRequestChange;
 
     private List<BankOptionItem> banks;
 
@@ -561,7 +562,9 @@ public class OptionPage extends BasicWorkspacePage {
     }
 
     public void setEnableNotificationGoodRequestChange(Boolean enableNotificationGoodRequestChange) {
-        if(!enableNotificationGoodRequestChange) hideMissedColumnsNotificationGoodRequestChange=false;
+        if(!enableNotificationGoodRequestChange) {
+            hideMissedColumnsNotificationGoodRequestChange=false;
+        }
         this.enableNotificationGoodRequestChange = enableNotificationGoodRequestChange;
     }
 
@@ -572,6 +575,14 @@ public class OptionPage extends BasicWorkspacePage {
     public void setHideMissedColumnsNotificationGoodRequestChange(
             Boolean hideMissedColumnsNotificationGoodRequestChange) {
         this.hideMissedColumnsNotificationGoodRequestChange = hideMissedColumnsNotificationGoodRequestChange;
+    }
+
+    public Integer getMaxNumDaysNotificationGoodRequestChange() {
+        return maxNumDaysNotificationGoodRequestChange;
+    }
+
+    public void setMaxNumDaysNotificationGoodRequestChange(Integer maxNumDaysNotificationGoodRequestChange) {
+        this.maxNumDaysNotificationGoodRequestChange = maxNumDaysNotificationGoodRequestChange;
     }
 
     public String getPageFilename() {
@@ -648,7 +659,8 @@ public class OptionPage extends BasicWorkspacePage {
 
         enableNotificationGoodRequestChange = runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATION_GOOD_REQUEST_CHANGE);
         hideMissedColumnsNotificationGoodRequestChange = runtimeContext.getOptionValueBool(Option.OPTION_HIDE_MISSED_COL_NOTIFICATION_GOOD_REQUEST_CHANGE);
-
+        maxNumDaysNotificationGoodRequestChange = runtimeContext.getOptionValueInt(
+                Option.OPTION_MAX_NUM_DAYS_NOTIFICATION_GOOD_REQUEST_CHANGE);
         bankListPage.onShow();
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -764,6 +776,8 @@ public class OptionPage extends BasicWorkspacePage {
                     enableNotificationGoodRequestChange);
             runtimeContext.setOptionValue(Option.OPTION_HIDE_MISSED_COL_NOTIFICATION_GOOD_REQUEST_CHANGE,
                     hideMissedColumnsNotificationGoodRequestChange);
+            runtimeContext.setOptionValue(Option.OPTION_MAX_NUM_DAYS_NOTIFICATION_GOOD_REQUEST_CHANGE,
+                    maxNumDaysNotificationGoodRequestChange);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
