@@ -580,6 +580,22 @@ public class ImportRegisterClientsService {
         }
     }
 
+    public RegistryChange getRegistryChange(Long idOfRegistryChange) {
+        if(idOfRegistryChange == null) {
+            return null;
+        }
+        RegistryChange change = em.find(RegistryChange.class, idOfRegistryChange);
+        return change;
+    }
+
+    public RegistryChangeError getRegistryChangeError(Long idOfRegistryChangeError) {
+        if(idOfRegistryChangeError == null) {
+            return null;
+        }
+        RegistryChangeError e = em.find(RegistryChangeError.class, idOfRegistryChangeError);
+        return e;
+    }
+
     @Transactional
     public void applyRegistryChange(long idOfRegistryChange, boolean fullNameValidation) throws Exception {
         RegistryChange change = em.find(RegistryChange.class, idOfRegistryChange);
