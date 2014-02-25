@@ -9,6 +9,7 @@
               version="1.2">
 
     <application>
+        <message-bundle>org.richfaces.renderkit.calendar.messages</message-bundle>
         <locale-config>
             <default-locale>ru</default-locale>
         </locale-config>
