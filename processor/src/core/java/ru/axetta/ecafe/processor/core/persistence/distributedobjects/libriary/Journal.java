@@ -33,7 +33,7 @@ public class Journal extends LibraryDistributedObject {
 
     private Fund fund;
     private Publication publication;
-    private boolean isNewspaper;
+    private boolean newspaper;
     private int monthCount;
     private int count;
 
@@ -48,7 +48,7 @@ public class Journal extends LibraryDistributedObject {
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);
 
-        projectionList.add(Projections.property("isNewspaper"), "isNewspaper");
+        projectionList.add(Projections.property("newspaper"), "newspaper");
         projectionList.add(Projections.property("monthCount"), "monthCount");
         projectionList.add(Projections.property("count"), "count");
 
@@ -70,7 +70,7 @@ public class Journal extends LibraryDistributedObject {
     public Journal parseAttributes(Node node) throws Exception {
         guidFund = XMLUtils.getStringAttributeValue(node, "GuidFund", 36);
         guidPublication = XMLUtils.getStringAttributeValue(node, "GuidPublication", 36);
-        isNewspaper = XMLUtils.getBooleanAttributeValue(node, "IsNewspaper");
+        newspaper = XMLUtils.getBooleanAttributeValue(node, "IsNewspaper");
         monthCount = XMLUtils.getIntegerAttributeValue(node, "MonthCount");
         count = XMLUtils.getIntegerAttributeValue(node, "Count");
         setSendAll(SendToAssociatedOrgs.DontSend);
@@ -94,7 +94,7 @@ public class Journal extends LibraryDistributedObject {
     @Override
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(((Journal) distributedObject).getOrgOwner());
-        setNewspaper(((Journal) distributedObject).isNewspaper());
+        setNewspaper(((Journal) distributedObject).getNewspaper());
         setMonthCount(((Journal) distributedObject).getMonthCount());
         setCount(((Journal) distributedObject).getCount());
         setFund(((Journal) distributedObject).getFund());
@@ -119,12 +119,12 @@ public class Journal extends LibraryDistributedObject {
         this.publication = publication;
     }
 
-    public boolean isNewspaper() {
-        return isNewspaper;
+    public boolean getNewspaper() {
+        return newspaper;
     }
 
     public void setNewspaper(boolean newspaper) {
-        isNewspaper = newspaper;
+        this.newspaper = newspaper;
     }
 
     public int getMonthCount() {
@@ -145,7 +145,7 @@ public class Journal extends LibraryDistributedObject {
 
     @Override
     public String toString() {
-        return String.format("Journal{fund=%s, publication=%s, isNewspaper=%s, monthCount=%d, count=%d}", fund, publication, isNewspaper,
+        return String.format("Journal{fund=%s, publication=%s, isNewspaper=%s, monthCount=%d, count=%d}", fund, publication, newspaper,
                 monthCount, count);
     }
 
