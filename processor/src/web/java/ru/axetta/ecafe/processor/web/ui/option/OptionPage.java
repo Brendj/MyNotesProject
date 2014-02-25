@@ -96,6 +96,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean enableNotificationGoodRequestChange;
     private Boolean hideMissedColumnsNotificationGoodRequestChange;
     private Integer maxNumDaysNotificationGoodRequestChange;
+    private String frontControllerRequestIpMask;
 
     private List<BankOptionItem> banks;
 
@@ -585,6 +586,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.maxNumDaysNotificationGoodRequestChange = maxNumDaysNotificationGoodRequestChange;
     }
 
+    public String getFrontControllerRequestIpMask() {
+        return frontControllerRequestIpMask;
+    }
+
+    public void setFrontControllerRequestIpMask(String frontControllerRequestIpMask) {
+        this.frontControllerRequestIpMask = frontControllerRequestIpMask;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -661,6 +670,7 @@ public class OptionPage extends BasicWorkspacePage {
         hideMissedColumnsNotificationGoodRequestChange = runtimeContext.getOptionValueBool(Option.OPTION_HIDE_MISSED_COL_NOTIFICATION_GOOD_REQUEST_CHANGE);
         maxNumDaysNotificationGoodRequestChange = runtimeContext.getOptionValueInt(
                 Option.OPTION_MAX_NUM_DAYS_NOTIFICATION_GOOD_REQUEST_CHANGE);
+        frontControllerRequestIpMask = runtimeContext.getOptionValueString(Option.OPTION_FRON_CONTROLLER_REQ_IP_MASK);
         bankListPage.onShow();
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -778,6 +788,8 @@ public class OptionPage extends BasicWorkspacePage {
                     hideMissedColumnsNotificationGoodRequestChange);
             runtimeContext.setOptionValue(Option.OPTION_MAX_NUM_DAYS_NOTIFICATION_GOOD_REQUEST_CHANGE,
                     maxNumDaysNotificationGoodRequestChange);
+
+            runtimeContext.setOptionValue(Option.OPTION_FRON_CONTROLLER_REQ_IP_MASK, frontControllerRequestIpMask);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");

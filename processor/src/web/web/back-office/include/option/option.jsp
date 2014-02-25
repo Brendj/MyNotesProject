@@ -290,6 +290,8 @@
                     <h:inputText value="#{optionPage.syncRegisterSupportEmail}" styleClass="input-text" size="100" />
                     <h:outputText escape="true" value="Хранить историю сверки не более (дней)" styleClass="output-text" />
                     <h:inputText value="#{optionPage.syncRegisterDaysTimeout}" styleClass="input-text" size="5" />
+                    <h:outputText escape="true" value="Маска IP-адреса для доступа к локальным методам" styleClass="output-text" />
+                    <h:inputText value="#{optionPage.frontControllerRequestIpMask}" styleClass="input-text" size="40" />
                 </h:panelGrid>
             </rich:panel>
 

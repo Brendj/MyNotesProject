@@ -21,6 +21,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import javax.jws.WebMethod;
@@ -83,6 +84,11 @@ public class FrontController extends HttpServlet {
     @WebMethod(operationName = "loadRegistryChangeItemsInternal")
     public List<RegistryChangeItem> loadRegistryChangeItemsInternal(@WebParam(name = "idOfOrg") long idOfOrg,
             @WebParam(name = "revisionDate") long revisionDate) {
+        try {
+            checkIpValidity();
+        } catch (FrontControllerException fce) {
+            return Collections.EMPTY_LIST;
+        }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 loadRegistryChangeItems(idOfOrg, revisionDate);
     }
@@ -102,6 +108,11 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "refreshRegistryChangeItemsInternal")
     public List<RegistryChangeItem> refreshRegistryChangeItemsInternal(@WebParam(name = "idOfOrg") long idOfOrg) {
+        try {
+            checkIpValidity();
+        } catch (FrontControllerException fce) {
+            return Collections.EMPTY_LIST;
+        }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 refreshRegistryChangeItems(idOfOrg);
     }
@@ -134,6 +145,15 @@ public class FrontController extends HttpServlet {
     public String proceedRegitryChangeItemInternal(@WebParam(name = "changesList") List<Long> changesList,
             @WebParam(name = "operation") int operation,
             @WebParam(name = "fullNameValidation") boolean fullNameValidation) {
+        if (operation != ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE) {
+            return null;
+        }
+        try {
+            checkIpValidity();
+        } catch (FrontControllerException fce) {
+            logger.error("Failed to pass ip check", fce);
+            return "При подтверждении изменения из Реестров, произошла ошибка: " + fce.getMessage();
+        }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 proceedRegitryChangeItem(changesList, operation, fullNameValidation);
     }
@@ -152,6 +172,11 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "loadRegistryChangeRevisionsInternal")
     public List<Long> loadRegistryChangeRevisionsInternal(@WebParam(name = "idOfOrg") long idOfOrg) {
+        try {
+            checkIpValidity();
+        } catch (FrontControllerException fce) {
+            return Collections.EMPTY_LIST;
+        }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 loadRegistryChangeRevisions(idOfOrg);
     }
@@ -171,6 +196,11 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "loadRegistryChangeErrorItemsInternal")
     public List<RegistryChangeErrorItem> loadRegistryChangeErrorItemsInternal(@WebParam(name = "idOfOrg") long idOfOrg) {
+        try {
+            checkIpValidity();
+        } catch (FrontControllerException fce) {
+            return Collections.EMPTY_LIST;
+        }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 loadRegistryChangeErrorItems(idOfOrg);
     }
@@ -195,6 +225,12 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "revisionDate") long revisionDate,
             @WebParam(name = "error") String error,
             @WebParam(name = "errorDetails") String errorDetails) {
+        try {
+            checkIpValidity();
+        } catch (FrontControllerException fce) {
+            logger.error("Failed to pass ip check", fce);
+            return fce.getMessage();
+        }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 addRegistryChangeError(idOfOrg, revisionDate, error, errorDetails);
     }
@@ -218,6 +254,12 @@ public class FrontController extends HttpServlet {
     public String commentRegistryChangeErrorInternal(@WebParam(name = "idOfRegistryChangeError") long idOfRegistryChangeError,
             @WebParam(name = "comment") String comment,
             @WebParam(name = "author") String author) {
+        try {
+            checkIpValidity();
+        } catch (FrontControllerException fce) {
+            logger.error("Failed to pass ip check", fce);
+            return fce.getMessage();
+        }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 commentRegistryChangeError(idOfRegistryChangeError, comment, author);
     }
@@ -577,6 +619,16 @@ public class FrontController extends HttpServlet {
             }
         }
         return results;
+    }
+
+    protected void checkIpValidity() throws FrontControllerException {
+        MessageContext msgContext = wsContext.getMessageContext();
+        HttpServletRequest request = (HttpServletRequest) msgContext.get(MessageContext.SERVLET_REQUEST);
+        String ipPattern = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_FRON_CONTROLLER_REQ_IP_MASK);
+        String remoteIp = request.getRemoteAddr();
+        if(!remoteIp.matches(ipPattern)) {
+            throw new FrontControllerException("Запрос с входящего узла обязан проходить проходить проверку сертификатов");
+        }
     }
 
     private void checkRequestValidity(Long orgId) throws FrontControllerException {
