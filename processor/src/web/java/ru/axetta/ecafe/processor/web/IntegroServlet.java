@@ -42,7 +42,9 @@ import java.io.OutputStream;
 import java.security.PublicKey;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -132,7 +134,8 @@ public class IntegroServlet extends HttpServlet {
             Document responseDocument = null;
 
             if(org.getCommodityAccounting()){
-                String[]  doGroupNames = new String[]{"ProductsGroup", "DocumentGroup"};
+                //String[]  doGroupNames = new String[]{"ProductsGroup", "DocumentGroup"};
+                List<String> doGroupNames = Arrays.asList("ProductsGroup", "DocumentGroup");
 
                 Manager manager = new Manager(org.getIdOfOrg(), doGroupNames);
                 try {

@@ -298,6 +298,11 @@ public class Processor implements SyncProcessor,
                     response = buildAccRegisgtryUpdate(request);
                     break;
                 }
+                case TYPE_COMMODITY_ACCOUNTING:{
+                    // обработка синхронизации параметров клиента
+                    response = buildCommodityAccounyingSyncResponse(request);
+                    break;
+                }
             }
 
         } catch (Exception e) {
@@ -852,33 +857,6 @@ public class Processor implements SyncProcessor,
             logger.error(message, e);
         }
 
-        // Process library data
-                /*try {
-                    if (request.getLibraryData() != null) {
-                        if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_B)) {
-                            throw new Exception("no license slots available");
-                        }
-
-                        resLibraryData = processSyncLibraryData(request.getLibraryData());
-                    }
-                } catch (Exception e) {
-                    logger.error(String.format("Failed to process library data, IdOfOrg == %s", request.getIdOfOrg()),
-                            e);
-                }
-
-                try {
-                    if (request.getLibraryData2() != null) {
-                        if (!RuntimeContext.getInstance().isPermitted(request.getIdOfOrg(), RuntimeContext.TYPE_B)) {
-                            throw new Exception("no license slots available");
-                        }
-
-                        resLibraryData2 = processSyncLibraryData2(request.getLibraryData2());
-                    }
-                } catch (Exception e) {
-                    logger.error(String.format("Failed to process library data 2, IdOfOrg == %s", request.getIdOfOrg()),
-                            e);
-                } */
-
         // Process ResCategoriesDiscountsAndRules
         try {
             resCategoriesDiscountsAndRules = processCategoriesDiscountsAndRules(request.getIdOfOrg());
@@ -947,12 +925,87 @@ public class Processor implements SyncProcessor,
         }
 
         Date syncEndTime = new Date();
+        updateSyncHistory(syncHistory.getIdOfSync(), syncResult, syncEndTime);
+        updateFullSyncParam(request.getIdOfOrg());
 
-        if (request.getSyncType() == SyncType.TYPE_FULL) {
-            // Update sync history - store sync end time and sync result
-            updateSyncHistory(syncHistory.getIdOfSync(), syncResult, syncEndTime);
-            updateFullSyncParam(request.getIdOfOrg());
+        return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
+                request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+                resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
+                resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
+                correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
+                directiveElement, resultClientGuardian, clientGuardianData);
+    }
+
+    /* Do process full synchronization */
+    private SyncResponse buildCommodityAccounyingSyncResponse(SyncRequest request) throws Exception {
+
+        Long idOfPacket = null;
+        SyncHistory syncHistory = null; // регистируются и заполняются только для полной синхронизации
+
+        ResPaymentRegistry resPaymentRegistry = null;
+        SyncResponse.AccRegistry accRegistry = null;
+        SyncResponse.AccIncRegistry accIncRegistry = null;
+        SyncResponse.ClientRegistry clientRegistry = null;
+        SyncResponse.ResOrgStructure resOrgStructure = null;
+        SyncResponse.ResMenuExchangeData resMenuExchange = null;
+        SyncResponse.ResDiary resDiary = null;
+        SyncResponse.ResEnterEvents resEnterEvents = null;
+        ResTempCardsOperations resTempCardsOperations = null;
+        TempCardOperationData tempCardOperationData = null;
+        SyncResponse.ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
+        ComplexRoles complexRoles = null;
+        SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
+        Manager manager = null;
+        OrgOwnerData orgOwnerData = null;
+        QuestionaryData questionaryData = null;
+        GoodsBasicBasketData goodsBasicBasketData = null;
+        DirectiveElement directiveElement = null;
+        List<Long> errorClientIds = new ArrayList<Long>();
+        ResultClientGuardian resultClientGuardian = null;
+        ClientGuardianData clientGuardianData = null;
+
+        boolean bError = false;
+
+        idOfPacket = generateIdOfPacket(request.getIdOfOrg());
+        // Register sync history
+        //syncHistory = createSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
+        //        request.getRemoteAddr());
+        //addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
+        //        request.getRemoteAddr());
+
+        try {
+            orgOwnerData = processOrgOwnerData(request.getIdOfOrg());
+        } catch (Exception e) {
+            String message = String.format("Failed to process org owner data, IdOfOrg == %s", request.getIdOfOrg());
+            createSyncHistory(request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
         }
+
+        try {
+            if (request.getManager() != null) {
+                manager = request.getManager();
+                manager.setSyncHistory(syncHistory);
+                manager.process(persistenceSessionFactory);
+            }
+        } catch (Exception e) {
+            logger.error(String.format("Failed to process of Distribution Manager, IdOfOrg == %s",
+                    request.getIdOfOrg()), e);
+        }
+
+        //if (bError) {
+        //    DAOService.getInstance().updateLastUnsuccessfulBalanceSync(request.getIdOfOrg());
+        //} else {
+        //    DAOService.getInstance().updateLastSuccessfulBalanceSync(request.getIdOfOrg());
+        //}
+
+        Date syncEndTime = new Date();
+
+        //if (request.getSyncType() == SyncType.TYPE_FULL) {
+        //    // Update sync history - store sync end time and sync result
+        //    updateSyncHistory(syncHistory.getIdOfSync(), syncResult, syncEndTime);
+        //    updateFullSyncParam(request.getIdOfOrg());
+        //}
+
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
                 request.getOrg().getType(), idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
@@ -997,7 +1050,6 @@ public class Processor implements SyncProcessor,
             accRegistry = new SyncResponse.AccRegistry();
             String message = String.format("Failed to build AccRegistry, IdOfOrg == %s", request.getIdOfOrg());
             logger.error(message, e);
-
         }
 
         // Build AccRegistry

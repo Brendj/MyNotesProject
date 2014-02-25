@@ -78,7 +78,8 @@ public class Manager {
     private SortedMap<String, List<String>> confirmDOMap = new TreeMap<String, List<String>>();
     private Long idOfOrg;
     private SyncHistory syncHistory;
-    private final String[] doGroupNames;
+    //private final String[] doGroupNames;
+    private final List<String> doGroupNames;
     private final DOGroupsFactory doGroupsFactory = new DOGroupsFactory();
 
     /* Максимальное количество объектов используемых в запросах конструкции IN */
@@ -90,7 +91,18 @@ public class Manager {
         this.syncHistory = syncHistory;
     }
 
-    public Manager(Long idOfOrg, String[] doGroupNames) {
+    //public Manager(Long idOfOrg, String[] doGroupNames) {
+    //    this.idOfOrg = idOfOrg;
+    //    this.doGroupNames = doGroupNames;
+    //    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    //    try {
+    //        this.conflictDocument = factory.newDocumentBuilder().newDocument();
+    //    } catch (Exception ex) {
+    //        throw new RuntimeException(ex.getMessage());
+    //    }
+    //}
+
+    public Manager(Long idOfOrg, List<String> doGroupNames) {
         this.idOfOrg = idOfOrg;
         this.doGroupNames = doGroupNames;
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

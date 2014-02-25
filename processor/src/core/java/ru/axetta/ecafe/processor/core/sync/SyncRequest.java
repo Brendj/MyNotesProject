@@ -2203,17 +2203,41 @@ public class SyncRequest {
             Node roNode = findFirstChildElement(envelopeNode, "RO");
             if (roNode != null){
                 String[] doGroupNames;
-                if(org.getCommodityAccounting()){
-                    Boolean enableSubscriptionFeeding = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_SUBSCRIPTION_FEEDING);
-                    if(enableSubscriptionFeeding){
-                        doGroupNames = new String[]{"ProductsGroup", "DocumentGroup", "SettingsGroup", "LibraryGroup", "SubscriptionGroup"};
-                    } else {
-                        doGroupNames = new String[]{"ProductsGroup", "DocumentGroup", "SettingsGroup", "LibraryGroup"};
-                    }
-                } else {
-                    doGroupNames = new String[]{"SettingsGroup", "LibraryGroup"};
+                Boolean enableSubscriptionFeeding = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_SUBSCRIPTION_FEEDING);
+                //if(syncType.equals(SyncType.TYPE_COMMODITY_ACCOUNTING)){
+                //    if(org.getCommodityAccounting()){
+                //        if(enableSubscriptionFeeding){
+                //            doGroupNames = new String[]{"ProductsGroup", "DocumentGroup", "SettingsGroup", "SubscriptionGroup"};
+                //        } else {
+                //            doGroupNames = new String[]{"ProductsGroup", "DocumentGroup", "SettingsGroup"};
+                //        }
+                //    } else {
+                //        doGroupNames = new String[]{"SettingsGroup"};
+                //    }
+                //} else {
+                //    if(org.getCommodityAccounting()){
+                //        if(enableSubscriptionFeeding){
+                //            doGroupNames = new String[]{"ProductsGroup", "DocumentGroup", "SettingsGroup", "LibraryGroup", "SubscriptionGroup"};
+                //        } else {
+                //            doGroupNames = new String[]{"ProductsGroup", "DocumentGroup", "SettingsGroup", "LibraryGroup"};
+                //        }
+                //    } else {
+                //        doGroupNames = new String[]{"SettingsGroup", "LibraryGroup"};
+                //    }
+                //}
+                //manager = new Manager(org.getIdOfOrg(), doGroupNames);
+                List<String> groups = new ArrayList<String>();
+                groups.add("SettingsGroup");
+                /* В короткой синхронизации не участвует библиотека */
+                if(!syncType.equals(SyncType.TYPE_COMMODITY_ACCOUNTING)) groups.add("LibraryGroup");
+
+                /* Если включена опция товарного учета у организации */
+                if(org.getCommodityAccounting()) {
+                    groups.addAll(Arrays.asList("ProductsGroup", "DocumentGroup"));
+                    /* В обработка абонентного питания*/
+                    if(enableSubscriptionFeeding) groups.add("SubscriptionGroup");
                 }
-                manager = new Manager(org.getIdOfOrg(), doGroupNames);
+                manager = new Manager(org.getIdOfOrg(), groups);
                 manager.buildRO(roNode);
             }
 
