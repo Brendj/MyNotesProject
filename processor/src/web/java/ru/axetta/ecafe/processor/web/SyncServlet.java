@@ -65,7 +65,6 @@ public class SyncServlet extends HttpServlet {
             // Read XML request
             try {
                 requestData = readRequest(request);
-                //requestData = readRequestFromFile();  /* For tests only!!! */
             } catch (Exception e) {
                 logger.error("Failed to parse request", e);
                 final String format = String.format("Failed to parse request: %s", e.getMessage());
