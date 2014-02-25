@@ -32,15 +32,15 @@
 
         <property name="orgOwner" column="OrgOwner" type="long"/>
 
-        <many-to-one name="prohibition" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Prohibition">
+        <many-to-one name="prohibition" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Prohibition">
             <column name="IdOfProhibition" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="good" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good">
+        <many-to-one name="good" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good">
             <column name="IdOfGood" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="goodsGroup" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup">
+        <many-to-one name="goodsGroup" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup">
             <column name="IdOfGoodsGroup" not-null="false" />
         </many-to-one>
 
