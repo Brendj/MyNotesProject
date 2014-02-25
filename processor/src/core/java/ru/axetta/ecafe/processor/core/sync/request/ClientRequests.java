@@ -18,31 +18,10 @@ public class ClientRequests {
 
     ClientRequests(Node clientRequestNode) {
         this.responseTempCardOperation = XMLUtils.findFirstChildElement(clientRequestNode, "TempCardsRequest") != null;
-        //Node responseClientGuardianNode = XMLUtils.findFirstChildElement(clientRequestNode, "ClientGuardianRequest");
-        //if(responseClientGuardianNode!=null){
-        //    Long v = XMLUtils.getLongAttributeValue(responseClientGuardianNode, "V");
-        //    responseClientGuardian = (v==null?0L:v);
-        //} else {
-        //    responseClientGuardian=null;
-        //}
-        //this.responseClientGuardian = XMLUtils.findFirstChildElement(clientRequestNode, "ClientGuardianRequest") != null;
     }
 
     public Boolean getResponseTempCardOperation() {
         return responseTempCardOperation;
     }
-
-    //public Long getResponseClientGuardian() {
-    //    return responseClientGuardian;
-    //}
-
-    //public static ClientRequests build(Node clientRequestNode) throws Exception{
-    //    Node responseTempCardOperationNode = XMLUtils.findFirstChildElement(clientRequestNode, "TempCardsRequest");
-    //    return new ClientRequests(responseTempCardOperationNode!=null);
-    //}
-
-    //public Boolean getResponseClientGuardian() {
-    //    return responseClientGuardian;
-    //}
 
 }
