@@ -50,21 +50,6 @@ public class ActOfInventorization extends SupplierRequestDistributedObject /*Inv
         return false;
     }
 
-    //@Override
-    //@SuppressWarnings("unchecked")
-    //protected boolean addReceiverRestriction(Criteria criteria, Session session, String supplierOrgId, boolean isReceiver) {
-    //    final String s = "select distinct ai.globalId from InternalIncomingDocument iid left join iid.wayBill wb left join iid.actOfInventorization ai where ";
-    //    Query query = session.createQuery(s +(isReceiver?"wb.receiver":"wb.shipper")+"=:idOdOrg");
-    //    query.setParameter("idOdOrg", supplierOrgId);
-    //    List<Long> ids = query.list();
-    //    if(ids!=null && !ids.isEmpty()) {
-    //        criteria.add(Restrictions.in("globalId", ids));
-    //        return true;
-    //    } else {
-    //        return false;
-    //    }
-    //}
-
     @Override
     public void createProjections(Criteria criteria) {
         ProjectionList projectionList = Projections.projectionList();

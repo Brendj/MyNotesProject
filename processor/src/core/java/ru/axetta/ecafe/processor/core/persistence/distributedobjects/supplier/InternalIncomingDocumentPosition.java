@@ -53,7 +53,7 @@ public class InternalIncomingDocumentPosition extends SupplierRequestDistributed
     @Override
     protected boolean hasWayBillLinks(Session session) throws DistributedObjectException{
         InternalIncomingDocument iid  = DAOUtils.findDistributedObjectByRefGUID(InternalIncomingDocument.class, session, guidOfIID);
-        return !StringUtils.isEmpty(iid.getGuidOfWB());
+        return iid!=null && !StringUtils.isEmpty(iid.getGuidOfWB());
     }
 
     @Override

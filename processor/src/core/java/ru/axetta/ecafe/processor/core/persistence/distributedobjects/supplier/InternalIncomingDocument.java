@@ -51,14 +51,9 @@ public class InternalIncomingDocument extends SupplierRequestDistributedObject {
     private Set<InternalIncomingDocumentPosition> internalIncomingDocumentPositionInternal;
 
     @Override
-    protected boolean hasWayBillLinks(Session session) {
-        try {
-            WayBill wb  = DAOUtils.findDistributedObjectByRefGUID(WayBill.class, session, guidOfWB);
-            if(wb==null) return false;
-            else return true;
-        } catch (DistributedObjectException e) {
-            return false;
-        }
+    protected boolean hasWayBillLinks(Session session) throws DistributedObjectException{
+        WayBill wb  = DAOUtils.findDistributedObjectByRefGUID(WayBill.class, session, guidOfWB);
+        return wb != null;
     }
 
     @Override
