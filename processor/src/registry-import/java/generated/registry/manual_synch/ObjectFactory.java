@@ -25,39 +25,55 @@ import javax.xml.namespace.QName;
 public class ObjectFactory {
 
     private final static QName _LoadRegistryChangeRevisions_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeRevisions");
-    private final static QName _CommentRegistryChangeErrorResponse_QNAME = new QName("http://ru.axetta.ecafe", "commentRegistryChangeErrorResponse");
     private final static QName _GenerateLinkingTokenResponse_QNAME = new QName("http://ru.axetta.ecafe", "generateLinkingTokenResponse");
     private final static QName _RegisterClientsResponse_QNAME = new QName("http://ru.axetta.ecafe", "registerClientsResponse");
     private final static QName _RegisterVisitorTempCard_QNAME = new QName("http://ru.axetta.ecafe", "registerVisitorTempCard");
-    private final static QName _AddRegistryChangeErrorResponse_QNAME = new QName("http://ru.axetta.ecafe", "addRegistryChangeErrorResponse");
-    private final static QName _ProceedRegitryChangeItemResponse_QNAME = new QName("http://ru.axetta.ecafe", "proceedRegitryChangeItemResponse");
-    private final static QName _RefreshRegistryChangeItems_QNAME = new QName("http://ru.axetta.ecafe", "refreshRegistryChangeItems");
-    private final static QName _RegisterVisitorResponse_QNAME = new QName("http://ru.axetta.ecafe", "registerVisitorResponse");
-    private final static QName _RegisterTempCardResponse_QNAME = new QName("http://ru.axetta.ecafe", "registerTempCardResponse");
-    private final static QName _GetLastTempCardOperationResponse_QNAME = new QName("http://ru.axetta.ecafe", "getLastTempCardOperationResponse");
+    private final static QName _LoadRegistryChangeItemsInternalResponse_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeItemsInternalResponse");
+    private final static QName _ChangeCardOwner_QNAME = new QName("http://ru.axetta.ecafe", "changeCardOwner");
+    private final static QName _CommentRegistryChangeErrorInternal_QNAME = new QName("http://ru.axetta.ecafe", "commentRegistryChangeErrorInternal");
+    private final static QName _LoadRegistryChangeRevisionsInternalResponse_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeRevisionsInternalResponse");
     private final static QName _LoadRegistryChangeItemsResponse_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeItemsResponse");
-    private final static QName _RefreshRegistryChangeItemsResponse_QNAME = new QName("http://ru.axetta.ecafe", "refreshRegistryChangeItemsResponse");
-    private final static QName _FrontControllerException_QNAME = new QName("http://ru.axetta.ecafe", "FrontControllerException");
-    private final static QName _RegisterTempCard_QNAME = new QName("http://ru.axetta.ecafe", "registerTempCard");
-    private final static QName _RegisterCard_QNAME = new QName("http://ru.axetta.ecafe", "registerCard");
+    private final static QName _GetLastTempCardOperationResponse_QNAME = new QName("http://ru.axetta.ecafe", "getLastTempCardOperationResponse");
+    private final static QName _CommentRegistryChangeErrorInternalResponse_QNAME = new QName("http://ru.axetta.ecafe", "commentRegistryChangeErrorInternalResponse");
+    private final static QName _LoadRegistryChangeItemsInternal_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeItemsInternal");
+    private final static QName _RefreshRegistryChangeItemsInternalResponse_QNAME = new QName("http://ru.axetta.ecafe", "refreshRegistryChangeItemsInternalResponse");
     private final static QName _RegisterCardResponse_QNAME = new QName("http://ru.axetta.ecafe", "registerCardResponse");
     private final static QName _ProceedRegitryChangeItem_QNAME = new QName("http://ru.axetta.ecafe", "proceedRegitryChangeItem");
-    private final static QName _RegisterVisitorTempCardResponse_QNAME = new QName("http://ru.axetta.ecafe", "registerVisitorTempCardResponse");
-    private final static QName _RegisterVisitor_QNAME = new QName("http://ru.axetta.ecafe", "registerVisitor");
+    private final static QName _ProceedRegitryChangeItemInternal_QNAME = new QName("http://ru.axetta.ecafe", "proceedRegitryChangeItemInternal");
     private final static QName _CheckVisitorByCardResponse_QNAME = new QName("http://ru.axetta.ecafe", "checkVisitorByCardResponse");
-    private final static QName _LoadRegistryChangeItems_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeItems");
+    private final static QName _RefreshRegistryChangeItemsInternal_QNAME = new QName("http://ru.axetta.ecafe", "refreshRegistryChangeItemsInternal");
     private final static QName _LoadRegistryChangeErrorItems_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeErrorItems");
-    private final static QName _CommentRegistryChangeError_QNAME = new QName("http://ru.axetta.ecafe", "commentRegistryChangeError");
     private final static QName _GenerateLinkingToken_QNAME = new QName("http://ru.axetta.ecafe", "generateLinkingToken");
-    private final static QName _LoadRegistryChangeErrorItemsResponse_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeErrorItemsResponse");
-    private final static QName _TestResponse_QNAME = new QName("http://ru.axetta.ecafe", "testResponse");
     private final static QName _RegisterClients_QNAME = new QName("http://ru.axetta.ecafe", "registerClients");
     private final static QName _CheckVisitorByCard_QNAME = new QName("http://ru.axetta.ecafe", "checkVisitorByCard");
-    private final static QName _Test_QNAME = new QName("http://ru.axetta.ecafe", "test");
     private final static QName _AddRegistryChangeError_QNAME = new QName("http://ru.axetta.ecafe", "addRegistryChangeError");
-    private final static QName _LoadRegistryChangeRevisionsResponse_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeRevisionsResponse");
-    private final static QName _GetLastTempCardOperation_QNAME = new QName("http://ru.axetta.ecafe", "getLastTempCardOperation");
     private final static QName _Exception_QNAME = new QName("http://ru.axetta.ecafe", "Exception");
+    private final static QName _LoadRegistryChangeRevisionsResponse_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeRevisionsResponse");
+    private final static QName _CommentRegistryChangeErrorResponse_QNAME = new QName("http://ru.axetta.ecafe", "commentRegistryChangeErrorResponse");
+    private final static QName _ChangeCardOwnerResponse_QNAME = new QName("http://ru.axetta.ecafe", "changeCardOwnerResponse");
+    private final static QName _AddRegistryChangeErrorResponse_QNAME = new QName("http://ru.axetta.ecafe", "addRegistryChangeErrorResponse");
+    private final static QName _ProceedRegitryChangeItemResponse_QNAME = new QName("http://ru.axetta.ecafe", "proceedRegitryChangeItemResponse");
+    private final static QName _RegisterVisitorResponse_QNAME = new QName("http://ru.axetta.ecafe", "registerVisitorResponse");
+    private final static QName _RefreshRegistryChangeItems_QNAME = new QName("http://ru.axetta.ecafe", "refreshRegistryChangeItems");
+    private final static QName _LoadRegistryChangeErrorItemsInternalResponse_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeErrorItemsInternalResponse");
+    private final static QName _RegisterTempCardResponse_QNAME = new QName("http://ru.axetta.ecafe", "registerTempCardResponse");
+    private final static QName _RefreshRegistryChangeItemsResponse_QNAME = new QName("http://ru.axetta.ecafe", "refreshRegistryChangeItemsResponse");
+    private final static QName _AddRegistryChangeErrorInternalResponse_QNAME = new QName("http://ru.axetta.ecafe", "addRegistryChangeErrorInternalResponse");
+    private final static QName _AddRegistryChangeErrorInternal_QNAME = new QName("http://ru.axetta.ecafe", "addRegistryChangeErrorInternal");
+    private final static QName _RegisterTempCard_QNAME = new QName("http://ru.axetta.ecafe", "registerTempCard");
+    private final static QName _FrontControllerException_QNAME = new QName("http://ru.axetta.ecafe", "FrontControllerException");
+    private final static QName _RegisterCard_QNAME = new QName("http://ru.axetta.ecafe", "registerCard");
+    private final static QName _LoadRegistryChangeErrorItemsInternal_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeErrorItemsInternal");
+    private final static QName _ProceedRegitryChangeItemInternalResponse_QNAME = new QName("http://ru.axetta.ecafe", "proceedRegitryChangeItemInternalResponse");
+    private final static QName _RegisterVisitorTempCardResponse_QNAME = new QName("http://ru.axetta.ecafe", "registerVisitorTempCardResponse");
+    private final static QName _RegisterVisitor_QNAME = new QName("http://ru.axetta.ecafe", "registerVisitor");
+    private final static QName _LoadRegistryChangeItems_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeItems");
+    private final static QName _CommentRegistryChangeError_QNAME = new QName("http://ru.axetta.ecafe", "commentRegistryChangeError");
+    private final static QName _LoadRegistryChangeErrorItemsResponse_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeErrorItemsResponse");
+    private final static QName _LoadRegistryChangeRevisionsInternal_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeRevisionsInternal");
+    private final static QName _TestResponse_QNAME = new QName("http://ru.axetta.ecafe", "testResponse");
+    private final static QName _Test_QNAME = new QName("http://ru.axetta.ecafe", "test");
+    private final static QName _GetLastTempCardOperation_QNAME = new QName("http://ru.axetta.ecafe", "getLastTempCardOperation");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: generated.registry.manual_synch
@@ -67,51 +83,51 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link RegisterClients }
+     * Create an instance of {@link ProceedRegitryChangeItem }
      * 
      */
-    public RegisterClients createRegisterClients() {
-        return new RegisterClients();
+    public ProceedRegitryChangeItem createProceedRegitryChangeItem() {
+        return new ProceedRegitryChangeItem();
     }
 
     /**
-     * Create an instance of {@link RegisterCard }
+     * Create an instance of {@link LoadRegistryChangeRevisions }
      * 
      */
-    public RegisterCard createRegisterCard() {
-        return new RegisterCard();
+    public LoadRegistryChangeRevisions createLoadRegistryChangeRevisions() {
+        return new LoadRegistryChangeRevisions();
     }
 
     /**
-     * Create an instance of {@link RefreshRegistryChangeItemsResponse }
+     * Create an instance of {@link TempCardOperationItem }
      * 
      */
-    public RefreshRegistryChangeItemsResponse createRefreshRegistryChangeItemsResponse() {
-        return new RefreshRegistryChangeItemsResponse();
+    public TempCardOperationItem createTempCardOperationItem() {
+        return new TempCardOperationItem();
     }
 
     /**
-     * Create an instance of {@link RegistryChangeErrorItem }
+     * Create an instance of {@link CommentRegistryChangeErrorInternalResponse }
      * 
      */
-    public RegistryChangeErrorItem createRegistryChangeErrorItem() {
-        return new RegistryChangeErrorItem();
+    public CommentRegistryChangeErrorInternalResponse createCommentRegistryChangeErrorInternalResponse() {
+        return new CommentRegistryChangeErrorInternalResponse();
     }
 
     /**
-     * Create an instance of {@link LoadRegistryChangeErrorItemsResponse }
+     * Create an instance of {@link LoadRegistryChangeItemsResponse }
      * 
      */
-    public LoadRegistryChangeErrorItemsResponse createLoadRegistryChangeErrorItemsResponse() {
-        return new LoadRegistryChangeErrorItemsResponse();
+    public LoadRegistryChangeItemsResponse createLoadRegistryChangeItemsResponse() {
+        return new LoadRegistryChangeItemsResponse();
     }
 
     /**
-     * Create an instance of {@link TestResponse }
+     * Create an instance of {@link VisitorItem }
      * 
      */
-    public TestResponse createTestResponse() {
-        return new TestResponse();
+    public VisitorItem createVisitorItem() {
+        return new VisitorItem();
     }
 
     /**
@@ -131,86 +147,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link RegistryChangeItem }
-     * 
-     */
-    public RegistryChangeItem createRegistryChangeItem() {
-        return new RegistryChangeItem();
-    }
-
-    /**
-     * Create an instance of {@link CheckVisitorByCardResponse }
-     * 
-     */
-    public CheckVisitorByCardResponse createCheckVisitorByCardResponse() {
-        return new CheckVisitorByCardResponse();
-    }
-
-    /**
-     * Create an instance of {@link CommentRegistryChangeError }
-     * 
-     */
-    public CommentRegistryChangeError createCommentRegistryChangeError() {
-        return new CommentRegistryChangeError();
-    }
-
-    /**
-     * Create an instance of {@link CommentRegistryChangeErrorResponse }
-     * 
-     */
-    public CommentRegistryChangeErrorResponse createCommentRegistryChangeErrorResponse() {
-        return new CommentRegistryChangeErrorResponse();
-    }
-
-    /**
-     * Create an instance of {@link VisitorItem }
-     * 
-     */
-    public VisitorItem createVisitorItem() {
-        return new VisitorItem();
-    }
-
-    /**
-     * Create an instance of {@link LoadRegistryChangeItemsResponse }
-     * 
-     */
-    public LoadRegistryChangeItemsResponse createLoadRegistryChangeItemsResponse() {
-        return new LoadRegistryChangeItemsResponse();
-    }
-
-    /**
-     * Create an instance of {@link Test }
-     * 
-     */
-    public Test createTest() {
-        return new Test();
-    }
-
-    /**
-     * Create an instance of {@link LoadRegistryChangeErrorItems }
-     * 
-     */
-    public LoadRegistryChangeErrorItems createLoadRegistryChangeErrorItems() {
-        return new LoadRegistryChangeErrorItems();
-    }
-
-    /**
-     * Create an instance of {@link RegisterClientResult }
-     * 
-     */
-    public RegisterClientResult createRegisterClientResult() {
-        return new RegisterClientResult();
-    }
-
-    /**
-     * Create an instance of {@link AddRegistryChangeError }
-     * 
-     */
-    public AddRegistryChangeError createAddRegistryChangeError() {
-        return new AddRegistryChangeError();
-    }
-
-    /**
      * Create an instance of {@link GenerateLinkingToken }
      * 
      */
@@ -219,11 +155,43 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Exception }
+     * Create an instance of {@link RegistryChangeErrorItem }
      * 
      */
-    public Exception createException() {
-        return new Exception();
+    public RegistryChangeErrorItem createRegistryChangeErrorItem() {
+        return new RegistryChangeErrorItem();
+    }
+
+    /**
+     * Create an instance of {@link TestResponse }
+     * 
+     */
+    public TestResponse createTestResponse() {
+        return new TestResponse();
+    }
+
+    /**
+     * Create an instance of {@link AddRegistryChangeErrorInternalResponse }
+     * 
+     */
+    public AddRegistryChangeErrorInternalResponse createAddRegistryChangeErrorInternalResponse() {
+        return new AddRegistryChangeErrorInternalResponse();
+    }
+
+    /**
+     * Create an instance of {@link LoadRegistryChangeRevisionsInternal }
+     * 
+     */
+    public LoadRegistryChangeRevisionsInternal createLoadRegistryChangeRevisionsInternal() {
+        return new LoadRegistryChangeRevisionsInternal();
+    }
+
+    /**
+     * Create an instance of {@link LoadRegistryChangeItemsInternalResponse }
+     * 
+     */
+    public LoadRegistryChangeItemsInternalResponse createLoadRegistryChangeItemsInternalResponse() {
+        return new LoadRegistryChangeItemsInternalResponse();
     }
 
     /**
@@ -235,35 +203,51 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link RegisterTempCardResponse }
+     * Create an instance of {@link AddRegistryChangeError }
      * 
      */
-    public RegisterTempCardResponse createRegisterTempCardResponse() {
-        return new RegisterTempCardResponse();
+    public AddRegistryChangeError createAddRegistryChangeError() {
+        return new AddRegistryChangeError();
     }
 
     /**
-     * Create an instance of {@link ProceedRegitryChangeItemResponse }
+     * Create an instance of {@link CommentRegistryChangeErrorResponse }
      * 
      */
-    public ProceedRegitryChangeItemResponse createProceedRegitryChangeItemResponse() {
-        return new ProceedRegitryChangeItemResponse();
+    public CommentRegistryChangeErrorResponse createCommentRegistryChangeErrorResponse() {
+        return new CommentRegistryChangeErrorResponse();
     }
 
     /**
-     * Create an instance of {@link CheckVisitorByCard }
+     * Create an instance of {@link FrontControllerException }
      * 
      */
-    public CheckVisitorByCard createCheckVisitorByCard() {
-        return new CheckVisitorByCard();
+    public FrontControllerException createFrontControllerException() {
+        return new FrontControllerException();
     }
 
     /**
-     * Create an instance of {@link ClientDesc }
+     * Create an instance of {@link ProceedRegitryChangeItemInternalResponse }
      * 
      */
-    public ClientDesc createClientDesc() {
-        return new ClientDesc();
+    public ProceedRegitryChangeItemInternalResponse createProceedRegitryChangeItemInternalResponse() {
+        return new ProceedRegitryChangeItemInternalResponse();
+    }
+
+    /**
+     * Create an instance of {@link RefreshRegistryChangeItemsInternal }
+     * 
+     */
+    public RefreshRegistryChangeItemsInternal createRefreshRegistryChangeItemsInternal() {
+        return new RefreshRegistryChangeItemsInternal();
+    }
+
+    /**
+     * Create an instance of {@link RegisterTempCard }
+     * 
+     */
+    public RegisterTempCard createRegisterTempCard() {
+        return new RegisterTempCard();
     }
 
     /**
@@ -283,11 +267,51 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link RegisterClientsResponse }
+     * Create an instance of {@link Exception }
      * 
      */
-    public RegisterClientsResponse createRegisterClientsResponse() {
-        return new RegisterClientsResponse();
+    public Exception createException() {
+        return new Exception();
+    }
+
+    /**
+     * Create an instance of {@link LoadRegistryChangeErrorItemsResponse }
+     * 
+     */
+    public LoadRegistryChangeErrorItemsResponse createLoadRegistryChangeErrorItemsResponse() {
+        return new LoadRegistryChangeErrorItemsResponse();
+    }
+
+    /**
+     * Create an instance of {@link RefreshRegistryChangeItemsInternalResponse }
+     * 
+     */
+    public RefreshRegistryChangeItemsInternalResponse createRefreshRegistryChangeItemsInternalResponse() {
+        return new RefreshRegistryChangeItemsInternalResponse();
+    }
+
+    /**
+     * Create an instance of {@link RegistryChangeItem }
+     * 
+     */
+    public RegistryChangeItem createRegistryChangeItem() {
+        return new RegistryChangeItem();
+    }
+
+    /**
+     * Create an instance of {@link ChangeCardOwnerResponse }
+     * 
+     */
+    public ChangeCardOwnerResponse createChangeCardOwnerResponse() {
+        return new ChangeCardOwnerResponse();
+    }
+
+    /**
+     * Create an instance of {@link ProceedRegitryChangeItemInternal }
+     * 
+     */
+    public ProceedRegitryChangeItemInternal createProceedRegitryChangeItemInternal() {
+        return new ProceedRegitryChangeItemInternal();
     }
 
     /**
@@ -299,75 +323,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link RegisterTempCard }
+     * Create an instance of {@link CommentRegistryChangeErrorInternal }
      * 
      */
-    public RegisterTempCard createRegisterTempCard() {
-        return new RegisterTempCard();
-    }
-
-    /**
-     * Create an instance of {@link FrontControllerException }
-     * 
-     */
-    public FrontControllerException createFrontControllerException() {
-        return new FrontControllerException();
-    }
-
-    /**
-     * Create an instance of {@link RegisterCardResponse }
-     * 
-     */
-    public RegisterCardResponse createRegisterCardResponse() {
-        return new RegisterCardResponse();
-    }
-
-    /**
-     * Create an instance of {@link TempCardOperationItem }
-     * 
-     */
-    public TempCardOperationItem createTempCardOperationItem() {
-        return new TempCardOperationItem();
-    }
-
-    /**
-     * Create an instance of {@link LoadRegistryChangeRevisionsResponse }
-     * 
-     */
-    public LoadRegistryChangeRevisionsResponse createLoadRegistryChangeRevisionsResponse() {
-        return new LoadRegistryChangeRevisionsResponse();
-    }
-
-    /**
-     * Create an instance of {@link LoadRegistryChangeRevisions }
-     * 
-     */
-    public LoadRegistryChangeRevisions createLoadRegistryChangeRevisions() {
-        return new LoadRegistryChangeRevisions();
-    }
-
-    /**
-     * Create an instance of {@link GetLastTempCardOperationResponse }
-     * 
-     */
-    public GetLastTempCardOperationResponse createGetLastTempCardOperationResponse() {
-        return new GetLastTempCardOperationResponse();
-    }
-
-    /**
-     * Create an instance of {@link AddRegistryChangeErrorResponse }
-     * 
-     */
-    public AddRegistryChangeErrorResponse createAddRegistryChangeErrorResponse() {
-        return new AddRegistryChangeErrorResponse();
-    }
-
-    /**
-     * Create an instance of {@link RegisterVisitorTempCard }
-     * 
-     */
-    public RegisterVisitorTempCard createRegisterVisitorTempCard() {
-        return new RegisterVisitorTempCard();
+    public CommentRegistryChangeErrorInternal createCommentRegistryChangeErrorInternal() {
+        return new CommentRegistryChangeErrorInternal();
     }
 
     /**
@@ -379,11 +339,195 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ProceedRegitryChangeItem }
+     * Create an instance of {@link RegisterCardResponse }
      * 
      */
-    public ProceedRegitryChangeItem createProceedRegitryChangeItem() {
-        return new ProceedRegitryChangeItem();
+    public RegisterCardResponse createRegisterCardResponse() {
+        return new RegisterCardResponse();
+    }
+
+    /**
+     * Create an instance of {@link LoadRegistryChangeItemsInternal }
+     * 
+     */
+    public LoadRegistryChangeItemsInternal createLoadRegistryChangeItemsInternal() {
+        return new LoadRegistryChangeItemsInternal();
+    }
+
+    /**
+     * Create an instance of {@link LoadRegistryChangeRevisionsInternalResponse }
+     * 
+     */
+    public LoadRegistryChangeRevisionsInternalResponse createLoadRegistryChangeRevisionsInternalResponse() {
+        return new LoadRegistryChangeRevisionsInternalResponse();
+    }
+
+    /**
+     * Create an instance of {@link Test }
+     * 
+     */
+    public Test createTest() {
+        return new Test();
+    }
+
+    /**
+     * Create an instance of {@link RegisterCard }
+     * 
+     */
+    public RegisterCard createRegisterCard() {
+        return new RegisterCard();
+    }
+
+    /**
+     * Create an instance of {@link ChangeCardOwner }
+     * 
+     */
+    public ChangeCardOwner createChangeCardOwner() {
+        return new ChangeCardOwner();
+    }
+
+    /**
+     * Create an instance of {@link CommentRegistryChangeError }
+     * 
+     */
+    public CommentRegistryChangeError createCommentRegistryChangeError() {
+        return new CommentRegistryChangeError();
+    }
+
+    /**
+     * Create an instance of {@link LoadRegistryChangeErrorItemsInternal }
+     * 
+     */
+    public LoadRegistryChangeErrorItemsInternal createLoadRegistryChangeErrorItemsInternal() {
+        return new LoadRegistryChangeErrorItemsInternal();
+    }
+
+    /**
+     * Create an instance of {@link LoadRegistryChangeRevisionsResponse }
+     * 
+     */
+    public LoadRegistryChangeRevisionsResponse createLoadRegistryChangeRevisionsResponse() {
+        return new LoadRegistryChangeRevisionsResponse();
+    }
+
+    /**
+     * Create an instance of {@link AddRegistryChangeErrorInternal }
+     * 
+     */
+    public AddRegistryChangeErrorInternal createAddRegistryChangeErrorInternal() {
+        return new AddRegistryChangeErrorInternal();
+    }
+
+    /**
+     * Create an instance of {@link RegisterClientsResponse }
+     * 
+     */
+    public RegisterClientsResponse createRegisterClientsResponse() {
+        return new RegisterClientsResponse();
+    }
+
+    /**
+     * Create an instance of {@link LoadRegistryChangeErrorItems }
+     * 
+     */
+    public LoadRegistryChangeErrorItems createLoadRegistryChangeErrorItems() {
+        return new LoadRegistryChangeErrorItems();
+    }
+
+    /**
+     * Create an instance of {@link GetLastTempCardOperationResponse }
+     * 
+     */
+    public GetLastTempCardOperationResponse createGetLastTempCardOperationResponse() {
+        return new GetLastTempCardOperationResponse();
+    }
+
+    /**
+     * Create an instance of {@link CheckVisitorByCard }
+     * 
+     */
+    public CheckVisitorByCard createCheckVisitorByCard() {
+        return new CheckVisitorByCard();
+    }
+
+    /**
+     * Create an instance of {@link ProceedRegitryChangeItemResponse }
+     * 
+     */
+    public ProceedRegitryChangeItemResponse createProceedRegitryChangeItemResponse() {
+        return new ProceedRegitryChangeItemResponse();
+    }
+
+    /**
+     * Create an instance of {@link RegisterClients }
+     * 
+     */
+    public RegisterClients createRegisterClients() {
+        return new RegisterClients();
+    }
+
+    /**
+     * Create an instance of {@link ClientDesc }
+     * 
+     */
+    public ClientDesc createClientDesc() {
+        return new ClientDesc();
+    }
+
+    /**
+     * Create an instance of {@link RegisterVisitorTempCard }
+     * 
+     */
+    public RegisterVisitorTempCard createRegisterVisitorTempCard() {
+        return new RegisterVisitorTempCard();
+    }
+
+    /**
+     * Create an instance of {@link RegisterClientResult }
+     * 
+     */
+    public RegisterClientResult createRegisterClientResult() {
+        return new RegisterClientResult();
+    }
+
+    /**
+     * Create an instance of {@link AddRegistryChangeErrorResponse }
+     * 
+     */
+    public AddRegistryChangeErrorResponse createAddRegistryChangeErrorResponse() {
+        return new AddRegistryChangeErrorResponse();
+    }
+
+    /**
+     * Create an instance of {@link CheckVisitorByCardResponse }
+     * 
+     */
+    public CheckVisitorByCardResponse createCheckVisitorByCardResponse() {
+        return new CheckVisitorByCardResponse();
+    }
+
+    /**
+     * Create an instance of {@link LoadRegistryChangeErrorItemsInternalResponse }
+     * 
+     */
+    public LoadRegistryChangeErrorItemsInternalResponse createLoadRegistryChangeErrorItemsInternalResponse() {
+        return new LoadRegistryChangeErrorItemsInternalResponse();
+    }
+
+    /**
+     * Create an instance of {@link RegisterTempCardResponse }
+     * 
+     */
+    public RegisterTempCardResponse createRegisterTempCardResponse() {
+        return new RegisterTempCardResponse();
+    }
+
+    /**
+     * Create an instance of {@link RefreshRegistryChangeItemsResponse }
+     * 
+     */
+    public RefreshRegistryChangeItemsResponse createRefreshRegistryChangeItemsResponse() {
+        return new RefreshRegistryChangeItemsResponse();
     }
 
     /**
@@ -393,15 +537,6 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "loadRegistryChangeRevisions")
     public JAXBElement<LoadRegistryChangeRevisions> createLoadRegistryChangeRevisions(LoadRegistryChangeRevisions value) {
         return new JAXBElement<LoadRegistryChangeRevisions>(_LoadRegistryChangeRevisions_QNAME, LoadRegistryChangeRevisions.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link CommentRegistryChangeErrorResponse }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "commentRegistryChangeErrorResponse")
-    public JAXBElement<CommentRegistryChangeErrorResponse> createCommentRegistryChangeErrorResponse(CommentRegistryChangeErrorResponse value) {
-        return new JAXBElement<CommentRegistryChangeErrorResponse>(_CommentRegistryChangeErrorResponse_QNAME, CommentRegistryChangeErrorResponse.class, null, value);
     }
 
     /**
@@ -432,57 +567,39 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link AddRegistryChangeErrorResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link LoadRegistryChangeItemsInternalResponse }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "addRegistryChangeErrorResponse")
-    public JAXBElement<AddRegistryChangeErrorResponse> createAddRegistryChangeErrorResponse(AddRegistryChangeErrorResponse value) {
-        return new JAXBElement<AddRegistryChangeErrorResponse>(_AddRegistryChangeErrorResponse_QNAME, AddRegistryChangeErrorResponse.class, null, value);
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "loadRegistryChangeItemsInternalResponse")
+    public JAXBElement<LoadRegistryChangeItemsInternalResponse> createLoadRegistryChangeItemsInternalResponse(LoadRegistryChangeItemsInternalResponse value) {
+        return new JAXBElement<LoadRegistryChangeItemsInternalResponse>(_LoadRegistryChangeItemsInternalResponse_QNAME, LoadRegistryChangeItemsInternalResponse.class, null, value);
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ProceedRegitryChangeItemResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ChangeCardOwner }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "proceedRegitryChangeItemResponse")
-    public JAXBElement<ProceedRegitryChangeItemResponse> createProceedRegitryChangeItemResponse(ProceedRegitryChangeItemResponse value) {
-        return new JAXBElement<ProceedRegitryChangeItemResponse>(_ProceedRegitryChangeItemResponse_QNAME, ProceedRegitryChangeItemResponse.class, null, value);
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "changeCardOwner")
+    public JAXBElement<ChangeCardOwner> createChangeCardOwner(ChangeCardOwner value) {
+        return new JAXBElement<ChangeCardOwner>(_ChangeCardOwner_QNAME, ChangeCardOwner.class, null, value);
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RefreshRegistryChangeItems }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link CommentRegistryChangeErrorInternal }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "refreshRegistryChangeItems")
-    public JAXBElement<RefreshRegistryChangeItems> createRefreshRegistryChangeItems(RefreshRegistryChangeItems value) {
-        return new JAXBElement<RefreshRegistryChangeItems>(_RefreshRegistryChangeItems_QNAME, RefreshRegistryChangeItems.class, null, value);
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "commentRegistryChangeErrorInternal")
+    public JAXBElement<CommentRegistryChangeErrorInternal> createCommentRegistryChangeErrorInternal(CommentRegistryChangeErrorInternal value) {
+        return new JAXBElement<CommentRegistryChangeErrorInternal>(_CommentRegistryChangeErrorInternal_QNAME, CommentRegistryChangeErrorInternal.class, null, value);
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RegisterVisitorResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link LoadRegistryChangeRevisionsInternalResponse }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "registerVisitorResponse")
-    public JAXBElement<RegisterVisitorResponse> createRegisterVisitorResponse(RegisterVisitorResponse value) {
-        return new JAXBElement<RegisterVisitorResponse>(_RegisterVisitorResponse_QNAME, RegisterVisitorResponse.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RegisterTempCardResponse }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "registerTempCardResponse")
-    public JAXBElement<RegisterTempCardResponse> createRegisterTempCardResponse(RegisterTempCardResponse value) {
-        return new JAXBElement<RegisterTempCardResponse>(_RegisterTempCardResponse_QNAME, RegisterTempCardResponse.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link GetLastTempCardOperationResponse }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "getLastTempCardOperationResponse")
-    public JAXBElement<GetLastTempCardOperationResponse> createGetLastTempCardOperationResponse(GetLastTempCardOperationResponse value) {
-        return new JAXBElement<GetLastTempCardOperationResponse>(_GetLastTempCardOperationResponse_QNAME, GetLastTempCardOperationResponse.class, null, value);
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "loadRegistryChangeRevisionsInternalResponse")
+    public JAXBElement<LoadRegistryChangeRevisionsInternalResponse> createLoadRegistryChangeRevisionsInternalResponse(LoadRegistryChangeRevisionsInternalResponse value) {
+        return new JAXBElement<LoadRegistryChangeRevisionsInternalResponse>(_LoadRegistryChangeRevisionsInternalResponse_QNAME, LoadRegistryChangeRevisionsInternalResponse.class, null, value);
     }
 
     /**
@@ -495,39 +612,39 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RefreshRegistryChangeItemsResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link GetLastTempCardOperationResponse }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "refreshRegistryChangeItemsResponse")
-    public JAXBElement<RefreshRegistryChangeItemsResponse> createRefreshRegistryChangeItemsResponse(RefreshRegistryChangeItemsResponse value) {
-        return new JAXBElement<RefreshRegistryChangeItemsResponse>(_RefreshRegistryChangeItemsResponse_QNAME, RefreshRegistryChangeItemsResponse.class, null, value);
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "getLastTempCardOperationResponse")
+    public JAXBElement<GetLastTempCardOperationResponse> createGetLastTempCardOperationResponse(GetLastTempCardOperationResponse value) {
+        return new JAXBElement<GetLastTempCardOperationResponse>(_GetLastTempCardOperationResponse_QNAME, GetLastTempCardOperationResponse.class, null, value);
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link FrontControllerException }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link CommentRegistryChangeErrorInternalResponse }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "FrontControllerException")
-    public JAXBElement<FrontControllerException> createFrontControllerException(FrontControllerException value) {
-        return new JAXBElement<FrontControllerException>(_FrontControllerException_QNAME, FrontControllerException.class, null, value);
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "commentRegistryChangeErrorInternalResponse")
+    public JAXBElement<CommentRegistryChangeErrorInternalResponse> createCommentRegistryChangeErrorInternalResponse(CommentRegistryChangeErrorInternalResponse value) {
+        return new JAXBElement<CommentRegistryChangeErrorInternalResponse>(_CommentRegistryChangeErrorInternalResponse_QNAME, CommentRegistryChangeErrorInternalResponse.class, null, value);
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RegisterTempCard }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link LoadRegistryChangeItemsInternal }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "registerTempCard")
-    public JAXBElement<RegisterTempCard> createRegisterTempCard(RegisterTempCard value) {
-        return new JAXBElement<RegisterTempCard>(_RegisterTempCard_QNAME, RegisterTempCard.class, null, value);
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "loadRegistryChangeItemsInternal")
+    public JAXBElement<LoadRegistryChangeItemsInternal> createLoadRegistryChangeItemsInternal(LoadRegistryChangeItemsInternal value) {
+        return new JAXBElement<LoadRegistryChangeItemsInternal>(_LoadRegistryChangeItemsInternal_QNAME, LoadRegistryChangeItemsInternal.class, null, value);
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RegisterCard }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link RefreshRegistryChangeItemsInternalResponse }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "registerCard")
-    public JAXBElement<RegisterCard> createRegisterCard(RegisterCard value) {
-        return new JAXBElement<RegisterCard>(_RegisterCard_QNAME, RegisterCard.class, null, value);
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "refreshRegistryChangeItemsInternalResponse")
+    public JAXBElement<RefreshRegistryChangeItemsInternalResponse> createRefreshRegistryChangeItemsInternalResponse(RefreshRegistryChangeItemsInternalResponse value) {
+        return new JAXBElement<RefreshRegistryChangeItemsInternalResponse>(_RefreshRegistryChangeItemsInternalResponse_QNAME, RefreshRegistryChangeItemsInternalResponse.class, null, value);
     }
 
     /**
@@ -549,21 +666,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RegisterVisitorTempCardResponse }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link ProceedRegitryChangeItemInternal }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "registerVisitorTempCardResponse")
-    public JAXBElement<RegisterVisitorTempCardResponse> createRegisterVisitorTempCardResponse(RegisterVisitorTempCardResponse value) {
-        return new JAXBElement<RegisterVisitorTempCardResponse>(_RegisterVisitorTempCardResponse_QNAME, RegisterVisitorTempCardResponse.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link RegisterVisitor }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "registerVisitor")
-    public JAXBElement<RegisterVisitor> createRegisterVisitor(RegisterVisitor value) {
-        return new JAXBElement<RegisterVisitor>(_RegisterVisitor_QNAME, RegisterVisitor.class, null, value);
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "proceedRegitryChangeItemInternal")
+    public JAXBElement<ProceedRegitryChangeItemInternal> createProceedRegitryChangeItemInternal(ProceedRegitryChangeItemInternal value) {
+        return new JAXBElement<ProceedRegitryChangeItemInternal>(_ProceedRegitryChangeItemInternal_QNAME, ProceedRegitryChangeItemInternal.class, null, value);
     }
 
     /**
@@ -576,12 +684,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link LoadRegistryChangeItems }{@code >}}
+     * Create an instance of {@link JAXBElement }{@code <}{@link RefreshRegistryChangeItemsInternal }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "loadRegistryChangeItems")
-    public JAXBElement<LoadRegistryChangeItems> createLoadRegistryChangeItems(LoadRegistryChangeItems value) {
-        return new JAXBElement<LoadRegistryChangeItems>(_LoadRegistryChangeItems_QNAME, LoadRegistryChangeItems.class, null, value);
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "refreshRegistryChangeItemsInternal")
+    public JAXBElement<RefreshRegistryChangeItemsInternal> createRefreshRegistryChangeItemsInternal(RefreshRegistryChangeItemsInternal value) {
+        return new JAXBElement<RefreshRegistryChangeItemsInternal>(_RefreshRegistryChangeItemsInternal_QNAME, RefreshRegistryChangeItemsInternal.class, null, value);
     }
 
     /**
@@ -594,39 +702,12 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link CommentRegistryChangeError }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "commentRegistryChangeError")
-    public JAXBElement<CommentRegistryChangeError> createCommentRegistryChangeError(CommentRegistryChangeError value) {
-        return new JAXBElement<CommentRegistryChangeError>(_CommentRegistryChangeError_QNAME, CommentRegistryChangeError.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GenerateLinkingToken }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "generateLinkingToken")
     public JAXBElement<GenerateLinkingToken> createGenerateLinkingToken(GenerateLinkingToken value) {
         return new JAXBElement<GenerateLinkingToken>(_GenerateLinkingToken_QNAME, GenerateLinkingToken.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link LoadRegistryChangeErrorItemsResponse }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "loadRegistryChangeErrorItemsResponse")
-    public JAXBElement<LoadRegistryChangeErrorItemsResponse> createLoadRegistryChangeErrorItemsResponse(LoadRegistryChangeErrorItemsResponse value) {
-        return new JAXBElement<LoadRegistryChangeErrorItemsResponse>(_LoadRegistryChangeErrorItemsResponse_QNAME, LoadRegistryChangeErrorItemsResponse.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link TestResponse }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "testResponse")
-    public JAXBElement<TestResponse> createTestResponse(TestResponse value) {
-        return new JAXBElement<TestResponse>(_TestResponse_QNAME, TestResponse.class, null, value);
     }
 
     /**
@@ -648,21 +729,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Test }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "test")
-    public JAXBElement<Test> createTest(Test value) {
-        return new JAXBElement<Test>(_Test_QNAME, Test.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link AddRegistryChangeError }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "addRegistryChangeError")
     public JAXBElement<AddRegistryChangeError> createAddRegistryChangeError(AddRegistryChangeError value) {
         return new JAXBElement<AddRegistryChangeError>(_AddRegistryChangeError_QNAME, AddRegistryChangeError.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Exception }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "Exception")
+    public JAXBElement<Exception> createException(Exception value) {
+        return new JAXBElement<Exception>(_Exception_QNAME, Exception.class, null, value);
     }
 
     /**
@@ -675,21 +756,228 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CommentRegistryChangeErrorResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "commentRegistryChangeErrorResponse")
+    public JAXBElement<CommentRegistryChangeErrorResponse> createCommentRegistryChangeErrorResponse(CommentRegistryChangeErrorResponse value) {
+        return new JAXBElement<CommentRegistryChangeErrorResponse>(_CommentRegistryChangeErrorResponse_QNAME, CommentRegistryChangeErrorResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ChangeCardOwnerResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "changeCardOwnerResponse")
+    public JAXBElement<ChangeCardOwnerResponse> createChangeCardOwnerResponse(ChangeCardOwnerResponse value) {
+        return new JAXBElement<ChangeCardOwnerResponse>(_ChangeCardOwnerResponse_QNAME, ChangeCardOwnerResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AddRegistryChangeErrorResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "addRegistryChangeErrorResponse")
+    public JAXBElement<AddRegistryChangeErrorResponse> createAddRegistryChangeErrorResponse(AddRegistryChangeErrorResponse value) {
+        return new JAXBElement<AddRegistryChangeErrorResponse>(_AddRegistryChangeErrorResponse_QNAME, AddRegistryChangeErrorResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ProceedRegitryChangeItemResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "proceedRegitryChangeItemResponse")
+    public JAXBElement<ProceedRegitryChangeItemResponse> createProceedRegitryChangeItemResponse(ProceedRegitryChangeItemResponse value) {
+        return new JAXBElement<ProceedRegitryChangeItemResponse>(_ProceedRegitryChangeItemResponse_QNAME, ProceedRegitryChangeItemResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RegisterVisitorResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "registerVisitorResponse")
+    public JAXBElement<RegisterVisitorResponse> createRegisterVisitorResponse(RegisterVisitorResponse value) {
+        return new JAXBElement<RegisterVisitorResponse>(_RegisterVisitorResponse_QNAME, RegisterVisitorResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RefreshRegistryChangeItems }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "refreshRegistryChangeItems")
+    public JAXBElement<RefreshRegistryChangeItems> createRefreshRegistryChangeItems(RefreshRegistryChangeItems value) {
+        return new JAXBElement<RefreshRegistryChangeItems>(_RefreshRegistryChangeItems_QNAME, RefreshRegistryChangeItems.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link LoadRegistryChangeErrorItemsInternalResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "loadRegistryChangeErrorItemsInternalResponse")
+    public JAXBElement<LoadRegistryChangeErrorItemsInternalResponse> createLoadRegistryChangeErrorItemsInternalResponse(LoadRegistryChangeErrorItemsInternalResponse value) {
+        return new JAXBElement<LoadRegistryChangeErrorItemsInternalResponse>(_LoadRegistryChangeErrorItemsInternalResponse_QNAME, LoadRegistryChangeErrorItemsInternalResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RegisterTempCardResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "registerTempCardResponse")
+    public JAXBElement<RegisterTempCardResponse> createRegisterTempCardResponse(RegisterTempCardResponse value) {
+        return new JAXBElement<RegisterTempCardResponse>(_RegisterTempCardResponse_QNAME, RegisterTempCardResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RefreshRegistryChangeItemsResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "refreshRegistryChangeItemsResponse")
+    public JAXBElement<RefreshRegistryChangeItemsResponse> createRefreshRegistryChangeItemsResponse(RefreshRegistryChangeItemsResponse value) {
+        return new JAXBElement<RefreshRegistryChangeItemsResponse>(_RefreshRegistryChangeItemsResponse_QNAME, RefreshRegistryChangeItemsResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AddRegistryChangeErrorInternalResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "addRegistryChangeErrorInternalResponse")
+    public JAXBElement<AddRegistryChangeErrorInternalResponse> createAddRegistryChangeErrorInternalResponse(AddRegistryChangeErrorInternalResponse value) {
+        return new JAXBElement<AddRegistryChangeErrorInternalResponse>(_AddRegistryChangeErrorInternalResponse_QNAME, AddRegistryChangeErrorInternalResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AddRegistryChangeErrorInternal }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "addRegistryChangeErrorInternal")
+    public JAXBElement<AddRegistryChangeErrorInternal> createAddRegistryChangeErrorInternal(AddRegistryChangeErrorInternal value) {
+        return new JAXBElement<AddRegistryChangeErrorInternal>(_AddRegistryChangeErrorInternal_QNAME, AddRegistryChangeErrorInternal.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RegisterTempCard }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "registerTempCard")
+    public JAXBElement<RegisterTempCard> createRegisterTempCard(RegisterTempCard value) {
+        return new JAXBElement<RegisterTempCard>(_RegisterTempCard_QNAME, RegisterTempCard.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link FrontControllerException }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "FrontControllerException")
+    public JAXBElement<FrontControllerException> createFrontControllerException(FrontControllerException value) {
+        return new JAXBElement<FrontControllerException>(_FrontControllerException_QNAME, FrontControllerException.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RegisterCard }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "registerCard")
+    public JAXBElement<RegisterCard> createRegisterCard(RegisterCard value) {
+        return new JAXBElement<RegisterCard>(_RegisterCard_QNAME, RegisterCard.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link LoadRegistryChangeErrorItemsInternal }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "loadRegistryChangeErrorItemsInternal")
+    public JAXBElement<LoadRegistryChangeErrorItemsInternal> createLoadRegistryChangeErrorItemsInternal(LoadRegistryChangeErrorItemsInternal value) {
+        return new JAXBElement<LoadRegistryChangeErrorItemsInternal>(_LoadRegistryChangeErrorItemsInternal_QNAME, LoadRegistryChangeErrorItemsInternal.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link ProceedRegitryChangeItemInternalResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "proceedRegitryChangeItemInternalResponse")
+    public JAXBElement<ProceedRegitryChangeItemInternalResponse> createProceedRegitryChangeItemInternalResponse(ProceedRegitryChangeItemInternalResponse value) {
+        return new JAXBElement<ProceedRegitryChangeItemInternalResponse>(_ProceedRegitryChangeItemInternalResponse_QNAME, ProceedRegitryChangeItemInternalResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RegisterVisitorTempCardResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "registerVisitorTempCardResponse")
+    public JAXBElement<RegisterVisitorTempCardResponse> createRegisterVisitorTempCardResponse(RegisterVisitorTempCardResponse value) {
+        return new JAXBElement<RegisterVisitorTempCardResponse>(_RegisterVisitorTempCardResponse_QNAME, RegisterVisitorTempCardResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link RegisterVisitor }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "registerVisitor")
+    public JAXBElement<RegisterVisitor> createRegisterVisitor(RegisterVisitor value) {
+        return new JAXBElement<RegisterVisitor>(_RegisterVisitor_QNAME, RegisterVisitor.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link LoadRegistryChangeItems }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "loadRegistryChangeItems")
+    public JAXBElement<LoadRegistryChangeItems> createLoadRegistryChangeItems(LoadRegistryChangeItems value) {
+        return new JAXBElement<LoadRegistryChangeItems>(_LoadRegistryChangeItems_QNAME, LoadRegistryChangeItems.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CommentRegistryChangeError }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "commentRegistryChangeError")
+    public JAXBElement<CommentRegistryChangeError> createCommentRegistryChangeError(CommentRegistryChangeError value) {
+        return new JAXBElement<CommentRegistryChangeError>(_CommentRegistryChangeError_QNAME, CommentRegistryChangeError.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link LoadRegistryChangeErrorItemsResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "loadRegistryChangeErrorItemsResponse")
+    public JAXBElement<LoadRegistryChangeErrorItemsResponse> createLoadRegistryChangeErrorItemsResponse(LoadRegistryChangeErrorItemsResponse value) {
+        return new JAXBElement<LoadRegistryChangeErrorItemsResponse>(_LoadRegistryChangeErrorItemsResponse_QNAME, LoadRegistryChangeErrorItemsResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link LoadRegistryChangeRevisionsInternal }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "loadRegistryChangeRevisionsInternal")
+    public JAXBElement<LoadRegistryChangeRevisionsInternal> createLoadRegistryChangeRevisionsInternal(LoadRegistryChangeRevisionsInternal value) {
+        return new JAXBElement<LoadRegistryChangeRevisionsInternal>(_LoadRegistryChangeRevisionsInternal_QNAME, LoadRegistryChangeRevisionsInternal.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link TestResponse }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "testResponse")
+    public JAXBElement<TestResponse> createTestResponse(TestResponse value) {
+        return new JAXBElement<TestResponse>(_TestResponse_QNAME, TestResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Test }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "test")
+    public JAXBElement<Test> createTest(Test value) {
+        return new JAXBElement<Test>(_Test_QNAME, Test.class, null, value);
+    }
+
+    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link GetLastTempCardOperation }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "getLastTempCardOperation")
     public JAXBElement<GetLastTempCardOperation> createGetLastTempCardOperation(GetLastTempCardOperation value) {
         return new JAXBElement<GetLastTempCardOperation>(_GetLastTempCardOperation_QNAME, GetLastTempCardOperation.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Exception }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "Exception")
-    public JAXBElement<Exception> createException(Exception value) {
-        return new JAXBElement<Exception>(_Exception_QNAME, Exception.class, null, value);
     }
 
 }

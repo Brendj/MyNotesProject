@@ -94,6 +94,32 @@ public interface FrontController {
      * 
      * @param cardNo
      * @param orgId
+     * @param validTime
+     * @param changeTime
+     * @param newOwnerId
+     * @throws FrontControllerException_Exception
+     */
+    @WebMethod
+    @RequestWrapper(localName = "changeCardOwner", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.ChangeCardOwner")
+    @ResponseWrapper(localName = "changeCardOwnerResponse", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.ChangeCardOwnerResponse")
+    public void changeCardOwner(
+        @WebParam(name = "orgId", targetNamespace = "")
+        Long orgId,
+        @WebParam(name = "newOwnerId", targetNamespace = "")
+        Long newOwnerId,
+        @WebParam(name = "cardNo", targetNamespace = "")
+        Long cardNo,
+        @WebParam(name = "changeTime", targetNamespace = "")
+        XMLGregorianCalendar changeTime,
+        @WebParam(name = "validTime", targetNamespace = "")
+        XMLGregorianCalendar validTime)
+        throws FrontControllerException_Exception
+    ;
+
+    /**
+     * 
+     * @param cardNo
+     * @param orgId
      * @return
      *     returns generated.registry.manual_synch.VisitorItem
      * @throws FrontControllerException_Exception
@@ -129,6 +155,26 @@ public interface FrontController {
 
     /**
      * 
+     * @param fullNameValidation
+     * @param operation
+     * @param changesList
+     * @return
+     *     returns java.lang.String
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "proceedRegitryChangeItemInternal", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.ProceedRegitryChangeItemInternal")
+    @ResponseWrapper(localName = "proceedRegitryChangeItemInternalResponse", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.ProceedRegitryChangeItemInternalResponse")
+    public String proceedRegitryChangeItemInternal(
+        @WebParam(name = "changesList", targetNamespace = "")
+        List<Long> changesList,
+        @WebParam(name = "operation", targetNamespace = "")
+        int operation,
+        @WebParam(name = "fullNameValidation", targetNamespace = "")
+        boolean fullNameValidation);
+
+    /**
+     * 
      * @param orgId
      * @param clientDescList
      * @param checkFullNameUniqueness
@@ -152,6 +198,20 @@ public interface FrontController {
 
     /**
      * 
+     * @param idOfOrg
+     * @return
+     *     returns java.util.List<generated.registry.manual_synch.RegistryChangeErrorItem>
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "loadRegistryChangeErrorItemsInternal", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeErrorItemsInternal")
+    @ResponseWrapper(localName = "loadRegistryChangeErrorItemsInternalResponse", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeErrorItemsInternalResponse")
+    public List<RegistryChangeErrorItem> loadRegistryChangeErrorItemsInternal(
+        @WebParam(name = "idOfOrg", targetNamespace = "")
+        long idOfOrg);
+
+    /**
+     * 
      * @param fullNameValidation
      * @param operation
      * @param changesList
@@ -169,6 +229,40 @@ public interface FrontController {
         int operation,
         @WebParam(name = "fullNameValidation", targetNamespace = "")
         boolean fullNameValidation);
+
+    /**
+     * 
+     * @param idOfOrg
+     * @return
+     *     returns java.util.List<generated.registry.manual_synch.RegistryChangeItem>
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "refreshRegistryChangeItemsInternal", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.RefreshRegistryChangeItemsInternal")
+    @ResponseWrapper(localName = "refreshRegistryChangeItemsInternalResponse", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.RefreshRegistryChangeItemsInternalResponse")
+    public List<RegistryChangeItem> refreshRegistryChangeItemsInternal(
+        @WebParam(name = "idOfOrg", targetNamespace = "")
+        long idOfOrg);
+
+    /**
+     * 
+     * @param author
+     * @param idOfRegistryChangeError
+     * @param comment
+     * @return
+     *     returns java.lang.String
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "commentRegistryChangeErrorInternal", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.CommentRegistryChangeErrorInternal")
+    @ResponseWrapper(localName = "commentRegistryChangeErrorInternalResponse", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.CommentRegistryChangeErrorInternalResponse")
+    public String commentRegistryChangeErrorInternal(
+        @WebParam(name = "idOfRegistryChangeError", targetNamespace = "")
+        long idOfRegistryChangeError,
+        @WebParam(name = "comment", targetNamespace = "")
+        String comment,
+        @WebParam(name = "author", targetNamespace = "")
+        String author);
 
     /**
      * 
@@ -275,6 +369,23 @@ public interface FrontController {
 
     /**
      * 
+     * @param idOfOrg
+     * @param revisionDate
+     * @return
+     *     returns java.util.List<generated.registry.manual_synch.RegistryChangeItem>
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "loadRegistryChangeItemsInternal", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeItemsInternal")
+    @ResponseWrapper(localName = "loadRegistryChangeItemsInternalResponse", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeItemsInternalResponse")
+    public List<RegistryChangeItem> loadRegistryChangeItemsInternal(
+        @WebParam(name = "idOfOrg", targetNamespace = "")
+        long idOfOrg,
+        @WebParam(name = "revisionDate", targetNamespace = "")
+        long revisionDate);
+
+    /**
+     * 
      * @param cardNo
      * @param orgId
      * @param validTime
@@ -310,20 +421,6 @@ public interface FrontController {
 
     /**
      * 
-     * @param idOfOrg
-     * @return
-     *     returns java.util.List<java.lang.Long>
-     */
-    @WebMethod
-    @WebResult(targetNamespace = "")
-    @RequestWrapper(localName = "loadRegistryChangeRevisions", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeRevisions")
-    @ResponseWrapper(localName = "loadRegistryChangeRevisionsResponse", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeRevisionsResponse")
-    public List<Long> loadRegistryChangeRevisions(
-        @WebParam(name = "idOfOrg", targetNamespace = "")
-        long idOfOrg);
-
-    /**
-     * 
      * @param orgId
      * @param visitor
      * @return
@@ -341,5 +438,56 @@ public interface FrontController {
         VisitorItem visitor)
         throws FrontControllerException_Exception
     ;
+
+    /**
+     * 
+     * @param idOfOrg
+     * @return
+     *     returns java.util.List<java.lang.Long>
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "loadRegistryChangeRevisions", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeRevisions")
+    @ResponseWrapper(localName = "loadRegistryChangeRevisionsResponse", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeRevisionsResponse")
+    public List<Long> loadRegistryChangeRevisions(
+        @WebParam(name = "idOfOrg", targetNamespace = "")
+        long idOfOrg);
+
+    /**
+     * 
+     * @param idOfOrg
+     * @return
+     *     returns java.util.List<java.lang.Long>
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "loadRegistryChangeRevisionsInternal", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeRevisionsInternal")
+    @ResponseWrapper(localName = "loadRegistryChangeRevisionsInternalResponse", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.LoadRegistryChangeRevisionsInternalResponse")
+    public List<Long> loadRegistryChangeRevisionsInternal(
+        @WebParam(name = "idOfOrg", targetNamespace = "")
+        long idOfOrg);
+
+    /**
+     * 
+     * @param idOfOrg
+     * @param error
+     * @param errorDetails
+     * @param revisionDate
+     * @return
+     *     returns java.lang.String
+     */
+    @WebMethod
+    @WebResult(targetNamespace = "")
+    @RequestWrapper(localName = "addRegistryChangeErrorInternal", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.AddRegistryChangeErrorInternal")
+    @ResponseWrapper(localName = "addRegistryChangeErrorInternalResponse", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.AddRegistryChangeErrorInternalResponse")
+    public String addRegistryChangeErrorInternal(
+        @WebParam(name = "idOfOrg", targetNamespace = "")
+        long idOfOrg,
+        @WebParam(name = "revisionDate", targetNamespace = "")
+        long revisionDate,
+        @WebParam(name = "error", targetNamespace = "")
+        String error,
+        @WebParam(name = "errorDetails", targetNamespace = "")
+        String errorDetails);
 
 }

@@ -90,7 +90,7 @@ public class NSIOrgRegistrySynchErrorPage extends BasicWorkspacePage {
                 return;
             }
             FrontController controller = NSIOrgRegistrySynchPageBase.createController(logger);
-            controller.addRegistryChangeError(idOfOrg, revisionCreateDate, errors.get(errorType), errorDetails);
+            controller.addRegistryChangeErrorInternal(idOfOrg, revisionCreateDate, errors.get(errorType), errorDetails);
         } catch (Exception e) {
             logger.error("Failed to load client by name", e);
             sendError("Произошел критический сбой, пожалуйста, повторите попытку позже");

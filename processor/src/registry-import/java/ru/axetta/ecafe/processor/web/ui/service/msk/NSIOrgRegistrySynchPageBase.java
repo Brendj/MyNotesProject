@@ -163,7 +163,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         if (list.size() < 1) {
             return;
         }
-        String error = controller.proceedRegitryChangeItem(list, ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation);
+        String error = controller.proceedRegitryChangeItemInternal(list, ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation);
         doUpdate();
         if (error == null) {
         } else {
@@ -211,7 +211,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             author = MainPage.getSessionInstance().getCurrentUser().getUserName();
         } catch (Exception e) {
         }
-        String error = controller.commentRegistryChangeError(idOfSelectedError, errorComment, author);
+        String error = controller.commentRegistryChangeErrorInternal(idOfSelectedError, errorComment, author);
         idOfSelectedError = -1L;
         errorComment = "";
         loadErrors();
@@ -268,9 +268,9 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         //  Выполнение запроса к службе
         List<RegistryChangeItem> changedItems = null;
         if (!refresh) {
-            changedItems = controller.loadRegistryChangeItems(getIdOfOrg(), revisionCreateDate);
+            changedItems = controller.loadRegistryChangeItemsInternal(getIdOfOrg(), revisionCreateDate);
         } else {
-            changedItems = controller.refreshRegistryChangeItems(getIdOfOrg());
+            changedItems = controller.refreshRegistryChangeItemsInternal(getIdOfOrg());
         }
         items = new ArrayList<WebRegistryChangeItem>();
         for (RegistryChangeItem i : changedItems) {
@@ -305,7 +305,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             errorMessages = "Не удалось подключиться в веб-службе";
             return;
         }
-        errors = controller.loadRegistryChangeErrorItems(getIdOfOrg());
+        errors = controller.loadRegistryChangeErrorItemsInternal(getIdOfOrg());
     }
 
     private List<Long> loadRevisions () {
@@ -327,7 +327,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         }
 
         //  Выполнение запроса к службе
-        return controller.loadRegistryChangeRevisions(getIdOfOrg());
+        return controller.loadRegistryChangeRevisionsInternal(getIdOfOrg());
     }
 
 

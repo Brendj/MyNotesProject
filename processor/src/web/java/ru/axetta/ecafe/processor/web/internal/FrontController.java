@@ -69,46 +69,41 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "loadRegistryChangeItems")
     public List<RegistryChangeItem> loadRegistryChangeItems(@WebParam(name = "idOfOrg") long idOfOrg,
-                                                            @WebParam(name = "revisionDate") long revisionDate) {
+            @WebParam(name = "revisionDate") long revisionDate) {
         try {
             checkRequestValidity(idOfOrg);
-            List<RegistryChangeItem> items = new ArrayList<RegistryChangeItem>();
-            List<RegistryChange> changes = DAOService.getInstance().getLastRegistryChanges(idOfOrg, revisionDate);
-            for (RegistryChange c : changes) {
-                RegistryChangeItem i = new RegistryChangeItem(c.getIdOfOrg(),
-                                                              c.getIdOfMigrateOrgTo() == null ? -1L : c.getIdOfMigrateOrgTo(),
-                                                              c.getIdOfMigrateOrgFrom() == null ? -1L : c.getIdOfMigrateOrgFrom(),
-                                                              c.getCreateDate(), c.getIdOfRegistryChange(),
-                                                              c.getClientGUID(), c.getFirstName(), c.getSecondName(),
-                                                              c.getSurname(), c.getGroupName(), c.getFirstNameFrom(),
-                                                              c.getSecondNameFrom(), c.getSurnameFrom(), c.getGroupNameFrom(),
-                                                              c.getIdOfClient() == null ? -1L : c.getIdOfClient(),
-                                                              c.getOperation(), c.getApplied());
-                items.add(i);
-            }
-            return items;
-        } catch(FrontControllerException fce) {
-            logger.error("Failed to pass auth", fce);
-            return Collections.EMPTY_LIST;
-        } catch (Exception e) {
-            logger.error("Failed to load registry change items form database", e);
+        } catch (FrontControllerException fce) {
             return Collections.EMPTY_LIST;
         }
+
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                                            loadRegistryChangeItems(idOfOrg, revisionDate);
+    }
+
+    @WebMethod(operationName = "loadRegistryChangeItemsInternal")
+    public List<RegistryChangeItem> loadRegistryChangeItemsInternal(@WebParam(name = "idOfOrg") long idOfOrg,
+            @WebParam(name = "revisionDate") long revisionDate) {
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                loadRegistryChangeItems(idOfOrg, revisionDate);
     }
 
     @WebMethod(operationName = "refreshRegistryChangeItems")
     public List<RegistryChangeItem> refreshRegistryChangeItems(@WebParam(name = "idOfOrg") long idOfOrg) {
         try {
             checkRequestValidity(idOfOrg);
-            RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).syncClientsWithRegistry(idOfOrg,false, new StringBuffer(), true);
-            return loadRegistryChangeItems(idOfOrg, -1L);   //  -1 значит последняя загрузка из Реестров
         } catch(FrontControllerException fce) {
             logger.error("Failed to pass auth", fce);
             return Collections.EMPTY_LIST;
-        } catch (Exception e) {
-            logger.error("Failed to refresh registry change items", e);
         }
-        return Collections.EMPTY_LIST;
+
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                refreshRegistryChangeItems(idOfOrg);
+    }
+
+    @WebMethod(operationName = "refreshRegistryChangeItemsInternal")
+    public List<RegistryChangeItem> refreshRegistryChangeItemsInternal(@WebParam(name = "idOfOrg") long idOfOrg) {
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                refreshRegistryChangeItems(idOfOrg);
     }
 
     @WebMethod(operationName = "proceedRegitryChangeItem")
@@ -121,66 +116,63 @@ public class FrontController extends HttpServlet {
         }
 
         try {
-            if(changesList == null || changesList.size() < 1) {
-                return null;
+            if(changesList != null && changesList.size() > 0) {
+                RegistryChange change = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).getRegistryChange(changesList.get(0));
+                checkRequestValidity(change.getIdOfOrg());
             }
-
-            boolean authPassed = false;
-            for (Long idOfRegistryChange : changesList) {
-                if(!authPassed) {
-                    RegistryChange change = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).getRegistryChange(idOfRegistryChange);
-                    checkRequestValidity(change.getIdOfOrg());
-                    authPassed = true;
-                }
-                RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).applyRegistryChange(idOfRegistryChange, fullNameValidation);
-            }
-        } catch(FrontControllerException fce) {
-            logger.error("Failed to pass auth", fce);
-            return "При подтверждении изменения из Реестров, произошла ошибка: " + fce.getMessage();
         } catch (Exception e) {
-            logger.error("Failed to commit registry change item", e);
+            logger.error("Failed to pass auth", e);
             return "При подтверждении изменения из Реестров, произошла ошибка: " + e.getMessage();
         }
 
-        return null;
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                proceedRegitryChangeItem(changesList, operation, fullNameValidation);
+    }
+
+    @WebMethod(operationName = "proceedRegitryChangeItemInternal")
+    /* Если метод возвращает null, значит операция произведена успешно, иначсе это будет сообщение об ошибке */
+    public String proceedRegitryChangeItemInternal(@WebParam(name = "changesList") List<Long> changesList,
+            @WebParam(name = "operation") int operation,
+            @WebParam(name = "fullNameValidation") boolean fullNameValidation) {
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                proceedRegitryChangeItem(changesList, operation, fullNameValidation);
     }
 
     @WebMethod(operationName = "loadRegistryChangeRevisions")
     public List<Long> loadRegistryChangeRevisions(@WebParam(name = "idOfOrg") long idOfOrg) {
         try {
             checkRequestValidity(idOfOrg);
-            return DAOService.getInstance().getRegistryChangeRevisions(idOfOrg);
         } catch(FrontControllerException fce) {
             logger.error("Failed to pass auth", fce);
-        } catch (Exception e) {
-            logger.error("Failed to load registry change revisions list", e);
+            return Collections.EMPTY_LIST;
         }
-        return Collections.EMPTY_LIST;
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                loadRegistryChangeRevisions(idOfOrg);
+    }
+
+    @WebMethod(operationName = "loadRegistryChangeRevisionsInternal")
+    public List<Long> loadRegistryChangeRevisionsInternal(@WebParam(name = "idOfOrg") long idOfOrg) {
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                loadRegistryChangeRevisions(idOfOrg);
     }
 
     @WebMethod(operationName = "loadRegistryChangeErrorItems")
     public List<RegistryChangeErrorItem> loadRegistryChangeErrorItems(@WebParam(name = "idOfOrg") long idOfOrg) {
         try {
             checkRequestValidity(idOfOrg);
-            List<RegistryChangeErrorItem> items = new ArrayList<RegistryChangeErrorItem>();
-            List<RegistryChangeError> errors = DAOService.getInstance().getRegistryChangeErrors(idOfOrg);
-            for (RegistryChangeError e : errors) {
-                String orgName = DAOService.getInstance().findOrById(e.getIdOfOrg()).getOfficialName();
-                RegistryChangeErrorItem i = new RegistryChangeErrorItem(e.getIdOfRegistryChangeError(), e.getIdOfOrg(),
-                                                                        e.getRevisionCreateDate(), e.getCreateDate(),
-                                                                        e.getCommentCreateDate(), e.getError(),
-                                                                        e.getErrorDetail(), e.getComment(),
-                                                                        orgName, e.getCommentAuthor());
-                items.add(i);
-            }
-            return items;
         } catch(FrontControllerException fce) {
             logger.error("Failed to pass auth", fce);
             return Collections.EMPTY_LIST;
-        } catch (Exception e) {
-            logger.error("Failed to load registry change error items from database", e);
-            return Collections.EMPTY_LIST;
         }
+
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                loadRegistryChangeErrorItems(idOfOrg);
+    }
+
+    @WebMethod(operationName = "loadRegistryChangeErrorItemsInternal")
+    public List<RegistryChangeErrorItem> loadRegistryChangeErrorItemsInternal(@WebParam(name = "idOfOrg") long idOfOrg) {
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                loadRegistryChangeErrorItems(idOfOrg);
     }
 
     @WebMethod(operationName = "addRegistryChangeError")
@@ -190,33 +182,44 @@ public class FrontController extends HttpServlet {
                                          @WebParam(name = "errorDetails") String errorDetails) {
         try {
             checkRequestValidity(idOfOrg);
-            DAOService.getInstance().addRegistryChangeError(idOfOrg, revisionDate, error, errorDetails);
-            return null;
         } catch(FrontControllerException fce) {
             logger.error("Failed to pass auth", fce);
             return fce.getMessage();
-        } catch (Exception e) {
-            logger.error("Failed to add comment for registry change error", e);
-            return e.getMessage();
         }
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                addRegistryChangeError(idOfOrg, revisionDate, error, errorDetails);
+    }
+
+    @WebMethod(operationName = "addRegistryChangeErrorInternal")
+    public String addRegistryChangeErrorInternal(@WebParam(name = "idOfOrg") long idOfOrg,
+            @WebParam(name = "revisionDate") long revisionDate,
+            @WebParam(name = "error") String error,
+            @WebParam(name = "errorDetails") String errorDetails) {
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                addRegistryChangeError(idOfOrg, revisionDate, error, errorDetails);
     }
 
     @WebMethod(operationName = "commentRegistryChangeError")
     public String commentRegistryChangeError(@WebParam(name = "idOfRegistryChangeError") long idOfRegistryChangeError,
                                              @WebParam(name = "comment") String comment,
                                              @WebParam(name = "author") String author) {
+        RegistryChangeError e = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).getRegistryChangeError(idOfRegistryChangeError);
         try {
-            RegistryChangeError e = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).getRegistryChangeError(idOfRegistryChangeError);
             checkRequestValidity(e.getIdOfOrg());
-            DAOService.getInstance().addRegistryChangeErrorComment(idOfRegistryChangeError, comment, author);
-            return null;
-        } catch(FrontControllerException fce) {
+        } catch (FrontControllerException fce) {
             logger.error("Failed to pass auth", fce);
             return fce.getMessage();
-        } catch (Exception e) {
-            logger.error("Failed to add comment for registry change error", e);
-            return e.getMessage();
         }
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                commentRegistryChangeError(idOfRegistryChangeError, comment, author);
+    }
+
+    @WebMethod(operationName = "commentRegistryChangeErrorInternal")
+    public String commentRegistryChangeErrorInternal(@WebParam(name = "idOfRegistryChangeError") long idOfRegistryChangeError,
+            @WebParam(name = "comment") String comment,
+            @WebParam(name = "author") String author) {
+        return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
+                commentRegistryChangeError(idOfRegistryChangeError, comment, author);
     }
 
     /* Выполняет проверку наличия «не нашей customerType=1» карты с физическим идентификатором  cardNo в таблице временных карт. */
