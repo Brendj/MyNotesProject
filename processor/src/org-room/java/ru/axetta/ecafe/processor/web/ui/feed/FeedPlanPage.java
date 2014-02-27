@@ -206,11 +206,14 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
         List<Complex> allComplexes = new ArrayList<Complex>();
         List<Complex> superComlexGroups = new ArrayList<Complex>();
         Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
-        String feedTypeRestrict = " and position('" + DISCOUNT_START + "' in cf_discountrules.description)";
+        String feedTypeRestrict = "";
         if(displayDiscountClients) {
-            feedTypeRestrict += "=0 ";
-        } else {
-            feedTypeRestrict += ">0 ";
+            feedTypeRestrict = " and position('" + DISCOUNT_START + "' in cf_discountrules.description)";
+            if(displayDiscountClients) {
+                feedTypeRestrict += "=0 ";
+            } else {
+                feedTypeRestrict += ">0 ";
+            }
         }
 
 
@@ -229,8 +232,9 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
                 + "left join cf_temporary_orders on cf_temporary_orders.idofclient=cf_clients.idofclient and "
                 + "          cf_temporary_orders.idofcomplex=cf_clientscomplexdiscounts.idofcomplex and "
                 + "          cf_temporary_orders.plandate=:plandate "
-                + "where cf_clients.idoforg=:idoforg and CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 " //+ groupFilter
-                +        feedTypeRestrict 
+                + "where cf_clients.idoforg=:idoforg and CAST(substring(groupname FROM '[0-9]+') AS INTEGER)<>0 "
+                +        feedTypeRestrict
+                //+ " and cf_clients.idofclient=129962 "
                 + "order by groupNum, groupname, cf_persons.firstname, cf_persons.secondname, cf_persons.surname, cf_clients.idofclient, idofcomplex";
         org.hibernate.Query q = session.createSQLQuery(sql);
         q.setLong("idoforg", org.getIdOfOrg());
