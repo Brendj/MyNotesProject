@@ -25,6 +25,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormatSymbols;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -49,6 +51,8 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
     private static final String POS_NAME = "№";
     private static final String FIO_NAME = "ФИО";
     private static final String CLASS_NAME = "Класс";
+    private static final String PRIMARY_SCHOOL = "Итого начальные классы";
+    private static final String HIGH_SCHOOL = "Итого старшие классы";
     private static final String TOTAL_NAME = "Итого";
     private static final int DISTRICT_COL = 0;
     private static final int ORG_COL = 1;
@@ -56,7 +60,9 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
     private static final int POS_COL = 3;
     private static final int FIO_COL = 4;
     private static final int CLASS_COL = 5;
-    private static final int TOTAL_COL = 6;
+    private static final int HIGH_SCHOOL_COL = 6;
+    private static final int PRIMARY_SCHOOL_COL = 7;
+    private static final int TOTAL_COL = 8;
     private static final int CATEGORY_COL = 100;
     private static final int GOOD_COL = 101;
     private static final List <ReportColumn> DEFAULT_COLUMNS = new ArrayList <ReportColumn> ();
@@ -69,6 +75,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
         DEFAULT_COLUMNS.add(new ReportColumn (FIO_COL, FIO_NAME));
         DEFAULT_COLUMNS.add(new ReportColumn (CLASS_COL, CLASS_NAME));
     }
+
 
 
     public List<ActiveDiscountClientsItem> getItems() {
@@ -262,10 +269,16 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                     orgItem.addGoodClient(goodName, price);
                     districtItem.addGoodClient(goodName, price);
                     overallItem.addGoodClient(goodName, price);
+
                     item.addTotal(price);
                     orgItem.addTotal(price);
                     districtItem.addTotal(price);
                     overallItem.addTotal(price);
+
+                    item.addSchoolGroup(groupName, price);
+                    orgItem.addSchoolGroup(groupName, price);
+                    districtItem.addSchoolGroup(groupName, price);
+                    overallItem.addSchoolGroup(groupName, price);
                 }
 
                 if((prevCategoryname == null && categoryname != null) ||
@@ -409,13 +422,32 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                 Map gValues = orgI == null ? i.getGoods() : orgI.getGoodsClients();
                 columnId = addActiveDiscountClientsJasperItem(i, gValues, columnId, result);
 
-                //  total
+                //  Primary school
                 ActiveDiscountClientsJasperItem ji = new ActiveDiscountClientsJasperItem
                         (i.getUniqueId(), columnId, i.getDistrict(), i.getName(),
+                                i.getAddress(), i.getPosition(), i.getSurname(), i.getFirstname(),
+                                i.getSecondname(), i.getGroupName(), PRIMARY_SCHOOL,
+                                new BigDecimal(i.getPrimarySchool()).setScale(2, BigDecimal.ROUND_HALF_DOWN).toString());
+                result.add(ji);
+                columnId++;
+
+                //  High school
+                ji = new ActiveDiscountClientsJasperItem
+                        (i.getUniqueId(), columnId, i.getDistrict(), i.getName(),
+                                i.getAddress(), i.getPosition(), i.getSurname(), i.getFirstname(),
+                                i.getSecondname(), i.getGroupName(), HIGH_SCHOOL,
+                                new BigDecimal(i.getHighSchool()).setScale(2, BigDecimal.ROUND_HALF_DOWN).toString());
+                result.add(ji);
+                columnId++;
+
+                //  total
+                ji = new ActiveDiscountClientsJasperItem
+                        (i.getUniqueId(), columnId, i.getDistrict(), i.getName(),
                          i.getAddress(), i.getPosition(), i.getSurname(), i.getFirstname(),
-                         i.getSecondname(), i.getGroupName(), "Итого",
+                         i.getSecondname(), i.getGroupName(), TOTAL_NAME,
                          new BigDecimal(i.getTotal()).setScale(2, BigDecimal.ROUND_HALF_DOWN).toString());
                 result.add(ji);
+                columnId++;
             }
             return result;
         }
@@ -515,6 +547,8 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
         for (String good : goodsSet) {
             cols.add(new ReportColumn(GOOD_COL, good));
         }
+        cols.add(new ReportColumn(PRIMARY_SCHOOL_COL, PRIMARY_SCHOOL));
+        cols.add(new ReportColumn(HIGH_SCHOOL_COL, HIGH_SCHOOL));
         cols.add(new ReportColumn(TOTAL_COL, TOTAL_NAME));
         return cols.toArray();
     }
@@ -572,6 +606,8 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             this.columnValue = columnValue;
             this.categories = new HashMap<String, String>();
             this.goods = new HashMap<String, Double>();
+            this.primarySchool = 0D;
+            this.highSchool = 0D;
             this.total = 0D;
         }
 
@@ -606,6 +642,10 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
         protected Map<String, Double> goodsClients;
 
         public ActiveDiscountOrgItem(Long uniqueId, String district, String name) {
+            init(uniqueId, district, name);
+        }
+
+        private void init(Long uniqueId, String district, String name) {
             this.uniqueId = uniqueId;
             if (district != null && district.length() > 0) {
                 this.district = "Итого по " + district;
@@ -624,6 +664,8 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             this.groupName  = "";
             categoriesClients      = new TreeMap<String, Integer>();
             goodsClients           = new TreeMap<String, Double>();
+            primarySchool = 0D;
+            highSchool = 0D;
             total           = 0D;
         }
 
@@ -685,6 +727,18 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                         return "";
                     case CLASS_COL:
                         return "";
+                    case PRIMARY_SCHOOL_COL:
+                        if(primarySchool == null) {
+                            return "0";
+                        } else {
+                            return "" + new BigDecimal(primarySchool).setScale(2, BigDecimal.ROUND_HALF_DOWN).toString();
+                        }
+                    case HIGH_SCHOOL_COL:
+                        if(highSchool == null) {
+                            return "0";
+                        } else {
+                            return "" + new BigDecimal(highSchool).setScale(2, BigDecimal.ROUND_HALF_DOWN).toString();
+                        }
                     case TOTAL_COL:
                         if(total == null) {
                             return "0";
@@ -721,6 +775,8 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
         protected String groupName;
         protected Map<String, String> categories;
         protected Map<String, Double> goods;
+        protected Double primarySchool;
+        protected Double highSchool;
         protected Double total;
 
 
@@ -751,6 +807,8 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             this.groupName  = groupName;
             categories      = new TreeMap<String,String>();
             goods           = new TreeMap<String,Double>();
+            primarySchool   = 0D;
+            highSchool      = 0D;
             total           = 0D;
         }
 
@@ -772,6 +830,29 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
 
         public void addTotal(Double total) {
             this.total += total;
+        }
+
+        public void addSchoolGroup(String groupName, Double total) {
+            Pattern p = Pattern.compile("[0-9]{1,2}");
+            Matcher m = p.matcher(groupName);
+            m.find();
+            String group = m.group();
+            if(group != null && group.length() > 0) {
+                int grp = Integer.parseInt(group);
+                if(grp < 4) {
+                    primarySchool += total;
+                } else {
+                    highSchool += total;
+                }
+            }
+        }
+
+        public Double getPrimarySchool() {
+            return new BigDecimal(primarySchool).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
+        }
+
+        public Double getHighSchool() {
+            return new BigDecimal(highSchool).setScale(2, BigDecimal.ROUND_HALF_DOWN).doubleValue();
         }
 
         public Double getTotal() {
@@ -900,8 +981,24 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                         return surname + " " + firstname + " " + secondname;
                     case CLASS_COL:
                         return groupName;
+                    case PRIMARY_SCHOOL_COL:
+                        if(primarySchool == null) {
+                            return "0";
+                        } else {
+                            return "" + new BigDecimal(primarySchool).setScale(2, BigDecimal.ROUND_HALF_DOWN).toString();
+                        }
+                    case HIGH_SCHOOL_COL:
+                        if(highSchool == null) {
+                            return "0";
+                        } else {
+                            return "" + new BigDecimal(highSchool).setScale(2, BigDecimal.ROUND_HALF_DOWN).toString();
+                        }
                     case TOTAL_COL:
-                        return "" + total;
+                        if(total == null) {
+                            return "0";
+                        } else {
+                            return "" + new BigDecimal(total).setScale(2, BigDecimal.ROUND_HALF_DOWN).toString();
+                        }
                 }
             } else if (col.getType() == CATEGORY_COL) {
                 String val = categories.get(col.getName());
