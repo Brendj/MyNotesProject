@@ -243,7 +243,7 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
                 + "  FROM cf_enterevents "
                 + "  join cf_clients on cf_clients.idofclient=cf_enterevents.idofclient "  /* берем только детей */
                 + "  join cf_menuexchangerules on cf_menuexchangerules.idofdestorg=cf_enterevents.idoforg "
-                + "  WHERE evtdatetime >= :startDate AND evtdatetime <= :endDate AND (passdirection = 0 or passdirection = 6) and "
+                + "  WHERE evtdatetime >= :startDate AND evtdatetime <= :endDate AND passdirection = 0 and "
                 + "  cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
                 + "  cf_clients.discountmode=3 and "  /* берем только льготников */
                 + "  cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS enter_event_data "
