@@ -177,7 +177,7 @@ import net.sf.jasperreports.engine.JRException;
          GoodRequestsReport.Builder reportBuilder = new GoodRequestsReport.Builder();
          this.goodRequests = reportBuilder
                  .build(session, hideMissedColumns, startDate, endDate, idOfOrgList, idOfContragentOrgList, goodName,
-                         orgsFilter);
+                         orgsFilter, showDailySamplesCount);
      }
 
      @Override
@@ -193,8 +193,9 @@ import net.sf.jasperreports.engine.JRException;
              AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
              String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + GoodRequestsReport.class.getSimpleName() + ".jasper";
              GoodRequestsReport.Builder builder = new GoodRequestsReport.Builder(templateFilename);
+
              GoodRequestsReport report = builder.build(session, hideMissedColumns, startDate, endDate, idOfOrgList, idOfContragentOrgList, goodName,
-                     orgsFilter);
+                     orgsFilter, showDailySamplesCount);
 
              HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
 

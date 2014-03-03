@@ -82,7 +82,6 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
 
         private final String templateFilename;
         private boolean exportToObjects = false;
-        protected boolean dailySample;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
@@ -108,7 +107,7 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
                     orgFilter = -1;
                 }
             } catch (Exception e) { }
-            dailySample = false;
+            boolean dailySample = true;
             try {
                 dailySample = Boolean.parseBoolean(reportProperties.getProperty("dailySample"));
             } catch (Exception e) { }
@@ -130,36 +129,36 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
                     idOfContragentList.add(Long.parseLong(id));
                 }
             } catch (Exception e) { }
-            return build(session, hideMissedColumns, startTime, endTime,idOfOrgList, idOfContragentList, goodName, true, orgFilter);
+            return build(session, hideMissedColumns, startTime, endTime,idOfOrgList, idOfContragentList, goodName, true, orgFilter, dailySample);
         }
 
         public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
                 Date startDate, Date endDate, Long idOfOrg) throws Exception{
-            return build(session, hideMissedColumns,startDate,endDate, Arrays.asList(idOfOrg),null, "", false, null);
+            return build(session, hideMissedColumns,startDate,endDate, Arrays.asList(idOfOrg),null, "", false, null, true);
         }
 
-        public GoodRequestsReport build(Session session,
-                Date startDate, Date endDate, List<Long> idOfSupplierList) throws Exception{
-            return build(session, false,startDate,endDate, new ArrayList<Long>(0),idOfSupplierList, "", true, null);
-        }
+        //public GoodRequestsReport build(Session session,
+        //        Date startDate, Date endDate, List<Long> idOfSupplierList) throws Exception{
+        //    return build(session, false,startDate,endDate, new ArrayList<Long>(0),idOfSupplierList, "", true, null, true);
+        //}
+
+        //public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
+        //        Date startDate, Date endDate, List<Long> idOfOrgList, List<Long> idOfSupplierList,
+        //        int requestsFilter, String goodName)
+        //        throws Exception {
+        //    return build(session, hideMissedColumns,startDate,endDate, idOfOrgList ,idOfSupplierList, goodName, true, null, true);
+        //}
 
         public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
                 Date startDate, Date endDate, List<Long> idOfOrgList, List<Long> idOfSupplierList,
-                int requestsFilter, String goodName)
+                String goodName, Integer orgsFilter, boolean showDailySamplesCount)
                 throws Exception {
-            return build(session, hideMissedColumns,startDate,endDate, idOfOrgList ,idOfSupplierList, goodName, true, null);
-        }
-
-        public GoodRequestsReport build(Session session, Boolean hideMissedColumns,
-                Date startDate, Date endDate, List<Long> idOfOrgList, List<Long> idOfSupplierList,
-                String goodName, Integer orgsFilter)
-                throws Exception {
-            return build(session, hideMissedColumns,startDate,endDate, idOfOrgList ,idOfSupplierList, goodName, true, orgsFilter);
+            return build(session, hideMissedColumns,startDate,endDate, idOfOrgList ,idOfSupplierList, goodName, true, orgsFilter, showDailySamplesCount);
         }
 
         private GoodRequestsReport build(Session session, Boolean hideMissedColumns,
                 Date startDate, Date endDate, List<Long> idOfOrgList, List <Long> idOfSupplierList,
-                String goodName, Boolean isWriteTotalRow, Integer orgsFilter)
+                String goodName, Boolean isWriteTotalRow, Integer orgsFilter, boolean showDailySamplesCount)
                 throws Exception {
             Date generateTime = new Date();
 
@@ -182,7 +181,7 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
             List<RequestItem> items = findItems(session, hideMissedColumns, startDate, endDate, idOfOrgList, idOfSupplierList,
                     goodName, isWriteTotalRow, orgsFilter, report);
             if(!exportToObjects) {
-                List<JasperRequestItem> jasperItems = toJasperItems(hideMissedColumns, dailySample, items, startDate, endDate);
+                List<JasperRequestItem> jasperItems = toJasperItems(hideMissedColumns, showDailySamplesCount, items, startDate, endDate);
                 JasperPrint jasperPrint = JasperFillManager
                         .fillReport(templateFilename, parameterMap, createDataSource(jasperItems));
                 report.setPrint(jasperPrint);

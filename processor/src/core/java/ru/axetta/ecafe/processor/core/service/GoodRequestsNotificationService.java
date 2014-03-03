@@ -146,6 +146,7 @@ public class GoodRequestsNotificationService {
                         }
                         List<GoodRequestsReport.RequestItem> items = goodRequests.getGoodRequestItems();
                         newValueHistory.append("</tr>");
+                        boolean doSend = false;
                         for (GoodRequestsReport.RequestItem item: items){
                             newValueHistory.append("<tr>");
                             i = 0;
@@ -170,7 +171,9 @@ public class GoodRequestsNotificationService {
                                             final boolean c = day.equals(doneDate);
                                             final boolean d = position.getOrgOwner().equals(item.getIdOfOrg());
                                             if(b && c && d){
-                                                isGood = true; break;
+                                                isGood = true;
+                                                doSend = doSend || isGood;
+                                                break;
                                             }
                                         }
                                     }
@@ -202,34 +205,35 @@ public class GoodRequestsNotificationService {
                             }
                             newValueHistory.append("</tr>");
                         }
-                        newValueHistory.append("</table>");
-                        String[] values = {"address", org.getAddress(),
-                                           "shortOrgName", org.getShortName(), "reportValues",
-                                           newValueHistory.toString()};
-                        List<String> strings = Arrays.asList(StringUtils.split(requestNotifyEmailAddress, ";"));
-                        List<String> addresses = new ArrayList<String>(strings);
-
-                        DetachedCriteria staffClientQuery = DetachedCriteria.forClass(Staff.class);
-                        staffClientQuery.add(Restrictions.eq("orgOwner", org.getIdOfOrg()));
-                        staffClientQuery.add(Restrictions.eq("idOfRole", 0L));
-                        staffClientQuery.setProjection(Property.forName("idOfClient"));
-                        Criteria subCriteria = staffClientQuery.getExecutableCriteria(session);
-                        Integer countResult = subCriteria.list().size();
-                        if(countResult>0){
-                            Criteria clientCriteria = session.createCriteria(Client.class);
-                            clientCriteria.add(Property.forName("idOfClient").in(staffClientQuery));
-                            clientCriteria.setProjection(Property.forName("email"));
-                            List<String> address = clientCriteria.list();
-                            addresses.addAll(address);
-                        }
-
                         boolean sended = false;
-                        for (String address: addresses){
-                            if(StringUtils.trimToNull(address)!=null){
-                                sended |= eventNotificationService.sendEmail(address, notificationType, values);
+                        if(doSend){
+                            newValueHistory.append("</table>");
+                            String[] values = {"address", org.getAddress(),
+                                               "shortOrgName", org.getShortName(), "reportValues",
+                                               newValueHistory.toString()};
+                            List<String> strings = Arrays.asList(StringUtils.split(requestNotifyEmailAddress, ";"));
+                            List<String> addresses = new ArrayList<String>(strings);
+
+                            DetachedCriteria staffClientQuery = DetachedCriteria.forClass(Staff.class);
+                            staffClientQuery.add(Restrictions.eq("orgOwner", org.getIdOfOrg()));
+                            staffClientQuery.add(Restrictions.eq("idOfRole", 0L));
+                            staffClientQuery.setProjection(Property.forName("idOfClient"));
+                            Criteria subCriteria = staffClientQuery.getExecutableCriteria(session);
+                            Integer countResult = subCriteria.list().size();
+                            if(countResult>0){
+                                Criteria clientCriteria = session.createCriteria(Client.class);
+                                clientCriteria.add(Property.forName("idOfClient").in(staffClientQuery));
+                                clientCriteria.setProjection(Property.forName("email"));
+                                List<String> address = clientCriteria.list();
+                                addresses.addAll(address);
+                            }
+                            for (String address: addresses){
+                                if(StringUtils.trimToNull(address)!=null){
+                                    sended |= eventNotificationService.sendEmail(address, notificationType, values);
+                                }
                             }
                         }
-                        if(sended){
+                        if(sended || !doSend){
                             if(currentOrgVersions.isEmpty()){
                                 sql = "select max(globalVersion) from GoodRequestPosition p where p.orgOwner=:orgOwner";
                                 query = session.createQuery(sql);
