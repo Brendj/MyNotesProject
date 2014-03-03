@@ -9,8 +9,8 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.210000000000001"/>
-	<property name="ireport.x" value="57"/>
-	<property name="ireport.y" value="172"/>
+	<property name="ireport.x" value="83"/>
+	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -217,7 +217,7 @@
 				</crosstabHeaderCell>
 				<rowGroup name="unique" width="0" totalPosition="End">
 					<bucket class="java.lang.Long">
-						<bucketExpression><![CDATA[$F{idoforg}]]></bucketExpression>
+						<bucketExpression><![CDATA[$F{orgnum}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents>
