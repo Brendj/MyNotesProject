@@ -68,8 +68,6 @@
 
             <h:outputText styleClass="output-text" escape="true" value="Дата выборки от" />
             <rich:calendar value="#{mainPage.goodRequestReportPage.startDate}" datePattern="dd.MM.yyyy"
-                           onexpand="renameBtn();" oncomplete="renameBtn();" oncurrentdateselect="renameBtn();"
-                           oncurrentdateselected="renameBtn();" onchanged="renameBtn();"
                            converter="dateConverter" inputClass="input-text"
                            showWeeksBar="false">
                 <a4j:support event="onchanged" reRender="endDateCalendar"
@@ -87,7 +85,7 @@
             </h:selectOneMenu>
 
             <h:outputText styleClass="output-text" escape="true" value="Дата выборки до" />
-            <rich:calendar value="#{mainPage.goodRequestReportPage.endDate}" datePattern="dd.MM.yyyy"
+            <rich:calendar id="endDateCalendar" value="#{mainPage.goodRequestReportPage.endDate}" datePattern="dd.MM.yyyy"
                            converter="dateConverter" inputClass="input-text" showWeeksBar="false" rendered="true">
                 <a4j:support event="onchanged" reRender="endDatePeriodSelect"
                              actionListener="#{mainPage.goodRequestReportPage.onEndDateSpecified}" />
