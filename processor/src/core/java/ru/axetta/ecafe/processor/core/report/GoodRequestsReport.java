@@ -489,21 +489,24 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
                 Set<Long> tmpItems = totalItems.keySet();
                 if(tmpItems.size() > 0) {
                     for (Long id : tmpItems) {
-                        addMissionOrg(totalItems.get(id), org, report, items);
+                        RequestItem newItem = createEmptyOrg(totalItems.get(id), org, report, items);
+                        items.add(newItem);
                     }
                 } else {
-                    addMissionOrg(null, org, report, items);
+                    RequestItem newItem = createEmptyOrg(null, org, report, items);
+                    items.add(newItem);
                 }
             }
+            Collections.sort(items, new RequestItemsComparator());
         }
 
-        protected void addMissionOrg(RequestItem reqItem, Org org, GoodRequestsReport report, List<RequestItem> items) {
+        protected RequestItem createEmptyOrg(RequestItem reqItem, Org org, GoodRequestsReport report, List<RequestItem> items) {
             RequestItem newItem = new RequestItem
                                     (org.getIdOfOrg(), org.getOrgNumberInName(), org.getOfficialName(),
                                      reqItem == null ? -1 : reqItem.getIdOfGood(),
                                      reqItem == null ? "" : reqItem.getGood(), report);
             newItem.dailySamples = new TreeMap<Long, RequestValue>();
-            items.add(newItem);
+            return newItem;
         }
 
         protected void resetTotalValues(Map <Long, RequestItem> totalItems, RequestItem overallItem) {
@@ -826,6 +829,21 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
 
         public String getColumnName() {
             return columnName;
+        }
+    }
+
+    public static class RequestItemsComparator implements Comparator {
+        public int compare(Object o1, Object o2) {
+            if(!(o1 instanceof RequestItem) || !(o2 instanceof RequestItem)) {
+                return 0;
+            }
+            RequestItem ri1 = (RequestItem) o1;
+            RequestItem ri2 = (RequestItem) o2;
+            return ri1.getOrg().compareTo(ri2.getOrg());
+        }
+
+        public boolean equals(Object obj) {
+            return equals(obj);
         }
     }
 
