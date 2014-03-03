@@ -17,12 +17,13 @@ public class RegisterStampPageItem {
 
     private String date;
     private HashMap<String,Long> map = new HashMap<String, Long>();
-    //private HashMap<Long,Long> map = new HashMap<Long, Long>();
 
     public RegisterStampPageItem(String data, List<GoodItem> items) {
         this.date = data;
         for (GoodItem item: items){
-            map.put(item.getFullName(),0L);
+            if(!map.containsKey(item.getFullName())){
+                map.put(item.getFullName(),0L);
+            }
         }
     }
 

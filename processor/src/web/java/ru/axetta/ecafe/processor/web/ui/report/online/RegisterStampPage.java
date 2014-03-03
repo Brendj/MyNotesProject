@@ -194,10 +194,13 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
             servletOutputStream.close();
 
         } catch (JRException fnfe) {
-            //String message = (fnfe.getCause()==null?fnfe.getMessage():fnfe.getCause().getMessage());
-            logAndPrintMessage("Ошибка при подготовке отчета:",fnfe);
+            ////String message = (fnfe.getCause()==null?fnfe.getMessage():fnfe.getCause().getMessage());
+            //logAndPrintMessage("Ошибка при подготовке отчета:",fnfe);
+            logger.error("Error by reload data by RegisterStamp (OrderDetails  + Goods): ", fnfe);
+            printError("Не найден шаблон отчета: " + fnfe.getMessage());
         } catch (Exception e) {
-            logAndPrintMessage("Error generate csv file ",e);
+            logger.error("Error generate csv file: ", e);
+            printError("Ошибка при подготовке отчета: " + e.getMessage());
         }
     }
 
