@@ -186,31 +186,49 @@ import net.sf.jasperreports.engine.JRException;
      }
 
      public void export(Session session) throws Exception {
-         //  пределяем на какой лимит дней необходимо увеличить дату
-         //endDate = new Date(getDaysLimitTS(daysLimit, startDate));
-
-         //  Запускаем отчет
-         GoodRequestsReport.Builder reportBuilder = new GoodRequestsReport.Builder();
-         this.goodRequests = reportBuilder
-                 .build(session, hideMissedColumns, startDate, endDate, idOfOrgList, idOfContragentOrgList, goodName,
-                         orgsFilter);
-
          FacesContext facesContext = FacesContext.getCurrentInstance();
-         HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
-         facesContext.responseComplete();
-         response.setContentType("text/csv; charset=windows-1251");
-         response.setHeader("Content-disposition", "inline;filename=" + this.getClass().getSimpleName() + ".csv");
-
-         final ServletOutputStream responseOutputStream = response.getOutputStream();
+         Session persistenceSession = null;
+         Transaction persistenceTransaction = null;
          try {
-             Writer writer = new OutputStreamWriter(responseOutputStream);
-             GoodRequestsReport.writeToFile(goodRequests, writer);
-             writer.flush();
-             responseOutputStream.flush();
+             AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+             String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + GoodRequestsReport.class.getSimpleName() + ".jasper";
+             GoodRequestsReport.Builder builder = new GoodRequestsReport.Builder(templateFilename);
+             GoodRequestsReport report = builder.build(session, hideMissedColumns, startDate, endDate, idOfOrgList, idOfContragentOrgList, goodName,
+                     orgsFilter);
+
+             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+
+             ServletOutputStream servletOutputStream = response.getOutputStream();
+
+             facesContext.responseComplete();
+             response.setContentType("application/xls");
+             response.setHeader("Content-disposition", "inline;filename=good_requests.xls");
+
+             JRXlsExporter xlsExport = new JRXlsExporter();
+             //JRCsvExporter csvExporter = new JRCsvExporter();
+             xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
+             xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+             xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+             xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+             xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+             //xlsExport.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ";");
+             xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+             xlsExport.exportReport();
+
+             servletOutputStream.flush();
+             servletOutputStream.close();
+
+         } catch (JRException fnfe) {
+             String message = (fnfe.getCause()==null?fnfe.getMessage():fnfe.getCause().getMessage());
+             logAndPrintMessage(String.format("Ошибка при подготовке отчета не найден файл шаблона: %s", message),fnfe);
+         } catch (Exception e) {
+             getLogger().error("Failed to build sales report", e);
+             facesContext.addMessage(null,
+                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета", e.getMessage()));
          } finally {
-             responseOutputStream.close();
+             HibernateUtils.rollback(persistenceTransaction, getLogger());
+             HibernateUtils.close(persistenceSession, getLogger());
          }
-         facesContext.responseComplete();
      }
 
  }
