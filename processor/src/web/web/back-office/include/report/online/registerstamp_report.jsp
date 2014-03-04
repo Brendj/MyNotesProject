@@ -36,7 +36,7 @@
             <rich:calendar value="#{registerStampPage.startDate}" datePattern="dd.MM.yyyy"
                            converter="dateConverter" inputClass="input-text"
                            showWeeksBar="false">
-                <a4j:support event="onchanged" reRender="endDateCalendar"
+                <a4j:support event="onchanged" reRender="endDateCalendar,registerStampReportPanel"
                              actionListener="#{registerStampPage.onReportPeriodChanged}" />
             </rich:calendar>
 
@@ -45,19 +45,21 @@
                              styleClass="input-text" style="width: 250px;">
                 <f:converter converterId="periodTypeConverter" />
                 <f:selectItems value="#{registerStampPage.periodTypeMenu.items}" />
-                <a4j:support event="onchange" reRender="endDateCalendar"
+                <a4j:support event="onchange" reRender="endDateCalendar,registerStampReportPanel"
                              actionListener="#{registerStampPage.onReportPeriodChanged}" />
             </h:selectOneMenu>
             <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
             <rich:calendar id="endDateCalendar" value="#{registerStampPage.endDate}"
                            datePattern="dd.MM.yyyy" converter="dateConverter"
                            inputClass="input-text" showWeeksBar="false">
-                <a4j:support event="onchanged" reRender="endDatePeriodSelect"
+                <a4j:support event="onchanged" reRender="endDatePeriodSelect,registerStampReportPanel"
                              actionListener="#{registerStampPage.onEndDateSpecified}" />
             </rich:calendar>
 
             <h:outputText value="Показывать с расхождениями: " styleClass="output-text"/>
-            <h:selectBooleanCheckbox value="#{registerStampPage.includeActDiscrepancies}"/>
+            <h:selectBooleanCheckbox value="#{registerStampPage.includeActDiscrepancies}">
+                <a4j:support event="onchange" reRender="registerStampReportPanel"/>
+            </h:selectBooleanCheckbox>
 
 
         </h:panelGrid>
