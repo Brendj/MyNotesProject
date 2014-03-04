@@ -1,25 +1,22 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
-import net.sf.jasperreports.engine.export.JRXlsExporter;
-import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
-import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.RegisterStampReport;
 import ru.axetta.ecafe.processor.core.report.ReportDAOService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
-import ru.axetta.ecafe.processor.web.ui.report.online.items.stamp.RegisterStampPageItem;
-import ru.axetta.ecafe.processor.web.ui.report.online.items.stamp.Tree;
-import ru.axetta.ecafe.processor.web.ui.report.online.items.stamp.Visitor;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -35,6 +32,8 @@ import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -48,44 +47,9 @@ import java.util.*;
  */
 @Component
 @Scope("session")
-public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler, Visitor<String> {
+public class RegisterStampPage extends OnlineReportPage{
 
     private final static Logger logger = LoggerFactory.getLogger(RegisterStampPage.class);
-
-    @Override
-    public Visitor<String> visitTree(Tree<String> tree) {
-        return new RegisterStampPage(lvl1, lvl2, lvlBottom);
-    }
-
-    @Override
-    public void visitData(Tree<String> parent, String data) {
-        int level = parent.getLevel();
-        switch (level){
-            case 3: lvl1.add(new HashMap.SimpleImmutableEntry<String, Tree>(data,parent)); break;
-            case 4: lvl2.add(new HashMap.SimpleImmutableEntry<String, Tree>(data,parent)); break;
-        }
-
-        if(parent.getChildCount()<1){
-            lvlBottom.add(new HashMap.SimpleImmutableEntry<String, Tree>(data, parent));
-        }
-    }
-
-    public Integer getLastLvlElements(){
-        int size = 0;
-        for (Map.Entry<String,Tree> entry: lvl1){
-            if(entry.getValue().getChildCount()==0) size++;
-        }
-        return lvl2.size() + size;
-    }
-
-    public RegisterStampPage() {}
-
-    public RegisterStampPage(List<Map.Entry<String, Tree>> lvl1, List<Map.Entry<String, Tree>> lvl2,
-            List<Map.Entry<String, Tree>> lvlBottom) {
-        this.lvl1 = lvl1;
-        this.lvl2 = lvl2;
-        this.lvlBottom = lvlBottom;
-    }
 
     @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
@@ -93,83 +57,129 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
     private RuntimeContext runtimeContext;
     @Autowired
     private ReportDAOService daoService;
-
-    private OrgShortItem org;
-    private Date start;
-    private Date end;
+    private String htmlReport = null;
     private Boolean includeActDiscrepancies = true;
-    private final OrderDetailsDAOService service = new OrderDetailsDAOService();
-    private List<RegisterStampPageItem> pageItems = new ArrayList<RegisterStampPageItem>();
-    private List<GoodItem> allGoods = new LinkedList<GoodItem>();
+    private final PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu();
 
-    private List<Map.Entry<String,Tree>> lvl1 = new ArrayList<Map.Entry<String, Tree>>();
-    private List<Map.Entry<String,Tree>> lvl2 = new ArrayList<Map.Entry<String, Tree>>();
-    private List<Map.Entry<String,Tree>> lvlBottom = new ArrayList<Map.Entry<String, Tree>>();
-    protected Calendar localCalendar;
-    public final static int REPORT_PERIOD_DAY = 0, REPORT_PERIOD_WEEK = 1, REPORT_PERIOD_2WEEKS = 2, REPORT_PERIOD_MONTH = 3, REPORT_PERIOD_DATE = 4;
-    protected int reportPeriod;
+    public PeriodTypeMenu getPeriodTypeMenu() {
+        return periodTypeMenu;
+    }
+
+    public void onReportPeriodChanged(ActionEvent event) {
+        switch (periodTypeMenu.getPeriodType()){
+            case ONE_DAY: {
+                setEndDate(startDate);
+            } break;
+            case ONE_WEEK: {
+                setEndDate(CalendarUtils.addDays(startDate, 6));
+            } break;
+            case TWO_WEEK: {
+                setEndDate(CalendarUtils.addDays(startDate, 13));
+            } break;
+            case ONE_MONTH: {
+                setEndDate(CalendarUtils.addMonth(startDate, 1));
+            } break;
+        }
+    }
+
+    public void onEndDateSpecified(ActionEvent event) {
+        periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY);
+    }
 
     @Override
-    public void onShow() throws Exception {
-        service.setSession((Session) entityManager.getDelegate());
+    public void onShow() throws Exception {}
+
+    public String getHtmlReport() {
+        return htmlReport;
+    }
+
+    public Object buildReportHTML() {
+        if(this.idOfOrg==null){
+            printError("Не выбрана организация");
+            return null;
+        }
+        AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
+        String templateShortFileName = RegisterStampReport.class.getSimpleName() + "_summary.jasper";
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
+        if(!(new File(templateFilename)).exists()){
+            printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
+            return null;
+        }
+        RegisterStampReport.Builder builder = new RegisterStampReport.Builder(templateFilename);
+        Properties properties = new Properties();
+        properties.setProperty(RegisterStampReport.PARAM_WITH_OUT_ACT_DISCREPANCIES, includeActDiscrepancies.toString());
+        builder.setReportProperties(properties);
+        Org org = daoService.getOrg(idOfOrg);
+        builder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+        try {
+            Session session = runtimeContext.createReportPersistenceSession();
+            BasicReportJob report =  builder.build(session,startDate, endDate, localCalendar);
+            if (report != null) {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                JRHtmlExporter exporter = new JRHtmlExporter();
+                exporter.setParameter(JRExporterParameter.JASPER_PRINT, report.getPrint());
+                exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
+                exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
+                exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
+                exporter.setParameter(JRHtmlExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
+                exporter.exportReport();
+                htmlReport = os.toString("UTF-8");
+                os.close();
+            }
+            printMessage("Реестр талонов построен");
+        } catch (Exception e) {
+            printError("Ошибка при построении отчета: "+e.getMessage());
+            logger.error("Failed build report ",e);
+        }
+        return null;
+    }
+
+    public Object clear(){
+        idOfOrg=null;
+        filter=null;
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
         FacesContext facesContext = FacesContext.getCurrentInstance();
         localCalendar = runtimeContext
                 .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
 
         localCalendar.setTime(new Date());
-        reportPeriod = REPORT_PERIOD_MONTH;
-        this.start = DateUtils.truncate(localCalendar, Calendar.MONTH).getTime();
+        this.startDate = DateUtils.truncate(localCalendar, Calendar.MONTH).getTime();
 
-        localCalendar.setTime(this.start);
+        localCalendar.setTime(this.startDate);
         localCalendar.add(Calendar.MONTH, 1);
-        //localCalendar.add(Calendar.SECOND, -1);
-        this.end = localCalendar.getTime();
-        clear();
-    }
-
-    public Object clear(){
-        org = null;
-        pageItems = new ArrayList<RegisterStampPageItem>();
-        allGoods = new ArrayList<GoodItem>();
+        localCalendar.add(Calendar.SECOND, -1);
+        this.endDate = localCalendar.getTime();
+        includeActDiscrepancies = true;
+        htmlReport = null;
         return null;
-    }
-
-    public Object reload(){
-        try {
-            pageItems = new ArrayList<RegisterStampPageItem>();
-            refresh();
-        } catch (Exception e){
-            logger.error("Error by reload data by RegisterStamp (OrderDetails  + Goods): ", e);
-            printError("Ошибка при загрузке данных по реестру талонов");
-        }
-        return null;
-    }
-
-    public List<Map.Entry<String, Tree>> getLvl1() {
-        return lvl1;
-    }
-
-    public List<Map.Entry<String, Tree>> getLvl2() {
-        return lvl2;
-    }
-
-    public List<Map.Entry<String, Tree>> getLvlBottom() {
-        return lvlBottom;
     }
 
     public void showCSVList(ActionEvent actionEvent){
+        if(this.idOfOrg==null){
+            printError("Не выбрана организация");
+            return;
+        }
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
-        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + RegisterStampReport.class.getSimpleName() + ".jasper";
+        String templateShortFileName = RegisterStampReport.class.getSimpleName() + ".jasper";
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
+        if(!(new File(templateFilename)).exists()){
+            printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
+            return;
+        }
+        Date generateTime = new Date();
         RegisterStampReport.Builder builder = new RegisterStampReport.Builder(templateFilename);
         Properties properties = new Properties();
         properties.setProperty(RegisterStampReport.PARAM_WITH_OUT_ACT_DISCREPANCIES, includeActDiscrepancies.toString());
         builder.setReportProperties(properties);
-        Org org = daoService.getOrg(this.org.getIdOfOrg());
+        Org org = daoService.getOrg(idOfOrg);
         builder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
         Session session = (Session) entityManager.getDelegate();
         try {
-            RegisterStampReport registerStampReport = (RegisterStampReport) builder.build(session,start, end, localCalendar);
+            RegisterStampReport registerStampReport = (RegisterStampReport) builder.build(session,startDate, endDate, localCalendar);
             FacesContext facesContext = FacesContext.getCurrentInstance();
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
 
@@ -177,16 +187,15 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
 
             facesContext.responseComplete();
             response.setContentType("application/xls");
-            response.setHeader("Content-disposition", "inline;filename=register_stamp.xls");
+            String filename = buildFileName(generateTime, registerStampReport);
+            response.setHeader("Content-disposition", String.format("inline;filename=%s", filename));
 
             JRXlsExporter xlsExport = new JRXlsExporter();
-            //JRCsvExporter csvExporter = new JRCsvExporter();
             xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, registerStampReport.getPrint());
             xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
             xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
             xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
             xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-            //xlsExport.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ";");
             xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
             xlsExport.exportReport();
 
@@ -194,102 +203,19 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
             servletOutputStream.close();
 
         } catch (JRException fnfe) {
-            ////String message = (fnfe.getCause()==null?fnfe.getMessage():fnfe.getCause().getMessage());
-            //logAndPrintMessage("Ошибка при подготовке отчета:",fnfe);
-            logger.error("Error by reload data by RegisterStamp (OrderDetails  + Goods): ", fnfe);
+            logger.error("Failed export report: ", fnfe);
             printError("Не найден шаблон отчета: " + fnfe.getMessage());
         } catch (Exception e) {
-            logger.error("Error generate csv file: ", e);
+            logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
         }
     }
 
-
-    @Override
-    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
-        if (null != idOfOrg) {
-            Org organization = (Org) session.load(Org.class, idOfOrg);
-            org = new OrgShortItem();
-            org.setIdOfOrg(organization.getIdOfOrg());
-            org.setOfficialName(organization.getOfficialName());
-            org.setShortName(organization.getShortName());
-            List<GoodItem> goods = service.findAllGoods(organization.getIdOfOrg());
-            allGoods = goods;
-            Tree<String> forest = new Tree<String>("Количество", 0, null);
-            Tree<String> current = forest;
-            List<String> namesList = new ArrayList<String>();
-            lvl1 = new ArrayList<Map.Entry<String, Tree>>();
-            lvl2 = new ArrayList<Map.Entry<String, Tree>>();
-            lvlBottom = new ArrayList<Map.Entry<String, Tree>>();
-            for(GoodItem item: goods){
-                namesList.add(item.getFullName());
-            }
-            for (String tree : namesList) {
-                Tree<String> root = current;
-                for (String data : tree.split("/")) {
-                    current = current.child(data, tree);
-                }
-                current = root;
-            }
-            forest.accept(this);
-        }
-    }
-
-    private void refresh() throws Exception {
-        DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
-        localCalendar.setTime(start);
-        RegisterStampPageItem total = new RegisterStampPageItem("Итого", allGoods);
-        RegisterStampPageItem allTotal = new RegisterStampPageItem("Всего кол-во:", allGoods);
-        while (end.getTime()>localCalendar.getTimeInMillis()){
-            String date = timeFormat.format(localCalendar.getTime());
-            RegisterStampPageItem item = new RegisterStampPageItem(date, allGoods);
-            for (String l: item.getSetKey()){
-                Long val = service.buildRegisterStampBodyValue(org.getIdOfOrg(), localCalendar.getTime(), l,
-                        includeActDiscrepancies);
-                item.addValue(l, val);
-                total.addValue(l, val);
-                allTotal.addValue(l, val);
-            }
-            pageItems.add(item);
-            localCalendar.add(Calendar.DATE,1);
-        }
-        pageItems.add(total);
-        RegisterStampPageItem dailySampleItem = new RegisterStampPageItem("Суточная проба", allGoods);
-        for (String l: dailySampleItem.getSetKey()){
-            Long val = service.buildRegisterStampDailySampleValue(org.getIdOfOrg(), start, end, l);
-            dailySampleItem.addValue(l, val);
-            allTotal.addValue(l, val);
-        }
-        pageItems.add(dailySampleItem);
-        pageItems.add(allTotal);
-    }
-
-    public List<RegisterStampPageItem> getPageItems() {
-        return pageItems;
-    }
-
-    public void setPageItems(List<RegisterStampPageItem> pageItems) {
-        this.pageItems = pageItems;
-    }
-
-    public OrgShortItem getOrg() {
-        return org;
-    }
-
-    public void setOrg(OrgShortItem org) {
-        this.org = org;
-    }
-
-    public Date getStart() {
-        return start;
-    }
-
-    public void setStart(Date start) {
-        this.start = start;
-    }
-
-    public Date getEnd() {
-        return end;
+    private String buildFileName(Date generateTime, RegisterStampReport registerStampReport) {
+        DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss");
+        String reportDistinctText = registerStampReport.getReportDistinctText();
+        String format = timeFormat.format(generateTime);
+        return String.format("%s-%s-%s.xls", "RegisterStampReport", reportDistinctText, format);
     }
 
     public Boolean getIncludeActDiscrepancies() {
@@ -298,39 +224,6 @@ public class RegisterStampPage extends BasicWorkspacePage implements OrgSelectPa
 
     public void setIncludeActDiscrepancies(Boolean includeActDiscrepancies) {
         this.includeActDiscrepancies = includeActDiscrepancies;
-    }
-
-    public void setEnd(Date end) {
-        localCalendar.setTime(end);
-        localCalendar.add(Calendar.DAY_OF_MONTH,1);
-        localCalendar.add(Calendar.SECOND, -1);
-        this.end = localCalendar.getTime();
-    }
-
-    public void onDateSpecified(ActionEvent event) {
-        reportPeriod = REPORT_PERIOD_DATE;
-    }
-
-
-    public void onReportPeriodChanged(ActionEvent event) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTimeInMillis(start.getTime());
-        if (reportPeriod == REPORT_PERIOD_WEEK) {
-            cal.add(Calendar.DAY_OF_MONTH, 7);
-        } else if (reportPeriod == REPORT_PERIOD_2WEEKS) {
-            cal.add(Calendar.DAY_OF_MONTH, 14);
-        } else if (reportPeriod == REPORT_PERIOD_MONTH) {
-            cal.add(Calendar.MONTH, 1);
-        }
-        this.end = cal.getTime();
-    }
-
-    public int getReportPeriod() {
-        return reportPeriod;
-    }
-
-    public void setReportPeriod(int reportPeriod) {
-        this.reportPeriod = reportPeriod;
     }
 
     @Override

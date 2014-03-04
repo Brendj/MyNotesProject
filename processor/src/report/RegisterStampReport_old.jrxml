@@ -29,8 +29,6 @@
 	<parameter name="endDate" class="java.util.Date"/>
 	<field name="level1" class="java.lang.String"/>
 	<field name="level2" class="java.lang.String"/>
-	<field name="level3" class="java.lang.String"/>
-	<field name="level4" class="java.lang.String"/>
 	<field name="qty" class="java.lang.Long"/>
 	<field name="date" class="java.lang.String"/>
 	<title>
@@ -183,48 +181,10 @@
 						<cellContents style="Crosstab Data Text"/>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
-				<columnGroup name="level3" height="15" headerPosition="Stretch">
-					<bucket class="java.lang.String">
-						<bucketExpression><![CDATA[$F{level3}]]></bucketExpression>
-					</bucket>
-					<crosstabColumnHeader>
-						<cellContents>
-							<textField isBlankWhenNull="true">
-								<reportElement uuid="50c1d000-5857-4a6f-b60c-8f447e7eb91d" style="table" x="0" y="0" width="70" height="15"/>
-								<textElement textAlignment="Center">
-									<font size="8"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$V{level3}]]></textFieldExpression>
-							</textField>
-						</cellContents>
-					</crosstabColumnHeader>
-					<crosstabTotalColumnHeader>
-						<cellContents/>
-					</crosstabTotalColumnHeader>
-				</columnGroup>
-				<columnGroup name="level4" height="17" headerPosition="Stretch">
-					<bucket class="java.lang.String">
-						<bucketExpression><![CDATA[$F{level4}]]></bucketExpression>
-					</bucket>
-					<crosstabColumnHeader>
-						<cellContents>
-							<textField isBlankWhenNull="true">
-								<reportElement uuid="0794bb42-2f65-446a-a5b1-5fe852753477" style="table" x="0" y="0" width="70" height="15"/>
-								<textElement textAlignment="Center">
-									<font size="8"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$V{level4}]]></textFieldExpression>
-							</textField>
-						</cellContents>
-					</crosstabColumnHeader>
-					<crosstabTotalColumnHeader>
-						<cellContents/>
-					</crosstabTotalColumnHeader>
-				</columnGroup>
 				<measure name="qtyMeasure" class="java.lang.Long" calculation="Sum">
 					<measureExpression><![CDATA[$F{qty}]]></measureExpression>
 				</measure>
-				<crosstabCell width="70" height="15">
+				<crosstabCell width="70" height="13">
 					<cellContents style="Crosstab Data Text">
 						<textField>
 							<reportElement uuid="9c7ea58c-6de3-4896-a460-802f45f87561" style="table" positionType="Float" x="0" y="0" width="70" height="13"/>
@@ -279,18 +239,6 @@
 							<textFieldExpression><![CDATA[$V{qtyMeasure}]]></textFieldExpression>
 						</textField>
 					</cellContents>
-				</crosstabCell>
-				<crosstabCell columnTotalGroup="level3">
-					<cellContents/>
-				</crosstabCell>
-				<crosstabCell rowTotalGroup="date" columnTotalGroup="level3">
-					<cellContents/>
-				</crosstabCell>
-				<crosstabCell columnTotalGroup="level4">
-					<cellContents/>
-				</crosstabCell>
-				<crosstabCell rowTotalGroup="date" columnTotalGroup="level4">
-					<cellContents/>
 				</crosstabCell>
 			</crosstab>
 		</band>

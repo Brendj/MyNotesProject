@@ -86,7 +86,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
 
     /* получаем список всех  */
     @SuppressWarnings("unchecked")
-    public List<GoodItem> findAllGoods(Long idOfOrg){
+    public List<GoodItem> findAllGoods(Long idOfOrg, Date startTime, Date endTime){
         Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>();
         orderTypeEnumTypeSet.add(OrderTypeEnumType.DEFAULT);
         orderTypeEnumTypeSet.add(OrderTypeEnumType.UNKNOWN);
@@ -95,16 +95,19 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE);
         orderTypeEnumTypeSet.add(OrderTypeEnumType.CORRECTION_TYPE);
         String sql = "select distinct good.globalId as globalId, good.pathPart3 as pathPart3, "
-                + "good.pathPart4 as pathPart4,good.pathPart2 as pathPart2, good.fullName as fullName "
+                + "good.pathPart4 as pathPart4,good.pathPart2 as pathPart2, good.pathPart1 as pathPart1, good.fullName as fullName "
                 + " from OrderDetail details "
                 + " left join details.good good left join details.order ord left join ord.org o "
                 + " where ord.orderType in :orderType and details.good is not null and o.idOfOrg=:idOfOrg and "
+                + " ord.createTime between :startDate and :endDate and "
                 + " details.menuType >= :mintype and details.menuType <=:maxtype order by fullName";
         Query query = getSession().createQuery(sql);
         query.setParameterList("orderType",orderTypeEnumTypeSet);
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("startDate",startTime);
+        query.setParameter("endDate", endTime);
         query.setResultTransformer(Transformers.aliasToBean(GoodItem.class));
         return  (List<GoodItem>) query.list();
     }

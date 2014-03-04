@@ -18,91 +18,77 @@
 <%--@elvariable id="registerStampPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampPage"--%>
 <h:panelGrid id="registerStampReportPanelGrid" binding="#{registerStampPage.pageComponent}"
              styleClass="borderless-grid">
-    <h:panelGrid styleClass="borderless-grid" columns="2">
 
-        <h:outputText styleClass="output-text" escape="true" value="Организация" />
-        <h:panelGroup styleClass="borderless-div">
-            <h:inputText value="#{registerStampPage.org.shortName}" readonly="true" styleClass="input-text long-field"
-                         style="margin-right: 2px;" />
-            <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" />
-        </h:panelGroup>
+    <rich:simpleTogglePanel label="Настройки отчета" switchType="client" opened="true"
+                            headerClass="filter-panel-header" width="800">
+        <h:panelGrid styleClass="borderless-grid" columns="2">
 
-        <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
-        <rich:calendar value="#{registerStampPage.start}" datePattern="dd.MM.yyyy" converter="dateConverter"
-                       inputClass="input-text" showWeeksBar="false">
-            <a4j:support event="onchanged" reRender="datePeriodSelect" actionListener="#{registerStampPage.onDateSpecified}"/>
-        </rich:calendar>
+            <h:outputText styleClass="output-text" escape="true" value="Организация" />
+            <h:panelGroup styleClass="borderless-div">
+                <h:inputText value="#{registerStampPage.filter}" readonly="true" styleClass="input-text long-field"
+                             style="margin-right: 2px;" />
+                <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;" />
+            </h:panelGroup>
 
-        <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
-        <rich:calendar value="#{registerStampPage.end}" datePattern="dd.MM.yyyy" converter="dateConverter"
-                       inputClass="input-text" showWeeksBar="false" id="endDateCalendar">
-            <a4j:support event="onchanged" reRender="datePeriodSelect" actionListener="#{registerStampPage.onDateSpecified}"/>
-        </rich:calendar>
+            <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
+            <rich:calendar value="#{registerStampPage.startDate}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text"
+                           showWeeksBar="false">
+                <a4j:support event="onchanged" reRender="endDateCalendar"
+                             actionListener="#{registerStampPage.onReportPeriodChanged}" />
+            </rich:calendar>
 
-        <h:outputText value="Интервал: " styleClass="output-text"/>
-        <h:selectOneMenu id="datePeriodSelect" value="#{registerStampPage.reportPeriod}" converter="javax.faces.Integer"
-                         styleClass="output-text" >
-            <f:selectItem itemValue="0" itemLabel="1 день"/>
-            <f:selectItem itemValue="1" itemLabel="1 неделя"/>
-            <f:selectItem itemValue="2" itemLabel="2 недели"/>
-            <f:selectItem itemValue="3" itemLabel="1 месяц"/>
-            <f:selectItem itemValue="4" itemLabel="Точная дата"/>
-            <a4j:support event="onchange" reRender="endDateCalendar" actionListener="#{registerStampPage.onReportPeriodChanged}"/>
-        </h:selectOneMenu>
+            <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
+            <h:selectOneMenu id="endDatePeriodSelect" value="#{registerStampPage.periodTypeMenu.periodType}"
+                             styleClass="input-text" style="width: 250px;">
+                <f:converter converterId="periodTypeConverter" />
+                <f:selectItems value="#{registerStampPage.periodTypeMenu.items}" />
+                <a4j:support event="onchange" reRender="endDateCalendar"
+                             actionListener="#{registerStampPage.onReportPeriodChanged}" />
+            </h:selectOneMenu>
+            <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
+            <rich:calendar id="endDateCalendar" value="#{registerStampPage.endDate}"
+                           datePattern="dd.MM.yyyy" converter="dateConverter"
+                           inputClass="input-text" showWeeksBar="false">
+                <a4j:support event="onchanged" reRender="endDatePeriodSelect"
+                             actionListener="#{registerStampPage.onEndDateSpecified}" />
+            </rich:calendar>
 
-        <h:outputText value="Показывать с расхождениями: " styleClass="output-text"/>
-        <h:selectBooleanCheckbox value="#{registerStampPage.includeActDiscrepancies}"/>
+            <h:outputText value="Показывать с расхождениями: " styleClass="output-text"/>
+            <h:selectBooleanCheckbox value="#{registerStampPage.includeActDiscrepancies}"/>
 
-        <a4j:commandButton value="Применить" action="#{registerStampPage.reload}"
-                           reRender="registerStampReportPanelGrid" />
+
+        </h:panelGrid>
+
+    </rich:simpleTogglePanel>
+    <h:panelGrid styleClass="borderless-grid" columns="3">
+        <a4j:commandButton value="Генерировать отчет" action="#{registerStampPage.buildReportHTML}"
+                           reRender="registerStampReportPanel"
+                           styleClass="command-button" status="reportGenerateStatus" />
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{registerStampPage.showCSVList}" styleClass="command-button" />
         <a4j:commandButton value="Очистить" action="#{registerStampPage.clear}"
-                           reRender="registerStampReportPanelGrid" />
-        <a4j:status id="reportGenerateStatus">
-            <f:facet name="start">
-                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
-            </f:facet>
-        </a4j:status>
+                           reRender="registerStampReportPanelGrid"
+                           styleClass="command-button" status="reportGenerateStatus" />
     </h:panelGrid>
-
-
-    <rich:dataTable value="#{registerStampPage.pageItems}" var="item">
-        <f:facet name="header">
-            <rich:columnGroup>
-                <rich:column rowspan="3">
-                    <h:outputText value="Дата и номер талона"/>
-                </rich:column>
-                <rich:column colspan="#{registerStampPage.lastLvlElements}" rowspan="1">
-                    <h:outputText value="Количество"/>
-                </rich:column>
-
-                <rich:column breakBefore="true" rendered="false">
-                    <rich:spacer />
-                </rich:column>
-                <rich:columns value="#{registerStampPage.lvl1}" var="lvl1" colspan="#{lvl1.value.childCount}" rowspan="#{3-(lvl1.value.childCount>0?2:1)}">
-                    <h:outputText value="#{lvl1.key}"/>
-                </rich:columns>
-
-                <rich:column breakBefore="true" rendered="false">
-                    <rich:spacer />
-                </rich:column>
-                <rich:columns value="#{registerStampPage.lvl2}" var="lvl2" colspan="#{lvl2.value.childCount}">
-                    <h:outputText value="#{lvl2.key}"/>
-                </rich:columns>
-
-            </rich:columnGroup>
+    <a4j:status id="reportGenerateStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
         </f:facet>
-        <rich:column>
-            <h:outputText value="#{item.date}"/>
-        </rich:column>
-        <rich:columns value="#{registerStampPage.lvlBottom}" var="lvlBottom" colspan="#{lvlBottom.value.childCount}">
-            <h:outputText value="#{item.getValue(lvlBottom.value.fullName)} " />
-        </rich:columns>
-    </rich:dataTable>
-
-    <h:commandButton value="Выгрузить в Excel" actionListener="#{registerStampPage.showCSVList}" styleClass="command-button" />
+    </a4j:status>
 
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
+
+    <h:panelGrid styleClass="borderless-grid" id="registerStampReportPanel" columnClasses="center-aligned-column">
+        <%-- не показывать пустую таблицу --%>
+        <c:if test="${registerStampPage.htmlReport!=null && not empty registerStampPage.htmlReport}" >
+            <f:verbatim>
+                <div>${registerStampPage.htmlReport}</div>
+            </f:verbatim>
+        </c:if>
+    </h:panelGrid>
+
+
 </h:panelGrid>

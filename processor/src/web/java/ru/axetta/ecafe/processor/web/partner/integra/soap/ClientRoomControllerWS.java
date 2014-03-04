@@ -73,6 +73,8 @@ import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
 import java.util.*;
 
+import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
+
 /**
  * Created by IntelliJ IDEA.
  * User: rumil
@@ -84,7 +86,11 @@ import java.util.*;
 @WebService()
 public class ClientRoomControllerWS extends HttpServlet implements ClientRoomController {
 
-    final Logger logger = LoggerFactory.getLogger(ClientRoomControllerWS.class);
+    @Resource
+    private WebServiceContext context;
+
+    private static final Logger logger = LoggerFactory.getLogger(ClientRoomControllerWS.class);
+
     private static final Long RC_CLIENT_AUTHORIZATION_FAILED = -101L;
     private static final Long RC_PARTNER_AUTHORIZATION_FAILED = -100L;
     private static final Long RC_OK = 0L;
@@ -111,10 +117,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_DO_NOT_ACCESS_TO_SUB_BALANCE_DESC = "Нет доступа к субсчетам";
     private static final String RC_SUBSCRIPTION_FEEDING_DUPLICATE_DESC = "У клиента уже есть активная подписка на АП.";
     private static final String RC_LACK_OF_SUBBALANCE1_DESC = "У клиента недостаточно средств на субсчете АП";
+    private static final int MAX_RECS = 50;
 
-    @Resource
-    private WebServiceContext context;
-
+    public static final int CIRCULATION_STATUS_FILTER_ALL = -1, CIRCULATION_STATUS_FILTER_ALL_ON_HANDS = -2;
 
     static class Processor {
 
@@ -1688,8 +1693,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         data.setClientSummaryExt(clientSummaryExt);
     }
 
-    final static int MAX_RECS = 50;
-
     @Override
     public PurchaseListResult getPurchaseList(Long contractId, final Date startDate, final Date endDate) {
 
@@ -1985,22 +1988,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return complexListResult;
     }
 
-
-    public void calendarResetTime(Calendar date) {
-        date.set(Calendar.HOUR_OF_DAY, 0);
-        date.set(Calendar.MINUTE, 0);
-        date.set(Calendar.SECOND, 0);
-        date.set(Calendar.MILLISECOND, 0);
-    }
-
     private void processMenuList(Org org, Data data, ObjectFactory objectFactory, Session session, Date startDate,
             Date endDate) throws DatatypeConfigurationException {
         Criteria menuCriteria = session.createCriteria(Menu.class);
         Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
         fromCal.setTime(startDate);
         toCal.setTime(endDate);
-        calendarResetTime(fromCal);
-        calendarResetTime(toCal);
+        truncateToDayOfMonth(fromCal);
+        truncateToDayOfMonth(toCal);
         fromCal.add(Calendar.HOUR, -1);
         menuCriteria.add(Restrictions.eq("org", org));
         menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
@@ -2057,8 +2052,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
         fromCal.setTime(startDate);
         toCal.setTime(endDate);
-        calendarResetTime(fromCal);
-        calendarResetTime(toCal);
+        truncateToDayOfMonth(fromCal);
+        truncateToDayOfMonth(toCal);
         fromCal.add(Calendar.HOUR, -1);
         complexCriteria.add(Restrictions.eq("org", org));
 
@@ -2373,49 +2368,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
         return data;
     }
-    /*public ClientsData getClientsByGuardSan(String guardSan) {
-        authenticateRequest(null);
-
-        ClientsData data = new ClientsData();
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-
-            Criterion exp1 = Restrictions.or(Restrictions.ilike("guardSan", guardSan, MatchMode.EXACT),
-                    Restrictions.ilike("guardSan", guardSan + ";", MatchMode.START));
-            Criterion exp2 = Restrictions.or(Restrictions.like("guardSan", ";" + guardSan, MatchMode.END),
-                    Restrictions.like("guardSan", ";" + guardSan + ";", MatchMode.ANYWHERE));
-            Criterion expression = Restrictions.or(exp1, exp2);
-            clientCriteria.add(expression);
-
-            List<Client> clients = clientCriteria.list();
-
-            data.clientList = new ClientList();
-            for (Client client : clients) {
-                ClientItem clientItem = new ClientItem();
-                clientItem.setContractId(client.getContractId());
-                clientItem.setSan(client.getSan());
-                data.clientList.getClients().add(clientItem);
-            }
-            data.resultCode = RC_OK;
-            data.description = "OK";
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed to process client room controller request", e);
-            data.resultCode = RC_INTERNAL_ERROR;
-            data.description = e.toString();
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-        return data;
-    }*/
 
     @Override
     public AttachGuardSanResult attachGuardSan(String san, String guardSan) {
@@ -2649,79 +2601,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
     }
 
-    /*private void workClientSan(EntityManager entityManager, String guardSan, Result data, List clientList) {
-        if (clientList.size() == 0) {
-            data.resultCode = RC_CLIENT_NOT_FOUND;
-            data.description = RC_CLIENT_NOT_FOUND_DESC;
-        } else if (clientList.size() > 1) {
-            data.resultCode = RC_SEVERAL_CLIENTS_WERE_FOUND;
-            data.description = RC_SEVERAL_CLIENTS_WERE_FOUND_DESC;
-        } else {
-            Object[] clientObject = (Object[]) clientList.get(0);
-            Long idOfClient = ((BigInteger) clientObject[0]).longValue();
-            String clientGuardSan = (String) clientObject[1];
-            if (clientGuardSan == null) {
-                if (data instanceof AttachGuardSanResult) {
-                    Query query = entityManager.createNativeQuery(
-                            "update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
-                    query.setParameter("guardSan", guardSan);
-                    query.setParameter("idOfClient", idOfClient);
-                    query.executeUpdate();
-                    data.resultCode = RC_OK;
-                    data.description = "Ok";
-                } else if (data instanceof DetachGuardSanResult) {
-                    data.resultCode = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS;
-                    data.description = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC;
-                }
-            } else {
-                if (data instanceof AttachGuardSanResult) {
-                    if (isGuardSanExists(guardSan, clientGuardSan)) {
-                        data.resultCode = RC_CLIENT_HAS_THIS_SNILS_ALREADY;
-                        data.description = RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC;
-                    } else {
-                        String gs = "";
-                        if (clientGuardSan.endsWith(";")) {
-                            gs = clientGuardSan + guardSan;
-                        } else {
-                            gs = clientGuardSan + ";" + guardSan;
-                        }
-                        Query query = entityManager.createNativeQuery(
-                                "update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
-                        query.setParameter("guardSan", gs);
-                        query.setParameter("idOfClient", idOfClient);
-                        query.executeUpdate();
-                        data.resultCode = RC_OK;
-                        data.description = "Ok";
-                    }
-                } else if (data instanceof DetachGuardSanResult) {
-                    if (!isGuardSanExists(guardSan, clientGuardSan)) {
-                        data.resultCode = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS;
-                        data.description = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC;
-                    } else {
-                        if (clientGuardSan.contains(";" + guardSan + ";")) {
-                            clientGuardSan = clientGuardSan.replace(";" + guardSan + ";", ";");
-                        } else if (clientGuardSan.startsWith(guardSan + ";")) {
-                            clientGuardSan = clientGuardSan.substring((guardSan + ";").length());
-                        } else if (clientGuardSan.endsWith(";" + guardSan)) {
-                            clientGuardSan = clientGuardSan
-                                    .substring(0, clientGuardSan.length() - (";" + guardSan).length());
-                        } else {
-                            clientGuardSan = clientGuardSan.replace(guardSan, "");
-                        }
-                        Query query = entityManager.createNativeQuery(
-                                "update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
-                        query.setParameter("guardSan", clientGuardSan);
-                        query.setParameter("idOfClient", idOfClient);
-                        query.executeUpdate();
-                        data.resultCode = RC_OK;
-                        data.description = "Ok";
-                    }
-                }
-            }
-        }
-    }*/
-
-
     private boolean isGuardSanExists(String guardSan, String clientGuardSans) {
         String[] guardSans = clientGuardSans.split(";");
         for (String gs : guardSans) {
@@ -2880,8 +2759,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         circListResult.description = data.getDescription();
         return circListResult;
     }
-
-    public final static int CIRCULATION_STATUS_FILTER_ALL = -1, CIRCULATION_STATUS_FILTER_ALL_ON_HANDS = -2;
 
     private void processCirculationList(Client client, Data data, ObjectFactory objectFactory, Session session,
             int state) throws DatatypeConfigurationException {
@@ -4239,7 +4116,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ECafeSettings cafeSettings = settings.get(0);
             SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) cafeSettings
                     .getSplitSettingValue();
-            Date today = CalendarUtils.truncateToDayOfMonth(new Date());
+            Date today = truncateToDayOfMonth(new Date());
             Date activationDate = CalendarUtils.addDays(today, 1 + parser.getDayForbidChange());
             // Если день активации выпадает на выходной - воскресенье, то берем понедельник.
             if (!CalendarUtils.isWorkingDate(activationDate)) {
@@ -4380,3 +4257,121 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }
+
+
+
+/*public ClientsData getClientsByGuardSan(String guardSan) {
+        authenticateRequest(null);
+
+        ClientsData data = new ClientsData();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
+
+            Criterion exp1 = Restrictions.or(Restrictions.ilike("guardSan", guardSan, MatchMode.EXACT),
+                    Restrictions.ilike("guardSan", guardSan + ";", MatchMode.START));
+            Criterion exp2 = Restrictions.or(Restrictions.like("guardSan", ";" + guardSan, MatchMode.END),
+                    Restrictions.like("guardSan", ";" + guardSan + ";", MatchMode.ANYWHERE));
+            Criterion expression = Restrictions.or(exp1, exp2);
+            clientCriteria.add(expression);
+
+            List<Client> clients = clientCriteria.list();
+
+            data.clientList = new ClientList();
+            for (Client client : clients) {
+                ClientItem clientItem = new ClientItem();
+                clientItem.setContractId(client.getContractId());
+                clientItem.setSan(client.getSan());
+                data.clientList.getClients().add(clientItem);
+            }
+            data.resultCode = RC_OK;
+            data.description = "OK";
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to process client room controller request", e);
+            data.resultCode = RC_INTERNAL_ERROR;
+            data.description = e.toString();
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return data;
+    }*/
+
+    /*private void workClientSan(EntityManager entityManager, String guardSan, Result data, List clientList) {
+        if (clientList.size() == 0) {
+            data.resultCode = RC_CLIENT_NOT_FOUND;
+            data.description = RC_CLIENT_NOT_FOUND_DESC;
+        } else if (clientList.size() > 1) {
+            data.resultCode = RC_SEVERAL_CLIENTS_WERE_FOUND;
+            data.description = RC_SEVERAL_CLIENTS_WERE_FOUND_DESC;
+        } else {
+            Object[] clientObject = (Object[]) clientList.get(0);
+            Long idOfClient = ((BigInteger) clientObject[0]).longValue();
+            String clientGuardSan = (String) clientObject[1];
+            if (clientGuardSan == null) {
+                if (data instanceof AttachGuardSanResult) {
+                    Query query = entityManager.createNativeQuery(
+                            "update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
+                    query.setParameter("guardSan", guardSan);
+                    query.setParameter("idOfClient", idOfClient);
+                    query.executeUpdate();
+                    data.resultCode = RC_OK;
+                    data.description = "Ok";
+                } else if (data instanceof DetachGuardSanResult) {
+                    data.resultCode = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS;
+                    data.description = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC;
+                }
+            } else {
+                if (data instanceof AttachGuardSanResult) {
+                    if (isGuardSanExists(guardSan, clientGuardSan)) {
+                        data.resultCode = RC_CLIENT_HAS_THIS_SNILS_ALREADY;
+                        data.description = RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC;
+                    } else {
+                        String gs = "";
+                        if (clientGuardSan.endsWith(";")) {
+                            gs = clientGuardSan + guardSan;
+                        } else {
+                            gs = clientGuardSan + ";" + guardSan;
+                        }
+                        Query query = entityManager.createNativeQuery(
+                                "update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
+                        query.setParameter("guardSan", gs);
+                        query.setParameter("idOfClient", idOfClient);
+                        query.executeUpdate();
+                        data.resultCode = RC_OK;
+                        data.description = "Ok";
+                    }
+                } else if (data instanceof DetachGuardSanResult) {
+                    if (!isGuardSanExists(guardSan, clientGuardSan)) {
+                        data.resultCode = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS;
+                        data.description = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC;
+                    } else {
+                        if (clientGuardSan.contains(";" + guardSan + ";")) {
+                            clientGuardSan = clientGuardSan.replace(";" + guardSan + ";", ";");
+                        } else if (clientGuardSan.startsWith(guardSan + ";")) {
+                            clientGuardSan = clientGuardSan.substring((guardSan + ";").length());
+                        } else if (clientGuardSan.endsWith(";" + guardSan)) {
+                            clientGuardSan = clientGuardSan
+                                    .substring(0, clientGuardSan.length() - (";" + guardSan).length());
+                        } else {
+                            clientGuardSan = clientGuardSan.replace(guardSan, "");
+                        }
+                        Query query = entityManager.createNativeQuery(
+                                "update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
+                        query.setParameter("guardSan", clientGuardSan);
+                        query.setParameter("idOfClient", idOfClient);
+                        query.executeUpdate();
+                        data.resultCode = RC_OK;
+                        data.description = "Ok";
+                    }
+                }
+            }
+        }
+    }*/

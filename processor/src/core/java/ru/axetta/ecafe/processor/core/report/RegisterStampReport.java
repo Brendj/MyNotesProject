@@ -77,28 +77,38 @@ public class RegisterStampReport extends BasicReportForOrgJob {
             }
 
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
-            List<GoodItem> allGoods = service.findAllGoods(org.getIdOfOrg());
+            List<GoodItem> allGoods = service.findAllGoods(org.getIdOfOrg(), startTime, endTime );
             List<RegisterStampReportItem> result = new ArrayList<RegisterStampReportItem>();
             calendar.setTime(startTime);
             while (endTime.getTime()>calendar.getTimeInMillis()){
                 String date = timeFormat.format(calendar.getTime());
-                for (GoodItem goodItem: allGoods){
-                    Long val = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
-                            goodItem.getFullName(), withOutActDiscrepancies);
-                    RegisterStampReportItem item = new RegisterStampReportItem(goodItem.getPathPart3(),goodItem.getPathPart4(),val,date);
-                    RegisterStampReportItem total = new RegisterStampReportItem(goodItem.getPathPart3(),goodItem.getPathPart4(),val,"77777");
-                    RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem.getPathPart3(),goodItem.getPathPart4(),val,"99999");
+                if(allGoods.isEmpty()){
+                    GoodItem emptyGoodItem = new GoodItem();
+                    RegisterStampReportItem item = new RegisterStampReportItem(emptyGoodItem,0L,date);
+                    RegisterStampReportItem total = new RegisterStampReportItem(emptyGoodItem,0L,"77777");
+                    RegisterStampReportItem allTotal = new RegisterStampReportItem(emptyGoodItem,0L,"99999");
                     result.add(allTotal);
                     result.add(item);
                     result.add(total);
+                } else {
+                    for (GoodItem goodItem: allGoods){
+                        Long val = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
+                                goodItem.getFullName(), withOutActDiscrepancies);
+                        RegisterStampReportItem item = new RegisterStampReportItem(goodItem,val,date);
+                        RegisterStampReportItem total = new RegisterStampReportItem(goodItem,val,"77777");
+                        RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem,val,"99999");
+                        result.add(allTotal);
+                        result.add(item);
+                        result.add(total);
+                    }
                 }
                 calendar.add(Calendar.DATE,1);
             }
             for (GoodItem goodItem: allGoods){
                 Long val = service.buildRegisterStampDailySampleValue(org.getIdOfOrg(), startTime, endTime,
                         goodItem.getFullName());
-                RegisterStampReportItem dailySampleItem = new RegisterStampReportItem(goodItem.getPathPart3(),goodItem.getPathPart4(),val,"88888");
-                RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem.getPathPart3(),goodItem.getPathPart4(),val,"99999");
+                RegisterStampReportItem dailySampleItem = new RegisterStampReportItem(goodItem,val,"88888");
+                RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem,val,"99999");
                 result.add(allTotal);
                 result.add(dailySampleItem);
             }
