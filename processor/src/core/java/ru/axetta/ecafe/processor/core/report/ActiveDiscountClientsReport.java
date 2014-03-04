@@ -833,6 +833,9 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
         }
 
         public void addSchoolGroup(String groupName, Double total) {
+            if(groupName == null || groupName.length() < 1) {
+                return;
+            }
             Pattern p = Pattern.compile("[0-9]{1,2}");
             Matcher m = p.matcher(groupName);
             m.find();
