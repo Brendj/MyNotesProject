@@ -36,7 +36,7 @@ import javax.servlet.http.HttpServletResponse;
  * User: chirikov
  * Date: 25.04.13
  * Time: 16:47
- * To change this template use File | Settings | File Templates.
+ * Отчет по предоставленным услугам
  */
 public class DeliveredServicesReportPage extends OnlineReportPage
         implements ContragentSelectPage.CompleteHandler, ContractSelectPage.CompleteHandler {
@@ -102,6 +102,13 @@ public class DeliveredServicesReportPage extends OnlineReportPage
             AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
             String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + DeliveredServicesReport.class.getSimpleName() + ".jasper";
             DeliveredServicesReport.Builder builder = new DeliveredServicesReport.Builder(templateFilename);
+            if (idOfOrg != null) {
+                Org org = null;
+                if (idOfOrg > -1) {
+                    org = DAOService.getInstance().findOrById(idOfOrg);
+                    builder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+                }
+            }
             Session session = RuntimeContext.getInstance().createReportPersistenceSession();
             DeliveredServicesReport deliveredServicesReport = builder.build(session,startDate, endDate, localCalendar,contragentFilter.getContragent().getIdOfContragent(),
                     contractFilter.getContract().getIdOfContract());
