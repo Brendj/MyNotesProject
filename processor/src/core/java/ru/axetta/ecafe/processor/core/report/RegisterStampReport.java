@@ -80,10 +80,10 @@ public class RegisterStampReport extends BasicReportForOrgJob {
             List<GoodItem> allGoods = service.findAllGoods(org.getIdOfOrg(), startTime, endTime );
             List<RegisterStampReportItem> result = new ArrayList<RegisterStampReportItem>();
             calendar.setTime(startTime);
+            GoodItem emptyGoodItem = new GoodItem();
             while (endTime.getTime()>calendar.getTimeInMillis()){
                 String date = timeFormat.format(calendar.getTime());
                 if(allGoods.isEmpty()){
-                    GoodItem emptyGoodItem = new GoodItem();
                     RegisterStampReportItem item = new RegisterStampReportItem(emptyGoodItem,0L,date);
                     RegisterStampReportItem total = new RegisterStampReportItem(emptyGoodItem,0L,"77777");
                     RegisterStampReportItem allTotal = new RegisterStampReportItem(emptyGoodItem,0L,"99999");
@@ -104,13 +104,20 @@ public class RegisterStampReport extends BasicReportForOrgJob {
                 }
                 calendar.add(Calendar.DATE,1);
             }
-            for (GoodItem goodItem: allGoods){
-                Long val = service.buildRegisterStampDailySampleValue(org.getIdOfOrg(), startTime, endTime,
-                        goodItem.getFullName());
-                RegisterStampReportItem dailySampleItem = new RegisterStampReportItem(goodItem,val,"88888");
-                RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem,val,"99999");
+            if(allGoods.isEmpty()){
+                RegisterStampReportItem dailySampleItem = new RegisterStampReportItem(emptyGoodItem,0L,"88888");
+                RegisterStampReportItem allTotal = new RegisterStampReportItem(emptyGoodItem,0L,"99999");
                 result.add(allTotal);
                 result.add(dailySampleItem);
+            } else {
+                for (GoodItem goodItem: allGoods){
+                    Long val = service.buildRegisterStampDailySampleValue(org.getIdOfOrg(), startTime, endTime,
+                            goodItem.getFullName());
+                    RegisterStampReportItem dailySampleItem = new RegisterStampReportItem(goodItem,val,"88888");
+                    RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem,val,"99999");
+                    result.add(allTotal);
+                    result.add(dailySampleItem);
+                }
             }
             return new JRBeanCollectionDataSource(result);
         }

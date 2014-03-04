@@ -73,15 +73,27 @@ import net.sf.jasperreports.engine.JRException;
              }
              break;
              case ONE_MONTH: {
-                 setEndDate(CalendarUtils.addMonth(startDate, 1));
+                 setEndDate(CalendarUtils.addDays(CalendarUtils.addMonth(startDate, 1), -1));
              }
              break;
          }
      }
 
-     public void onEndDateSpecified(ActionEvent event) {
-         periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY);
-     }
+    public void onEndDateSpecified(ActionEvent event) {
+        Date end = CalendarUtils.truncateToDayOfMonth(endDate);
+        if(CalendarUtils.addMonth(end, -1).equals(CalendarUtils.addDays(startDate, -1))){
+            periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
+        } else {
+            long diff=end.getTime()-startDate.getTime();
+            int noofdays=(int)(diff/(1000*24*60*60));
+            switch (noofdays){
+                case 0: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY); break;
+                case 6: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK); break;
+                case 13: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK); break;
+                default: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY); break;
+            }
+        }
+    }
 
      public String getPageFilename() {
          return "report/online/good_requests_report";

@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.RegisterStampReport;
 import ru.axetta.ecafe.processor.core.report.ReportDAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
@@ -19,6 +20,7 @@ import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,21 +53,14 @@ public class RegisterStampPage extends OnlineReportPage{
 
     private final static Logger logger = LoggerFactory.getLogger(RegisterStampPage.class);
 
-    @PersistenceContext(unitName = "reportsPU")
-    private EntityManager entityManager;
-    @Autowired
-    private RuntimeContext runtimeContext;
     @Autowired
     private ReportDAOService daoService;
     private String htmlReport = null;
     private Boolean includeActDiscrepancies = true;
     private final PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu();
 
-    public PeriodTypeMenu getPeriodTypeMenu() {
-        return periodTypeMenu;
-    }
-
     public void onReportPeriodChanged(ActionEvent event) {
+        htmlReport = null;
         switch (periodTypeMenu.getPeriodType()){
             case ONE_DAY: {
                 setEndDate(startDate);
@@ -77,13 +72,26 @@ public class RegisterStampPage extends OnlineReportPage{
                 setEndDate(CalendarUtils.addDays(startDate, 13));
             } break;
             case ONE_MONTH: {
-                setEndDate(CalendarUtils.addMonth(startDate, 1));
+                setEndDate(CalendarUtils.addDays(CalendarUtils.addMonth(startDate, 1), -1));
             } break;
         }
     }
 
     public void onEndDateSpecified(ActionEvent event) {
-        periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY);
+        htmlReport = null;
+        Date end = CalendarUtils.truncateToDayOfMonth(endDate);
+        if(CalendarUtils.addMonth(end, -1).equals(CalendarUtils.addDays(startDate, -1))){
+            periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
+        } else {
+            long diff=end.getTime()-startDate.getTime();
+            int noofdays=(int)(diff/(1000*24*60*60));
+            switch (noofdays){
+                case 0: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY); break;
+                case 6: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK); break;
+                case 13: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK); break;
+                default: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY); break;
+            }
+        }
     }
 
     @Override
@@ -93,11 +101,18 @@ public class RegisterStampPage extends OnlineReportPage{
         return htmlReport;
     }
 
+    @Override
+    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
+        htmlReport = null;
+        super.completeOrgSelection(session,idOfOrg);
+    }
+
     public Object buildReportHTML() {
         if(this.idOfOrg==null){
             printError("Не выбрана организация");
             return null;
         }
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
         String templateShortFileName = RegisterStampReport.class.getSimpleName() + "_summary.jasper";
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
@@ -109,11 +124,16 @@ public class RegisterStampPage extends OnlineReportPage{
         Properties properties = new Properties();
         properties.setProperty(RegisterStampReport.PARAM_WITH_OUT_ACT_DISCREPANCIES, includeActDiscrepancies.toString());
         builder.setReportProperties(properties);
-        Org org = daoService.getOrg(idOfOrg);
-        builder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
+        Session session = null;
+        Transaction persistenceTransaction = null;
         try {
-            Session session = runtimeContext.createReportPersistenceSession();
+            session = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
+            Org org = (Org) session.load(Org.class, idOfOrg);
+            builder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
             BasicReportJob report =  builder.build(session,startDate, endDate, localCalendar);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
             if (report != null) {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 JRHtmlExporter exporter = new JRHtmlExporter();
@@ -133,6 +153,9 @@ public class RegisterStampPage extends OnlineReportPage{
         } catch (Exception e) {
             printError("Ошибка при построении отчета: "+e.getMessage());
             logger.error("Failed build report ",e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(session, logger);
         }
         return null;
     }
@@ -163,6 +186,7 @@ public class RegisterStampPage extends OnlineReportPage{
             printError("Не выбрана организация");
             return;
         }
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
         String templateShortFileName = RegisterStampReport.class.getSimpleName() + ".jasper";
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
@@ -175,11 +199,16 @@ public class RegisterStampPage extends OnlineReportPage{
         Properties properties = new Properties();
         properties.setProperty(RegisterStampReport.PARAM_WITH_OUT_ACT_DISCREPANCIES, includeActDiscrepancies.toString());
         builder.setReportProperties(properties);
-        Org org = daoService.getOrg(idOfOrg);
-        builder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
-        Session session = (Session) entityManager.getDelegate();
+        Session session = null;
+        Transaction persistenceTransaction = null;
         try {
+            session = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
+            Org org = (Org) session.load(Org.class, idOfOrg);
+            builder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
             RegisterStampReport registerStampReport = (RegisterStampReport) builder.build(session,startDate, endDate, localCalendar);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
             FacesContext facesContext = FacesContext.getCurrentInstance();
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
 
@@ -208,6 +237,9 @@ public class RegisterStampPage extends OnlineReportPage{
         } catch (Exception e) {
             logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(session, logger);
         }
     }
 
@@ -223,7 +255,12 @@ public class RegisterStampPage extends OnlineReportPage{
     }
 
     public void setIncludeActDiscrepancies(Boolean includeActDiscrepancies) {
+        htmlReport = null;
         this.includeActDiscrepancies = includeActDiscrepancies;
+    }
+
+    public PeriodTypeMenu getPeriodTypeMenu() {
+        return periodTypeMenu;
     }
 
     @Override
