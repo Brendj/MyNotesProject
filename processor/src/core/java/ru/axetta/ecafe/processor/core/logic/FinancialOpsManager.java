@@ -415,15 +415,15 @@ public class FinancialOpsManager {
         }
         checkBalance(fromBalanceLong, fromSubBalance, sum);
         Date dt = new Date();
-        if(fromBalance==1){
-            final String qlString = "from CycleDiagram where stateDiagram=0 and client=:client";
-            TypedQuery<CycleDiagram> query = em.createQuery(qlString, CycleDiagram.class);
-            query.setParameter("client", client);
-            query.setMaxResults(1);
-            CycleDiagram cycleDiagram = query.getSingleResult();
-            Long limit = cycleDiagram.getWeekPrice();
-            checkBalance(fromBalanceLong, fromSubBalance - limit, sum);
-        }
+        //if(fromBalance==1){
+        //    final String qlString = "from CycleDiagram where stateDiagram=0 and client=:client";
+        //    TypedQuery<CycleDiagram> query = em.createQuery(qlString, CycleDiagram.class);
+        //    query.setParameter("client", client);
+        //    query.setMaxResults(1);
+        //    CycleDiagram cycleDiagram = query.getSingleResult();
+        //    Long limit = cycleDiagram.getWeekPrice();
+        //    checkBalance(fromBalanceLong, fromSubBalance - limit, sum);
+        //}
 
         // регистрируем транзакцию на исходящем счете клиента
         AccountTransaction accountTransactionOnBenefactor = ClientAccountManager.processAccountTransaction(session, client,
