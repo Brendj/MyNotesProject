@@ -156,6 +156,7 @@
             this.currentDataTable = response.getDataTable();
             this.draw();
         }
+        executeNext();
     };
 
 
@@ -169,6 +170,7 @@
         } else {
             throw Error(message + ' ' + detailedMessage);
         }
+        executeNext();
     };
 
 
@@ -207,7 +209,7 @@ function drawActiveChart ()
         chartArea: {width: '70%', height: '80%', left: '50'}, fontSize: 11};
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
-    executeNext();
+    //executeNext();
 }
 
 function drawUniqueChart ()
@@ -221,7 +223,7 @@ function drawUniqueChart ()
         chartArea: {width: '70%', height: '80%', left: '50'}, fontSize: 11};
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
-    executeNext();
+    //executeNext();
 }
 
 function drawContentsChart()
@@ -234,7 +236,7 @@ function drawContentsChart()
     var options = { title: 'Состав потребления питания в ОУ', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие' };
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
-    executeNext();
+    //executeNext();
 }
 
 function toUTF8(str)
@@ -252,7 +254,7 @@ function drawRefillChart ()
     var options = { title: 'Обеспечение пополнения лицевых счетов учащихся (количество транзакций)', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие' };
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
-    executeNext();
+    //executeNext();
 }
 
 function drawRefillAvgChart ()
@@ -265,7 +267,7 @@ function drawRefillAvgChart ()
     var options = { title: 'Обеспечение пополнения лицевых счетов учащихся (средняя сумма пополнения)', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие' };
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
-    executeNext();
+    //executeNext();
 }
 
 function drawRefillProgressChart ()
@@ -278,7 +280,7 @@ function drawRefillProgressChart ()
     var options = { title: 'Обеспечение пополнения лицевых счетов учащихся (динамика пополнений)', isStacked: true, vAxis: {title: 'Динамика пополнений относительно всех пополнений', maxValue: 100, viewWindow: {max: 100}} };
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
-    executeNext();
+    //executeNext();
 }
 
 function drawInformingChart()
@@ -291,7 +293,7 @@ function drawInformingChart()
     var options = { title: 'Организация информирования родителей', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие'  };
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
-    executeNext();
+    //executeNext();
 }
 
 function drawBenefitsChart()
@@ -304,7 +306,7 @@ function drawBenefitsChart()
     var options = { title: 'Детализация льготных категорий кроме 1-4 класса', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие'  };
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
-    executeNext();
+    //executeNext();
 }
 
 function drawBenefitPartChart()
@@ -317,7 +319,7 @@ function drawBenefitPartChart()
     var options = { title: 'Льготные категории по питанию в общем составе учащихся', sliceVisibilityThreshold: 1/10000000, pieResidueSliceLabel: 'Другие'  };
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
-    executeNext();
+    //executeNext();
 }
 
 function drawVisitorsChart()
@@ -331,7 +333,7 @@ function drawVisitorsChart()
         chartArea: {width: '90%', height: '70%', left: '50'}, fontSize: 11};
     var queryWrapper = new QueryWrapper(query, chart, options, container);
     queryWrapper.sendAndDraw();
-    executeNext();
+    //executeNext();
 }
 
 
@@ -348,7 +350,7 @@ function drawRatingDescChart()
     var queryWrapper = new QueryWrapper(query, table, options, container, true);
     queryWrapper.sendAndDraw();
     drawToolbar();
-    executeNext();
+    //executeNext();
 }
 
 
@@ -365,7 +367,7 @@ function drawRatingAscChart()
     var queryWrapper = new QueryWrapper(query, table, options, container, true);
     queryWrapper.sendAndDraw();
     drawToolbar();
-    executeNext();
+    //executeNext();
 }
 
 function drawToolbar() {

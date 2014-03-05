@@ -738,9 +738,9 @@ public class ProjectStateReportService {
         cal.set(Calendar.MILLISECOND, 0);
 
 
-        /*cal.set(Calendar.YEAR, 2013);
-        cal.set(Calendar.MONTH, Calendar.OCTOBER);
-        cal.set(Calendar.DAY_OF_MONTH, 28);*/
+        cal.set(Calendar.YEAR, 2014);
+        cal.set(Calendar.MONTH, Calendar.FEBRUARY);
+        cal.set(Calendar.DAY_OF_MONTH, 28);
 
         return cal;
     }
@@ -1055,7 +1055,11 @@ public class ProjectStateReportService {
                         if (i - 1 >= vals.size()) {
                             r.addCell("");
                         } else {
-                            r.addCell(encode (val, encoding));
+                            if(val != null) {
+                                r.addCell(encode (val, encoding));
+                            } else {
+                                r.addCell("");
+                            }
                         }
                     } else if ((ValueType) col[0] == ValueType.NUMBER) {
                         //  Проверка, если выполняем за выходной и выполняются конкретные типы,
