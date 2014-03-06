@@ -217,6 +217,23 @@
         <element id="file-copy" path="$PROJECT_DIR$/../lib/apache/log4j-1.2.16.jar" />
       </root>
     </artifact>
+    <artifact type="exploded-war" name="subfeeding:war exploded">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/subfeeding_war_exploded</output-path>
+      <root id="root">
+        <element id="directory" name="WEB-INF">
+          <element id="directory" name="classes">
+            <element id="module-output" name="subfeeding" />
+          </element>
+        </element>
+        <element id="javaee-facet-resources" facet="subfeeding/web/Web" />
+      </root>
+    </artifact>
+    <artifact type="war" name="subfeeding:war">
+      <output-path>$PROJECT_DIR$/../../target/out/artifacts/subfeeding_war</output-path>
+      <root id="archive" name="subfeeding_war.war">
+        <element id="artifact" artifact-name="subfeeding:war exploded" />
+      </root>
+    </artifact>
   </component>
   <component name="ClearCaseSharedConfig">
     <option name="myUseUcmModel" value="true" />
@@ -520,7 +537,7 @@
     </copyright>
     <module2copyright />
   </component>
-  <component name="DataSourceManagerImpl" format="xml" hash="2324180718">
+  <component name="DataSourceManagerImpl" format="xml" hash="1033305336">
     <data-source source="LOCAL" name="Moscow Stand VM" product="PostgreSQL" version="9.1.8" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
       <identifier-quote-string>&quot;</identifier-quote-string>
       <synchronize>true</synchronize>
@@ -574,6 +591,20 @@
       <jdbc-url>jdbc:postgresql://corp.axetta-server:5432/amoscow</jdbc-url>
       <user-name>postgres</user-name>
       <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+      <libraries>
+        <library>
+          <url>jar://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar!/</url>
+        </library>
+      </libraries>
+    </data-source>
+    <data-source source="LOCAL" name="SPB Data Base Source" product="PostgreSQL" version="9.2.3" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="c480fc0c-b222-491f-845b-ef25d1401d9a">
+      <identifier-quote-string>&quot;</identifier-quote-string>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/aspb</jdbc-url>
+      <user-name>postgres</user-name>
+      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
+      <schema-pattern>aspb.public</schema-pattern>
       <libraries>
         <library>
           <url>jar://$PROJECT_DIR$/../lib/hibernate/postgresql-9.1-901.jdbc4.jar!/</url>
@@ -1561,6 +1592,7 @@
         <root url="jar://$USER_HOME$/.ideaLibSources/commons-lang-2.4-sources.jar!/" />
         <root url="jar://$USER_HOME$/.ideaLibSources/commons-io-1.4-sources.jar!/" />
         <root url="jar://$USER_HOME$/.ideaLibSources/commons-httpclient-3.1-sources.jar!/" />
+        <root url="jar://$USER_HOME$/.ideaLibSources/commons-collections-3.2.1-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="cryptopro">
