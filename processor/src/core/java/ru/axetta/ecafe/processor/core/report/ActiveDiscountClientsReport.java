@@ -836,17 +836,21 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
             if(groupName == null || groupName.length() < 1) {
                 return;
             }
-            Pattern p = Pattern.compile("[0-9]{1,2}");
-            Matcher m = p.matcher(groupName);
-            m.find();
-            String group = m.group();
-            if(group != null && group.length() > 0) {
-                int grp = Integer.parseInt(group);
-                if(grp < 4) {
-                    primarySchool += total;
-                } else {
-                    highSchool += total;
+            try {
+                Pattern p = Pattern.compile("[0-9]{1,2}");
+                Matcher m = p.matcher(groupName);
+                m.find();
+                String group = m.group();
+                if(group != null && group.length() > 0) {
+                    int grp = Integer.parseInt(group);
+                    if(grp < 4) {
+                        primarySchool += total;
+                    } else {
+                        highSchool += total;
+                    }
                 }
+            } catch (Exception e) {
+                logger.error("Failed to find match", e);
             }
         }
 
