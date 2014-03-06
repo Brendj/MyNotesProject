@@ -231,7 +231,7 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
                 + " WHERE cf_orders.createddate >= :startDate AND cf_orders.createddate <= :endDate and "
                 + " cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
                 + " cf_clients.discountmode=3 and "  /* берем только льготников */
-                + " (cf_orders.ordertype=3 or cf_orders.ordertype=4) and "/* смотрим плану льготного питания */
+                + " cf_orders.ordertype=4 and "/* смотрим плану льготного питания */
                 + " cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS enter_event_data "
                 + "GROUP BY enter_event_data.d, enter_event_data.org";
 
