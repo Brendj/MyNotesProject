@@ -36,7 +36,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
                 "   and orderdetail.idoforder = cforder.idoforder" +
                 " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
-                " where cforder.createddate>=:startDate and cforder.createddate<:endDate and orderdetail.socdiscount>0 and" +
+                " where cforder.createddate>=:startDate and cforder.createddate<=:endDate and orderdetail.socdiscount>0 and" +
                 " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"' and " +
                 " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
                 " (cforder.ordertype in (0,1,4,6) or (cforder.ordertype=8 "
