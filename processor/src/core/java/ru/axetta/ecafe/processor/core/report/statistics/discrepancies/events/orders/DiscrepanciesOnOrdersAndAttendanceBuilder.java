@@ -153,33 +153,6 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         }
 
         final ArrayList<Long> orgs = new ArrayList<Long>(orgItems.keySet());
-
-        //String goodSQL = "select sum(this_.TotalCount)/1000, this_.OrgOwner, gr1_.DoneDate "
-        //        + " from cf_goods_requests_positions this_ "
-        //        + " inner join cf_goods_requests gr1_ on this_.IdOfGoodsRequest=gr1_.IdOfGoodsRequest "
-        //        + "  join cf_menuexchangerules on cf_menuexchangerules.idofdestorg=this_.OrgOwner "
-        //        + "  join cf_goods on cf_goods.idofgood=this_.idofgood "
-        //        + " where gr1_.DoneDate>=:startDate and gr1_.DoneDate<=:endDate "
-        //        + " and cf_menuexchangerules.idofsourceorg in (:idOfSupplier)"
-        //        + " and cf_goods.nameofgood ilike '%завтрак%' or cf_goods.nameofgood ilike '%обед%' "
-        //        + " or cf_goods.nameofgood ilike '%полдник%' "
-        //        + " and gr1_.State=1 and this_.DeletedState=false group by this_.OrgOwner, gr1_.DoneDate "
-        //        + " order by this_.OrgOwner asc ";
-        //String goodSQL = "SELECT resultdata.dd, int8(sum(resultdata.tc)*2/sum(resultdata.cg)) FROM  ( "
-        //        + " SELECT ddate AS dd, sum(tcount) AS tc, count(good) AS cg, sum(tcount)/count(good), int8(sum(tcount)/count(good)) FROM "
-        //        + "(  SELECT  int8(sum(totalcount) / 1000) AS tcount, "
-        //        + "  cf_goods_requests.DoneDate AS ddate, cf_goods.fullname AS good, "
-        //        + "  (CASE WHEN cf_goods.fullname ILIKE '%завтрак%' THEN 1 WHEN cf_goods.fullname ILIKE '%обед%' THEN 2 WHEN cf_goods.fullname ILIKE '%полдник%' THEN 3 ELSE 0 END) AS gtype "
-        //        + "  FROM cf_goods_requests_positions "
-        //        + "  LEFT JOIN cf_goods_requests ON cf_goods_requests_positions.IdOfGoodsRequest=cf_goods_requests.IdOfGoodsRequest "
-        //        + "  LEFT JOIN cf_goods ON cf_goods.idofgood=cf_goods_requests_positions.idofgood  WHERE "
-        //        + (idOfOrgs!=null && !idOfOrgs.isEmpty()?" cf_goods_requests.orgowner in (:idOfOrgs)  AND ":" ")
-        //        + "  cf_goods_requests.DoneDate>=:startDate AND cf_goods_requests.DoneDate<=:endDate "
-        //        + "  AND (cf_goods.fullname ILIKE '%завтрак%' OR cf_goods.fullname ILIKE '%обед%' OR cf_goods.fullname ILIKE '%полдник%') "
-        //        + "  AND NOT(cf_goods.fullname ILIKE '%сотрудник%')   AND cf_goods.orgowner = :idOfSupplier"
-        //        + "  GROUP BY cf_goods_requests.DoneDate, cf_goods.fullname) AS rdata"
-        //        + " GROUP BY rdata.ddate, rdata.gtype ORDER BY rdata.ddate) AS resultdata "
-        //        + " GROUP BY resultdata.dd ";
         String orgCriteria ="";
         if (idOfOrgs!=null && !idOfOrgs.isEmpty() && idOfOrgs.get(0)!=null) {
             orgCriteria =" cf_goods_requests.orgowner IN (:idOfOrgs) ";
@@ -210,11 +183,8 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
 
         Map<Long, Map<Date, RequestCountItem>> requestCountMap = new HashMap<Long, Map<Date, RequestCountItem>>();
         for (Object[] row : goodRes) {
-            //Long idOfOrg = (Long) row[1];
             Long idOfOrg = ((BigInteger) row[1]).longValue();
-            //Long totalCount = row[0] == null ? 0L : ((Long) row[0])/1000;
             Long totalCount = ((BigInteger) row[2]).longValue();
-            //Date date = CalendarUtils.truncateToDayOfMonth((Date) row[2]);
             Date date  = CalendarUtils.truncateToDayOfMonth(new Date(((BigInteger) row[0]).longValue()));
             Map<Date, RequestCountItem> dateRequestCountItemMap = requestCountMap.get(idOfOrg);
             if(dateRequestCountItemMap == null){
@@ -224,9 +194,6 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
             } else {
                 RequestCountItem item = dateRequestCountItemMap.get(date);
                 if(item==null){
-                    //HashMap<Date, RequestCountItem> value = new HashMap<Date, RequestCountItem>();
-                    //value.put(date, new RequestCountItem(totalCount, date));
-                    //requestCountMap.put(idOfOrg, value);
                     dateRequestCountItemMap.put(date, new RequestCountItem(totalCount, date));
                 } else {
                     item.setTotalCount(item.getTotalCount()+totalCount);
@@ -235,19 +202,38 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         }
 
 
-        String sql = "SELECT count(client), EXTRACT(EPOCH FROM enter_event_data.d) * 1000, enter_event_data.org "
+        //String sql = "SELECT count(distinct client), EXTRACT(EPOCH FROM enter_event_data.d) * 1000, enter_event_data.org "
+        //        + "FROM ("
+        //        + " SELECT cf_enterevents.idofclient AS client, "
+        //        + "  date_trunc('day', to_timestamp(cf_enterevents.evtdatetime/1000)) AS d, "
+        //        + "  cf_enterevents.idoforg AS org "
+        //        + " FROM cf_enterevents "
+        //        + " join cf_clients on cf_clients.idofclient=cf_enterevents.idofclient "
+        //        + " join cf_clients_categorydiscounts on cf_clients.idofclient=cf_clients_categorydiscounts.idofclient "
+        //        + " join cf_categorydiscounts on "
+        //        + "   cf_categorydiscounts.idofcategorydiscount=cf_clients_categorydiscounts.idofcategorydiscount "
+        //        + " join cf_menuexchangerules on cf_menuexchangerules.idofdestorg=cf_enterevents.idoforg "
+        //        + " WHERE evtdatetime >= :startDate AND evtdatetime <= :endDate AND passdirection = 0 and "
+        //        + " cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
+        //        + " cf_clients.discountmode=3 and "  /* берем только льготников */
+        //        + " cf_categorydiscounts.categorytype=0 and "/* смотрим только тех у кого категория бесплатная */
+        //        + " cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS enter_event_data "
+        //        + "GROUP BY enter_event_data.d, enter_event_data.org";
+
+        String sql = "SELECT count(distinct client), EXTRACT(EPOCH FROM enter_event_data.d) * 1000, enter_event_data.org "
                 + "FROM ("
-                + "  SELECT cf_enterevents.idofclient AS client, "
-                + "   date_trunc('day', to_timestamp(cf_enterevents.evtdatetime/1000)) AS d, "
-                + "   cf_enterevents.idoforg AS org "
-                + "  FROM cf_enterevents "
-                + "  join cf_clients on cf_clients.idofclient=cf_enterevents.idofclient "  /* берем только детей */
-                + "  join cf_menuexchangerules on cf_menuexchangerules.idofdestorg=cf_enterevents.idoforg "
-                + "  WHERE evtdatetime >= :startDate AND evtdatetime <= :endDate AND passdirection = 0 and "
-                + "  cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
-                + "  cf_clients.discountmode=3 and "  /* берем только льготников */
-                + "  cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS enter_event_data "
-                + "  GROUP BY enter_event_data.d, enter_event_data.org";
+                + " SELECT cf_orders.idofclient AS client, "
+                + "  date_trunc('day', to_timestamp(cf_orders.createddate/1000)) AS d, "
+                + "  cf_orders.idoforg AS org "
+                + " FROM cf_orders "
+                + " join cf_clients on cf_clients.idofclient=cf_orders.idofclient "
+                + " join cf_menuexchangerules on cf_menuexchangerules.idofdestorg=cf_orders.idoforg "
+                + " WHERE cf_orders.createddate >= :startDate AND cf_orders.createddate <= :endDate and "
+                + " cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
+                + " cf_clients.discountmode=3 and "  /* берем только льготников */
+                + " (cf_orders.ordertype=3 or cf_orders.ordertype=4) and "/* смотрим плану льготного питания */
+                + " cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS enter_event_data "
+                + "GROUP BY enter_event_data.d, enter_event_data.org";
 
         Query query = session.createSQLQuery(sql);
         query.setLong("startDate", startTime.getTime());
@@ -257,10 +243,8 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
 
         Map<Long, Map<Date, EnterEventCountItem>> eventCountMap = new HashMap<Long, Map<Date, EnterEventCountItem>>();
         for (Object[] row : res) {
-            Long idOfOrg = ((BigInteger) row[2]).longValue();// (Long) row[2];
+            Long idOfOrg = ((BigInteger) row[2]).longValue();
             Long totalCount = ((BigInteger) row[0]).longValue();
-            //Long totalCount = row[0] == null ? 0L : ((Long) row[0]);
-            //Date date = CalendarUtils.truncateToDayOfMonth((Date) row[1]);
             long d = ((Double) row[1]).longValue();
             calendar.setTimeInMillis(d);
             Date date = calendar.getTime();
@@ -272,9 +256,6 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
             } else {
                 EnterEventCountItem item = dateEventCountItemMap.get(date);
                 if(item==null){
-                    //HashMap<Date, EnterEventCountItem> value = new HashMap<Date, EnterEventCountItem>();
-                    //value.put(date, new EnterEventCountItem(totalCount, date));
-                    //eventCountMap.put(idOfOrg, value);
                     dateEventCountItemMap.put(date, new EnterEventCountItem(totalCount, date));
                 } else {
                     item.setTotalCount(item.getTotalCount()+totalCount);
@@ -287,8 +268,6 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
             OrgItem orgItem = orgItems.get(id);
             Map<Date, RequestCountItem> dateRequestCountItemMap = requestCountMap.get(id);
             Map<Date, EnterEventCountItem> dateEventCountItemMap = eventCountMap.get(id);
-            //Map<Date, OrderDetailQtyCountItem> orderDetailQtyCountItemMap = orderQtyForecastCountMap.get(id);
-            //Map<Date, EnterEventCountItem> dateForecastEventCountItemMap = eventForecastCountMap.get(id);
             Date beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
             Date endDate = CalendarUtils.truncateToDayOfMonth(endTime);
             while (beginDate.getTime() <= endDate.getTime()) {

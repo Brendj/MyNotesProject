@@ -4,38 +4,22 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
-import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
 
-import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.msc.DiscrepanciesDataOnOrdersAndPaymentJasperReport;
-import ru.axetta.ecafe.processor.core.report.msc.DiscrepanciesOnOrdersAndAttendanceJasperReport;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.events.orders.DiscrepanciesOnOrdersAndAttendanceBuilder;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.events.orders.DiscrepanciesOnOrdersAndAttendanceReport;
-import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.payment.orders.DiscrepanciesDataOnOrdersAndPaymentBuilder;
-import ru.axetta.ecafe.processor.core.report.statistics.payment.preferential.supply.StatisticsPaymentPreferentialSupplyBuilder;
-import ru.axetta.ecafe.processor.core.report.statistics.payment.preferential.supply.StatisticsPaymentPreferentialSupplyReport;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
-import ru.axetta.ecafe.processor.web.ui.MainPage;
-import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
-import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.util.List;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -69,6 +53,7 @@ public class StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage extends Onli
         if(idOfContragentOrgList==null || idOfContragentOrgList.isEmpty()){
             throw new Exception("Выберите список поставщиков");
         }
+        Date generateTime = new Date();
         DiscrepanciesOnOrdersAndAttendanceBuilder builder = new DiscrepanciesOnOrdersAndAttendanceBuilder();
         builder.setReportProperties(new Properties());
         String sourceMenuOrgId = StringUtils.join(idOfContragentOrgList.iterator(), ",");
@@ -82,7 +67,9 @@ public class StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage extends Onli
             ServletOutputStream servletOutputStream = response.getOutputStream();
             facesContext.responseComplete();
             response.setContentType("application/xls");
-            response.setHeader("Content-disposition", "inline;filename=DiscrepanciesOnOrdersAndAttendanceReport.xls");
+            String filename = buildFileName(generateTime, report);
+            response.setHeader("Content-disposition", String.format("inline;filename=%s.xls", filename));
+            //response.setHeader("Content-disposition", "inline;filename=DiscrepanciesOnOrdersAndAttendanceReport.xls");
             JRXlsExporter xlsExport = new JRXlsExporter();
             xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
             xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
@@ -97,4 +84,10 @@ public class StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage extends Onli
 
     public void fill() {}
 
+    private String buildFileName(Date generateTime, BasicReportJob report) {
+        DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss");
+        String reportDistinctText = report.getReportDistinctText();
+        String format = timeFormat.format(generateTime);
+        return String.format("%s-%s-%s", "DiscrepanciesOnOrdersAndAttendanceReport", reportDistinctText, format);
+    }
 }
