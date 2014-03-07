@@ -2322,7 +2322,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
-                contractSelectPage.fill(persistenceSession, multiContrFlag, classTypes, contragentName, idOfContragent);
+                contractSelectPage.fill(persistenceSession, multiContrFlag, contragentName, idOfContragent);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
                 if (currentTopMostPage instanceof ContractSelectPage.CompleteHandler) {

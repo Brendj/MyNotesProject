@@ -67,9 +67,10 @@ public class DeliveredServicesReportPage extends OnlineReportPage
         return contractFilter;
     }
 
-    public void showContractSelectPage () {
-        MainPage.getSessionInstance().showContractSelectPage (this.contragentFilter.getContragent().getContragentName(),
-                                                              this.contragentFilter.getContragent().getIdOfContragent());
+    public Object showContractSelectPage () {
+        MainPage.getSessionInstance().showContractSelectPage(this.contragentFilter.getContragent().getContragentName(),
+                                                             this.contragentFilter.getContragent().getIdOfContragent());
+        return null;
     }
 
     public void showOrgSelectPage () {

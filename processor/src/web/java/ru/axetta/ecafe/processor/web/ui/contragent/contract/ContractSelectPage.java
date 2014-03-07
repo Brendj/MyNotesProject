@@ -111,14 +111,14 @@ public class ContractSelectPage extends BasicPage {
         this.filter = filter;
     }
 
-    public void fill(Session session, int multiContrFlag, String classTypes, String contragentName) throws Exception {
-        fill(session, multiContrFlag, classTypes, contragentName, null);
+    public void fill(Session session, int multiContrFlag, String contragentName) throws Exception {
+        fill(session, multiContrFlag, contragentName, null);
     }
 
-    public void fill(Session session, int multiContrFlag, String classTypes, String contragentName, Long idOfContragent) throws Exception {
+    public void fill(Session session, int multiContrFlag,  String contragentName, Long idOfContragent) throws Exception {
         this.multiContrFlag = multiContrFlag;
         List<Item> items = new LinkedList<Item>();
-        List contracts = retrieveContracts(session, classTypes, contragentName, idOfContragent);
+        List contracts = retrieveContracts(session, contragentName, idOfContragent);
         for (Object object : contracts) {
             Contract contract = (Contract) object;
             Item item = new Item(contract);
@@ -144,11 +144,11 @@ public class ContractSelectPage extends BasicPage {
         this.selectedItem = selectedItem;
     }*/
 
-    private List retrieveContracts(Session session, String classTypesString, String contragentName) throws HibernateException {
-        return retrieveContracts(session, classTypesString, contragentName, null);
+    private List retrieveContracts(Session session, String contragentName) throws HibernateException {
+        return retrieveContracts(session, contragentName, null);
     }
 
-    private List retrieveContracts(Session session, String classTypesString, String contragentName, Long idOfContragent) throws HibernateException {
+    private List retrieveContracts(Session session, String contragentName, Long idOfContragent) throws HibernateException {
         this.classTypesString = classTypesString;
         Criteria criteria = session.createCriteria(Contract.class).addOrder(Order.asc("contractNumber"));
         try {
@@ -170,14 +170,7 @@ public class ContractSelectPage extends BasicPage {
         else if (StringUtils.isNotEmpty(contragentName)) {
             criteria.add(Restrictions.like("performer", contragentName, MatchMode.ANYWHERE));
         }
-        if(!classTypesString.isEmpty()) {
-            String[] classTypes = classTypesString.split(",");
-            Criterion exp = Restrictions.eq("classId", Integer.parseInt(classTypes[0]));
-            for (int i = 1; i < classTypes.length; i++) {
-                exp = Restrictions.or(exp, Restrictions.eq("classId", Integer.parseInt(classTypes[i])));
-            }
-            criteria.add(exp);
-        }
+
         return criteria.list();
     }
 
