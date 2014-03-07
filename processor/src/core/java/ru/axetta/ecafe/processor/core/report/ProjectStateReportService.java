@@ -1357,7 +1357,7 @@ public class ProjectStateReportService {
 
     public void parseOrgsEvents(Object dataSource, Object sessionObj, Object paramsObj) {
         parseOrgsRequest(dataSource, sessionObj, paramsObj,
-                "select cf_orgs.idoforg, count(distinct cf_enterevents.idofclient) "
+                "select cf_enterevents.idoforg, count(distinct cf_enterevents.idofclient) "
                         + "from cf_orgs "
                         + "left join cf_friendly_organization on cf_orgs.idoforg=currentorg "
                         + "left join cf_enterevents on cf_enterevents.idoforg=idoffriendlyorg or cf_enterevents.idoforg=currentorg "
@@ -1429,7 +1429,12 @@ public class ProjectStateReportService {
 
         Session session = (Session) sessionObj;
         try {
-            String sql = "SELECT cf_orgs.officialname, cf_orgs.district, count(cf_clients.idofclient) from cf_orgs left join cf_clients on  cf_clients.idoforg=cf_orgs.idoforg where officialname<>'' and cf_orgs.state<>0 group by cf_orgs.officialname, cf_orgs.district order by cf_orgs.officialname";
+            String sql = "SELECT cf_orgs.officialname, cf_orgs.district, count(cf_clients.idofclient) "
+                    + "from cf_orgs "
+                    + "left join cf_clients on  cf_clients.idoforg=cf_orgs.idoforg "
+                    + "where officialname<>'' and cf_orgs.state<>0 "
+                    + "group by cf_orgs.officialname, cf_orgs.district "
+                    + "order by cf_orgs.officialname";
             Map<Long, Long> targetsCount = new HashMap<Long, Long>();
             String finalSQL = applyMacroReplace(sql, reportType, dateAt, dateTo);
             org.hibernate.Query q = session.createSQLQuery(finalSQL);
