@@ -832,9 +832,9 @@
                             reRender="workspaceForm" />
 
         <%--@elvariable id="goodRequestsNewReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.GoodRequestsNewReportPage"--%>
-        <%--<rich:panelMenuItem id="goodRequestNewReportMenuItem" binding="#{goodRequestsNewReportPage.mainMenuComponent}"
+        <rich:panelMenuItem id="goodRequestNewReportMenuItem" binding="#{goodRequestsNewReportPage.mainMenuComponent}"
                             label="Новый Сводный отчет по заявкам" action="#{goodRequestsNewReportPage.show}"
-                            reRender="workspaceForm" />--%>
+                            reRender="workspaceForm" />
 
         <rich:panelMenuItem id="detailedGoodRequestReportMenuItem"
                             binding="#{mainPage.detailedGoodRequestReportPage.mainMenuComponent}"

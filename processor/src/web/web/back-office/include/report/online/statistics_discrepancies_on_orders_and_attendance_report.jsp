@@ -89,13 +89,13 @@
                         <h:outputText value="Дата"/>
                     </rich:column>
                     <rich:column>
-                        <h:outputText value="Заказ факт"/>
+                        <h:outputText value="Заказано"/>
                     </rich:column>
                     <rich:column rendered="false">
                         <h:outputText value="Рекомендуемое кол-во для заказа"/>
                     </rich:column>
                     <rich:column>
-                        <h:outputText value="Посещение - факт"/>
+                        <h:outputText value="Продано"/>
                     </rich:column>
                     <rich:column>
                         <h:outputText value="% несоответствия"/>

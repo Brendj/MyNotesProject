@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GoodRequestsNewReport" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.2" value="rowGroup"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
+	<property name="ireport.zoom" value="1.3310000000000015"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date"/>
+	<field name="orgNum" class="java.lang.Long"/>
+	<field name="officialName" class="java.lang.String"/>
+	<field name="goodName" class="java.lang.String"/>
+	<field name="doneDate" class="java.lang.String"/>
+	<field name="totalCount" class="java.lang.Long"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band/>
+	</pageHeader>
+	<detail>
+		<band/>
+	</detail>
+	<lastPageFooter>
+		<band/>
+	</lastPageFooter>
+	<summary>
+		<band height="258">
+			<crosstab>
+				<reportElement uuid="3bfcb917-f9bf-4051-a07d-2b0bd55b0d1e" x="0" y="0" width="842" height="258"/>
+				<rowGroup name="orgNum" width="70" totalPosition="End">
+					<bucket class="java.lang.Long">
+						<bucketExpression><![CDATA[$F{orgNum}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<textField>
+								<reportElement uuid="b4d51cce-7e14-431c-b91a-ee8611457f98" style="Crosstab Data Text" x="0" y="0" width="70" height="25"/>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{orgNum}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents backcolor="#005FB3" mode="Opaque">
+							<staticText>
+								<reportElement uuid="a4c221f6-a6e0-42e4-9efa-ebae1977ab23" x="0" y="0" width="140" height="25" forecolor="#FFFFFF"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Total orgNum]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="officialName" width="70" totalPosition="End">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{officialName}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<textField>
+								<reportElement uuid="bc9ab963-c961-418a-9522-63dfa82aa6ef" style="Crosstab Data Text" x="0" y="0" width="70" height="25"/>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{officialName}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents backcolor="#BFE1FF" mode="Opaque">
+							<staticText>
+								<reportElement uuid="13d9bb50-3cb0-4053-bb9f-bb0ea7142cfc" x="0" y="0" width="70" height="25"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[Total officialName]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="doneDate" height="30">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{doneDate}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
+							<textField>
+								<reportElement uuid="210aa02f-1589-4bd3-a557-56c1156fde40" style="Crosstab Data Text" x="0" y="0" width="50" height="30"/>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{doneDate}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="totalCountMeasure" class="java.lang.Long" calculation="Sum">
+					<measureExpression><![CDATA[$F{totalCount}]]></measureExpression>
+				</measure>
+				<crosstabCell width="50" height="25">
+					<cellContents>
+						<textField>
+							<reportElement uuid="5c4ab84c-4a12-4c2f-a26c-b35a5d485a67" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{totalCountMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell height="25" rowTotalGroup="orgNum">
+					<cellContents backcolor="#005FB3" mode="Opaque">
+						<textField>
+							<reportElement uuid="0dcb1503-cb65-4767-bdb2-f6c6884de55b" style="Crosstab Data Text" x="0" y="0" width="50" height="25" forecolor="#FFFFFF"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{totalCountMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="50" columnTotalGroup="doneDate">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<textField>
+							<reportElement uuid="4b60a23b-752c-4ba8-80e4-ae6774ed9aef" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{totalCountMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="orgNum" columnTotalGroup="doneDate">
+					<cellContents backcolor="#005FB3" mode="Opaque">
+						<textField>
+							<reportElement uuid="b73af58b-642a-4e2c-bf31-a04fd56197ba" style="Crosstab Data Text" x="0" y="0" width="50" height="25" forecolor="#FFFFFF"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{totalCountMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell height="25" rowTotalGroup="officialName">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<textField>
+							<reportElement uuid="60fe1bfb-76a1-4d2d-a889-82c4d47bd185" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{totalCountMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="officialName" columnTotalGroup="doneDate">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<textField>
+							<reportElement uuid="a7830eca-b3f5-40e3-91ad-0d63f405d0bd" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{totalCountMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+	<noData>
+		<band/>
+	</noData>
+</jasperReport>
