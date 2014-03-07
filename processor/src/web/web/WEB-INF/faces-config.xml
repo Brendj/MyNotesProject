@@ -32,6 +32,12 @@
     </managed-bean>
 
     <converter>
+        <description>fromTypeConverter</description>
+        <converter-id>fromTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.FromTypeConverter</converter-class>
+    </converter>
+
+    <converter>
         <description>Org state converter</description>
         <converter-id>orgStateConverter</converter-id>
         <converter-class>ru.axetta.ecafe.processor.web.ui.org.OrgStateConverter</converter-class>

@@ -353,6 +353,12 @@
                             binding="#{clientRefundPage.mainMenuComponent}" action="#{clientRefundPage.show}"
                             reRender="workspaceForm" />
 
+        <%--@elvariable id="clientSubAccountTransferPage" type="ru.axetta.ecafe.processor.web.ui.client.ClientSubAccountTransferPage"--%>
+        <rich:panelMenuItem id="clientSubAccountTransferMenuItem" label="Перевод между субсчетами"
+                            binding="#{clientSubAccountTransferPage.mainMenuComponent}"
+                            action="#{clientSubAccountTransferPage.show}"
+                            reRender="workspaceForm" />
+
     </rich:panelMenuGroup>
 
 </rich:panelMenuGroup>
@@ -825,6 +831,11 @@
                             label="Сводный отчет по заявкам" action="#{mainPage.showGoodRequestReportPage}"
                             reRender="workspaceForm" />
 
+        <%--@elvariable id="goodRequestsNewReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.GoodRequestsNewReportPage"--%>
+        <%--<rich:panelMenuItem id="goodRequestNewReportMenuItem" binding="#{goodRequestsNewReportPage.mainMenuComponent}"
+                            label="Новый Сводный отчет по заявкам" action="#{goodRequestsNewReportPage.show}"
+                            reRender="workspaceForm" />--%>
+
         <rich:panelMenuItem id="detailedGoodRequestReportMenuItem"
                             binding="#{mainPage.detailedGoodRequestReportPage.mainMenuComponent}"
                             label="Детальный отчет по заявкам" action="#{mainPage.showAggregateGoodRequestReportPage}"
@@ -894,7 +905,7 @@
 
     <rich:panelMenuItem id="statisticsDiscrepanciesOnOrdersAndAttendanceReportMenuItem"
                         binding="#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.mainMenuComponent}"
-                        label="Статистика расхождения данных по заказам и посещаемости"
+                        label="Статистика расхождения данных по заказам и продажам"
                         action="#{mainPage.showDiscrepanciesOnOrdersAndAttendanceReportPage}"
                         reRender="workspaceForm"/>
 
