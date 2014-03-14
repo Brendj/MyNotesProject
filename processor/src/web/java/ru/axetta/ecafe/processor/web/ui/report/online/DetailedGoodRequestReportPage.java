@@ -76,3 +76,5 @@ public class DetailedGoodRequestReportPage extends OnlineReportWithContragentPag
         detailedGoodRequestReportItems = service.buildReport(persistenceSession, idOfContragentOrgList, idOfOrgList, startDate, endDate, documentStateFilterMenu.getDocumentStateFilter());
     }
 }
+
+

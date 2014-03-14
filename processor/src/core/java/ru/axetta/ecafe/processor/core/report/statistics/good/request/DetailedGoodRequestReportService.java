@@ -73,6 +73,7 @@ public class DetailedGoodRequestReportService {
                         + "                join request.goodRequestPositionInternal position"
                         + "                right join position.product product"
                         + "                where request.orgOwner = :eduid and request.state in :state "
+                        + "                and position.deletedState<>true and request.deletedState<>true "
                         + "                and request.doneDate between :startDate and :endDate "
                         + "                order by request.doneDate desc";
                 query = session.createQuery(sql);
@@ -91,6 +92,7 @@ public class DetailedGoodRequestReportService {
                         + "                join request.goodRequestPositionInternal position"
                         + "                right join position.good good"
                         + "                where request.orgOwner = :eduid and request.state in :state "
+                        + "                and position.deletedState<>true and request.deletedState<>true "
                         + "                and request.doneDate between :startDate and :endDate "
                         + "                order by request.doneDate desc";
                 query = session.createQuery(sql);

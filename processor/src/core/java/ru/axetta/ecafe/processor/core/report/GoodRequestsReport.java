@@ -255,7 +255,7 @@ public class GoodRequestsReport extends BasicReportForAllOrgJob {
                 productCondition = "and (cf_products.productname like '%" + goodName + "%' or cf_products.fullname like '%"+goodName+"%' )";
             }
 
-            String stateCondition = " cf_goods_requests.deletedstate<>true and ";
+            String stateCondition = " cf_goods_requests.deletedstate<>true and cf_goods_requests_positions.deletedstate<>true and";
             /*switch (requestsFilter) {
                 case 0:
                     stateCondition = " cf_goods_requests.state=" + DocumentState.CREATED.ordinal() + " AND ";

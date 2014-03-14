@@ -2,8 +2,11 @@ package ru.axetta.ecafe.processor.core.report.statistics.good.request;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created with IntelliJ IDEA.
@@ -97,4 +100,5 @@ public class DetailedGoodRequestReportItem {
     public Date getLastUpdate() {
         return lastUpdate;
     }
+
 }
