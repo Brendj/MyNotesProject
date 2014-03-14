@@ -57,6 +57,7 @@ public class Publication extends LibraryDistributedObject {
         addDistributedObjectProjectionList(projectionList);
 
         projectionList.add(Projections.property("data"), "data");
+        projectionList.add(Projections.property("validISBN"), "validISBN");
 
         criteria.setProjection(projectionList);
     }
