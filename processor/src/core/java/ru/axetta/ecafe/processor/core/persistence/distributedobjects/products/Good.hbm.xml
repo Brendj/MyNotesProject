@@ -52,19 +52,19 @@
         <property name="lifeTime" column="LifeTime" type="long"/>
         <property name="margin" column="Margin" type="long"/>
 
-        <many-to-one name="goodGroup" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup">
+        <many-to-one name="goodGroup" fetch="select" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup">
             <column name="IdOfGoodsGroup" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="product" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product">
+        <many-to-one name="product" fetch="select" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product">
             <column name="IdOfProducts" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="technologicalMap" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap">
+        <many-to-one name="technologicalMap" fetch="select" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMap">
             <column name="IdOfTechnologicalMaps" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="basicGood" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket">
+        <many-to-one name="basicGood" fetch="select" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.GoodsBasicBasket">
             <column name="idOfBasicGood" not-null="false" />
         </many-to-one>
 

@@ -45,7 +45,7 @@
         <property name="requestType" column="RequestType" type="int"/>
 
 
-        <many-to-one name="staff" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
+        <many-to-one name="staff" fetch="select" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
             <column name="IdOfStaff" not-null="false" />
         </many-to-one>
 
