@@ -26,16 +26,17 @@ import java.util.Properties;
  */
 public class ReportPropertiesUtils {
     
-    public static String P_ID_OF_ORG="idOfOrg";
-    public static String P_ORG_TAG="orgTag";
-    public static String P_ORG_NUMBER_IN_NAME="orgNumberInName";
-    public static String P_SHORT_NAME="shortName";
-    public static String P_OFFICIAL_NAME="officialName";
-    public static String P_JOB_NAME ="reportJob";
-    public static String P_REPORT_PERIOD="reportPeriod";
-    public static String P_REPORT_PERIOD_TYPE="reportPeriodType";
-    public static String P_REPORT_CLASS="class";
-    public static String P_DATES_SPECIFIED_BY_USER="datesSpecifiedByUser";
+    final public static String P_ID_OF_ORG="idOfOrg";
+    final public static String P_ORG_TAG="orgTag";
+    final public static String P_ORG_NUMBER_IN_NAME="orgNumberInName";
+    final public static String P_SHORT_NAME="shortName";
+    final public static String P_OFFICIAL_NAME="officialName";
+    final public static String P_JOB_NAME ="reportJob";
+    final public static String P_REPORT_PERIOD="reportPeriod";
+    final public static String P_REPORT_PERIOD_TYPE="reportPeriodType";
+    final public static String P_REPORT_CLASS="class";
+    final public static String P_DATES_SPECIFIED_BY_USER="datesSpecifiedByUser";
+    final public static String P_ID_OF_MENU_SOURCE_ORG = "idOfMenuSourceOrg";
 
     //private static String DELIMETER = ",";
 

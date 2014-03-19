@@ -69,6 +69,10 @@ public class CalendarUtils {
         return dateTimeFormat.format(dateTime);
     }
 
+    public static boolean betweenDate(Date createDate, Date generateBeginTime, Date generateEndTime) {
+        return createDate.before(generateEndTime) && createDate.after(generateBeginTime);
+    }
+
     public static String toStringFullDateTimeWithUTCTimeZone(Date dateTime) throws ParseException {
         dateTimeFormat.setTimeZone(utcTimeZone);
         return dateTimeFormat.format(dateTime);

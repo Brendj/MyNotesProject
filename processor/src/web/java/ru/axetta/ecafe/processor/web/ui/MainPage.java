@@ -347,6 +347,7 @@ private Long selectedIdOfMenu;
 
     private final ClientPaymentsPage clientPaymentsReportPage = new ClientPaymentsPage();
     private final GoodRequestsReportPage goodRequestsReportPage = new GoodRequestsReportPage();
+    private final GoodRequestsNewReportPage goodRequestsNewReportPage = new GoodRequestsNewReportPage();
     private final DeliveredServicesReportPage deliveredServicesReportPage = new DeliveredServicesReportPage ();
     private final ClientsBenefitsReportPage clientsBenefitsReportPage = new ClientsBenefitsReportPage ();
     private final StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage discrepanciesOnOrdersAndAttendanceReportPage
@@ -5471,6 +5472,10 @@ public Long getSelectedIdOfReportRule() {
         return goodRequestsReportPage;
     }
 
+    public GoodRequestsNewReportPage getGoodRequestsNewReportPage() {
+        return goodRequestsNewReportPage;
+    }
+
     public StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage getDiscrepanciesOnOrdersAndAttendanceReportPage() {
         return discrepanciesOnOrdersAndAttendanceReportPage;
     }
@@ -5488,6 +5493,20 @@ public Long getSelectedIdOfReportRule() {
         try {
             goodRequestsReportPage.fill();
             currentWorkspacePage = goodRequestsReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set sales report page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по запрошенным товарам: " + e.getMessage(),
+                            null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showGoodRequestNewReportPage () {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = goodRequestsNewReportPage;
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
             facesContext.addMessage(null,

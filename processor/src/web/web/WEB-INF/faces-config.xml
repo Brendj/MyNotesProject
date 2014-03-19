@@ -38,6 +38,12 @@
     </converter>
 
     <converter>
+        <description>OrgRequestFilterConverter</description>
+        <converter-id>orgRequestFilterConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.OrgRequestFilterConverter</converter-class>
+    </converter>
+
+    <converter>
         <description>Org state converter</description>
         <converter-id>orgStateConverter</converter-id>
         <converter-class>ru.axetta.ecafe.processor.web.ui.org.OrgStateConverter</converter-class>
