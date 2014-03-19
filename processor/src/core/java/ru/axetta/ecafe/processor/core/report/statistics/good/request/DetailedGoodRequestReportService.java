@@ -68,7 +68,7 @@ public class DetailedGoodRequestReportService {
 
                 List<Object> requests = new ArrayList<Object>();
                 sql = "select request.number, request.doneDate, position.totalCount/1000, "
-                        + " position.dailySampleCount/1000 ,product.productName, request.createdDate, request.lastUpdate "
+                        + " position.dailySampleCount/1000 ,product.productName, position.createdDate, position.lastUpdate "
                         + " from GoodRequest request"
                         + "                join request.goodRequestPositionInternal position"
                         + "                right join position.product product"
@@ -87,7 +87,7 @@ public class DetailedGoodRequestReportService {
                 }
 
                 sql = "select request.number, request.doneDate, position.totalCount/1000, "
-                        + " position.dailySampleCount/1000, good.nameOfGood, request.createdDate, request.lastUpdate "
+                        + " position.dailySampleCount/1000, good.nameOfGood, position.createdDate, position.lastUpdate "
                         + " from GoodRequest request"
                         + "                join request.goodRequestPositionInternal position"
                         + "                right join position.good good"
