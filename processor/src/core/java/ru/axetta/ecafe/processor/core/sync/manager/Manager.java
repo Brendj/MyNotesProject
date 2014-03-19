@@ -91,17 +91,6 @@ public class Manager {
         this.syncHistory = syncHistory;
     }
 
-    //public Manager(Long idOfOrg, String[] doGroupNames) {
-    //    this.idOfOrg = idOfOrg;
-    //    this.doGroupNames = doGroupNames;
-    //    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    //    try {
-    //        this.conflictDocument = factory.newDocumentBuilder().newDocument();
-    //    } catch (Exception ex) {
-    //        throw new RuntimeException(ex.getMessage());
-    //    }
-    //}
-
     public Manager(Long idOfOrg, List<String> doGroupNames) {
         this.idOfOrg = idOfOrg;
         this.doGroupNames = doGroupNames;
@@ -316,18 +305,28 @@ public class Manager {
 
             } else {
                 LOGGER.debug("init findConfirmedDO");
-                List<DistributedObject> currentResultDOList = findConfirmedDO(sessionFactory, doClass);
+                //List<DistributedObject> currentResultDOList = findConfirmedDO(sessionFactory, doClass);
+                Set<DistributedObject>  currentResultDOSet = new HashSet<DistributedObject>(findConfirmedDO(sessionFactory, doClass));
                 LOGGER.debug("end findConfirmedDO");
-                final int newLimit = currentLimit - currentResultDOList.size();
+                //final int newLimit = currentLimit - currentResultDOList.size();
+                final int newLimit = currentLimit - currentResultDOSet.size();
                 if (newLimit > 0) {
                     List<DistributedObject> newResultDOList = findResponseResult(sessionFactory, doClass, newLimit);
-                    currentResultDOList.addAll(newResultDOList);
+                    //currentResultDOList.addAll(newResultDOList);
+                    currentResultDOSet.addAll(newResultDOList);
                     LOGGER.debug("end findResponseResult");
                     LOGGER.debug("init addConfirms");
-                    addConfirms(sessionFactory, classSimpleName, currentResultDOList);
+                    //addConfirms(sessionFactory, classSimpleName, currentResultDOList);
+                    addConfirms(sessionFactory, classSimpleName, new ArrayList<DistributedObject>(currentResultDOSet));
                     LOGGER.debug("end addConfirms");
                 }
-                resultDOMap.put(doSyncClass, currentResultDOList);
+                LOGGER.debug("init processDistributedObjectsList");
+                List<DistributedObject> distributedObjectsList = processDistributedObjectsList(sessionFactory,
+                        doSyncClass);
+                LOGGER.debug("end processDistributedObjectsList");
+                currentDOListMap.put(doSyncClass, distributedObjectsList);
+                //resultDOMap.put(doSyncClass, currentResultDOList);
+                resultDOMap.put(doSyncClass,  new ArrayList<DistributedObject>(currentResultDOSet));
 
             }
         }
@@ -460,6 +459,7 @@ public class Manager {
         LOGGER.debug("RO end parse Confirm XML section");
     }
 
+    @SuppressWarnings("unchecked")
     private void addConfirms(SessionFactory sessionFactory, String simpleName,
             List<DistributedObject> confirmDistributedObjectList) {
         Session persistenceSession = null;
@@ -471,8 +471,10 @@ public class Manager {
             //persistenceSession.setCacheMode(CacheMode.IGNORE);
             if (confirmDistributedObjectList != null && !confirmDistributedObjectList.isEmpty()) {
                 final int size = confirmDistributedObjectList.size();
+                //Set<String> currentGUIDs = new HashSet<String>();
+                Set<String> dbGUIDs = new HashSet<String>();
                 List<String> currentGUIDs = new ArrayList<String>(size);
-                List<String> dbGUIDs = new ArrayList<String>();
+                //List<String> dbGUIDs = new ArrayList<String>();
                 LOGGER.debug("addConfirms: currentGUIDs create list");
                 long duration = System.currentTimeMillis();
                 for (DistributedObject distributedObject : confirmDistributedObjectList) {
@@ -502,7 +504,8 @@ public class Manager {
                     uuidCriteria.add(Restrictions.eq("orgOwner", idOfOrg));
                     uuidCriteria.add(Restrictions.in("guid", currentGUIDs));
                     uuidCriteria.setProjection(Projections.property("guid"));
-                    dbGUIDs = (List<String>) uuidCriteria.list();
+                    List<String> dbGUIDs1 = (List<String>) uuidCriteria.list();
+                    dbGUIDs.addAll(dbGUIDs1);
                 }
                 duration = System.currentTimeMillis() - duration;
                 LOGGER.debug("addConfirms: end find exist UUID duration: " + duration);
@@ -601,8 +604,6 @@ public class Manager {
         }
         return version;
     }
-
-
 
     private DistributedObject processCurrentObject(SessionFactory sessionFactory, DistributedObject distributedObject,
             Long currentMaxVersion) {
