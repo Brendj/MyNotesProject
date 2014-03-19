@@ -92,6 +92,7 @@ public abstract class BasicReportJob extends BasicJasperReport {
         private String shortName;
         private String officialName;
         private String address;
+        private Long sourceMenuOrg;
         private Boolean selected = false;
 
         public OrgShortItem() {
@@ -141,6 +142,14 @@ public abstract class BasicReportJob extends BasicJasperReport {
 
         public void setSelected(Boolean selected) {
             this.selected = selected;
+        }
+
+        public Long getSourceMenuOrg() {
+            return sourceMenuOrg;
+        }
+
+        public void setSourceMenuOrg(Long sourceMenuOrg) {
+            this.sourceMenuOrg = sourceMenuOrg;
         }
     }
 
