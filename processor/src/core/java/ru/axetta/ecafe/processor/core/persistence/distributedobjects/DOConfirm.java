@@ -57,4 +57,36 @@ public class DOConfirm {
     public void setIdOfDOConfirm(long idOfDOConfirm) {
         this.idOfDOConfirm = idOfDOConfirm;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DOConfirm doConfirm = (DOConfirm) o;
+
+        if (orgOwner != doConfirm.orgOwner) {
+            return false;
+        }
+        if (!distributedObjectClassName.equals(doConfirm.distributedObjectClassName)) {
+            return false;
+        }
+        if (!guid.equals(doConfirm.guid)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = distributedObjectClassName.hashCode();
+        result = 31 * result + guid.hashCode();
+        result = 31 * result + (int) (orgOwner ^ (orgOwner >>> 32));
+        return result;
+    }
 }
