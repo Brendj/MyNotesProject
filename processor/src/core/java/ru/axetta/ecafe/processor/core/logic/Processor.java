@@ -1215,7 +1215,7 @@ public class Processor implements SyncProcessor,
         boolean bError = false;
 
         try {
-            accIncRegistry = getAccIncRegistry(request.getIdOfOrg(),
+            accIncRegistry = getAccIncRegistry(request.getOrg(),
                     request.getAccIncRegistryRequest().dateTime);
         } catch (Exception e) {
             logger.error(String.format("Failed to build AccIncRegistry, IdOfOrg == %s", request.getIdOfOrg()),
@@ -2373,7 +2373,7 @@ public class Processor implements SyncProcessor,
         return accRegistry;
     }
 
-    private SyncResponse.AccIncRegistry getAccIncRegistry(Long idOfOrg, Date fromDateTime) throws Exception {
+    private SyncResponse.AccIncRegistry getAccIncRegistry(Org org, Date fromDateTime) throws Exception {
         SyncResponse.AccIncRegistry accIncRegistry = new SyncResponse.AccIncRegistry();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -2382,9 +2382,13 @@ public class Processor implements SyncProcessor,
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Date currentDate = new Date();
+            List<Integer> transactionSourceTypes = Arrays.asList(
+                    AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE,
+                    AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE);
+            persistenceSession.refresh(org);
             List<AccountTransaction> accountTransactionList = DAOUtils
-                    .getAccountTransactionsForOrgSinceTime(persistenceSession, idOfOrg, fromDateTime, currentDate,
-                            AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE);
+                    .getAccountTransactionsForOrgSinceTime(persistenceSession, org, fromDateTime, currentDate,
+                            transactionSourceTypes);
             for (AccountTransaction accountTransaction : accountTransactionList) {
                 SyncResponse.AccIncRegistry.Item accIncItem = new SyncResponse.AccIncRegistry.Item(
                         accountTransaction.getIdOfTransaction(), accountTransaction.getClient().getIdOfClient(),
@@ -2401,6 +2405,35 @@ public class Processor implements SyncProcessor,
         }
         return accIncRegistry;
     }
+
+    //private SyncResponse.AccIncRegistry getAccIncRegistry(Long idOfOrg, Date fromDateTime) throws Exception {
+    //    SyncResponse.AccIncRegistry accIncRegistry = new SyncResponse.AccIncRegistry();
+    //    Session persistenceSession = null;
+    //    Transaction persistenceTransaction = null;
+    //    try {
+    //        persistenceSession = persistenceSessionFactory.openSession();
+    //        persistenceTransaction = persistenceSession.beginTransaction();
+    //
+    //        Date currentDate = new Date();
+    //        List<AccountTransaction> accountTransactionList = DAOUtils
+    //                .getAccountTransactionsForOrgSinceTime(persistenceSession, idOfOrg, fromDateTime, currentDate,
+    //                        AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE);
+    //        for (AccountTransaction accountTransaction : accountTransactionList) {
+    //            SyncResponse.AccIncRegistry.Item accIncItem = new SyncResponse.AccIncRegistry.Item(
+    //                    accountTransaction.getIdOfTransaction(), accountTransaction.getClient().getIdOfClient(),
+    //                    accountTransaction.getTransactionTime(), accountTransaction.getTransactionSum(), accountTransaction.getTransactionSubBalance1Sum());
+    //            accIncRegistry.addItem(accIncItem);
+    //        }
+    //        accIncRegistry.setDate(currentDate);
+    //
+    //        persistenceTransaction.commit();
+    //        persistenceTransaction = null;
+    //    } finally {
+    //        HibernateUtils.rollback(persistenceTransaction, logger);
+    //        HibernateUtils.close(persistenceSession, logger);
+    //    }
+    //    return accIncRegistry;
+    //}
 
     private SyncResponse.ClientRegistry processSyncClientRegistry(Long idOfOrg,
             SyncRequest.ClientRegistryRequest clientRegistryRequest, List<Long> errorClientIds) throws Exception {
