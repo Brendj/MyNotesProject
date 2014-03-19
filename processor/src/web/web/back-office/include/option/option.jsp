@@ -66,12 +66,15 @@
 
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <h:outputText escape="true" value="Включить абоненское питание" styleClass="output-text" />
-            <h:selectBooleanCheckbox value="#{optionPage.enableSubscriptionFeeding}" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{optionPage.enableSubscriptionFeeding}" styleClass="output-text">
+                <a4j:support event="onclick" ajaxSingle="true" reRender="enableSubBalanceOperationControl"/>
+            </h:selectBooleanCheckbox>
         </h:panelGrid>
 
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <h:outputText escape="true" value="Включить работу по субсчетам" styleClass="output-text" />
-            <h:selectBooleanCheckbox value="#{optionPage.enableSubBalanceOperation}" styleClass="output-text" />
+            <h:selectBooleanCheckbox id="enableSubBalanceOperationControl" styleClass="output-text"
+                                     value="#{optionPage.enableSubBalanceOperation}"/>
         </h:panelGrid>
 
         <h:panelGrid styleClass="borderless-grid" columns="2">

@@ -539,6 +539,7 @@ public class OptionPage extends BasicWorkspacePage {
     }
 
     public void setEnableSubscriptionFeeding(Boolean enableSubscriptionFeeding) {
+        enableSubBalanceOperation = true;
         this.enableSubscriptionFeeding = enableSubscriptionFeeding;
     }
 
