@@ -80,7 +80,8 @@ public class Staff extends DistributedObject {
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception {
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
+            String currentLastGuid, Integer currentLimit) throws Exception {
         Boolean isSupplier = DAOUtils.isSupplierByOrg(session, idOfOrg);
         List<Long> orgOwners = new ArrayList<Long>();
         if(isSupplier){
@@ -98,7 +99,7 @@ public class Staff extends DistributedObject {
         orgOwners.add(idOfOrg);
         Criteria criteria = session.createCriteria(getClass());
         criteria.add(Restrictions.in("orgOwner", orgOwners));
-        criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
+        //criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
         createProjections(criteria);
         criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
         return criteria.list();

@@ -52,7 +52,8 @@ public class LibVisit extends LibraryDistributedObject {
     }
 
     @Override
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws DistributedObjectException {
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
+            String currentLastGuid, Integer currentLimit) throws DistributedObjectException {
         return null;//toSelfProcess(session, idOfOrg, currentMaxVersion);
     }
 

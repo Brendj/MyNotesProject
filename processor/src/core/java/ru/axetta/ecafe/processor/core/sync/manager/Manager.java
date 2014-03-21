@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.doGroups.DOGroupsFactory;
 import ru.axetta.ecafe.processor.core.sync.doGroups.DOSyncClass;
 import ru.axetta.ecafe.processor.core.sync.doGroups.IDOGroup;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -336,7 +337,6 @@ public class Manager {
     private List<DistributedObject> findResponseResult(SessionFactory sessionFactory,
             Class<? extends DistributedObject> doClass, final Integer currentLimit) {
         List<DistributedObject> currentResultDOList = new ArrayList<DistributedObject>();
-        //sessionFactory = RuntimeContext.reportsSessionFactory;
         Session persistenceSession = null;
         String errorMessage = null;
         try {
@@ -344,39 +344,11 @@ public class Manager {
             DistributedObject refDistributedObject = doClass.newInstance();
             final String classSimpleName = doClass.getSimpleName();
             Long currentMaxVersion = currentMaxVersions.get(classSimpleName);
-            if (currentLimit == null || currentLimit <= 0) {
-                currentResultDOList = refDistributedObject.process(persistenceSession, idOfOrg, currentMaxVersion);
-            } else {
-                Criteria criteria = persistenceSession.createCriteria(doClass);
-                final String currentLastGuid = currentLastGuids.get(classSimpleName);
-                refDistributedObject.createProjections(criteria);
-
-                //Disjunction orgOwnerDisjunctionRestriction = Restrictions.disjunction();
-                //orgOwnerDisjunctionRestriction.add(Restrictions.isNull("orgOwner"));
-                //Conjunction orgOwnerConjunctionRestriction = Restrictions.conjunction();
-                //orgOwnerConjunctionRestriction.add(Restrictions.isNotNull("orgOwner"));
-                //orgOwnerConjunctionRestriction.add(Restrictions.eq("orgOwner", idOfOrg));
-                //orgOwnerDisjunctionRestriction.add(orgOwnerConjunctionRestriction);
-                //criteria.add(orgOwnerDisjunctionRestriction);
-                criteria.add(Restrictions.eq("orgOwner", idOfOrg));
-
-                if (StringUtils.isNotEmpty(currentLastGuid)) {
-                    Disjunction mainRestriction = Restrictions.disjunction();
-                    mainRestriction.add(Restrictions.gt("globalVersion", currentMaxVersion));
-                    Conjunction andRestr = Restrictions.conjunction();
-                    andRestr.add(Restrictions.gt("guid", currentLastGuid));
-                    andRestr.add(Restrictions.ge("globalVersion", currentMaxVersion));
-                    mainRestriction.add(andRestr);
-                    criteria.add(mainRestriction);
-                } else {
-                    criteria.add(Restrictions.ge("globalVersion", currentMaxVersion));
-                }
-
-                criteria.addOrder(Order.asc("globalVersion"));
-                criteria.addOrder(Order.asc("guid"));
-                criteria.setMaxResults(currentLimit);
-                criteria.setResultTransformer(Transformers.aliasToBean(doClass));
-                currentResultDOList = (List<DistributedObject>) criteria.list();
+            final String currentLastGuid = currentLastGuids.get(classSimpleName);
+            List<DistributedObject> currentDOList = refDistributedObject.process(persistenceSession, idOfOrg, currentMaxVersion,
+                    currentLastGuid, currentLimit);
+            if(!CollectionUtils.isEmpty(currentDOList)){
+                currentResultDOList.addAll(currentDOList);
             }
         } catch (Exception e) {
             errorMessage = e.getMessage();
@@ -704,7 +676,6 @@ public class Manager {
         currentDO.preProcess(persistenceSession, idOfOrg);
         persistenceSession.update(currentDO);
         return currentDO;
-        //return doService.update(currentDO);
     }
 
     private DistributedObject processDistributedObject(Session persistenceSession, DistributedObject distributedObject,
@@ -772,7 +743,6 @@ public class Manager {
         return conflict;
     }
 
-    /* взять из XML Utills */
     private String createStringElement(Document document, DistributedObject distributedObject)
             throws TransformerException {
         Element element = document.createElement("O");

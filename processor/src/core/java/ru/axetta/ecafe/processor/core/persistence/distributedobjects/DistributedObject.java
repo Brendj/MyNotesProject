@@ -7,11 +7,10 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.ProjectionList;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.hibernate.transform.Transformers;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -51,6 +50,25 @@ public abstract class DistributedObject{
     /* имя узла элемента */
     protected String tagName;
     private DistributedObjectException distributedObjectException;
+
+    protected void buildVersionCriteria(Long currentMaxVersion, String currentLastGuid, Integer currentLimit,
+            Criteria criteria) {
+        if (currentLimit == null || currentLimit <= 0) {
+            if (StringUtils.isNotEmpty(currentLastGuid)) {
+                Disjunction mainRestriction = Restrictions.disjunction();
+                mainRestriction.add(Restrictions.gt("globalVersion", currentMaxVersion));
+                Conjunction andRestr = Restrictions.conjunction();
+                andRestr.add(Restrictions.gt("guid", currentLastGuid));
+                andRestr.add(Restrictions.ge("globalVersion", currentMaxVersion));
+                mainRestriction.add(andRestr);
+                criteria.add(mainRestriction);
+            } else {
+                criteria.add(Restrictions.ge("globalVersion", currentMaxVersion));
+            }
+        } else {
+            criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
+        }
+    }
 
     protected void addDistributedObjectProjectionList(ProjectionList projectionList) {
         projectionList.add(Projections.property("globalId"), "globalId");
@@ -139,7 +157,8 @@ public abstract class DistributedObject{
 
     public abstract void fill(DistributedObject distributedObject);
 
-    public abstract List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception;
+    public abstract List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
+            String currentLastGuid, Integer currentLimit) throws Exception;
 
     public abstract void createProjections(Criteria criteria);
 
@@ -154,10 +173,11 @@ public abstract class DistributedObject{
      * @throws DistributedObjectException
      */
     @SuppressWarnings("unchecked")
-    protected List<DistributedObject> toSelfProcess(Session session, Long idOfOrg, Long currentMaxVersion) throws DistributedObjectException{
+    protected List<DistributedObject> toSelfProcess(Session session, Long idOfOrg, Long currentMaxVersion, String currentLastGuid, Integer currentLimit) throws DistributedObjectException{
         Criteria criteria = session.createCriteria(getClass());
         criteria.add(Restrictions.eq("orgOwner",idOfOrg));
-        criteria.add(Restrictions.gt("globalVersion",currentMaxVersion));
+        buildVersionCriteria(currentMaxVersion, currentLastGuid, currentLimit, criteria);
+        //criteria.add(Restrictions.gt("globalVersion",currentMaxVersion));
         createProjections(criteria);
         criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
         return criteria.list();

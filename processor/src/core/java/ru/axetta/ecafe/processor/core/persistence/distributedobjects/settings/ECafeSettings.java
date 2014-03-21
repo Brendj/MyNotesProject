@@ -10,9 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
@@ -20,8 +18,6 @@ import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -37,8 +33,9 @@ public class ECafeSettings extends DistributedObject{
     private SettingsIds settingsId;
 
     @Override
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception {
-        List<DistributedObject> list = toSelfProcess(session, idOfOrg, currentMaxVersion);
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
+            String currentLastGuid, Integer currentLimit) throws Exception {
+        List<DistributedObject> list = toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
         Map<SettingsIds, Long> map = new TreeMap<SettingsIds, Long>();
         for (DistributedObject dobj: list){
             ECafeSettings settings = (ECafeSettings) dobj;
@@ -58,7 +55,7 @@ public class ECafeSettings extends DistributedObject{
                 DAOService.getInstance().removeSetting(settings);
             }
         }
-        return toSelfProcess(session, idOfOrg, currentMaxVersion);
+        return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
     }
 
     @Override

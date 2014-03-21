@@ -7,8 +7,11 @@ package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Conjunction;
+import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 
@@ -28,7 +31,8 @@ public abstract class SupplierRequestDistributedObject extends DistributedObject
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception {
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
+            String currentLastGuid, Integer currentLimit) throws Exception {
         final boolean hasWayBillLinks = hasWayBillLinks(session);
         Boolean isSupplier = DAOUtils.isSupplierByOrg(session, idOfOrg);
         Criteria criteria = session.createCriteria(getClass());
@@ -36,7 +40,7 @@ public abstract class SupplierRequestDistributedObject extends DistributedObject
             boolean result = addReceiverRestriction(criteria, session, String.valueOf(idOfOrg), !isSupplier);
             if(result){
                 createProjections(criteria);
-                criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
+                buildVersionCriteria(currentMaxVersion, currentLastGuid, currentLimit, criteria);
                 criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
                 return criteria.list();
             } else {
@@ -49,8 +53,9 @@ public abstract class SupplierRequestDistributedObject extends DistributedObject
                 List<Long> sourceMenuOrg = DAOUtils.findMenuExchangeDestOrg(session, idOfOrg);
                 idOfOrgs.addAll(sourceMenuOrg);
             }
+            buildVersionCriteria(currentMaxVersion, currentLastGuid, currentLimit, criteria);
+            //criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
             criteria.add(Restrictions.in("orgOwner",idOfOrgs));
-            criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
             createProjections(criteria);
             criteria.setResultTransformer(Transformers.aliasToBean(getClass()));
             return criteria.list();

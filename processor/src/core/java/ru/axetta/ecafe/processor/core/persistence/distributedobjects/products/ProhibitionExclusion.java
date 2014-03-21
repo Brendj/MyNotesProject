@@ -39,7 +39,8 @@ public class ProhibitionExclusion extends DistributedObject {
     }
 
     @Override
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception {
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
+            String currentLastGuid, Integer currentLimit) throws Exception {
         return null; //toSelfProcess(session, idOfOrg, currentMaxVersion);
     }
 

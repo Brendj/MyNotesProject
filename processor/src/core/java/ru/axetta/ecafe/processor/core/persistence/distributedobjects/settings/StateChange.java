@@ -76,8 +76,9 @@ public class StateChange extends DistributedObject {
     }
 
     @Override
-    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion) throws Exception {
-        return toSelfProcess(session, idOfOrg, currentMaxVersion);
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
+            String currentLastGuid, Integer currentLimit) throws Exception {
+        return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
     }
 
     @Override
