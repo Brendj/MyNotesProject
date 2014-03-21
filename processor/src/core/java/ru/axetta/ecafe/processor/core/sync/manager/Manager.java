@@ -352,6 +352,14 @@ public class Manager {
                 final String currentLastGuid = currentLastGuids.get(classSimpleName);
                 refDistributedObject.createProjections(criteria);
 
+                Disjunction orgOwnerDisjunctionRestriction = Restrictions.disjunction();
+                orgOwnerDisjunctionRestriction.add(Restrictions.isNull("orgOwner"));
+                Conjunction orgOwnerConjunctionRestriction = Restrictions.conjunction();
+                orgOwnerConjunctionRestriction.add(Restrictions.isNotNull("orgOwner"));
+                orgOwnerConjunctionRestriction.add(Restrictions.eq("orgOwner", idOfOrg));
+                orgOwnerDisjunctionRestriction.add(orgOwnerConjunctionRestriction);
+                criteria.add(orgOwnerDisjunctionRestriction);
+
                 if (StringUtils.isNotEmpty(currentLastGuid)) {
                     Disjunction mainRestriction = Restrictions.disjunction();
                     mainRestriction.add(Restrictions.gt("globalVersion", currentMaxVersion));
