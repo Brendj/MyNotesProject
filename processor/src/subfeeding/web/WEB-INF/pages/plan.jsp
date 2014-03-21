@@ -44,22 +44,18 @@
         var total = 0;
         var minDateActivate = new Date(dateActivateStr.replace(/(\d+)\.(\d+)\.(\d+)/, '$2/$1/$3'));
         function formatSum(sum){
-            sum = sum/100;
-            sum = sum.toFixed(2)+" руб";
-            sum = sum.replace(/\./,',');
-            return sum;
+            return (sum/100).toFixed(2)+" руб".replace(/\./,',');
+        }
+        function updateTotalValue() {
+            $('#totalweek').text(formatSum(total));
+            $('#totalmonth').text(formatSum(4 * total));
+            $('#totalweek1').text(formatSum(subBalance1 - total));
+            $('#totalmonth1').text(formatSum(subBalance1 - 4 * total));
         }
         function addUp(choice){
             var num = parseInt(choice.value);
-            if(choice.checked){
-                total +=num;
-            } else {
-                total -=num;
-            }
-            $('#totalweek').text(formatSum(total));
-            $('#totalmonth').text(formatSum(4*total));
-            $('#totalweek1').text(formatSum(subBalance1-total));
-            $('#totalmonth1').text(formatSum(subBalance1-4*total));
+            total += choice.checked?num:-num;
+            updateTotalValue();
         }
         $(function () {
             $("#complexForm").preventDoubleSubmission();
@@ -69,22 +65,17 @@
             dateActivate.datepicker("option", "minDate", minDateActivate);
             var $cbs = $('.simpleTable input[type="checkbox"]');
             $cbs.each(function() {
-                if (this.checked)
-                    total = parseInt(total) + parseInt(this.value);
+                addUp(this);
+                //if (this.checked)
+                //    total = parseInt(total) + parseInt(this.value);
             });
-
-            $('#totalweek').text(formatSum(total));
-            $('#totalmonth').text(formatSum(4*total));
-            $('#totalweek1').text(formatSum(subBalance1-total));
-            $('#totalmonth1').text(formatSum(subBalance1-4*total));
+            updateTotalValue();
         });
     </script>
     <style type="text/css">
         fieldset legend {text-align: left; }
         fieldset legend div { margin: 0.3em 0.5em; }
-        fieldset .field { text-align: left; margin: 0.5em; padding: 0.5em; }
     </style>
-
 </head>
 <body>
 <div class="bodyDiv">
@@ -109,7 +100,7 @@
         <form method="post" enctype="application/x-www-form-urlencoded" id="complexForm"
               action="${pageContext.request.contextPath}/office/<%=action%>">
         <div id="infoHeader">
-<%
+            <%
     if (sf.getIdOfSubscriptionFeeding() == null) {
 %>
             <h1>Активировать подписку абонементного питания?</h1>

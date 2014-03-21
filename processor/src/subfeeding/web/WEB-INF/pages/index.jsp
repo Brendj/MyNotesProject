@@ -24,6 +24,12 @@
             $('input:text, input:password').button().addClass('ui-textfield');
         });
     </script>
+    <style type="text/css">
+    .sf-error-text {
+        color: red;
+        margin-top: 10px;
+    }
+    </style>
 </head>
 <body>
 <div id="loginDiv">
@@ -34,10 +40,9 @@
             <input type="text" name="contractId" size="25" maxlength="64" placeholder="Номер лицевого счета" />
             <input type="password" name="password" size="25" maxlength="64" placeholder="Пароль" />
             <input id="submit" type="submit" name="authorize" value="Войти" />
-            <%if (request.getAttribute("subFeedingError") != null) {%>
-            <div class="ui-state-error-text" style="color: red; margin-top: 10px;"><%=request.getAttribute("subFeedingError")%>
-            </div>
-            <%}%>
+            <c:if test="${not empty requestScope.subFeedingError}">
+                <div class="ui-state-error-text sf-error-text">${requestScope.subFeedingError}</div>
+            </c:if>
         </form>
     </div>
 </div>
