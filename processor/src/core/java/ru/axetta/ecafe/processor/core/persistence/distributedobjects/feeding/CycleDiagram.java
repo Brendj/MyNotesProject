@@ -185,6 +185,8 @@ public class CycleDiagram extends DistributedObject{
         setSunday(((CycleDiagram) distributedObject).getSunday());
     }
 
+
+
     public boolean isActual() {
         return deletedState != null && !deletedState && stateDiagram == StateDiagram.ACTIVE;
     }
