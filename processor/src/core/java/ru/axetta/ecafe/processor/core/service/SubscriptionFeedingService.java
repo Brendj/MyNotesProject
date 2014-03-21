@@ -230,8 +230,7 @@ public class SubscriptionFeedingService {
     @Transactional(rollbackFor = Exception.class)
     // Подключает подписку на АП. Создает также первую циклограмму.
     public SubscriptionFeeding createSubscriptionFeeding(Client client, Org org, String monday, String tuesday,
-            String wednesday, String thursday, String friday, String saturday,
-            SubscriberFeedingSettingSettingValue parser) {
+            String wednesday, String thursday, String friday, String saturday, Date newCreateDate) {
         DAOService daoService = DAOService.getInstance();
         Date date = new Date();
         Date dayBegin = CalendarUtils.truncateToDayOfMonth(date);
@@ -241,12 +240,15 @@ public class SubscriptionFeedingService {
         sf.setOrgOwner(org.getIdOfOrg());
         sf.setIdOfClient(client.getIdOfClient());
         sf.setGuid(UUID.randomUUID().toString());
-        Date dateActivateService = CalendarUtils.addDays(dayBegin, 1 + parser.getDayForbidChange());
+        //Date dateActivateService = CalendarUtils.addDays(dayBegin, 1 + parser.getDayForbidChange());
+        //newCreateDate<dateActivateService то ошибка
+
         // Если день активации выпадает на выходной - воскресенье, то берем понедельник.
-        if (!CalendarUtils.isWorkingDate(dateActivateService)) {
-            dateActivateService = CalendarUtils.addDays(dateActivateService, 1);
-        }
-        sf.setDateActivateService(dateActivateService);
+        //if (!CalendarUtils.isWorkingDate(dateActivateService)) {
+        //    dateActivateService = CalendarUtils.addDays(dateActivateService, 1);
+        //}
+        //sf.setDateActivateService(dateActivateService);
+        sf.setDateActivateService(newCreateDate);
         sf.setDeletedState(false);
         sf.setSendAll(SendToAssociatedOrgs.SendToSelf);
         sf.setWasSuspended(false);
@@ -255,6 +257,13 @@ public class SubscriptionFeedingService {
         sf.setGlobalVersion(version);
         entityManager.persist(sf);
         CycleDiagram cd = findClientCycleDiagram(client);
+        //  if(!( new Date() between  dateActivateService and dateDeActivateService)) {
+        //     редактируем
+        //  }
+        //  else {
+        //    создаем копию с отложеной деактивацией. new cd.setStateDiagram(StateDiagram.WAIT);
+        //    с вычислением даты активации
+        // }
         // Если осталась активная циклограмма со старой подписки, то ее необходимо удалить.
         if (cd != null) {
             cd.setDeletedState(true);
