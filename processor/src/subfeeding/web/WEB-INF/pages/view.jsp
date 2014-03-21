@@ -10,6 +10,26 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.TimeZone" %>
+<%
+    DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+    df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+    DateFormat tf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+    tf.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+    @SuppressWarnings("unchecked")
+    SubFeedingResult sf = (SubFeedingResult) request.getAttribute("subscriptionFeeding");
+    ClientSummaryExt client = (ClientSummaryExt) request.getAttribute("client");
+    String subBalance1 = CurrencyStringUtils.copecksToRubles(client.getSubBalance1());
+    String subBalance0 = CurrencyStringUtils.copecksToRubles(client.getSubBalance0());
+    boolean wasSuspended = sf.getSuspended() != null && sf.getSuspended();
+    String startDate = (String) request.getAttribute("startDate");
+    String endDate = (String) request.getAttribute("endDate");
+    PaymentListResult payments = (PaymentListResult) request.getAttribute("payments");
+    PurchaseListResult purchases = (PurchaseListResult) request.getAttribute("purchases");
+    TransferSubBalanceListResult transfers = (TransferSubBalanceListResult) request.getAttribute("transfers");
+    boolean purchasesExist = purchases != null && purchases.purchaseList != null && !purchases.purchaseList.getP().isEmpty();
+    boolean paymentsExist = payments != null && payments.paymentList != null && !payments.paymentList.getP().isEmpty();
+    boolean transferExist = transfers != null && transfers.transferSubBalanceListExt != null && !transfers.transferSubBalanceListExt.getT().isEmpty();
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -46,24 +66,13 @@
 </head>
 <body>
 <div class="bodyDiv">
-<%
-    DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-    df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
-    DateFormat tf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-    tf.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
-    @SuppressWarnings("unchecked")
-    SubFeedingResult sf = (SubFeedingResult) request.getAttribute("subscriptionFeeding");
-    ClientSummaryExt client = (ClientSummaryExt) request.getAttribute("client");
-    String subBalance1 = CurrencyStringUtils.copecksToRubles(client.getSubBalance1());
-    String subBalance0 = CurrencyStringUtils.copecksToRubles(client.getSubBalance0());
-    boolean wasSuspended = sf.getSuspended() != null && sf.getSuspended();
-%>
 <div class="header">
     <span class="contract"><%=ContractIdFormat.format(client.getContractId())%></span>
     <span class="contract" style="padding-left: 20px;"><%=client.getFullName()%></span>
     <span style="float: right;">
-        <button onclick="location.href = '${pageContext.request.contextPath}/office/logout'" name="logout">Выход
-            </button>
+        <button onclick="location.href = '${pageContext.request.contextPath}/office/logout'" name="logout">
+            Выход
+        </button>
     </span>
 </div>
 <div id="content">
@@ -126,15 +135,6 @@
             </button>
         </div>
     </div>
-    <%
-        String startDate = (String) request.getAttribute("startDate");
-        String endDate = (String) request.getAttribute("endDate");
-        PaymentListResult payments = (PaymentListResult) request.getAttribute("payments");
-        PurchaseListResult purchases = (PurchaseListResult) request.getAttribute("purchases");
-        boolean purchasesExist = purchases != null && purchases.purchaseList != null && !purchases.purchaseList.getP().isEmpty();
-        boolean paymentsExist = payments != null && payments.paymentList != null && !payments.paymentList.getP().isEmpty();
-        //boolean transferExist = transfers != null && transfers.transferList != null && !transfers.transferList.getP().isEmpty();
-    %>
     <div id="history">
         <div style="font-weight: bold;">История операций</div>
         <div style="margin-top: 20px;">
@@ -240,29 +240,31 @@
             %>
         </div>
 
-       <%-- <div id="transfers">
+       <div id="transfers">
             <div style="font-weight: bold;">Переводы</div>
             <div style="line-height: 3em;">
-                <span><%=!paymentsExist ? " За данный период по субсчету АП переводов не было." : ""%></span>
+                <span><%=!transferExist ? " За данный период по субсчету АП переводов не было." : ""%></span>
             </div>
             <%
-                if (paymentsExist) {
+                if (transferExist) {
             %>
             <div class="simpleTable purchaseTable">
                 <div class="simpleTableHeader purchaseRow">
+                    <div class="simpleCell purchaseHeaderCell wideCell">Номер счета списания</div>
+                    <div class="simpleCell purchaseHeaderCell wideCell">Номер счета пополнения</div>
                     <div class="simpleCell purchaseHeaderCell">Дата</div>
                     <div class="simpleCell purchaseHeaderCell">Сумма</div>
-                    <div class="simpleCell purchaseHeaderCell wideCell">Информация о платеже</div>
                 </div>
                 <%
-                    for (Payment payment : payments.paymentList.getP()) {
-                        String date = tf.format(payment.getTime().toGregorianCalendar().getTime());
-                        String sum = CurrencyStringUtils.copecksToRubles(payment.getSum());
+                    for (TransferSubBalanceExt transferSubBalanceExt : transfers.transferSubBalanceListExt.getT()) {
+                        String date = tf.format(transferSubBalanceExt.getCreateTime());
+                        String sum = CurrencyStringUtils.copecksToRubles(transferSubBalanceExt.getTransferSum());
                 %>
                 <div class="simpleRow purchaseRow">
+                    <div class="purchaseCell simpleCell"><%=transferSubBalanceExt.getBalanceBenefactor()%></div>
+                    <div class="purchaseCell simpleCell"><%=transferSubBalanceExt.getBalanceBeneficiary()%></div>
                     <div class="purchaseCell simpleCell"><%=date%></div>
                     <div class="purchaseCell simpleCell sum"><%=sum%></div>
-                    <div class="purchaseCell simpleCell complexName"><%=payment.getOrigin()%></div>
                 </div>
                 <%
                     }
@@ -271,7 +273,7 @@
             <%
                 }
             %>
-        </div>--%>
+        </div>
 
     </div>
 </div>

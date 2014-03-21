@@ -1,6 +1,12 @@
 <%@ page import="ru.axetta.ecafe.processor.core.client.ContractIdFormat" %>
 <%@ page import="ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils" %>
 <%@ page import="ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryExt" %>
+<%@ page import="ru.axetta.ecafe.processor.web.partner.integra.dataflow.TransferSubBalanceListResult" %>
+<%@ page import="ru.axetta.ecafe.processor.web.partner.integra.dataflow.TransferSubBalanceExt" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@ page import="java.util.TimeZone" %>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.text.DateFormat" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page trimDirectiveWhitespaces="true" %>
@@ -38,6 +44,13 @@
             $("button").button();
             $('input:text').button().addClass('ui-textfield');
             $('#transferMenu').menu().addClass('ui-textfield');
+            var datepickerBegin = $("#datepickerBegin").datepicker({
+                onSelect: function (selected) {
+                    $("#datepickerEnd").datepicker("option", "minDate", selected);
+                }
+            });
+            var datepickerEnd = $("#datepickerEnd").datepicker();
+            datepickerEnd.datepicker("option", "minDate", datepickerBegin.datepicker("getDate"));
         });
     </script>
 </head>
@@ -46,6 +59,12 @@
     ClientSummaryExt client = (ClientSummaryExt) request.getAttribute("client");
     String subBalance1 = CurrencyStringUtils.copecksToRubles(client.getSubBalance1());
     String subBalance0 = CurrencyStringUtils.copecksToRubles(client.getSubBalance0());
+    DateFormat tf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+    tf.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+    String startDate = (String) request.getAttribute("startDate");
+    String endDate = (String) request.getAttribute("endDate");
+    TransferSubBalanceListResult transfers = (TransferSubBalanceListResult) request.getAttribute("transfers");
+    boolean transferExist = transfers != null && transfers.transferSubBalanceListExt != null && !transfers.transferSubBalanceListExt.getT().isEmpty();
 %>
 <div class="bodyDiv">
     <div class="header">
@@ -100,6 +119,55 @@
                     </c:if>
                 </div>
             </form>
+        </div>
+        <div id="history">
+            <div style="font-weight: bold;">История операций</div>
+            <div style="margin-top: 20px;">
+                <form method="post" enctype="application/x-www-form-urlencoded"
+                      action="${pageContext.request.contextPath}/office/transfer">
+                    <span style="padding-right: 10px;">Начальная дата:</span>
+                    <input type="text" name="startDate" value="<%=StringEscapeUtils.escapeHtml(startDate)%>"
+                           id="datepickerBegin" maxlength="10" required />
+                    <span style="padding: 10px;">Конечная дата:</span>
+                    <input type="text" name="endDate" value="<%=StringEscapeUtils.escapeHtml(endDate)%>" id="datepickerEnd"
+                           maxlength="10" required />
+                    <button type="submit">Показать</button>
+                </form>
+            </div>
+            <div id="transfers">
+                <div style="font-weight: bold;">Переводы</div>
+                <div style="line-height: 3em;">
+                    <span><%=!transferExist ? " За данный период по субсчету АП переводов не было." : ""%></span>
+                </div>
+                <%
+                    if (transferExist) {
+                %>
+                <div class="simpleTable purchaseTable">
+                    <div class="simpleTableHeader purchaseRow">
+                        <div class="simpleCell purchaseHeaderCell wideCell">Номер счета списания</div>
+                        <div class="simpleCell purchaseHeaderCell wideCell">Номер счета пополнения</div>
+                        <div class="simpleCell purchaseHeaderCell">Дата</div>
+                        <div class="simpleCell purchaseHeaderCell">Сумма</div>
+                    </div>
+                    <%
+                        for (TransferSubBalanceExt transferSubBalanceExt : transfers.transferSubBalanceListExt.getT()) {
+                            String date = tf.format(transferSubBalanceExt.getCreateTime());
+                            String sum = CurrencyStringUtils.copecksToRubles(transferSubBalanceExt.getTransferSum());
+                    %>
+                    <div class="simpleRow purchaseRow">
+                        <div class="purchaseCell simpleCell"><%=transferSubBalanceExt.getBalanceBenefactor()%></div>
+                        <div class="purchaseCell simpleCell"><%=transferSubBalanceExt.getBalanceBeneficiary()%></div>
+                        <div class="purchaseCell simpleCell"><%=date%></div>
+                        <div class="purchaseCell simpleCell sum"><%=sum%></div>
+                    </div>
+                    <%
+                        }
+                    %>
+                </div>
+                <%
+                    }
+                %>
+            </div>
         </div>
     </div>
 </div>
