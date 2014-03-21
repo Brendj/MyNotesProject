@@ -59,7 +59,7 @@ public class TransferSubBalanceListExt {
      *
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link ru.axetta.ecafe.processor.web.partner.integra.dataflow.PurchaseExt }
+     * {@link PurchaseExt }
      * 
      * 
      */

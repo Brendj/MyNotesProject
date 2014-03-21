@@ -6,7 +6,6 @@
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import javax.xml.bind.annotation.*;
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

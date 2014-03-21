@@ -105,6 +105,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_SETTINGS_NOT_FOUND = 180L;
     private static final Long RC_SUBSCRIPTION_FEEDING_DUPLICATE = 190L;
     private static final Long RC_LACK_OF_SUBBALANCE1 = 200L;
+    private static final Long RC_ERROR_CREATE_SUBSCRIPTION_FEEDING = 210L;
 
     private static final String RC_OK_DESC = "OK";
     private static final String RC_CLIENT_NOT_FOUND_DESC = "Клиент не найден";
@@ -117,6 +118,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_DO_NOT_ACCESS_TO_SUB_BALANCE_DESC = "Нет доступа к субсчетам";
     private static final String RC_SUBSCRIPTION_FEEDING_DUPLICATE_DESC = "У клиента уже есть активная подписка на АП.";
     private static final String RC_LACK_OF_SUBBALANCE1_DESC = "У клиента недостаточно средств на субсчете АП";
+    private static final String RC_ERROR_CREATE_SUBSCRIPTION_FEEDING_DESC = "Не верная дата активация циклограммы";
     private static final int MAX_RECS = 50;
 
     public static final int CIRCULATION_STATUS_FILTER_ALL = -1, CIRCULATION_STATUS_FILTER_ALL_ON_HANDS = -2;
@@ -1539,8 +1541,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         authenticateRequest(contractId);
 
         Data data = new ClientRequest().process(contractId, new Processor() {
-            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
-                    Transaction transaction) throws Exception {
+            public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
+                    Session session, Transaction transaction) throws Exception {
                 processSummary(client, data, objectFactory, session);
             }
         });
@@ -1558,8 +1560,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         Data data = new ClientRequest()
                 .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
-                    public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
-                            Transaction transaction) throws Exception {
+                    public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
+                            Session session, Transaction transaction) throws Exception {
                         processSummary(client, data, objectFactory, session);
                     }
                 });
@@ -1825,7 +1827,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public PaymentListResult getPaymentList(Long contractId, final Date startDate, final Date endDate) {
-        authenticateRequest(contractId);
+
+        Long clientContractId = contractId;
+        String contractIdstr = String.valueOf(contractId);
+        if(ContractIdGenerator.luhnTest(contractIdstr)){
+            clientContractId = contractId;
+        } else {
+            int len = contractIdstr.length();
+            if(len>2 && ContractIdGenerator.luhnTest(contractIdstr.substring(0, len - 2))){
+                clientContractId = Long.parseLong(contractIdstr.substring(0, len-2));
+            }
+        }
+
+        authenticateRequest(clientContractId);
+        //authenticateRequest(contractId);
 
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory, Session session,
@@ -3855,9 +3870,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public Result createSubscriptionFeeding(@WebParam(name = "contractId") Long contractId, @WebParam(
-            name = "cycleDiagram") CycleDiagramIn cycleDiagramIn) {
+            name = "cycleDiagram") CycleDiagramIn cycleDiagramIn, @WebParam(name = "date") Date date) {
         authenticateRequest(contractId);
-        return createSubscriptionFeeding(contractId, null, cycleDiagramIn);
+        return createSubscriptionFeeding(contractId, null, cycleDiagramIn, date);
     }
 
     @Override
@@ -3899,9 +3914,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public Result createSubscriptionFeeding(@WebParam(name = "san") String san, @WebParam(
-            name = "cycleDiagram") CycleDiagramIn cycleDiagramIn) {
+            name = "cycleDiagram") CycleDiagramIn cycleDiagramIn,@WebParam(name = "date") Date date) {
         authenticateRequest(null);
-        return createSubscriptionFeeding(null, san, cycleDiagramIn);
+        return createSubscriptionFeeding(null, san, cycleDiagramIn, date);
     }
 
     @Override
@@ -3941,7 +3956,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return findComplexesWithSubFeeding(null, san);
     }
 
-    private Result createSubscriptionFeeding(Long contractId, String san, CycleDiagramIn cycleDiagramIn) {
+    private Result createSubscriptionFeeding(Long contractId, String san, CycleDiagramIn cycleDiagramIn, Date newCreateDate) {
         RuntimeContext runtimeContext;
         Session session = null;
         Transaction transaction = null;
@@ -3982,9 +3997,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ECafeSettings cafeSettings = settings.get(0);
             SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) cafeSettings
                     .getSplitSettingValue();
+            //newCreateDate<dateActivateService то ошибка
+            Date date = new Date();
+            Date dayBegin = CalendarUtils.truncateToDayOfMonth(date);
+            Date dateActivateService = CalendarUtils.addDays(dayBegin, 1 + parser.getDayForbidChange());
+            if(newCreateDate.getTime()<dateActivateService.getTime()){
+                res.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
+                res.description = "Не верная дата активация циклограммы";
+                return res;
+            }
+            // Если день активации выпадает на выходной - воскресенье, то берем понедельник.
+            //if (!CalendarUtils.isWorkingDate(dateActivateService)) {
+            //    dateActivateService = CalendarUtils.addDays(dateActivateService, 1);
+            //}
+
             sfService.createSubscriptionFeeding(client, client.getOrg(), cycleDiagramIn.getMonday(),
                     cycleDiagramIn.getTuesday(), cycleDiagramIn.getWednesday(), cycleDiagramIn.getThursday(),
-                    cycleDiagramIn.getFriday(), cycleDiagramIn.getSaturday(), parser);
+                    cycleDiagramIn.getFriday(), cycleDiagramIn.getSaturday(), /*parser*/ newCreateDate);
             res.resultCode = RC_OK;
             res.description = RC_OK_DESC;
         } catch (Exception ex) {
@@ -4245,17 +4274,202 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
 
+
     @Override
     public TransferSubBalanceListResult getTransferSubBalanceList(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        Session session = null;
+        Transaction transaction = null;
+        TransferSubBalanceListResult result = new TransferSubBalanceListResult();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = findClient(session, contractId, null, result);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+            Criteria criteria = session.createCriteria(SubAccountTransfer.class);
+            criteria.add(Restrictions.eq("clientTransfer", client));
+            criteria.add(Restrictions.between("createTime", startDate, endDate));
+            List list = criteria.list();
+            List<TransferSubBalanceExt> t = result.transferSubBalanceListExt.getT();
+            for (Object obj: list){
+                SubAccountTransfer subAccountTransfer = (SubAccountTransfer) obj;
+                TransferSubBalanceExt transferSubBalance = new TransferSubBalanceExt();
+                transferSubBalance.setCreateTime(subAccountTransfer.getCreateTime());
+                transferSubBalance.setBalanceBenefactor(subAccountTransfer.getBalanceBenefactor());
+                transferSubBalance.setBalanceBeneficiary(subAccountTransfer.getBalanceBeneficiary());
+                transferSubBalance.setTransferSum(subAccountTransfer.getTransferSum());
+                t.add(transferSubBalance);
+            }
+            transaction.commit();
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage());
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        return result;
     }
 
     @Override
     public TransferSubBalanceListResult getTransferSubBalanceList(@WebParam(name = "san") String san,
             @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        Session session = null;
+        Transaction transaction = null;
+        TransferSubBalanceListResult result = new TransferSubBalanceListResult();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = findClient(session, null, san, result);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+            Criteria criteria = session.createCriteria(SubAccountTransfer.class);
+            criteria.add(Restrictions.eq("clientTransfer", client));
+            criteria.add(Restrictions.between("createTime", startDate, endDate));
+            List list = criteria.list();
+            List<TransferSubBalanceExt> t = result.transferSubBalanceListExt.getT();
+            for (Object obj: list){
+                SubAccountTransfer subAccountTransfer = (SubAccountTransfer) obj;
+                TransferSubBalanceExt transferSubBalance = new TransferSubBalanceExt();
+                transferSubBalance.setCreateTime(subAccountTransfer.getCreateTime());
+                transferSubBalance.setBalanceBenefactor(subAccountTransfer.getBalanceBenefactor());
+                transferSubBalance.setBalanceBeneficiary(subAccountTransfer.getBalanceBeneficiary());
+                transferSubBalance.setTransferSum(subAccountTransfer.getTransferSum());
+                t.add(transferSubBalance);
+            }
+            transaction.commit();
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage());
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        return result;
     }
+
+
+    @Override
+    public SubscriptionFeedingSettingResult getSubscriptionFeedingSetting(@WebParam(name = "contractId") Long contractId){
+        Session session = null;
+        Transaction transaction = null;
+        SubscriptionFeedingSettingResult result = new SubscriptionFeedingSettingResult();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = findClient(session, contractId, null, result);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+            Criteria criteria = session.createCriteria(ECafeSettings.class);
+            final Org clientOrg = client.getOrg();
+            final Long idOfOrg = clientOrg.getIdOfOrg();
+            criteria.add(Restrictions.eq("orgOwner", idOfOrg));
+            criteria.add(Restrictions.eq("settingsId", SettingsIds.SubscriberFeeding));
+            criteria.add(Restrictions.eq("deletedState", false));
+            List list = criteria.list();
+            transaction.commit();
+            if(list==null || list.isEmpty()){
+                result.resultCode = RC_SETTINGS_NOT_FOUND;
+                result.description = "Отсутствуют настройки абонементного питания для организации "+clientOrg.getShortName();
+                return result;
+            }
+            if(list.size()>1){
+                result.resultCode = RC_SETTINGS_NOT_FOUND;
+                result.description = "Организация имеет более одной настройки "+clientOrg.getShortName();
+                return result;
+            }
+            ECafeSettings settings = (ECafeSettings) list.get(0);
+            SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) settings.getSplitSettingValue();
+            SubscriptionFeedingSettingExt settingExt = new SubscriptionFeedingSettingExt();
+            settingExt.setDayDeActivate(parser.getDayDeActivate());
+            settingExt.setDayForbidChange(parser.getDayForbidChange());
+            settingExt.setDayRequest(parser.getDayRequest());
+            settingExt.setEnableFeeding(parser.isEnableFeeding());
+            result.subscriptionFeedingSettingExt = settingExt;
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage());
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public SubscriptionFeedingSettingResult getSubscriptionFeedingSetting(@WebParam(name = "san") String san){
+        Session session = null;
+        Transaction transaction = null;
+        SubscriptionFeedingSettingResult result = new SubscriptionFeedingSettingResult();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = findClient(session, null, san, result);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+            Criteria criteria = session.createCriteria(ECafeSettings.class);
+            final Long idOfOrg = client.getOrg().getIdOfOrg();
+            criteria.add(Restrictions.eq("orgOwner", idOfOrg));
+            criteria.add(Restrictions.eq("settingsId", SettingsIds.SubscriberFeeding));
+            List list = criteria.list();
+            transaction.commit();
+            if(list==null || list.isEmpty()){
+                result.resultCode = RC_SETTINGS_NOT_FOUND;
+                result.description = String
+                        .format("Отсутствуют настройки абонементного питания для организации %s (IdOfOrg = %s)",
+                                client.getOrg().getShortName(), idOfOrg);
+                return result;
+            }
+            if(list.size()>1){
+                result.resultCode = RC_SETTINGS_NOT_FOUND;
+                result.description = String
+                        .format("Организация имеет более одной настройки %s (IdOfOrg = %s)",
+                                client.getOrg().getShortName(), idOfOrg);
+                return result;
+            }
+            ECafeSettings settings = (ECafeSettings) list.get(0);
+            SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) settings.getSplitSettingValue();
+            SubscriptionFeedingSettingExt settingExt = new SubscriptionFeedingSettingExt();
+            settingExt.setDayDeActivate(parser.getDayDeActivate());
+            settingExt.setDayForbidChange(parser.getDayForbidChange());
+            settingExt.setDayRequest(parser.getDayRequest());
+            settingExt.setEnableFeeding(parser.isEnableFeeding());
+            result.subscriptionFeedingSettingExt = settingExt;
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage());
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
 }
 
 

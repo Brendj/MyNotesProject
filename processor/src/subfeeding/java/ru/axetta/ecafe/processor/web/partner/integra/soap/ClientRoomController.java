@@ -306,7 +306,7 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "createSubscriptionFeeding")
     Result createSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
-            @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn);
+            @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn, @WebParam(name = "date") Date date);
 
     @WebMethod(operationName = "findSubscriptionFeeding")
     SubFeedingResult findSubscriptionFeeding(@WebParam(name = "contractId") Long contractId);
@@ -329,7 +329,7 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "createSubscriptionFeedingBySan")
     Result createSubscriptionFeeding(@WebParam(name = "san") String san,
-            @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn);
+            @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn,  @WebParam(name = "date") Date date);
 
     @WebMethod(operationName = "findSubscriptionFeedingBySan")
     SubFeedingResult findSubscriptionFeeding(@WebParam(name = "san") String san);
@@ -351,11 +351,17 @@ public interface ClientRoomController {
     ComplexInfoResult findComplexesWithSubFeeding(@WebParam(name = "san") String san);
 
     @WebMethod(operationName = "getTransferSubBalanceList")
-    PurchaseListResult getTransferSubBalanceList(@WebParam(name = "contractId") Long contractId,
+    TransferSubBalanceListResult getTransferSubBalanceList(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate);
 
     @WebMethod(operationName = "getTransferSubBalanceListBySan")
-    PurchaseListResult getTransferSubBalanceList(@WebParam(name = "san") String san, @WebParam(name = "startDate") Date startDate,
+    TransferSubBalanceListResult getTransferSubBalanceList(@WebParam(name = "san") String san, @WebParam(name = "startDate") Date startDate,
             @WebParam(name = "endDate") Date endDate);
+
+    @WebMethod(operationName = "getSubscriptionFeedingSetting")
+    SubscriptionFeedingSettingResult getSubscriptionFeedingSetting(@WebParam(name = "contractId") Long contractId);
+
+    @WebMethod(operationName = "getSubscriptionFeedingSettingBySan")
+    SubscriptionFeedingSettingResult getSubscriptionFeedingSetting(@WebParam(name = "san") String san);
 
 }
