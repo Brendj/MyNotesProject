@@ -78,7 +78,6 @@ public class Manager {
     private SortedMap<String, List<String>> confirmDOMap = new TreeMap<String, List<String>>();
     private Long idOfOrg;
     private SyncHistory syncHistory;
-    //private final String[] doGroupNames;
     private final List<String> doGroupNames;
     private final DOGroupsFactory doGroupsFactory = new DOGroupsFactory();
 
@@ -352,13 +351,14 @@ public class Manager {
                 final String currentLastGuid = currentLastGuids.get(classSimpleName);
                 refDistributedObject.createProjections(criteria);
 
-                Disjunction orgOwnerDisjunctionRestriction = Restrictions.disjunction();
-                orgOwnerDisjunctionRestriction.add(Restrictions.isNull("orgOwner"));
-                Conjunction orgOwnerConjunctionRestriction = Restrictions.conjunction();
-                orgOwnerConjunctionRestriction.add(Restrictions.isNotNull("orgOwner"));
-                orgOwnerConjunctionRestriction.add(Restrictions.eq("orgOwner", idOfOrg));
-                orgOwnerDisjunctionRestriction.add(orgOwnerConjunctionRestriction);
-                criteria.add(orgOwnerDisjunctionRestriction);
+                //Disjunction orgOwnerDisjunctionRestriction = Restrictions.disjunction();
+                //orgOwnerDisjunctionRestriction.add(Restrictions.isNull("orgOwner"));
+                //Conjunction orgOwnerConjunctionRestriction = Restrictions.conjunction();
+                //orgOwnerConjunctionRestriction.add(Restrictions.isNotNull("orgOwner"));
+                //orgOwnerConjunctionRestriction.add(Restrictions.eq("orgOwner", idOfOrg));
+                //orgOwnerDisjunctionRestriction.add(orgOwnerConjunctionRestriction);
+                //criteria.add(orgOwnerDisjunctionRestriction);
+                criteria.add(Restrictions.eq("orgOwner", idOfOrg));
 
                 if (StringUtils.isNotEmpty(currentLastGuid)) {
                     Disjunction mainRestriction = Restrictions.disjunction();
@@ -429,6 +429,7 @@ public class Manager {
                 } else {
                     criteria.add(Restrictions.ge("globalVersion", currentMaxVersion));
                 }
+                criteria.add(Restrictions.eq("orgOwner", idOfOrg));
                 criteria.addOrder(Order.asc("globalVersion"));
                 criteria.addOrder(Order.asc("guid"));
                 criteria.setMaxResults(currentLimit);
