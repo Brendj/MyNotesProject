@@ -31,7 +31,7 @@ import static org.apache.commons.lang.StringUtils.isNotEmpty;
  * User: damir
  * Date: 14.08.12
  * Time: 16:33
- * To change this template use File | Settings | File Templates.
+ * Позиция внутреннего приходного документа
  */
 public class InternalIncomingDocumentPosition extends SupplierRequestDistributedObject {
 
