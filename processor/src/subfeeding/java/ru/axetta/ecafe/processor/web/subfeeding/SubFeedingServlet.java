@@ -284,21 +284,12 @@ public class SubFeedingServlet extends HttpServlet {
         for (String key: req.getParameterMap().keySet()){
             if (key.contains(COMPLEX_PARAM_PREFIX)) {
                 String[] ids = StringUtils.split(key, '_');
-                String complexId = ids[3];
-                int dayNumber = Integer.parseInt(ids[2]);
+                String complexId = ids[2];
+                int dayNumber = Integer.parseInt(ids[3]);
                 String prevValue = cycle.getDayValue(dayNumber);
                 cycle.setDayValue(dayNumber, prevValue == null ? complexId : (prevValue + ";" + complexId));
             }
         }
-        //for (Map.Entry<String, String[]> entry : req.getParameterMap().entrySet()) {
-        //    if (entry.getKey().contains(COMPLEX_PARAM_PREFIX)) {
-        //        String[] ids = StringUtils.split(entry.getValue()[0], '_');
-        //        String complexId = ids[0];
-        //        int dayNumber = Integer.parseInt(ids[1]);
-        //        String prevValue = cycle.getDayValue(dayNumber);
-        //        cycle.setDayValue(dayNumber, prevValue == null ? complexId : (prevValue + ";" + complexId));
-        //    }
-        //}
         return cycle;
     }
 

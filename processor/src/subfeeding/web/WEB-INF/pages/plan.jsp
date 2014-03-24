@@ -26,31 +26,22 @@
 <html>
 <head>
     <title>Абонементное питание</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" type="text/css"
-          href="${pageContext.request.contextPath}/WebContent/css/flick/jquery-ui-1.10.3.custom.min.css" />
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/common.css" />
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/plan.css"/>
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/tables.css"/>
-
-    <script src="${pageContext.request.contextPath}/WebContent/js/jquery-1.10.2.min.js"></script>
-    <script src="${pageContext.request.contextPath}/WebContent/js/jquery-ui-1.10.3.custom.min.js"></script>
-    <script src="${pageContext.request.contextPath}/WebContent/js/jquery.ui.datepicker-ru.js"></script>
-    <script src="${pageContext.request.contextPath}/WebContent/js/tools.js"></script>
+    <jsp:include page="include/header.jsp"/>
+    <script src="${pageContext.request.contextPath}/resources/scripts/tools.js"></script>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/styles/plan.css"/>
     <script>
         var subBalance0 = <%=subBalance0%>;
         var subBalance1 = <%=subBalance1%>;
         var dateActivateStr = '<%=dateActivate%>';
+        var dateActivateDisable = '<%=(sf.getIdOfSubscriptionFeeding() == null?"disable":"enable")%>';
         var total = 0;
         var minDateActivate = new Date(dateActivateStr.replace(/(\d+)\.(\d+)\.(\d+)/, '$2/$1/$3'));
         function formatSum(sum){
-            return (sum/100).toFixed(2)+" руб".replace(/\./,',');
+            return (sum/100).toFixed(2).replace(".",",")+" руб";
         }
         function updateTotalValue() {
-            $('#totalweek').text(formatSum(total));
-            $('#totalmonth').text(formatSum(4 * total));
-            $('#totalweek1').text(formatSum(subBalance1 - total));
-            $('#totalmonth1').text(formatSum(subBalance1 - 4 * total));
+            $('#totalweek').text(formatSum(total));$('#totalmonth').text(formatSum(4 * total));
+            //$('#totalweek1').text(formatSum(subBalance1 - total));//$('#totalmonth1').text(formatSum(subBalance1 - 4 * total));
         }
         function addUp(choice){
             var num = parseInt(choice.value);
@@ -61,13 +52,11 @@
             $("#complexForm").preventDoubleSubmission();
             $('input:text').button().addClass('ui-textfield');
             $("button").button();
-            var dateActivate = $("#dateActivate").datepicker();
+            var dateActivate = $("#dateActivate").datepicker(dateActivateDisable);
             dateActivate.datepicker("option", "minDate", minDateActivate);
             var $cbs = $('.simpleTable input[type="checkbox"]');
             $cbs.each(function() {
-                addUp(this);
-                //if (this.checked)
-                //    total = parseInt(total) + parseInt(this.value);
+                total += this.checked?parseInt(this.value):0;
             });
             updateTotalValue();
         });
@@ -84,14 +73,10 @@
             <%=ContractIdFormat.format(client.getContractId())%></span>
         <span class="contract" style="padding-left: 20px;"><%=client.getFullName()%></span>
         <span style="float: right;">
-        <%
-            if (sf.getIdOfSubscriptionFeeding() != null) {
-        %>
-            <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/view'">Вернуться
-            </button>
-        <%
-            }
-        %>
+             <c:if test="${requestScope.subscriptionFeeding.idOfSubscriptionFeeding!=null}">
+                 <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/view'">Вернуться
+                 </button>
+             </c:if>
             <button onclick="location.href = '${pageContext.request.contextPath}/office/logout'" name="logout">Выход
             </button>
         </span>
@@ -100,26 +85,28 @@
         <form method="post" enctype="application/x-www-form-urlencoded" id="complexForm"
               action="${pageContext.request.contextPath}/office/<%=action%>">
         <div id="infoHeader">
-            <%
-    if (sf.getIdOfSubscriptionFeeding() == null) {
-%>
-            <h1>Активировать подписку абонементного питания?</h1>
-            <h2>Для продолжения необходимо заполнить циклограмму.</h2>
-            <label for="dateActivate" style="padding-right: 10px;">Дата активации услуги:</label>
-            <input type="text" name="dateActivate" value="<%=StringEscapeUtils.escapeHtml(dateActivate)%>"
-                   id="dateActivate" maxlength="10" required />
-<%
-    } else {
-%>
-            <h1>Редактирование циклограммы питания</h1>
-            <div class="ui-widget">Дата активации услуги: <span class="ui-widget-content ui-textfield"><%=dateActivate%></span></div>
-<%  } %>
+
+            <c:if test="${requestScope.subscriptionFeeding.idOfSubscriptionFeeding==null}">
+                <h1>Активировать подписку абонементного питания?</h1>
+                <h2>Для продолжения необходимо заполнить циклограмму.</h2>
+                <label for="dateActivate" style="padding-right: 10px;">Дата активации услуги:</label>
+                <input type="text" name="dateActivate" value="<%=StringEscapeUtils.escapeHtml(dateActivate)%>"
+                       id="dateActivate" maxlength="10" required/>
+            </c:if>
+            <c:if test="${requestScope.subscriptionFeeding.idOfSubscriptionFeeding!=null}">
+                <h1>Редактирование циклограммы питания</h1>
+                <label for="dateActivate" style="padding-right: 10px;">Дата активации услуги:</label>
+                <input type="text" name="dateActivate" value="<%=StringEscapeUtils.escapeHtml(dateActivate)%>"
+                       id="dateActivate" maxlength="10" style="opacity: 1" disabled="disabled" required />
+            </c:if>
+
             <c:if test="${not empty requestScope.subFeedingError}">
-                <div class="errorMessage">${requestScope.subFeedingError}</div>
+                <div class="messageDiv errorMessage">${requestScope.subFeedingError}</div>
             </c:if>
             <c:if test="${not empty requestScope.subFeedingSuccess}">
-                <div class="successMessage">${requestScope.subFeedingSuccess}</div>
+                <div class="messageDiv successMessage">${requestScope.subFeedingSuccess}</div>
             </c:if>
+
         </div>
         <div id="cycleDiagram">
                 <div class="simpleTable">
@@ -168,45 +155,38 @@
                         <fieldset class="ui-widget ui-widget-content">
                             <legend class="ui-widget-header ui-corner-all"><div>Расчетная информация</div></legend>
                             <div class="simpleTable" style="margin: 0">
-                                <div class="simpleRow simpleTableHeader">
+                                <%--<div class="simpleRow simpleTableHeader">
                                     <div class="simpleCell"></div>
                                     <div class="simpleCell" style="text-align: right;">Сумма</div>
                                     <div class="simpleCell wideCell" style="text-align: right;">Баланс за вычетом суммы</div>
-                                </div>
+                                </div>--%>
                                 <div class="simpleRow">
                                     <div class="simpleCell wideCell" style="text-align: left;">Расчетная стоимость 1-ой недели:</div>
                                     <div class="simpleCell" id="totalweek" style="text-align: right;"></div>
-                                    <div class="simpleCell" id="totalweek1" style="text-align: right;"></div>
+                                    <%--<div class="simpleCell" id="totalweek1" style="text-align: right;"></div>--%>
                                 </div>
                                 <div class="simpleRow" style="border: 0">
                                     <div class="simpleCell" style="text-align: left;">Расчетная стоимость 4-х недель:</div>
                                     <div class="simpleCell" id="totalmonth" style="text-align: right;"></div>
-                                    <div class="simpleCell" id="totalmonth1" style="text-align: right;"></div>
+                                    <%--<div class="simpleCell" id="totalmonth1" style="text-align: right;"></div>--%>
                                 </div>
                             </div>
                         </fieldset>
-            <%
-                if (sf.getIdOfSubscriptionFeeding() == null) {
-            %>
-                        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/transfer'">
-                            Перевод средств
-                        </button>
-                        <button type="submit" name="activate">Активировать</button>
-                        <div style="font-size: 0.8em;">
-                            Нажимая на данную кнопку, Вы согласны с условиями предоставления услуги.
-                        </div>
 
-            <%  } else {
-
-            %>
-                        <%
-                            if (!sf.getSuspended()) {
-                        %>
-                        <button type="submit" name="edit">Сохранить изменения</button>
-                        <%
-                            }
-                        %>
-            <%  } %>
+                        <c:if test="${requestScope.subscriptionFeeding.idOfSubscriptionFeeding==null}">
+                            <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/transfer'">
+                                Перевод средств
+                            </button>
+                            <button type="submit" name="activate">Активировать</button>
+                            <div style="font-size: 0.8em;">
+                                Нажимая на данную кнопку, Вы согласны с условиями предоставления услуги.
+                            </div>
+                        </c:if>
+                        <c:if test="${requestScope.subscriptionFeeding.idOfSubscriptionFeeding!=null}">
+                            <c:if test="${!requestScope.subscriptionFeeding.suspended}">
+                                <button type="submit" name="edit">Сохранить изменения</button>
+                            </c:if>
+                        </c:if>
                     </div>
                 </div>
             </div>

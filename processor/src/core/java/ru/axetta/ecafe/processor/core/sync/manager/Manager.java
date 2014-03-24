@@ -305,18 +305,14 @@ public class Manager {
 
             } else {
                 LOGGER.debug("init findConfirmedDO");
-                //List<DistributedObject> currentResultDOList = findConfirmedDO(sessionFactory, doClass);
                 Set<DistributedObject>  currentResultDOSet = new HashSet<DistributedObject>(findConfirmedDO(sessionFactory, doClass));
                 LOGGER.debug("end findConfirmedDO");
-                //final int newLimit = currentLimit - currentResultDOList.size();
                 final int newLimit = currentLimit - currentResultDOSet.size();
                 if (newLimit > 0) {
                     List<DistributedObject> newResultDOList = findResponseResult(sessionFactory, doClass, newLimit);
-                    //currentResultDOList.addAll(newResultDOList);
                     currentResultDOSet.addAll(newResultDOList);
                     LOGGER.debug("end findResponseResult");
                     LOGGER.debug("init addConfirms");
-                    //addConfirms(sessionFactory, classSimpleName, currentResultDOList);
                     addConfirms(sessionFactory, classSimpleName, new ArrayList<DistributedObject>(currentResultDOSet));
                     LOGGER.debug("end addConfirms");
                 }
@@ -325,7 +321,6 @@ public class Manager {
                         doSyncClass);
                 LOGGER.debug("end processDistributedObjectsList");
                 currentDOListMap.put(doSyncClass, distributedObjectsList);
-                //resultDOMap.put(doSyncClass, currentResultDOList);
                 resultDOMap.put(doSyncClass,  new ArrayList<DistributedObject>(currentResultDOSet));
 
             }
@@ -449,13 +444,10 @@ public class Manager {
         try {
             persistenceSession = sessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            //persistenceSession.setCacheMode(CacheMode.IGNORE);
             if (confirmDistributedObjectList != null && !confirmDistributedObjectList.isEmpty()) {
                 final int size = confirmDistributedObjectList.size();
-                //Set<String> currentGUIDs = new HashSet<String>();
                 Set<String> dbGUIDs = new HashSet<String>();
                 List<String> currentGUIDs = new ArrayList<String>(size);
-                //List<String> dbGUIDs = new ArrayList<String>();
                 LOGGER.debug("addConfirms: currentGUIDs create list");
                 long duration = System.currentTimeMillis();
                 for (DistributedObject distributedObject : confirmDistributedObjectList) {

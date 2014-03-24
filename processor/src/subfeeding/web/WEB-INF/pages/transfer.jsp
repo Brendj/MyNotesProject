@@ -10,20 +10,24 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page trimDirectiveWhitespaces="true" %>
+<%
+    ClientSummaryExt client = (ClientSummaryExt) request.getAttribute("client");
+    String subBalance1 = CurrencyStringUtils.copecksToRubles(client.getSubBalance1());
+    String subBalance0 = CurrencyStringUtils.copecksToRubles(client.getSubBalance0());
+    DateFormat tf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+    tf.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+    String startDate = (String) request.getAttribute("startDate");
+    String endDate = (String) request.getAttribute("endDate");
+    TransferSubBalanceListResult transfers = (TransferSubBalanceListResult) request.getAttribute("transfers");
+    boolean transferExist = transfers != null && transfers.transferSubBalanceListExt != null && !transfers.transferSubBalanceListExt.getT().isEmpty();
+%>
 <!DOCTYPE html>
 <html>
 <head>
     <title>Абонементное питание</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" type="text/css"
-          href="${pageContext.request.contextPath}/WebContent/css/flick/jquery-ui-1.10.3.custom.min.css" />
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/common.css" />
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/transfer.css" />
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/tables.css" />
-    <script src="${pageContext.request.contextPath}/WebContent/js/jquery-1.10.2.min.js"></script>
-    <script src="${pageContext.request.contextPath}/WebContent/js/jquery-ui-1.10.3.custom.min.js"></script>
-    <script src="${pageContext.request.contextPath}/WebContent/js/jquery.ui.datepicker-ru.js"></script>
-    <script src="${pageContext.request.contextPath}/WebContent/js/tools.js"></script>
+    <jsp:include page="include/header.jsp"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/styles/transfer.css" />
+    <script src="${pageContext.request.contextPath}/resources/scripts/tools.js"></script>
     <script>
         $(function () {
             $('#transferForm').on('submit', function (e) {
@@ -55,17 +59,6 @@
     </script>
 </head>
 <body>
-<%
-    ClientSummaryExt client = (ClientSummaryExt) request.getAttribute("client");
-    String subBalance1 = CurrencyStringUtils.copecksToRubles(client.getSubBalance1());
-    String subBalance0 = CurrencyStringUtils.copecksToRubles(client.getSubBalance0());
-    DateFormat tf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
-    tf.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
-    String startDate = (String) request.getAttribute("startDate");
-    String endDate = (String) request.getAttribute("endDate");
-    TransferSubBalanceListResult transfers = (TransferSubBalanceListResult) request.getAttribute("transfers");
-    boolean transferExist = transfers != null && transfers.transferSubBalanceListExt != null && !transfers.transferSubBalanceListExt.getT().isEmpty();
-%>
 <div class="bodyDiv">
     <div class="header">
         <span class="contract"><%=ContractIdFormat.format(client.getContractId())%></span>

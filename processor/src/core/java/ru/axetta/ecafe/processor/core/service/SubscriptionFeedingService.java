@@ -143,7 +143,7 @@ public class SubscriptionFeedingService {
     // Возвращает комплексы, участвующие в АП, для данной орг-ии.
     public List<ComplexInfo> findComplexesWithSubFeeding(Org org) {
         Date today = CalendarUtils.truncateToDayOfMonth(new Date());
-        Date tomorrow = CalendarUtils.addDays(today, 1);
+        Date tomorrow = CalendarUtils.addOneDay(today);
         TypedQuery<ComplexInfo> query = entityManager.createQuery("select distinct ci from ComplexInfo ci "
                 + "where ci.org = :org and usedSubscriptionFeeding = 1 and menuDate >= :startDate and menuDate < :endDate",
                 ComplexInfo.class).setParameter("org", org).setParameter("startDate", today)
@@ -169,12 +169,17 @@ public class SubscriptionFeedingService {
     public SubscriptionFeeding findClientSubscriptionFeeding(Client c) {
         Session session = entityManager.unwrap(Session.class);
         Date now = new Date();
-        DetachedCriteria subQuery = DetachedCriteria.forClass(SubscriptionFeeding.class)
-                .add(Restrictions.eq("client", c)).add(Restrictions.eq("deletedState", false)).add(Restrictions
-                    .or(Restrictions.isNull("dateDeactivateService"), Restrictions.gt("dateDeactivateService", now)))
-                .setProjection(Projections.max("dateActivateService"));
-        Criteria criteria = session.createCriteria(SubscriptionFeeding.class).add(Restrictions.eq("client", c))
-                .add(Subqueries.propertyEq("dateActivateService", subQuery));
+        DetachedCriteria subQuery = DetachedCriteria.forClass(SubscriptionFeeding.class);
+        subQuery.add(Restrictions.eq("client", c));
+        subQuery.add(Restrictions.eq("deletedState", false));
+        subQuery.add(Restrictions.or(
+                Restrictions.isNull("dateDeactivateService"),
+                Restrictions.gt("dateDeactivateService", now))
+        );
+        subQuery.setProjection(Projections.max("dateActivateService"));
+        Criteria criteria = session.createCriteria(SubscriptionFeeding.class);
+        criteria.add(Restrictions.eq("client", c));
+        criteria.add(Subqueries.propertyEq("dateActivateService", subQuery));
         return (SubscriptionFeeding) criteria.uniqueResult();
     }
 
@@ -183,8 +188,10 @@ public class SubscriptionFeedingService {
     // Возвращает циклограмму питания, актуальную на текущий день.
     public CycleDiagram findClientCycleDiagram(Client c) {
         Session session = entityManager.unwrap(Session.class);
-        Criteria criteria = session.createCriteria(CycleDiagram.class).add(Restrictions.eq("client", c))
-                .add(Restrictions.eq("deletedState", false)).add(Restrictions.eq("stateDiagram", StateDiagram.ACTIVE));
+        Criteria criteria = session.createCriteria(CycleDiagram.class);
+        criteria.add(Restrictions.eq("client", c));
+        criteria.add(Restrictions.eq("deletedState", false));
+        criteria.add(Restrictions.eq("stateDiagram", StateDiagram.ACTIVE));
         return (CycleDiagram) criteria.uniqueResult();
     }
 
@@ -195,11 +202,12 @@ public class SubscriptionFeedingService {
         Date dateActivation = CalendarUtils.truncateToDayOfMonth(date);
         Date tomorrow = CalendarUtils.addDays(dateActivation, 1);
         Session session = entityManager.unwrap(Session.class);
-        Criteria criteria = session.createCriteria(CycleDiagram.class).add(Restrictions.eq("client", client))
-                .add(Restrictions.in("stateDiagram", new Object[]{StateDiagram.WAIT, StateDiagram.ACTIVE}))
-                .add(Restrictions.eq("deletedState", false))
-                .add(Restrictions.ge("dateActivationDiagram", dateActivation))
-                .add(Restrictions.lt("dateActivationDiagram", tomorrow));
+        Criteria criteria = session.createCriteria(CycleDiagram.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.in("stateDiagram", new Object[]{StateDiagram.WAIT, StateDiagram.ACTIVE}));
+        criteria.add(Restrictions.eq("deletedState", false));
+        criteria.add(Restrictions.ge("dateActivationDiagram", dateActivation));
+        criteria.add(Restrictions.lt("dateActivationDiagram", tomorrow));
         return (CycleDiagram) criteria.uniqueResult();
     }
 
@@ -240,14 +248,6 @@ public class SubscriptionFeedingService {
         sf.setOrgOwner(org.getIdOfOrg());
         sf.setIdOfClient(client.getIdOfClient());
         sf.setGuid(UUID.randomUUID().toString());
-        //Date dateActivateService = CalendarUtils.addDays(dayBegin, 1 + parser.getDayForbidChange());
-        //newCreateDate<dateActivateService то ошибка
-
-        // Если день активации выпадает на выходной - воскресенье, то берем понедельник.
-        //if (!CalendarUtils.isWorkingDate(dateActivateService)) {
-        //    dateActivateService = CalendarUtils.addDays(dateActivateService, 1);
-        //}
-        //sf.setDateActivateService(dateActivateService);
         sf.setDateActivateService(newCreateDate);
         sf.setDeletedState(false);
         sf.setSendAll(SendToAssociatedOrgs.SendToSelf);
@@ -257,13 +257,6 @@ public class SubscriptionFeedingService {
         sf.setGlobalVersion(version);
         entityManager.persist(sf);
         CycleDiagram cd = findClientCycleDiagram(client);
-        //  if(!( new Date() between  dateActivateService and dateDeActivateService)) {
-        //     редактируем
-        //  }
-        //  else {
-        //    создаем копию с отложеной деактивацией. new cd.setStateDiagram(StateDiagram.WAIT);
-        //    с вычислением даты активации
-        // }
         // Если осталась активная циклограмма со старой подписки, то ее необходимо удалить.
         if (cd != null) {
             cd.setDeletedState(true);
@@ -272,7 +265,9 @@ public class SubscriptionFeedingService {
             entityManager.merge(cd);
         }
         // Активируем циклограмму сегодняшним днем.
-        createCycleDiagram(client, org, monday, tuesday, wednesday, thursday, friday, saturday, dayBegin, true);
+        if(cd==null){
+            createCycleDiagram(client, org, monday, tuesday, wednesday, thursday, friday, saturday, dayBegin, true);
+        }
         return sf;
     }
 
@@ -319,18 +314,76 @@ public class SubscriptionFeedingService {
 
     @Transactional(rollbackFor = Exception.class)
     // Создает новую циклограмму. Если на дату ее активации уже есть цилкограмма, то переводит ее в удаленные.
+    // Если есть циклограмма на эту дату то ее редактируем
     public CycleDiagram editCycleDiagram(Client client, Org org, String monday, String tuesday, String wednesday,
             String thursday, String friday, String saturday, Date dateActivationDiagram) {
         DAOService daoService = DAOService.getInstance();
+        SubscriptionFeeding sf = findClientSubscriptionFeeding(client);
         CycleDiagram cd = findCycleDiagramOnDate(client, dateActivationDiagram);
-        if (cd != null) {
-            cd.setDeletedState(true);
-            cd.setStateDiagram(StateDiagram.BLOCK);
-            cd.setGlobalVersion(daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName()));
-            entityManager.merge(cd);
+        Date currentDate = new Date();
+        //  if(!( new Date() between  dateActivateService and dateDeActivateService)) {
+        //     редактируем
+        //  }
+        if(!(currentDate.getTime()>sf.getDateActivateService().getTime() && sf.isActual())){
+            if(cd==null){
+                cd = createCycleDiagram(client, org, monday, tuesday, wednesday, thursday, friday, saturday,
+                        dateActivationDiagram, false);
+            } else {
+                cd.setGlobalVersion(daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName()));
+                List<ComplexInfo> availableComplexes = findComplexesWithSubFeeding(org);
+                cd.setMonday(monday);
+                cd.setMondayPrice(getPriceOfDay(monday, availableComplexes));
+                cd.setTuesday(tuesday);
+                cd.setTuesdayPrice(getPriceOfDay(tuesday, availableComplexes));
+                cd.setWednesday(wednesday);
+                cd.setWednesdayPrice(getPriceOfDay(wednesday, availableComplexes));
+                cd.setThursday(thursday);
+                cd.setThursdayPrice(getPriceOfDay(thursday, availableComplexes));
+                cd.setFriday(friday);
+                cd.setFridayPrice(getPriceOfDay(friday, availableComplexes));
+                cd.setSaturday(saturday);
+                cd.setSaturdayPrice(getPriceOfDay(saturday, availableComplexes));
+                cd.setSunday("");
+                cd.setSundayPrice(0L);
+                entityManager.merge(cd);
+            }
+        } else {
+            //  else {
+            //    создаем копию с отложеной деактивацией. new cd.setStateDiagram(StateDiagram.WAIT);
+            //    с вычислением даты активации
+            // }
+            if(cd==null || cd.isActual()){
+                cd = createCycleDiagram(client, org, monday, tuesday, wednesday, thursday, friday, saturday,
+                        dateActivationDiagram, false);
+            } else {
+                cd.setGlobalVersion(daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName()));
+                List<ComplexInfo> availableComplexes = findComplexesWithSubFeeding(org);
+                cd.setMonday(monday);
+                cd.setMondayPrice(getPriceOfDay(monday, availableComplexes));
+                cd.setTuesday(tuesday);
+                cd.setTuesdayPrice(getPriceOfDay(tuesday, availableComplexes));
+                cd.setWednesday(wednesday);
+                cd.setWednesdayPrice(getPriceOfDay(wednesday, availableComplexes));
+                cd.setThursday(thursday);
+                cd.setThursdayPrice(getPriceOfDay(thursday, availableComplexes));
+                cd.setFriday(friday);
+                cd.setFridayPrice(getPriceOfDay(friday, availableComplexes));
+                cd.setSaturday(saturday);
+                cd.setSaturdayPrice(getPriceOfDay(saturday, availableComplexes));
+                cd.setSunday("");
+                cd.setSundayPrice(0L);
+                entityManager.merge(cd);
+            }
         }
-        cd = createCycleDiagram(client, org, monday, tuesday, wednesday, thursday, friday, saturday,
-                dateActivationDiagram, false);
+
+        //if (cd != null) {
+        //    cd.setDeletedState(true);
+        //    cd.setStateDiagram(StateDiagram.BLOCK);
+        //    cd.setGlobalVersion(daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName()));
+        //    entityManager.merge(cd);
+        //}
+        //cd = createCycleDiagram(client, org, monday, tuesday, wednesday, thursday, friday, saturday,
+        //        dateActivationDiagram, false);
         return cd;
     }
 

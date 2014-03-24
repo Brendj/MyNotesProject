@@ -8,14 +8,9 @@
 <html>
 <head>
     <title>Абонементное питание</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" type="text/css"
-          href="${pageContext.request.contextPath}/WebContent/css/flick/jquery-ui-1.10.3.custom.min.css" />
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/common.css" />
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/WebContent/css/index.css" />
-    <script src="${pageContext.request.contextPath}/WebContent/js/jquery-1.10.2.min.js"></script>
-    <script src="${pageContext.request.contextPath}/WebContent/js/jquery-ui-1.10.3.custom.min.js"></script>
-    <script src="${pageContext.request.contextPath}/WebContent/js/tools.js"></script>
+    <jsp:include page="include/header.jsp"/>
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/styles/index.css" />
+    <script src="${pageContext.request.contextPath}/resources/scripts/tools.js"></script>
     <script>
         $(function () {
             $("#submit").button().css({
