@@ -99,6 +99,12 @@ public class ReferReport extends BasicReportForAllOrgJob {
         public ReferReport doBuild(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
             Date generateTime = new Date();
 
+            Calendar endCal = new GregorianCalendar();
+            endCal.setTimeInMillis(endTime.getTime());
+            endCal.set(Calendar.HOUR_OF_DAY, 24);
+            endCal.set(Calendar.MINUTE, 59);
+            endCal.set(Calendar.SECOND, 59);
+            endTime.setTime(endCal.getTimeInMillis());
 
             /* Строим параметры для передачи в jasper */
             Map<String, Object> parameterMap = new HashMap<String, Object>();
@@ -194,6 +200,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
             List<DailyReferReportItem> result = new ArrayList<DailyReferReportItem>();
             List res = DailyReferReport.getReportData(session, org.getIdOfOrg(), startTime.getTime(), endTime.getTime(),
                                                       " and cf_discountrules.subcategory <> ''");
+                        //"and cf_discountrules.subcategory = 'Многодетные 5-11 кл.(завтрак+обед)' and nameofgood='Обед 5-11' ");
             for (Object entry : res) {
                 Object e[]            = (Object[]) entry;
                 String name           = (String) e[0];
@@ -223,7 +230,9 @@ public class ReferReport extends BasicReportForAllOrgJob {
         List<ReferReportItem> workdays = new ArrayList<ReferReportItem>();
         List<ReferReportItem> weekends = new ArrayList<ReferReportItem>();
         int id = 0;
+        Set<Double> prices = new TreeSet<Double>();
         for (String cat : categories) {
+            prices.clear();
             //  Поиск итогового объекта
             ReferReportItem workdayItem = new ReferReportItem();
             workdayItem.setLineId(id);
@@ -241,6 +250,10 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 if (!i.getName().equals(cat)) {
                     continue;
                 }
+                if(i.getGroup2().equals(LUNCH) || cat.indexOf("(завтрак)") > 0 ||
+                   i.getGroup2().equals(BREAKFAST)) {
+                    prices.add(i.getPrice());
+                }
                 if (i.getGroup2() != null &&
                     (!i.getGroup2().equals(LUNCH) && cat.indexOf("(завтрак)") < 1)) {
                     continue;
@@ -255,15 +268,21 @@ public class ReferReport extends BasicReportForAllOrgJob {
                     tmp.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
                     workdayItem.setChildren(workdayItem.getChildren() + i.getChildren());
                     workdayItem.setTotal(workdayItem.getTotal() + i.getChildren());
-                    workdayItem.setSummary(workdayItem.getSummary() + i.getPrice() * i.getChildren());
+                    //workdayItem.setSummary(workdayItem.getSummary() + i.getPrice() * i.getChildren());
                 }
                 //  Иначе - обновляем данные за субботы
                 else {
                     weekendItem.setChildren(weekendItem.getChildren() + i.getChildren());
-                    weekendItem.setSummary(weekendItem.getSummary() + i.getPrice() * i.getChildren());
+                    weekendItem.setTotal(weekendItem.getTotal() + i.getChildren());
+                    //weekendItem.setSummary(weekendItem.getSummary() + i.getPrice() * i.getChildren());
                 }
             }
-            workdayItem.setChildren(Math.round(workdayItem.getChildren() / workDaysCount));
+            for(Double p : prices) {
+                workdayItem.setSummary(workdayItem.getSummary() + workdayItem.getTotal() * p);
+                weekendItem.setSummary(weekendItem.getSummary() + weekendItem.getTotal() * p);
+            }
+            workdayItem.setChildren((long) Math.round((double) workdayItem.getChildren() / workDaysCount));
+            weekendItem.setChildren((long) Math.round((double) weekendItem.getChildren() / weekendsCount));
             id++;
         }
 
