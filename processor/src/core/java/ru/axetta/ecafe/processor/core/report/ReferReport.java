@@ -49,6 +49,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
     private static final long MILLIS_IN_DAY = 86400000L;
     public static final String BREAKFAST = "ЗАВТРАК";
     public static final String LUNCH = "ОБЕД";
+    public static final String SNACK = "ПОЛДНИК";
 
 
     public List<List<ReferReportItem>> getItems() {

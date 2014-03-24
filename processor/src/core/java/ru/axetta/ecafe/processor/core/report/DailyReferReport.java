@@ -288,15 +288,21 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 this.group2 = ReferReport.BREAKFAST;
             } else if (goodname.toLowerCase().indexOf("обед") > -1) {
                 this.group2 = ReferReport.LUNCH;
+            } else if (goodname.toLowerCase().indexOf("полдник") > -1) {
+                this.group2 = ReferReport.SNACK;
             }
 
             //  Если это суббота и обед, то значение ставим в 0!!!
             Calendar cal = new GregorianCalendar();
             cal.setTimeInMillis(ts);
-            if (this.group2.equals(ReferReport.LUNCH) &&
-                cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
-                children = 0L;
-                summary = 0D;
+            if(this.group2 != null && cal != null) {
+                if (this.group2.equals(ReferReport.LUNCH) &&
+                        cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
+                    children = 0L;
+                    summary = 0D;
+                }
+            } else {
+                int few =2;
             }
 
             this.children = children;
