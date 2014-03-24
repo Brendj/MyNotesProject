@@ -3997,7 +3997,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ECafeSettings cafeSettings = settings.get(0);
             SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) cafeSettings
                     .getSplitSettingValue();
-            //newCreateDate<dateActivateService то ошибка
             Date date = new Date();
             Date dayBegin = CalendarUtils.truncateToDayOfMonth(date);
             Date dateActivateService = CalendarUtils.addDays(dayBegin, 1 + parser.getDayForbidChange());
@@ -4013,7 +4012,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             sfService.createSubscriptionFeeding(client, client.getOrg(), cycleDiagramIn.getMonday(),
                     cycleDiagramIn.getTuesday(), cycleDiagramIn.getWednesday(), cycleDiagramIn.getThursday(),
-                    cycleDiagramIn.getFriday(), cycleDiagramIn.getSaturday(), /*parser*/ newCreateDate);
+                    cycleDiagramIn.getFriday(), cycleDiagramIn.getSaturday(), newCreateDate);
             res.resultCode = RC_OK;
             res.description = RC_OK_DESC;
         } catch (Exception ex) {
@@ -4120,7 +4119,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    public CycleDiagramOut editSubscriptionFeedingPlan(Long contractId, String san, CycleDiagramIn cycleDiagramIn) {
+    public CycleDiagramOut editSubscriptionFeedingPlan(Long contractId, String san,
+            CycleDiagramIn cycleDiagramIn) {
         Session session = null;
         Transaction transaction = null;
         CycleDiagramOut result = new CycleDiagramOut();
@@ -4141,10 +4141,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                 client.getOrg().getShortName(), client.getOrg().getIdOfOrg());
                 return result;
             }
-            transaction.commit();
             ECafeSettings cafeSettings = settings.get(0);
             SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) cafeSettings
                     .getSplitSettingValue();
+
             Date today = truncateToDayOfMonth(new Date());
             Date activationDate = CalendarUtils.addDays(today, 1 + parser.getDayForbidChange());
             // Если день активации выпадает на выходной - воскресенье, то берем понедельник.
@@ -4158,11 +4158,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             cycleDiagramIn.getWednesday(), cycleDiagramIn.getThursday(), cycleDiagramIn.getFriday(),
                             cycleDiagramIn.getSaturday(), activationDate);
             result = new CycleDiagramOut(cd);
+            transaction.commit();
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
             HibernateUtils.rollback(transaction, logger);
-            logger.error(ex.getMessage());
+            logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
@@ -4193,7 +4194,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
             HibernateUtils.rollback(transaction, logger);
-            logger.error(ex.getMessage());
+            logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
@@ -4218,7 +4219,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
                     .getBean(SubscriptionFeedingService.class);
             List<ComplexInfo> complexInfoList = sfService.findComplexesWithSubFeeding(org);
-            result.setComplexInfoList(new ComplexInfoList());
             List<ComplexInfoExt> list = new ArrayList<ComplexInfoExt>();
             result.getComplexInfoList().setList(list);
             for (ComplexInfo ci : complexInfoList) {
@@ -4293,6 +4293,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Criteria criteria = session.createCriteria(SubAccountTransfer.class);
             criteria.add(Restrictions.eq("clientTransfer", client));
             criteria.add(Restrictions.between("createTime", startDate, endDate));
+            criteria.setMaxResults(MAX_RECS);
             List list = criteria.list();
             List<TransferSubBalanceExt> t = result.transferSubBalanceListExt.getT();
             for (Object obj: list){
@@ -4336,6 +4337,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Criteria criteria = session.createCriteria(SubAccountTransfer.class);
             criteria.add(Restrictions.eq("clientTransfer", client));
             criteria.add(Restrictions.between("createTime", startDate, endDate));
+            criteria.setMaxResults(MAX_RECS);
             List list = criteria.list();
             List<TransferSubBalanceExt> t = result.transferSubBalanceListExt.getT();
             for (Object obj: list){

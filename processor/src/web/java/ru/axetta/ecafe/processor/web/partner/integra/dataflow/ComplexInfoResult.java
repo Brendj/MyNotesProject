@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class ComplexInfoResult extends Result {
 
     @XmlElement(name = "ComplexInfoList")
-    private ComplexInfoList complexInfoList;
+    private ComplexInfoList complexInfoList = new ComplexInfoList();
 
     public ComplexInfoList getComplexInfoList() {
         return complexInfoList;
