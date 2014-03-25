@@ -555,7 +555,7 @@ public class ClientManager {
 
             logger.debug("exist client");
             if (checkFullNameUnique && existClient(persistenceSession, organization, firstName, surname, secondName)) {
-                throw new Exception(
+                throw new ClientAlreadyExistException(
                         "Клиент с данными ФИО уже зарегистрирован в организации: " + surname + " " + firstName + " "
                                 + secondName, null);
             }

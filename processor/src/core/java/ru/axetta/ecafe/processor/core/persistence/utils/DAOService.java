@@ -1490,15 +1490,32 @@ public class DAOService {
     }
 
     public List<RegistryChange> getLastRegistryChanges(long idOfOrg, long revisionDate) throws Exception {
+        return getLastRegistryChanges(idOfOrg, revisionDate, null, null);
+    }
+
+    public List<RegistryChange> getLastRegistryChanges(long idOfOrg, long revisionDate,
+            Integer actionFilter, String nameFilter) throws Exception {
         if (revisionDate < 1L) {
             revisionDate = getLastRegistryChangeUpdate(idOfOrg);
-}
+        }
         if (revisionDate < 1) {
             return Collections.EMPTY_LIST;
         }
-        TypedQuery<RegistryChange> query = entityManager.createQuery("from RegistryChange where idOfOrg=:idOfOrg and createDate=:lastUpdate order by groupName, surname, firstName, secondName",RegistryChange.class);
+        String nameStatement = "";
+        if(nameFilter != null && nameFilter.length() > 0) {
+            nameStatement = " and surname like '%" + nameFilter + "%' ";
+        }
+        String actionStatement = "";
+        if(actionFilter != null) {
+            actionStatement = " and operation=:operation ";
+        }
+        String q = "from RegistryChange where idOfOrg=:idOfOrg and createDate=:lastUpdate" + nameStatement + actionStatement + " order by groupName, surname, firstName, secondName";
+        TypedQuery<RegistryChange> query = entityManager.createQuery(q,RegistryChange.class);
         query.setParameter("idOfOrg", idOfOrg);
         query.setParameter("lastUpdate", revisionDate);
+        if(actionFilter != null) {
+            query.setParameter("operation", actionFilter);
+        }
         return query.getResultList();
     }
 

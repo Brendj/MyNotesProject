@@ -657,6 +657,24 @@ public class ImportRegisterClientsService {
         change.setApplied(true);
         session.update(change);
     }
+
+    @Transactional
+    public void setChangeError(long idOfRegistryChange, Exception e) throws Exception {
+        RegistryChange change = em.find(RegistryChange.class, idOfRegistryChange);
+        Session session = null;
+        try {
+            session = (Session) em.getDelegate();
+        } catch (Exception ex) {
+            logger.error("Failed to craete session", e);
+            throw ex;
+        }
+        String err = e.getMessage();
+        if(err.length() > 255) {
+            err = err.substring(0, 255).trim();
+        }
+        change.setError(err);
+        session.update(change);
+    }
     
     @Transactional
     public StringBuffer syncClientsWithRegistry(long idOfOrg, boolean performChanges, StringBuffer logBuffer, boolean manualCheckout) throws Exception {

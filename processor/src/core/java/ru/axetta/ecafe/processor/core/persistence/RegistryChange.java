@@ -26,6 +26,7 @@ public class RegistryChange {
     protected String secondNameFrom;
     protected String surnameFrom;
     protected String groupNameFrom;
+    protected String error;
     protected Long idOfClient;
     protected Integer operation;
     protected Boolean applied;
@@ -36,7 +37,7 @@ public class RegistryChange {
     public RegistryChange(Long idOfOrg, Long idOfMigrateOrgTo, Long idOfMigrateOrgFrom, Long createDate,
             Long idOfRegistryChange, String clientGUID, String firstName, String secondName, String surname,
             String groupName, String firstNameFrom, String secondNameFrom, String surnameFrom, String groupNameFrom,
-            Long idOfClient, Integer operation, Boolean applied) {
+            Long idOfClient, Integer operation, Boolean applied, String error) {
         this.idOfOrg = idOfOrg;
         this.idOfMigrateOrgTo = idOfMigrateOrgTo;
         this.idOfMigrateOrgFrom = idOfMigrateOrgFrom;
@@ -54,6 +55,7 @@ public class RegistryChange {
         this.idOfClient = idOfClient;
         this.operation = operation;
         this.applied = applied;
+        this.error = error;
     }
 
     public Long getIdOfOrg() {
@@ -190,5 +192,13 @@ public class RegistryChange {
 
     public void setApplied(Boolean applied) {
         this.applied = applied;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
     }
 }

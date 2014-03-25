@@ -30,6 +30,7 @@
         <property name="idOfClient" column="IdOfClient" type="long" not-null="false"/>
         <property name="operation" column="Operation" type="int" not-null="true"/>
         <property name="applied" column="Applied" type="boolean" not-null="true"/>
+        <property name="error" column="Error" type="string" length="256"/>
     </class>
 </hibernate-mapping>
 

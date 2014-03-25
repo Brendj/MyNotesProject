@@ -24,8 +24,8 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _LoadRegistryChangeRevisions_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeRevisions");
     private final static QName _GenerateLinkingTokenResponse_QNAME = new QName("http://ru.axetta.ecafe", "generateLinkingTokenResponse");
+    private final static QName _LoadRegistryChangeRevisions_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeRevisions");
     private final static QName _RegisterClientsResponse_QNAME = new QName("http://ru.axetta.ecafe", "registerClientsResponse");
     private final static QName _RegisterVisitorTempCard_QNAME = new QName("http://ru.axetta.ecafe", "registerVisitorTempCard");
     private final static QName _LoadRegistryChangeItemsInternalResponse_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeItemsInternalResponse");
@@ -47,8 +47,8 @@ public class ObjectFactory {
     private final static QName _RegisterClients_QNAME = new QName("http://ru.axetta.ecafe", "registerClients");
     private final static QName _CheckVisitorByCard_QNAME = new QName("http://ru.axetta.ecafe", "checkVisitorByCard");
     private final static QName _AddRegistryChangeError_QNAME = new QName("http://ru.axetta.ecafe", "addRegistryChangeError");
-    private final static QName _Exception_QNAME = new QName("http://ru.axetta.ecafe", "Exception");
     private final static QName _LoadRegistryChangeRevisionsResponse_QNAME = new QName("http://ru.axetta.ecafe", "loadRegistryChangeRevisionsResponse");
+    private final static QName _Exception_QNAME = new QName("http://ru.axetta.ecafe", "Exception");
     private final static QName _CommentRegistryChangeErrorResponse_QNAME = new QName("http://ru.axetta.ecafe", "commentRegistryChangeErrorResponse");
     private final static QName _ChangeCardOwnerResponse_QNAME = new QName("http://ru.axetta.ecafe", "changeCardOwnerResponse");
     private final static QName _AddRegistryChangeErrorResponse_QNAME = new QName("http://ru.axetta.ecafe", "addRegistryChangeErrorResponse");
@@ -83,283 +83,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ProceedRegitryChangeItem }
+     * Create an instance of {@link ChangeCardOwner }
      * 
      */
-    public ProceedRegitryChangeItem createProceedRegitryChangeItem() {
-        return new ProceedRegitryChangeItem();
-    }
-
-    /**
-     * Create an instance of {@link LoadRegistryChangeRevisions }
-     * 
-     */
-    public LoadRegistryChangeRevisions createLoadRegistryChangeRevisions() {
-        return new LoadRegistryChangeRevisions();
-    }
-
-    /**
-     * Create an instance of {@link TempCardOperationItem }
-     * 
-     */
-    public TempCardOperationItem createTempCardOperationItem() {
-        return new TempCardOperationItem();
-    }
-
-    /**
-     * Create an instance of {@link CommentRegistryChangeErrorInternalResponse }
-     * 
-     */
-    public CommentRegistryChangeErrorInternalResponse createCommentRegistryChangeErrorInternalResponse() {
-        return new CommentRegistryChangeErrorInternalResponse();
-    }
-
-    /**
-     * Create an instance of {@link LoadRegistryChangeItemsResponse }
-     * 
-     */
-    public LoadRegistryChangeItemsResponse createLoadRegistryChangeItemsResponse() {
-        return new LoadRegistryChangeItemsResponse();
-    }
-
-    /**
-     * Create an instance of {@link VisitorItem }
-     * 
-     */
-    public VisitorItem createVisitorItem() {
-        return new VisitorItem();
-    }
-
-    /**
-     * Create an instance of {@link RegisterVisitor }
-     * 
-     */
-    public RegisterVisitor createRegisterVisitor() {
-        return new RegisterVisitor();
-    }
-
-    /**
-     * Create an instance of {@link RegisterVisitorTempCardResponse }
-     * 
-     */
-    public RegisterVisitorTempCardResponse createRegisterVisitorTempCardResponse() {
-        return new RegisterVisitorTempCardResponse();
-    }
-
-    /**
-     * Create an instance of {@link GenerateLinkingToken }
-     * 
-     */
-    public GenerateLinkingToken createGenerateLinkingToken() {
-        return new GenerateLinkingToken();
-    }
-
-    /**
-     * Create an instance of {@link RegistryChangeErrorItem }
-     * 
-     */
-    public RegistryChangeErrorItem createRegistryChangeErrorItem() {
-        return new RegistryChangeErrorItem();
-    }
-
-    /**
-     * Create an instance of {@link TestResponse }
-     * 
-     */
-    public TestResponse createTestResponse() {
-        return new TestResponse();
-    }
-
-    /**
-     * Create an instance of {@link AddRegistryChangeErrorInternalResponse }
-     * 
-     */
-    public AddRegistryChangeErrorInternalResponse createAddRegistryChangeErrorInternalResponse() {
-        return new AddRegistryChangeErrorInternalResponse();
-    }
-
-    /**
-     * Create an instance of {@link LoadRegistryChangeRevisionsInternal }
-     * 
-     */
-    public LoadRegistryChangeRevisionsInternal createLoadRegistryChangeRevisionsInternal() {
-        return new LoadRegistryChangeRevisionsInternal();
-    }
-
-    /**
-     * Create an instance of {@link LoadRegistryChangeItemsInternalResponse }
-     * 
-     */
-    public LoadRegistryChangeItemsInternalResponse createLoadRegistryChangeItemsInternalResponse() {
-        return new LoadRegistryChangeItemsInternalResponse();
-    }
-
-    /**
-     * Create an instance of {@link RefreshRegistryChangeItems }
-     * 
-     */
-    public RefreshRegistryChangeItems createRefreshRegistryChangeItems() {
-        return new RefreshRegistryChangeItems();
-    }
-
-    /**
-     * Create an instance of {@link AddRegistryChangeError }
-     * 
-     */
-    public AddRegistryChangeError createAddRegistryChangeError() {
-        return new AddRegistryChangeError();
-    }
-
-    /**
-     * Create an instance of {@link CommentRegistryChangeErrorResponse }
-     * 
-     */
-    public CommentRegistryChangeErrorResponse createCommentRegistryChangeErrorResponse() {
-        return new CommentRegistryChangeErrorResponse();
-    }
-
-    /**
-     * Create an instance of {@link FrontControllerException }
-     * 
-     */
-    public FrontControllerException createFrontControllerException() {
-        return new FrontControllerException();
-    }
-
-    /**
-     * Create an instance of {@link ProceedRegitryChangeItemInternalResponse }
-     * 
-     */
-    public ProceedRegitryChangeItemInternalResponse createProceedRegitryChangeItemInternalResponse() {
-        return new ProceedRegitryChangeItemInternalResponse();
-    }
-
-    /**
-     * Create an instance of {@link RefreshRegistryChangeItemsInternal }
-     * 
-     */
-    public RefreshRegistryChangeItemsInternal createRefreshRegistryChangeItemsInternal() {
-        return new RefreshRegistryChangeItemsInternal();
-    }
-
-    /**
-     * Create an instance of {@link RegisterTempCard }
-     * 
-     */
-    public RegisterTempCard createRegisterTempCard() {
-        return new RegisterTempCard();
-    }
-
-    /**
-     * Create an instance of {@link GenerateLinkingTokenResponse }
-     * 
-     */
-    public GenerateLinkingTokenResponse createGenerateLinkingTokenResponse() {
-        return new GenerateLinkingTokenResponse();
-    }
-
-    /**
-     * Create an instance of {@link GetLastTempCardOperation }
-     * 
-     */
-    public GetLastTempCardOperation createGetLastTempCardOperation() {
-        return new GetLastTempCardOperation();
-    }
-
-    /**
-     * Create an instance of {@link Exception }
-     * 
-     */
-    public Exception createException() {
-        return new Exception();
-    }
-
-    /**
-     * Create an instance of {@link LoadRegistryChangeErrorItemsResponse }
-     * 
-     */
-    public LoadRegistryChangeErrorItemsResponse createLoadRegistryChangeErrorItemsResponse() {
-        return new LoadRegistryChangeErrorItemsResponse();
-    }
-
-    /**
-     * Create an instance of {@link RefreshRegistryChangeItemsInternalResponse }
-     * 
-     */
-    public RefreshRegistryChangeItemsInternalResponse createRefreshRegistryChangeItemsInternalResponse() {
-        return new RefreshRegistryChangeItemsInternalResponse();
-    }
-
-    /**
-     * Create an instance of {@link RegistryChangeItem }
-     * 
-     */
-    public RegistryChangeItem createRegistryChangeItem() {
-        return new RegistryChangeItem();
-    }
-
-    /**
-     * Create an instance of {@link ChangeCardOwnerResponse }
-     * 
-     */
-    public ChangeCardOwnerResponse createChangeCardOwnerResponse() {
-        return new ChangeCardOwnerResponse();
-    }
-
-    /**
-     * Create an instance of {@link ProceedRegitryChangeItemInternal }
-     * 
-     */
-    public ProceedRegitryChangeItemInternal createProceedRegitryChangeItemInternal() {
-        return new ProceedRegitryChangeItemInternal();
-    }
-
-    /**
-     * Create an instance of {@link RegisterVisitorResponse }
-     * 
-     */
-    public RegisterVisitorResponse createRegisterVisitorResponse() {
-        return new RegisterVisitorResponse();
-    }
-
-    /**
-     * Create an instance of {@link CommentRegistryChangeErrorInternal }
-     * 
-     */
-    public CommentRegistryChangeErrorInternal createCommentRegistryChangeErrorInternal() {
-        return new CommentRegistryChangeErrorInternal();
-    }
-
-    /**
-     * Create an instance of {@link LoadRegistryChangeItems }
-     * 
-     */
-    public LoadRegistryChangeItems createLoadRegistryChangeItems() {
-        return new LoadRegistryChangeItems();
-    }
-
-    /**
-     * Create an instance of {@link RegisterCardResponse }
-     * 
-     */
-    public RegisterCardResponse createRegisterCardResponse() {
-        return new RegisterCardResponse();
-    }
-
-    /**
-     * Create an instance of {@link LoadRegistryChangeItemsInternal }
-     * 
-     */
-    public LoadRegistryChangeItemsInternal createLoadRegistryChangeItemsInternal() {
-        return new LoadRegistryChangeItemsInternal();
-    }
-
-    /**
-     * Create an instance of {@link LoadRegistryChangeRevisionsInternalResponse }
-     * 
-     */
-    public LoadRegistryChangeRevisionsInternalResponse createLoadRegistryChangeRevisionsInternalResponse() {
-        return new LoadRegistryChangeRevisionsInternalResponse();
+    public ChangeCardOwner createChangeCardOwner() {
+        return new ChangeCardOwner();
     }
 
     /**
@@ -371,6 +99,38 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link LoadRegistryChangeErrorItems }
+     * 
+     */
+    public LoadRegistryChangeErrorItems createLoadRegistryChangeErrorItems() {
+        return new LoadRegistryChangeErrorItems();
+    }
+
+    /**
+     * Create an instance of {@link GenerateLinkingTokenResponse }
+     * 
+     */
+    public GenerateLinkingTokenResponse createGenerateLinkingTokenResponse() {
+        return new GenerateLinkingTokenResponse();
+    }
+
+    /**
+     * Create an instance of {@link CommentRegistryChangeErrorInternal }
+     * 
+     */
+    public CommentRegistryChangeErrorInternal createCommentRegistryChangeErrorInternal() {
+        return new CommentRegistryChangeErrorInternal();
+    }
+
+    /**
+     * Create an instance of {@link RegistryChangeCallback }
+     * 
+     */
+    public RegistryChangeCallback createRegistryChangeCallback() {
+        return new RegistryChangeCallback();
+    }
+
+    /**
      * Create an instance of {@link RegisterCard }
      * 
      */
@@ -379,19 +139,27 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ChangeCardOwner }
+     * Create an instance of {@link RefreshRegistryChangeItemsResponse }
      * 
      */
-    public ChangeCardOwner createChangeCardOwner() {
-        return new ChangeCardOwner();
+    public RefreshRegistryChangeItemsResponse createRefreshRegistryChangeItemsResponse() {
+        return new RefreshRegistryChangeItemsResponse();
     }
 
     /**
-     * Create an instance of {@link CommentRegistryChangeError }
+     * Create an instance of {@link CommentRegistryChangeErrorResponse }
      * 
      */
-    public CommentRegistryChangeError createCommentRegistryChangeError() {
-        return new CommentRegistryChangeError();
+    public CommentRegistryChangeErrorResponse createCommentRegistryChangeErrorResponse() {
+        return new CommentRegistryChangeErrorResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetLastTempCardOperation }
+     * 
+     */
+    public GetLastTempCardOperation createGetLastTempCardOperation() {
+        return new GetLastTempCardOperation();
     }
 
     /**
@@ -403,19 +171,83 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link LoadRegistryChangeRevisionsResponse }
+     * Create an instance of {@link RegisterClientResult }
      * 
      */
-    public LoadRegistryChangeRevisionsResponse createLoadRegistryChangeRevisionsResponse() {
-        return new LoadRegistryChangeRevisionsResponse();
+    public RegisterClientResult createRegisterClientResult() {
+        return new RegisterClientResult();
     }
 
     /**
-     * Create an instance of {@link AddRegistryChangeErrorInternal }
+     * Create an instance of {@link LoadRegistryChangeErrorItemsResponse }
      * 
      */
-    public AddRegistryChangeErrorInternal createAddRegistryChangeErrorInternal() {
-        return new AddRegistryChangeErrorInternal();
+    public LoadRegistryChangeErrorItemsResponse createLoadRegistryChangeErrorItemsResponse() {
+        return new LoadRegistryChangeErrorItemsResponse();
+    }
+
+    /**
+     * Create an instance of {@link LoadRegistryChangeRevisionsInternal }
+     * 
+     */
+    public LoadRegistryChangeRevisionsInternal createLoadRegistryChangeRevisionsInternal() {
+        return new LoadRegistryChangeRevisionsInternal();
+    }
+
+    /**
+     * Create an instance of {@link TempCardOperationItem }
+     * 
+     */
+    public TempCardOperationItem createTempCardOperationItem() {
+        return new TempCardOperationItem();
+    }
+
+    /**
+     * Create an instance of {@link RegisterCardResponse }
+     * 
+     */
+    public RegisterCardResponse createRegisterCardResponse() {
+        return new RegisterCardResponse();
+    }
+
+    /**
+     * Create an instance of {@link AddRegistryChangeErrorInternalResponse }
+     * 
+     */
+    public AddRegistryChangeErrorInternalResponse createAddRegistryChangeErrorInternalResponse() {
+        return new AddRegistryChangeErrorInternalResponse();
+    }
+
+    /**
+     * Create an instance of {@link VisitorItem }
+     * 
+     */
+    public VisitorItem createVisitorItem() {
+        return new VisitorItem();
+    }
+
+    /**
+     * Create an instance of {@link RegisterVisitorTempCardResponse }
+     * 
+     */
+    public RegisterVisitorTempCardResponse createRegisterVisitorTempCardResponse() {
+        return new RegisterVisitorTempCardResponse();
+    }
+
+    /**
+     * Create an instance of {@link ProceedRegitryChangeItemInternalResponse }
+     * 
+     */
+    public ProceedRegitryChangeItemInternalResponse createProceedRegitryChangeItemInternalResponse() {
+        return new ProceedRegitryChangeItemInternalResponse();
+    }
+
+    /**
+     * Create an instance of {@link AddRegistryChangeError }
+     * 
+     */
+    public AddRegistryChangeError createAddRegistryChangeError() {
+        return new AddRegistryChangeError();
     }
 
     /**
@@ -427,75 +259,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link LoadRegistryChangeErrorItems }
+     * Create an instance of {@link AddRegistryChangeErrorInternal }
      * 
      */
-    public LoadRegistryChangeErrorItems createLoadRegistryChangeErrorItems() {
-        return new LoadRegistryChangeErrorItems();
-    }
-
-    /**
-     * Create an instance of {@link GetLastTempCardOperationResponse }
-     * 
-     */
-    public GetLastTempCardOperationResponse createGetLastTempCardOperationResponse() {
-        return new GetLastTempCardOperationResponse();
-    }
-
-    /**
-     * Create an instance of {@link CheckVisitorByCard }
-     * 
-     */
-    public CheckVisitorByCard createCheckVisitorByCard() {
-        return new CheckVisitorByCard();
-    }
-
-    /**
-     * Create an instance of {@link ProceedRegitryChangeItemResponse }
-     * 
-     */
-    public ProceedRegitryChangeItemResponse createProceedRegitryChangeItemResponse() {
-        return new ProceedRegitryChangeItemResponse();
-    }
-
-    /**
-     * Create an instance of {@link RegisterClients }
-     * 
-     */
-    public RegisterClients createRegisterClients() {
-        return new RegisterClients();
-    }
-
-    /**
-     * Create an instance of {@link ClientDesc }
-     * 
-     */
-    public ClientDesc createClientDesc() {
-        return new ClientDesc();
-    }
-
-    /**
-     * Create an instance of {@link RegisterVisitorTempCard }
-     * 
-     */
-    public RegisterVisitorTempCard createRegisterVisitorTempCard() {
-        return new RegisterVisitorTempCard();
-    }
-
-    /**
-     * Create an instance of {@link RegisterClientResult }
-     * 
-     */
-    public RegisterClientResult createRegisterClientResult() {
-        return new RegisterClientResult();
-    }
-
-    /**
-     * Create an instance of {@link AddRegistryChangeErrorResponse }
-     * 
-     */
-    public AddRegistryChangeErrorResponse createAddRegistryChangeErrorResponse() {
-        return new AddRegistryChangeErrorResponse();
+    public AddRegistryChangeErrorInternal createAddRegistryChangeErrorInternal() {
+        return new AddRegistryChangeErrorInternal();
     }
 
     /**
@@ -515,6 +283,94 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link CheckVisitorByCard }
+     * 
+     */
+    public CheckVisitorByCard createCheckVisitorByCard() {
+        return new CheckVisitorByCard();
+    }
+
+    /**
+     * Create an instance of {@link RegisterClients }
+     * 
+     */
+    public RegisterClients createRegisterClients() {
+        return new RegisterClients();
+    }
+
+    /**
+     * Create an instance of {@link LoadRegistryChangeItemsResponse }
+     * 
+     */
+    public LoadRegistryChangeItemsResponse createLoadRegistryChangeItemsResponse() {
+        return new LoadRegistryChangeItemsResponse();
+    }
+
+    /**
+     * Create an instance of {@link RefreshRegistryChangeItemsInternalResponse }
+     * 
+     */
+    public RefreshRegistryChangeItemsInternalResponse createRefreshRegistryChangeItemsInternalResponse() {
+        return new RefreshRegistryChangeItemsInternalResponse();
+    }
+
+    /**
+     * Create an instance of {@link CommentRegistryChangeError }
+     * 
+     */
+    public CommentRegistryChangeError createCommentRegistryChangeError() {
+        return new CommentRegistryChangeError();
+    }
+
+    /**
+     * Create an instance of {@link RegistryChangeItem }
+     * 
+     */
+    public RegistryChangeItem createRegistryChangeItem() {
+        return new RegistryChangeItem();
+    }
+
+    /**
+     * Create an instance of {@link RegisterVisitor }
+     * 
+     */
+    public RegisterVisitor createRegisterVisitor() {
+        return new RegisterVisitor();
+    }
+
+    /**
+     * Create an instance of {@link LoadRegistryChangeItemsInternalResponse }
+     * 
+     */
+    public LoadRegistryChangeItemsInternalResponse createLoadRegistryChangeItemsInternalResponse() {
+        return new LoadRegistryChangeItemsInternalResponse();
+    }
+
+    /**
+     * Create an instance of {@link RegisterVisitorTempCard }
+     * 
+     */
+    public RegisterVisitorTempCard createRegisterVisitorTempCard() {
+        return new RegisterVisitorTempCard();
+    }
+
+    /**
+     * Create an instance of {@link LoadRegistryChangeRevisionsResponse }
+     * 
+     */
+    public LoadRegistryChangeRevisionsResponse createLoadRegistryChangeRevisionsResponse() {
+        return new LoadRegistryChangeRevisionsResponse();
+    }
+
+    /**
+     * Create an instance of {@link LoadRegistryChangeItemsInternal }
+     * 
+     */
+    public LoadRegistryChangeItemsInternal createLoadRegistryChangeItemsInternal() {
+        return new LoadRegistryChangeItemsInternal();
+    }
+
+    /**
      * Create an instance of {@link RegisterTempCardResponse }
      * 
      */
@@ -523,20 +379,163 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link RefreshRegistryChangeItemsResponse }
+     * Create an instance of {@link AddRegistryChangeErrorResponse }
      * 
      */
-    public RefreshRegistryChangeItemsResponse createRefreshRegistryChangeItemsResponse() {
-        return new RefreshRegistryChangeItemsResponse();
+    public AddRegistryChangeErrorResponse createAddRegistryChangeErrorResponse() {
+        return new AddRegistryChangeErrorResponse();
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link LoadRegistryChangeRevisions }{@code >}}
+     * Create an instance of {@link ProceedRegitryChangeItemInternal }
      * 
      */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "loadRegistryChangeRevisions")
-    public JAXBElement<LoadRegistryChangeRevisions> createLoadRegistryChangeRevisions(LoadRegistryChangeRevisions value) {
-        return new JAXBElement<LoadRegistryChangeRevisions>(_LoadRegistryChangeRevisions_QNAME, LoadRegistryChangeRevisions.class, null, value);
+    public ProceedRegitryChangeItemInternal createProceedRegitryChangeItemInternal() {
+        return new ProceedRegitryChangeItemInternal();
+    }
+
+    /**
+     * Create an instance of {@link ProceedRegitryChangeItem }
+     * 
+     */
+    public ProceedRegitryChangeItem createProceedRegitryChangeItem() {
+        return new ProceedRegitryChangeItem();
+    }
+
+    /**
+     * Create an instance of {@link RegisterVisitorResponse }
+     * 
+     */
+    public RegisterVisitorResponse createRegisterVisitorResponse() {
+        return new RegisterVisitorResponse();
+    }
+
+    /**
+     * Create an instance of {@link ProceedRegitryChangeItemResponse }
+     * 
+     */
+    public ProceedRegitryChangeItemResponse createProceedRegitryChangeItemResponse() {
+        return new ProceedRegitryChangeItemResponse();
+    }
+
+    /**
+     * Create an instance of {@link ChangeCardOwnerResponse }
+     * 
+     */
+    public ChangeCardOwnerResponse createChangeCardOwnerResponse() {
+        return new ChangeCardOwnerResponse();
+    }
+
+    /**
+     * Create an instance of {@link GetLastTempCardOperationResponse }
+     * 
+     */
+    public GetLastTempCardOperationResponse createGetLastTempCardOperationResponse() {
+        return new GetLastTempCardOperationResponse();
+    }
+
+    /**
+     * Create an instance of {@link ClientDesc }
+     * 
+     */
+    public ClientDesc createClientDesc() {
+        return new ClientDesc();
+    }
+
+    /**
+     * Create an instance of {@link TestResponse }
+     * 
+     */
+    public TestResponse createTestResponse() {
+        return new TestResponse();
+    }
+
+    /**
+     * Create an instance of {@link FrontControllerException }
+     * 
+     */
+    public FrontControllerException createFrontControllerException() {
+        return new FrontControllerException();
+    }
+
+    /**
+     * Create an instance of {@link LoadRegistryChangeItems }
+     * 
+     */
+    public LoadRegistryChangeItems createLoadRegistryChangeItems() {
+        return new LoadRegistryChangeItems();
+    }
+
+    /**
+     * Create an instance of {@link RegisterTempCard }
+     * 
+     */
+    public RegisterTempCard createRegisterTempCard() {
+        return new RegisterTempCard();
+    }
+
+    /**
+     * Create an instance of {@link LoadRegistryChangeRevisionsInternalResponse }
+     * 
+     */
+    public LoadRegistryChangeRevisionsInternalResponse createLoadRegistryChangeRevisionsInternalResponse() {
+        return new LoadRegistryChangeRevisionsInternalResponse();
+    }
+
+    /**
+     * Create an instance of {@link CommentRegistryChangeErrorInternalResponse }
+     * 
+     */
+    public CommentRegistryChangeErrorInternalResponse createCommentRegistryChangeErrorInternalResponse() {
+        return new CommentRegistryChangeErrorInternalResponse();
+    }
+
+    /**
+     * Create an instance of {@link RefreshRegistryChangeItemsInternal }
+     * 
+     */
+    public RefreshRegistryChangeItemsInternal createRefreshRegistryChangeItemsInternal() {
+        return new RefreshRegistryChangeItemsInternal();
+    }
+
+    /**
+     * Create an instance of {@link LoadRegistryChangeRevisions }
+     * 
+     */
+    public LoadRegistryChangeRevisions createLoadRegistryChangeRevisions() {
+        return new LoadRegistryChangeRevisions();
+    }
+
+    /**
+     * Create an instance of {@link RefreshRegistryChangeItems }
+     * 
+     */
+    public RefreshRegistryChangeItems createRefreshRegistryChangeItems() {
+        return new RefreshRegistryChangeItems();
+    }
+
+    /**
+     * Create an instance of {@link Exception }
+     * 
+     */
+    public Exception createException() {
+        return new Exception();
+    }
+
+    /**
+     * Create an instance of {@link RegistryChangeErrorItem }
+     * 
+     */
+    public RegistryChangeErrorItem createRegistryChangeErrorItem() {
+        return new RegistryChangeErrorItem();
+    }
+
+    /**
+     * Create an instance of {@link GenerateLinkingToken }
+     * 
+     */
+    public GenerateLinkingToken createGenerateLinkingToken() {
+        return new GenerateLinkingToken();
     }
 
     /**
@@ -546,6 +545,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "generateLinkingTokenResponse")
     public JAXBElement<GenerateLinkingTokenResponse> createGenerateLinkingTokenResponse(GenerateLinkingTokenResponse value) {
         return new JAXBElement<GenerateLinkingTokenResponse>(_GenerateLinkingTokenResponse_QNAME, GenerateLinkingTokenResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link LoadRegistryChangeRevisions }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "loadRegistryChangeRevisions")
+    public JAXBElement<LoadRegistryChangeRevisions> createLoadRegistryChangeRevisions(LoadRegistryChangeRevisions value) {
+        return new JAXBElement<LoadRegistryChangeRevisions>(_LoadRegistryChangeRevisions_QNAME, LoadRegistryChangeRevisions.class, null, value);
     }
 
     /**
@@ -738,21 +746,21 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Exception }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "Exception")
-    public JAXBElement<Exception> createException(Exception value) {
-        return new JAXBElement<Exception>(_Exception_QNAME, Exception.class, null, value);
-    }
-
-    /**
      * Create an instance of {@link JAXBElement }{@code <}{@link LoadRegistryChangeRevisionsResponse }{@code >}}
      * 
      */
     @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "loadRegistryChangeRevisionsResponse")
     public JAXBElement<LoadRegistryChangeRevisionsResponse> createLoadRegistryChangeRevisionsResponse(LoadRegistryChangeRevisionsResponse value) {
         return new JAXBElement<LoadRegistryChangeRevisionsResponse>(_LoadRegistryChangeRevisionsResponse_QNAME, LoadRegistryChangeRevisionsResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Exception }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://ru.axetta.ecafe", name = "Exception")
+    public JAXBElement<Exception> createException(Exception value) {
+        return new JAXBElement<Exception>(_Exception_QNAME, Exception.class, null, value);
     }
 
     /**

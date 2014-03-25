@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.service.msk;
 
-import generated.registry.manual_synch.FrontController;
-import generated.registry.manual_synch.FrontControllerService;
-import generated.registry.manual_synch.RegistryChangeItem;
-import generated.registry.manual_synch.RegistryChangeErrorItem;
+import generated.registry.manual_synch.*;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -50,19 +47,23 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
     private static final int DISPLAY_COMMENTED_MODE = 2;
     private static final int DISPLAY_NON_COMMENTED_MODE = 3;
     private static final boolean ALLOW_TO_APPLY_PREVIOS_REVISIONS = false;
+    private static final int ALL_OPERATIONS = 0;
     private DateFormat df = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private boolean fullNameValidation = true;
     private String errorMessages;
     private String infoMessages;
     Logger logger = LoggerFactory.getLogger(NSIOrgRegistrySynchPageBase.class);
     private long revisionCreateDate;
+    private int actionFilter;
     private List<Long> revisions;
     private List<RegistryChangeErrorItem> errors;
+    private static Map<Integer, String> ACTION_FILTERS = new HashMap<Integer, String>();
     private long idOfSelectedError;
     List <WebRegistryChangeItem> items;
     private String errorComment;
     private List<SelectItem> displayModes;
     private int displayMode;
+    private String nameFilter;
 
     public String getPageFilename() {
         return "service/msk/nsi_org_registry_sync_page";
@@ -74,6 +75,22 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
 
     public String getPageTitle() {
         return "Синхронизация организации с Реестрами";
+    }
+
+    public String getNameFilter() {
+        return nameFilter;
+    }
+
+    public void setNameFilter(String nameFilter) {
+        this.nameFilter = nameFilter;
+    }
+
+    public int getActionFilter() {
+        return actionFilter;
+    }
+
+    public void setActionFilter(int actionFilter) {
+        this.actionFilter = actionFilter;
     }
 
     public List<WebRegistryChangeItem> getItems() {
@@ -138,6 +155,22 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         return items;
     }
 
+    public List<SelectItem> getActionFilters() {
+        if(ACTION_FILTERS.isEmpty()) {
+            ACTION_FILTERS.put(ImportRegisterClientsService.CREATE_OPERATION, "Создание");
+            ACTION_FILTERS.put(ImportRegisterClientsService.DELETE_OPERATION, "Удаление");
+            ACTION_FILTERS.put(ImportRegisterClientsService.MODIFY_OPERATION, "Изменение");
+            ACTION_FILTERS.put(ImportRegisterClientsService.MOVE_OPERATION, "Премещение");
+            ACTION_FILTERS.put(ALL_OPERATIONS, "Все");
+        }
+
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        for(Integer k : ACTION_FILTERS.keySet()) {
+            items.add(new SelectItem(k, ACTION_FILTERS.get(k)));
+        }
+        return items;
+    }
+
     @Override
     public void onShow() {
         revisions = loadRevisions();
@@ -163,16 +196,25 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         if (list.size() < 1) {
             return;
         }
-        String error = controller.proceedRegitryChangeItemInternal(list, ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation);
+        List<RegistryChangeCallback> result = controller.proceedRegitryChangeItemInternal(list, ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE, fullNameValidation);
         doUpdate();
-        if (error == null) {
+        if (result == null) {
         } else {
             //  Ошибка
-            errorMessages = error;
+            //errorMessages = error;
+            errorMessages = "";
+            for(RegistryChangeCallback cb : result) {
+                if(errorMessages.length() > 0) {
+                    errorMessages += "; ";
+                }
+                errorMessages += cb.getError();
+            }
         }
     }
 
     public void doRefresh() {
+        nameFilter = "";
+        actionFilter = ALL_OPERATIONS;
         load(true);
     }
 
@@ -209,7 +251,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         String author = "";
         try {
             author = MainPage.getSessionInstance().getCurrentUser().getUserName();
-        } catch (Exception e) {
+        } catch (java.lang.Exception e) {
         }
         String error = controller.commentRegistryChangeErrorInternal(idOfSelectedError, errorComment, author);
         idOfSelectedError = -1L;
@@ -268,7 +310,8 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         //  Выполнение запроса к службе
         List<RegistryChangeItem> changedItems = null;
         if (!refresh) {
-            changedItems = controller.loadRegistryChangeItemsInternal(getIdOfOrg(), revisionCreateDate);
+            changedItems = controller.loadRegistryChangeItemsInternal(getIdOfOrg(), revisionCreateDate,
+                                                                      actionFilter, nameFilter);
         } else {
             changedItems = controller.refreshRegistryChangeItemsInternal(getIdOfOrg());
         }
@@ -344,7 +387,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             policy.setReceiveTimeout(10 * 60 * 1000);
             policy.setConnectionTimeout(10 * 60 * 1000);
             return controller;
-        } catch (Exception e) {
+        } catch (java.lang.Exception e) {
             logger.error("Failed to intialize FrontControllerService", e);
             return null;
         }
@@ -391,9 +434,17 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         return item.isApplied();
     }
 
+    public Boolean isError(WebRegistryChangeItem item) {
+        return item.getError() != null && item.getError().length() > 0;
+    }
+
     private boolean isPermittedRevision() {
         return (revisionCreateDate < 0 || revisions == null || revisions.get(0) == null ||
                 revisionCreateDate != revisions.get(0)) && !ALLOW_TO_APPLY_PREVIOS_REVISIONS;
+    }
+
+    private int getCountOfOperation() {
+        return items.size();
     }
     
     private int getCountOfOperation(int operation) {
@@ -467,6 +518,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             createDate         = parent.getCreateDate();
             operation          = parent.getOperation();
             applied            = parent.isApplied();
+            error              = parent.getError();
             selected           = false;
         }
 

@@ -48,7 +48,9 @@ public interface FrontController {
     /**
      * 
      * @param idOfOrg
+     * @param nameFilter
      * @param revisionDate
+     * @param actionFilter
      * @return
      *     returns java.util.List<generated.registry.manual_synch.RegistryChangeItem>
      */
@@ -60,7 +62,11 @@ public interface FrontController {
         @WebParam(name = "idOfOrg", targetNamespace = "")
         long idOfOrg,
         @WebParam(name = "revisionDate", targetNamespace = "")
-        long revisionDate);
+        long revisionDate,
+        @WebParam(name = "actionFilter", targetNamespace = "")
+        int actionFilter,
+        @WebParam(name = "nameFilter", targetNamespace = "")
+        String nameFilter);
 
     /**
      * 
@@ -159,13 +165,13 @@ public interface FrontController {
      * @param operation
      * @param changesList
      * @return
-     *     returns java.lang.String
+     *     returns java.util.List<generated.registry.manual_synch.RegistryChangeCallback>
      */
     @WebMethod
     @WebResult(targetNamespace = "")
     @RequestWrapper(localName = "proceedRegitryChangeItemInternal", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.ProceedRegitryChangeItemInternal")
     @ResponseWrapper(localName = "proceedRegitryChangeItemInternalResponse", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.ProceedRegitryChangeItemInternalResponse")
-    public String proceedRegitryChangeItemInternal(
+    public List<RegistryChangeCallback> proceedRegitryChangeItemInternal(
         @WebParam(name = "changesList", targetNamespace = "")
         List<Long> changesList,
         @WebParam(name = "operation", targetNamespace = "")
@@ -216,13 +222,13 @@ public interface FrontController {
      * @param operation
      * @param changesList
      * @return
-     *     returns java.lang.String
+     *     returns java.util.List<generated.registry.manual_synch.RegistryChangeCallback>
      */
     @WebMethod
     @WebResult(targetNamespace = "")
     @RequestWrapper(localName = "proceedRegitryChangeItem", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.ProceedRegitryChangeItem")
     @ResponseWrapper(localName = "proceedRegitryChangeItemResponse", targetNamespace = "http://ru.axetta.ecafe", className = "generated.registry.manual_synch.ProceedRegitryChangeItemResponse")
-    public String proceedRegitryChangeItem(
+    public List<RegistryChangeCallback> proceedRegitryChangeItem(
         @WebParam(name = "changesList", targetNamespace = "")
         List<Long> changesList,
         @WebParam(name = "operation", targetNamespace = "")
@@ -370,7 +376,9 @@ public interface FrontController {
     /**
      * 
      * @param idOfOrg
+     * @param nameFilter
      * @param revisionDate
+     * @param actionFilter
      * @return
      *     returns java.util.List<generated.registry.manual_synch.RegistryChangeItem>
      */
@@ -382,7 +390,11 @@ public interface FrontController {
         @WebParam(name = "idOfOrg", targetNamespace = "")
         long idOfOrg,
         @WebParam(name = "revisionDate", targetNamespace = "")
-        long revisionDate);
+        long revisionDate,
+        @WebParam(name = "actionFilter", targetNamespace = "")
+        int actionFilter,
+        @WebParam(name = "nameFilter", targetNamespace = "")
+        String nameFilter);
 
     /**
      * 

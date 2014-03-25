@@ -56,6 +56,16 @@
             </h:selectOneMenu>
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Фильтр расхождений" styleClass="output-text" />
+            <h:selectOneMenu id="actionFilter" value="#{NSIOrgRegistrySynchPage.actionFilter}" style="width:150px;" >
+                <f:selectItems value="#{NSIOrgRegistrySynchPage.actionFilters}"/>
+            </h:selectOneMenu>
+        </h:panelGrid>
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Фильтр ФИО" styleClass="output-text" />
+            <h:inputText value="#{NSIOrgRegistrySynchPage.nameFilter}" size="64" styleClass="input-text" />
+        </h:panelGrid>
+        <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText escape="true" value="Проверка ФИО на дубликат при регистрации" styleClass="output-text" />
             <h:selectBooleanCheckbox value="#{NSIOrgRegistrySynchPage.fullNameValidation}" styleClass="output-text"/>
         </h:panelGrid>
@@ -136,9 +146,11 @@
                                 <h:outputText value="Применить" />
                             </f:facet>
                             <h:selectBooleanCheckbox value="#{e.selected}" styleClass="checkboxes"
-                                                     rendered="#{!NSIOrgRegistrySynchPage.isApplied(e, false)}"/>
+                                                     rendered="#{!NSIOrgRegistrySynchPage.isError(e) && !NSIOrgRegistrySynchPage.isApplied(e, false)}"/>
                             <h:outputText value="применено" styleClass="output-text"
-                                          rendered="#{NSIOrgRegistrySynchPage.isApplied(e, true)}"/>
+                                          rendered="#{!NSIOrgRegistrySynchPage.isError(e) && NSIOrgRegistrySynchPage.isApplied(e, true)}"/>
+                            <h:outputText value="ошибка" styleClass="output-text"
+                                          rendered="#{NSIOrgRegistrySynchPage.isError(e)}"/>
                         </rich:column>
 
                         <f:facet name="footer">
@@ -170,14 +182,18 @@
                         </a4j:commandButton>
                     </h:panelGrid>
                     <h:panelGrid id="revisionInfo" columns="2">
-                        <h:panelGroup styleClass="createClientRow"><h:outputText value="Созданий" styleClass="output-text"/></h:panelGroup>
+                        <h:panelGroup styleClass="createClientRow"><h:outputText value="Количество созданных записей" styleClass="output-text"/></h:panelGroup>
                         <h:outputText value="#{NSIOrgRegistrySynchPage.creationsCount}" styleClass="output-text" style="font-weight: bold;"/>
-                        <h:panelGroup styleClass="deleteClientRow"><h:outputText value="Удалений" styleClass="output-text"/></h:panelGroup>
+                        <h:panelGroup styleClass="deleteClientRow"><h:outputText value="Количество удаленных записей" styleClass="output-text"/></h:panelGroup>
                         <h:outputText value="#{NSIOrgRegistrySynchPage.deletionsCount}" styleClass="output-text" style="font-weight: bold;"/>
-                        <h:panelGroup styleClass="moveClientRow"><h:outputText value="Перемещений" styleClass="output-text"/></h:panelGroup>
+                        <h:panelGroup styleClass="moveClientRow"><h:outputText value="Количество перемещений" styleClass="output-text"/></h:panelGroup>
                         <h:outputText value="#{NSIOrgRegistrySynchPage.movesCount}" styleClass="output-text" style="font-weight: bold;"/>
-                        <h:panelGroup styleClass="modifyClientRow"><h:outputText value="Изменений" styleClass="output-text"/></h:panelGroup>
+                        <h:panelGroup styleClass="modifyClientRow"><h:outputText value="Количество измененных записей" styleClass="output-text"/></h:panelGroup>
                         <h:outputText value="#{NSIOrgRegistrySynchPage.modificationsCount}" styleClass="output-text" style="font-weight: bold;"/>
+                        <rich:spacer width="10px" />
+                        <rich:spacer width="10px" />
+                        <h:panelGroup styleClass="modifyClientRow"><h:outputText value="Количество найденных разногласий всего" styleClass="output-text"/></h:panelGroup>
+                        <h:outputText value="#{NSIOrgRegistrySynchPage.totalCount}" styleClass="output-text" style="font-weight: bold;"/>
                     </h:panelGrid>
                 </h:panelGrid>
             </h:panelGrid>

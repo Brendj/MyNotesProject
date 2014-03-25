@@ -15,6 +15,10 @@
     </a4j:status>
 
 
+    <h:panelGrid columns="2" styleClass="borderless-grid">
+        <h:outputText escape="true" value="Фильтр ФИО" styleClass="output-text" />
+        <h:inputText value="#{NSIOrgRegistrySynchOverviewPage.orgFilter}" size="64" styleClass="input-text" />
+    </h:panelGrid>
 
     <a4j:commandButton value="Обновить" action="#{NSIOrgRegistrySynchOverviewPage.doUpdate}"
                        reRender="workspaceTogglePanel" styleClass="command-button" />

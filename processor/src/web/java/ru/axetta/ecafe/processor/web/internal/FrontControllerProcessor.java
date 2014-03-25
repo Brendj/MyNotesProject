@@ -5,10 +5,12 @@
 package ru.axetta.ecafe.processor.web.internal;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientAlreadyExistException;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChangeError;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeCallback;
 import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeErrorItem;
 import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem;
 
@@ -18,9 +20,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.jws.WebParam;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -36,10 +36,16 @@ public class FrontControllerProcessor {
 
 
     public List<RegistryChangeItem> loadRegistryChangeItems(long idOfOrg,
-                                                            long revisionDate) {
+            long revisionDate) {
+        return loadRegistryChangeItems(idOfOrg, revisionDate, null, null);
+    }
+
+
+    public List<RegistryChangeItem> loadRegistryChangeItems(long idOfOrg, long revisionDate,
+                                                            Integer actionFilter, String nameFilter) {
         try {
             List<RegistryChangeItem> items = new ArrayList<RegistryChangeItem>();
-            List<RegistryChange> changes = DAOService.getInstance().getLastRegistryChanges(idOfOrg, revisionDate);
+            List<RegistryChange> changes = DAOService.getInstance().getLastRegistryChanges(idOfOrg, revisionDate, actionFilter, nameFilter);
             for (RegistryChange c : changes) {
                 RegistryChangeItem i = new RegistryChangeItem(c.getIdOfOrg(),
                         c.getIdOfMigrateOrgTo() == null ? -1L : c.getIdOfMigrateOrgTo(),
@@ -49,7 +55,7 @@ public class FrontControllerProcessor {
                         c.getSurname(), c.getGroupName(), c.getFirstNameFrom(),
                         c.getSecondNameFrom(), c.getSurnameFrom(), c.getGroupNameFrom(),
                         c.getIdOfClient() == null ? -1L : c.getIdOfClient(),
-                        c.getOperation(), c.getApplied());
+                        c.getOperation(), c.getApplied(), c.getError());
                 items.add(i);
             }
             return items;
@@ -81,16 +87,17 @@ public class FrontControllerProcessor {
         return Collections.EMPTY_LIST;
     }
 
-    public String proceedRegitryChangeItem(List<Long> changesList,
+    public List<RegistryChangeCallback> proceedRegitryChangeItem(List<Long> changesList,
                                             int operation,
                                             boolean fullNameValidation) {
         if (operation != ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE) {
-            return null;
+            return Collections.EMPTY_LIST;
         }
 
+        List<RegistryChangeCallback> result = new ArrayList<RegistryChangeCallback>();
         try {
             if(changesList == null || changesList.size() < 1) {
-                return null;
+                return Collections.EMPTY_LIST;
             }
 
             boolean authPassed = false;
@@ -99,14 +106,22 @@ public class FrontControllerProcessor {
                     RegistryChange change = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).getRegistryChange(idOfRegistryChange);
                     authPassed = true;
                 }
-                RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).applyRegistryChange(idOfRegistryChange, fullNameValidation);
+                try {
+                    RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).applyRegistryChange(idOfRegistryChange, fullNameValidation);
+                    result.add(new RegistryChangeCallback(idOfRegistryChange, ""));
+                } catch (Exception e1) {
+                    //if(e1 instanceof ClientAlreadyExistException) {
+                    RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).setChangeError(
+                            idOfRegistryChange, e1);
+                    //}
+                    result.add(new RegistryChangeCallback(idOfRegistryChange, e1.getMessage()));
+                }
             }
         } catch (Exception e) {
             logger.error("Failed to commit registry change item", e);
-            return "При подтверждении изменения из Реестров, произошла ошибка: " + e.getMessage();
+            //return "При подтверждении изменения из Реестров, произошла ошибка: " + e.getMessage();
         }
-
-        return null;
+        return result;
     }
 
     public List<RegistryChangeErrorItem> loadRegistryChangeErrorItems(long idOfOrg) {

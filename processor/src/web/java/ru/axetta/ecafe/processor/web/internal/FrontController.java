@@ -11,10 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeErrorItem;
-import ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem;
-import ru.axetta.ecafe.processor.web.internal.front.items.TempCardOperationItem;
-import ru.axetta.ecafe.processor.web.internal.front.items.VisitorItem;
+import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.hibernate.Session;
@@ -70,27 +67,42 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "loadRegistryChangeItems")
     public List<RegistryChangeItem> loadRegistryChangeItems(@WebParam(name = "idOfOrg") long idOfOrg,
-            @WebParam(name = "revisionDate") long revisionDate) {
+            @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "actionFilter") int actionFilter,
+            @WebParam(name = "nameFilter") String nameFilter) {
         try {
             checkRequestValidity(idOfOrg);
         } catch (FrontControllerException fce) {
             return Collections.EMPTY_LIST;
         }
-
+        Integer af = actionFilter;
+        if(actionFilter != ImportRegisterClientsService.CREATE_OPERATION &&
+           actionFilter != ImportRegisterClientsService.DELETE_OPERATION &&
+           actionFilter != ImportRegisterClientsService.MODIFY_OPERATION &&
+           actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+            af = null;
+        }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                                            loadRegistryChangeItems(idOfOrg, revisionDate);
+                                            loadRegistryChangeItems(idOfOrg, revisionDate, af, nameFilter);
     }
 
     @WebMethod(operationName = "loadRegistryChangeItemsInternal")
     public List<RegistryChangeItem> loadRegistryChangeItemsInternal(@WebParam(name = "idOfOrg") long idOfOrg,
-            @WebParam(name = "revisionDate") long revisionDate) {
+            @WebParam(name = "revisionDate") long revisionDate, @WebParam(name = "actionFilter") int actionFilter,
+            @WebParam(name = "nameFilter") String nameFilter) {
         try {
             checkIpValidity();
         } catch (FrontControllerException fce) {
             return Collections.EMPTY_LIST;
         }
+        Integer af = actionFilter;
+        if(actionFilter != ImportRegisterClientsService.CREATE_OPERATION &&
+                actionFilter != ImportRegisterClientsService.DELETE_OPERATION &&
+                actionFilter != ImportRegisterClientsService.MODIFY_OPERATION &&
+                actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+            af = null;
+        }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                loadRegistryChangeItems(idOfOrg, revisionDate);
+                loadRegistryChangeItems(idOfOrg, revisionDate, af, nameFilter);
     }
 
     @WebMethod(operationName = "refreshRegistryChangeItems")
@@ -119,11 +131,11 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "proceedRegitryChangeItem")
     /* Если метод возвращает null, значит операция произведена успешно, иначсе это будет сообщение об ошибке */
-    public String proceedRegitryChangeItem(@WebParam(name = "changesList") List<Long> changesList,
+    public List<RegistryChangeCallback> proceedRegitryChangeItem(@WebParam(name = "changesList") List<Long> changesList,
                                            @WebParam(name = "operation") int operation,
                                            @WebParam(name = "fullNameValidation") boolean fullNameValidation) {
         if (operation != ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE) {
-            return null;
+            return Collections.EMPTY_LIST;
         }
 
         try {
@@ -133,7 +145,7 @@ public class FrontController extends HttpServlet {
             }
         } catch (Exception e) {
             logger.error("Failed to pass auth", e);
-            return "При подтверждении изменения из Реестров, произошла ошибка: " + e.getMessage();
+            //return "При подтверждении изменения из Реестров, произошла ошибка: " + e.getMessage();
         }
 
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
@@ -142,17 +154,17 @@ public class FrontController extends HttpServlet {
 
     @WebMethod(operationName = "proceedRegitryChangeItemInternal")
     /* Если метод возвращает null, значит операция произведена успешно, иначсе это будет сообщение об ошибке */
-    public String proceedRegitryChangeItemInternal(@WebParam(name = "changesList") List<Long> changesList,
+    public List<RegistryChangeCallback> proceedRegitryChangeItemInternal(@WebParam(name = "changesList") List<Long> changesList,
             @WebParam(name = "operation") int operation,
             @WebParam(name = "fullNameValidation") boolean fullNameValidation) {
         if (operation != ru.axetta.ecafe.processor.web.internal.front.items.RegistryChangeItem.APPLY_REGISTRY_CHANGE) {
-            return null;
+            return Collections.EMPTY_LIST;
         }
         try {
             checkIpValidity();
         } catch (FrontControllerException fce) {
             logger.error("Failed to pass ip check", fce);
-            return "При подтверждении изменения из Реестров, произошла ошибка: " + fce.getMessage();
+            //return "При подтверждении изменения из Реестров, произошла ошибка: " + fce.getMessage();
         }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
                 proceedRegitryChangeItem(changesList, operation, fullNameValidation);

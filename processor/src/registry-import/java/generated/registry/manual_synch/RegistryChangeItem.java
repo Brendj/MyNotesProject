@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="applied" type="{http://www.w3.org/2001/XMLSchema}boolean" minOccurs="0"/>
  *         &lt;element name="clientGUID" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="createDate" type="{http://www.w3.org/2001/XMLSchema}long" minOccurs="0"/>
+ *         &lt;element name="error" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="firstName" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="firstNameFrom" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="groupName" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
@@ -46,6 +47,7 @@ import javax.xml.bind.annotation.XmlType;
     "applied",
     "clientGUID",
     "createDate",
+    "error",
     "firstName",
     "firstNameFrom",
     "groupName",
@@ -66,6 +68,7 @@ public class RegistryChangeItem {
     protected Boolean applied;
     protected String clientGUID;
     protected Long createDate;
+    protected String error;
     protected String firstName;
     protected String firstNameFrom;
     protected String groupName;
@@ -151,6 +154,30 @@ public class RegistryChangeItem {
      */
     public void setCreateDate(Long value) {
         this.createDate = value;
+    }
+
+    /**
+     * Gets the value of the error property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getError() {
+        return error;
+    }
+
+    /**
+     * Sets the value of the error property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setError(String value) {
+        this.error = value;
     }
 
     /**

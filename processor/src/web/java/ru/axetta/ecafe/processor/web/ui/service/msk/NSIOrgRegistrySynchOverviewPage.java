@@ -19,10 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,10 +33,19 @@ import java.util.Map;
 public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
     protected List<Item> list;
     Logger logger = LoggerFactory.getLogger(NSIOrgRegistrySynchPageBase.class);
+    protected String orgFilter = "";
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
+
+    public String getOrgFilter() {
+        return orgFilter;
+    }
+
+    public void setOrgFilter(String orgFilter) {
+        this.orgFilter = orgFilter;
+    }
 
     @Override
     public void onShow() {
@@ -61,12 +67,17 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
                 list = new ArrayList<Item>();
             }
             list.clear();
-            Map<Long, Item> res = new HashMap<Long, Item>();
+            Map<Long, Item> res = new TreeMap<Long, Item>();
             Session session = (Session) entityManager.getDelegate();
+            String orgStatement = "";
+            if(orgFilter != null && orgFilter.length() > 0) {
+                orgStatement = " where cf_orgs.shortname like '%" + orgFilter + "%' ";
+            }
             Query q = session.createSQLQuery(
                     "select cf_orgs.idoforg, cf_orgs.officialname, operation, count(cf_registrychange.operation) "
                     + "from cf_registrychange "
                     + "left join cf_orgs on cf_orgs.idoforg=cf_registrychange.idoforg "
+                    + orgStatement
                     + "group by cf_orgs.idoforg, cf_orgs.officialname, operation "
                     + "order by cf_orgs.idoforg, cf_orgs.officialname, operation");
             List result = q.list();

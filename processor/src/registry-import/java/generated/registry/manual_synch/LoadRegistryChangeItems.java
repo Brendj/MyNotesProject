@@ -18,6 +18,8 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;sequence>
  *         &lt;element name="idOfOrg" type="{http://www.w3.org/2001/XMLSchema}long"/>
  *         &lt;element name="revisionDate" type="{http://www.w3.org/2001/XMLSchema}long"/>
+ *         &lt;element name="actionFilter" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="nameFilter" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -29,12 +31,16 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "loadRegistryChangeItems", propOrder = {
     "idOfOrg",
-    "revisionDate"
+    "revisionDate",
+    "actionFilter",
+    "nameFilter"
 })
 public class LoadRegistryChangeItems {
 
     protected long idOfOrg;
     protected long revisionDate;
+    protected int actionFilter;
+    protected String nameFilter;
 
     /**
      * Gets the value of the idOfOrg property.
@@ -66,6 +72,46 @@ public class LoadRegistryChangeItems {
      */
     public void setRevisionDate(long value) {
         this.revisionDate = value;
+    }
+
+    /**
+     * Gets the value of the actionFilter property.
+     * 
+     */
+    public int getActionFilter() {
+        return actionFilter;
+    }
+
+    /**
+     * Sets the value of the actionFilter property.
+     * 
+     */
+    public void setActionFilter(int value) {
+        this.actionFilter = value;
+    }
+
+    /**
+     * Gets the value of the nameFilter property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getNameFilter() {
+        return nameFilter;
+    }
+
+    /**
+     * Sets the value of the nameFilter property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setNameFilter(String value) {
+        this.nameFilter = value;
     }
 
 }
