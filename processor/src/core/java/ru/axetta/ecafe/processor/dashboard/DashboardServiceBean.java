@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.dashboard.data.DashboardResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
@@ -683,7 +684,7 @@ public class DashboardServiceBean {
             ;
             items.add(new DashboardResponse.OrgSyncStatItem(org.getIdOfOrg(), org.getShortName(), tags, org.getLastSuccessfulBalanceSync(),
                     org.getLastUnSuccessfulBalanceSync(),org.getRemoteAddress(), org.getClientVersion(),
-                    daoService.getSynchErrorsCount(org)));
+                    daoService.getSynchErrorsCount(org), org.getDistrict()));
 
         }
         orgSyncStats.setOrgSyncStatItems(items);
@@ -691,11 +692,11 @@ public class DashboardServiceBean {
     }
 
     public String parseTags(String orgTagsStr) {
-        if (orgTagsStr == null || orgTagsStr.length() < 1) {
+        if (StringUtils.isEmpty(orgTagsStr)) {
             return "";
         }
         String allowedTagsStr = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_MSK_MONITORING_ALLOWED_TAGS);
-        if (allowedTagsStr == null || allowedTagsStr.length() < 1) {
+        if (StringUtils.isEmpty(allowedTagsStr)) {
             return "";
         }
         String allowedTags [] = allowedTagsStr.split(";");

@@ -41,7 +41,7 @@ public class SyncMonitorPage extends BasicWorkspacePage {
     public SyncMonitorPage() {
     }
 
-    public void update() {
+    public Object update() {
         this.payStatItems = dashboardServiceBean.getPaymentSystemInfo(new Date()).getPaymentSystemItemInfos();
         this.items = dashboardServiceBean.getOrgSyncInfo().getOrgSyncStatItems();
         this.namedParams = dashboardServiceBean.getNamedParams();
@@ -50,6 +50,7 @@ public class SyncMonitorPage extends BasicWorkspacePage {
             lastUpdate = new Date();
         }
         lastUpdate.setTime(System.currentTimeMillis());
+        return null;
     }
 
     public List<DashboardResponse.OrgSyncStatItem> getItemList() {

@@ -55,6 +55,14 @@
 
             <rich:column headerClass="column-header">
                 <f:facet name="header">
+                    <h:outputText escape="true" value="Округ" />
+                </f:facet>
+                <h:outputText escape="false" value="#{item.district}" styleClass="output-text"
+                              style="#{(item.lastSuccessfulBalanceSync!=null and syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}" />
+            </rich:column>
+
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
                     <h:outputText escape="false" value="Посл. успешная <br/>синхр. балансов" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.lastSuccessfulBalanceSync}"
@@ -76,7 +84,7 @@
                     <h:outputText escape="false" value="Количество ошибок <br/>при синхронизации" />
                 </f:facet>
                 <a4j:commandLink styleClass="output-text-mod" rendered="#{item.errorsCount > 0}">
-                    <a4j:support event="onclick" action="#{synchErrorsPage.show(item.idoforg)}"
+                    <a4j:support event="onclick" action="#{synchErrorsPage.show(item.idOfOrg)}"
                                  status="feedPlanStatus" reRender="workspaceForm"/>
                     <h:outputText value="#{item.errorsCount}" styleClass="output-text"
                                   style="color: red"/>

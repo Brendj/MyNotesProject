@@ -396,18 +396,20 @@ public class DashboardResponse {
 
         private String orgName;
         private String tags;
+        private String district;
         private Date lastSuccessfulBalanceSync;
         private Date lastUnSuccessfulBalanceSync;
         private String remoteAddr;
         private String version;
         private Long errorsCount;
-        private Long idoforg;
+        private Long idOfOrg;
         
 
-        public OrgSyncStatItem(Long idoforg, String orgName, String tags, Date lastSuccessfulBalanceSync, Date lastUnSuccessfulBalanceSync,
-                String remoteAddr, String version, Long errorsCount) {
-            this.idoforg = idoforg;
+        public OrgSyncStatItem(Long idOfOrg, String orgName, String tags, Date lastSuccessfulBalanceSync, Date lastUnSuccessfulBalanceSync,
+                String remoteAddr, String version, Long errorsCount, String district) {
+            this.idOfOrg = idOfOrg;
             this.orgName = orgName;
+            this.district = district;
             this.tags = tags;
             this.lastSuccessfulBalanceSync = lastSuccessfulBalanceSync;
             this.lastUnSuccessfulBalanceSync = lastUnSuccessfulBalanceSync;
@@ -444,8 +446,16 @@ public class DashboardResponse {
             return errorsCount;
         }
 
-        public Long getIdoforg() {
-            return idoforg;
+        public Long getIdOfOrg() {
+            return idOfOrg;
+        }
+
+        public String getDistrict() {
+            return district;
+        }
+
+        public void setDistrict(String district) {
+            this.district = district;
         }
     }
 
