@@ -45,18 +45,18 @@
         <property name="selfPrice" column="SelfPrice" type="long" not-null="true"/>
         <property name="nds" column="NDS" type="long" not-null="true"/>
 
-        <many-to-one name="good" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good">
+        <many-to-one name="good" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good">
             <column name="IdOfGood" not-null="false" />
         </many-to-one>
 
-        <set name="internalIncomingDocumentPositionInternal" lazy="true" inverse="true">
+        <set name="internalIncomingDocumentPositionInternal" fetch="select" lazy="true" inverse="true">
             <key>
                 <column name="IdOfTradeMaterialGood"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocumentPosition" />
         </set>
 
-        <set name="internalDisposingDocumentPositionInternal" lazy="true" inverse="true">
+        <set name="internalDisposingDocumentPositionInternal" fetch="select" lazy="true" inverse="true">
             <key>
                 <column name="IdOfTradeMaterialGood"/>
             </key>

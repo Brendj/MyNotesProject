@@ -20,7 +20,7 @@
         <property name="address" column="Address" type="string" length="128" not-null="true"/>
         <property name="phone" column="Phone" type="string" length="32"/>
         <many-to-one name="officialPerson" class="ru.axetta.ecafe.processor.core.persistence.Person"
-                     column="IdOfOfficialPerson" not-null="true" fetch="join"/>
+                     column="IdOfOfficialPerson" not-null="true" fetch="select"/>
         <property name="officialPosition" column="OfficialPosition" type="string" length="128" not-null="true"/>
         <property name="contractId" column="ContractId" type="string" length="50" not-null="true"/>
         <property name="contractTime" column="ContractDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
@@ -138,7 +138,7 @@
         </set>
 
         <!-- Производственая конфигурация -->
-        <many-to-one name="configurationProvider" class="ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider" fetch="join" lazy="false">
+        <many-to-one name="configurationProvider" class="ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider" fetch="select" lazy="proxy">
             <column name="idOfConfigurationProvider"/>
         </many-to-one>
 
@@ -151,7 +151,7 @@
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="friendlyOrg"/>
         </set>
 
-        <set name="questionaries" table="cf_qa_organization_questionary" inverse="true" lazy="true" fetch="join">
+        <set name="questionaries" table="cf_qa_organization_questionary" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="IdOfOrg" not-null="true" />
             </key>

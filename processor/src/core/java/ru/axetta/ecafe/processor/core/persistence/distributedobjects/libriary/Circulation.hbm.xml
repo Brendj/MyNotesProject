@@ -38,7 +38,7 @@
         column="IdOfParentCirculation"/>
 
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
-                     not-null="true" update="false" fetch="join"/>
+                     not-null="true" update="false" fetch="select" lazy="proxy"/>
 
         <property name="issuanceDate" column="IssuanceDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>

@@ -65,9 +65,9 @@ public class InternalIncomingDocumentPosition extends SupplierRequestDistributed
 
     @Override
     public void createProjections(Criteria criteria) {
-        criteria.createAlias("good","g", JoinType.LEFT_OUTER_JOIN);
-        criteria.createAlias("internalIncomingDocument","iid", JoinType.LEFT_OUTER_JOIN);
-        criteria.createAlias("tradeMaterialGood","tmg", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("good","g", JoinType.RIGHT_OUTER_JOIN);
+        criteria.createAlias("internalIncomingDocument","iid", JoinType.RIGHT_OUTER_JOIN);
+        criteria.createAlias("tradeMaterialGood","tmg", JoinType.RIGHT_OUTER_JOIN);
 
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);

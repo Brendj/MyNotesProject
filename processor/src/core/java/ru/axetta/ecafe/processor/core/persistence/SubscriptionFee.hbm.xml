@@ -13,7 +13,7 @@
         <property name="subscriptionYear" type="integer" column="SubscriptionYear" not-null="true"/>
         <property name="periodNo" type="integer" column="PeriodNo" not-null="true"/>
         <many-to-one name="transaction" class="ru.axetta.ecafe.processor.core.persistence.AccountTransaction"
-                     column="IdOfTransaction" not-null="true" update="false" fetch="join"/>
+                     column="IdOfTransaction" not-null="true" update="false" fetch="select"/>
         <property name="createTime" column="CreateTime" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
         <property name="subscriptionSum" column="SubscriptionSum" type="long" not-null="true" update="false"/>

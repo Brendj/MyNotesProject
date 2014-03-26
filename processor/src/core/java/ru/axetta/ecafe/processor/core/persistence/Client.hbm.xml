@@ -25,9 +25,9 @@
             <column name="IdOfClientGroup"/>
         </many-to-one>
         <many-to-one name="person" class="ru.axetta.ecafe.processor.core.persistence.Person" column="IdOfPerson"
-                     not-null="true" fetch="join"/>
+                     not-null="true" fetch="select"/>
         <many-to-one name="contractPerson" class="ru.axetta.ecafe.processor.core.persistence.Person"
-                     column="IdOfContractPerson" not-null="true" fetch="join"/>
+                     column="IdOfContractPerson" not-null="true" fetch="select"/>
         <property name="flags" column="Flags" type="integer" not-null="true"/>
         <property name="address" column="Address" type="string" length="128" not-null="true"/>
         <property name="phone" column="Phone" type="string" length="32"/>

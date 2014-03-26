@@ -37,14 +37,14 @@
             <!--<column name="idOfConfigurationProvider" not-null="false" />-->
         <!--</many-to-one>-->
 
-        <set name="productInternal" lazy="true" inverse="true" fetch="join">
+        <set name="productInternal" inverse="true" fetch="select" lazy="true">
             <key>
                 <column name="IdOfProductGroups"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product" />
         </set>
 
-        <set name="prohibitionInternal" lazy="true" inverse="true" fetch="join">
+        <set name="prohibitionInternal" lazy="true" inverse="true" fetch="select">
             <key>
                 <column name="IdOfProductGroups"/>
             </key>

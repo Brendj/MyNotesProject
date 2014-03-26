@@ -31,14 +31,14 @@
                   not-null="true" update="false"/>
         <property name="updatedDate" column="UpdatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
 
-        <set name="answers" table="cf_qa_answers" lazy="false" inverse="true" cascade="all-delete-orphan" fetch="join">
+        <set name="answers" table="cf_qa_answers" lazy="true" inverse="true" cascade="all-delete-orphan" fetch="select">
             <key>
                 <column name="IdOfQuestionary" not-null="true" />
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.questionary.Answer" />
         </set>
 
-        <set name="orgs" table="cf_qa_organization_questionary" inverse="false" lazy="true" fetch="join" cascade="all" >
+        <set name="orgs" table="cf_qa_organization_questionary" inverse="false" lazy="true" fetch="select" cascade="all" >
             <key>
                 <column name="IdOfQuestionary" not-null="true" />
             </key>

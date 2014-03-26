@@ -64,10 +64,10 @@ public class InternalIncomingDocument extends SupplierRequestDistributedObject {
 
     @Override
     public void createProjections(Criteria criteria) {
-        criteria.createAlias("wayBill","w", JoinType.LEFT_OUTER_JOIN);
-        criteria.createAlias("internalDisposingDocument","idd", JoinType.LEFT_OUTER_JOIN);
-        criteria.createAlias("actOfInventorization","ai", JoinType.LEFT_OUTER_JOIN);
-        criteria.createAlias("staff","s", JoinType.LEFT_OUTER_JOIN);
+        criteria.createAlias("wayBill","w", JoinType.RIGHT_OUTER_JOIN);
+        criteria.createAlias("internalDisposingDocument","idd", JoinType.RIGHT_OUTER_JOIN);
+        criteria.createAlias("actOfInventorization","ai", JoinType.RIGHT_OUTER_JOIN);
+        criteria.createAlias("staff","s", JoinType.RIGHT_OUTER_JOIN);
 
         ProjectionList projectionList = Projections.projectionList();
         addDistributedObjectProjectionList(projectionList);

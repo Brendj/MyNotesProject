@@ -33,7 +33,7 @@
         <property name="date" column="DateOfActOfDifference" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="number" column="NumberOfActOfDifference" type="string" length="128"/>
 
-        <many-to-one name="staff" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
+        <many-to-one name="staff" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
             <column name="IdOfStaff" not-null="false" />
         </many-to-one>
 

@@ -17,7 +17,7 @@
         </id>
         <version name="version" column="Version" type="long"/>
         <many-to-one name="contactPerson" class="ru.axetta.ecafe.processor.core.persistence.Person"
-                     column="IdOfContactPerson" not-null="true" fetch="join"/>
+                     column="IdOfContactPerson" not-null="true" fetch="select"/>
         <property name="parentId" column="ParentId" type="integer"/>
         <property name="contragentName" column="ContragentName" type="string" length="128" not-null="true"/>
         <property name="classId" column="ClassId" type="integer" not-null="true"/>

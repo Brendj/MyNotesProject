@@ -55,27 +55,28 @@
 
         <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
 
-        <many-to-one name="technologicalMapGroup" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup">
+        <many-to-one name="technologicalMapGroup" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapGroup">
             <column name="IdOfTechMapGroups" not-null="false" />
         </many-to-one>
 
-        <set name="technologicalMapProductInternal" lazy="true" inverse="true">
+        <set name="technologicalMapProductInternal" lazy="true" fetch="select" inverse="true">
             <key>
                 <column name="idOfTechnologicalMaps"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapProduct" />
         </set>
 
-        <set name="goodInternal" lazy="true" inverse="true">
+        <set name="goodInternal" lazy="true" fetch="select" inverse="true">
             <key>
                 <column name="IdOfGood"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" />
         </set>
 
-        <many-to-one name="userCreate" column="IdOfUserCreate" class="ru.axetta.ecafe.processor.core.persistence.User" update="false"/>
-        <many-to-one name="userDelete" column="IdOfUserDelete" class="ru.axetta.ecafe.processor.core.persistence.User" />
-        <many-to-one name="userEdit" column="IdOfUserEdit" class="ru.axetta.ecafe.processor.core.persistence.User" />
+        <many-to-one name="userCreate" column="IdOfUserCreate" fetch="select" lazy="proxy"
+                     class="ru.axetta.ecafe.processor.core.persistence.User" update="false"/>
+        <many-to-one name="userDelete" column="IdOfUserDelete" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.User" />
+        <many-to-one name="userEdit" column="IdOfUserEdit" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.User" />
 
     </class>
 </hibernate-mapping>

@@ -184,7 +184,6 @@ public class GoodRequestRepository {
         doVersion.setDistributedObjectClassName("GoodRequest");
         if(goodRequest.getGlobalId()==null){
             goodRequest.setGlobalVersion(version);
-            goodRequest.setGuid(UUID.randomUUID().toString());
             entityManager.persist(doVersion);
             entityManager.persist(goodRequest);
         } else {
@@ -216,7 +215,6 @@ public class GoodRequestRepository {
         doVersion.setDistributedObjectClassName("GoodRequestPosition");
         if(goodRequestPosition.getGlobalId()==null){
             goodRequestPosition.setGlobalVersion(version);
-            goodRequestPosition.setGuid(UUID.randomUUID().toString());
             entityManager.persist(doVersion);
             entityManager.persist(goodRequestPosition);
         } else {

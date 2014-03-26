@@ -42,7 +42,7 @@
         <many-to-one name="userEdit" column="IdOfUserEdit" class="ru.axetta.ecafe.processor.core.persistence.User" />
         <property name="idOfConfigurationProvider" column="idOfConfigurationProvider" type="long"/>
         <!--<many-to-one name="configurationProvider" column="idOfConfigurationProvider" class="ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider" />-->
-        <!--<many-to-one name="configurationProvider" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider">-->
+        <!--<many-to-one name="configurationProvider" fetch="select" lazy="proxy"  class="ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider">-->
             <!--<column name="idOfConfigurationProvider" not-null="false" />-->
         <!--</many-to-one>-->
 
@@ -50,28 +50,28 @@
             <column name="idOfProductGroups" not-null="false" />
         </many-to-one>
 
-        <set name="goodInternal" lazy="true" inverse="true">
+        <set name="goodInternal" lazy="true" fetch="select" inverse="true">
             <key>
                 <column name="idOfProducts"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" />
         </set>
 
-        <set name="technologicalMapProductInternal" lazy="true" inverse="true">
+        <set name="technologicalMapProductInternal" fetch="select" lazy="true" inverse="true">
             <key>
                 <column name="idOfProducts"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TechnologicalMapProduct" />
         </set>
 
-        <set name="prohibitionInternal" lazy="true" inverse="true">
+        <set name="prohibitionInternal" lazy="true" fetch="select" inverse="true">
             <key>
                 <column name="idOfProducts"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Prohibition" />
         </set>
 
-        <set name="goodRequestPositionInternal" lazy="true" inverse="true">
+        <set name="goodRequestPositionInternal" lazy="true" fetch="select" inverse="true">
             <key>
                 <column name="idOfProducts"/>
             </key>

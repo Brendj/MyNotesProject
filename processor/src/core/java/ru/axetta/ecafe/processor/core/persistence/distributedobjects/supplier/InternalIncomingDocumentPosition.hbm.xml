@@ -33,7 +33,6 @@
         <property name="orgOwner" column="OrgOwner" type="long"/>
         <property name="goodsCreationDate" column="GoodsCreationDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="lifeTime" column="LifeTime" type="long"/>
-        <!--<property name="unitsScale" column="UnitsScale" type="long"/>-->
         <property name="unitsScale" column="UnitsScale">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale</param>
@@ -45,15 +44,15 @@
         <property name="incomingPrice" column="IncomingPrice" type="long"/>
         <property name="nds" column="NDS" type="long"/>
 
-        <many-to-one name="internalIncomingDocument" fetch="join" lazy="false"  class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocument">
+        <many-to-one name="internalIncomingDocument" fetch="select" lazy="proxy"   class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocument">
             <column name="IdOfInternalIncomingDocument" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="tradeMaterialGood" fetch="join" lazy="false"  class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TradeMaterialGood">
+        <many-to-one name="tradeMaterialGood" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.TradeMaterialGood">
             <column name="IdOfTradeMaterialGood" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="good" fetch="join" lazy="false"  class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good">
+        <many-to-one name="good" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good">
             <column name="IdOfGood" not-null="false" />
         </many-to-one>
 

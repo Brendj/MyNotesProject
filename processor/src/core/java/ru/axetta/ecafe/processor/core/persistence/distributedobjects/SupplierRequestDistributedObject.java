@@ -54,7 +54,6 @@ public abstract class SupplierRequestDistributedObject extends DistributedObject
                 idOfOrgs.addAll(sourceMenuOrg);
             }
             buildVersionCriteria(currentMaxVersion, currentLastGuid, currentLimit, criteria);
-            //criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
             criteria.add(Restrictions.in("orgOwner",idOfOrgs));
             createProjections(criteria);
             criteria.setResultTransformer(Transformers.aliasToBean(getClass()));

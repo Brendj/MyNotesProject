@@ -31,7 +31,6 @@
         <!-- End Global params -->
 
         <property name="orgOwner" column="OrgOwner" type="long"/>
-        <!--<property name="unitsScale" column="UnitsScale" type="integer" not-null="true"/>-->
         <property name="unitsScale" column="UnitsScale">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale</param>
@@ -46,11 +45,11 @@
         <property name="price" column="Price" type="long" not-null="true"/>
         <property name="nds" column="NDS" type="long" not-null="true"/>
 
-        <many-to-one name="good" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good">
+        <many-to-one name="good" fetch="select" lazy="proxy"  class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good">
             <column name="IdOfGood" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="wayBill" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.WayBill">
+        <many-to-one name="wayBill" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.WayBill">
             <column name="IdOfWayBill" not-null="false" />
         </many-to-one>
 

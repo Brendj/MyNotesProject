@@ -32,7 +32,7 @@
 
         <property name="orgOwner" column="OrgOwner" type="long"/>
 
-        <many-to-one name="complaintIteration" fetch="join" lazy="false"  class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterations">
+        <many-to-one name="complaintIteration" fetch="select" lazy="proxy" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintIterations">
             <column name="IdOfIteration" not-null="false" />
         </many-to-one>
 

@@ -17,6 +17,7 @@ import org.w3c.dom.Node;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -50,6 +51,10 @@ public abstract class DistributedObject{
     /* имя узла элемента */
     protected String tagName;
     private DistributedObjectException distributedObjectException;
+
+    public DistributedObject() {
+        this.guid = UUID.randomUUID().toString();
+    }
 
     protected void buildVersionCriteria(Long currentMaxVersion, String currentLastGuid, Integer currentLimit,
             Criteria criteria) {
@@ -106,7 +111,6 @@ public abstract class DistributedObject{
         return element;
     }
 
-
     /* метод добавления общих атрибутов в узел */
     public Element toElement(Element element){
         element.setAttribute("Guid", getGuid());
@@ -124,8 +128,8 @@ public abstract class DistributedObject{
         tagName = node.getNodeName();
         /* Begin required params */
         String stringGUID = XMLUtils.getStringAttributeValue(node, "Guid", 36);
-        if (stringGUID != null)
-            setGuid(stringGUID);
+        if (StringUtils.isEmpty(stringGUID)) throw new Exception("Attribute GUID is Empty");
+        setGuid(stringGUID);
         Long version = XMLUtils.getLongAttributeValue(node, "V");
         if (version != null)
             setGlobalVersion(version);
@@ -214,7 +218,7 @@ public abstract class DistributedObject{
         return guid;
     }
 
-    public void setGuid(String guid) {
+    protected void setGuid(String guid) {
         this.guid = guid;
     }
 

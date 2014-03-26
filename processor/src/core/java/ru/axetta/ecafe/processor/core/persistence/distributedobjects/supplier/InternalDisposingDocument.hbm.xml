@@ -41,11 +41,11 @@
         </property>
         <property name="comments" column="Comments" type="string" length="1024" not-null="true"/>
 
-        <many-to-one name="staff" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
+        <many-to-one name="staff" fetch="select" lazy="proxy"  class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
             <column name="IdOfStaff" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="actOfInventorization" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.ActOfInventorization">
+        <many-to-one name="actOfInventorization" fetch="select" lazy="proxy"  class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.ActOfInventorization">
             <column name="IdOfActOfInventarization" not-null="false" />
         </many-to-one>
 

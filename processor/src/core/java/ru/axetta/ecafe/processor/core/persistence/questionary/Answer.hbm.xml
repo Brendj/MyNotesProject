@@ -17,7 +17,8 @@
                   not-null="true" update="false"/>
         <property name="updatedDate" column="UpdatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
 
-        <many-to-one name="questionary" class="ru.axetta.ecafe.processor.core.persistence.questionary.Questionary" lazy="false" fetch="join">
+        <many-to-one name="questionary" class="ru.axetta.ecafe.processor.core.persistence.questionary.Questionary"
+                     lazy="proxy" fetch="select">
             <column name="IdOfQuestionary" not-null="true" />
         </many-to-one>
 

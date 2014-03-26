@@ -12,7 +12,7 @@
         </id>
 
         <many-to-one name="person" class="ru.axetta.ecafe.processor.core.persistence.Person" column="IdOfPerson"
-                     not-null="true" fetch="join"/>
+                     not-null="true" fetch="select"/>
 
         <property name="visitorType" column="VisitorType" type="integer"/>
         <!--<property name="VisitorType" column="VisitorType">-->
