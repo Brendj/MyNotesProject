@@ -111,7 +111,7 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
             technologicalMap.setCreatedDate(new Date());
             technologicalMap.setDeletedState(true);
             technologicalMap.setGlobalVersion(daoService.updateVersionByDistributedObjects(TechnologicalMap.class.getSimpleName()));
-            technologicalMap.setGuid(UUID.randomUUID().toString());
+            //technologicalMap.setGuid(UUID.randomUUID().toString());
 
             MainPage mainPage = MainPage.getSessionInstance();
             technologicalMap.setUserCreate(mainPage.getCurrentUser());
@@ -127,7 +127,6 @@ public class TechnologicalMapCreatePage extends BasicWorkspacePage implements Pr
                 Long version = daoService.updateVersionByDistributedObjects(TechnologicalMapProduct.class.getSimpleName());
                 for (TechnologicalMapProduct technologicalMapProduct: technologicalMapProducts){
                     technologicalMapProduct.setCreatedDate(new Date());
-                    technologicalMapProduct.setGuid(UUID.randomUUID().toString());
                     technologicalMapProduct.setTechnologicalMap(technologicalMap);
                     technologicalMapProduct.setIdOfConfigurationProvider(currentIdOfConfigurationProvider);
                     technologicalMapProduct.setOrgOwner(orgOwner);

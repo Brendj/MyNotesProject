@@ -247,7 +247,7 @@ public class SubscriptionFeedingService {
         sf.setClient(client);
         sf.setOrgOwner(org.getIdOfOrg());
         sf.setIdOfClient(client.getIdOfClient());
-        sf.setGuid(UUID.randomUUID().toString());
+        //sf.setGuid();
         sf.setDateActivateService(newCreateDate);
         sf.setDeletedState(false);
         sf.setSendAll(SendToAssociatedOrgs.SendToSelf);
@@ -258,16 +258,17 @@ public class SubscriptionFeedingService {
         entityManager.persist(sf);
         CycleDiagram cd = findClientCycleDiagram(client);
         // Если осталась активная циклограмма со старой подписки, то ее необходимо удалить.
-        if (cd != null) {
-            cd.setDeletedState(true);
-            cd.setStateDiagram(StateDiagram.BLOCK);
-            cd.setGlobalVersion(daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName()));
-            entityManager.merge(cd);
-        }
+        // Данная опираеция проводится на стороне АРМ
+        //if (cd != null) {
+        //    cd.setDeletedState(true);
+        //    cd.setStateDiagram(StateDiagram.BLOCK);
+        //    cd.setGlobalVersion(daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName()));
+        //    entityManager.merge(cd);
+        //}
         // Активируем циклограмму сегодняшним днем.
-        if(cd==null){
-            createCycleDiagram(client, org, monday, tuesday, wednesday, thursday, friday, saturday, dayBegin, true);
-        }
+        // Создаем циклограмму если есть на клиента циклограммы то создаем с ожидаем если нет то активную
+        createCycleDiagram(client, org, monday, tuesday, wednesday, thursday, friday, saturday, dayBegin, cd==null);
+
         return sf;
     }
 
@@ -287,12 +288,12 @@ public class SubscriptionFeedingService {
         } else {
             cd.setStateDiagram(StateDiagram.WAIT);
         }
-        cd.setGuid(UUID.randomUUID().toString());
+        //cd.setGuid(UUID.randomUUID().toString());
         cd.setDeletedState(false);
         cd.setSendAll(SendToAssociatedOrgs.SendToSelf);
         Long version = daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
-        cd.setGlobalVersion(version);
         cd.setGlobalVersionOnCreate(version);
+        cd.setGlobalVersion(version);
         List<ComplexInfo> availableComplexes = findComplexesWithSubFeeding(org);
         cd.setMonday(monday);
         cd.setMondayPrice(getPriceOfDay(monday, availableComplexes));
@@ -317,34 +318,18 @@ public class SubscriptionFeedingService {
     // Если есть циклограмма на эту дату то ее редактируем
     public CycleDiagram editCycleDiagram(Client client, Org org, String monday, String tuesday, String wednesday,
             String thursday, String friday, String saturday, Date dateActivationDiagram) {
-        DAOService daoService = DAOService.getInstance();
         SubscriptionFeeding sf = findClientSubscriptionFeeding(client);
         CycleDiagram cd = findCycleDiagramOnDate(client, dateActivationDiagram);
         Date currentDate = new Date();
         //  if(!( new Date() between  dateActivateService and dateDeActivateService)) {
         //     редактируем
         //  }
-        if(!(currentDate.getTime()>sf.getDateActivateService().getTime() && sf.isActual())){
+        if(!(currentDate.after(sf.getDateActivateService()) && sf.isActual())){
             if(cd==null){
                 cd = createCycleDiagram(client, org, monday, tuesday, wednesday, thursday, friday, saturday,
                         dateActivationDiagram, false);
             } else {
-                cd.setGlobalVersion(daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName()));
-                List<ComplexInfo> availableComplexes = findComplexesWithSubFeeding(org);
-                cd.setMonday(monday);
-                cd.setMondayPrice(getPriceOfDay(monday, availableComplexes));
-                cd.setTuesday(tuesday);
-                cd.setTuesdayPrice(getPriceOfDay(tuesday, availableComplexes));
-                cd.setWednesday(wednesday);
-                cd.setWednesdayPrice(getPriceOfDay(wednesday, availableComplexes));
-                cd.setThursday(thursday);
-                cd.setThursdayPrice(getPriceOfDay(thursday, availableComplexes));
-                cd.setFriday(friday);
-                cd.setFridayPrice(getPriceOfDay(friday, availableComplexes));
-                cd.setSaturday(saturday);
-                cd.setSaturdayPrice(getPriceOfDay(saturday, availableComplexes));
-                cd.setSunday("");
-                cd.setSundayPrice(0L);
+                editCycleDiagram(org, cd, monday, tuesday, wednesday, thursday, friday, saturday);
                 entityManager.merge(cd);
             }
         } else {
@@ -356,22 +341,7 @@ public class SubscriptionFeedingService {
                 cd = createCycleDiagram(client, org, monday, tuesday, wednesday, thursday, friday, saturday,
                         dateActivationDiagram, false);
             } else {
-                cd.setGlobalVersion(daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName()));
-                List<ComplexInfo> availableComplexes = findComplexesWithSubFeeding(org);
-                cd.setMonday(monday);
-                cd.setMondayPrice(getPriceOfDay(monday, availableComplexes));
-                cd.setTuesday(tuesday);
-                cd.setTuesdayPrice(getPriceOfDay(tuesday, availableComplexes));
-                cd.setWednesday(wednesday);
-                cd.setWednesdayPrice(getPriceOfDay(wednesday, availableComplexes));
-                cd.setThursday(thursday);
-                cd.setThursdayPrice(getPriceOfDay(thursday, availableComplexes));
-                cd.setFriday(friday);
-                cd.setFridayPrice(getPriceOfDay(friday, availableComplexes));
-                cd.setSaturday(saturday);
-                cd.setSaturdayPrice(getPriceOfDay(saturday, availableComplexes));
-                cd.setSunday("");
-                cd.setSundayPrice(0L);
+                editCycleDiagram(org, cd, monday, tuesday, wednesday, thursday, friday, saturday);
                 entityManager.merge(cd);
             }
         }
@@ -385,6 +355,27 @@ public class SubscriptionFeedingService {
         //cd = createCycleDiagram(client, org, monday, tuesday, wednesday, thursday, friday, saturday,
         //        dateActivationDiagram, false);
         return cd;
+    }
+
+    private void editCycleDiagram(Org org, CycleDiagram cd, String monday, String tuesday, String wednesday,
+            String thursday, String friday, String saturday) {
+        DAOService daoService = DAOService.getInstance();
+        cd.setGlobalVersion(daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName()));
+        List<ComplexInfo> availableComplexes = findComplexesWithSubFeeding(org);
+        cd.setMonday(monday);
+        cd.setMondayPrice(getPriceOfDay(monday, availableComplexes));
+        cd.setTuesday(tuesday);
+        cd.setTuesdayPrice(getPriceOfDay(tuesday, availableComplexes));
+        cd.setWednesday(wednesday);
+        cd.setWednesdayPrice(getPriceOfDay(wednesday, availableComplexes));
+        cd.setThursday(thursday);
+        cd.setThursdayPrice(getPriceOfDay(thursday, availableComplexes));
+        cd.setFriday(friday);
+        cd.setFridayPrice(getPriceOfDay(friday, availableComplexes));
+        cd.setSaturday(saturday);
+        cd.setSaturdayPrice(getPriceOfDay(saturday, availableComplexes));
+        cd.setSunday("");
+        cd.setSundayPrice(0L);
     }
 
     // Возвращает полную стоимость питания на сегодня по заданным комплексам орг-ии.
@@ -406,38 +397,38 @@ public class SubscriptionFeedingService {
         return price;
     }
 
-    @SuppressWarnings("unchecked")
-    @Transactional(propagation = Propagation.REQUIRED)
-    public void activateCycleDiagrams() {
-        DAOService daoService = DAOService.getInstance();
-        Date today = CalendarUtils.truncateToDayOfMonth(new Date());
-        Date tomorrow = CalendarUtils.addDays(today, 1);
-        Query updateQuery = entityManager.createQuery(
-                "update CycleDiagram cd set cd.stateDiagram = :active, cd.globalVersion = :newVersion "
-                        + "where cd.stateDiagram = :wait and cd.deletedState = false and "
-                        + "cd.dateActivationDiagram >= :today and cd.dateActivationDiagram < :tomorrow and cd.client.idOfClient = :id");
-        Query deleteQuery = entityManager.createQuery(
-                "update CycleDiagram cd set cd.stateDiagram = :block, cd.deletedState = true, cd.globalVersion = :newVersion"
-                        + " where cd.client.idOfClient = :id and cd.dateActivationDiagram < :today and cd.stateDiagram = :active");
-        Query query = entityManager.createQuery(
-                "select cd.client.idOfClient from CycleDiagram cd where cd.stateDiagram = :active and cd.deletedState = false")
-                .setParameter("active", StateDiagram.ACTIVE);
-        List<Long> clientIds = (List<Long>) query.getResultList();
-        int activatedCount = 0;
-        int blockedCount = 0;
-        long version = daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
-        for (Long clientId : clientIds) {
-            int count = updateQuery.setParameter("active", StateDiagram.ACTIVE).setParameter("newVersion", version)
-                    .setParameter("wait", StateDiagram.WAIT).setParameter("today", today)
-                    .setParameter("tomorrow", tomorrow).setParameter("id", clientId).executeUpdate();
-            if (count != 0) {
-                blockedCount += deleteQuery.setParameter("block", StateDiagram.BLOCK)
-                        .setParameter("newVersion", version).setParameter("id", clientId).setParameter("today", today)
-                        .setParameter("active", StateDiagram.ACTIVE).executeUpdate();
-                activatedCount += count;
-            }
-        }
-        LOGGER.info("Today activated cycle diagrams count: {}", activatedCount);
-        LOGGER.info("Today blocked cycle diagrams count: {}", blockedCount);
-    }
+    //@SuppressWarnings("unchecked")
+    //@Transactional(propagation = Propagation.REQUIRED)
+    //public void activateCycleDiagrams() {
+    //    DAOService daoService = DAOService.getInstance();
+    //    Date today = CalendarUtils.truncateToDayOfMonth(new Date());
+    //    Date tomorrow = CalendarUtils.addDays(today, 1);
+    //    Query updateQuery = entityManager.createQuery(
+    //            "update CycleDiagram cd set cd.stateDiagram = :active, cd.globalVersion = :newVersion "
+    //                    + "where cd.stateDiagram = :wait and cd.deletedState = false and "
+    //                    + "cd.dateActivationDiagram >= :today and cd.dateActivationDiagram < :tomorrow and cd.client.idOfClient = :id");
+    //    Query deleteQuery = entityManager.createQuery(
+    //            "update CycleDiagram cd set cd.stateDiagram = :block, cd.deletedState = true, cd.globalVersion = :newVersion"
+    //                    + " where cd.client.idOfClient = :id and cd.dateActivationDiagram < :today and cd.stateDiagram = :active");
+    //    Query query = entityManager.createQuery(
+    //            "select cd.client.idOfClient from CycleDiagram cd where cd.stateDiagram = :active and cd.deletedState = false")
+    //            .setParameter("active", StateDiagram.ACTIVE);
+    //    List<Long> clientIds = (List<Long>) query.getResultList();
+    //    int activatedCount = 0;
+    //    int blockedCount = 0;
+    //    long version = daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
+    //    for (Long clientId : clientIds) {
+    //        int count = updateQuery.setParameter("active", StateDiagram.ACTIVE).setParameter("newVersion", version)
+    //                .setParameter("wait", StateDiagram.WAIT).setParameter("today", today)
+    //                .setParameter("tomorrow", tomorrow).setParameter("id", clientId).executeUpdate();
+    //        if (count != 0) {
+    //            blockedCount += deleteQuery.setParameter("block", StateDiagram.BLOCK)
+    //                    .setParameter("newVersion", version).setParameter("id", clientId).setParameter("today", today)
+    //                    .setParameter("active", StateDiagram.ACTIVE).executeUpdate();
+    //            activatedCount += count;
+    //        }
+    //    }
+    //    LOGGER.info("Today activated cycle diagrams count: {}", activatedCount);
+    //    LOGGER.info("Today blocked cycle diagrams count: {}", blockedCount);
+    //}
 }

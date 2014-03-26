@@ -31,6 +31,7 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
     final public static String P_NAME_FILTER = "nameFilter";
     final public static String P_ORG_REQUEST_FILTER = "orgRequestFilter";
     final public static String P_HIDE_DAILY_SAMPLE_COUNT = "hideDailySampleCount";
+    final public static String P_HIDE_LAST_VALUE = "hideLastValue";
     final public static String P_GENERATE_BEGIN_DATE = "generateBeginDate";
     final public static String P_GENERATE_END_DATE = "generateEndDate";
 
@@ -71,6 +72,10 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             int orgFilter = Integer.parseInt(reportProperties.getProperty(P_ORG_REQUEST_FILTER, "1"));
             String hideDailySampleProperty = reportProperties.getProperty(P_HIDE_DAILY_SAMPLE_COUNT, "false");
             final int hideDailySampleValue = Boolean.parseBoolean(hideDailySampleProperty)?0:1;
+
+            String hideLastValueProperty = reportProperties.getProperty(P_HIDE_LAST_VALUE, "false");
+            final int hideLastValue = Boolean.parseBoolean(hideLastValueProperty)?0:1;
+
             String defaultGenerateTime = Long.toString(System.currentTimeMillis());
             long generateBeginDate = Long.parseLong(reportProperties.getProperty(P_GENERATE_BEGIN_DATE, defaultGenerateTime));
             Date generateBeginTime = new Date(generateBeginDate);
@@ -84,8 +89,6 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             for (String idOfOrg : stringOrgList) {
                 idOfOrgList.add(Long.parseLong(idOfOrg));
             }
-
-
 
             String idOfMenuSourceOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG));
             List<String> idOfMenuSourceOrgStrList = Arrays.asList(StringUtils.split(idOfMenuSourceOrgs, ','));
@@ -102,7 +105,7 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
 
             return new JRBeanCollectionDataSource(service.buildRepotItems(startTime, endTime, nameFilter, orgFilter,
                     hideDailySampleValue, generateBeginTime, generateEndTime, idOfOrgList, idOfMenuSourceOrgList,
-                    hideMissedColumns, hideGeneratePeriod));
+                    hideMissedColumns, hideGeneratePeriod, hideLastValue));
         }
 
 

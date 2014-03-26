@@ -88,7 +88,6 @@ public class GoodCreatePage extends BasicWorkspacePage implements GoodGroupSelec
             }
             good.setCreatedDate(new Date());
             good.setDeletedState(true);
-            good.setGuid(UUID.randomUUID().toString());
             good.setUnitsScale(UnitScale.fromInteger(unitsScale));
             good.setGlobalVersion(daoService.updateVersionByDistributedObjects(Good.class.getSimpleName()));
             good.setOrgOwner(currentGoodGroup.getOrgOwner());

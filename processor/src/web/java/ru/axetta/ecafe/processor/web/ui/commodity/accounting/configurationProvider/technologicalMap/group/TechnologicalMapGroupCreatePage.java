@@ -63,7 +63,6 @@ public class TechnologicalMapGroupCreatePage extends BasicWorkspacePage implemen
             }
             technologicalMapGroup.setCreatedDate(new Date());
             technologicalMapGroup.setDeletedState(true);
-            technologicalMapGroup.setGuid(UUID.randomUUID().toString());
             technologicalMapGroup.setGlobalVersion(daoService.updateVersionByDistributedObjects(TechnologicalMapGroup.class.getSimpleName()));
             technologicalMapGroup.setOrgOwner(org.getIdOfOrg());
             technologicalMapGroup.setIdOfConfigurationProvider(currentConfigurationProvider.getIdOfConfigurationProvider());

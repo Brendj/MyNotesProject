@@ -59,7 +59,6 @@ public class SettingCreatePage extends BasicWorkspacePage implements OrgSelectPa
 
     @Override
     public void onShow() throws Exception {
-        setting.setGuid(UUID.randomUUID().toString());
         init();
     }
 

@@ -63,7 +63,6 @@ public class ProductGroupCreatePage extends BasicWorkspacePage implements Config
             }
             productGroup.setCreatedDate(new Date());
             productGroup.setDeletedState(true);
-            productGroup.setGuid(UUID.randomUUID().toString());
             productGroup.setOrgOwner(org.getIdOfOrg());
             productGroup.setIdOfConfigurationProvider(currentConfigurationProvider.getIdOfConfigurationProvider());
             productGroup.setGlobalVersion(daoService.updateVersionByDistributedObjects(ProductGroup.class.getSimpleName()));

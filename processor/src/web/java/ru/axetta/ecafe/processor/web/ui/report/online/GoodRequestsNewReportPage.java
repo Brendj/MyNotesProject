@@ -55,6 +55,7 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     private Boolean hideMissedColumns = true;
     private Boolean hideDailySamplesCount = false;
     private Boolean hideGeneratePeriod = false;
+    private Boolean hideLastValue = false;
     private String nameFiler;
     private final OrgRequestFilterConverter orgRequest = new OrgRequestFilterConverter();
 
@@ -225,6 +226,7 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         properties.setProperty(GoodRequestsNewReport.P_GENERATE_END_DATE, Long.toString(generateEndDate.getTime()));
         properties.setProperty(GoodRequestsNewReport.P_HIDE_MISSED_COLUMNS, Boolean.toString(hideMissedColumns));
         properties.setProperty(GoodRequestsNewReport.P_HIDE_DAILY_SAMPLE_COUNT, Boolean.toString(hideDailySamplesCount));
+        properties.setProperty(GoodRequestsNewReport.P_HIDE_LAST_VALUE, Boolean.toString(hideLastValue));
         properties.setProperty(GoodRequestsNewReport.P_NAME_FILTER, nameFiler);
         properties.setProperty(GoodRequestsNewReport.P_ORG_REQUEST_FILTER, Integer.toString(orgRequest.getOrgRequestFilterEnum().ordinal()));
         return properties;
@@ -322,5 +324,13 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
 
     public void setHideGeneratePeriod(Boolean hideGeneratePeriod) {
         this.hideGeneratePeriod = hideGeneratePeriod;
+    }
+
+    public Boolean getHideLastValue() {
+        return hideLastValue;
+    }
+
+    public void setHideLastValue(Boolean hideLastValue) {
+        this.hideLastValue = hideLastValue;
     }
 }

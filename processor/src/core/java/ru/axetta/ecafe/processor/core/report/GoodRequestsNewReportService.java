@@ -48,10 +48,9 @@ public class GoodRequestsNewReportService {
         this.session = session;
     }
 
-    public List<Item> buildRepotItems(Date startTime, Date endTime, String nameFilter,
-            int orgFilter, int hideDailySampleValue, Date generateBeginTime, Date generateEndTime,
+    public List<Item> buildRepotItems(Date startTime, Date endTime, String nameFilter, int orgFilter, int hideDailySampleValue, Date generateBeginTime, Date generateEndTime,
             List<Long> idOfOrgList, List<Long> idOfMenuSourceOrgList, boolean hideMissedColumns,
-            boolean hideGeneratePeriod) {
+            boolean hideGeneratePeriod, int hideLastValue) {
         Criteria orgCriteria = session.createCriteria(Org.class);
         if (!CollectionUtils.isEmpty(idOfOrgList)) {
             orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
@@ -84,11 +83,13 @@ public class GoodRequestsNewReportService {
 
         Date  beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
         Date  endDate = CalendarUtils.truncateToDayOfMonth(endTime);
-
-            /* Скрыть пустые значения, если не надо скрывать то заполним их нулями*/
+        //TreeSet<Item> items = new TreeSet<Item>();
+        TreeSet<Date> dates = new TreeSet<Date>();
+        /* Скрыть пустые значения, если не надо скрывать то заполним их нулями*/
         if(!hideMissedColumns){
             while (beginDate.getTime()<=endDate.getTime()) {
-                itemList.add(new Item(OVERALL_TOTAL, OVERALL_TOTAL_TITLE, "", beginDate, hideDailySampleValue));
+                itemList.add(new Item(OVERALL_TOTAL, OVERALL_TOTAL_TITLE, "", beginDate, hideDailySampleValue, hideLastValue));
+                dates.add(beginDate);
                 beginDate = CalendarUtils.addOneDay(beginDate);
             }
         }
@@ -117,6 +118,8 @@ public class GoodRequestsNewReportService {
 
         List goodRequestPositionList = goodRequestPositionCriteria.list();
 
+        Date doneDate = CalendarUtils.truncateToDayOfMonth(new Date(endDate.getTime()));
+
         for (Object obj: goodRequestPositionList){
             GoodRequestPosition position = (GoodRequestPosition) obj;
             BasicReportJob.OrgShortItem org = orgMap.get(position.getOrgOwner());
@@ -127,7 +130,6 @@ public class GoodRequestsNewReportService {
 
             Long newTotalCount = 0L;
             Long newDailySample = 0L;
-
 
             if(hideGeneratePeriod){
                 Date createDate = position.getCreatedDate();
@@ -145,18 +147,26 @@ public class GoodRequestsNewReportService {
                 }
             }
 
-            Date doneDate = CalendarUtils.truncateToDayOfMonth(position.getGoodRequest().getDoneDate());
+            doneDate = CalendarUtils.truncateToDayOfMonth(position.getGoodRequest().getDoneDate());
 
             String name = position.getGood().getFullName();
             if(StringUtils.isEmpty(name)) name = position.getGood().getNameOfGood();
 
-            itemList.add( new Item(org, name, doneDate, totalCount, dailySampleCount,
-                    newTotalCount, newDailySample, hideDailySampleValue));
-            itemList.add( new Item(OVERALL, OVERALL_TITLE, name, doneDate, totalCount, dailySampleCount,
-                    newTotalCount, newDailySample, hideDailySampleValue));
-            itemList.add( new Item(OVERALL_TOTAL, OVERALL_TOTAL_TITLE, "", doneDate, totalCount, dailySampleCount,
-                    newTotalCount, newDailySample, hideDailySampleValue));
+            addItemsFromList(itemList, org, doneDate, name, totalCount, dailySampleCount, newTotalCount, newDailySample,
+                    hideDailySampleValue, hideLastValue);
+            //items.add(new Item(org, name, doneDate, hideDailySampleValue));
+            dates.add(doneDate);
         }
+
+        //if(hideDailySampleValue>0){
+        //    for (Item item: items){
+        //        for (Date date: dates){
+        //            itemList.add( new Item(item, date));
+        //            itemList.add( new Item(OVERALL, OVERALL_TITLE, item.getGoodName(), date, hideDailySampleValue));
+        //            itemList.add( new Item(OVERALL_TOTAL, OVERALL_TOTAL_TITLE, "", date, hideDailySampleValue));
+        //        }
+        //    }
+        //}
 
         if(orgFilter==0 && !idOfMenuSourceOrgList.isEmpty()){
             for (BasicReportJob.OrgShortItem item: orgMap.values()){
@@ -185,17 +195,20 @@ public class GoodRequestsNewReportService {
                     }
                     for (Object name: fullNameProviderMap.getCollection(item.getSourceMenuOrg())){
                         if(hideMissedColumns){
-                            Date date = CalendarUtils.truncateToDayOfMonth(new Date(endDate.getTime()));
-                            itemList.add( new Item(item, name.toString(), date, hideDailySampleValue));
-                            itemList.add( new Item(OVERALL, OVERALL_TITLE, name.toString(), date, hideDailySampleValue));
-                            itemList.add( new Item(OVERALL_TOTAL, OVERALL_TOTAL_TITLE, "", date, hideDailySampleValue));
+                            for (Date date: dates){
+                                addItemsFromList(itemList, item, date, name.toString(), hideDailySampleValue, hideLastValue);
+                                //itemList.add( new Item(item, name.toString(), date, hideDailySampleValue));
+                                //itemList.add( new Item(OVERALL, OVERALL_TITLE, name.toString(), date, hideDailySampleValue));
+                                //itemList.add( new Item(OVERALL_TOTAL, OVERALL_TOTAL_TITLE, "", date, hideDailySampleValue));
+                            }
                         } else {
                             beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
                             endDate = CalendarUtils.truncateToDayOfMonth(endTime);
                             while (beginDate.getTime()<=endDate.getTime()) {
-                                itemList.add( new Item(item, name.toString(), beginDate, hideDailySampleValue));
-                                itemList.add( new Item(OVERALL, OVERALL_TITLE, name.toString(), beginDate, hideDailySampleValue));
-                                itemList.add( new Item(OVERALL_TOTAL, OVERALL_TOTAL_TITLE, "", beginDate, hideDailySampleValue));
+                                addItemsFromList(itemList, item, beginDate, name.toString(), hideDailySampleValue, hideLastValue);
+                                //itemList.add( new Item(item, name.toString(), beginDate, hideDailySampleValue));
+                                //itemList.add( new Item(OVERALL, OVERALL_TITLE, name.toString(), beginDate, hideDailySampleValue));
+                                //itemList.add( new Item(OVERALL_TOTAL, OVERALL_TOTAL_TITLE, "", beginDate, hideDailySampleValue));
                                 beginDate = CalendarUtils.addOneDay(beginDate);
                             }
                         }
@@ -204,6 +217,8 @@ public class GoodRequestsNewReportService {
             }
         }
 
+
+        // функционал не работает
         if(orgFilter==2 && !idOfMenuSourceOrgList.isEmpty()){
             for (BasicReportJob.OrgShortItem item: orgMap.values()){
                 if(item.getSourceMenuOrg()!=null){
@@ -232,14 +247,14 @@ public class GoodRequestsNewReportService {
                     for (Object name: fullNameProviderMap.getCollection(item.getSourceMenuOrg())){
                         if(hideMissedColumns){
                             Date date = CalendarUtils.truncateToDayOfMonth(new Date(endDate.getTime()));
-                            itemList.add( new Item(item, name.toString(), date, hideDailySampleValue));
-                            itemList.add( new Item(OVERALL, OVERALL_TITLE, name.toString(), date, hideDailySampleValue));
-                            itemList.add( new Item(OVERALL_TOTAL, OVERALL_TOTAL_TITLE, "", date, hideDailySampleValue));
+                            itemList.add( new Item(item, name.toString(), date, hideDailySampleValue, hideLastValue));
+                            itemList.add( new Item(OVERALL, OVERALL_TITLE, name.toString(), date, hideDailySampleValue, hideLastValue));
+                            itemList.add( new Item(OVERALL_TOTAL, OVERALL_TOTAL_TITLE, "", date, hideDailySampleValue, hideLastValue));
                         } else {
                             beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
                             endDate = CalendarUtils.truncateToDayOfMonth(endTime);
                             while (beginDate.getTime()<=endDate.getTime()) {
-                                Item e = new Item(item, name.toString(), beginDate, hideDailySampleValue);
+                                Item e = new Item(item, name.toString(), beginDate, hideDailySampleValue, hideLastValue);
                                 boolean flag = true;
                                 //Iterator<Item> itemIterator = itemList.listIterator();
                                 List<Item> copyList = new ArrayList<Item>(itemList);
@@ -251,8 +266,8 @@ public class GoodRequestsNewReportService {
                                 }
                                 if(flag){
                                     itemList.add(e);
-                                    itemList.add( new Item(OVERALL, OVERALL_TITLE, name.toString(), beginDate, hideDailySampleValue));
-                                    itemList.add( new Item(OVERALL_TOTAL, OVERALL_TOTAL_TITLE, "", beginDate, hideDailySampleValue));
+                                    itemList.add( new Item(OVERALL, OVERALL_TITLE, name.toString(), beginDate, hideDailySampleValue, hideLastValue));
+                                    itemList.add( new Item(OVERALL_TOTAL, OVERALL_TOTAL_TITLE, "", beginDate, hideDailySampleValue, hideLastValue));
                                     beginDate = CalendarUtils.addOneDay(beginDate);
                                 } else {
                                     copyList = new ArrayList<Item>(itemList);
@@ -271,16 +286,35 @@ public class GoodRequestsNewReportService {
 
         if(itemList.isEmpty()){
             for (BasicReportJob.OrgShortItem item: orgMap.values()){
-                itemList.add( new Item(item, "", CalendarUtils.truncateToDayOfMonth(startTime), hideDailySampleValue));
+                itemList.add( new Item(item, "", CalendarUtils.truncateToDayOfMonth(startTime), hideDailySampleValue, hideLastValue));
             }
-            itemList.add( new Item(OVERALL, OVERALL_TITLE, "", CalendarUtils.truncateToDayOfMonth(startTime), hideDailySampleValue));
-            itemList.add( new Item(OVERALL_TOTAL, OVERALL_TOTAL_TITLE, "", CalendarUtils.truncateToDayOfMonth(startTime), hideDailySampleValue));
+            itemList.add( new Item(OVERALL, OVERALL_TITLE, "", CalendarUtils.truncateToDayOfMonth(startTime), hideDailySampleValue, hideLastValue));
+            itemList.add( new Item(OVERALL_TOTAL, OVERALL_TOTAL_TITLE, "", CalendarUtils.truncateToDayOfMonth(startTime), hideDailySampleValue, hideLastValue));
         }
         return itemList;
     }
 
+    private void addItemsFromList(List<Item> itemList, BasicReportJob.OrgShortItem org, Date doneDate, String name,
+            int hideDailySampleValue, int hideLastValue) {
+        itemList.add( new Item(org, name, doneDate, hideDailySampleValue, hideLastValue));
+        itemList.add( new Item(OVERALL, OVERALL_TITLE, name, doneDate, hideDailySampleValue, hideLastValue));
+        itemList.add( new Item(OVERALL_TOTAL, OVERALL_TOTAL_TITLE, "", doneDate, hideDailySampleValue, hideLastValue));
+    }
 
-    public static class Item {
+
+    private void addItemsFromList(List<Item> itemList, BasicReportJob.OrgShortItem org, Date doneDate, String name,
+            Long totalCount, Long dailySampleCount, Long newTotalCount, Long newDailySample, int hideDailySampleValue,
+            int hideLastValue) {
+        itemList.add( new Item(org, name, doneDate, totalCount, dailySampleCount,
+                newTotalCount, newDailySample, hideDailySampleValue, hideLastValue));
+        itemList.add( new Item(OVERALL, OVERALL_TITLE, name, doneDate, totalCount, dailySampleCount,
+                newTotalCount, newDailySample, hideDailySampleValue, hideLastValue));
+        itemList.add( new Item(OVERALL_TOTAL, OVERALL_TOTAL_TITLE, "", doneDate, totalCount, dailySampleCount,
+                newTotalCount, newDailySample, hideDailySampleValue, hideLastValue));
+    }
+
+
+    public static class Item implements Comparable{
         final private static String STR_YEAR_DATE_FORMAT = "EE dd.MM";
         final private static DateFormat YEAR_DATE_FORMAT = new SimpleDateFormat(STR_YEAR_DATE_FORMAT, new Locale("ru"));
         private Long orgNum;
@@ -289,13 +323,24 @@ public class GoodRequestsNewReportService {
         private Date doneDate;
         private String doneDateStr;
         private int hideDailySample=0;
+        private int hideLastValue = 0;
         private Long totalCount;
         private Long dailySample;
         private Long newTotalCount;
         private Long newDailySample;
 
+        protected Item(Item item, Date doneDate) {
+            this(item.getOrgNum(), item.getOfficialName(), item.getGoodName(), doneDate, 0L, 0L, 0L, 0L,
+                    item.getHideDailySample(), item.getHideLastValue());
+        }
+
+        @Override
+        public int compareTo(Object o) {
+            return Integer.valueOf(hashCode()).compareTo(o.hashCode());
+        }
+
         public Item(Long orgNum, String officialName, String goodName, Date doneDate, Long totalCount, Long dailySample,
-                Long newTotalCount, Long newDailySample, int hideDailySampleValue) {
+                Long newTotalCount, Long newDailySample, int hideDailySampleValue, int hideLastValue) {
             this.orgNum = orgNum;
             this.officialName = officialName;
             this.goodName = goodName;
@@ -306,6 +351,7 @@ public class GoodRequestsNewReportService {
             this.newTotalCount = newTotalCount;
             this.newDailySample = newDailySample;
             this.hideDailySample = hideDailySampleValue;
+            this.hideLastValue = hideLastValue;
         }
 
         @Override
@@ -319,17 +365,9 @@ public class GoodRequestsNewReportService {
 
             Item item = (Item) o;
 
-            if (!doneDate.equals(item.doneDate)) {
-                return false;
-            }
-            if (!goodName.equals(item.goodName)) {
-                return false;
-            }
-            if (!officialName.equals(item.officialName)) {
-                return false;
-            }
+            return doneDate.equals(item.doneDate) && goodName.equals(item.goodName) && officialName
+                    .equals(item.officialName);
 
-            return true;
         }
 
         @Override
@@ -340,19 +378,19 @@ public class GoodRequestsNewReportService {
             return result;
         }
 
-        public Item(Long orgNum, String officialName, String goodName, Date doneDate, int hideDailySampleValue) {
-            this(orgNum, officialName, goodName, doneDate, 0L, 0L, 0L, 0L, hideDailySampleValue);
+        public Item(Long orgNum, String officialName, String goodName, Date doneDate, int hideDailySampleValue, int hideLastValue) {
+            this(orgNum, officialName, goodName, doneDate, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue);
         }
 
         public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, Long totalCount, Long dailySample,
-                Long newTotalCount, Long newDailySample, int hideDailySampleValue) {
+                Long newTotalCount, Long newDailySample, int hideDailySampleValue, int hideLastValue) {
             this(Long.parseLong(Org.extractOrgNumberFromName(item.getOfficialName())), item.getOfficialName(),
                     goodName, doneDate, totalCount, dailySample, newTotalCount, newDailySample,
-                    hideDailySampleValue);
+                    hideDailySampleValue, hideLastValue);
         }
 
-        public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, int hideDailySampleValue) {
-            this(item, goodName, doneDate, 0L, 0L, 0L, 0L, hideDailySampleValue);
+        public Item(BasicReportJob.OrgShortItem item, String goodName, Date doneDate, int hideDailySampleValue, int hideLastValue) {
+            this(item, goodName, doneDate, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue);
         }
 
         public Long getOrgNum() {
@@ -433,6 +471,14 @@ public class GoodRequestsNewReportService {
 
         public void setHideDailySample(int hideDailySample) {
             this.hideDailySample = hideDailySample;
+        }
+
+        public int getHideLastValue() {
+            return hideLastValue;
+        }
+
+        public void setHideLastValue(int hideLastValue) {
+            this.hideLastValue = hideLastValue;
         }
     }
 

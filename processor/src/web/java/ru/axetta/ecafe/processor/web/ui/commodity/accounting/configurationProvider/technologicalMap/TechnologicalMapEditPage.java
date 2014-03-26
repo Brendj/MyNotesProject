@@ -178,7 +178,7 @@ public class TechnologicalMapEditPage extends BasicWorkspacePage implements Prod
                 for (TechnologicalMapProduct technologicalMapProduct: technologicalMapProducts){
                     if(technologicalMapProduct.getGlobalId()==null){
                         technologicalMapProduct.setCreatedDate(new Date());
-                        technologicalMapProduct.setGuid(UUID.randomUUID().toString());
+                        //technologicalMapProduct.setGuid(UUID.randomUUID().toString());
                         technologicalMapProduct.setGlobalVersion(version);
                         technologicalMapProduct.setTechnologicalMap(currentTechnologicalMap);
                         technologicalMapProduct.setOrgOwner(orgOwner);

@@ -152,6 +152,7 @@ public class Manager {
             if (Node.ELEMENT_NODE == doNode.getNodeType()) {
                 DistributedObject distributedObject = null;
                 try {
+                    // TODO: реализовать паттерн билдер
                     distributedObject = doSyncClass.getDoClass().newInstance();
                     distributedObject.setIdOfSyncOrg(idOfOrg);
                     distributedObject = distributedObject.build(doNode);
