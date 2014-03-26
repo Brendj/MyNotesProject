@@ -610,7 +610,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     private void fillDisctributedObjectsCommonDetails(DistributedObject distributedObject, Org org) {
         distributedObject.setOrgOwner(org.getIdOfOrg());
-        distributedObject.setGuid(UUID.randomUUID().toString());
         distributedObject.setCreatedDate(new Date());
         distributedObject.setDeletedState(false);
         distributedObject.setSendAll(SendToAssociatedOrgs.SendToMain);
@@ -1138,7 +1137,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Prohibition prohibition = new Prohibition();
             prohibition.setClient(client);
             prohibition.setOrgOwner(org.getIdOfOrg());
-            prohibition.setGuid(UUID.randomUUID().toString());
             prohibition.setCreatedDate(new Date());
             prohibition.setDeletedState(false);
             prohibition.setSendAll(SendToAssociatedOrgs.SendToSelf);
@@ -1281,7 +1279,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ProhibitionExclusion exclusion = new ProhibitionExclusion();
             exclusion.setProhibition(prohibition);
             exclusion.setOrgOwner(org.getIdOfOrg());
-            exclusion.setGuid(UUID.randomUUID().toString());
             exclusion.setCreatedDate(new Date());
             exclusion.setDeletedState(false);
             exclusion.setSendAll(SendToAssociatedOrgs.SendToSelf);
