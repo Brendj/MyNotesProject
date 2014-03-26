@@ -35,7 +35,7 @@
                     columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column">
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Номер" />
+                <h:outputText escape="true" value="Номер ОУ" />
             </f:facet>
             <h:outputText value="#{item.number}" />
         </rich:column>

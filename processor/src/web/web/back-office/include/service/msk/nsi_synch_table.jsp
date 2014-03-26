@@ -16,7 +16,7 @@
 
 
     <h:panelGrid columns="2" styleClass="borderless-grid">
-        <h:outputText escape="true" value="Фильтр ФИО" styleClass="output-text" />
+        <h:outputText escape="true" value="Фильтр по названию организации" styleClass="output-text" />
         <h:inputText value="#{NSIOrgRegistrySynchOverviewPage.orgFilter}" size="64" styleClass="input-text" />
     </h:panelGrid>
 

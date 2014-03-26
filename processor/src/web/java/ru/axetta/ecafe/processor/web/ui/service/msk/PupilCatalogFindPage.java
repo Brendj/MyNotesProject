@@ -210,6 +210,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
             int nItemsNotFound = 0;
             List<ImportRegisterClientsService.ExpandedPupilInfo> pis = nsiService
                     .getPupilsByOrgGUID(orgGuids==null?null:orgGuids.getOrgGuids(), familyName, firstName, secondName);
+            Collections.sort(pis, new PupilCatalogComparator());
             for (ImportRegisterClientsService.ExpandedPupilInfo pi : pis) {
                 Item i = new Item(pi);
                 i.idOfClient = DAOUtils.getClientIdByGuid(em, i.guid);
@@ -495,6 +496,17 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
             facesContext.responseComplete();
         } catch (Exception e) {
             logger.error("Failed to send comparison file", e);
+        }
+    }
+
+    public class PupilCatalogComparator implements Comparator {
+        @Override
+        public int compare(Object o1, Object o2) {
+            ImportRegisterClientsService.ExpandedPupilInfo p1 = (ImportRegisterClientsService.ExpandedPupilInfo) o1;
+            ImportRegisterClientsService.ExpandedPupilInfo p2 = (ImportRegisterClientsService.ExpandedPupilInfo) o2;
+            String name1 = p1.getFamilyName() + " " + p1.getFirstName() + " " + p1.getSecondName();
+            String name2 = p2.getFamilyName() + " " + p2.getFirstName() + " " + p2.getSecondName();
+            return name1.compareTo(name2);
         }
     }
 }
