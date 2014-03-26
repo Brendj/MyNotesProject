@@ -39,7 +39,7 @@ public class OrgSelectPage extends BasicPage {
     private OrgShortItem selectedItem = new OrgShortItem();
     private String filter;
     private String tagFilter;
-    private Long idFilter;
+    private String idFilter;
     /*
        0               - нет фильтра
        1               - фильтр "только ОУ"
@@ -132,8 +132,11 @@ public class OrgSelectPage extends BasicPage {
         if (StringUtils.isNotEmpty(tagFilter)) {
             criteria.add(Restrictions.like("shortName", tagFilter, MatchMode.ANYWHERE));
         }
-        if (idFilter != null && idFilter > -1 ) {
-            criteria.add(Restrictions.eq("id", idFilter));
+        if (idFilter != null && idFilter.length() > 0) {
+            try {
+                Long id = Long.parseLong(idFilter);
+                criteria.add(Restrictions.eq("id", id));
+            } catch (Exception e) { }
         }
 
         if (idOfContract != null) {
@@ -195,11 +198,11 @@ public class OrgSelectPage extends BasicPage {
         this.filter = filter;
     }
 
-    public Long getIdFilter() {
+    public String getIdFilter() {
         return idFilter;
     }
 
-    public void setIdFilter(Long idFilter) {
+    public void setIdFilter(String idFilter) {
         this.idFilter = idFilter;
     }
 

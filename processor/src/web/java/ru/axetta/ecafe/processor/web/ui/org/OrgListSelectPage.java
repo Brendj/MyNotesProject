@@ -36,7 +36,7 @@ public class OrgListSelectPage extends BasicPage {
     private List<OrgShortItem> items = Collections.emptyList();
     private String filter;
     private String tagFilter;
-    private Long idFilter;
+    private String idFilter;
     /*
        0               - нет фильтра
        1               - фильтр "только ОУ"
@@ -101,11 +101,11 @@ public class OrgListSelectPage extends BasicPage {
         this.filter = filter;
     }
 
-    public Long getIdFilter() {
+    public String getIdFilter() {
         return idFilter;
     }
 
-    public void setIdFilter(Long idFilter) {
+    public void setIdFilter(String idFilter) {
         this.idFilter = idFilter;
     }
 
@@ -257,7 +257,7 @@ public class OrgListSelectPage extends BasicPage {
 
     @SuppressWarnings("unchecked")
     public static List<OrgShortItem> retrieveOrgs(Session session, String filter, String tagFilter,
-            int supplierFilter, Long idFilter, List<Long> idOfContragentOrgList) throws HibernateException {
+            int supplierFilter, String idFilter, List<Long> idOfContragentOrgList) throws HibernateException {
         Criteria criteria = session.createCriteria(Org.class);
         criteria.addOrder(Order.asc("idOfOrg"));
         //  Ограничение оргов, которые позволено видеть пользователю
@@ -273,8 +273,11 @@ public class OrgListSelectPage extends BasicPage {
         if (StringUtils.isNotEmpty(tagFilter)) {
             criteria.add(Restrictions.like("tag", tagFilter, MatchMode.ANYWHERE));
         }
-        if (idFilter != null && idFilter > -1 ) {
-            criteria.add(Restrictions.eq("id", idFilter));
+        if (idFilter != null && idFilter.length() > 0) {
+            try {
+                Long id = Long.parseLong(idFilter);
+                criteria.add(Restrictions.eq("id", id));
+            } catch (Exception e) { }
         }
         if(supplierFilter==1 &&  idOfContragentOrgList!=null && !idOfContragentOrgList.isEmpty() && idOfContragentOrgList.get(0)!=null){
             criteria.createAlias("sourceMenuOrgs", "sm").add(Restrictions.in("sm.idOfOrg", idOfContragentOrgList));
