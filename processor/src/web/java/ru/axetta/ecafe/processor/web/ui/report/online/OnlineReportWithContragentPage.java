@@ -74,8 +74,6 @@ public class OnlineReportWithContragentPage extends OnlineReportPage {
     }
 
     public Object showOrgListSelectPage () {
-        MainPage.getSessionInstance().getOrgListSelectPage().setFilter("");
-        MainPage.getSessionInstance().getOrgListSelectPage().setTagFilter("");
         setSelectIdOfOrgList(true);
         final List<Long> oldIdOfContragentOrgList1 = MainPage.getSessionInstance().getIdOfContragentOrgList();
         if(oldIdOfContragentOrgList1 !=null && !oldIdOfContragentOrgList1.containsAll(idOfContragentOrgList)){
@@ -98,8 +96,6 @@ public class OnlineReportWithContragentPage extends OnlineReportPage {
     }
 
     public Object showContragentListSelectPage () {
-        MainPage.getSessionInstance().getOrgListSelectPage().setFilter("");
-        MainPage.getSessionInstance().getOrgListSelectPage().setTagFilter("");
         setSelectIdOfOrgList(false);
         MainPage.getSessionInstance().showOrgListSelectPage();
         return null;

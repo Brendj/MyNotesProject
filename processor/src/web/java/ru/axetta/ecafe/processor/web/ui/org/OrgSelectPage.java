@@ -92,6 +92,9 @@ public class OrgSelectPage extends BasicPage {
     public void fill(Long idOfContragent, Long idOfContract, Session session) throws Exception {
         this.idOfContragent = idOfContragent;
         this.idOfContract = idOfContract;
+        this.filter="";
+        this.tagFilter="";
+        this.idFilter="";
         this.items = retrieveOrgs(session);
     }
 

@@ -162,32 +162,6 @@ public class OrgListSelectPage extends BasicPage {
         return supplierFilterDisabled;
     }
 
-    private void fill(Session session, String orgFilter, Boolean isUpdate) throws Exception {
-        if(isUpdate) {
-            updateSelectedOrgs();
-        } else {
-            selectedOrgs.clear();
-        }
-        String[] idOfOrgs = orgFilter.split(",");
-        Set<String> longSet = new HashSet<String>(Arrays.asList(idOfOrgs));
-        ///
-        for (String sId : longSet) {
-            try{
-                Long id = Long.parseLong(sId.trim());
-                if (selectedOrgs.containsKey(id)) continue;
-                Org org = (Org)session.get(Org.class, id);
-                selectedOrgs.put(id, org.getShortName());
-            } catch (Exception e){}
-        }
-        ///
-        List<OrgShortItem> items = retrieveOrgs(session, null);
-        for (OrgShortItem orgShortItem: items){
-            orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
-        }
-
-        this.items = items;
-    }
-
     public void fill(Session session, String orgFilter, Boolean isUpdate, List<Long> idOfContragentOrgList) throws Exception {
         if(isUpdate) {
             updateSelectedOrgs();
@@ -207,20 +181,6 @@ public class OrgListSelectPage extends BasicPage {
         }
         ///
         List<OrgShortItem> items = retrieveOrgs(session, idOfContragentOrgList);
-        for (OrgShortItem orgShortItem: items){
-            orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
-        }
-
-        this.items = items;
-    }
-
-    private void fill(Session session, Boolean isUpdate) throws Exception {
-        if(isUpdate) {
-            updateSelectedOrgs();
-        } else {
-            selectedOrgs.clear();
-        }
-        List<OrgShortItem> items = retrieveOrgs(session, null);
         for (OrgShortItem orgShortItem: items){
             orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
         }

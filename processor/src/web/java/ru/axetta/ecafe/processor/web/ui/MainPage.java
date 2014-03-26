@@ -1708,6 +1708,9 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
+                orgListSelectPage.setIdFilter("");
+                orgListSelectPage.setFilter("");
+                orgListSelectPage.setTagFilter("");
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList);
                 } else {
@@ -1742,6 +1745,9 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
+                orgListSelectPage.setIdFilter("");
+                orgListSelectPage.setFilter("");
+                orgListSelectPage.setTagFilter("");
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList);
                 } else {
