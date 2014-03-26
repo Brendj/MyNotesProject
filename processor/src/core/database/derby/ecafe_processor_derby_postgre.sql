@@ -2680,6 +2680,7 @@ create table CF_RegistryChange (
   IdOfClient bigint,
   Operation integer not null,
   Applied boolean not null default false,
+  Error character varying(256) DEFAULT null, -- v59
   CONSTRAINT cf_registrychange_pk PRIMARY KEY (IdOfRegistryChange),
   CONSTRAINT cf_registrychange_org FOREIGN KEY (IdOfOrg) REFERENCES cf_orgs (IdOfOrg)
 );
