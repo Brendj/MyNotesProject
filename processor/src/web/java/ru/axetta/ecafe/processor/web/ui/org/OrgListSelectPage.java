@@ -36,6 +36,7 @@ public class OrgListSelectPage extends BasicPage {
     private List<OrgShortItem> items = Collections.emptyList();
     private String filter;
     private String tagFilter;
+    private Long idFilter;
     /*
        0               - нет фильтра
        1               - фильтр "только ОУ"
@@ -98,6 +99,14 @@ public class OrgListSelectPage extends BasicPage {
 
     public void setFilter(String filter) {
         this.filter = filter;
+    }
+
+    public Long getIdFilter() {
+        return idFilter;
+    }
+
+    public void setIdFilter(Long idFilter) {
+        this.idFilter = idFilter;
     }
 
     public int getSupplierFilter() {
@@ -243,12 +252,12 @@ public class OrgListSelectPage extends BasicPage {
 
     private List<OrgShortItem> retrieveOrgs(Session session, List<Long> idOfContragentOrgList) throws HibernateException {
         deselectAllItems();
-        return retrieveOrgs(session, filter, tagFilter, supplierFilter, idOfContragentOrgList);
+        return retrieveOrgs(session, filter, tagFilter, supplierFilter, idFilter, idOfContragentOrgList);
     }
 
     @SuppressWarnings("unchecked")
     public static List<OrgShortItem> retrieveOrgs(Session session, String filter, String tagFilter,
-            int supplierFilter, List<Long> idOfContragentOrgList) throws HibernateException {
+            int supplierFilter, Long idFilter, List<Long> idOfContragentOrgList) throws HibernateException {
         Criteria criteria = session.createCriteria(Org.class);
         criteria.addOrder(Order.asc("idOfOrg"));
         //  Ограничение оргов, которые позволено видеть пользователю
@@ -263,6 +272,9 @@ public class OrgListSelectPage extends BasicPage {
         }
         if (StringUtils.isNotEmpty(tagFilter)) {
             criteria.add(Restrictions.like("tag", tagFilter, MatchMode.ANYWHERE));
+        }
+        if (idFilter != null && idFilter > -1 ) {
+            criteria.add(Restrictions.eq("id", idFilter));
         }
         if(supplierFilter==1 &&  idOfContragentOrgList!=null && !idOfContragentOrgList.isEmpty() && idOfContragentOrgList.get(0)!=null){
             criteria.createAlias("sourceMenuOrgs", "sm").add(Restrictions.in("sm.idOfOrg", idOfContragentOrgList));

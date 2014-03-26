@@ -35,6 +35,9 @@
                             <h:outputText escape="true" value="Фильтр по тэгу: " styleClass="output-text" />
                             <h:inputText value="#{mainPage.orgSelectPage.tagFilter}" size="48" maxlength="128"
                                          styleClass="input-text" />
+                            <h:outputText escape="true" value="Фильтр по ID: " styleClass="output-text" />
+                            <h:inputText value="#{mainPage.orgSelectPage.idFilter}" size="48" maxlength="128"
+                                         styleClass="input-text" />
                         </h:panelGrid>
                         <a4j:commandLink action="#{mainPage.updateOrgSelectPage}" reRender="modalOrgSelectorForm"
                                          styleClass="command-link">
