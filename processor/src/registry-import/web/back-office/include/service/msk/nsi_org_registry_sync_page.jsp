@@ -155,12 +155,18 @@
 
                         <f:facet name="footer">
                             <rich:datascroller for="table" renderIfSinglePage="false" maxPages="5" fastControls="hide"
-                                               stepControls="auto" boundaryControls="hide">
+                                               stepControls="auto">
+                                <f:facet name="first">
+                                    <h:graphicImage value="/images/16x16/first.png" />
+                                </f:facet>
                                 <f:facet name="previous">
                                     <h:graphicImage value="/images/16x16/left-arrow.png" />
                                 </f:facet>
                                 <f:facet name="next">
                                     <h:graphicImage value="/images/16x16/right-arrow.png" />
+                                </f:facet>
+                                <f:facet name="last">
+                                    <h:graphicImage value="/images/16x16/last.png" />
                                 </f:facet>
                             </rich:datascroller>
                         </f:facet>
