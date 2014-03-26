@@ -115,6 +115,7 @@
                                      styleClass="output-text">
                 <a4j:support event="onclick" reRender="goodRequestsNewReportFilterPanelGrid" ajaxSingle="true" />
             </h:selectBooleanCheckbox>
+
             <h:outputText style="margin-left: 20px;" escape="true" value="Время генерации от" styleClass="output-text"
                           rendered="#{mainPage.goodRequestsNewReportPage.hideGeneratePeriod}"/>
             <rich:calendar value="#{mainPage.goodRequestsNewReportPage.generateBeginDate}"
@@ -128,8 +129,12 @@
             <rich:calendar id="generateEndDateCal" value="#{mainPage.goodRequestsNewReportPage.generateEndDate}"
                            datePattern="dd.MM.yyyy HH:mm" converter="timeMinuteConverter" inputClass="input-text"
                            showWeeksBar="false" rendered="#{mainPage.goodRequestsNewReportPage.hideGeneratePeriod}"/>
-
-
+            <h:outputText style="margin-left: 20px;" escape="true"
+                          rendered="#{mainPage.goodRequestsNewReportPage.hideGeneratePeriod}"
+                          value="Скрыть предыдущее значение в скобках при изменении" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{mainPage.goodRequestsNewReportPage.hideLastValue}"
+                                     styleClass="output-text"
+                                     rendered="#{mainPage.goodRequestsNewReportPage.hideGeneratePeriod}"/>
 
         </h:panelGrid>
     </rich:simpleTogglePanel>
