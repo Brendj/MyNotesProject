@@ -116,6 +116,16 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
             printError("Выберите список организаций или поставщиков");
             return null;
         }
+        if(hideGeneratePeriod){
+            if(generateBeginDate==null){
+                printError("Не указано время генерации от");
+                return null;
+            }
+            if(generateEndDate==null){
+                printError("Не указано время генерации до");
+                return null;
+            }
+        }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
         String templateShortFileName = GoodRequestsNewReport.class.getSimpleName() + "_summary.jasper";
@@ -164,6 +174,16 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         if(CollectionUtils.isEmpty(idOfOrgList) && CollectionUtils.isEmpty(idOfContragentOrgList)){
             printError("Выберите список организаций или поставщиков");
             return;
+        }
+        if(hideGeneratePeriod){
+            if(generateBeginDate==null){
+                printError("Не указано время генерации от");
+                return;
+            }
+            if(generateEndDate==null){
+                printError("Не указано время генерации до");
+                return;
+            }
         }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
@@ -222,8 +242,14 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         String idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
         properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
         properties.setProperty(GoodRequestsNewReport.P_HIDE_GENERATE_PERIOD, Boolean.toString(hideGeneratePeriod));
-        properties.setProperty(GoodRequestsNewReport.P_GENERATE_BEGIN_DATE, Long.toString(generateBeginDate.getTime()));
-        properties.setProperty(GoodRequestsNewReport.P_GENERATE_END_DATE, Long.toString(generateEndDate.getTime()));
+        if(hideGeneratePeriod){
+            properties.setProperty(GoodRequestsNewReport.P_GENERATE_BEGIN_DATE, Long.toString(generateBeginDate.getTime()));
+            properties.setProperty(GoodRequestsNewReport.P_GENERATE_END_DATE, Long.toString(generateEndDate.getTime()));
+        } else {
+            // ставит текущее значение оно все равно не участвет в выборке и формировании отчета
+            properties.setProperty(GoodRequestsNewReport.P_GENERATE_BEGIN_DATE, Long.toString(System.currentTimeMillis()));
+            properties.setProperty(GoodRequestsNewReport.P_GENERATE_END_DATE, Long.toString(System.currentTimeMillis()));
+        }
         properties.setProperty(GoodRequestsNewReport.P_HIDE_MISSED_COLUMNS, Boolean.toString(hideMissedColumns));
         properties.setProperty(GoodRequestsNewReport.P_HIDE_DAILY_SAMPLE_COUNT, Boolean.toString(hideDailySamplesCount));
         properties.setProperty(GoodRequestsNewReport.P_HIDE_LAST_VALUE, Boolean.toString(hideLastValue));
