@@ -162,7 +162,7 @@
         <%-- не показывать пустую таблицу --%>
         <c:if test="${not empty mainPage.goodRequestsNewReportPage.htmlReport}" >
             <f:verbatim>
-                <div id='floatTheadJsTest'>${mainPage.goodRequestsNewReportPage.htmlReport}</div>
+                <div>${mainPage.goodRequestsNewReportPage.htmlReport}</div>
             </f:verbatim>
         </c:if>
     </h:panelGrid>
