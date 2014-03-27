@@ -77,7 +77,7 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
     private static final String HIGH_CLASSES_TYPE_NAME       = "Старшие";
     private static final String ORDER_TYPE_NAME              = "Заказ";
     private static final String ALL_TYPE_NAME                = "Все";
-    public static final String DISCOUNT_START = "Платное питание[";
+    public static final String DISCOUNT_START = "Платное питание";
     public static final String DISCOUNT_END = "%]";
     private static final Logger logger = LoggerFactory.getLogger(FeedPlanPage.class);
 
@@ -267,7 +267,9 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
                     String discount = ruleDescription.substring(
                             ruleDescription.indexOf(DISCOUNT_START) + DISCOUNT_START.length(),
                             ruleDescription.indexOf(DISCOUNT_END));
-                    discountRate = Integer.parseInt(discount);
+                    discount = discount.replaceAll("\\[", "");
+                    discount = discount.replaceAll("\\]", "");
+                    discountRate = Integer.parseInt(discount.trim());
                     //ruleDescription = "";
                 } else {
                     discountRate = 100;
