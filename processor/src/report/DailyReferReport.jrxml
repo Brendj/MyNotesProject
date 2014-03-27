@@ -10,7 +10,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.0000000000000018"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="40"/>
+	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -140,7 +140,7 @@
 						<staticText>
 							<reportElement uuid="0056d03f-40f9-4144-9889-3f90733794e9" style="Crosstab Data Text" x="0" y="0" width="200" height="97"/>
 							<textElement>
-								<font fontName="Arial"/>
+								<font fontName="SansSerif"/>
 							</textElement>
 							<text><![CDATA[]]></text>
 						</staticText>
@@ -158,7 +158,7 @@
 							<textField isBlankWhenNull="true">
 								<reportElement uuid="dbcf40db-46ed-4274-aea8-646aeb8a9e64" style="Crosstab Data Text" x="0" y="0" width="200" height="23"/>
 								<textElement textAlignment="Left" verticalAlignment="Middle">
-									<font fontName="Arial"/>
+									<font fontName="SansSerif"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{day}]]></textFieldExpression>
 							</textField>
@@ -172,7 +172,7 @@
 							<staticText>
 								<reportElement uuid="6a8b20bc-6a1f-443a-9f0a-b04c523146ac" x="0" y="0" width="200" height="23"/>
 								<textElement textAlignment="Right" verticalAlignment="Middle">
-									<font fontName="Arial" isBold="true"/>
+									<font fontName="SansSerif" isBold="true"/>
 								</textElement>
 								<text><![CDATA[ИТОГО]]></text>
 							</staticText>
@@ -191,7 +191,7 @@
 							<textField isBlankWhenNull="true">
 								<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="225" height="23"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None">
-									<font fontName="Arial" isBold="true"/>
+									<font fontName="SansSerif" isBold="true"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{group1}]]></textFieldExpression>
 							</textField>
@@ -204,7 +204,9 @@
 							</box>
 							<staticText>
 								<reportElement uuid="e8c98786-145a-42c8-ac66-4c9d8d9882a1" x="0" y="23" width="71" height="74"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="SansSerif"/>
+								</textElement>
 								<text><![CDATA[Стоимость за отчетный период (руб.)]]></text>
 							</staticText>
 						</cellContents>
@@ -219,28 +221,28 @@
 							<staticText>
 								<reportElement uuid="7f70a7d8-dc4c-4f1d-89f1-152c8a38bac0" style="Crosstab Data Text" x="0" y="23" width="75" height="51"/>
 								<textElement verticalAlignment="Middle">
-									<font fontName="Arial" size="10" isBold="true"/>
+									<font fontName="SansSerif" size="10" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Цена по ГК за единицу рацион питания]]></text>
 							</staticText>
 							<staticText>
 								<reportElement uuid="0e487a46-f5e8-4fbe-896f-ada0fb537d8e" style="Crosstab Data Text" x="75" y="23" width="75" height="51"/>
 								<textElement verticalAlignment="Middle">
-									<font fontName="Arial" size="10" isBold="true"/>
+									<font fontName="SansSerif" size="10" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Кол-во детей]]></text>
 							</staticText>
 							<staticText>
 								<reportElement uuid="cb80a078-ce29-4775-bf13-30fe3ea1548f" style="Crosstab Data Text" x="150" y="23" width="75" height="51"/>
 								<textElement verticalAlignment="Middle">
-									<font fontName="Arial" size="10" isBold="true"/>
+									<font fontName="SansSerif" size="10" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Сумма (руб.)]]></text>
 							</staticText>
 							<textField isBlankWhenNull="true">
 								<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="225" height="23"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None">
-									<font fontName="Arial" size="10" isBold="true"/>
+									<font fontName="SansSerif" size="10" isBold="true"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{group2}]]></textFieldExpression>
 							</textField>
@@ -267,21 +269,21 @@
 						<textField isBlankWhenNull="true">
 							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="75" y="0" width="75" height="23"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
-								<font fontName="Arial" size="10"/>
+								<font fontName="SansSerif" size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{childrenMeasure}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
 							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="75" height="23"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
-								<font fontName="Arial" size="10"/>
+								<font fontName="SansSerif" size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[String.format("%.2f", $V{priceMeasure})]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
 							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="150" y="0" width="75" height="23"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
-								<font fontName="Arial" size="10"/>
+								<font fontName="SansSerif" size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure})]]></textFieldExpression>
 						</textField>
@@ -295,20 +297,20 @@
 						<textField isBlankWhenNull="true">
 							<reportElement uuid="c8769447-1698-4813-b937-aaa4bf82c680" style="Crosstab Data Text" x="75" y="0" width="75" height="23"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
-								<font fontName="Arial" size="10"/>
+								<font fontName="SansSerif" size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{childrenMeasure}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
 							<reportElement uuid="c8769447-1698-4813-b937-aaa4bf82c680" style="Crosstab Data Text" x="0" y="0" width="75" height="23"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
-								<font fontName="Arial" size="10"/>
+								<font fontName="SansSerif" size="10"/>
 							</textElement>
 						</textField>
 						<textField isBlankWhenNull="true">
 							<reportElement uuid="c8769447-1698-4813-b937-aaa4bf82c680" style="Crosstab Data Text" x="150" y="0" width="75" height="23"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
-								<font fontName="Arial" size="10"/>
+								<font fontName="SansSerif" size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure})]]></textFieldExpression>
 						</textField>
@@ -322,7 +324,7 @@
 						<textField isBlankWhenNull="true">
 							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="0" y="0" width="71" height="23"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
-								<font fontName="Arial"/>
+								<font fontName="SansSerif"/>
 							</textElement>
 							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure})]]></textFieldExpression>
 						</textField>
@@ -336,7 +338,7 @@
 						<textField isBlankWhenNull="true">
 							<reportElement uuid="c8769447-1698-4813-b937-aaa4bf82c680" style="Crosstab Data Text" x="0" y="0" width="71" height="23"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
-								<font fontName="Arial"/>
+								<font fontName="SansSerif"/>
 							</textElement>
 							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure})]]></textFieldExpression>
 						</textField>
