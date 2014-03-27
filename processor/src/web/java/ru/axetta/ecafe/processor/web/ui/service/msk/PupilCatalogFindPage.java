@@ -357,21 +357,21 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
         /*
                                                              ДЛЯ ТЕСТА!!!
         pupilInfos = new ArrayList<Item>();
-        ImportRegisterClientsService.PupilInfo test = new ImportRegisterClientsService.PupilInfo();
+        ImportRegisterClientsService.PupilInfo test = new ImportRegisterClientsService.ExpandedPupilInfo();
         test.familyName = "Кожина";
         test.firstName = "Ольга";
         test.secondName = "Александровна";
         test.group = "11А";
         test.guid = "111";
         pupilInfos.add(new Item(test));
-        test = new ImportRegisterClientsService.PupilInfo();
+        test = new ImportRegisterClientsService.ExpandedPupilInfo();
         test.familyName = "Копейкин";
         test.firstName = "Александр";
         test.secondName = "Юрьевич";
         test.group = "2Б";
         test.guid = "222";
         pupilInfos.add(new Item(test));
-        test = new ImportRegisterClientsService.PupilInfo();
+        test = new ImportRegisterClientsService.ExpandedPupilInfo();
         test.familyName = "Тест";
         test.firstName = "Тест";
         test.secondName = "Тест";

@@ -171,7 +171,7 @@ public class ReferReportPage extends OnlineReportPage {
                     break;
             }
         } catch (Exception e) {
-            logger.error("Failed to load clients data", e);
+            logAndPrintMessage(String.format("Не удалось построить отчет: %s", e.getMessage()),e);
         } finally {
             //HibernateUtils.close(session, logger);
         }
@@ -196,7 +196,7 @@ public class ReferReportPage extends OnlineReportPage {
                     break;
             }
         } catch (Exception e) {
-            logger.error("Failed to load clients data", e);
+            logAndPrintMessage(String.format("Не удалось построить отчет: %s", e.getMessage()),e);
         } finally {
             //HibernateUtils.close(session, logger);
         }
@@ -208,7 +208,7 @@ public class ReferReportPage extends OnlineReportPage {
         return templateFilename;
     }
 
-    public void generateMonthlyReport(Session session, BasicReportJob.OrgShortItem orgItem, Calendar cal, String templateName) {
+    public void generateMonthlyReport(Session session, BasicReportJob.OrgShortItem orgItem, Calendar cal, String templateName) throws Exception {
         ReferReport.Builder reportBuilder = null;
         if(templateName != null) {
             reportBuilder = new ReferReport.Builder(templateName);
@@ -219,11 +219,12 @@ public class ReferReportPage extends OnlineReportPage {
         try {
             monthlyReport = reportBuilder.build(session, start, end, cal);
         } catch (Exception e) {
-            logger.error("Failed to generate monthly report", e);
+            throw e;
+            //logAndPrintMessage(String.format("Не удалось построить отчет: %s", e.getMessage()),e);
         }
     }
 
-    public void generateDailyReport(Session session, BasicReportJob.OrgShortItem orgItem, Calendar cal, String templateName) {
+    public void generateDailyReport(Session session, BasicReportJob.OrgShortItem orgItem, Calendar cal, String templateName) throws Exception {
         DailyReferReport.Builder reportBuilder = null;
         if(templateName != null) {
             reportBuilder = new DailyReferReport.Builder(templateName);
@@ -237,7 +238,8 @@ public class ReferReportPage extends OnlineReportPage {
         try {
             dailyReport = reportBuilder.build(session, start, end, cal);
         } catch (Exception e) {
-            logger.error("Failed to generate daily report", e);
+            throw e;
+            //logAndPrintMessage(String.format("Не удалось построить отчет: %s", e.getMessage()),e);
         }
     }
 
