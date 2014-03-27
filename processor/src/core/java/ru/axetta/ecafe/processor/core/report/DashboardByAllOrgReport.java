@@ -10,8 +10,6 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
-import ru.axetta.ecafe.processor.core.daoservices.order.items.ClientReportItem;
 import ru.axetta.ecafe.processor.dashboard.DashboardServiceBean;
 import ru.axetta.ecafe.processor.dashboard.data.DashboardResponse;
 
@@ -31,6 +29,9 @@ import java.util.*;
  */
 
 public class DashboardByAllOrgReport extends BasicReportForAllOrgJob {
+
+    final public static String P_ORG_STATE = "orgState";
+    final private static Logger logger = LoggerFactory.getLogger(DashboardByAllOrgReport.class);
 
     public class AutoReportBuildJob extends BasicReportForAllOrgJob.AutoReportBuildJob {
     }
@@ -68,20 +69,14 @@ public class DashboardByAllOrgReport extends BasicReportForAllOrgJob {
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime,
                 Calendar calendar, Map<String, Object> parameterMap) throws Exception {
 
-            DashboardServiceBean dashboardService = RuntimeContext.getAppContext().getBean(DashboardServiceBean.class);
-            DashboardResponse response = new DashboardResponse();
-            DashboardResponse.OrgBasicStats orgBasicStats = dashboardService.getOrgBasicStats(endTime, null, 2);
+            int orgFilter = Integer.parseInt(reportProperties.getProperty(P_ORG_STATE, "1"));
 
-            //OrderDetailsDAOService service = new OrderDetailsDAOService();
-            //service.setSession(session);
-            //List<ClientReportItem> clientReportItems = service.fetchClientReportItem(startTime, endTime, null);
-            //return new JRBeanCollectionDataSource(clientReportItems);
+            DashboardServiceBean dashboardService = RuntimeContext.getAppContext().getBean(DashboardServiceBean.class);
+            DashboardResponse.OrgBasicStats orgBasicStats = dashboardService.getOrgBasicStats(endTime, null, orgFilter);
             return new JRBeanCollectionDataSource(orgBasicStats.getOrgBasicStatItems());
         }
 
     }
-
-    private final static Logger logger = LoggerFactory.getLogger(DashboardByAllOrgReport.class);
 
     public DashboardByAllOrgReport() {}
 

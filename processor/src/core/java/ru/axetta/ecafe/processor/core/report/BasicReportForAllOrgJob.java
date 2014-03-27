@@ -120,6 +120,7 @@ public abstract class BasicReportForAllOrgJob extends BasicReportJob {
                 session = sessionFactory.openSession();
                 transaction = BasicReport.createTransaction(session);
                 transaction.begin();
+                builder.setReportProperties(getReportProperties());
                 BasicReportJob report = builder.build(session, startTime, endTime, calendar);
                 setGenerateTime(report.getGenerateTime());
                 setGenerateDuration(report.getGenerateDuration());

@@ -29,6 +29,11 @@ public abstract class BasicReportJob extends BasicJasperReport {
             REPORT_PERIOD_PREV_PREV_DAY=3, REPORT_PERIOD_PREV_PREV_PREV_DAY=4,
             REPORT_PERIOD_LAST_WEEK =5;
     private String BASE_DOCUMENT_FILENAME;
+    public Date startTime;
+    public Date endTime;
+    public Calendar calendar;
+    public String templateFilename;
+    public SessionFactory sessionFactory;
 
     {
         String fullName = this.getClass().getCanonicalName();
@@ -56,7 +61,7 @@ public abstract class BasicReportJob extends BasicJasperReport {
         protected Contragent contragent;
         protected OrgShortItem org;
         
-        Properties reportProperties;
+        Properties reportProperties = new Properties();
 
         public Properties getReportProperties() {
             return reportProperties;
@@ -349,12 +354,6 @@ public abstract class BasicReportJob extends BasicJasperReport {
                         (DateFormat) dateFormat.clone(), (DateFormat) timeFormat.clone()));
         return documentBuilders;
     }
-
-    public Date startTime;
-    public Date endTime;
-    public Calendar calendar;
-    public String templateFilename;
-    public SessionFactory sessionFactory;
 
     public BasicReportJob(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
             Date endTime) {

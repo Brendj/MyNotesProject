@@ -79,12 +79,12 @@ public class ReportRuleConstants {
             return value;
         }
 
-        public ParamHint setDefaultRule (String defaultRule) {
+        public ParamHint setDefaultRule(String defaultRule) {
             this.defaultRule = defaultRule;
             return this;
         }
 
-        public String getDefaultRule () {
+        public String getDefaultRule() {
             return defaultRule;
         }
 
@@ -125,8 +125,7 @@ public class ReportRuleConstants {
             new ParamHint("idOfOrg", "Организации").setDefaultRule("= org: "),
             new ParamHint("shortName", "Краткое название организации"),
             new ParamHint("officialName", "Официальное название организации"),
-            new ParamHint("groupName", "Название класса"),
-            new ParamHint("idOfClient", "Идентификатор клиента"),
+            new ParamHint("groupName", "Название класса"), new ParamHint("idOfClient", "Идентификатор клиента"),
             new ParamHint("email", "Адрес электронной почты клиента"),
             new ParamHint("contractPerson.surname", "Фамилия физического лица, заключившего контракт"),      //10
             new ParamHint("contractPerson.firstName", "Имя физического лица, заключившего контракт"),
@@ -138,24 +137,34 @@ public class ReportRuleConstants {
             new ParamHint("person.abbreviation", "Фамилия И.О. обслуживаемого физического лица"),
             new ParamHint("phone", "Телефонный номер клиента"),
             new ParamHint("mobile", "Номер мобильного телефона клиента"), new ParamHint("address", "Адрес клиента"),
-            new ParamHint(BasicReportForContragentJob.PARAM_CONTRAGENT_ID, "Идентификатор контрагента").setDefaultRule("= contragent: "),    //20
-            new ParamHint("contragentName", "Название контрагента"),
-            new ParamHint("category", "Категория организации"),
+            new ParamHint(BasicReportForContragentJob.PARAM_CONTRAGENT_ID, "Идентификатор контрагента")
+                    .setDefaultRule("= contragent: "),    //20
+            new ParamHint("contragentName", "Название контрагента"), new ParamHint("category", "Категория организации"),
             new ParamHint("idOfMenuSourceOrg", "Организация - источник меню"),
-            new ParamHint("enterEventType", "Тип отчета по посещаемости: ").setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{все}Все,{учащиеся}Учащиеся,{все_без_учащихся}Все без учащихся"),
-            new ParamHint("groupByMenuGroup", "Группировка отчета").setDefaultRule("= "+RuleProcessor.COMBOBOX_EXPRESSION+"{false}По типам производства,{true}По товарным группам"),
+            new ParamHint("enterEventType", "Тип отчета по посещаемости: ").setDefaultRule(
+                    "= " + RuleProcessor.RADIO_EXPRESSION
+                            + "{все}Все,{учащиеся}Учащиеся,{все_без_учащихся}Все без учащихся"),
+            new ParamHint("groupByMenuGroup", "Группировка отчета").setDefaultRule(
+                    "= " + RuleProcessor.COMBOBOX_EXPRESSION
+                            + "{false}По типам производства,{true}По товарным группам"),
             new ParamHint(DailySalesByGroupsReport.PARAM_MENU_GROUPS, "Группы меню"), //26
             new ParamHint(DailySalesByGroupsReport.PARAM_INCLUDE_COMPLEX, "Включать комплексы"),
-            new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD, "Количество дней в выборке").setHideOnSetup(true),     //  Период отображать не надо, он устанавливается автоматически
+            new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD, "Количество дней в выборке").setHideOnSetup(true),
+            //  Период отображать не надо, он устанавливается автоматически
             new ParamHint(ReportPropertiesUtils.P_JOB_NAME, "Название задачи"),
-            new ParamHint(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID, "Контрагент-получатель").setDefaultRule("= contragent-receiver:"), //30,
-            new ParamHint(BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID, "Агент по приему платежей").setDefaultRule("= contragent-payagent:"),
-            new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE, "Период").setHideOnSetup(true).setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION +
-                    "{"+BasicReportJob.REPORT_PERIOD_PREV_MONTH+"}месяц,"+
-                    "{"+BasicReportJob.REPORT_PERIOD_LAST_WEEK+"}неделя,"+
-                    "{"+BasicReportJob.REPORT_PERIOD_PREV_PREV_PREV_DAY+"}-3 дня,"+
-                    "{"+BasicReportJob.REPORT_PERIOD_PREV_PREV_DAY+"}-2 дня,{"+BasicReportJob.REPORT_PERIOD_PREV_DAY+"}-1 день,{"+BasicReportJob.REPORT_PERIOD_TODAY+"}сегодня"),
-            new ParamHint("referCategory", "Категория").setDefaultRule("= "+RuleProcessor.COMBOBOX_EXPRESSION+
+            new ParamHint(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID, "Контрагент-получатель")
+                    .setDefaultRule("= contragent-receiver:"), //30,
+            new ParamHint(BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID, "Агент по приему платежей")
+                    .setDefaultRule("= contragent-payagent:"),
+            new ParamHint(ReportPropertiesUtils.P_REPORT_PERIOD_TYPE, "Период").setHideOnSetup(true)
+                    .setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION +
+                            "{" + BasicReportJob.REPORT_PERIOD_PREV_MONTH + "}месяц," +
+                            "{" + BasicReportJob.REPORT_PERIOD_LAST_WEEK + "}неделя," +
+                            "{" + BasicReportJob.REPORT_PERIOD_PREV_PREV_PREV_DAY + "}-3 дня," +
+                            "{" + BasicReportJob.REPORT_PERIOD_PREV_PREV_DAY + "}-2 дня,{"
+                            + BasicReportJob.REPORT_PERIOD_PREV_DAY + "}-1 день,{" + BasicReportJob.REPORT_PERIOD_TODAY
+                            + "}сегодня"),
+            new ParamHint("referCategory", "Категория").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION +
                     "{Шк Здоровья 1-4 кл.(завтрак+обед)}Шк Здоровья 1-4 кл.(завтрак+обед),"
                     + "{Шк Здоровья 5-11 кл.(завтрак+обед)}Шк Здоровья 5-11 кл.(завтрак+обед),"
                     + "{Многодетные 1-4 кл.(завтрак+обед)}Многодетные 1-4 кл.(завтрак+обед),"
@@ -163,10 +172,19 @@ public class ReportRuleConstants {
                     + "{Соц./незащищ. 5-11 кл.(завтрак+обед)}Соц./незащищ. 5-11 кл.(завтрак+обед),"
                     + "{Соц./незащищ. 1-4 кл.(завтрак+обед)}Соц./незащищ. 1-4 кл.(завтрак+обед)"),
             new ParamHint("goodName", "Наименование товара").setDefaultRule("= " + RuleProcessor.INPUT_EXPRESSION),
-            new ParamHint("hideMissedColumns", "Скрывать даты с пустыми значениями").setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}Не скрывать,{true}Скрывать"), //35
-            new ParamHint("goodsFilter", "Фильтры по заявкам").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION + "{3}Отображать организации с отсутствием заявок за последние 2 дня,{2}Только пустые,{0}Все,{1}Только с данными"),
-            new ParamHint("dailySample", "Суточная проба").setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}Не выводить,{true}Выводить"), //30
-            // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
+            new ParamHint("hideMissedColumns", "Скрывать даты с пустыми значениями")
+                    .setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}Не скрывать,{true}Скрывать"), //35
+            new ParamHint("goodsFilter", "Фильтры по заявкам").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION
+                    + "{3}Отображать организации с отсутствием заявок за последние 2 дня,{2}Только пустые,{0}Все,{1}Только с данными"),
+            new ParamHint("dailySample", "Суточная проба")
+                    .setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{false}Не выводить,{true}Выводить"), //37
+            new ParamHint(RegisterStampReport.PARAM_WITH_OUT_ACT_DISCREPANCIES, "Показывать без расхождений")
+                    .setDefaultRule("= " + RuleProcessor.CHECKBOX_EXPRESSION + " {true}"), //38
+            new ParamHint(DashboardByAllOrgReport.P_ORG_STATE, "Статус").setDefaultRule(
+                    String.format("= %s{0}Не обслуживается,{1}Обслуживается,{2}Все,",
+                            RuleProcessor.COMBOBOX_EXPRESSION)),//39
+    };
+    // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
             /*new ParamHint("idOfContract", "Контракт"),
             new ParamHint("listValue", "Какое-то значение из списка").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION + "{111}один,{222}два,{333}три"),
             new ParamHint("checkValue", "Какое-то значение по чекбоксу").setDefaultRule("= " + RuleProcessor.CHECKBOX_EXPRESSION + "{555}пять,{666}шесть,{777}семь"),
@@ -174,9 +192,6 @@ public class ReportRuleConstants {
             new ParamHint("methodValues", "Какие-то значения из метода").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION + RuleProcessor.METHOD_EXPRESSION + "ru.axetta.ecafe.processor.core.RuleProcessor.testMethodCalling"),
             new ParamHint("radioValues", "Какие-то значения из радио").setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{100}сто,{200}двести,{300}триста"),
             new ParamHint("input", "Какие-то произольное значение").setDefaultRule("= " + RuleProcessor.INPUT_EXPRESSION + RuleProcessor.METHOD_EXPRESSION + "ru.axetta.ecafe.processor.core.RuleProcessor.inputValueMethodCalling"),*/
-            new ParamHint(RegisterStampReport.PARAM_WITH_OUT_ACT_DISCREPANCIES, "Показывать без расхождений")
-                    .setDefaultRule("= "+RuleProcessor.CHECKBOX_EXPRESSION+" {true}"), //34
-    };
 
     public static final ReportHint[] REPORT_HINTS = {
             new ReportHint(ReportOnNutritionByWeekReport.class.getCanonicalName(), new int[]{3, 4, 5}),
@@ -196,7 +211,7 @@ public class ReportRuleConstants {
             new ReportHint(DailySalesByGroupsReport.class.getCanonicalName(), new int[]{3, 23, 29, 25, 26, 27, 32}),
             new ReportHint(SubscriptionFeedingJasperReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(ClientOrderDetailsByOneOrgReport.class.getCanonicalName(), new int[]{3, 4, 5}),
-            new ReportHint(RegisterStampReport.class.getCanonicalName(), new int[]{3, 4, 5, 34}),
+            new ReportHint(RegisterStampReport.class.getCanonicalName(), new int[]{3, 4, 5, 38}),
             new ReportHint(ComplaintCountByGoodReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(ComplaintCausesReport.class.getCanonicalName(), new int[]{3, 4, 5}),
             new ReportHint(ComplaintIterationsReport.class.getCanonicalName(), new int[]{3, 4, 5}),
@@ -206,13 +221,14 @@ public class ReportRuleConstants {
             new ReportHint(ClientMigrationHistoryReport.class.getCanonicalName(), new int[]{3}),
             new ReportHint(MenuDetailsGroupByMenuOriginReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(ClientOrderDetailsByAllOrgReport.class.getCanonicalName(), new int[]{}),
-            new ReportHint(DashboardByAllOrgReport.class.getCanonicalName(), new int[]{}),
+            new ReportHint(DashboardByAllOrgReport.class.getCanonicalName(), new int[]{39}),
             new ReportHint(OrderDetailsGroupByMenuOriginReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(ContragentPaymentReport.class.getCanonicalName(), new int[]{-31, 21, 30, 32}),
             new ReportHint(ContragentCompletionReport.class.getCanonicalName(), new int[]{20, 21}),
             new ReportHint(HalfYearSummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(BeneficiarySummaryReport.class.getCanonicalName(), new int[]{}),
-            new ReportHint(DeliveredServicesReport.class.getCanonicalName(), new int[]{3, -20/*, 31, 32, 33, 34, 35, 36, 37*/}),
+            new ReportHint(DeliveredServicesReport.class.getCanonicalName(),
+                    new int[]{3, -20/*, 31, 32, 33, 34, 35, 36, 37*/}),
             new ReportHint(CWOACReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(SSTSReport.class.getCanonicalName(), new int[]{30}),
             new ReportHint(BudgetMealsShippingReport.class.getCanonicalName(), new int[]{3}),
@@ -246,27 +262,28 @@ public class ReportRuleConstants {
     }
 
     public static class ParamHintWrapper {
+
         private ParamHint hint;
         private boolean required;
 
-        public ParamHintWrapper (ParamHint hint) {
+        public ParamHintWrapper(ParamHint hint) {
             this.hint = hint;
         }
 
-        public ParamHint getParamHint () {
+        public ParamHint getParamHint() {
             return hint;
         }
 
-        public boolean isRequired () {
+        public boolean isRequired() {
             return required;
         }
 
-        public ParamHintWrapper setRequired (boolean required) {
+        public ParamHintWrapper setRequired(boolean required) {
             this.required = required;
             return this;
         }
     }
-    
+
     public static class ReportParamHint {
 
         private final String typeName;
@@ -279,7 +296,7 @@ public class ReportRuleConstants {
                 //  Изменяем i, делаем его положительным всегда, но если изначально было отрицательным, то указываем, что
                 //  поле является обязательным
                 int i2 = i;
-                ParamHintWrapper newParam = new ParamHintWrapper (ReportRuleConstants.PARAM_HINTS[Math.abs(i)]);
+                ParamHintWrapper newParam = new ParamHintWrapper(ReportRuleConstants.PARAM_HINTS[Math.abs(i)]);
                 this.paramHints.add(newParam.setRequired(i2 < 0));
             }
         }
@@ -292,11 +309,14 @@ public class ReportRuleConstants {
             return paramHints;
         }
     }
-    
+
     public static List<ParamHintWrapper> getParamHintsForReportType(String reportType) {
         ReportHint hint = findReportHint(reportType);
-        if (hint==null) return Collections.emptyList();
-        else return new ReportParamHint(hint).getParamHints();
+        if (hint == null) {
+            return Collections.emptyList();
+        } else {
+            return new ReportParamHint(hint).getParamHints();
+        }
     }
 
 }

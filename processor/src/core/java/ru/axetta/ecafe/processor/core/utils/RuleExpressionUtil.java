@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.utils;
 import ru.axetta.ecafe.processor.core.report.BasicReportForContragentJob;
 import ru.axetta.ecafe.processor.core.report.ContragentPaymentReport;
 import ru.axetta.ecafe.processor.core.report.DailySalesByGroupsReport;
+import ru.axetta.ecafe.processor.core.report.DashboardByAllOrgReport;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,7 +40,7 @@ public class RuleExpressionUtil {
         BasicReportForContragentJob.PARAM_CONTRAGENT_ID, //"idOfContragent",
         "contragentName",
         "category",
-        "idOfMenuSourceOrg",
+        ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG,
         "orgTag",
         null, // далее идут параметры для передачи значений
         "enterEventType", // используется в AutoEnterEventByDaysReport и AutoEnterEventReport
@@ -49,14 +50,18 @@ public class RuleExpressionUtil {
         ReportPropertiesUtils.P_REPORT_PERIOD,
         ReportPropertiesUtils.P_REPORT_PERIOD_TYPE,
         BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID,
-        BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID
+        BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID,
+        DashboardByAllOrgReport.P_ORG_STATE
     };
 
     public static boolean isPostArgument(String argName) {
         boolean isPostArg=false;
-        for (int i = 0; i < ARGUMENT_NAMES.length; i++) {
-            if (ARGUMENT_NAMES[i]==null) { isPostArg=true; continue; }
-            if (ARGUMENT_NAMES[i].equals(argName)) {
+        for (String ARGUMENT_NAME : ARGUMENT_NAMES) {
+            if (ARGUMENT_NAME == null) {
+                isPostArg = true;
+                continue;
+            }
+            if (ARGUMENT_NAME.equals(argName)) {
                 return isPostArg;
             }
         }

@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.BasicReportForContragentJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
+import ru.axetta.ecafe.processor.core.report.DashboardByAllOrgReport;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -49,6 +50,7 @@ public class ReportPropertiesUtils {
         properties.setProperty(P_JOB_NAME, autoReportBuildTask==null?"null":autoReportBuildTask.jobName);
         properties.setProperty(P_DATES_SPECIFIED_BY_USER, autoReportBuildTask==null?"false":(autoReportBuildTask.datesSpecifiedByUser?"true":"false"));
         properties.setProperty(P_REPORT_PERIOD_TYPE, "");
+        properties.setProperty(DashboardByAllOrgReport.P_ORG_STATE,"1");
     }
 
     public static void addProperties(Session session, Properties properties, Org org, String prefix) throws Exception {
@@ -61,7 +63,7 @@ public class ReportPropertiesUtils {
         //idOfMenuSourceOrg
         Long idOfMenuSourceOrg = DAOUtils.findMenuExchangeSourceOrg(session, org.getIdOfOrg());
         if (idOfMenuSourceOrg != null)
-            properties.setProperty(realPrefix.concat("idOfMenuSourceOrg"), idOfMenuSourceOrg.toString());
+            properties.setProperty(realPrefix.concat(P_ID_OF_MENU_SOURCE_ORG), Long.toString(idOfMenuSourceOrg));
         //category
         StringBuilder categories = new StringBuilder();
         for (CategoryOrg categoryOrg : org.getCategories()) {

@@ -126,9 +126,9 @@ public class ReportJobConstants {
             new ParamHint("hideMissedColumns", "Скрывать даты с пустыми значениями").setDefaultRule("= " + RuleProcessor.CHECKBOX_EXPRESSION + "{false}Не скрывать,{true}Скрывать"),
             new ParamHint("goodsFilter", "Фильтры по заявкам").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION + "{3}Отображать организации с отсутствием заявок за последние 2 дня,{2}Только пустые,{0}Все,{1}Только с данными"),
             new ParamHint("showDailySample", "Суточная проба").setDefaultRule("= " + RuleProcessor.CHECKBOX_EXPRESSION + "{false}Не выводить,{true}Выводить"), //30
-
-
-            // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
+            new ParamHint(DashboardByAllOrgReport.P_ORG_STATE, "Статус")//31
+    };
+    // !!!!!!!! ДЛЯ ТЕСТА !!!!!!!!!!
             /*new ParamHint("idOfContract", "Контракт"),
             new ParamHint("listValue", "Какое-то значение из списка").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION + "{111}один,{222}два,{333}три"),
             new ParamHint("checkValue", "Какое-то значение по чекбоксу").setDefaultRule("= " + RuleProcessor.CHECKBOX_EXPRESSION + "{555}пять,{666}шесть,{777}семь"),
@@ -136,7 +136,6 @@ public class ReportJobConstants {
             new ParamHint("methodValues", "Какие-то значения из метода").setDefaultRule("= " + RuleProcessor.COMBOBOX_EXPRESSION + RuleProcessor.METHOD_EXPRESSION + "ru.axetta.ecafe.processor.core.RuleProcessor.testMethodCalling"),
             new ParamHint("radioValues", "Какие-то значения из радио").setDefaultRule("= " + RuleProcessor.RADIO_EXPRESSION + "{100}сто,{200}двести,{300}триста"),
             new ParamHint("input", "Какие-то произольное значение").setDefaultRule("= " + RuleProcessor.INPUT_EXPRESSION + RuleProcessor.METHOD_EXPRESSION + "ru.axetta.ecafe.processor.core.RuleProcessor.inputValueMethodCalling"),*/
-    };
 
     public static final ReportHint[] REPORT_HINTS = {
             new ReportHint(ReportOnNutritionByWeekReport.class.getCanonicalName(), new int[]{3, 4, 5}),
@@ -172,7 +171,8 @@ public class ReportJobConstants {
             new ReportHint(HalfYearSummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(BeneficiarySummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(DeliveredServicesReport.class.getCanonicalName(), new int[]{20/*, 26, 27, 28, 29, 30, 31, 32*/}),
-            new ReportHint(GoodRequestsReport.class.getCanonicalName(), new int[]{20, 3, 27, 28, 29, 30/*, 26, 27, 28, 29, 30, 31, 32*/})
+            new ReportHint(GoodRequestsReport.class.getCanonicalName(), new int[]{20, 3, 27, 28, 29, 30/*, 26, 27, 28, 29, 30, 31, 32*/}),
+            new ReportHint(DashboardByAllOrgReport.class.getCanonicalName(), new int[]{31})
     };
 
     private ReportJobConstants() {

@@ -154,14 +154,12 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
     private static interface BasicBoolExpression {
         public String getComparatorArgument();
         public String getComparatorValue();
-        
-        
+
         boolean applicatable(Properties properties);
 
         boolean evaluate(Properties properties);
 
     }
-
 
     private static class MethodExpression implements BasicBoolExpression {
         private final String comparatorArgument;
@@ -210,7 +208,6 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         public boolean evaluate(Properties properties) {
             return true;
         }
-
     }
 
     private static class EqualExpression implements BasicBoolExpression {
@@ -619,7 +616,6 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                         ((BasicReportJob)basicReport).setEndTime(originalReportEndTime);
                         originalReportStartTime = originalReportEndTime = null;
                     }
-                    
                 }
             }
         }
