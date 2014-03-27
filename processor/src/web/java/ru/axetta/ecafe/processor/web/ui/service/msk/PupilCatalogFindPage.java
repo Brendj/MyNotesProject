@@ -445,7 +445,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
 
             response.setHeader("Content-disposition", "attachment; filename=Synch.csv");
             response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
-            response.setCharacterEncoding("UTF-8");
+            response.setCharacterEncoding("windows-1251");
             response.setContentType("text/csv");
             final ServletOutputStream responseOutputStream = response.getOutputStream();
             try {
