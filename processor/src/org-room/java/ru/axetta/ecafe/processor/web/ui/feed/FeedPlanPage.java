@@ -206,14 +206,11 @@ public class FeedPlanPage extends BasicWorkspacePage implements /*ClientFeedActi
         List<Complex> allComplexes = new ArrayList<Complex>();
         List<Complex> superComlexGroups = new ArrayList<Complex>();
         Org org = RuntimeContext.getAppContext().getBean(LoginBean.class).getOrg(session);  //  Получаем Org от авторизованного клиента
-        String feedTypeRestrict = "";
+        String feedTypeRestrict = " and position('" + DISCOUNT_START + "' in cf_discountrules.description)";
         if(displayDiscountClients) {
-            feedTypeRestrict = " and position('" + DISCOUNT_START + "' in cf_discountrules.description)";
-            if(displayDiscountClients) {
-                feedTypeRestrict += "=0 ";
-            } else {
-                feedTypeRestrict += ">0 ";
-            }
+            feedTypeRestrict += "=0 ";
+        } else {
+            feedTypeRestrict += ">0 ";
         }
 
 
