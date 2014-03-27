@@ -27,7 +27,7 @@
                     <a4j:support event="onchange" reRender="menuDaysForDeletion,srcOrgMenuDaysForDeletion" />
                 </h:selectBooleanCheckbox>
             </h:panelGroup>
-            <h:panelGrid style="margin-left: 20px;" columns="2">
+            <h:panelGrid styleClass="mleft20px" columns="2">
                 <h:outputText escape="true" value="Хранить дней от текущей даты " styleClass="output-text" />
                 <h:inputText value="#{optionPage.menuDaysForDeletion}" id="menuDaysForDeletion" styleClass="input-text"
                              size="3" disabled="#{not optionPage.cleanMenu}" />
@@ -89,13 +89,14 @@
                       reRender="hideMissedColumnsNotificationGoodRequestChange,maxNumDaysNotificationGoodRequestChange"
                       ajaxSingle="true" />
                          </h:selectBooleanCheckbox>
-            <h:outputText style="margin-left: 20px;" escape="true" value="Скрывать даты с пустыми значениями"
-                          styleClass="output-text" />
+            <h:outputText escape="true" value="Скрывать даты с пустыми значениями"
+                          styleClass="output-text mleft20px" />
             <h:selectBooleanCheckbox id="hideMissedColumnsNotificationGoodRequestChange"
                                                   value="#{optionPage.hideMissedColumnsNotificationGoodRequestChange}"
-                                                  disabled="#{!optionPage.enableNotificationGoodRequestChange}" styleClass="output-text" />
-            <h:outputText style="margin-left: 20px;" escape="true" value="Количество дней выборки (от 7 до 31)"
-                                       styleClass="output-text" />
+                                                  disabled="#{!optionPage.enableNotificationGoodRequestChange}"
+                                                  styleClass="output-text" />
+            <h:outputText escape="true" value="Количество дней выборки (от 7 до 31)"
+                          styleClass="output-text mleft20px" />
             <rich:inputNumberSpinner id="maxNumDaysNotificationGoodRequestChange"
                                                   value="#{optionPage.maxNumDaysNotificationGoodRequestChange}"
                                                   disabled="#{!optionPage.enableNotificationGoodRequestChange}"

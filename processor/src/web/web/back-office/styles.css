@@ -1,6 +1,10 @@
 .login-panel {
 }
 
+.mleft20px{
+    margin-left: 20px;
+}
+
 .login-panel-header {
     text-align: center;
     font-family: Segoe UI, Tahoma, Arial, Sans-Serif;

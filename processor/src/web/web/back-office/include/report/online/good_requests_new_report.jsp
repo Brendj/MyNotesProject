@@ -116,7 +116,7 @@
                 <a4j:support event="onclick" reRender="goodRequestsNewReportFilterPanelGrid" ajaxSingle="true" />
             </h:selectBooleanCheckbox>
 
-            <h:outputText style="margin-left: 20px;" escape="true" value="Время генерации от" styleClass="output-text"
+            <h:outputText escape="true" value="Время генерации от" styleClass="output-text mleft20px"
                           rendered="#{mainPage.goodRequestsNewReportPage.hideGeneratePeriod}"/>
             <rich:calendar value="#{mainPage.goodRequestsNewReportPage.generateBeginDate}"
                            datePattern="dd.MM.yyyy HH:mm" converter="timeMinuteConverter" inputClass="input-text"
@@ -124,14 +124,14 @@
                 <a4j:support event="onchanged" reRender="generateEndDateCal"
                              actionListener="#{mainPage.goodRequestsNewReportPage.onGeneratePeriodChanged}" />
             </rich:calendar>
-            <h:outputText style="margin-left: 20px;" escape="true" value="Время генерации до" styleClass="output-text"
+            <h:outputText escape="true" value="Время генерации до" styleClass="output-text mleft20px"
                           rendered="#{mainPage.goodRequestsNewReportPage.hideGeneratePeriod}"/>
             <rich:calendar id="generateEndDateCal" value="#{mainPage.goodRequestsNewReportPage.generateEndDate}"
                            datePattern="dd.MM.yyyy HH:mm" converter="timeMinuteConverter" inputClass="input-text"
                            showWeeksBar="false" rendered="#{mainPage.goodRequestsNewReportPage.hideGeneratePeriod}"/>
-            <h:outputText style="margin-left: 20px;" escape="true"
+            <h:outputText escape="true" styleClass="output-text mleft20px"
                           rendered="#{mainPage.goodRequestsNewReportPage.hideGeneratePeriod}"
-                          value="Скрыть предыдущее значение в скобках при изменении" styleClass="output-text" />
+                          value="Скрыть предыдущее значение в скобках при изменении"  />
             <h:selectBooleanCheckbox value="#{mainPage.goodRequestsNewReportPage.hideLastValue}"
                                      styleClass="output-text"
                                      rendered="#{mainPage.goodRequestsNewReportPage.hideGeneratePeriod}"/>

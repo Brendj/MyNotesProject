@@ -23,7 +23,6 @@
                                      styleClass="input-text" />
                         <a4j:commandLink styleClass="command-link">
                             <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
-                            <%--<f:setPropertyActionListener value="" target="#{mainPage.orgSelectPage.filter}" />--%>
                             <a4j:support event="onclick" action="#{mainPage.orgSelectPage.cancelFilter}" reRender="modalOrgSelectorForm"/>
                         </a4j:commandLink>
                     </h:panelGrid>
