@@ -97,6 +97,12 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
         }
 
         public DailyReferReport doBuild(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
+            if(org == null) {
+                throw new IllegalArgumentException("Не указана организация");
+            }
+            if(startTime == null || endTime == null) {
+                throw new IllegalArgumentException("Не задан период");
+            }
             totalSumm = 0D;
             Date generateTime = new Date();
 

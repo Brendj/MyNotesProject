@@ -141,7 +141,11 @@ public class ReferReportPage extends OnlineReportPage {
         monthlyReport = null;
         dailyReport = null;
 
-        endDate = updateEndDate(endDate);
+        end = updateEndDate(end);
+        if(endDate.before(start)) {
+            endDate = updateEndDate(start);
+        }
+
 
         Calendar cal = new GregorianCalendar();
         cal.setTimeInMillis(System.currentTimeMillis());

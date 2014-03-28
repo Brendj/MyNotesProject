@@ -98,14 +98,14 @@ public class ReferReport extends BasicReportForAllOrgJob {
         }
 
         public ReferReport doBuild(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
-            Date generateTime = new Date();
+            if(org == null) {
+                throw new IllegalArgumentException("Не указана организация");
+            }
+            if(startTime == null || endTime == null) {
+                throw new IllegalArgumentException("Не задан период");
+            }
 
-            Calendar endCal = new GregorianCalendar();
-            endCal.setTimeInMillis(endTime.getTime());
-            endCal.set(Calendar.HOUR_OF_DAY, 24);
-            endCal.set(Calendar.MINUTE, 59);
-            endCal.set(Calendar.SECOND, 59);
-            endTime.setTime(endCal.getTimeInMillis());
+            Date generateTime = new Date();
 
             /* Строим параметры для передачи в jasper */
             Map<String, Object> parameterMap = new HashMap<String, Object>();
