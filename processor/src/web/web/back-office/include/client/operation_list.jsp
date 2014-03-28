@@ -19,14 +19,19 @@
     <rich:calendar value="#{mainPage.clientOperationListPage.endTime}" datePattern="dd.MM.yyyy"
                    converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
     <a4j:commandButton value="Показать" action="#{mainPage.showClientOperationListPage}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                       reRender="mainMenu, workspaceTogglePanel" status="clientOperationListGenerateStatus"
+                       styleClass="command-button" />
+    <a4j:status id="clientOperationListGenerateStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+        </f:facet>
+    </a4j:status>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
 <h:outputText value="Операции по счету:"/>
-<rich:dataTable id="clientAccountTransTable" value="#{mainPage.clientOperationListPage.accountTransactionList}" var="item"
-                rows="8"
+<rich:dataTable id="clientAccountTransTable" value="#{mainPage.clientOperationListPage.accountTransactionList}"
                 columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column"
-                footerClass="data-table-footer">
+                var="item" rows="8" footerClass="data-table-footer">
     <rich:column headerClass="column-header">
         <f:facet name="header">
             <h:outputText escape="true" value="Идентификатор" />
