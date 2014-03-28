@@ -4427,7 +4427,7 @@ public Long getSelectedIdOfReportRule() {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            reportRuleCreatePage.fill(persistenceSession);
+            reportRuleCreatePage.fill(persistenceSession, getCurrentUser());
             persistenceTransaction.commit();
             persistenceTransaction = null;
             currentWorkspacePage = reportRuleCreatePage;
@@ -5496,28 +5496,48 @@ public Long getSelectedIdOfReportRule() {
 
     public Object showGoodRequestReportPage () {
         FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
         try {
-            goodRequestsReportPage.fill();
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            goodRequestsReportPage.fill(persistenceSession, getCurrentUser());
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
             currentWorkspacePage = goodRequestsReportPage;
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по запрошенным товарам: " + e.getMessage(),
-                            null));
+            String summary = "Ошибка при подготовке страницы отчета по запрошенным товарам: " + e.getMessage();
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
-        updateSelectedMainMenu();
         return null;
     }
 
     public Object showGoodRequestNewReportPage () {
         FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
         try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            goodRequestsNewReportPage.fill(persistenceSession, getCurrentUser());
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
             currentWorkspacePage = goodRequestsNewReportPage;
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по запрошенным товарам: " + e.getMessage(),
-                            null));
+            String summary = "Ошибка при подготовке страницы отчета по запрошенным товарам: " + e.getMessage();
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
         updateSelectedMainMenu();
         return null;
@@ -5562,12 +5582,12 @@ public Long getSelectedIdOfReportRule() {
             goodRequestsReportPage.export(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+            String summary = "Подготовка отчета завершена успешно";
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, summary, null));
         } catch (Exception e) {
             logger.error("Failed to build sales report", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+            String summary = "Ошибка при подготовке отчета: " + e.getMessage();
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);

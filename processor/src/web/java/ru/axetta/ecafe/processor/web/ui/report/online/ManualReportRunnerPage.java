@@ -8,10 +8,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
-import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -101,7 +98,8 @@ public class ManualReportRunnerPage extends OnlineReportPage
     @Override
     //@Transactional -- здесь транзакция не будет работать нежун прокси клас
     public void onShow() throws Exception {
-        fill();
+        // не проверена работа сессии
+        fill(em.unwrap(Session.class), MainPage.getSessionInstance().getCurrentUser());
     }
 
     public int getDocumentFormat() {
@@ -326,8 +324,10 @@ public class ManualReportRunnerPage extends OnlineReportPage
         }
     }
 
+
+
     @Transactional
-    public void fill() throws Exception {
+    public void fill(Session session, User currentUser) throws Exception {
         List<RuleItem> newRuleItems = new LinkedList<RuleItem>();
         List<ReportHandleRule> rules = proxy.getReportHandlerRules(true);
         for (ReportHandleRule rule : rules) {

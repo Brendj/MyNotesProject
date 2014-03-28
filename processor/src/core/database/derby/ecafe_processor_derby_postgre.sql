@@ -2922,6 +2922,17 @@ CREATE TABLE cf_client_guardian
 create index cf_client_guardian_child_idx on cf_client_guardian(IdOfChildren);
 create index cf_client_guardian_guard_idx on cf_client_guardian(IdOfGuardian);
 
+-- v59
+CREATE TABLE cf_user_report_settings
+(
+  idOfUserReportSetting bigserial NOT NULL,
+  numberOfReport integer NOT NULL,
+  idOfUser bigint NOT NULL,
+  settings text,
+  CONSTRAINT cf_user_report_setting_pk PRIMARY KEY (idOfUserReportSetting),
+  CONSTRAINT cf_user_report_settings_fk_users FOREIGN KEY (idOfUser) REFERENCES cf_users (idofuser)
+);
+
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
   VALUES(2, 2, 55, 200110, 0, '');

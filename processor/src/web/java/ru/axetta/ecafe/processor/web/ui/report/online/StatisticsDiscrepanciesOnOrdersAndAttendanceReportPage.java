@@ -82,7 +82,7 @@ public class StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage extends Onli
         }
     }
 
-    public void fill() {}
+    public void fill() throws Exception{}
 
     private String buildFileName(Date generateTime, BasicReportJob report) {
         DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss");

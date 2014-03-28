@@ -8,29 +8,31 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.UserReportSetting;
 import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.converter.OrgRequestFilterConverter;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -47,9 +49,11 @@ import java.util.Properties;
 public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
 
     private final static Logger logger = LoggerFactory.getLogger(GoodRequestsNewReportPage.class);
+    private final static String generateBeginDateKey = "goodRequestsReport.generateBeginDate";
+    //private final static String generateEndDateKey = "goodRequestsReport.generateEndDate";
 
     private String htmlReport = null;
-    private final PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
     private Date generateBeginDate = new Date();
     private Date generateEndDate = new Date();
     private Boolean hideMissedColumns = true;
@@ -57,7 +61,36 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     private Boolean hideGeneratePeriod = false;
     private Boolean hideLastValue = false;
     private String nameFiler;
-    private final OrgRequestFilterConverter orgRequest = new OrgRequestFilterConverter();
+    private OrgRequestFilterConverter orgRequest = new OrgRequestFilterConverter();
+    private User currentUser;
+
+    // Транзакционный метод
+    @Override
+    public void fill(Session persistenceSession, User currentUser) throws Exception {
+        this.currentUser = currentUser;
+        Criteria criteria = persistenceSession.createCriteria(UserReportSetting.class);
+        criteria.add(Restrictions.eq("user", currentUser));
+        criteria.add(Restrictions.eq("numberOfReport", UserReportSetting.GOOD_REQUEST_REPORT));
+        Object obj = criteria.uniqueResult();
+        if(obj!=null){
+            UserReportSetting setting = (UserReportSetting) obj;
+            Properties properties = new Properties();
+            properties.load(new StringReader(setting.getSettings()));
+            Date dateTime = new Date();
+            String generateBeginDateStr = properties.getProperty(generateBeginDateKey, CalendarUtils.toStringFullDateTimeWithLocalTimeZone(
+                    dateTime));
+            generateBeginDate = CalendarUtils.parseFullDateTimeWithLocalTimeZone(generateBeginDateStr);
+            //String generateEndDateStr = properties.getProperty(generateEndDateKey, CalendarUtils.toStringFullDateTimeWithLocalTimeZone(dateTime));
+            //generateBeginDate = CalendarUtils.parseFullDateTimeWithLocalTimeZone(generateEndDateStr);
+            generateEndDate = new Date();
+        } else {
+           generateBeginDate = new Date();
+           generateEndDate = new Date();
+        }
+        //periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+        //orgRequest = new OrgRequestFilterConverter();
+        htmlReport = null;
+    }
 
     public GoodRequestsNewReportPage() {
         super();
@@ -136,14 +169,12 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         }
         GoodRequestsNewReport.Builder builder = new GoodRequestsNewReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
-        Session session = null;
+        Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            session = runtimeContext.createReportPersistenceSession();
-            persistenceTransaction = session.beginTransaction();
-            BasicReportJob report =  builder.build(session,startDate, endDate, localCalendar);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            BasicReportJob report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
             if (report != null) {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 JRHtmlExporter exporter = new JRHtmlExporter();
@@ -159,13 +190,32 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
                 htmlReport = os.toString("UTF-8");
                 os.close();
             }
+            if(hideGeneratePeriod){
+                Criteria criteria = persistenceSession.createCriteria(UserReportSetting.class);
+                criteria.add(Restrictions.eq("user", currentUser));
+                criteria.add(Restrictions.eq("numberOfReport", UserReportSetting.GOOD_REQUEST_REPORT));
+                Object obj = criteria.uniqueResult();
+                if(obj==null){
+                    UserReportSetting reportSetting = new UserReportSetting();
+                    reportSetting.setUser(currentUser);
+                    reportSetting.setNumberOfReport(UserReportSetting.GOOD_REQUEST_REPORT);
+                    writeSettings(reportSetting);
+                    persistenceSession.save(reportSetting);
+                } else {
+                    UserReportSetting reportSetting = (UserReportSetting) obj;
+                    writeSettings(reportSetting);
+                    persistenceSession.save(reportSetting);
+                }
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
             printMessage("Сводный отчет по заявкам построен");
         } catch (Exception e) {
             printError("Ошибка при построении отчета: "+e.getMessage());
             logger.error("Failed build report ",e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(session, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
         return null;
     }
@@ -196,14 +246,12 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         Date generateTime = new Date();
         GoodRequestsNewReport.Builder builder = new GoodRequestsNewReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
-        Session session = null;
+        Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            session = runtimeContext.createReportPersistenceSession();
-            persistenceTransaction = session.beginTransaction();
-            GoodRequestsNewReport goodRequestsNewReport = (GoodRequestsNewReport) builder.build(session,startDate, endDate, localCalendar);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            BasicReportJob report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
             FacesContext facesContext = FacesContext.getCurrentInstance();
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
 
@@ -211,11 +259,11 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
 
             facesContext.responseComplete();
             response.setContentType("application/xls");
-            String filename = buildFileName(generateTime, goodRequestsNewReport);
+            String filename = buildFileName(generateTime, report);
             response.setHeader("Content-disposition", String.format("inline;filename=%s.xls", filename));
 
             JRXlsExporter xlsExport = new JRXlsExporter();
-            xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, goodRequestsNewReport.getPrint());
+            xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
             xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
             xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
             xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
@@ -225,14 +273,61 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
 
             servletOutputStream.flush();
             servletOutputStream.close();
-
+            if(hideGeneratePeriod){
+                Criteria criteria = persistenceSession.createCriteria(UserReportSetting.class);
+                criteria.add(Restrictions.eq("user", currentUser));
+                criteria.add(Restrictions.eq("numberOfReport", UserReportSetting.GOOD_REQUEST_REPORT));
+                Object obj = criteria.uniqueResult();
+                if(obj==null){
+                    UserReportSetting reportSetting = new UserReportSetting();
+                    reportSetting.setUser(currentUser);
+                    reportSetting.setNumberOfReport(UserReportSetting.GOOD_REQUEST_REPORT);
+                    writeSettings(reportSetting);
+                    persistenceSession.save(reportSetting);
+                } else {
+                    UserReportSetting reportSetting = (UserReportSetting) obj;
+                    writeSettings(reportSetting);
+                    persistenceSession.save(reportSetting);
+                }
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
         } catch (Exception e) {
             logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(session, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    private void writeSettings(UserReportSetting reportSetting) {
+        Properties properties = new Properties();
+        String endGenerateDateStr = CalendarUtils.toStringFullDateTimeWithLocalTimeZone(generateEndDate);
+        properties.setProperty(generateBeginDateKey, endGenerateDateStr);
+        StringWriter writer = new StringWriter();
+        properties.list(new PrintWriter(writer));
+        reportSetting.setSettings(writer.getBuffer().toString());
+    }
+
+    public Object clear(){
+        idOfOrg=null;
+        filter=null;
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        localCalendar = runtimeContext
+                .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
+
+        localCalendar.setTime(new Date());
+        this.startDate = DateUtils.truncate(localCalendar, Calendar.MONTH).getTime();
+
+        localCalendar.setTime(this.startDate);
+        localCalendar.add(Calendar.DATE, 1);
+        localCalendar.add(Calendar.SECOND, -1);
+        this.endDate = localCalendar.getTime();
+        htmlReport = null;
+        return null;
     }
 
     private Properties buildProperties() {
@@ -258,26 +353,6 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         return properties;
     }
 
-    public Object clear(){
-        idOfOrg=null;
-        filter=null;
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        localCalendar = runtimeContext
-                .getDefaultLocalCalendar((HttpSession) facesContext.getExternalContext().getSession(false));
-
-        localCalendar.setTime(new Date());
-        this.startDate = DateUtils.truncate(localCalendar, Calendar.MONTH).getTime();
-
-        localCalendar.setTime(this.startDate);
-        localCalendar.add(Calendar.DATE, 1);
-        localCalendar.add(Calendar.SECOND, -1);
-        this.endDate = localCalendar.getTime();
-        htmlReport = null;
-        return null;
-    }
-
     private String buildFileName(Date generateTime, BasicReportJob basicReportJob) {
         DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss");
         String reportDistinctText = basicReportJob.getReportDistinctText();
@@ -291,7 +366,6 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     }
 
     /* Getter and Setters */
-
     public OrgRequestFilterConverter getOrgRequest() {
         return orgRequest;
     }

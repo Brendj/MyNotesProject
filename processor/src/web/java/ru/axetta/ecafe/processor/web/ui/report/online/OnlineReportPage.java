@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
@@ -106,4 +107,6 @@ public abstract class OnlineReportPage extends BasicWorkspacePage implements Org
     public String getGetStringIdOfOrgList() {
         return idOfOrgList.toString().replaceAll("[^0-9,]","");
     }
+
+    public void fill(Session persistenceSession, User currentUser) throws Exception{};
 }

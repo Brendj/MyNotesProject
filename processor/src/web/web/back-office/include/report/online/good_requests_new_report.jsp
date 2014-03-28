@@ -116,6 +116,11 @@
                 <a4j:support event="onclick" reRender="goodRequestsNewReportFilterPanelGrid" ajaxSingle="true" />
             </h:selectBooleanCheckbox>
 
+            <a4j:commandButton value="Обновить время генерации" action="#{mainPage.showGoodRequestNewReportPage}"
+                               reRender="goodRequestsNewReportPanelGrid"
+                               styleClass="command-button mleft20px" status="goodRequestsNewReportGenerateStatus"
+                               rendered="#{mainPage.goodRequestsNewReportPage.hideGeneratePeriod}"/>
+            <rich:spacer rendered="#{mainPage.goodRequestsNewReportPage.hideGeneratePeriod}"/>
             <h:outputText escape="true" value="Время генерации от" styleClass="output-text mleft20px"
                           rendered="#{mainPage.goodRequestsNewReportPage.hideGeneratePeriod}"/>
             <rich:calendar value="#{mainPage.goodRequestsNewReportPage.generateBeginDate}"

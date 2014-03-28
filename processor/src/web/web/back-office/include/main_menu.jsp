@@ -827,10 +827,6 @@
                          label="Отчет по заявкам" rendered="#{mainPage.eligibleToViewRequestReports}">
         <a4j:support event="onclick" action="#{mainPage.showGoodRequestsGroupMenu}" reRender="workspaceForm" />
 
-        <rich:panelMenuItem id="goodRequestReportMenuItem" binding="#{mainPage.goodRequestReportPage.mainMenuComponent}"
-                            label="Сводный отчет по заявкам" action="#{mainPage.showGoodRequestReportPage}"
-                            reRender="workspaceForm" rendered="false"/>
-
         <rich:panelMenuItem id="goodRequestNewReportMenuItem" binding="#{mainPage.goodRequestsNewReportPage.mainMenuComponent}"
                             label="Сводный отчет по заявкам" action="#{mainPage.showGoodRequestNewReportPage}"
                             reRender="workspaceForm" />

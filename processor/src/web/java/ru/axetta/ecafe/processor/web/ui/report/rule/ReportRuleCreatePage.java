@@ -5,10 +5,9 @@
 package ru.axetta.ecafe.processor.web.ui.report.rule;
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.report.ReportRuleConstants;
 import ru.axetta.ecafe.processor.core.report.RuleConditionItem;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -29,7 +28,6 @@ import javax.faces.model.SelectItem;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -225,7 +223,7 @@ public class ReportRuleCreatePage  extends OnlineReportPage
 
 
 
-    public void fill(Session session) throws Exception {
+    public void fill(Session session, User currentUser) throws Exception {
         this.documentFormat = 0;
         parseExecParams();
     }

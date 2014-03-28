@@ -10,30 +10,23 @@ import net.sf.jasperreports.engine.JRException;
  import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
  import ru.axetta.ecafe.processor.core.RuntimeContext;
- import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
- import ru.axetta.ecafe.processor.core.report.DeliveredServicesReport;
- import ru.axetta.ecafe.processor.core.report.GoodRequestsReport;
+import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.report.GoodRequestsReport;
  import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
  import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
- import ru.axetta.ecafe.processor.web.ui.MainPage;
 
- import org.hibernate.Session;
+import org.hibernate.Session;
  import org.hibernate.Transaction;
  import org.slf4j.Logger;
  import org.slf4j.LoggerFactory;
- import org.springframework.transaction.annotation.Transactional;
 
- import javax.faces.application.FacesMessage;
+import javax.faces.application.FacesMessage;
  import javax.faces.context.FacesContext;
  import javax.faces.event.ActionEvent;
- import javax.persistence.EntityManager;
- import javax.persistence.PersistenceContext;
- import javax.servlet.ServletOutputStream;
+import javax.servlet.ServletOutputStream;
  import javax.servlet.http.HttpServletResponse;
- import java.io.OutputStreamWriter;
- import java.io.Writer;
- import java.text.SimpleDateFormat;
- import java.util.*;
+import java.util.*;
 
 /**
   * Created with IntelliJ IDEA.
@@ -99,7 +92,7 @@ import net.sf.jasperreports.engine.JRException;
          return "report/online/good_requests_report";
      }
 
-     public void fill() {
+     public void fill(Session persistenceSession, User currentUser) throws Exception{
      }
 
      public void loadPredefinedContragents() {
