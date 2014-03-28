@@ -11,7 +11,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>SubFeedingServlet</servlet-name>
-        <url-pattern>/office/*</url-pattern>
+        <url-pattern>/sub-feeding/*</url-pattern>
     </servlet-mapping>
 
     <filter>

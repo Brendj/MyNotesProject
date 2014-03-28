@@ -31,7 +31,7 @@
     <div id="header">Авторизация</div>
     <div>
         <form method="post" enctype="application/x-www-form-urlencoded"
-              action="${pageContext.request.contextPath}/office/login">
+              action="${pageContext.request.contextPath}/sub-feeding/login">
             <input type="text" name="contractId" size="25" maxlength="64" placeholder="Номер лицевого счета" />
             <input type="password" name="password" size="25" maxlength="64" placeholder="Пароль" />
             <input id="submit" type="submit" name="authorize" value="Войти" />

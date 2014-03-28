@@ -64,7 +64,7 @@
     <span class="contract"><%=ContractIdFormat.format(client.getContractId())%></span>
     <span class="contract" style="padding-left: 20px;"><%=client.getFullName()%></span>
     <span style="float: right;">
-        <button onclick="location.href = '${pageContext.request.contextPath}/office/logout'" name="logout">
+        <button onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/logout'" name="logout">
             Выход
         </button>
     </span>
@@ -113,18 +113,18 @@
         </div>
         <div id="manageButtons">
             <%if (!wasSuspended) {%>
-            <button type="submit" id="pauseButton" onclick="location.href = '${pageContext.request.contextPath}/office/suspend'">
+            <button type="submit" id="pauseButton" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/suspend'">
                 Приостановить услугу
             </button>
             <%} else {%>
-            <button type="submit" id="reopenButton" onclick="location.href = '${pageContext.request.contextPath}/office/reopen'">
+            <button type="submit" id="reopenButton" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/reopen'">
                 Возобновить услугу
             </button>
             <%}%>
-            <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/plan'">
+            <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/plan'">
                 Просмотр циклограммы
             </button>
-            <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/transfer'">
+            <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/transfer'">
                 Перевод средств
             </button>
         </div>
@@ -133,7 +133,7 @@
         <div style="font-weight: bold;">История операций</div>
         <div style="margin-top: 20px;">
             <form method="post" enctype="application/x-www-form-urlencoded"
-                  action="${pageContext.request.contextPath}/office/view">
+                  action="${pageContext.request.contextPath}/sub-feeding/view">
                 <span style="padding-right: 10px;">Начальная дата:</span>
                 <input type="text" name="startDate" value="<%=StringEscapeUtils.escapeHtml(startDate)%>"
                        id="datepickerBegin" maxlength="10" required />

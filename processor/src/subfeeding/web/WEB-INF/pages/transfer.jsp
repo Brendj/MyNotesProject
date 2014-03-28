@@ -64,16 +64,16 @@
         <span class="contract"><%=ContractIdFormat.format(client.getContractId())%></span>
         <span class="contract" style="padding-left: 20px;"><%=client.getFullName()%></span>
         <span style="float: right;">
-        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/view'">Вернуться
+        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/view'">Вернуться
         </button>
-        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/logout'" name="logout">Выход
+        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/logout'" name="logout">Выход
         </button>
         </span>
     </div>
     <div id="content">
         <div id="infoHeader">
             <form method="post" enctype="application/x-www-form-urlencoded"
-                  action="${pageContext.request.contextPath}/office/transfer" id="transferForm">
+                  action="${pageContext.request.contextPath}/sub-feeding/transfer" id="transferForm">
                 <input type="hidden" name="stage" value="createTransfer"/>
                 <div id="transferTable">
                     <div class="colRow">
@@ -117,7 +117,7 @@
             <div style="font-weight: bold;">История операций</div>
             <div style="margin-top: 20px;">
                 <form method="post" enctype="application/x-www-form-urlencoded"
-                      action="${pageContext.request.contextPath}/office/transfer">
+                      action="${pageContext.request.contextPath}/sub-feeding/transfer">
                     <span style="padding-right: 10px;">Начальная дата:</span>
                     <input type="text" name="startDate" value="<%=StringEscapeUtils.escapeHtml(startDate)%>"
                            id="datepickerBegin" maxlength="10" required />

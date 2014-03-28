@@ -74,16 +74,16 @@
         <span class="contract" style="padding-left: 20px;"><%=client.getFullName()%></span>
         <span style="float: right;">
              <c:if test="${requestScope.subscriptionFeeding.idOfSubscriptionFeeding!=null}">
-                 <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/view'">Вернуться
+                 <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/view'">Вернуться
                  </button>
              </c:if>
-            <button onclick="location.href = '${pageContext.request.contextPath}/office/logout'" name="logout">Выход
+            <button onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/logout'" name="logout">Выход
             </button>
         </span>
     </div>
     <div id="content">
         <form method="post" enctype="application/x-www-form-urlencoded" id="complexForm"
-              action="${pageContext.request.contextPath}/office/<%=action%>">
+              action="${pageContext.request.contextPath}/sub-feeding/<%=action%>">
         <div id="infoHeader">
 
             <c:if test="${requestScope.subscriptionFeeding.idOfSubscriptionFeeding==null}">
@@ -174,7 +174,7 @@
                         </fieldset>
 
                         <c:if test="${requestScope.subscriptionFeeding.idOfSubscriptionFeeding==null}">
-                            <button type="button" onclick="location.href = '${pageContext.request.contextPath}/office/transfer'">
+                            <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/transfer'">
                                 Перевод средств
                             </button>
                             <button type="submit" name="activate">Активировать</button>
