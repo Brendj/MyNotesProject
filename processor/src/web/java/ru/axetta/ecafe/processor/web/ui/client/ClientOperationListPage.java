@@ -152,6 +152,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         criteria.add(Restrictions.eq("client", client));
         criteria.addOrder(Order.asc("evtDateTime"));
         List<EnterEvent> res = (List<EnterEvent>) criteria.list();
+        clientPasses = new ArrayList<ClientPassItem>();
         for (EnterEvent event : res) {
             clientPasses.add(new ClientPassItem(event));
         }
