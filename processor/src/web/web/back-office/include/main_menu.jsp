@@ -853,7 +853,6 @@
                             action="#{mainPage.showDeliveredServicesReportPage}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
-
     <rich:panelMenuGroup id="paymentReportsGroupMenu" binding="#{mainPage.paymentReportsGroupMenu.mainMenuComponent}"
                          label="Отчеты по пополнениям" rendered="#{mainPage.eligibleToViewRefillReports}">
         <a4j:support event="onclick" action="#{mainPage.showPaymentReportsGroupMenu}" reRender="workspaceForm" />
@@ -901,12 +900,23 @@
                             action="#{orgSmsStatsReportPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
+    <%--@elvariable id="statisticDifferencesGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.StatisticDifferencesGroupPage"--%>
+    <rich:panelMenuGroup id="statisticDifferencesGroupMenu" binding="#{statisticDifferencesGroupPage.mainMenuComponent}"
+                     label="Статистика по расхождениям данных" rendered="#{statisticDifferencesGroupPage.eligibleToWorkCommodityAccounting}">
+        <a4j:support event="onclick" action="#{statisticDifferencesGroupPage.show}" reRender="workspaceForm" />
 
-    <rich:panelMenuItem id="statisticsDiscrepanciesOnOrdersAndAttendanceReportMenuItem"
-                        binding="#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.mainMenuComponent}"
-                        label="Статистика расхождения данных по заказам и продажам"
-                        action="#{mainPage.showDiscrepanciesOnOrdersAndAttendanceReportPage}"
-                        reRender="workspaceForm"/>
+        <rich:panelMenuItem id="statisticsDiscrepanciesOnOrdersAndAttendanceReportMenuItem"
+                            binding="#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.mainMenuComponent}"
+                            label="Статистика расхождения данных по заказам и оплате"
+                            action="#{mainPage.showDiscrepanciesOnOrdersAndAttendanceReportPage}"
+                            reRender="workspaceForm"/>
+
+        <%--@elvariable id="discrepanciesDataOnOrdersAndPaymentReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.DiscrepanciesDataOnOrdersAndPaymentReportPage"--%>
+        <rich:panelMenuItem id="discrepanciesDataOnOrdersAndPaymentReportMenuItem"
+                            binding="#{discrepanciesDataOnOrdersAndPaymentReportPage.mainMenuComponent}"
+                            label="Статистика по актам расхождений"
+                            action="#{discrepanciesDataOnOrdersAndPaymentReportPage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"
                         label="Отчет по продажам" action="#{mainPage.showSalesReportPage}" reRender="workspaceForm" />
@@ -945,11 +955,7 @@
     <rich:panelMenuItem id="referReportMenuItem" binding="#{referReportPage.mainMenuComponent}"
                         label="Справки расходования средств" action="#{referReportPage.show}"
                         reRender="workspaceForm" />
-    <%--@elvariable id="discrepanciesDataOnOrdersAndPaymentReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.DiscrepanciesDataOnOrdersAndPaymentReportPage"--%>
-    <rich:panelMenuItem id="discrepanciesDataOnOrdersAndPaymentReportMenuItem"
-                        binding="#{discrepanciesDataOnOrdersAndPaymentReportPage.mainMenuComponent}"
-                        label="Статистика о расхождении данных по заказам и оплате"
-                        action="#{discrepanciesDataOnOrdersAndPaymentReportPage.show}" reRender="workspaceForm" />
+
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
     <rich:panelMenuItem id="manualReportRunnerMenuItem" binding="#{manualReportRunnerPage.mainMenuComponent}"
                         label="Ручной запуск отчетов" action="#{manualReportRunnerPage.show}"
