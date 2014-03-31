@@ -200,6 +200,9 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
     
     public static final List getReportData(Session session, long idoforg, long start, long end, 
                                            String categoryClause, String orderTypeClause) {
+        if(categoryClause.length() < 1) {
+            categoryClause = " and cf_discountrules.subcategory<>'' ";
+        }
         String sql =
                   "select subcategory, nameofgood, "
                 + "       int8(EXTRACT(EPOCH FROM d) * 1000) as day, "
@@ -301,15 +304,13 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             //  Если это суббота и обед, то значение ставим в 0!!!
             Calendar cal = new GregorianCalendar();
             cal.setTimeInMillis(ts);
-            if(this.group2 != null && cal != null) {
+            /*if(this.group2 != null && cal != null) {
                 if (this.group2.equals(ReferReport.LUNCH) &&
                         cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
                     children = 0L;
                     summary = 0D;
                 }
-            } else {
-                int few =2;
-            }
+            }*/
 
             this.children = children;
             this.price = price;
