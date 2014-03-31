@@ -443,14 +443,14 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
             ExternalContext externalContext = facesContext.getExternalContext();
             HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
 
-            response.setHeader("Content-disposition", "attachment; filename=Synch.csv");
-            response.setHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0");
-            response.setCharacterEncoding("windows-1251");
-            response.setContentType("text/csv");
+
+            response.setCharacterEncoding("winwdows-1251");
+            response.setHeader("Content-Type", "text/csv");
+            response.setHeader("Content-Disposition", "attachment;filename=\"synch.csv\"");
             final ServletOutputStream responseOutputStream = response.getOutputStream();
             try {
                 String str = "л\\с ИС ПП;Фамилия;Имя;Отчество;Класс;Есть в ИС ПП;Есть в Реестре;Результат;\n";
-                responseOutputStream.write(str.getBytes());
+                responseOutputStream.write(str.getBytes("windows-1251"));
                 for (Item i : missedISPPClients) {
                     str = ";" +
                             (i.getFamilyName() == null ? "" : i.getFamilyName()) + ";" +
@@ -459,7 +459,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
                             i.getGroup() + ";" +
                             "Нет;" +
                             "Да;;\n";
-                    responseOutputStream.write(str.getBytes());
+                    responseOutputStream.write(str.getBytes("windows-1251"));
                 }
                 for (Client cl : missedRegisterClients) {
                     String surname = "";
@@ -485,7 +485,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
                             group + ";" +
                             "Да;" +
                             "Нет;;\n";
-                    responseOutputStream.write(str.getBytes());
+                    responseOutputStream.write(str.getBytes("windows-1251"));
                 }
                 responseOutputStream.flush();
             } catch (Exception e1) {
