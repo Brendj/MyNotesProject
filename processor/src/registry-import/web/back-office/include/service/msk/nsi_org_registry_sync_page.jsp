@@ -70,7 +70,7 @@
             <h:selectBooleanCheckbox value="#{NSIOrgRegistrySynchPage.fullNameValidation}" styleClass="output-text"/>
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
-            <a4j:commandButton value="Загрузить" action="#{NSIOrgRegistrySynchPage.doUpdate}"
+            <a4j:commandButton value="Обновить" action="#{NSIOrgRegistrySynchPage.doUpdate}"
                                reRender="synchTable,synchTableInfoPanel,revisionInfo,NSIOrgRegistrySynchPage_tabpanel,resultTitle" styleClass="command-button" status="updateStatus"
                                onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
             <a4j:status id="updateStatus">
@@ -171,15 +171,15 @@
                             </rich:datascroller>
                         </f:facet>
                     </rich:dataTable>
-                    <a4j:commandButton value="Обновить из Реестров" action="#{NSIOrgRegistrySynchPage.doRefresh}" reRender="synchTable,synchTableInfoPanel,revisionInfo,revisionDates" status="updateStatus"
+                    <a4j:commandButton value="Провести сверку" action="#{NSIOrgRegistrySynchPage.doRefresh}" reRender="synchTable,synchTableInfoPanel,revisionInfo,revisionDates" status="updateStatus"
                                        onclick="this.disabled = true;" oncomplete="this.disabled = false;"/>
                 </h:panelGroup>
 
                 <h:panelGrid>
                     <h:panelGrid id="synchTableControl">
-                        <a4j:commandButton value="Применить изменения" action="#{NSIOrgRegistrySynchPage.doApply}" reRender="synchTable,synchTableInfoPanel,revisionInfo" status="updateStatus"
+                        <a4j:commandButton value="Подтвердить все" action="#{NSIOrgRegistrySynchPage.doApply}" reRender="synchTable,synchTableInfoPanel,revisionInfo" status="updateStatus"
                                            onclick="this.disabled = true;" oncomplete="this.disabled = false;" style="width: 180px;"/>
-                        <a4j:commandButton value="Сообщить об ошибке" status="updateStatus" style="width: 180px;">
+                        <a4j:commandButton value="Сообщение об ошибке" status="updateStatus" style="width: 180px;">
                             <a4j:support event="onclick" action="#{NSIOrgRegistrySynchErrorPage.onShow}" reRender="NSIOrgRegistrySynchErrorPage"
                                          oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('NSIOrgRegistrySynchErrorPage')}.show();">
                                 <f:setPropertyActionListener value="#{NSIOrgRegistrySynchPage.idOfOrg}" target="#{NSIOrgRegistrySynchErrorPage.idOfOrg}" />
