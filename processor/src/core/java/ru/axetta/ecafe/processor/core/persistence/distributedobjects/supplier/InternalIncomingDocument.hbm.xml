@@ -7,7 +7,8 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocument" table="cf_internal_incoming_documents">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocument"
+           table="cf_internal_incoming_documents" dynamic-update="true">
         <id name="globalId" column="IdOfInternalIncomingDocument" type="long">
             <generator class="identity"/>
         </id>
@@ -38,15 +39,18 @@
             <column name="IdOfWayBill" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="internalDisposingDocument" fetch="select" lazy="proxy"  class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalDisposingDocument">
+        <many-to-one name="internalDisposingDocument" fetch="select" lazy="proxy"
+                     class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalDisposingDocument">
             <column name="IdOfInternalDisposingDocument" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="actOfInventorization" fetch="select" lazy="proxy"  class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.ActOfInventorization">
+        <many-to-one name="actOfInventorization" fetch="select" lazy="proxy"
+                     class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.ActOfInventorization">
             <column name="IdOfActOfInventarization" not-null="false" />
         </many-to-one>
 
-        <many-to-one name="staff" fetch="select" lazy="proxy"  class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
+        <many-to-one name="staff" fetch="select" lazy="proxy"
+                     class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff">
             <column name="IdOfStaff" not-null="false" />
         </many-to-one>
 

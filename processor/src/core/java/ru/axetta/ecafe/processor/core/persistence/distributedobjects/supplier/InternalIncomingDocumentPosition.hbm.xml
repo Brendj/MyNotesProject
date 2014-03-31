@@ -7,7 +7,8 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocumentPosition" table="cf_internal_incoming_document_positions">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.supplier.InternalIncomingDocumentPosition"
+           table="cf_internal_incoming_document_positions" dynamic-update="true">
         <id name="globalId" column="IdOfInternalIncomingDocumentPositions" type="long">
             <generator class="identity"/>
         </id>
