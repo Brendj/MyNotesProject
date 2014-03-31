@@ -29,6 +29,7 @@
 }
 </style>
 
+
 <%--@elvariable id="NSIOrgRegistrySynchPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.NSIOrgRegistrySynchPage"--%>
 <h:panelGrid id="NSIOrgRegistrySynchPage" styleClass="borderless-grid" binding="#{NSIOrgRegistrySynchPage.pageComponent}">
 
