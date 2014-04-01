@@ -46,7 +46,6 @@ public class GoodRequestsNotificationService {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(GoodRequestsNotificationService.class);
 
-    //@Transactional
     public void notifyGoodRequestsReport() throws Exception {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         if (!runtimeContext.isMainNode()) {
@@ -61,7 +60,7 @@ public class GoodRequestsNotificationService {
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             try {
-                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 Criteria criteria = persistenceSession.createCriteria(Contragent.class);
                 criteria.add(Restrictions.eq("classId", Contragent.TSP));
@@ -82,7 +81,7 @@ public class GoodRequestsNotificationService {
                 Set<OrgShortItem> shortItems = new HashSet<OrgShortItem>();
 
                 try {
-                    persistenceSession = runtimeContext.createPersistenceSession();
+                    persistenceSession = runtimeContext.createReportPersistenceSession();
                     persistenceTransaction = persistenceSession.beginTransaction();
 
                     Criteria orgCriteria = persistenceSession.createCriteria(Org.class);
@@ -110,7 +109,7 @@ public class GoodRequestsNotificationService {
                     final long idOfOrg = orgShortItem.getIdOfOrg();
                     List<DOCurrentOrgVersion> currentOrgVersions = new ArrayList<DOCurrentOrgVersion>();
                     try {
-                        persistenceSession = runtimeContext.createPersistenceSession();
+                        persistenceSession = runtimeContext.createReportPersistenceSession();
                         persistenceTransaction = persistenceSession.beginTransaction();
                         String sql = "from DOCurrentOrgVersion where idOfOrg=:orgOwner";
                         Query query = persistenceSession.createQuery(sql);
@@ -146,7 +145,6 @@ public class GoodRequestsNotificationService {
                         }
                         GoodRequestsReport.Builder reportBuilder = new GoodRequestsReport.Builder();
                         currentDate = CalendarUtils.truncateToDayOfMonth(currentDate);
-                        //boolean isHideMissedColumns = false;
                         GoodRequestsReport goodRequests = reportBuilder
                                 .build(persistenceSession, isHideMissedColumns, currentDate,
                                         CalendarUtils.addDays(currentDate, maxNumDays), idOfOrg);
@@ -276,7 +274,7 @@ public class GoodRequestsNotificationService {
 
                     if (doSend) {
                         try {
-                            persistenceSession = runtimeContext.createPersistenceSession();
+                            persistenceSession = runtimeContext.createReportPersistenceSession();
                             persistenceTransaction = persistenceSession.beginTransaction();
                             newValueHistory.append("</table>");
                             String[] values = {
@@ -366,8 +364,5 @@ public class GoodRequestsNotificationService {
 
     @Autowired
     private EventNotificationService eventNotificationService;
-
-    @PersistenceContext(unitName = "processorPU")
-    private EntityManager entityManager;
 
 }
