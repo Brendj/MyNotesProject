@@ -24,6 +24,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,13 +33,11 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.*;
 
-@Component
-@Transactional
+@Service
+@Transactional (readOnly = true)
 public class ReportDAOService {
 
     private final static Logger logger = LoggerFactory.getLogger(ReportDAOService.class);
-
-    public final static int GROUP_TYPE_STUDENTS = 0, GROUP_TYPE_NON_STUDENTS = 1;
 
     @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
@@ -68,10 +67,6 @@ public class ReportDAOService {
         return (User) q.getSingleResult();
     }
 
-    public User setUserInfo(User user) {
-        return entityManager.merge(user);
-    }
-
     public Boolean isMenuExchange(Long idOfOrg){
         TypedQuery<Long> query = entityManager.createQuery("select idOfSourceOrg from MenuExchangeRule where idOfSourceOrg = :idOfSourceOrg",Long.class);
         query.setParameter("idOfSourceOrg",idOfOrg);
@@ -97,32 +92,6 @@ public class ReportDAOService {
         }
         List<ECafeSettings> list =(List<ECafeSettings>) criteria.list();
         return list;
-    }
-
-    public ConfigurationProvider onSave(ConfigurationProvider configurationProvider, User currentUser, List<Long> idOfOrgList) throws Exception {
-        ConfigurationProvider cp = entityManager.find(ConfigurationProvider.class, configurationProvider.getIdOfConfigurationProvider());
-        cp.setName(configurationProvider.getName());
-        cp.setLastUpdate(new Date());
-        cp.setUserEdit(currentUser);
-        if(!cp.getOrgs().isEmpty()){
-            for (Org org: cp.getOrgs()){
-                org = entityManager.merge(org);
-                org.setConfigurationProvider(null);
-                org = entityManager.merge(org);
-            }
-        }
-        cp.getOrgs().clear();
-        configurationProvider = entityManager.merge(cp);
-        if(!idOfOrgList.isEmpty()){
-            for (Long idOfOrg: idOfOrgList){
-                Org org = entityManager.find(Org.class, idOfOrg);
-                if (org != null) {
-                    org.setConfigurationProvider(configurationProvider);
-                    entityManager.persist(org);
-                }
-            }
-        }
-        return configurationProvider;
     }
 
     public Contragent getContragentByName(String name) {
@@ -218,77 +187,11 @@ public class ReportDAOService {
 
 
     public void removeTechnologicalMap(Long idOfTechnologicalMaps){
-        Query query1 = entityManager.createNativeQuery("DELETE FROM cf_technological_map_products where idoftechnologicalmaps="+idOfTechnologicalMaps);
+        Query query1 = entityManager.createNativeQuery(
+                "DELETE FROM cf_technological_map_products where idoftechnologicalmaps=" + idOfTechnologicalMaps);
         query1.executeUpdate();
         Query query = entityManager.createNativeQuery("DELETE FROM cf_technological_map where idoftechnologicalmaps="+idOfTechnologicalMaps);
         query.executeUpdate();
-    }
-
-
-
-    public void removeGoodGroup(GoodGroup goodGroup){
-         GoodGroup group = entityManager.merge(goodGroup);
-         entityManager.remove(group);
-    }
-
-
-    public void removeSetting(ECafeSettings eCafeSettings){
-        ECafeSettings settings = entityManager.merge(eCafeSettings);
-        entityManager.remove(settings);
-    }
-
-
-    public void removeGood(Good good){
-        Good g = entityManager.merge(good);
-        entityManager.remove(g);
-    }
-
-
-    public void removeProduct(Product product){
-        Product p = entityManager.merge(product);
-        entityManager.remove(p);
-    }
-
-
-    public Boolean isEmptyOrgConfigurationProvider(ConfigurationProvider configurationProvider){
-        ConfigurationProvider cp = entityManager.merge(configurationProvider);
-        return cp.getOrgEmpty();
-    }
-
-
-    public void removeConfigurationProvider(ConfigurationProvider configurationProvider) throws Exception{
-        ConfigurationProvider cp = entityManager.merge(configurationProvider);
-        entityManager.remove(cp);
-    }
-
-
-    //public DistributedObject mergeDistributedObject(DistributedObject distributedObject, Long globalVersion) {
-    //    TypedQuery<DistributedObject> query = entityManager.createQuery(
-    //            "from " + distributedObject.getClass().getSimpleName() + " where guid='" + distributedObject.getGuid()
-    //                    + "'", DistributedObject.class);
-    //    List<DistributedObject> distributedObjectList = query.getResultList();
-    //    if (distributedObjectList.isEmpty()) {
-    //        return null;
-    //    }
-    //    DistributedObject d = entityManager.find(distributedObject.getClass(), distributedObjectList.get(0).getGlobalId());
-    //    d.fill(distributedObject);
-    //    d.setGlobalVersion(globalVersion);
-    //    d.setDeletedState(distributedObject.getDeletedState());
-    //    d.setLastUpdate(new Date());
-    //    entityManager.persist(d);
-    //    return entityManager.find(distributedObject.getClass(), distributedObjectList.get(0).getGlobalId());
-    //}
-
-    public void persistEntity(Object entity) throws Exception {
-        entityManager.persist(entity);
-    }
-
-
-    public void deleteEntity(Object entity) {
-        entity = entityManager.merge(entity);
-        if (entity != null) {
-            entityManager.remove(entity);
-        }
     }
 
     public Long getContractIdByCardNo(long lCardId) throws Exception {
@@ -301,7 +204,6 @@ public class ReportDAOService {
             return list.get(0);
         }
     }
-
 
     public Long getContractIdByTempCardNoAndCheckValidDate(long lCardId) throws Exception {
         /* так как в поле хранится дата на 00:00 ночи текущего дня вычтем из текущего дня 24 часа в милисекудах */
@@ -438,12 +340,6 @@ public class ReportDAOService {
         return entityManager.find(Client.class, idOfClient);
     }
 
-
-    public <T> T saveEntity(T entity) {
-        return entityManager.merge(entity);
-    }
-
-
     public Client findAndDeleteLinkingToken(String linkingToken) {
         Query query = entityManager.createQuery("from LinkingToken where token=:token");
         query.setParameter("token", linkingToken);
@@ -513,25 +409,6 @@ public class ReportDAOService {
         query.setParameter("mobile", mobilePhone);
         return query.getResultList();
     }
-
-
-    public Contragent getClientOrgDefaultSupplier(Client client) {
-        client = entityManager.merge(client);
-        Contragent ca = client.getOrg().getDefaultSupplier();
-        ca.getContragentName(); //lazy load
-        return ca;
-    }
-
-
-    public ReportInfo registerReport(String ruleName, int documentFormat, String reportName, Date createdDate,
-            Long generationTime, Date startDate, Date endDate, String reportFile, String orgNum, Long idOfOrg,
-            String tag) {
-        ReportInfo ri = new ReportInfo(ruleName, documentFormat, reportName, createdDate, generationTime, startDate,
-                endDate, reportFile, orgNum, idOfOrg, tag, null, null, null, null);
-        entityManager.persist(ri);
-        return ri;
-    }
-
 
     public List<String> getReportHandleRuleNames() {
         TypedQuery<String> query = entityManager
@@ -656,187 +533,6 @@ public class ReportDAOService {
         q.setParameter("idOfCard", idOfCard);
         return q.executeUpdate() > 0;
     }
-
-    @SuppressWarnings("unchecked")
-    public Map<Long, Integer> getOrgEntersCountByGroupType(Date at, Date to, int groupType) {
-        String sql = "";
-        if (groupType == GROUP_TYPE_STUDENTS) {
-            sql = "SELECT cf_enterevents.idoforg, COUNT(cf_enterevents.idofclient) " +
-                    "FROM cf_enterevents " +
-                    "LEFT JOIN cf_clients ON cf_enterevents.idoforg=cf_clients.idoforg AND cf_enterevents.idofclient=cf_clients.idofclient "
-                    +
-                    "WHERE cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup<:studentsMaxValue "
-                    +
-                    "GROUP BY cf_enterevents.idoforg";
-        } else {
-            sql = "SELECT cf_enterevents.idoforg, COUNT(cf_enterevents.idofclient) " +
-                    "FROM cf_enterevents " +
-                    "LEFT JOIN cf_clients ON cf_enterevents.idoforg=cf_clients.idoforg AND cf_enterevents.idofclient=cf_clients.idofclient "
-                    +
-                    "WHERE cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup>=:nonStudentGroups AND cf_clients.idOfClientGroup<:leavingClientGroup "
-                    +
-                    "GROUP BY cf_enterevents.idoforg";
-        }
-
-        try {
-            Map<Long, Integer> res = new HashMap<Long, Integer>();
-            Query q = entityManager.createNativeQuery(sql);
-            q.setParameter("dateAt", at.getTime());
-            q.setParameter("dateTo", to.getTime());
-            if (groupType == GROUP_TYPE_STUDENTS) {
-                q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            } else {
-                q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-                q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-            }
-            List resultList = q.getResultList();
-
-            for (Object entry : resultList) {
-                Object e[] = (Object[]) entry;
-                res.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
-            }
-            return res;
-        } catch (Exception e) {
-            logger.error("Failed to load data", e);
-        }
-        return Collections.EMPTY_MAP;
-    }
-
-
-    @SuppressWarnings("unchecked")
-    public Map<Long, Integer> getOrgOrdersCountByGroupType(Date at, Date to, int groupType, boolean notDiscounted) {
-        String sql = "";
-        if (groupType == GROUP_TYPE_STUDENTS) {
-            sql = "SELECT cf_orders.idoforg, COUNT(distinct cf_orders.idofclient) " +
-                    "FROM cf_orders " +
-                    "LEFT JOIN cf_clients ON cf_orders.idofclient=cf_clients.idofclient " +
-                    "WHERE cf_orders.createddate BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup<:studentsMaxValue "
-                    + (notDiscounted ? " AND cf_orders.socdiscount=0" : "") +
-                    "GROUP BY cf_orders.idoforg";
-        } else {
-            sql = "SELECT cf_orders.idoforg, COUNT(distinct cf_orders.idofclient) " +
-                    "FROM cf_orders " +
-                    "LEFT JOIN cf_clients ON cf_orders.idofclient=cf_clients.idofclient " +
-                    "WHERE cf_orders.createddate BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup>=:nonStudentGroups AND cf_clients.idOfClientGroup<:leavingClientGroup "
-                    + (notDiscounted ? " AND cf_orders.socdiscount=0" : "") +
-                    "GROUP BY cf_orders.idoforg";
-        }
-
-        try {
-            Map<Long, Integer> res = new HashMap<Long, Integer>();
-            Query q = entityManager.createNativeQuery(sql);
-            q.setParameter("dateAt", at.getTime());
-            q.setParameter("dateTo", to.getTime());
-            if (groupType == GROUP_TYPE_STUDENTS) {
-                q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            } else {
-                q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-                q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-            }
-            List resultList = q.getResultList();
-
-            for (Object entry : resultList) {
-                Object e[] = (Object[]) entry;
-                res.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
-            }
-            return res;
-        } catch (Exception e) {
-            logger.error("Failed to load data", e);
-        }
-        return Collections.EMPTY_MAP;
-    }
-
-
-    @SuppressWarnings("unchecked")
-    public Map<Long, Integer> getProposalOrgDiscounsCountByGroupType(Date at, Date to, int groupType) {
-        String sql = "";
-        if (groupType == ReportDAOService.GROUP_TYPE_STUDENTS) {
-            sql = "SELECT idoforg, COUNT(DISTINCT cf_clientscomplexdiscounts.idofclient) " +
-                    "FROM cf_clients " +
-                    "LEFT JOIN cf_clientscomplexdiscounts ON cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient "
-                    +
-                    "WHERE cf_clients.idOfClientGroup<:studentsMaxValue " +
-                    //"where createdate between :dateAt and :dateTo and cf_clients.idOfClientGroup<:studentsMaxValue " +
-                    "GROUP BY idoforg " +
-                    "HAVING COUNT(cf_clientscomplexdiscounts.idofclient)<>0";
-        } else {
-            sql = "SELECT idoforg, COUNT(DISTINCT cf_clientscomplexdiscounts.idofclient) " +
-                    "FROM cf_clients " +
-                    "LEFT JOIN cf_clientscomplexdiscounts ON cf_clients.idofclient=cf_clientscomplexdiscounts.idofclient "
-                    +
-                    "WHERE cf_clients.idOfClientGroup>=:nonStudentGroups AND cf_clients.idOfClientGroup<:leavingClientGroup "
-                    +
-                    //"where createdate between :dateAt and :dateTo and cf_clients.idOfClientGroup>=:nonStudentGroups and cf_clients.idOfClientGroup<:leavingClientGroup " +
-                    "GROUP BY idoforg " +
-                    "HAVING COUNT(cf_clientscomplexdiscounts.idofclient)<>0";
-        }
-        try {
-            Map<Long, Integer> res = new HashMap<Long, Integer>();
-            Query q = entityManager.createNativeQuery(sql);
-            /*q.setParameter("dateAt", at.getTime());
-            q.setParameter("dateTo", to.getTime());*/
-            if (groupType == ReportDAOService.GROUP_TYPE_STUDENTS) {
-                q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            } else {
-                q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-                q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-            }
-            List resultList = q.getResultList();
-            for (Object entry : resultList) {
-                Object e[] = (Object[]) entry;
-                res.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
-            }
-            return res;
-        } catch (Exception e) {
-            logger.error("Failed to load data", e);
-        }
-        return Collections.EMPTY_MAP;
-    }
-
-
-    @SuppressWarnings("unchecked")
-    public Map<Long, Integer> getOrgUniqueOrdersCountByGroupType(Date at, Date to, int groupType) {
-        String sql = "";
-        if (groupType == ReportDAOService.GROUP_TYPE_STUDENTS) {
-            sql = "SELECT cf_orders.idoforg, COUNT(DISTINCT cf_orders.idofclient) " +
-                    "FROM cf_orders " +
-                    "LEFT JOIN cf_clients ON cf_clients.idofclient=cf_orders.idofclient " +
-                    "WHERE createddate BETWEEN :dateAt AND :dateTo AND " +
-                    "cf_clients.idOfClientGroup<:studentsMaxValue AND cf_orders.socdiscount<>0 " +
-                    "GROUP BY cf_orders.idoforg";
-        } else {
-            sql = "SELECT cf_orders.idoforg, COUNT(DISTINCT cf_orders.idofclient) " +
-                    "FROM cf_orders " +
-                    "LEFT JOIN cf_clients ON cf_clients.idofclient=cf_orders.idofclient " +
-                    "WHERE createddate BETWEEN :dateAt AND :dateTo AND cf_orders.socdiscount<>0 AND " +
-                    "cf_clients.idOfClientGroup>=:nonStudentGroups AND cf_clients.idOfClientGroup<:leavingClientGroup "
-                    +
-                    "GROUP BY cf_orders.idoforg";
-        }
-
-        try {
-            Map<Long, Integer> res = new HashMap<Long, Integer>();
-            Query q = entityManager.createNativeQuery(sql);
-            q.setParameter("dateAt", at.getTime());
-            q.setParameter("dateTo", to.getTime());
-            if (groupType == ReportDAOService.GROUP_TYPE_STUDENTS) {
-                q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            } else {
-                q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-                q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
-            }
-            List resultList = q.getResultList();
-            for (Object entry : resultList) {
-                Object e[] = (Object[]) entry;
-                res.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
-            }
-            return res;
-        } catch (Exception e) {
-            logger.error("Failed to load data", e);
-        }
-        return Collections.EMPTY_MAP;
-    }
-
 
     @SuppressWarnings("unchecked")
     public Map<Long, Integer> getOrgOrdersCount(Date at, Date to) {
@@ -1057,12 +753,12 @@ public class ReportDAOService {
     }
 
     public List<GoodGroup> findGoodGroupBySuplifier(String filter) {
-        TypedQuery<GoodGroup> query = entityManager.createQuery("from GoodGroup where UPPER(NameOfGoodsGroup) like '%"+filter.toUpperCase()+"%' and deletedState=false order by globalId", GoodGroup.class);
+        TypedQuery<GoodGroup> query = entityManager.createQuery("from GoodGroup where UPPER(nameOfGoodsGroup) like '%"+filter.toUpperCase()+"%' and deletedState=false order by globalId", GoodGroup.class);
         return query.getResultList();
     }
 
     public List<GoodGroup> findGoodGroupBySuplifier(List<Long> orgOwners, String filter) {
-        TypedQuery<GoodGroup> query = entityManager.createQuery("from GoodGroup where UPPER(NameOfGoodsGroup) like '%"+filter.toUpperCase()+"%' and orgOwner in :orgOwners and deletedState=false  order by globalId", GoodGroup.class);
+        TypedQuery<GoodGroup> query = entityManager.createQuery("from GoodGroup where UPPER(nameOfGoodsGroup) like '%"+filter.toUpperCase()+"%' and orgOwner in :orgOwners and deletedState=false  order by globalId", GoodGroup.class);
         query.setParameter("orgOwners", orgOwners);
         return query.getResultList();
     }
@@ -1379,24 +1075,6 @@ public class ReportDAOService {
         query.setParameter("netWeight",netWeight);
         query.setParameter("lastUpdate",new Date());
         return query.executeUpdate()!=0;
-    }
-
-
-    @Transactional
-    public List<Client> getClientsByOrgId (long idOfOrg) {
-        TypedQuery<Client> query = entityManager.createQuery("from Client where IdOfOrg=:idoforg", Client.class);
-        query.setParameter("idoforg",idOfOrg);
-        List <Client> clients = query.getResultList();
-        for (Client cl : clients) {
-            try {
-                cl.getPerson().getFirstName();
-                cl.getOrg().getOfficialName();
-                cl.getClientGroup().getGroupName();
-            } catch (Exception e) {
-
-            }
-        }
-        return clients;
     }
 
     public void applyFullSyncOperationByOrgList(List<Long> idOfOrgList) throws Exception{
