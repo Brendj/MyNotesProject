@@ -29,6 +29,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
@@ -67,12 +68,11 @@ public class DashboardServiceBean {
     private static final int LAST_OPERATION_TIME_PARAM_INDEX = CONTRAGENT_NAME_PARAM_INDEX + 1;
     private static final int NUM_OF_OPERATIONS_PARAM_INDEX = LAST_OPERATION_TIME_PARAM_INDEX + 1;
 
+    public final static int GROUP_TYPE_STUDENTS = 0, GROUP_TYPE_NON_STUDENTS = 1;
+
     @Autowired
     @Qualifier(value = "txManagerReports")
     private PlatformTransactionManager txManager;
-
-    @Autowired
-    DAOService daoService;
 
     @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
@@ -331,7 +331,10 @@ public class DashboardServiceBean {
                 statItem.setNumberOfPayOrders((Long) result[1]);
             }
             ////
-            queryText = "select cf_orders.idoforg, count(distinct cf_orders.idoforder) from cf_orders left join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg where lower(cf_orderdetails.menugroup)=:groupName AND cf_orders.createddate BETWEEN :dayStart AND :dayEnd group by cf_orders.idoforg";
+            queryText = " select cf_orders.idoforg, count(distinct cf_orders.idoforder) from cf_orders "
+                    + " left join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
+                    + " where lower(cf_orderdetails.menugroup)=:groupName "
+                    + " AND cf_orders.createddate BETWEEN :dayStart AND :dayEnd group by cf_orders.idoforg";
             query = entityManager.createNativeQuery(queryText);
             query.setParameter("groupName", "вендинг");
             query.setParameter("dayStart", dayStartDate.getTime());
@@ -357,23 +360,155 @@ public class DashboardServiceBean {
 
 
             //  Заполняем процентные показатели
-            Map<Long, Integer> studentEnters = daoService
-                    .getOrgEntersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS, session);
-            Map<Long, Integer> employeeEnters = daoService
-                    .getOrgEntersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_NON_STUDENTS, session);
-            Map<Long, Integer> studentPays = daoService
-                    .getOrgOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS, true, session);
-            Map<Long, Integer> employeePays = daoService
-                    .getOrgOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_NON_STUDENTS, true, session);
-            Map<Long, Integer> studentDiscounts = daoService
-                    .getProposalOrgDiscounsCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS, session);
-            Map<Long, Integer> employeeDiscounts = daoService
-                    .getProposalOrgDiscounsCountByGroupType(dayStartDate, dayEndDate,
-                            DAOService.GROUP_TYPE_NON_STUDENTS, session);
-            Map<Long, Integer> studentUniqueOrders = daoService
-                    .getOrgUniqueOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS, session);
-            Map<Long, Integer> employeeUniqueOrders = daoService
-                    .getOrgUniqueOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_NON_STUDENTS, session);
+            Map<Long, Integer> studentEnters = new HashMap<Long, Integer>();
+            String sql = "SELECT cf_enterevents.idoforg, COUNT(cf_enterevents.idofclient) " +
+                    "FROM cf_enterevents " +
+                    "LEFT JOIN cf_clients ON cf_enterevents.idoforg=cf_clients.idoforg AND cf_enterevents.idofclient=cf_clients.idofclient "
+                    +
+                    "WHERE cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup<:studentsMaxValue "
+                    +
+                    "GROUP BY cf_enterevents.idoforg";
+            Query q = entityManager.createNativeQuery(sql);
+            q.setParameter("dateAt", dayStartDate.getTime());
+            q.setParameter("dateTo", dayEndDate.getTime());
+            q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            List resultList = q.getResultList();
+
+            for (Object entry : resultList) {
+                Object e[] = (Object[]) entry;
+                studentEnters.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
+            }
+
+            Map<Long, Integer> employeeEnters = new HashMap<Long, Integer>();
+            sql = "SELECT cf_enterevents.idoforg, COUNT(cf_enterevents.idofclient) " +
+                    "FROM cf_enterevents " +
+                    "LEFT JOIN cf_clients ON cf_enterevents.idoforg=cf_clients.idoforg AND cf_enterevents.idofclient=cf_clients.idofclient "
+                    +
+                    "WHERE cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup>=:nonStudentGroups AND cf_clients.idOfClientGroup<:leavingClientGroup "
+                    +
+                    "GROUP BY cf_enterevents.idoforg";
+            q = entityManager.createNativeQuery(sql);
+            q.setParameter("dateAt", dayStartDate.getTime());
+            q.setParameter("dateTo", dayEndDate.getTime());
+            q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+            resultList = q.getResultList();
+
+            for (Object entry : resultList) {
+                Object e[] = (Object[]) entry;
+                employeeEnters.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
+            }
+
+            Map<Long, Integer> studentPays = new HashMap<Long, Integer>();
+            sql = "SELECT cf_orders.idoforg, COUNT(distinct cf_orders.idofclient) " +
+                    "FROM cf_orders " +
+                    "LEFT JOIN cf_clients ON cf_orders.idofclient=cf_clients.idofclient " +
+                    "WHERE cf_orders.createddate BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup<:studentsMaxValue "
+                    + " AND cf_orders.socdiscount=0" +
+                    " GROUP BY cf_orders.idoforg";
+            q = entityManager.createNativeQuery(sql);
+            q.setParameter("dateAt", dayStartDate.getTime());
+            q.setParameter("dateTo", dayEndDate.getTime());
+            q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            resultList = q.getResultList();
+
+            for (Object entry : resultList) {
+                Object e[] = (Object[]) entry;
+                studentPays.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
+            }
+            Map<Long, Integer> employeePays = new HashMap<Long, Integer>();
+            sql = "SELECT cf_orders.idoforg, COUNT(distinct cf_orders.idofclient) " +
+                    "FROM cf_orders " +
+                    "LEFT JOIN cf_clients ON cf_orders.idofclient=cf_clients.idofclient " +
+                    "WHERE cf_orders.createddate BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup>=:nonStudentGroups AND cf_clients.idOfClientGroup<:leavingClientGroup "
+                    + " AND cf_orders.socdiscount=0 "+
+                    "GROUP BY cf_orders.idoforg";
+            q = entityManager.createNativeQuery(sql);
+            q.setParameter("dateAt", dayStartDate.getTime());
+            q.setParameter("dateTo", dayEndDate.getTime());
+            q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+            resultList = q.getResultList();
+
+            for (Object entry : resultList) {
+                Object e[] = (Object[]) entry;
+                employeePays.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
+            }
+
+            Map<Long, Integer> studentDiscounts = new HashMap<Long, Integer>();
+            sql = "SELECT cf_enterevents.idoforg, COUNT(cf_enterevents.idofclient) " +
+                    "FROM cf_enterevents " +
+                    "LEFT JOIN cf_clients ON cf_enterevents.idoforg=cf_clients.idoforg AND cf_enterevents.idofclient=cf_clients.idofclient "
+                    +
+                    "WHERE cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup<:studentsMaxValue "
+                    +
+                    "GROUP BY cf_enterevents.idoforg";
+            q = entityManager.createNativeQuery(sql);
+            q.setParameter("dateAt", dayStartDate.getTime());
+            q.setParameter("dateTo", dayEndDate.getTime());
+            q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            resultList = q.getResultList();
+
+            for (Object entry : resultList) {
+                Object e[] = (Object[]) entry;
+                studentDiscounts.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
+            }
+            Map<Long, Integer> employeeDiscounts = new HashMap<Long, Integer>();
+            sql = "SELECT cf_enterevents.idoforg, COUNT(cf_enterevents.idofclient) " +
+                    "FROM cf_enterevents " +
+                    "LEFT JOIN cf_clients ON cf_enterevents.idoforg=cf_clients.idoforg AND cf_enterevents.idofclient=cf_clients.idofclient "
+                    +
+                    "WHERE cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup>=:nonStudentGroups AND cf_clients.idOfClientGroup<:leavingClientGroup "
+                    +
+                    "GROUP BY cf_enterevents.idoforg";
+            q = entityManager.createNativeQuery(sql);
+            q.setParameter("dateAt", dayStartDate.getTime());
+            q.setParameter("dateTo", dayEndDate.getTime());
+            q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+            resultList = q.getResultList();
+
+            for (Object entry : resultList) {
+                Object e[] = (Object[]) entry;
+                employeeDiscounts.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
+            }
+            Map<Long, Integer> studentUniqueOrders = new HashMap<Long, Integer>();
+            sql = "SELECT cf_orders.idoforg, COUNT(DISTINCT cf_orders.idofclient) " +
+                    "FROM cf_orders " +
+                    "LEFT JOIN cf_clients ON cf_clients.idofclient=cf_orders.idofclient " +
+                    "WHERE createddate BETWEEN :dateAt AND :dateTo AND " +
+                    "cf_clients.idOfClientGroup<:studentsMaxValue AND cf_orders.socdiscount<>0 " +
+                    "GROUP BY cf_orders.idoforg";
+            q = entityManager.createNativeQuery(sql);
+            q.setParameter("dateAt", dayStartDate.getTime());
+            q.setParameter("dateTo", dayEndDate.getTime());
+            q.setParameter("studentsMaxValue", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            resultList = q.getResultList();
+
+            for (Object entry : resultList) {
+                Object e[] = (Object[]) entry;
+                studentUniqueOrders.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
+            }
+            Map<Long, Integer> employeeUniqueOrders = new HashMap<Long, Integer>();
+            sql = "SELECT cf_enterevents.idoforg, COUNT(cf_enterevents.idofclient) " +
+                    "FROM cf_enterevents " +
+                    "LEFT JOIN cf_clients ON cf_enterevents.idoforg=cf_clients.idoforg AND cf_enterevents.idofclient=cf_clients.idofclient "
+                    +
+                    "WHERE cf_enterevents.evtdatetime BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup>=:nonStudentGroups AND cf_clients.idOfClientGroup<:leavingClientGroup "
+                    +
+                    "GROUP BY cf_enterevents.idoforg";
+            q = entityManager.createNativeQuery(sql);
+            q.setParameter("dateAt", dayStartDate.getTime());
+            q.setParameter("dateTo", dayEndDate.getTime());
+            q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+            resultList = q.getResultList();
+
+            for (Object entry : resultList) {
+                Object e[] = (Object[]) entry;
+                employeeUniqueOrders.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
+            }
+
 
             for (Long orgID : orgStats.keySet()) {
                 DashboardResponse.OrgBasicStatItem statItem = orgStats.get(orgID);
@@ -637,7 +772,10 @@ public class DashboardServiceBean {
     public DashboardResponse.PaymentSystemStats getPaymentSystemInfo(Date dt) {
         DashboardResponse.PaymentSystemStats paymentSystemStats = new DashboardResponse.PaymentSystemStats();
         //// получение данных по платежам
-        List<Object[]> lastTransactionStats = daoService.getMonitoringPayLastTransactionStats();
+        Query q = entityManager.createNativeQuery(
+                "SELECT cp.idOfContragent, cc.contragentName, MAX(cp.createddate) FROM cf_clientpayments cp, cf_contragents cc WHERE cp.idOfContragent=cc.idOfContragent AND cc.classid=1 GROUP BY cp.idOfContragent, cc.contragentName");
+        List<Object[]> lastTransactionStats = q.getResultList();
+        //List<Object[]> lastTransactionStats = daoService.getMonitoringPayLastTransactionStats();
         LinkedList<DashboardResponse.PaymentSystemStatItem> payStatItems = new LinkedList<DashboardResponse.PaymentSystemStatItem>();
         for (Object[] r : lastTransactionStats) {
             DashboardResponse.PaymentSystemStatItem psi = new DashboardResponse.PaymentSystemStatItem();
@@ -646,9 +784,11 @@ public class DashboardServiceBean {
             psi.setLastOperationTime(new Date(Long.parseLong("" + r[2])));
             payStatItems.add(psi);
         }
-        List<Object[]> monitoringPayDayTransactionsStats = daoService
-                .getMonitoringPayDayTransactionsStats(CalendarUtils.truncateToDayOfMonth(dt),
-                        CalendarUtils.truncateToDayOfMonth(CalendarUtils.addDays(dt, 1)));
+        q = entityManager.createNativeQuery(
+                "SELECT cp.idOfContragent, cc.contragentName, COUNT(*) FROM cf_clientpayments cp, cf_contragents cc WHERE cp.idOfContragent=cc.idOfContragent AND cc.classid=1 AND cp.createdDate>=:fromDate AND cp.createdDate<:toDate GROUP BY cp.idOfContragent, cc.contragentName");
+        q.setParameter("fromDate", CalendarUtils.truncateToDayOfMonth(dt).getTime());
+        q.setParameter("toDate", CalendarUtils.truncateToDayOfMonth(CalendarUtils.addDays(dt, 1)).getTime());
+        List<Object[]> monitoringPayDayTransactionsStats = q.getResultList();
         for (Object[] r : monitoringPayDayTransactionsStats) {
             Long caId = Long.parseLong("" + r[0]);
             DashboardResponse.PaymentSystemStatItem psi = null;
@@ -673,7 +813,8 @@ public class DashboardServiceBean {
     public DashboardResponse.OrgSyncStats getOrgSyncInfo() {
         DashboardResponse.OrgSyncStats orgSyncStats = new DashboardResponse.OrgSyncStats();
         ///// получение данных по сихронизации
-        List<Org> orgs = daoService.getOrderedSynchOrgsList(true);
+        TypedQuery<Org> query = entityManager.createQuery("from Org where state<>0 order by lastSuccessfulBalanceSync ", Org.class);
+        List<Org> orgs = query.getResultList();
         LinkedList<DashboardResponse.OrgSyncStatItem> items = new LinkedList<DashboardResponse.OrgSyncStatItem>();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         for (Org org : orgs) {
@@ -681,10 +822,12 @@ public class DashboardServiceBean {
             //        org.getLastUnSuccessfulBalanceSync(),
             //        runtimeContext.getProcessor().getOrgSyncAddress(org.getIdOfOrg())));
             String tags = parseTags(org.getTag());
-            ;
+            Query q = entityManager.createNativeQuery("select count(idoforg) from cf_synchistory_exceptions where idoforg=:idoforg");
+            q.setParameter("idoforg", org.getIdOfOrg());
+            Long synchErrorsCount = ((BigInteger) q.getSingleResult()).longValue();
             items.add(new DashboardResponse.OrgSyncStatItem(org.getIdOfOrg(), org.getShortName(), tags, org.getLastSuccessfulBalanceSync(),
                     org.getLastUnSuccessfulBalanceSync(),org.getRemoteAddress(), org.getClientVersion(),
-                    daoService.getSynchErrorsCount(org), org.getDistrict()));
+                    synchErrorsCount, org.getDistrict()));
 
         }
         orgSyncStats.setOrgSyncStatItems(items);
