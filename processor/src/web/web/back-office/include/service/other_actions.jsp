@@ -32,6 +32,9 @@
     <a4j:commandButton value="Очистить Репозиторий" action="#{otherActionsPage.runRepositoryReportsCleanup}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 
+    <a4j:commandButton value="Очистить журналы синхронизации" action="#{otherActionsPage.runSynchCleanup}"
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+
 
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />

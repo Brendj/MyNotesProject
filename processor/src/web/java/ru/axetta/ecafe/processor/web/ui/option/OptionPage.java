@@ -97,6 +97,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean hideMissedColumnsNotificationGoodRequestChange;
     private Integer maxNumDaysNotificationGoodRequestChange;
     private String frontControllerRequestIpMask;
+    private Boolean synchCleanup;
 
     private List<BankOptionItem> banks;
 
@@ -595,6 +596,14 @@ public class OptionPage extends BasicWorkspacePage {
         this.frontControllerRequestIpMask = frontControllerRequestIpMask;
     }
 
+    public Boolean getSynchCleanup() {
+        return synchCleanup;
+    }
+
+    public void setSynchCleanup(Boolean synchCleanup) {
+        this.synchCleanup = synchCleanup;
+    }
+
     public String getPageFilename() {
         return "option/option";
     }
@@ -672,6 +681,8 @@ public class OptionPage extends BasicWorkspacePage {
         maxNumDaysNotificationGoodRequestChange = runtimeContext.getOptionValueInt(
                 Option.OPTION_MAX_NUM_DAYS_NOTIFICATION_GOOD_REQUEST_CHANGE);
         frontControllerRequestIpMask = runtimeContext.getOptionValueString(Option.OPTION_FRON_CONTROLLER_REQ_IP_MASK);
+        synchCleanup = runtimeContext.getOptionValueBool(Option.OPTION_SYNCH_CLEANUP_ON);
+
         bankListPage.onShow();
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -791,6 +802,7 @@ public class OptionPage extends BasicWorkspacePage {
                     maxNumDaysNotificationGoodRequestChange);
 
             runtimeContext.setOptionValue(Option.OPTION_FRON_CONTROLLER_REQ_IP_MASK, frontControllerRequestIpMask);
+            runtimeContext.setOptionValue(Option.OPTION_SYNCH_CLEANUP_ON, synchCleanup);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");

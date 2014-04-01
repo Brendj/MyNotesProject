@@ -63,6 +63,13 @@ public class OtherActionsPage extends BasicWorkspacePage {
         printMessage("Переформирование Guard SAN для клиентов выполнено успешно");
     }*/
 
+    public void runSynchCleanup() throws Exception {
+        RuntimeContext.getAppContext().getBean(SynchCleanupService.class).run(); //DEF
+        printMessage("Очистка журналов синхронизации успешно завершена");
+    }
+
+
+
     @Override
     public String getPageFilename() {
         return "service/other_actions";

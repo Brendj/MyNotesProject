@@ -308,6 +308,9 @@
                     <h:outputText escape="true" value="Тайм-аут"
                                                        styleClass="output-text" />
                     <h:inputText value="#{optionPage.retryAfter}" styleClass="input-text" size="5" />
+                    <h:outputText escape="true" value="Производить очистку журналов синхронизации"
+                                  styleClass="output-text" />
+                    <h:selectBooleanCheckbox value="#{optionPage.synchCleanup}" styleClass="output-text" />
                 </h:panelGrid>
             </rich:panel>
 
