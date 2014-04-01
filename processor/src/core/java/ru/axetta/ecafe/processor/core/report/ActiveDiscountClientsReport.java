@@ -843,7 +843,7 @@ public class ActiveDiscountClientsReport extends BasicReportForAllOrgJob {
                 String group = m.group();
                 if(group != null && group.length() > 0) {
                     int grp = Integer.parseInt(group);
-                    if(grp < 4) {
+                    if(grp <= 4) {
                         primarySchool += total;
                     } else {
                         highSchool += total;
