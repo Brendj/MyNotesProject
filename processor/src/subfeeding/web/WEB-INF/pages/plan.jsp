@@ -32,10 +32,8 @@
     <script>
         var subBalance0 = <%=subBalance0%>;
         var subBalance1 = <%=subBalance1%>;
-        var dateActivateStr = '<%=dateActivate%>';
-        var dateActivateDisable = '<%=(sf.getIdOfSubscriptionFeeding() == null?"disable":"enable")%>';
         var total = 0;
-        var minDateActivate = new Date(dateActivateStr.replace(/(\d+)\.(\d+)\.(\d+)/, '$2/$1/$3'));
+        var minDateActivate = new Date('<%=dateActivate%>'.replace(/(\d+)\.(\d+)\.(\d+)/, '$2/$1/$3'));
         function formatSum(sum){
             return (sum/100).toFixed(2).replace(".",",")+" руб";
         }
@@ -52,7 +50,7 @@
             $("#complexForm").preventDoubleSubmission();
             $('input:text').button().addClass('ui-textfield');
             $("button").button();
-            var dateActivate = $("#dateActivate").datepicker(dateActivateDisable);
+            var dateActivate = $("#dateActivate").datepicker(<%=(sf.getIdOfSubscriptionFeeding() != null?"disable":"")%>);
             dateActivate.datepicker("option", "minDate", minDateActivate);
             var $cbs = $('.simpleTable input[type="checkbox"]');
             $cbs.each(function() {
