@@ -251,12 +251,15 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 if (!i.getName().equals(cat)) {
                     continue;
                 }
+                if(i.getGroup2() == null) {
+                    continue;
+                }
                 if(i.getGroup2().equals(LUNCH) || cat.indexOf("(завтрак)") > 0 ||
-                   i.getGroup2().equals(BREAKFAST)) {
+                   i.getGroup2().equals(BREAKFAST) || i.getGroup2().equals(SNACK)) {
                     prices.add(i.getPrice());
                 }
                 if (i.getGroup2() != null &&
-                    (!i.getGroup2().equals(LUNCH) && cat.indexOf("(завтрак)") < 1)) {
+                    (!i.getGroup2().equals(LUNCH) && !i.getGroup2().equals(SNACK) && cat.indexOf("(завтрак)") < 1)) {
                     continue;
                 }
                 /*if (i.getGroup2() != null && !i.getGroup2().equals(LUNCH)) {
@@ -438,6 +441,8 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 this.group2 = BREAKFAST;
             } else if (goodname.toLowerCase().indexOf(LUNCH.toLowerCase()) > -1) {
                 this.group2 = LUNCH;
+            } else if (goodname.toLowerCase().indexOf(SNACK.toLowerCase()) > -1) {
+                this.group2 = SNACK;
             }
             this.children = children;
             this.price = price;
