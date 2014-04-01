@@ -358,22 +358,22 @@ public class DashboardServiceBean {
 
             //  Заполняем процентные показатели
             Map<Long, Integer> studentEnters = daoService
-                    .getOrgEntersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS);
+                    .getOrgEntersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS, session);
             Map<Long, Integer> employeeEnters = daoService
-                    .getOrgEntersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_NON_STUDENTS);
+                    .getOrgEntersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_NON_STUDENTS, session);
             Map<Long, Integer> studentPays = daoService
-                    .getOrgOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS, true);
+                    .getOrgOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS, true, session);
             Map<Long, Integer> employeePays = daoService
-                    .getOrgOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_NON_STUDENTS, true);
+                    .getOrgOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_NON_STUDENTS, true, session);
             Map<Long, Integer> studentDiscounts = daoService
-                    .getProposalOrgDiscounsCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS);
+                    .getProposalOrgDiscounsCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS, session);
             Map<Long, Integer> employeeDiscounts = daoService
                     .getProposalOrgDiscounsCountByGroupType(dayStartDate, dayEndDate,
-                            DAOService.GROUP_TYPE_NON_STUDENTS);
+                            DAOService.GROUP_TYPE_NON_STUDENTS, session);
             Map<Long, Integer> studentUniqueOrders = daoService
-                    .getOrgUniqueOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS);
+                    .getOrgUniqueOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_STUDENTS, session);
             Map<Long, Integer> employeeUniqueOrders = daoService
-                    .getOrgUniqueOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_NON_STUDENTS);
+                    .getOrgUniqueOrdersCountByGroupType(dayStartDate, dayEndDate, DAOService.GROUP_TYPE_NON_STUDENTS, session);
 
             for (Long orgID : orgStats.keySet()) {
                 DashboardResponse.OrgBasicStatItem statItem = orgStats.get(orgID);

@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
@@ -654,9 +655,13 @@ public class DAOService {
         q.setParameter("idOfCard", idOfCard);
         return q.executeUpdate() > 0;
     }
+    public Map<Long, Integer> getOrgEntersCountByGroupType(Date at, Date to, int groupType) {
+        Session session = (Session) entityManager.getDelegate();
+        return getOrgEntersCountByGroupType(at, to, groupType, session);
+    }
 
     @SuppressWarnings("unchecked")
-    public Map<Long, Integer> getOrgEntersCountByGroupType(Date at, Date to, int groupType) {
+    public Map<Long, Integer> getOrgEntersCountByGroupType(Date at, Date to, int groupType, Session session) {
         String sql = "";
         if (groupType == GROUP_TYPE_STUDENTS) {
             sql = "SELECT cf_enterevents.idoforg, COUNT(cf_enterevents.idofclient) " +
@@ -678,7 +683,7 @@ public class DAOService {
 
         try {
             Map<Long, Integer> res = new HashMap<Long, Integer>();
-            Query q = entityManager.createNativeQuery(sql);
+            org.hibernate.SQLQuery q = session.createSQLQuery(sql);
             q.setParameter("dateAt", at.getTime());
             q.setParameter("dateTo", to.getTime());
             if (groupType == GROUP_TYPE_STUDENTS) {
@@ -687,7 +692,7 @@ public class DAOService {
                 q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
                 q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
             }
-            List resultList = q.getResultList();
+            List resultList = q.list();
 
             for (Object entry : resultList) {
                 Object e[] = (Object[]) entry;
@@ -703,6 +708,13 @@ public class DAOService {
 
     @SuppressWarnings("unchecked")
     public Map<Long, Integer> getOrgOrdersCountByGroupType(Date at, Date to, int groupType, boolean notDiscounted) {
+        Session session = (Session) entityManager.getDelegate();
+        return getOrgOrdersCountByGroupType(at, to, groupType, notDiscounted, session);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public Map<Long, Integer> getOrgOrdersCountByGroupType(Date at, Date to, int groupType, boolean notDiscounted, Session session) {
         String sql = "";
         if (groupType == GROUP_TYPE_STUDENTS) {
             sql = "SELECT cf_orders.idoforg, COUNT(distinct cf_orders.idofclient) " +
@@ -722,7 +734,7 @@ public class DAOService {
 
         try {
             Map<Long, Integer> res = new HashMap<Long, Integer>();
-            Query q = entityManager.createNativeQuery(sql);
+            org.hibernate.SQLQuery q = session.createSQLQuery(sql);
             q.setParameter("dateAt", at.getTime());
             q.setParameter("dateTo", to.getTime());
             if (groupType == GROUP_TYPE_STUDENTS) {
@@ -731,7 +743,7 @@ public class DAOService {
                 q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
                 q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
             }
-            List resultList = q.getResultList();
+            List resultList = q.list();
 
             for (Object entry : resultList) {
                 Object e[] = (Object[]) entry;
@@ -747,6 +759,13 @@ public class DAOService {
 
     @SuppressWarnings("unchecked")
     public Map<Long, Integer> getProposalOrgDiscounsCountByGroupType(Date at, Date to, int groupType) {
+        Session session = (Session) entityManager.getDelegate();
+        return getProposalOrgDiscounsCountByGroupType(at, to, groupType, session);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public Map<Long, Integer> getProposalOrgDiscounsCountByGroupType(Date at, Date to, int groupType, Session session) {
         String sql = "";
         if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
             sql = "SELECT idoforg, COUNT(DISTINCT cf_clientscomplexdiscounts.idofclient) " +
@@ -770,7 +789,7 @@ public class DAOService {
         }
         try {
             Map<Long, Integer> res = new HashMap<Long, Integer>();
-            Query q = entityManager.createNativeQuery(sql);
+            org.hibernate.SQLQuery q = session.createSQLQuery(sql);
             /*q.setParameter("dateAt", at.getTime());
             q.setParameter("dateTo", to.getTime());*/
             if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
@@ -779,7 +798,7 @@ public class DAOService {
                 q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
                 q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
             }
-            List resultList = q.getResultList();
+            List resultList = q.list();
             for (Object entry : resultList) {
                 Object e[] = (Object[]) entry;
                 res.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
@@ -794,6 +813,13 @@ public class DAOService {
 
     @SuppressWarnings("unchecked")
     public Map<Long, Integer> getOrgUniqueOrdersCountByGroupType(Date at, Date to, int groupType) {
+        Session session = (Session) entityManager.getDelegate();
+        return getOrgUniqueOrdersCountByGroupType(at, to, groupType, session);
+    }
+
+
+    @SuppressWarnings("unchecked")
+    public Map<Long, Integer> getOrgUniqueOrdersCountByGroupType(Date at, Date to, int groupType, Session session) {
         String sql = "";
         if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
             sql = "SELECT cf_orders.idoforg, COUNT(DISTINCT cf_orders.idofclient) " +
@@ -814,7 +840,7 @@ public class DAOService {
 
         try {
             Map<Long, Integer> res = new HashMap<Long, Integer>();
-            Query q = entityManager.createNativeQuery(sql);
+            org.hibernate.SQLQuery q = session.createSQLQuery(sql);
             q.setParameter("dateAt", at.getTime());
             q.setParameter("dateTo", to.getTime());
             if (groupType == DAOService.GROUP_TYPE_STUDENTS) {
@@ -823,7 +849,7 @@ public class DAOService {
                 q.setParameter("nonStudentGroups", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
                 q.setParameter("leavingClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
             }
-            List resultList = q.getResultList();
+            List resultList = q.list();
             for (Object entry : resultList) {
                 Object e[] = (Object[]) entry;
                 res.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
