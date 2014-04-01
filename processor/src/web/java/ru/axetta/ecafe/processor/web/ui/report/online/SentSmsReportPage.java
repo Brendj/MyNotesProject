@@ -45,7 +45,7 @@ import java.util.GregorianCalendar;
 @Component
 @Scope(value = "session")
 public class SentSmsReportPage extends OnlineReportPage {
-    @PersistenceContext(unitName = "processorPU")
+    @PersistenceContext(unitName = "reportsPU")
     public EntityManager entityManager;
     private final static Logger logger = LoggerFactory.getLogger(SentSmsReportPage.class);
     private SentSmsReport report;
