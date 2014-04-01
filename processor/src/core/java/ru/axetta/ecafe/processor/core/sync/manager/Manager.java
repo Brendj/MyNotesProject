@@ -584,6 +584,38 @@ public class Manager {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         String errorMessage = null;
+        DistributedObject currentDO = null;
+        final Class<? extends DistributedObject> aClass = distributedObject.getClass();
+        final String simpleClassName = aClass.getSimpleName();
+        try {
+            persistenceSession = sessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Criteria currentDOCriteria = persistenceSession.createCriteria(aClass);
+            currentDOCriteria.add(Restrictions.eq("guid", distributedObject.getGuid()));
+            distributedObject.createProjections(currentDOCriteria);
+            currentDOCriteria.setResultTransformer(Transformers.aliasToBean(aClass));
+            currentDOCriteria.setMaxResults(1);
+            currentDO = (DistributedObject) currentDOCriteria.uniqueResult();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, LOGGER);
+            HibernateUtils.close(persistenceSession, LOGGER);
+            if (StringUtils.isNotEmpty(errorMessage)) {
+                saveException(sessionFactory, errorMessage);
+            }
+        }
+        /* Проверки вне транзакции */
+        if (distributedObject.getTagName().equals("C") && currentDO != null) {
+            final String message = simpleClassName + " DUPLICATE_GUID : " + distributedObject.getGuid();
+            distributedObject.setDistributedObjectException(new DistributedObjectException(message));
+            return distributedObject;
+        }
+        if (distributedObject.getTagName().equals("M") && currentDO == null) {
+            final String message = simpleClassName + " NOT_FOUND_VALUE : " + distributedObject.getGuid();
+            distributedObject.setDistributedObjectException(new DistributedObjectException(message));
+            return distributedObject;
+        }
         try {
             persistenceSession = sessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -592,7 +624,7 @@ public class Manager {
                 if (!(distributedObject.getDeletedState() == null || distributedObject.getDeletedState())) {
                     distributedObject.preProcess(persistenceSession, idOfOrg);
                     distributedObject = processDistributedObject(persistenceSession, distributedObject,
-                            currentMaxVersion);
+                            currentMaxVersion, currentDO);
                 } else {
                     distributedObject = updateDeleteState(persistenceSession, distributedObject, currentMaxVersion);
                 }
@@ -657,10 +689,6 @@ public class Manager {
         currentDOCriteria.setResultTransformer(Transformers.aliasToBean(distributedObject.getClass()));
         currentDOCriteria.setMaxResults(1);
         DistributedObject currentDO = (DistributedObject) currentDOCriteria.uniqueResult();
-        if (currentDO == null) {
-            throw new DistributedObjectException(
-                    distributedObject.getClass().getSimpleName() + " NOT_FOUND_VALUE : " + distributedObject.getGuid());
-        }
         currentDO.setLastUpdate(new Date());
         currentDO.setDeleteDate(new Date());
         currentDO.setGlobalVersion(currentMaxVersion);
@@ -672,21 +700,11 @@ public class Manager {
     }
 
     private DistributedObject processDistributedObject(Session persistenceSession, DistributedObject distributedObject,
-            Long currentMaxVersion) throws Exception {
+            Long currentMaxVersion, DistributedObject currentDO) throws Exception {
         final Class<? extends DistributedObject> aClass = distributedObject.getClass();
-        Criteria currentDOCriteria = persistenceSession.createCriteria(aClass);
-        currentDOCriteria.add(Restrictions.eq("guid", distributedObject.getGuid()));
-        distributedObject.createProjections(currentDOCriteria);
-        currentDOCriteria.setResultTransformer(Transformers.aliasToBean(aClass));
-        currentDOCriteria.setMaxResults(1);
-        DistributedObject currentDO = (DistributedObject) currentDOCriteria.uniqueResult();
         // Создание в БД нового экземпляра РО.
         final String simpleClassName = aClass.getSimpleName();
         if (distributedObject.getTagName().equals("C")) {
-            if (currentDO != null) {
-                final String message = simpleClassName + " DUPLICATE_GUID : " + distributedObject.getGuid();
-                throw new DistributedObjectException(message);
-            }
             distributedObject.setGlobalVersion(currentMaxVersion);
             distributedObject.setGlobalVersionOnCreate(currentMaxVersion);
             distributedObject.setCreatedDate(new Date());
@@ -696,10 +714,10 @@ public class Manager {
         }
         // Изменение существующего в БД экземпляра РО.
         if (distributedObject.getTagName().equals("M")) {
-            if (currentDO == null) {
-                final String message = simpleClassName + " NOT_FOUND_VALUE : " + distributedObject.getGuid();
-                throw new DistributedObjectException(message);
-            }
+            //if (currentDO == null) {
+            //    final String message = simpleClassName + " NOT_FOUND_VALUE : " + distributedObject.getGuid();
+            //    throw new DistributedObjectException(message);
+            //}
             Long currentVersion = currentDO.getGlobalVersion();
             Long objectVersion = distributedObject.getGlobalVersion();
             currentDO.fill(distributedObject);
