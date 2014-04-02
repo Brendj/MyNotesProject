@@ -157,7 +157,7 @@ public class BasicWorkspacePage extends BasicPage {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         logger.error(msg, e);
         facesContext.addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR, msg+(e==null?"":": "+e), null));
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, msg+(e==null?"":": "+e.getMessage()), null));
     }
     public void logAndPrintMessageFor(String componentId, String msg, Exception e) {
         FacesContext facesContext = FacesContext.getCurrentInstance();

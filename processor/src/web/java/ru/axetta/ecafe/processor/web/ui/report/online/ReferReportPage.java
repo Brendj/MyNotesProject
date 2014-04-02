@@ -141,6 +141,10 @@ public class ReferReportPage extends OnlineReportPage {
         monthlyReport = null;
         dailyReport = null;
 
+
+        if(start == null && end == null) {
+            throw new IllegalStateException("Необходимо выбрать хотя бы одну дату (начальную или конечную)");
+        }
         if(start == null && end != null) {
             start = updateStartDate(end);
         }
@@ -179,7 +183,7 @@ public class ReferReportPage extends OnlineReportPage {
                     break;
             }
         } catch (Exception e) {
-            logAndPrintMessage(String.format("Не удалось построить отчет: %s", e.getMessage()),e);
+            logAndPrintMessage("Не удалось построить отчет",e);
         } finally {
             //HibernateUtils.close(session, logger);
         }
@@ -204,7 +208,7 @@ public class ReferReportPage extends OnlineReportPage {
                     break;
             }
         } catch (Exception e) {
-            logAndPrintMessage(String.format("Не удалось построить отчет: %s", e.getMessage()),e);
+            logAndPrintMessage("Не удалось построить отчет",e);
         } finally {
             //HibernateUtils.close(session, logger);
         }
