@@ -91,15 +91,14 @@ public class ManualReportRunnerPage extends OnlineReportPage
     private ReportDAOService proxy;
 
     @PersistenceContext(unitName = "reportsPU")
-    //@PersistenceContext(unitName = "processorPU")
     private EntityManager em;
 
 
     @Override
     //@Transactional -- здесь транзакция не будет работать нежун прокси клас
     public void onShow() throws Exception {
-        // не проверена работа сессии
-        fill(em.unwrap(Session.class), MainPage.getSessionInstance().getCurrentUser());
+        // данные не используются
+        fill();
     }
 
     public int getDocumentFormat() {
@@ -327,7 +326,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
 
 
     @Transactional
-    public void fill(Session session, User currentUser) throws Exception {
+    public void fill() throws Exception {
         List<RuleItem> newRuleItems = new LinkedList<RuleItem>();
         List<ReportHandleRule> rules = proxy.getReportHandlerRules(true);
         for (ReportHandleRule rule : rules) {
@@ -431,7 +430,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
         }
         try {
             long idOfContragent = Long.parseLong(hint.getConditionConstant());
-            Contragent contragent = DAOService.getInstance().getContragentById(idOfContragent);
+            Contragent contragent = ReportDAOService.getInstance().getContragentById(idOfContragent);
             contragentFilter.completeContragentSelection(contragent);
         } catch (Exception e) {
             logger.error("Failed to parse contragent hint " + hint.getConditionConstant(), e);
@@ -444,7 +443,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
         }
         try {
             long idOfContragent = Long.parseLong(hint.getConditionConstant());
-            Contragent contragent = DAOService.getInstance().getContragentById(idOfContragent);
+            Contragent contragent = ReportDAOService.getInstance().getContragentById(idOfContragent);
             contragentPayAgentFilter.completeContragentSelection(contragent);
         } catch (Exception e) {
             logger.error("Failed to parse contragent hint " + hint.getConditionConstant(), e);
@@ -457,7 +456,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
         }
         try {
             long idOfContragent = Long.parseLong(hint.getConditionConstant());
-            Contragent contragent = DAOService.getInstance().getContragentById(idOfContragent);
+            Contragent contragent = ReportDAOService.getInstance().getContragentById(idOfContragent);
             contragentReceiverFilter.completeContragentSelection(contragent);
         } catch (Exception e) {
             logger.error("Failed to parse contragent hint " + hint.getConditionConstant(), e);
@@ -471,7 +470,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
         }
         try {
             long idOfContract = Long.parseLong(hint.getConditionConstant());
-            String contractName = DAOService.getInstance().getContractNameById(idOfContract);
+            String contractName = ReportDAOService.getInstance().getContractNameById(idOfContract);
             contractFilter.completeContractSelection(idOfContract, contractName);
         } catch (Exception e) {
             logger.error("Failed to parse contract hint " + hint.getConditionConstant(), e);
@@ -487,7 +486,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
             Map<Long, String> res = new HashMap<Long, String>();
             for (String id : ids) {
                 long idOfOrg = Long.parseLong(id);
-                Org org = DAOService.getInstance().getOrg(idOfOrg);
+                Org org = ReportDAOService.getInstance().getOrg(idOfOrg);
                 res.put(org.getIdOfOrg(), org.getOfficialName());
             }
             completeOrgListSelection(res);
@@ -616,7 +615,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
             //  Если были выбраны орги, то для каждого орга запускаем отчет..
             List<String> idOfOrgList = values.get("idOfOrg");
             for (String idOfOrg : idOfOrgList) {
-                Org org = DAOService.getInstance().getOrg(Long.parseLong(idOfOrg));
+                Org org = ReportDAOService.getInstance().getOrg(Long.parseLong(idOfOrg));
                 try {
                     buildReport(values, org);
                 } catch (Exception e) {
@@ -646,7 +645,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
 
     public void buildReport(Map<String, List<String>> values, Org org) throws Exception {
         //  Строим отчет
-        ReportHandleRule rule = DAOService.getInstance().getReportHandleRule(ruleId);
+        ReportHandleRule rule = ReportDAOService.getInstance().getReportHandleRule(ruleId);
         if (rule == null) {
             return;
         }
@@ -657,7 +656,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
         if (values.get("idOfContragent") != null) {
             List<String> idOfContragentList = values.get("idOfContragent");
             if (idOfContragentList != null && idOfContragentList.size() > 0) {
-                Contragent contragent = DAOService.getInstance()
+                Contragent contragent = ReportDAOService.getInstance()
                         .getContragentById(Long.parseLong(idOfContragentList.get(0)));
                 builder.setContragent(contragent);
             }
@@ -711,7 +710,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
                 if (tmpList != null && tmpList.size() > 0) {
                     try {
                         long idOfContragentReceiver = Long.parseLong(tmpList.get(0));
-                        contragentReceiver = DAOService.getInstance().getContragentById(idOfContragentReceiver);
+                        contragentReceiver = ReportDAOService.getInstance().getContragentById(idOfContragentReceiver);
                     } catch (Exception e) {
                         contragentReceiver = null;
                     }
@@ -723,7 +722,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
                 if (tmpList != null && tmpList.size() > 0) {
                     try {
                         long idOfContragentPayer = Long.parseLong(tmpList.get(0));
-                        contragentPayer = DAOService.getInstance().getContragentById(idOfContragentPayer);
+                        contragentPayer = ReportDAOService.getInstance().getContragentById(idOfContragentPayer);
                     } catch (Exception e) {
                         contragentPayer = null;
                     }
@@ -735,7 +734,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
                 if (tmpList != null && tmpList.size() > 0) {
                     try {
                         long idOfContragent = Long.parseLong(tmpList.get(0));
-                        contragent = DAOService.getInstance().getContragentById(idOfContragent);
+                        contragent = ReportDAOService.getInstance().getContragentById(idOfContragent);
                     } catch (Exception e) {
                         contragent = null;
                     }
@@ -772,7 +771,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
         }
 
 
-        ReportHandleRule rule = DAOService.getInstance().getReportHandleRule(ruleId);
+        //ReportHandleRule rule = ReportDAOService.getInstance().getReportHandleRule(ruleId);
         DateFormat dateFormat = new SimpleDateFormat();
         DateFormat timeFormat = new SimpleDateFormat();
         BasicJasperReport.ManualBuilder resultBuilder = new BasicJasperReport.ManualBuilder("", dateFormat, timeFormat);
@@ -796,7 +795,6 @@ public class ManualReportRunnerPage extends OnlineReportPage
             FacesContext facesContext = FacesContext.getCurrentInstance();
             ExternalContext externalContext = facesContext.getExternalContext();
             HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
-            DateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
 
             // Header
             String ext = "";
