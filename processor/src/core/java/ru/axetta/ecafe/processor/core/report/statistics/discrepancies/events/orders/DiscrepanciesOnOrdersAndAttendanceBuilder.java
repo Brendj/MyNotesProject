@@ -14,11 +14,8 @@ import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.SentSmsItem;
 import ru.axetta.ecafe.processor.core.report.msc.DiscrepanciesOnOrdersAndAttendanceJasperReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
@@ -32,7 +29,6 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 
 import java.io.ByteArrayOutputStream;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormatSymbols;
 import java.util.*;
@@ -201,26 +197,7 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
             }
         }
 
-
-        //String sql = "SELECT count(distinct client), EXTRACT(EPOCH FROM enter_event_data.d) * 1000, enter_event_data.org "
-        //        + "FROM ("
-        //        + " SELECT cf_enterevents.idofclient AS client, "
-        //        + "  date_trunc('day', to_timestamp(cf_enterevents.evtdatetime/1000)) AS d, "
-        //        + "  cf_enterevents.idoforg AS org "
-        //        + " FROM cf_enterevents "
-        //        + " join cf_clients on cf_clients.idofclient=cf_enterevents.idofclient "
-        //        + " join cf_clients_categorydiscounts on cf_clients.idofclient=cf_clients_categorydiscounts.idofclient "
-        //        + " join cf_categorydiscounts on "
-        //        + "   cf_categorydiscounts.idofcategorydiscount=cf_clients_categorydiscounts.idofcategorydiscount "
-        //        + " join cf_menuexchangerules on cf_menuexchangerules.idofdestorg=cf_enterevents.idoforg "
-        //        + " WHERE evtdatetime >= :startDate AND evtdatetime <= :endDate AND passdirection = 0 and "
-        //        + " cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
-        //        + " cf_clients.discountmode=3 and "  /* берем только льготников */
-        //        + " cf_categorydiscounts.categorytype=0 and "/* смотрим только тех у кого категория бесплатная */
-        //        + " cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS enter_event_data "
-        //        + "GROUP BY enter_event_data.d, enter_event_data.org";
-
-        String sql = "SELECT count(distinct client), EXTRACT(EPOCH FROM enter_event_data.d) * 1000, enter_event_data.org "
+        String sql = "SELECT count(distinct client), EXTRACT(EPOCH FROM order_data.d) * 1000, order_data.org "
                 + "FROM ("
                 + " SELECT cf_orders.idofclient AS client, "
                 + "  date_trunc('day', to_timestamp(cf_orders.createddate/1000)) AS d, "
@@ -230,10 +207,10 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
                 + " join cf_menuexchangerules on cf_menuexchangerules.idofdestorg=cf_orders.idoforg "
                 + " WHERE cf_orders.createddate >= :startDate AND cf_orders.createddate <= :endDate and "
                 + " cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
-                + " cf_clients.discountmode=3 and "  /* берем только льготников */
-                + " cf_orders.ordertype=4 and "/* смотрим плану льготного питания */
-                + " cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS enter_event_data "
-                + "GROUP BY enter_event_data.d, enter_event_data.org";
+                + " cf_clients.discountmode = 3 and "  /* берем только льготников */
+                + " cf_orders.ordertype = 4 and "/* смотрим плану льготного питания */
+                + " cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS order_data "
+                + "GROUP BY order_data.d, order_data.org";
 
         Query query = session.createSQLQuery(sql);
         query.setLong("startDate", startTime.getTime());
@@ -241,22 +218,67 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         query.setParameterList("idOfSupplier", idOfSupplier);
         List<Object[]> res = query.list();
 
-        Map<Long, Map<Date, EnterEventCountItem>> eventCountMap = new HashMap<Long, Map<Date, EnterEventCountItem>>();
+        Map<Long, Map<Date, OrderCountItem>> orderCountMap = new HashMap<Long, Map<Date, OrderCountItem>>();
         for (Object[] row : res) {
             Long idOfOrg = ((BigInteger) row[2]).longValue();
             Long totalCount = ((BigInteger) row[0]).longValue();
             long d = ((Double) row[1]).longValue();
             calendar.setTimeInMillis(d);
             Date date = calendar.getTime();
-            Map<Date, EnterEventCountItem> dateEventCountItemMap = eventCountMap.get(idOfOrg);
-            if(dateEventCountItemMap == null){
-                HashMap<Date, EnterEventCountItem> value = new HashMap<Date, EnterEventCountItem>();
-                value.put(date, new EnterEventCountItem(totalCount, date));
-                eventCountMap.put(idOfOrg, value);
+            Map<Date, OrderCountItem> dateOrderCountItemMap = orderCountMap.get(idOfOrg);
+            if(dateOrderCountItemMap == null){
+                HashMap<Date, OrderCountItem> value = new HashMap<Date, OrderCountItem>();
+                value.put(date, new OrderCountItem(totalCount, date));
+                orderCountMap.put(idOfOrg, value);
             } else {
-                EnterEventCountItem item = dateEventCountItemMap.get(date);
+                OrderCountItem item = dateOrderCountItemMap.get(date);
                 if(item==null){
-                    dateEventCountItemMap.put(date, new EnterEventCountItem(totalCount, date));
+                    dateOrderCountItemMap.put(date, new OrderCountItem(totalCount, date));
+                } else {
+                    item.setTotalCount(item.getTotalCount()+totalCount);
+                }
+            }
+        }
+
+
+        sql = "SELECT count(distinct client), EXTRACT(EPOCH FROM order_data.d) * 1000, order_data.org "
+                + "FROM ("
+                + " SELECT cf_orders.idofclient AS client, "
+                + "  date_trunc('day', to_timestamp(cf_orders.createddate/1000)) AS d, "
+                + "  cf_orders.idoforg AS org "
+                + " FROM cf_orders "
+                + " join cf_clients on cf_clients.idofclient=cf_orders.idofclient "
+                //+ " join cf_orgs on cf_orgs.idoforg=cf_orders.idoforg "
+                + " join cf_menuexchangerules on cf_menuexchangerules.idofdestorg=cf_orders.idoforg "
+                + " WHERE cf_orders.createddate >= :startDate AND cf_orders.createddate <= :endDate and "
+                + " cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
+                + " cf_clients.discountmode = 3 and "  /* берем только льготников */
+                + " cf_orders.ordertype = 6 and "/* План льготного питания, резерв */
+                + " cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS order_data "
+                + "GROUP BY order_data.d, order_data.org";
+
+        query = session.createSQLQuery(sql);
+        query.setLong("startDate", startTime.getTime());
+        query.setLong("endDate", endTime.getTime());
+        query.setParameterList("idOfSupplier", idOfSupplier);
+        res = query.list();
+
+        Map<Long, Map<Date, OrderCountItem>> orderReserveCountMap = new HashMap<Long, Map<Date, OrderCountItem>>();
+        for (Object[] row : res) {
+            Long idOfOrg = ((BigInteger) row[2]).longValue();
+            Long totalCount = ((BigInteger) row[0]).longValue();
+            long d = ((Double) row[1]).longValue();
+            calendar.setTimeInMillis(d);
+            Date date = calendar.getTime();
+            Map<Date, OrderCountItem> dateOrderCountItemMap = orderReserveCountMap.get(idOfOrg);
+            if(dateOrderCountItemMap == null){
+                HashMap<Date, OrderCountItem> value = new HashMap<Date, OrderCountItem>();
+                value.put(date, new OrderCountItem(totalCount, date));
+                orderReserveCountMap.put(idOfOrg, value);
+            } else {
+                OrderCountItem item = dateOrderCountItemMap.get(date);
+                if(item==null){
+                    dateOrderCountItemMap.put(date, new OrderCountItem(totalCount, date));
                 } else {
                     item.setTotalCount(item.getTotalCount()+totalCount);
                 }
@@ -267,7 +289,8 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         for (Long id: orgs){
             OrgItem orgItem = orgItems.get(id);
             Map<Date, RequestCountItem> dateRequestCountItemMap = requestCountMap.get(id);
-            Map<Date, EnterEventCountItem> dateEventCountItemMap = eventCountMap.get(id);
+            Map<Date, OrderCountItem> dateOrderCountItemMap = orderCountMap.get(id);
+            Map<Date, OrderCountItem> dateOrderReserveCountItemMap = orderReserveCountMap.get(id);
             Date beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
             Date endDate = CalendarUtils.truncateToDayOfMonth(endTime);
             while (beginDate.getTime() <= endDate.getTime()) {
@@ -279,15 +302,26 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
                         e.setRequestCount(item.getTotalCount());
                     } else e.setRequestCount(0L);
                 } else e.setRequestCount(0L);
-                if(dateEventCountItemMap!=null){
-                    EnterEventCountItem item = dateEventCountItemMap.get(beginDate);
+                if(dateOrderCountItemMap!=null){
+                    OrderCountItem item = dateOrderCountItemMap.get(beginDate);
                     if(item!=null){
-                        e.setEnterEventCount(item.getTotalCount());
-                    } else e.setEnterEventCount(0L);
-                } else e.setEnterEventCount(0L);
+                        e.setOrderCount(item.getTotalCount());
+                    } else e.setOrderCount(0L);
+                } else e.setOrderCount(0L);
+
+                if(dateOrderCountItemMap!=null){
+                    if(dateOrderReserveCountItemMap==null || dateOrderReserveCountItemMap.isEmpty()){
+                        e.setOrderReserveCount(0L);
+                    } else {
+                        OrderCountItem item = dateOrderReserveCountItemMap.get(beginDate);
+                        if(item!=null){
+                            e.setOrderReserveCount(item.getTotalCount());
+                        } else e.setOrderReserveCount(0L);
+                    }
+                } else e.setOrderReserveCount(0L);
 
                 //if(dateForecastEventCountItemMap!=null){
-                //    EnterEventCountItem item = dateForecastEventCountItemMap.get(beginDate);
+                //    OrderCountItem item = dateForecastEventCountItemMap.get(beginDate);
                 //    if(item!=null){
                 //        //e.setForecastQty(item.getTotalCount()*103/2100);
                 //        e.setForecastQty((item.getTotalCount()*103)/100);
@@ -330,50 +364,50 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
 //
 //List<Object[]>  enterEventForecastRes = (List<Object[]>) enterEventForecastCrit.list();
 
-//Map<Long, Map<Date, EnterEventCountItem>> eventForecastCountMap = new HashMap<Long, Map<Date, EnterEventCountItem>>();
+//Map<Long, Map<Date, OrderCountItem>> eventForecastCountMap = new HashMap<Long, Map<Date, OrderCountItem>>();
 //for (Object[] row: enterEventForecastRes){
 //    Long idOfOrg = (Long) row[1];
 //    Long totalCount = row[0] == null ? 0L : ((Long) row[0]);
 //Date date = CalendarUtils.truncateToDayOfMonth((Date) row[2]);
-//Map<Date, EnterEventCountItem> dateEventCountItemMap = eventForecastCountMap.get(idOfOrg);
+//Map<Date, OrderCountItem> dateEventCountItemMap = eventForecastCountMap.get(idOfOrg);
 
 
 //if(dateEventCountItemMap == null){
-//    HashMap<Date, EnterEventCountItem> value = new HashMap<Date, EnterEventCountItem>();
-//    value.put(date, new EnterEventCountItem(totalCount, date));
+//    HashMap<Date, OrderCountItem> value = new HashMap<Date, OrderCountItem>();
+//    value.put(date, new OrderCountItem(totalCount, date));
 //    eventForecastCountMap.put(idOfOrg, value);
 //} else {
-//    EnterEventCountItem item = dateEventCountItemMap.get(date);
+//    OrderCountItem item = dateEventCountItemMap.get(date);
 //    if(item==null){
-//        //HashMap<Date, EnterEventCountItem> value = new HashMap<Date, EnterEventCountItem>();
-//        //value.put(date, new EnterEventCountItem(totalCount, date));
+//        //HashMap<Date, OrderCountItem> value = new HashMap<Date, OrderCountItem>();
+//        //value.put(date, new OrderCountItem(totalCount, date));
 //        //eventForecastCountMap.put(idOfOrg, value);
-//        dateEventCountItemMap.put(date, new EnterEventCountItem(totalCount, date));
+//        dateEventCountItemMap.put(date, new OrderCountItem(totalCount, date));
 //    } else {
 //        item.setTotalCount(item.getTotalCount()+totalCount);
 //    }
 //}
 //}
 
-//Map<Long, Map<Date, EnterEventCountItem>> eventForecastCountMap = new HashMap<Long, Map<Date, EnterEventCountItem>>();
+//Map<Long, Map<Date, OrderCountItem>> eventForecastCountMap = new HashMap<Long, Map<Date, OrderCountItem>>();
 //for (Long idOfOrg: eventForecastCountMap.keySet()){
-//    Map<Date, EnterEventCountItem> dateOrderCountItemMap = eventForecastCountMap.get(idOfOrg);
+//    Map<Date, OrderCountItem> dateOrderCountItemMap = eventForecastCountMap.get(idOfOrg);
 //    Date beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
 //    Date endDate = CalendarUtils.truncateToDayOfMonth(endTime);
 //    orderBeginDate = CalendarUtils.addDays(beginDate, -21);
 //    orderEndDate = CalendarUtils.addDays(endDate, -21);
-//    Map<Date, EnterEventCountItem> dateOrderForecastCountItemMap = new HashMap<Date, EnterEventCountItem>();
+//    Map<Date, OrderCountItem> dateOrderForecastCountItemMap = new HashMap<Date, OrderCountItem>();
 //
 //    while (orderBeginDate.getTime() <= orderEndDate.getTime()) {
-//        EnterEventCountItem m = dateOrderCountItemMap.get(orderBeginDate);
+//        OrderCountItem m = dateOrderCountItemMap.get(orderBeginDate);
 //        long total =0L;
 //        if(m!=null) total = m.getTotalCount();
 //        Date forecastBeginDate = CalendarUtils.addDays(orderBeginDate, 21);
 //        //Date forecastEndDate = CalendarUtils.addDays(orderEndDate, 21);
 //        while (forecastBeginDate.getTime() <= endDate.getTime() ) {
-//            EnterEventCountItem forecastItem = dateOrderForecastCountItemMap.get(forecastBeginDate);
+//            OrderCountItem forecastItem = dateOrderForecastCountItemMap.get(forecastBeginDate);
 //            if(forecastItem==null){
-//                dateOrderForecastCountItemMap.put(forecastBeginDate, new EnterEventCountItem(total, forecastBeginDate));
+//                dateOrderForecastCountItemMap.put(forecastBeginDate, new OrderCountItem(total, forecastBeginDate));
 //            } else {
 //                forecastItem.setTotalCountAndCount(forecastItem.getTotalCount() + total);
 //            }
@@ -383,7 +417,7 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
 //        orderBeginDate = CalendarUtils.addDays(orderBeginDate, 1);
 //    }
 //    for (Date d: dateOrderForecastCountItemMap.keySet()){
-//        EnterEventCountItem item = dateOrderForecastCountItemMap.get(d);
+//        OrderCountItem item = dateOrderForecastCountItemMap.get(d);
 //        if(item.getCount()!=null && item.getCount()>0) item.setTotalCount(item.getTotalCount()/item.getCount());
 //    }
 //    eventForecastCountMap.put(idOfOrg, dateOrderForecastCountItemMap);

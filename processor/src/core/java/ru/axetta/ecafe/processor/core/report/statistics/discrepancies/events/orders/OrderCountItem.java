@@ -13,13 +13,13 @@ import java.util.Date;
  * Time: 15:51
  * To change this template use File | Settings | File Templates.
  */
-class EnterEventCountItem {
+class OrderCountItem {
 
     private Long totalCount;
     private final Date doneDate;
     private Long count;
 
-    EnterEventCountItem(Long totalCount, Date doneDate) {
+    OrderCountItem(Long totalCount, Date doneDate) {
         this.totalCount = totalCount;
         this.doneDate = doneDate;
         count=1L;

@@ -156,6 +156,8 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             BasicReportJob report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
             if (report != null) {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 JRHtmlExporter exporter = new JRHtmlExporter();
@@ -171,15 +173,6 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
                 htmlReport = os.toString("UTF-8");
                 os.close();
             }
-            if(hideGeneratePeriod){
-                Properties properties = new Properties();
-                String endGenerateDateStr = CalendarUtils.toStringFullDateTimeWithLocalTimeZone(generateEndDate);
-                properties.setProperty(generateBeginDateKey, endGenerateDateStr);
-                DAOUtils.saveReportSettings(persistenceSession, currentUser, UserReportSetting.GOOD_REQUEST_REPORT,
-                        properties);
-            }
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
             printMessage("Сводный отчет по заявкам построен");
         } catch (Exception e) {
             printError("Ошибка при построении отчета: "+e.getMessage());
@@ -187,6 +180,27 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+        }
+
+        if(hideGeneratePeriod){
+            try {
+                // идет запись
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                Properties properties = new Properties();
+                String endGenerateDateStr = CalendarUtils.toStringFullDateTimeWithLocalTimeZone(generateEndDate);
+                properties.setProperty(generateBeginDateKey, endGenerateDateStr);
+                DAOUtils.saveReportSettings(persistenceSession, currentUser, UserReportSetting.GOOD_REQUEST_REPORT,
+                        properties);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } catch (Exception e) {
+                logger.error("Failed export report : ", e);
+                printError("Ошибка при подготовке отчета: " + e.getMessage());
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
         }
         return null;
     }
@@ -250,6 +264,8 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             BasicReportJob report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
             FacesContext facesContext = FacesContext.getCurrentInstance();
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
 
@@ -274,21 +290,38 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
             //if(hideGeneratePeriod){
             //    saveReportSettings(persistenceSession, currentUser);
             //}
-            if(hideGeneratePeriod){
-                Properties properties = new Properties();
-                String endGenerateDateStr = CalendarUtils.toStringFullDateTimeWithLocalTimeZone(generateEndDate);
-                properties.setProperty(generateBeginDateKey, endGenerateDateStr);
-                DAOUtils.saveReportSettings(persistenceSession, currentUser, UserReportSetting.GOOD_REQUEST_REPORT,
-                        properties);
-            }
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
+
+
         } catch (Exception e) {
             logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
+        }
+
+
+
+        if(hideGeneratePeriod){
+            try {
+                // идет запись
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                Properties properties = new Properties();
+                String endGenerateDateStr = CalendarUtils.toStringFullDateTimeWithLocalTimeZone(generateEndDate);
+                properties.setProperty(generateBeginDateKey, endGenerateDateStr);
+                DAOUtils.saveReportSettings(persistenceSession, currentUser, UserReportSetting.GOOD_REQUEST_REPORT,
+                        properties);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+
+            } catch (Exception e) {
+                logger.error("Failed export report : ", e);
+                printError("Ошибка при подготовке отчета: " + e.getMessage());
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
         }
     }
 

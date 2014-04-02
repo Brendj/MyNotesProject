@@ -25,7 +25,8 @@ public class Item {
     private Date currentDate;
     private Long requestCount;
     private Long forecastQty;
-    private Long enterEventCount;
+    private Long orderCount;
+    private Long orderReserveCount;
     private Long idOfOrg;
 
     void fillOrgInfo(OrgItem item) {
@@ -101,16 +102,25 @@ public class Item {
         this.requestCount = requestCount;
     }
 
-    public Long getEnterEventCount() {
-        return enterEventCount;
+    public Long getOrderCount() {
+        return orderCount;
     }
 
     public Double getPercent() {
-        return Math.abs((requestCount==null || enterEventCount==null || requestCount==0)?0.0:(requestCount-enterEventCount)*100.0/requestCount);
+        long reserve = (orderReserveCount==null?0L:orderReserveCount);
+        return Math.abs((requestCount==null || orderCount ==null || requestCount==0)?0.0:(requestCount- orderCount-reserve)*100.0/requestCount);
     }
 
-    public void setEnterEventCount(Long enterEventCount) {
-        this.enterEventCount = enterEventCount;
+    public void setOrderCount(Long orderCount) {
+        this.orderCount = orderCount;
+    }
+
+    public Long getOrderReserveCount() {
+        return orderReserveCount;
+    }
+
+    public void setOrderReserveCount(Long orderReserveCount) {
+        this.orderReserveCount = orderReserveCount;
     }
 
     public Long getForecastQty() {

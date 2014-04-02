@@ -98,6 +98,9 @@
                         <h:outputText value="Продано"/>
                     </rich:column>
                     <rich:column>
+                        <h:outputText value="Продано, резервникам"/>
+                    </rich:column>
+                    <rich:column>
                         <h:outputText value="% несоответствия"/>
                     </rich:column>
                 </rich:columnGroup>
@@ -127,10 +130,18 @@
                 <h:outputText value="#{item.forecastQty==null?0:item.forecastQty}"/>
             </rich:column>
             <rich:column>
-                <h:outputText value="#{item.enterEventCount==null?0:item.enterEventCount}"/>
+                <h:outputText value="#{item.orderCount==null?0:item.orderCount}"/>
             </rich:column>
             <rich:column>
-                <h:outputText value="#{(item.requestCount==null || item.enterEventCount==null || item.requestCount==0)?0:(item.requestCount-item.enterEventCount)*100/item.requestCount}">
+                <h:outputText value="#{item.orderReserveCount==null?0:item.orderReserveCount}"/>
+            </rich:column>
+            <rich:column>
+                <h:outputText value="#{item.percent}">
+                    <f:convertNumber pattern="#0.00"/>
+                </h:outputText>
+            </rich:column>
+            <rich:column rendered="false">
+                <h:outputText value="#{(item.requestCount==null || item.orderCount==null || item.requestCount==0)?0:(item.requestCount-item.orderCount)*100/item.requestCount}">
                     <f:convertNumber pattern="#0.00"/>
                 </h:outputText>
             </rich:column>
