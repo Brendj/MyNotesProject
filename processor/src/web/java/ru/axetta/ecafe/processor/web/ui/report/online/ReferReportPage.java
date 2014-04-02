@@ -53,7 +53,7 @@ public class ReferReportPage extends OnlineReportPage {
     private String category;
     private List<String> categories;
 
-    @PersistenceContext(unitName = "processorPU")
+    @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
 
 
@@ -142,8 +142,8 @@ public class ReferReportPage extends OnlineReportPage {
         dailyReport = null;
 
         end = updateEndDate(end);
-        if(endDate.before(start)) {
-            endDate = updateEndDate(start);
+        if(end.before(start)) {
+            end = updateEndDate(start);
         }
 
 
