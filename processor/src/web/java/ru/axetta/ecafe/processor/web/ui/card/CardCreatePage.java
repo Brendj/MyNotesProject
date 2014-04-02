@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.utils.AbbreviationUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.card.items.ClientItem;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
 
 import org.hibernate.Session;
@@ -24,132 +25,6 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class CardCreatePage extends BasicWorkspacePage implements ClientSelectPage.CompleteHandler {
-
-    public static class ClientItem {
-
-        public static class PersonItem {
-
-            private String firstName;
-            private String surname;
-            private String secondName;
-            private String idDocument;
-
-            public String getFirstName() {
-                return firstName;
-            }
-
-            public void setFirstName(String firstName) {
-                this.firstName = firstName;
-            }
-
-            public String getSurname() {
-                return surname;
-            }
-
-            public void setSurname(String surname) {
-                this.surname = surname;
-            }
-
-            public String getSecondName() {
-                return secondName;
-            }
-
-            public void setSecondName(String secondName) {
-                this.secondName = secondName;
-            }
-
-            public String getIdDocument() {
-                return idDocument;
-            }
-
-            public void setIdDocument(String idDocument) {
-                this.idDocument = idDocument;
-            }
-
-            public PersonItem() {
-                this.firstName = null;
-                this.surname = null;
-                this.secondName = null;
-                this.idDocument = null;
-            }
-
-            public PersonItem(Person person) {
-                this.firstName = person.getFirstName();
-                this.surname = person.getSurname();
-                this.secondName = person.getSecondName();
-                this.idDocument = person.getIdDocument();
-            }
-        }
-
-        private final Long idOfClient;
-        private final String orgShortName;
-        private final PersonItem person;
-        private final PersonItem contractPerson;
-        private final Long contractId;
-        private final Date contractTime;
-        private final Integer contractState;
-
-        public String getShortName() {
-            if (null == contractId) {
-                return "";
-            }
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(ContractIdFormat.format(contractId)).append(" (")
-                    .append(AbbreviationUtils.buildAbbreviation(contractPerson.getFirstName(),
-                            contractPerson.getSurname(), contractPerson.getSecondName())).append("): ")
-                    .append(AbbreviationUtils.buildAbbreviation(person.getFirstName(), person.getSurname(),
-                            person.getSecondName()));
-            return stringBuilder.toString();
-        }
-
-        public ClientItem() {
-            this.idOfClient = null;
-            this.orgShortName = null;
-            this.person = new PersonItem();
-            this.contractPerson = new PersonItem();
-            this.contractId = null;
-            this.contractTime = null;
-            this.contractState = null;
-        }
-
-        public ClientItem(Client client) {
-            this.idOfClient = client.getIdOfClient();
-            this.orgShortName = client.getOrg().getShortName();
-            this.person = new PersonItem(client.getPerson());
-            this.contractPerson = new PersonItem(client.getContractPerson());
-            this.contractId = client.getContractId();
-            this.contractTime = client.getContractTime();
-            this.contractState = client.getContractState();
-        }
-
-        public Long getIdOfClient() {
-            return idOfClient;
-        }
-
-        public String getOrgShortName() {
-            return orgShortName;
-        }
-
-        public PersonItem getPerson() {
-            return person;
-        }
-
-        public PersonItem getContractPerson() {
-            return contractPerson;
-        }
-
-        public Long getContractId() {
-            return contractId;
-        }
-
-        public Date getContractTime() {
-            return contractTime;
-        }
-
-        public Integer getContractState() {
-            return contractState;
-        }
-    }
 
     private ClientItem client;
     private Long cardNo;

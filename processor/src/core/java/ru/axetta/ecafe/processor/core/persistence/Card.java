@@ -56,6 +56,7 @@ public class Card {
     private String externalId;
     private Set<AccountTransaction> transactions = new HashSet<AccountTransaction>();
     private Set<Order> orders = new HashSet<Order>();
+    private Set<HistoryCard> historyCards = new HashSet<HistoryCard>();
 
     protected Card() {
         // For Hibernate only
@@ -219,6 +220,18 @@ public class Card {
 
     public Set<Order> getOrders() {
         return Collections.unmodifiableSet(getOrdersIntenal());
+    }
+
+    private Set<HistoryCard> getHistoryCardsInternal() {
+        return historyCards;
+    }
+
+    private void setHistoryCardsInternal(Set<HistoryCard> historyCards) {
+        this.historyCards = historyCards;
+    }
+
+    public Set<HistoryCard> getHistoryCards() {
+        return Collections.unmodifiableSet(getHistoryCardsInternal());
     }
 
     @Override

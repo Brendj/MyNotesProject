@@ -53,3 +53,58 @@
     <a4j:commandButton value="Редактировать" action="#{mainPage.showCardEditPage}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
 </h:panelGrid>
+<%--Панель истории изменения владельца карты--%>
+<rich:panel headerClass="workspace-panel-header">
+    <f:facet name="header">
+        <h:outputText escape="true" value="История карты (#{mainPage.cardViewPage.historyCardListViewPage.itemCount})" />
+    </f:facet>
+    <h:panelGrid styleClass="borderless-grid">
+        <rich:dataTable id="historyCardTable" value="#{mainPage.cardViewPage.historyCardListViewPage.items}" var="item"
+                        rows="8"
+                        columnClasses="right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column"
+                        footerClass="data-table-footer">
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Дата и время" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.upDateTime}" converter="timeConverter"
+                              styleClass="output-text" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Прежний владелец" />
+                </f:facet>
+                <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.newOwnerContractId}" styleClass="command-link"
+                                 action="#{mainPage.showOrgViewPage}">
+                    <f:setPropertyActionListener value="#{item.newOwnerIdOfClient}" target="#{mainPage.selectedIdOfOrg}" />
+                </a4j:commandLink>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Новый владелец" />
+                </f:facet>
+                <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.formerOwnerContractId}" styleClass="command-link"
+                                 action="#{mainPage.showOrgViewPage}">
+                    <f:setPropertyActionListener value="#{item.formerOwnerIdOfClient}" target="#{mainPage.selectedIdOfOrg}" />
+                </a4j:commandLink>
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Информация об откреплении и прикреплении карты" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.informationAboutCard}" />
+            </rich:column>
+            <f:facet name="footer">
+                <rich:datascroller for="historyCardTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                                   stepControls="auto" boundaryControls="hide">
+                    <f:facet name="previous">
+                        <h:graphicImage value="/images/16x16/left-arrow.png" />
+                    </f:facet>
+                    <f:facet name="next">
+                        <h:graphicImage value="/images/16x16/right-arrow.png" />
+                    </f:facet>
+                </rich:datascroller>
+            </f:facet>
+        </rich:dataTable>
+    </h:panelGrid>
+</rich:panel>

@@ -39,6 +39,10 @@
             <key column="IdOfCard"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Order"/>
         </set>
+        <set name="historyCardsInternal" inverse="true" cascade="all">
+            <key column="IdOfCard"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.HistoryCard"/>
+        </set>
     </class>
 </hibernate-mapping>
 
