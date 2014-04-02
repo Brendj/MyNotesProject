@@ -141,6 +141,9 @@ public class ReferReportPage extends OnlineReportPage {
         monthlyReport = null;
         dailyReport = null;
 
+        if(start == null && end != null) {
+            start = updateStartDate(end);
+        }
         if(end != null && end.after(start)) {
             end = updateEndDate(end);
         } else {
@@ -282,9 +285,18 @@ public class ReferReportPage extends OnlineReportPage {
         }
     }
 
-    public Date updateEndDate(Date endDate) {
+    public Date updateStartDate(Date end) {
         Calendar cal = new GregorianCalendar();
-        cal.setTimeInMillis(endDate.getTime());
+        cal.setTimeInMillis(end.getTime());
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        return cal.getTime();
+    }
+
+    public Date updateEndDate(Date start) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTimeInMillis(start.getTime());
         cal.set(Calendar.HOUR_OF_DAY, 23);
         cal.set(Calendar.MINUTE, 59);
         cal.set(Calendar.SECOND, 59);

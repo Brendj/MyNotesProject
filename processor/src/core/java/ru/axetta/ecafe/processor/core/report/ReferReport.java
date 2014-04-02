@@ -254,12 +254,12 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 if(i.getGroup2() == null) {
                     continue;
                 }
-                if(i.getGroup2().equals(LUNCH) || cat.indexOf("(завтрак") > 0 ||
+                if(i.getGroup2().equals(LUNCH) || cat.indexOf("(завтрак)") > 0 ||
                    i.getGroup2().equals(BREAKFAST) || i.getGroup2().equals(SNACK)) {
                     prices.add(i.getPrice());
                 }
                 if (i.getGroup2() != null &&
-                    (!i.getGroup2().equals(LUNCH) && !i.getGroup2().equals(SNACK) && cat.indexOf("(завтрак") < 1)) {
+                    (!i.getGroup2().equals(LUNCH) && !i.getGroup2().equals(SNACK) && cat.indexOf("(завтрак)") < 1)) {
                     continue;
                 }
                 /*if (i.getGroup2() != null && !i.getGroup2().equals(LUNCH)) {
