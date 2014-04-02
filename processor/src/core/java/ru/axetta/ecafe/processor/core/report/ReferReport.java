@@ -292,12 +292,12 @@ public class ReferReport extends BasicReportForAllOrgJob {
 
         //  Подсчет пробы
         ReferReportItem workdaysTestItem = new ReferReportItem();
-        workdaysTestItem.setName("ПРОБА");
+        workdaysTestItem.setName("СУТОЧНАЯ ПРОБА");
         workdaysTestItem.setLineId(id);
         workdaysTestItem.setTotal(workdaysSample.getTotal());
         workdaysTestItem.setSummary(workdaysSample.getTotal() * workdaysSample.getPrice());
         ReferReportItem weekendsTestItem = new ReferReportItem();
-        weekendsTestItem.setName("ПРОБА");
+        weekendsTestItem.setName("СУТОЧНАЯ ПРОБА");
         weekendsTestItem.setLineId(id++);
         weekendsTestItem.setTotal(weekendsSample.getTotal());
         weekendsTestItem.setSummary(weekendsSample.getTotal() * weekendsSample.getPrice());
