@@ -620,7 +620,6 @@ public class ProjectStateReportService {
             long ms = System.currentTimeMillis();
             Calendar cal = getToday();
 
-
             org.hibernate.Query q;
             if (!clearedTypes.containsKey(t.getReportType())) {
                 q = session.createSQLQuery(DELETE_SQL);
@@ -631,7 +630,6 @@ public class ProjectStateReportService {
                 q.executeUpdate();
                 clearedTypes.put(t.getReportType(), true);
             }
-
 
             q = session.createSQLQuery(INSERT_SQL);
             q.setLong(0, ms);
@@ -738,9 +736,9 @@ public class ProjectStateReportService {
         cal.set(Calendar.MILLISECOND, 0);
 
 
-        cal.set(Calendar.YEAR, 2014);
+        /*cal.set(Calendar.YEAR, 2014);
         cal.set(Calendar.MONTH, Calendar.FEBRUARY);
-        cal.set(Calendar.DAY_OF_MONTH, 28);
+        cal.set(Calendar.DAY_OF_MONTH, 28);*/
 
         return cal;
     }
