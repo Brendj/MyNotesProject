@@ -11,13 +11,10 @@
 <%-- Панель просмотра правила обработки автоматических отчетов --%>
 <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
 <h:panelGrid id="manualReportRunnerViewGrid" binding="#{manualReportRunnerPage.pageComponent}" styleClass="borderless-grid">
-    <%--%><rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                   warnClass="warn-messages" />--%>
     <h:outputText value="#{manualReportRunnerPage.errorMessage}" style="color: #FF0000" styleClass="messages" rendered="#{not empty manualReportRunnerPage.errorMessage}"/>
     <h:outputText value="#{manualReportRunnerPage.infoMessage}" styleClass="messages" rendered="#{not empty manualReportRunnerPage.infoMessage}"/>
     <rich:simpleTogglePanel label="Настройки ручного запуска" switchType="client" style="width: 800px; max-width: 800px"
                             opened="true" headerClass="filter-panel-header">
-
         <f:verbatim>
             <style type="text/css">
                 .topAligned {
@@ -32,7 +29,6 @@
                     <h:selectOneListbox id="subscriptions" valueChangeListener="#{manualReportRunnerPage.valueChangeListener}"
                                          value="#{manualReportRunnerPage.ruleItem}" style="width:300px;" size="10">
                         <f:selectItems value="#{manualReportRunnerPage.ruleItems}"/>
-                        <%-- workspaceSubView:workspaceForm:workspacePageSubView:manualMainParams --%>
                         <a4j:support event="onselect" reRender="workspaceSubView:workspaceForm:workspacePageSubView:manualParamHints,workspaceSubView:workspaceForm:workspacePageSubView:manualMainParams" />
                         <a4j:support event="onchange" reRender="workspaceSubView:workspaceForm:workspacePageSubView:manualParamHints,workspaceSubView:workspaceForm:workspacePageSubView:manualMainParams" />
                     </h:selectOneListbox>
@@ -50,24 +46,50 @@
 
             <h:panelGrid styleClass="borderless-grid">
                 <h:panelGrid id="manualMainParams" styleClass="borderless-grid" columns="2">
-                    <h:outputText value="Дата выборки от:" styleClass="output-text"/>
-                    <rich:calendar value="#{manualReportRunnerPage.generateStartDate}" popup="true">
-                        <a4j:support event="onchanged" reRender="endDateCalendar" actionListener="#{manualReportRunnerPage.onReportPeriodChanged}" />
+
+                    <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
+                    <rich:calendar value="#{manualReportRunnerPage.startDate}" datePattern="dd.MM.yyyy"
+                                   converter="dateConverter" inputClass="input-text"
+                                   showWeeksBar="false">
+                        <a4j:support event="onchanged" reRender="endDateCalendar,goodRequestsNewReportPanel"
+                                     actionListener="#{manualReportRunnerPage.onReportPeriodChanged}" />
                     </rich:calendar>
-                    <h:outputText value="Интервал выборки: " styleClass="output-text"/>
-                    <h:selectOneMenu id="endDatePeriodSelect" value="#{manualReportRunnerPage.reportPeriod}" converter="javax.faces.Integer"
-                                     styleClass="output-text" >
-                        <f:selectItem itemValue="0" itemLabel="1 день"/>
-                        <f:selectItem itemValue="1" itemLabel="1 неделя"/>
-                        <f:selectItem itemValue="2" itemLabel="2 недели"/>
-                        <f:selectItem itemValue="3" itemLabel="1 месяц"/>
-                        <f:selectItem itemValue="4" itemLabel="Точная дата"/>
-                        <a4j:support event="onchange" reRender="endDateCalendar" actionListener="#{manualReportRunnerPage.onReportPeriodChanged}"/>
+
+                    <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
+                    <h:selectOneMenu id="endDatePeriodSelect"
+                                     value="#{manualReportRunnerPage.periodTypeMenu.periodType}"
+                                     styleClass="input-text" style="width: 250px;">
+                        <f:converter converterId="periodTypeConverter" />
+                        <f:selectItems value="#{manualReportRunnerPage.periodTypeMenu.items}" />
+                        <a4j:support event="onchange" reRender="endDateCalendar"
+                                     actionListener="#{manualReportRunnerPage.onReportPeriodChanged}" />
                     </h:selectOneMenu>
-                    <h:outputText value="Дата выборки до:" styleClass="output-text"/>
-                    <rich:calendar id="endDateCalendar" value="#{manualReportRunnerPage.generateEndDate}" popup="true">
-                        <a4j:support event="onchanged" reRender="endDatePeriodSelect" actionListener="#{manualReportRunnerPage.onEndDateSpecified}"/>
+                    <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
+                    <rich:calendar id="endDateCalendar" value="#{manualReportRunnerPage.endDate}"
+                                   datePattern="dd.MM.yyyy" converter="dateConverter"
+                                   inputClass="input-text" showWeeksBar="false">
+                        <a4j:support event="onchanged" reRender="endDatePeriodSelect"
+                                     actionListener="#{manualReportRunnerPage.onEndDateSpecified}" />
                     </rich:calendar>
+
+                    <%--<h:outputText value="Дата выборки от:" styleClass="output-text"/>--%>
+                    <%--<rich:calendar value="#{manualReportRunnerPage.generateStartDate}" popup="true">--%>
+                        <%--<a4j:support event="onchanged" reRender="endDateCalendar" actionListener="#{manualReportRunnerPage.onReportPeriodChanged}" />--%>
+                    <%--</rich:calendar>--%>
+                    <%--<h:outputText value="Интервал выборки: " styleClass="output-text"/>--%>
+                    <%--<h:selectOneMenu id="endDatePeriodSelect" value="#{manualReportRunnerPage.reportPeriod}" converter="javax.faces.Integer"--%>
+                                     <%--styleClass="output-text" >--%>
+                        <%--<f:selectItem itemValue="0" itemLabel="1 день"/>--%>
+                        <%--<f:selectItem itemValue="1" itemLabel="1 неделя"/>--%>
+                        <%--<f:selectItem itemValue="2" itemLabel="2 недели"/>--%>
+                        <%--<f:selectItem itemValue="3" itemLabel="1 месяц"/>--%>
+                        <%--<f:selectItem itemValue="4" itemLabel="Точная дата"/>--%>
+                        <%--<a4j:support event="onchange" reRender="endDateCalendar" actionListener="#{manualReportRunnerPage.onReportPeriodChanged}"/>--%>
+                    <%--</h:selectOneMenu>--%>
+                    <%--<h:outputText value="Дата выборки до:" styleClass="output-text"/>--%>
+                    <%--<rich:calendar id="endDateCalendar" value="#{manualReportRunnerPage.generateEndDate}" popup="true">--%>
+                        <%--<a4j:support event="onchanged" reRender="endDatePeriodSelect" actionListener="#{manualReportRunnerPage.onEndDateSpecified}"/>--%>
+                    <%--</rich:calendar>--%>
 
                     <h:outputText escape="true" value="Формат отчета" styleClass="output-text" />
                     <h:selectOneMenu value="#{manualReportRunnerPage.documentFormat}" styleClass="input-text">

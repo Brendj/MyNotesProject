@@ -85,6 +85,42 @@ public class MainPage {
 
     private static final Logger logger = LoggerFactory.getLogger(MainPage.class);
 
+    private Long selectedIdOfMenu;
+    private Long selectedIdOfOrg;
+    private CompositeIdOfContragentClientAccount removedIdOfCCAccount;
+    private Long selectedIdOfContragent;
+    private Long selectedIdOfAddPayment;
+    private Long selectedIdOfClient;
+    private Long selectedIdOfCard;
+    private Long selectedIdOfRule;
+    private Long selectedIdOfUser;
+    private Long removedIdOfUser;
+    private Long selectedIdOfReportJob;
+    private Long removedIdOfReportJob;
+    private Long selectedIdOfPos;
+    private Long selectedIdOfSettlement;
+    private Long selectedIdOfEventNotification;
+    private Long removedIdOfEventNotification;
+    private String removedReportTemplate;
+    private String currentConfigurationProvider;
+    /* Параметр фильтра по организациям в странице выбора списка оганизаций
+     * если строка не пуста и заполнена номерами идентификаторов организаций
+      * то отобразится диалоговое окно с организациями где будут помечены галочками
+      * те организации идентификаторы которых перечислены черз запятую в этой строке
+      * иначе отобразится весь список организаций без проставленных галочек*/
+    private String orgFilterOfSelectOrgListSelectPage = "";
+    private List<Long> idOfContragentOrgList = null;
+    private int multiContrFlag = 0;
+    private String classTypes;
+    private String selectedMenuDataXML;
+    private String categoryOrgFilterOfSelectCategoryOrgListSelectPage;
+    private String categoryFilterOfSelectCategoryListSelectPage;
+    private User currentUser;
+    private Long selectedIdOfReportRule;
+    private Long removedIdOfReportRule;
+    private String DEFAULT_ORG_FILTER_PAGE_NAME = "Выбор организаций";
+    private String orgFilterPageName = DEFAULT_ORG_FILTER_PAGE_NAME;
+
     private HtmlPanelMenu mainMenu;
     private BasicWorkspacePage currentWorkspacePage = new DefaultWorkspacePage();
     private Stack<BasicPage> modalPages = new Stack<BasicPage>();
@@ -92,8 +128,6 @@ public class MainPage {
     // User manipulation
     private final BasicWorkspacePage userGroupPage = new BasicWorkspacePage();
     private final UserListPage userListPage = new UserListPage();
-    private Long selectedIdOfUser;
-    private Long removedIdOfUser;
     private final SelectedUserGroupPage selectedUserGroupPage = new SelectedUserGroupPage();
     private final UserViewPage userViewPage = new UserViewPage();
     private final UserEditPage userEditPage = new UserEditPage();
@@ -104,9 +138,7 @@ public class MainPage {
     //categories orgs
     private final BasicWorkspacePage categoryOrgGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage optionsGroupPage = new BasicWorkspacePage();
-
     private final OrgListPage orgListPage = new OrgListPage();
-    private Long selectedIdOfOrg;
     private final SelectedOrgGroupPage selectedOrgGroupPage = new SelectedOrgGroupPage();
     private final OrgViewPage orgViewPage = new OrgViewPage();
     private final OrgEditPage orgEditPage = new OrgEditPage();
@@ -117,13 +149,9 @@ public class MainPage {
     private final MenuDetailsPage menuDetailsPage = new MenuDetailsPage();
     private final MenuExchangePage menuExchangePage = new MenuExchangePage();
 
-private Long selectedIdOfMenu;
-    private String selectedMenuDataXML;
-
     // Contragent manipulation
     private final BasicWorkspacePage contragentGroupPage = new BasicWorkspacePage();
     private final ContragentListPage contragentListPage = new ContragentListPage();
-    private Long selectedIdOfContragent;
     private final SelectedContragentGroupPage selectedContragentGroupPage = new SelectedContragentGroupPage();
     private final ContragentViewPage contragentViewPage = new ContragentViewPage();
     private final ContragentEditPage contragentEditPage = new ContragentEditPage();
@@ -135,7 +163,6 @@ private Long selectedIdOfMenu;
     // Contragent client account manipulation
     private final BasicWorkspacePage ccAccountGroupPage = new BasicWorkspacePage();
     private final CCAccountListPage ccAccountListPage = new CCAccountListPage();
-    private CompositeIdOfContragentClientAccount removedIdOfCCAccount;
     private final CCAccountDeletePage ccAccountDeletePage = new CCAccountDeletePage();
     private final CCAccountCreatePage ccAccountCreatePage = new CCAccountCreatePage();
     private final CCAccountFileLoadPage ccAccountFileLoadPage = new CCAccountFileLoadPage();
@@ -143,7 +170,6 @@ private Long selectedIdOfMenu;
     // Client manipulation
     private final BasicWorkspacePage clientGroupPage = new BasicWorkspacePage();
     private final ClientListPage clientListPage = new ClientListPage();
-    private Long selectedIdOfClient;
     private final SelectedClientGroupPage selectedClientGroupPage = new SelectedClientGroupPage();
     private final ClientViewPage clientViewPage = new ClientViewPage();
     private final ClientEditPage clientEditPage = new ClientEditPage();
@@ -154,13 +180,11 @@ private Long selectedIdOfMenu;
     private final ClientLimitBatchEditPage clientLimitBatchEditPage = new ClientLimitBatchEditPage();
     private final ClientSmsListPage clientSmsListPage = new ClientSmsListPage();
     private final ClientOperationListPage clientOperationListPage = new ClientOperationListPage();
-
     private final BasicWorkspacePage thinClientUserGroupPage = new BasicWorkspacePage();
 
     // Card manipulation
     private final BasicWorkspacePage cardGroupPage = new BasicWorkspacePage();
     private final CardListPage cardListPage = new CardListPage();
-    private Long selectedIdOfCard;
     private final SelectedCardGroupPage selectedCardGroupPage = new SelectedCardGroupPage();
     private final CardViewPage cardViewPage = new CardViewPage();
     private final CardEditPage cardEditPage = new CardEditPage();
@@ -179,8 +203,6 @@ private Long selectedIdOfMenu;
     // Report job manipulation
     private final BasicWorkspacePage reportJobGroupPage = new BasicWorkspacePage();
     private final ReportJobListPage reportJobListPage = new ReportJobListPage();
-    private Long selectedIdOfReportJob;
-    private Long removedIdOfReportJob;
     private final SelectedReportJobGroupPage selectedReportJobGroupPage = new SelectedReportJobGroupPage();
     private final ReportJobViewPage reportJobViewPage = new ReportJobViewPage();
     private final ReportJobEditPage reportJobEditPage = new ReportJobEditPage();
@@ -189,95 +211,64 @@ private Long selectedIdOfMenu;
     // Report discountrule manipulation
     private final BasicWorkspacePage reportRuleGroupPage = new BasicWorkspacePage();
     private final ReportRuleListPage reportRuleListPage = new ReportRuleListPage();
-    private Long selectedIdOfReportRule;
-    private Long removedIdOfReportRule;
     private final SelectedReportRuleGroupPage selectedReportRuleGroupPage = new SelectedReportRuleGroupPage();
     private final ReportRuleViewPage reportRuleViewPage = new ReportRuleViewPage();
     private final ReportRuleEditPage reportRuleEditPage = new ReportRuleEditPage();
     private final ReportRuleCreatePage reportRuleCreatePage = new ReportRuleCreatePage();
 
-
-    // Report online manipulation (baybikov 05.10.2011)
+    // Report online manipulation
     private final BasicWorkspacePage reportOnlineGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage monitoringGroupPage = new BasicWorkspacePage();
-    private final ManualReportRunnerPage manualReportRunnerPage = new ManualReportRunnerPage ();
-
-    // baybikov 23.11.2011
     private final FreeComplexReportPage freeComplexReportPage = new FreeComplexReportPage();
     private final PayComplexReportPage payComplexReportPage = new PayComplexReportPage();
-
-    // baybikov 23.11.2011
     private final BasicWorkspacePage complexGroupPage = new BasicWorkspacePage();
-
     private final BasicWorkspacePage uosGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage nsiGroupPage = new BasicWorkspacePage();
-
-    // baybikov (06.10.2011)
     private final SalesReportPage salesReportPage = new SalesReportPage();
     private final SyncReportPage syncReportPage = new SyncReportPage();
-
-    // baybikov (07.10.2011)
     private final StatusSyncReportPage statusSyncReportPage = new StatusSyncReportPage();
-    // baybikov (20.10.2011)
     private final ClientReportPage clientReportPage = new ClientReportPage();
-
-    // kadyrov (20.12.2011)
     private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
-
-    // baybikov (11.11.2011)
     private final BasicWorkspacePage configurationGroupPage = new BasicWorkspacePage();
     private final ConfigurationPage configurationPage = new ConfigurationPage();
-
-    // baybikov (25.11.2011)
     private final BasicWorkspacePage optionGroupPage = new BasicWorkspacePage();
-
-    // baybikov (21.11.2011)
     private final CurrentPositionsReportPage currentPositionsReportPage = new CurrentPositionsReportPage();
-
-    // baybikov (25.01.2012)
     private final AllComplexReportPage allComplexReportPage = new AllComplexReportPage();
 
-    // POS manipulation (baybikov 22.11.2011)
+    // POS manipulation
     private final BasicWorkspacePage posGroupPage = new BasicWorkspacePage();
     private final PosListPage posListPage = new PosListPage();
-    private Long selectedIdOfPos;
     private final PosDeletePage posDeletePage = new PosDeletePage();
     private final PosCreatePage posCreatePage = new PosCreatePage();
     private final SelectedPosGroupPage selectedPosGroupPage = new SelectedPosGroupPage();
     private final PosEditPage posEditPage = new PosEditPage();
 
-    // Settlement manipulation (baybikov 22.11.2011)
+    // Settlement manipulation
     private final BasicWorkspacePage settlementGroupPage = new BasicWorkspacePage();
     private final SettlementListPage settlementListPage = new SettlementListPage();
-    private Long selectedIdOfSettlement;
     private final SettlementDeletePage settlementDeletePage = new SettlementDeletePage();
     private final SettlementCreatePage settlementCreatePage = new SettlementCreatePage();
     private final SettlementEditPage settlementEditPage = new SettlementEditPage();
-    // baybikov (25.11.2011)
     private final SelectedSettlementGroupPage selectedSettlementGroupPage = new SelectedSettlementGroupPage();
 
-    // AddPayment manipulation (baybikov 29.11.2011)
+    // AddPayment manipulation
     private final BasicWorkspacePage addPaymentGroupPage = new BasicWorkspacePage();
     private final AddPaymentListPage addPaymentListPage = new AddPaymentListPage();
-    private Long selectedIdOfAddPayment;
     private final AddPaymentDeletePage addPaymentDeletePage = new AddPaymentDeletePage();
     private final AddPaymentCreatePage addPaymentCreatePage = new AddPaymentCreatePage();
     private final AddPaymentEditPage addPaymentEditPage = new AddPaymentEditPage();
     private final SelectedAddPaymentGroupPage selectedAddPaymentGroupPage = new SelectedAddPaymentGroupPage();
 
-    // Category manipulation (baybikov 05.12.2011)
+    // Category manipulation
     private final BasicWorkspacePage categoryGroupPage = new BasicWorkspacePage();
     private final ConfirmDeletePage confirmDeletePage = new ConfirmDeletePage();
 
-    // Rule manipulation (baybikov 06.12.2011)
+    // Rule manipulation
     private final BasicWorkspacePage ruleGroupPage = new BasicWorkspacePage();
-    private Long selectedIdOfRule;
 
     // Event notification manipulation
     private final BasicWorkspacePage eventNotificationGroupPage = new BasicWorkspacePage();
     private final EventNotificationListPage eventNotificationListPage = new EventNotificationListPage();
-    private Long selectedIdOfEventNotification;
-    private Long removedIdOfEventNotification;
     private final SelectedEventNotificationGroupPage selectedEventNotificationGroupPage = new SelectedEventNotificationGroupPage();
     private final EventNotificationViewPage eventNotificationViewPage = new EventNotificationViewPage();
     private final EventNotificationEditPage eventNotificationEditPage = new EventNotificationEditPage();
@@ -293,13 +284,11 @@ private Long selectedIdOfMenu;
     private final ClientSelectPage clientSelectPage = new ClientSelectPage();
     private final ClientGroupSelectPage clientGroupSelectPage = new ClientGroupSelectPage();
 
-    // baybikov (06.12.2011)
     private final CategorySelectPage categorySelectPage = new CategorySelectPage();
     private final CategoryListSelectPage categoryListSelectPage = new CategoryListSelectPage();
     private final RuleListSelectPage ruleListSelectPage = new RuleListSelectPage();
     private final CategoryOrgListSelectPage categoryOrgListSelectPage = new CategoryOrgListSelectPage();
 
-    // Levadny (11.02.2012)
     private final BasicWorkspacePage discountGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage goodRequestsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage budgetFoodGroupMenu = new BasicWorkspacePage();
@@ -307,19 +296,12 @@ private Long selectedIdOfMenu;
     private final BasicWorkspacePage activityReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage informReportsGroupMenu = new BasicWorkspacePage();
 
-
-
-    // Levadny (11.02.2012)
     private final OrgDiscountsReportPage orgDiscountsReportPage = new OrgDiscountsReportPage();
     private final AllOrgsDiscountsReportPage allOrgsDiscountsReportPage = new AllOrgsDiscountsReportPage();
 
     private final ReportTemplateManagerPage reportTemplateManagerPage = new ReportTemplateManagerPage();
-    private String removedReportTemplate;
-
 
     private final BasicWorkspacePage productGuideGroupPage = new BasicWorkspacePage();
-    private long removedProductGuideItemId;
-    private long selectedIdOfProductGuide;
 
     private final ConfigurationProviderCreatePage configurationProviderCreatePage = new ConfigurationProviderCreatePage();
     private final ConfigurationProviderListPage configurationProviderListPage = new ConfigurationProviderListPage();
@@ -327,14 +309,8 @@ private Long selectedIdOfMenu;
     private final ConfigurationProviderEditPage configurationProviderEditPage = new ConfigurationProviderEditPage();
     private final SelectedConfigurationProviderGroupPage selectedConfigurationProviderGroupPage = new SelectedConfigurationProviderGroupPage();
     private final BasicWorkspacePage configurationProviderGroupPage = new BasicWorkspacePage();
-    private long removedConfigurationProviderItemId;
-    private long selectedIdOfConfigurationProvider;
 
     private final BasicWorkspacePage reportGroupPage = new BasicWorkspacePage();
-
-    private String currentConfigurationProvider;
-
-    private Long editedProductGuideItemId;
 
     private BasicWorkspacePage infoGroupMenu = new BasicWorkspacePage();
 
@@ -358,7 +334,6 @@ private Long selectedIdOfMenu;
 
     private final BasicWorkspacePage repositoryUtilityGroupMenu = new BasicWorkspacePage();
 
-
     public BasicWorkspacePage getGoodGroupPage() {
         return goodGroupPage;
     }
@@ -369,10 +344,6 @@ private Long selectedIdOfMenu;
 
     public BasicWorkspacePage getProductGroupsGroupPage() {
         return productGroupsGroupPage;
-    }
-
-    public BasicWorkspacePage getProductGroupPage() {
-        return productGroupPage;
     }
 
     public BasicWorkspacePage getTechnologicalMapGroupsGroupPage() {
@@ -395,80 +366,16 @@ private Long selectedIdOfMenu;
         return productGuideGroupPage;
     }
 
-    public Long getEditedProductGuideItemId() {
-        return editedProductGuideItemId;
-    }
-
-    public void setEditedProductGuideItemId(Long editedProductGuideItemId) {
-        this.editedProductGuideItemId = editedProductGuideItemId;
-    }
-
     public String getCurrentConfigurationProvider() {
         return currentConfigurationProvider;
     }
 
     public void setCurrentConfigurationProvider(String currentConfigurationProvider) {
-        //        if (currentConfigurationProvider instanceof ConfigurationProvider) {
-        //            this.currentConfigurationProvider = (ConfigurationProvider)currentConfigurationProvider;
         this.currentConfigurationProvider = currentConfigurationProvider;
-        //updateProductGuideListPage();
-        //        }
-    }
-
-    public SelectedConfigurationProviderGroupPage getSelectedConfigurationProviderGroupPage() {
-        return selectedConfigurationProviderGroupPage;
-    }
-
-    public ConfigurationProviderEditPage getConfigurationProviderEditPage() {
-        return configurationProviderEditPage;
-    }
-
-    public ConfigurationProviderViewPage getConfigurationProviderViewPage() {
-        return configurationProviderViewPage;
-    }
-
-    public long getRemovedConfigurationProviderItemId() {
-        return removedConfigurationProviderItemId;
-    }
-
-    public void setRemovedConfigurationProviderItemId(long removedConfigurationProviderItemId) {
-        this.removedConfigurationProviderItemId = removedConfigurationProviderItemId;
-    }
-
-    public long getSelectedIdOfConfigurationProvider() {
-        return selectedIdOfConfigurationProvider;
-    }
-
-    public void setSelectedIdOfConfigurationProvider(long selectedIdOfConfigurationProvider) {
-        this.selectedIdOfConfigurationProvider = selectedIdOfConfigurationProvider;
-    }
-
-    public ConfigurationProviderListPage getConfigurationProviderListPage() {
-        return configurationProviderListPage;
     }
 
     public BasicWorkspacePage getConfigurationProviderGroupPage() {
         return configurationProviderGroupPage;
-    }
-
-    public ConfigurationProviderCreatePage getConfigurationProviderCreatePage() {
-        return configurationProviderCreatePage;
-    }
-
-    public long getRemovedProductGuideItemId() {
-        return removedProductGuideItemId;
-    }
-
-    public long getSelectedIdOfProductGuide() {
-        return selectedIdOfProductGuide;
-    }
-
-    public void setSelectedIdOfProductGuide(long selectedIdOfProductGuide) {
-        this.selectedIdOfProductGuide = selectedIdOfProductGuide;
-    }
-
-    public void setRemovedProductGuideItemId(long removedProductGuideItemId) {
-        this.removedProductGuideItemId = removedProductGuideItemId;
     }
 
     public ReportTemplateManagerPage getReportTemplateManagerPage() {
@@ -483,25 +390,6 @@ private Long selectedIdOfMenu;
         return reportGroupPage;
     }
 
-    public ManualReportRunnerPage getManualReportRunnerPage() {
-        return manualReportRunnerPage;
-    }
-
-    public Object showManualReportRunnerPage () {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        try {
-            currentWorkspacePage = manualReportRunnerPage;
-        } catch (Exception e) {
-            logger.error("Failed to set manul report runner page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы для ручного запуска отчетов: " + e.getMessage(),
-                            null));
-        }
-        updateSelectedMainMenu();
-        return null;
-    }
-
-    // Levadny (11.02.2012)
     public Object showAllOrgsDiscountReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -515,12 +403,10 @@ private Long selectedIdOfMenu;
         return null;
     }
 
-    // Levadny (11.02.2012)
     public OrgDiscountsReportPage getOrgDiscountsReportPage() {
         return orgDiscountsReportPage;
     }
 
-    // Levadny (11.02.2012)
     public Object showOrgDiscountsReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -628,7 +514,6 @@ private Long selectedIdOfMenu;
         return null;
     }
 
-//***//
     public BasicWorkspacePage getCategoryOrgGroupPage() {
         return categoryOrgGroupPage;
     }
@@ -642,7 +527,6 @@ private Long selectedIdOfMenu;
         updateSelectedMainMenu();
         return null;
     }
-
 
     public UserListPage getUserListPage() {
         return userListPage;
@@ -1147,49 +1031,8 @@ private Long selectedIdOfMenu;
         return null;
     }
 
-    /*
-public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
-   this.selectedIdOfMenu = selectedIdOfMenu;
-}
-    */
-    public void setSelectedIdOfMenu(String selectedIdOfMenu) {
-        this.selectedIdOfMenu = Long.parseLong(selectedIdOfMenu);
-    }
-
-    public String getSelectedIdOfMenu() {
-        return String.valueOf(selectedIdOfMenu);
-    }
-
     public MenuDetailsPage getMenuDetailsPage() {
         return menuDetailsPage;
-    }
-
-    public Object showMenuDetailsPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            menuDetailsPage.buildListMenuDetails(persistenceSession, selectedIdOfMenu);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            selectedOrgGroupPage.showAndExpandMenuGroup();
-            currentWorkspacePage = menuDetailsPage;
-        } catch (Exception e) {
-            logger.error("Failed to load menu from table", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при выводе данных по меню: " + e.getMessage(), null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-
-
-        }
-        updateSelectedMainMenu();
-        return null;
     }
 
     public MenuViewPage getMenuViewPage() {
@@ -1608,7 +1451,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             Transaction persistenceTransaction = null;
             try {
                 runtimeContext = RuntimeContext.getInstance();
-                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 orgSelectPage.fill(idOfContragent, idOfContract, persistenceSession);
                 persistenceTransaction.commit();
@@ -1629,14 +1472,6 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         return null;
     }
 
-    //01.11.2011
-    /* Параметр фильтра по организациям в странице выбора списка оганизаций
-     * если строка не пуста и заполнена номерами идентификаторов организаций
-      * то отобразится диалоговое окно с организациями где будут помечены галочками
-      * те организации идентификаторы которых перечислены черз запятую в этой строке
-      * иначе отобразится весь список организаций без проставленных галочек*/
-    private String orgFilterOfSelectOrgListSelectPage = "";
-
     public String getOrgFilterOfSelectOrgListSelectPage() {
         return orgFilterOfSelectOrgListSelectPage;
     }
@@ -1644,10 +1479,6 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
     public void setOrgFilterOfSelectOrgListSelectPage(String orgFilterOfSelectOrgListSelectPage) {
         this.orgFilterOfSelectOrgListSelectPage = orgFilterOfSelectOrgListSelectPage;
     }
-
-
-    private String DEFAULT_ORG_FILTER_PAGE_NAME = "Выбор организаций";
-    private String orgFilterPageName = DEFAULT_ORG_FILTER_PAGE_NAME;
 
     public void resetOrgFilterPageName() {
         orgFilterPageName = DEFAULT_ORG_FILTER_PAGE_NAME;
@@ -1661,42 +1492,6 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         this.orgFilterPageName = orgFilterPageName;
     }
 
-    /*public Object showContragentOrgListSelectPage() {
-        BasicPage currentTopMostPage = getTopMostPage();
-        if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            RuntimeContext runtimeContext = null;
-            Session persistenceSession = null;
-            Transaction persistenceTransaction = null;
-            try {
-                runtimeContext = RuntimeContext.getInstance();
-                persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                contragentOrgListSelectPage.setFilterMode(2);
-                contragentOrgListSelectPage.onShow();
-                if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                    contragentOrgListSelectPage.fill(persistenceSession);
-                } else {
-                    contragentOrgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage);
-                }
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-                contragentOrgListSelectPage.pushCompleteHandlerList((OrgListSelectPage.CompleteHandlerList) currentTopMostPage);
-                modalPages.push(contragentOrgListSelectPage);
-            } catch (Exception e) {
-                logger.error("Failed to fill org selection page", e);
-                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Ошибка при подготовке страницы выбора организации", null));
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
-
-
-            }
-        }
-        return null;
-    }*/
-
     private Object showOrgListSelectPage(List<Long> idOfContragentOrgList) {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof OrgListSelectPage.CompleteHandlerList) {
@@ -1706,7 +1501,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
             Transaction persistenceTransaction = null;
             try {
                 runtimeContext = RuntimeContext.getInstance();
-                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setFilter("");
@@ -1796,8 +1591,6 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         }
         return null;
     }
-
-    private List<Long> idOfContragentOrgList = null;
 
     public void setIdOfContragentOrgList(List<Long> idOfContragentOrgList) {
         this.idOfContragentOrgList = idOfContragentOrgList;
@@ -1904,7 +1697,6 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         return null;
     }
 
-    //01.11.2011
     public Object completeOrgListSelectionOk() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -1922,7 +1714,6 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         return null;
     }
 
-    //01.11.2011
     public Object completeOrgListSelectionCancel() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -2260,18 +2051,13 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         return contragentListSelectPage;
     }
 
-    private int multiContrFlag = 0;
-
     public void setMultiContrFlag(int multiContrFlag) {
         this.multiContrFlag = multiContrFlag;
     }
 
-    private String classTypes;
-
     public void setClassTypes(String classTypes) {
         this.classTypes = classTypes;
     }
-
 
     public Object showContragentListSelectPage () {
         BasicPage currentTopMostPage = getTopMostPage();
@@ -2382,31 +2168,6 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         }
         return null;
     }
-
-    /*public void updateContragentSelectPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            contragentSelectPage.fill(persistenceSession, 0, "");
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed to fill contragent selection page", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы выбора контрагента",
-                            null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-            
-        }
-    }*/
-
 
     public Object completeContragentListSelection () {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -3841,11 +3602,13 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         updateSelectedMainMenu();
         return null;
     }
+
     public Object showContragentOpsGroupPage() {
         currentWorkspacePage = caOpsGroupPage;
         updateSelectedMainMenu();
         return null;
     }
+
     public Object showClientOpsGroupPage() {
         currentWorkspacePage = clientOpsGroupPage;
         updateSelectedMainMenu();
@@ -4132,7 +3895,6 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         }
     }
 
-
     public BasicWorkspacePage getServiceGroupPage() {
         return serviceGroupPage;
     }
@@ -4270,8 +4032,7 @@ public void setSelectedIdOfMenu(Long selectedIdOfMenu) {
         return null;
     }
 
-
-public Long getSelectedIdOfReportRule() {
+    public Long getSelectedIdOfReportRule() {
         return selectedIdOfReportRule;
     }
 
@@ -5148,7 +4909,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (05.10.2011)
     public BasicWorkspacePage getReportOnlineGroupPage() {
         return reportOnlineGroupPage;
     }
@@ -5157,7 +4917,6 @@ public Long getSelectedIdOfReportRule() {
         return monitoringGroupPage;
     }
 
-    // baybikov (05.10.2011)
     public Object showReportOnlineGroupPage() {
         currentWorkspacePage = reportOnlineGroupPage;
         updateSelectedMainMenu();
@@ -5170,7 +4929,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (22.11.2011)
     public BasicWorkspacePage getComplexGroupPage() {
         return complexGroupPage;
     }
@@ -5178,42 +4936,39 @@ public Long getSelectedIdOfReportRule() {
     public BasicWorkspacePage getNsiGroupPage() {
         return nsiGroupPage;
     }
+
     public BasicWorkspacePage getUosGroupPage() {
         return uosGroupPage;
     }
 
-    // baybikov (22.11.2011)
     public Object showComplexGroupPage() {
         currentWorkspacePage = complexGroupPage;
         updateSelectedMainMenu();
         return null;
     }
 
-    // baybikov (22.11.2011)
     public Object showNSIGroupPage() {
         currentWorkspacePage = nsiGroupPage;
         updateSelectedMainMenu();
         return null;
     }
+
     public Object showUOSGroupPage() {
         currentWorkspacePage = uosGroupPage;
         updateSelectedMainMenu();
         return null;
     }
 
-    // Levadny (11.02.2012)
     public BasicWorkspacePage getDiscountGroupPage() {
         return discountGroupPage;
     }
 
-    // Levadny (11.02.2012)
     public Object showDiscountGroupPage() {
         currentWorkspacePage = discountGroupPage;
         updateSelectedMainMenu();
         return null;
     }
 
-    // Levadny (11.02.2012)
     public BasicWorkspacePage getGoodRequestsGroupMenu() {
         return goodRequestsGroupMenu;
     }
@@ -5250,10 +5005,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    /*public BasicWorkspacePage getPaymentReportsGroupMenu() {
-        return paymentReportsGroupMenu;
-    }*/
-
     public Object showPaymentReportsGroupMenu () {
         currentWorkspacePage = paymentReportsGroupMenu;
         updateSelectedMainMenu();
@@ -5275,12 +5026,10 @@ public Long getSelectedIdOfReportRule() {
     /*
         Беслатные комплексы
      */
-    // baybikov (05.10.2011)
     public FreeComplexReportPage getFreeComplexReportPage() {
         return freeComplexReportPage;
     }
 
-    // baybikov (05.10.2011)
     public Object showFreeComplexReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -5294,7 +5043,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (05.10.2011)
     public Object buildFreeComplexReport() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -5325,12 +5073,10 @@ public Long getSelectedIdOfReportRule() {
     /*
         Платные комплексы
      */
-    // baybikov (05.10.2011)
     public PayComplexReportPage getPayComplexReportPage() {
         return payComplexReportPage;
     }
 
-    // baybikov (05.10.2011)
     public Object showPayComplexReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -5344,7 +5090,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (05.10.2011)
     public Object buildPayComplexReport() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -5372,12 +5117,10 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (06.10.2011)
     public SalesReportPage getSalesReportPage() {
         return salesReportPage;
     }
 
-    // baybikov (06.10.2011)
     public ClientPaymentsPage getClientPaymentsReportPage() {
         return clientPaymentsReportPage;
     }
@@ -5636,7 +5379,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-
     public void exportDiscrepanciesOnOrdersAndAttendanceReport(javax.faces.event.ActionEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -5716,7 +5458,6 @@ public Long getSelectedIdOfReportRule() {
         updateSelectedMainMenu();
         return null;
     }
-
 
     public Object buildDiscrepanciesDataOnOrdersAndPaymentReport() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -5808,7 +5549,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (06.10.2011)
     public Object showSalesReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -5823,7 +5563,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (06.10.2011)
     public Object buildSalesReport() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -5851,27 +5590,22 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (23.11.2011)
     public String showFreeComplexCSVList() {
         return "showFreeComplexCSVList";
     }
 
-    // baybikov (23.11.2011)
     public String showPayComplexCSVList() {
         return "showPayComplexCSVList";
     }
 
-    // baybikov (06.10.2011)
     public String showSalesCSVList() {
         return "showSaleCSVList";
     }
 
-    // baybikov (06.10.2011)
     public SyncReportPage getSyncReportPage() {
         return syncReportPage;
     }
 
-    // baybikov (06.10.2011)
     public Object showSyncReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -5885,7 +5619,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (06.10.2011)
     public Object buildSyncReport() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -5913,12 +5646,10 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (07.10.2011)
     public StatusSyncReportPage getStatusSyncReportPage() {
         return statusSyncReportPage;
     }
 
-    // baybikov (07.10.2011)
     public Object showStatusSyncReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -5932,7 +5663,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (07.10.2011)
     public Object buildStatusSyncReport() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -5960,12 +5690,10 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // Kadirov (20.12.2011)
     public EnterEventReportPage getEnterEventReportPage() {
         return enterEventReportPage;
     }
 
-    // Kadirov (20.12.2011)
     public Object showEnterEventReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -5980,7 +5708,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // Kadirov (20.12.2011)
     public Object buildEnterEventReport() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6008,17 +5735,14 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // Kadirov (21.12.2011)
     public String showEnterEventCSVList() {
         return "showEnterEventCSVList";
     }
 
-    // baybikov (20.10.2011)
     public ClientReportPage getClientReportPage() {
         return clientReportPage;
     }
 
-    // baybikov (20.10.2011)
     public Object showClientReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -6033,7 +5757,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (20.10.2011)
     public Object buildClientReport() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6061,7 +5784,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (20.10.2011)
     public String showClientOrgCSVList() {
         return "showClientOrgCSVList";
     }
@@ -6069,24 +5791,10 @@ public Long getSelectedIdOfReportRule() {
     /*
         Configuration
      */
-    // baybikov (11.11.2011)
-    public BasicWorkspacePage getConfigurationGroupPage() {
-        return configurationGroupPage;
-    }
-
-    // baybikov (11.11.2011)
-    public Object showConfigurationGroupPage() {
-        currentWorkspacePage = configurationGroupPage;
-        updateSelectedMainMenu();
-        return null;
-    }
-
-    // baybikov (11.11.2011)
     public ConfigurationPage getConfigurationPage() {
         return configurationPage;
     }
 
-    // baybikov (11.11.2011)
     public Object showConfigurationPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6114,7 +5822,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // Levadny (01.05.2012)
     public Object showReportTemplateManagerPage() {
         reportTemplateManagerPage.load();
         currentWorkspacePage = reportTemplateManagerPage;
@@ -6149,7 +5856,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-
     private final JournalViewPage journalViewPage = new JournalViewPage();
 
     public JournalViewPage getJournalViewPage() {
@@ -6164,12 +5870,10 @@ public Long getSelectedIdOfReportRule() {
     /*
         Options
          */
-    // baybikov (11.11.2011)
     public BasicWorkspacePage getOptionGroupPage() {
         return optionGroupPage;
     }
 
-    // baybikov (11.11.2011)
     public Object showOptionGroupPage() {
         currentWorkspacePage = optionGroupPage;
         updateSelectedMainMenu();
@@ -6181,16 +5885,13 @@ public Long getSelectedIdOfReportRule() {
         updateSelectedMainMenu();
     }
 
-
     /*
         CurrentPositions
          */
-    // baybikov (21.11.2011)
     public CurrentPositionsReportPage getCurrentPositionsReportPage() {
         return currentPositionsReportPage;
     }
 
-    // baybikov (21.11.2011)
     public Object showCurrentPositionsReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -6205,7 +5906,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (21.11.2011)
     public Object buildCurrentPositionsReport() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6231,7 +5931,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (25.11.2011)
     public Object countCurrentPositions() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6291,24 +5990,20 @@ public Long getSelectedIdOfReportRule() {
     /*
       Справочник точек продаж
      */
-    // baybikov (22.11.2011)
     public BasicWorkspacePage getPosGroupPage() {
         return posGroupPage;
     }
 
-    // baybikov (22.11.2011)
     public Object showPosGroupPage() {
         currentWorkspacePage = posGroupPage;
         updateSelectedMainMenu();
         return null;
     }
 
-    // baybikov (22.11.2011)
     public PosListPage getPosListPage() {
         return posListPage;
     }
 
-    // baybikov (22.11.2011)
     public Object showPosListPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6336,12 +6031,10 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (22.11.2011)
     public PosCreatePage getPosCreatePage() {
         return posCreatePage;
     }
 
-    // baybikov (22.11.2011)
     public Object showPosCreatePage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6369,7 +6062,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (22.11.2011)
     public Object createPos() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6397,7 +6089,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (22.11.2011)
     public Object clearPosListPageFilter() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6425,22 +6116,18 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (22.11.2011)
     public PosDeletePage getPosDeletePage() {
         return posDeletePage;
     }
 
-    // baybikov (22.11.2011)
     public Long getSelectedIdOfPos() {
         return selectedIdOfPos;
     }
 
-    // baybikov (22.11.2011)
     public void setSelectedIdOfPos(Long selectedIdOfPos) {
         this.selectedIdOfPos = selectedIdOfPos;
     }
 
-    // baybikov (22.11.2011)
     public Object removePos() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6467,12 +6154,10 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (22.11.2011)
     public String showPosCSVList() {
         return "showPosCSVList";
     }
 
-    // baybikov (22.11.2011)
     public Object showPosEditPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6502,12 +6187,10 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (22.11.2011)
     public PosEditPage getPosEditPage() {
         return posEditPage;
     }
 
-    // baybikov (22.11.2011)
     public Object updatePos() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6536,7 +6219,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (25.11.2011)
     public SelectedPosGroupPage getSelectedPosGroupPage() {
         return selectedPosGroupPage;
     }
@@ -6572,24 +6254,20 @@ public Long getSelectedIdOfReportRule() {
     /*
       Платежи между контрагентами
      */
-    // baybikov (22.11.2011)
     public BasicWorkspacePage getSettlementGroupPage() {
         return settlementGroupPage;
     }
 
-    // baybikov (22.11.2011)
     public Object showSettlementGroupPage() {
         currentWorkspacePage = settlementGroupPage;
         updateSelectedMainMenu();
         return null;
     }
 
-    // baybikov (22.11.2011)
     public SettlementListPage getSettlementListPage() {
         return settlementListPage;
     }
 
-    // baybikov (22.11.2011)
     public Object showSettlementListPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6617,12 +6295,10 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (22.11.2011)
     public SettlementCreatePage getSettlementCreatePage() {
         return settlementCreatePage;
     }
 
-    // baybikov (22.11.2011)
     public Object showSettlementCreatePage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6650,7 +6326,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (22.11.2011)
     public Object createSettlement() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6684,7 +6359,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (22.11.2011)
     public Object clearSettlementListPageFilter() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6711,22 +6385,18 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (22.11.2011)
     public SettlementDeletePage getSettlementDeletePage() {
         return settlementDeletePage;
     }
 
-    // baybikov (22.11.2011)
     public Long getSelectedIdOfSettlement() {
         return selectedIdOfSettlement;
     }
 
-    // baybikov (22.11.2011)
     public void setSelectedIdOfSettlement(Long selectedIdOfSettlement) {
         this.selectedIdOfSettlement = selectedIdOfSettlement;
     }
 
-    // baybikov (22.11.2011)
     public Object removeSettlement() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6753,12 +6423,10 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (22.11.2011)
     public String showSettlementCSVList() {
         return "showSettlementCSVList";
     }
 
-    // baybikov (22.11.2011)
     public Object showSettlementEditPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6788,12 +6456,10 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (22.11.2011)
     public SettlementEditPage getSettlementEditPage() {
         return settlementEditPage;
     }
 
-    // baybikov (22.11.2011)
     public Object updateSettlement() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6855,24 +6521,20 @@ public Long getSelectedIdOfReportRule() {
     /*
         Начисление платы за обслуживание
      */
-    // baybikov (29.11.2011)
     public BasicWorkspacePage getAddPaymentGroupPage() {
         return addPaymentGroupPage;
     }
 
-    // baybikov (29.11.2011)
     public Object showAddPaymentGroupPage() {
         currentWorkspacePage = addPaymentGroupPage;
         updateSelectedMainMenu();
         return null;
     }
 
-    // baybikov (29.11.2011)
     public AddPaymentListPage getAddPaymentListPage() {
         return addPaymentListPage;
     }
 
-    // baybikov (29.11.2011)
     public Object showAddPaymentListPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6900,12 +6562,10 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (29.11.2011)
     public AddPaymentCreatePage getAddPaymentCreatePage() {
         return addPaymentCreatePage;
     }
 
-    // baybikov (29.11.2011)
     public Object showAddPaymentCreatePage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6933,7 +6593,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (29.11.2011)
     public Object createAddPayment() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6967,7 +6626,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (29.11.2011)
     public Object clearAddPaymentListPageFilter() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -6994,22 +6652,18 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (29.11.2011)
     public AddPaymentDeletePage getAddPaymentDeletePage() {
         return addPaymentDeletePage;
     }
 
-    // baybikov (29.11.2011)
     public Long getSelectedIdOfAddPayment() {
         return selectedIdOfAddPayment;
     }
 
-    // baybikov (29.11.2011)
     public void setSelectedIdOfAddPayment(Long selectedIdOfAddPayment) {
         this.selectedIdOfAddPayment = selectedIdOfAddPayment;
     }
 
-    // baybikov (29.11.2011)
     public Object removeAddPayment() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -7036,12 +6690,10 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (29.11.2011)
     public String showAddPaymentCSVList() {
         return "showAddPaymentCSVList";
     }
 
-    // baybikov (29.11.2011)
     public Object showAddPaymentEditPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -7071,12 +6723,10 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (29.11.2011)
     public AddPaymentEditPage getAddPaymentEditPage() {
         return addPaymentEditPage;
     }
 
-    // baybikov (29.11.2011)
     public Object updateAddPayment() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -7138,19 +6788,16 @@ public Long getSelectedIdOfReportRule() {
     /*
       Категории
      */
-    // baybikov (05.12.2011)
     public BasicWorkspacePage getCategoryGroupPage() {
         return categoryGroupPage;
     }
 
-    // baybikov (05.12.2011)
     public Object showCategoryGroupPage() {
         currentWorkspacePage = categoryGroupPage;
         updateSelectedMainMenu();
         return null;
     }
 
-    // baybikov (05.12.2011)
     public ConfirmDeletePage getConfirmDeletePage() {
         return confirmDeletePage;
     }
@@ -7159,7 +6806,6 @@ public Long getSelectedIdOfReportRule() {
         return ruleListSelectPage;
     }
 
-    // Kadyrov (18.01.2012)
     public Object showRuleListSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof RuleListSelectPage.CompleteHandlerList) {
@@ -7190,7 +6836,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // Kadyrov (18.01.2012)
     public Object updateRuleListSelectPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -7216,7 +6861,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-// Kadyrov (18.01.2012)
     public Object completeRuleListSelectionOk() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -7234,7 +6878,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-// Kadyrov (18.01.2012)
     public Object completeRuleListSelectionCancel() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -7252,12 +6895,9 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-
     public CategoryOrgListSelectPage getCategoryOrgListSelectPage() {
         return categoryOrgListSelectPage;
     }
-
-    String categoryOrgFilterOfSelectCategoryOrgListSelectPage;
 
     public String getCategoryOrgFilterOfSelectCategoryOrgListSelectPage() {
         return categoryOrgFilterOfSelectCategoryOrgListSelectPage;
@@ -7364,12 +7004,9 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // Kadyrov (18.01.2012)
     public CategoryListSelectPage getCategoryListSelectPage() {
         return categoryListSelectPage;
     }
-
-    String categoryFilterOfSelectCategoryListSelectPage;
 
     public String getCategoryFilterOfSelectCategoryListSelectPage() {
         return categoryFilterOfSelectCategoryListSelectPage;
@@ -7380,7 +7017,6 @@ public Long getSelectedIdOfReportRule() {
         this.categoryFilterOfSelectCategoryListSelectPage = categoryFilterOfSelectCategoryListSelectPage;
     }
 
-    // Kadyrov (18.01.2012)
     public Object showCategoryListSelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof CategoryListSelectPage.CompleteHandlerList) {
@@ -7422,7 +7058,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // Kadyrov (18.01.2012)
     public Object updateCategoryListSelectPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         Map<String, String> params = facesContext.getExternalContext().getRequestParameterMap();
@@ -7453,7 +7088,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-// Kadyrov (18.01.2012)
     public Object completeCategoryListSelectionOk() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -7471,7 +7105,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-// Kadyrov (18.01.2012)
     public Object completeCategoryListSelectionCancel() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -7489,12 +7122,10 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (06.12.2011)
     public CategorySelectPage getCategorySelectPage() {
         return categorySelectPage;
     }
 
-    // baybikov (06.12.2011)
     public Object showCategorySelectPage() {
         BasicPage currentTopMostPage = getTopMostPage();
         if (currentTopMostPage instanceof CategorySelectPage.CompleteHandler
@@ -7529,7 +7160,6 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    // baybikov (06.12.2011)
     public Object completeCategorySelection() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -7563,12 +7193,10 @@ public Long getSelectedIdOfReportRule() {
     /*
         Правила
      */
-    // baybikov (06.12.2011)
     public BasicWorkspacePage getRuleGroupPage() {
         return ruleGroupPage;
     }
 
-    // baybikov (06.12.2011)
     public Object showRuleGroupPage() {
         currentWorkspacePage = ruleGroupPage;
         updateSelectedMainMenu();
@@ -7581,22 +7209,9 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-
-    // baybikov (06.12.2011)
-    public Long getSelectedIdOfRule() {
-        return selectedIdOfRule;
-    }
-
-    // baybikov (06.12.2011)
-    public void setSelectedIdOfRule(Long selectedIdOfRule) {
-        this.selectedIdOfRule = selectedIdOfRule;
-    }
-
-
     public String showCurrentPositionCSVList() {
         return "showCurrentPositionCSVList";
     }
-
 
     public Object showProductGuideGroupPage() {
         currentWorkspacePage = productGuideGroupPage;
@@ -7610,9 +7225,7 @@ public Long getSelectedIdOfReportRule() {
         return null;
     }
 
-    User currentUser;
-
-public User getCurrentUser() throws Exception {
+    public User getCurrentUser() throws Exception {
         if (currentUser == null) {
             FacesContext context = FacesContext.getCurrentInstance();
             String userName = context.getExternalContext().getRemoteUser();
@@ -7836,12 +7449,10 @@ public User getCurrentUser() throws Exception {
     /*
        Все комплексы
     */
-    // baybikov (25.01.2012)
     public AllComplexReportPage getAllComplexReportPage() {
         return allComplexReportPage;
     }
 
-    // baybikov (25.01.2012)
     public Object showAllComplexReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -7855,7 +7466,6 @@ public User getCurrentUser() throws Exception {
         return null;
     }
 
-    // baybikov (25.01.2012)
     public Object buildAllComplexReport() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -7883,7 +7493,6 @@ public User getCurrentUser() throws Exception {
         return null;
     }
 
-    // baybikov (25.01.2012)
     public String showAllComplexCSVList() {
         return "showAllComplexCSVList";
     }
@@ -8058,138 +7667,3 @@ public User getCurrentUser() throws Exception {
         }
     }
 }
-
-
-
-//private int workspaceState = WorkspaceConstants.DEFAULT_PAGE_INDEX;
-///* For ru.axetta.ecafe.processor.core.test only */
-//private String smsMessageId;
-//private String smsMessageText;
-//private String smsPhoneNumber;
-//private String currentSmsMessageId;
-//
-//public String testSmsSend() {
-//    FacesContext facesContext = FacesContext.getCurrentInstance();
-//    try {
-//        SendResponse response = RuntimeContext.getInstance().getSmsService()
-//                .sendTextMessage(smsMessageId, null, smsPhoneNumber, smsMessageText);
-//        if (response.isSuccess()) {
-//            facesContext.addMessage(null,
-//                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Запрос на отправку отправлен успешно.", null));
-//        } else {
-//            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-//                    String.format("Запрос на отправку отправлен успешно, но служба ответила отказом. Результат: %s",
-//                            response.getStatusMessage()), null));
-//        }
-//    } catch (Exception e) {
-//        if (logger.isDebugEnabled()) {
-//            logger.debug("Failed working with SMS service", e);
-//        }
-//        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                String.format("Ошибка при работе с SMS службой: %s", StringUtils.defaultString(e.getMessage())),
-//                null));
-//        updateView();
-//        return null;
-//    }
-//    updateView();
-//    return null;
-//}
-//
-//public String testSmsDeliveryCheck() {
-//    FacesContext facesContext = FacesContext.getCurrentInstance();
-//    try {
-//        DeliveryResponse response = RuntimeContext.getInstance().getSmsService().getDeliveryStatus(smsMessageId);
-//        if (response.isDelivered()) {
-//            facesContext.addMessage(null,
-//                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Сообщение доставлено успешно.", null));
-//        } else {
-//            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-//                    String.format("Сообщение недоставлено. Результат: %s",
-//                            StringUtils.defaultString(response.getStatusMessage())), null));
-//        }
-//    } catch (Exception e) {
-//        if (logger.isDebugEnabled()) {
-//            logger.debug("Failed working with SMS service", e);
-//        }
-//        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-//                String.format("Ошибка при работе с SMS службой: %s", StringUtils.defaultString(e.getMessage())),
-//                null));
-//        updateView();
-//        return null;
-//    }
-//    updateView();
-//    return null;
-//}
-//
-//public String testSmsMessageIdGeneration2() {
-//    RuntimeContext runtimeContext = RuntimeContext.getInstance();
-//    FacesContext facesContext = FacesContext.getCurrentInstance();
-//    try {
-//        currentSmsMessageId = runtimeContext.getMessageIdGenerator().generate();
-//        if (logger.isDebugEnabled()) {
-//            logger.debug("Ok");
-//        }
-//        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Ok", null));
-//        if (logger.isDebugEnabled()) {
-//            logger.debug("Ok");
-//        }
-//        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Ok", null));
-//    } catch (Exception e) {
-//        logger.error("Failed", e);
-//        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Failed", null));
-//        updateView();
-//        return null;
-//    }
-//    updateView();
-//    return null;
-//}
-//
-//public String showOrderDeleter() {
-//    workspaceState = WorkspaceConstants.SERVICE_ORDER_DELETE_STATE;
-//    updateView();
-//    return null;
-//}
-//
-//public String deleteOrder() {
-//    FacesContext facesContext = FacesContext.getCurrentInstance();
-//    try {
-//        orderDeleter.delete();
-//        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Ok", null));
-//    } catch (Exception e) {
-//        logger.error("Failed", e);
-//        facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка", null));
-//    }
-//    updateView();
-//    return null;
-//}
-//
-//public String changePasswords() {
-//    Session session = null;
-//    AccountTransaction transaction = null;
-//    try {
-//        session = RuntimeContext.getInstance().getSessionFactory().openSession();
-//        transaction = session.beginTransaction();
-//        Org org = (Org) session.load(Org.class, 6L);
-//        Criteria clientCriteria = session.createCriteria(Client.class);
-//        clientCriteria.add(Restrictions.eq("org", org));
-//        List clients = clientCriteria.list();
-//        for (Object object : clients) {
-//            Client client = (Client) object;
-//            long contractId = client.getContractId();
-//            NumberFormat formatter = new DecimalFormat("0000");
-//            String newPassword = formatter.format(contractId % 10000);
-//            client.setPassword(newPassword);
-//            session.update(client);
-//        }
-//        transaction.commit();
-//        transaction = null;
-//    } catch (Exception e) {
-//        logger.error("Failed", e);
-//    } finally {
-//        HibernateUtils.rollback(transaction, logger);
-//        HibernateUtils.close(session, logger);
-//    }
-//    updateView();
-//    return null;
-//}
-//

@@ -6,10 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.commodity.accounting.configurationProvi
 
 import ru.axetta.ecafe.processor.core.daoservices.commodity.accounting.ConfigurationProviderService;
 import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
-/*import ru.axetta.ecafe.processor.core.persistence.ProductGuide;
-import ru.axetta.ecafe.processor.core.persistence.User;*/
 import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 

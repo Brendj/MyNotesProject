@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.*;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ReportFormatMenu;
 import ru.axetta.ecafe.processor.core.report.RuleConditionItem;
@@ -62,18 +63,13 @@ public class ManualReportRunnerPage extends OnlineReportPage
 
     private UIComponent paramsComponent;
 
-    Logger logger = LoggerFactory.getLogger(ReportRuleEditPage.class);
+    private Logger logger = LoggerFactory.getLogger(ReportRuleEditPage.class);
     private String reportType;
 
     private final CCAccountFilter contragentFilter = new CCAccountFilter();
     private final ContractFilter contractFilter = new ContractFilter();
     private CCAccountFilter contragentPayAgentFilter = new CCAccountFilter();
     private CCAccountFilter contragentReceiverFilter = new CCAccountFilter();
-    private Date generateStartDate = getDefaultStartDate();
-    private Date generateEndDate = getDefaultEndDate();
-    private int reportPeriod;
-    public final static int REPORT_PERIOD_DAY = 0, REPORT_PERIOD_WEEK = 1, REPORT_PERIOD_2WEEKS = 2, REPORT_PERIOD_MONTH = 3, REPORT_PERIOD_DATE = 4;
-
     private List<RuleItem> items = Collections.emptyList();
     private String ruleItem;
     private Long ruleId;
@@ -84,6 +80,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
     private String previousRuleName;
     private String infoMessage;
     private String errorMessage;
+    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
 
     private List<Hint> hints = new ArrayList<Hint>();
 
@@ -98,8 +95,51 @@ public class ManualReportRunnerPage extends OnlineReportPage
     //@Transactional -- здесь транзакция не будет работать нежун прокси клас
     public void onShow() throws Exception {
         // данные не используются
+        startDate = getDefaultStartDate();
+        endDate = getDefaultEndDate();
         fill();
     }
+
+    public PeriodTypeMenu getPeriodTypeMenu() {
+        return periodTypeMenu;
+    }
+
+    public void onReportPeriodChanged(ActionEvent event) {
+        switch (periodTypeMenu.getPeriodType()){
+            case ONE_DAY: {
+                setEndDate(startDate);
+            } break;
+            case ONE_WEEK: {
+                setEndDate(CalendarUtils.addDays(startDate, 6));
+            } break;
+            case TWO_WEEK: {
+                setEndDate(CalendarUtils.addDays(startDate, 13));
+            } break;
+            case ONE_MONTH: {
+                setEndDate(CalendarUtils.addDays(CalendarUtils.addMonth(startDate, 1), -1));
+            } break;
+        }
+    }
+
+    public void onEndDateSpecified(ActionEvent event) {
+        Date end = CalendarUtils.truncateToDayOfMonth(endDate);
+        if(CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)){
+            periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
+        } else {
+            long diff=end.getTime()-startDate.getTime();
+            int noofdays=(int)(diff/(24*60*60*1000));
+            switch (noofdays){
+                case 0: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY); break;
+                case 6: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK); break;
+                case 13: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK); break;
+                default: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY); break;
+            }
+        }
+        if(startDate.after(endDate)){
+            printError("Дата выборки от меньше дата выборки до");
+        }
+    }
+
 
     public int getDocumentFormat() {
         return documentFormat;
@@ -109,30 +149,6 @@ public class ManualReportRunnerPage extends OnlineReportPage
         this.documentFormat = documentFormat;
     }
 
-    public int getReportPeriod() {
-        return reportPeriod;
-    }
-
-    public void setReportPeriod(int reportPeriod) {
-        this.reportPeriod = reportPeriod;
-    }
-
-    public void onReportPeriodChanged(ActionEvent event) {
-        Calendar cal = new GregorianCalendar();
-        cal.setTimeInMillis(generateStartDate.getTime());
-        if (reportPeriod == REPORT_PERIOD_WEEK) {
-            cal.add(Calendar.DAY_OF_MONTH, 7);
-        } else if (reportPeriod == REPORT_PERIOD_2WEEKS) {
-            cal.add(Calendar.DAY_OF_MONTH, 14);
-        } else if (reportPeriod == REPORT_PERIOD_MONTH) {
-            cal.add(Calendar.MONTH, 1);
-        }
-        this.generateEndDate = cal.getTime();
-    }
-
-    public void onEndDateSpecified(ActionEvent event) {
-        reportPeriod = REPORT_PERIOD_DATE;
-    }
 
     public ReportFormatMenu getReportFormatMenu() {
         if (reportFormatMenu == null) {
@@ -159,17 +175,6 @@ public class ManualReportRunnerPage extends OnlineReportPage
         return previousPrint;
     }
 
-    private Boolean displaySettings;
-
-    //public boolean getDisplaySettings() {
-    //    displaySettings = (htmlResult == null || htmlResult.length() < 1);
-    //    return displaySettings;
-    //}
-    //
-    //public void setDisplaySettings(Boolean displaySettings) {
-    //    this.displaySettings = displaySettings;
-    //}
-
     public String getPageFilename() {
         return "report/online/manual_report_runner";
     }
@@ -191,28 +196,28 @@ public class ManualReportRunnerPage extends OnlineReportPage
     }
 
 
-    public Date getGenerateStartDate() {
-        return generateStartDate;
-    }
-
-    public void setGenerateStartDate(Date generateStartDate) {
-        this.generateStartDate = generateStartDate;
-    }
-
-    public Date getGenerateEndDate() {
-        return generateEndDate;
-    }
-
-    public void setGenerateEndDate(Date generateEndDate) {
-        if (generateEndDate != null) {
-            localCalendar.setTime(generateEndDate);
-            localCalendar.add(Calendar.DAY_OF_MONTH, 1);
-            localCalendar.add(Calendar.SECOND, -1);
-            this.generateEndDate = localCalendar.getTime();
-        } else {
-            this.generateEndDate = generateEndDate;
-        }
-    }
+    //public Date getGenerateStartDate() {
+    //    return generateStartDate;
+    //}
+    //
+    //public void setGenerateStartDate(Date generateStartDate) {
+    //    this.generateStartDate = generateStartDate;
+    //}
+    //
+    //public Date getGenerateEndDate() {
+    //    return generateEndDate;
+    //}
+    //
+    //public void setGenerateEndDate(Date generateEndDate) {
+    //    if (generateEndDate != null) {
+    //        localCalendar.setTime(generateEndDate);
+    //        localCalendar.add(Calendar.DAY_OF_MONTH, 1);
+    //        localCalendar.add(Calendar.SECOND, -1);
+    //        this.generateEndDate = localCalendar.getTime();
+    //    } else {
+    //        this.generateEndDate = generateEndDate;
+    //    }
+    //}
 
     public UIComponent getParamsComponent() {
         return paramsComponent;
@@ -680,7 +685,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
         builder.setReportProperties(props);
         Calendar cal = new GregorianCalendar();
         //  и запускаем
-        BasicReportJob report = builder.build((Session) em.getDelegate(), generateStartDate, generateEndDate, cal);
+        BasicReportJob report = builder.build((Session) em.getDelegate(), startDate, endDate, cal);
 
 
         //  Получаем принтер и в зависимости от выбранного типа отчета, выполняем его
