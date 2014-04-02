@@ -57,7 +57,14 @@ public class Publication extends LibraryDistributedObject {
         addDistributedObjectProjectionList(projectionList);
 
         projectionList.add(Projections.property("data"), "data");
+        projectionList.add(Projections.property("isbn"), "isbn");
         projectionList.add(Projections.property("validISBN"), "validISBN");
+        projectionList.add(Projections.property("author"), "author");
+        projectionList.add(Projections.property("title"), "title");
+        projectionList.add(Projections.property("title2"), "title2");
+        projectionList.add(Projections.property("publicationdate"), "publicationdate");
+        projectionList.add(Projections.property("publisher"), "publisher");
+        projectionList.add(Projections.property("hash"), "hash");
 
         criteria.setProjection(projectionList);
     }
@@ -144,9 +151,9 @@ public class Publication extends LibraryDistributedObject {
 
     @Override
     public void fill(DistributedObject distributedObject) {
+        setData(((Publication) distributedObject).getData());
         setOrgOwner(distributedObject.getOrgOwner());
         setIsbn(((Publication) distributedObject).getIsbn());
-        setData(((Publication) distributedObject).getData());
         setAuthor(((Publication) distributedObject).getAuthor());
         setTitle(((Publication) distributedObject).getTitle());
         setTitle2(((Publication) distributedObject).getTitle2());
