@@ -141,8 +141,9 @@ public class ReferReportPage extends OnlineReportPage {
         monthlyReport = null;
         dailyReport = null;
 
-        end = updateEndDate(end);
-        if(end.before(start)) {
+        if(end != null && end.after(start)) {
+            end = updateEndDate(end);
+        } else {
             end = updateEndDate(start);
         }
 
