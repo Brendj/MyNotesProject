@@ -81,7 +81,7 @@
                 <div class="rightcol"><%=subBalance1%> руб.</div>
             </div>
             <div class="colRow">
-                <div class="leftcol">Дата активации услуги:</div>
+                <div class="leftcol">Дата начала подписки на услугу АП:</div>
                 <div class="rightcol"><%=df.format(sf.getDateActivate())%>
                 </div>
             </div>

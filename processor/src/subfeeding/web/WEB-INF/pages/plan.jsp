@@ -87,13 +87,13 @@
             <c:if test="${requestScope.subscriptionFeeding.idOfSubscriptionFeeding==null}">
                 <h1>Активировать подписку абонементного питания?</h1>
                 <h2>Для продолжения необходимо заполнить циклограмму.</h2>
-                <label for="dateActivate" style="padding-right: 10px;">Дата активации услуги:</label>
+                <label for="dateActivate" style="padding-right: 10px;">Дата начала подписки на услугу АП:</label>
                 <input type="text" name="dateActivate" value="<%=StringEscapeUtils.escapeHtml(dateActivate)%>"
                        id="dateActivate" maxlength="10" required/>
             </c:if>
             <c:if test="${requestScope.subscriptionFeeding.idOfSubscriptionFeeding!=null}">
                 <h1>Редактирование циклограммы питания</h1>
-                <label for="dateActivate" style="padding-right: 10px;">Дата активации услуги:</label>
+                <label for="dateActivate" style="padding-right: 10px;">Дата начала подписки на услугу АП:</label>
                 <input type="text" name="dateActivate" value="<%=StringEscapeUtils.escapeHtml(dateActivate)%>"
                        id="dateActivate" maxlength="10" style="opacity: 1" disabled="disabled" required />
             </c:if>
@@ -177,7 +177,7 @@
                             </button>
                             <button type="submit" name="activate">Активировать</button>
                             <div style="font-size: 0.8em;">
-                                Нажимая на данную кнопку, Вы согласны с условиями предоставления услуги.
+                                Нажимая на кнопку "Активировать", Вы соглашаетесь с условиями предоставления услуги.
                             </div>
                         </c:if>
                         <c:if test="${requestScope.subscriptionFeeding.idOfSubscriptionFeeding!=null}">
