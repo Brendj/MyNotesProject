@@ -46,11 +46,11 @@ public class DetailedGoodRequestReportPage extends OnlineReportWithContragentPag
 
     public void onEndDateSpecified(ActionEvent event) {
         Date end = CalendarUtils.truncateToDayOfMonth(endDate);
-        if(CalendarUtils.addMonth(end, -1).equals(CalendarUtils.addDays(startDate, -1))){
+        if(CalendarUtils.addMonth(CalendarUtils.addDays(end, -1), -1).equals(startDate)){
             periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
         } else {
             long diff=end.getTime()-startDate.getTime();
-            int noofdays=(int)(diff/(1000*24*60*60));
+            int noofdays=(int)(diff/(24*60*60*1000));
             switch (noofdays){
                 case 0: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY); break;
                 case 6: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK); break;

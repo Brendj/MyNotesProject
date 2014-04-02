@@ -64,8 +64,6 @@ public class GoodRequestsNewReportService {
                         .add(Projections.property("shortName")).add(Projections.property("officialName"))
                         .add(Projections.property("sm.idOfOrg")));
         List orgList = orgCriteria.list();
-
-
         HashMap<Long, BasicReportJob.OrgShortItem> orgMap = new HashMap<Long, BasicReportJob.OrgShortItem>(orgList.size());
         for (Object obj: orgList){
             Object[] row = (Object[]) obj;

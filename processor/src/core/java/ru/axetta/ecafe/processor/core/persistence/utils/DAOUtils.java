@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2014. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.core.persistence.utils;
@@ -29,6 +29,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.math.BigInteger;
 import java.security.PublicKey;
 import java.util.*;
@@ -1169,21 +1173,8 @@ public class DAOUtils {
     public static List getClientGroupsByIdOfOrg(Session session, Long idOfOrg) {
         Criteria criteria = session.createCriteria(ClientGroup.class);
         criteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
-
         return criteria.list();
     }
-
-    /*
-    public static Set<Long> getFriendlyOrg(Session persistenceSession, Long idOfOrg) {
-        Query query = persistenceSession.createQuery("select org.friendlyOrg from Org org where org.idOfOrg=:idOfOrg");
-        query.setParameter("idOfOrg",idOfOrg);
-        List forg = query.list();
-        Set<Long> result = new HashSet<Long>(forg.size());
-        for (Object object: forg){
-            result.add(((Org) object).getIdOfOrg());
-        }
-        return result;
-    } */
 
     @SuppressWarnings("unchecked")
     public static List<Org> getAllOrgWithGuid(EntityManager em) {
@@ -1640,5 +1631,55 @@ public class DAOUtils {
         org.hibernate.Query q = session.createSQLQuery(
                 "select distinct subcategory from cf_discountrules where subcategory<>''");
         return (List<String>)q.list();
+    }
+
+    /**
+     * Получение настроек по отчтеам пользователя
+     * @param persistenceSession ссылка на сессию с бд
+     * @param currentUser ссылка на текущего пользователя
+     * @param numberOfReport тип отчтеа отпределен в классе UserReportSetting как контстанты
+     * @return возвращается настройки если есть, либо пустой объект
+     * @throws Exception
+     */
+    public static Properties extractPropertiesByUserReportSetting(Session persistenceSession, User currentUser,
+            Integer numberOfReport) throws Exception {
+        Properties properties = new Properties();
+        Criteria criteria = persistenceSession.createCriteria(UserReportSetting.class);
+        criteria.add(Restrictions.eq("user", currentUser));
+        criteria.add(Restrictions.eq("numberOfReport", numberOfReport));
+        Object obj = criteria.uniqueResult();
+        if(obj!=null){
+            UserReportSetting setting = (UserReportSetting) obj;
+            properties.load(new StringReader(setting.getSettings()));
+        }
+        return properties;
+    }
+
+    /**
+     * Создание или обновление параметров отчета
+     * @param persistenceSession ссылка на сессию бд
+     * @param currentUser ссылка на текущего пользователя
+     * @param numberOfReport тип отчтеа отпределен в классе UserReportSetting как контстанты
+     * @param properties настройки отчета
+     */
+    public static void saveReportSettings(Session persistenceSession, User currentUser,
+            Integer numberOfReport, Properties properties) {
+        Criteria criteria = persistenceSession.createCriteria(UserReportSetting.class);
+        criteria.add(Restrictions.eq("user", currentUser));
+        criteria.add(Restrictions.eq("numberOfReport", numberOfReport));
+        Object obj = criteria.uniqueResult();
+        StringWriter writer = new StringWriter();
+        properties.list(new PrintWriter(writer));
+        if(obj==null){
+            UserReportSetting reportSetting = new UserReportSetting();
+            reportSetting.setUser(currentUser);
+            reportSetting.setNumberOfReport(numberOfReport);
+            reportSetting.setSettings(writer.getBuffer().toString());
+            persistenceSession.save(reportSetting);
+        } else {
+            UserReportSetting reportSetting = (UserReportSetting) obj;
+            reportSetting.setSettings(writer.getBuffer().toString());
+            persistenceSession.save(reportSetting);
+        }
     }
 }

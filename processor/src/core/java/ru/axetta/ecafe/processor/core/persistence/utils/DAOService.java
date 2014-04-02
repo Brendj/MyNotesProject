@@ -606,6 +606,8 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         q.setParameter("idOfCard", idOfCard);
         return q.executeUpdate() > 0;
     }
+    
+
     public Map<Long, Integer> getOrgEntersCountByGroupType(Date at, Date to, int groupType) {
         Session session = (Session) entityManager.getDelegate();
         return getOrgEntersCountByGroupType(at, to, groupType, session);
