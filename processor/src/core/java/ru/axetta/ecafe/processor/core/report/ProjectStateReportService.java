@@ -480,6 +480,7 @@ public class ProjectStateReportService {
 
     private static final String INSERT_SQL = "INSERT INTO cf_projectstate_data (GenerationDate, Period, Region, Type, StringKey, StringValue, Comments) VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String DELETE_SQL = "DELETE FROM cf_projectstate_data WHERE Period=? AND Type=? and Region=?";
+    private static final String SAVE_DELETE_SQL = "DELETE FROM cf_projectstate_data WHERE Period=? AND Type=? and Region=? and StringKey=? ";
     //private static final String SELECT_SQL = "SELECT StringKey, StringValue FROM cf_projectstate_data WHERE Type=? and Period<=? and Region=? order by Period DESC, StringKey";
     private static final String SELECT_SQL = "SELECT StringKey, StringValue FROM cf_projectstate_data WHERE Type=? and Period=(select max(period) from cf_projectstate_data where type=? and region=?) and Region=? order by Period DESC, StringKey";
     private static final String PERIODIC_SELECT_SQL = "SELECT distinct StringKey, StringValue FROM cf_projectstate_data WHERE INT8(StringKey) <= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 and INT8(StringKey) >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND Type=? AND Region=? order by StringKey";
@@ -619,33 +620,42 @@ public class ProjectStateReportService {
 
             long ms = System.currentTimeMillis();
             Calendar cal = getToday();
+            int type = t.getReportType() + buildPayAgentTypeInc(contragentInc);  //  Увеличиваем ID типа, если это агент
+            long period = cal.getTimeInMillis();
 
             org.hibernate.Query q;
             if (!clearedTypes.containsKey(t.getReportType())) {
                 q = session.createSQLQuery(DELETE_SQL);
-                q.setLong(0, cal.getTimeInMillis());
-                q.setInteger(1, t.getReportType() + buildPayAgentTypeInc(
-                        contragentInc)); //  Увеличиваем ID типа, если это агент
+                q.setLong(0, period);
+                q.setInteger(1, type);
                 q.setString(2, regionName);
                 q.executeUpdate();
                 clearedTypes.put(t.getReportType(), true);
             }
-
             q = session.createSQLQuery(INSERT_SQL);
             q.setLong(0, ms);
-            q.setLong(1, cal.getTimeInMillis());
+            q.setLong(1, period);
             q.setString(2, regionName);
-            q.setInteger(3,
-                    t.getReportType() + buildPayAgentTypeInc(contragentInc)); //  Увеличиваем ID типа, если это агент
+            q.setInteger(3, type);
             q.setString(6, "Base: " + t.getReportType() + "; agent: " + buildPayAgentTypeInc(contragentInc));
             for (String k : data.keySet()) {
                 q.setString(4, k);
                 q.setString(5, data.get(k));
+                saveDeleteData(period, type, regionName, k, session);
                 q.executeUpdate();
             }
         } catch (Exception e) {
             logger.error("Failed to save report data into database for " + t.getReportType(), e);
         }
+    }
+
+    public void saveDeleteData(long period, int type, String regionName, String key, Session session) {
+        org.hibernate.Query q = session.createSQLQuery(SAVE_DELETE_SQL);
+        q.setLong(0, period);
+        q.setInteger(1, type);
+        q.setString(2, regionName);
+        q.setString(3, key);
+        q.executeUpdate();
     }
 
 
