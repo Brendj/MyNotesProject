@@ -1,10 +1,6 @@
 package ru.axetta.ecafe.processor.web.ui.card.items;
 
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.HistoryCard;
-
-import java.util.*;
+import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,8 +14,8 @@ public class HistoryCardItem {
     private ClientItem newOwner;
     private String informationAboutCard;
 
-    public HistoryCardItem(Long idOfHistoryCard, Date upDateTime, ClientItem formerOwner,
-            ClientItem newOwner, String informationAboutCard) {
+    public HistoryCardItem(Long idOfHistoryCard, Date upDateTime, ClientItem formerOwner, ClientItem newOwner,
+            String informationAboutCard) {
         this.idOfHistoryCard = idOfHistoryCard;
         this.upDateTime = upDateTime;
         this.formerOwner = formerOwner;

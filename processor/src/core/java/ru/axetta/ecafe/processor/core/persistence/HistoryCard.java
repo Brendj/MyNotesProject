@@ -43,9 +43,7 @@ public class HistoryCard {
 
     }
 
-    public HistoryCard(Long idOfHistoryCard, Card card, Date upDatetime, Client formerOwner, Client newOwner,
-            String informationAboutCard) {
-        this.idOfHistoryCard = idOfHistoryCard;
+    public HistoryCard(Card card, Date upDatetime, Client formerOwner, Client newOwner, String informationAboutCard) {
         this.card = card;
         this.upDatetime = upDatetime;
         this.formerOwner = formerOwner;

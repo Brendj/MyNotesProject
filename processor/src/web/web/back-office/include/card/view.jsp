@@ -13,7 +13,7 @@
              columns="2">
     <h:outputText escape="true" value="Клиент" styleClass="output-text" />
     <a4j:commandLink value="#{mainPage.cardViewPage.client.shortName}" styleClass="command-link"
-                   action="#{mainPage.showClientViewPage}" reRender="mainMenu, workspaceForm">
+                     action="#{mainPage.showClientViewPage}" reRender="mainMenu, workspaceForm">
         <f:setPropertyActionListener value="#{mainPage.cardViewPage.client.idOfClient}"
                                      target="#{mainPage.selectedIdOfClient}" />
     </a4j:commandLink>
@@ -56,7 +56,8 @@
 <%--Панель истории изменения владельца карты--%>
 <rich:panel headerClass="workspace-panel-header">
     <f:facet name="header">
-        <h:outputText escape="true" value="История карты (#{mainPage.cardViewPage.historyCardListViewPage.itemCount})" />
+        <h:outputText escape="true"
+                      value="История карты (#{mainPage.cardViewPage.historyCardListViewPage.itemCount})" />
     </f:facet>
     <h:panelGrid styleClass="borderless-grid">
         <rich:dataTable id="historyCardTable" value="#{mainPage.cardViewPage.historyCardListViewPage.items}" var="item"
@@ -74,18 +75,20 @@
                 <f:facet name="header">
                     <h:outputText escape="true" value="Прежний владелец" />
                 </f:facet>
-                <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.newOwnerContractId}" styleClass="command-link"
-                                 action="#{mainPage.showOrgViewPage}">
-                    <f:setPropertyActionListener value="#{item.newOwnerIdOfClient}" target="#{mainPage.selectedIdOfOrg}" />
+                <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.newOwnerContractId}"
+                                 styleClass="command-link" action="#{mainPage.showClientViewPage}">
+                    <f:setPropertyActionListener value="#{item.newOwnerIdOfClient}"
+                                                 target="#{mainPage.selectedIdOfClient}" />
                 </a4j:commandLink>
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
                     <h:outputText escape="true" value="Новый владелец" />
                 </f:facet>
-                <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.formerOwnerContractId}" styleClass="command-link"
-                                 action="#{mainPage.showOrgViewPage}">
-                    <f:setPropertyActionListener value="#{item.formerOwnerIdOfClient}" target="#{mainPage.selectedIdOfOrg}" />
+                <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.formerOwnerContractId}"
+                                 styleClass="command-link" action="#{mainPage.showClientViewPage}">
+                    <f:setPropertyActionListener value="#{item.formerOwnerIdOfClient}"
+                                                 target="#{mainPage.selectedIdOfClient}" />
                 </a4j:commandLink>
             </rich:column>
             <rich:column headerClass="column-header">

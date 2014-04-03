@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
-      <artifact name="subfeeding:war" />
+      <artifact name="web:web" />
     </artifacts-to-build>
   </component>
   <component name="BookmarkManager">
@@ -23,15 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" readonly="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/BasicReportForAllOrgJob.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/BasicReportForAllOrgJob.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/BasicReportJob.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/BasicReportJob.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/DashboardByAllOrgReport.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/DashboardByAllOrgReport.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/job/ReportJobConstants.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/job/ReportJobConstants.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/utils/ReportPropertiesUtils.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/utils/ReportPropertiesUtils.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/ReportRuleConstants.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/ReportRuleConstants.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/utils/RuleExpressionUtil.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/utils/RuleExpressionUtil.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuleProcessor.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuleProcessor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/HistoryCard.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/HistoryCard.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/card/items/HistoryCardItem.java" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/card/items/HistoryCardItem.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.ipr" afterPath="$PROJECT_DIR$/processor.ipr" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/processor.iws" afterPath="$PROJECT_DIR$/processor.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../src/web/web/back-office/include/card/view.jsp" afterPath="$PROJECT_DIR$/../../src/web/web/back-office/include/card/view.jsp" />
     </list>
     <list id="e1ee075d-5eee-4550-8974-bf9883a857e2" name="Failed commit: Default" comment="В процессинге в таблице публикаций создан составной первичный ключ, изменены cущности и изменена логика синхронизации в связи с этим;" />
     <list id="5b6999d5-a6c7-470d-8a7d-cf1ed7c67d95" name="Failed commit: Failed commit: Default" comment="Добавлена обработка журнала посещений, во всех отчетах таймаут проставляется правильно. Удален неиспользуемый data dource embed-derby-ds. В config.properties изменен почтовый сервер на smtp.gmail.com и включен starttls." />
@@ -138,10 +135,7 @@
     <file path="C:/updater/2013/update-server-14-08/src/core/java/ru/axetta/updater/core/updater/db/update.properties" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1383830837347" ignored="false" />
     <file path="C:/updater/2013/update-server-14-08/src/core/java/ru/axetta/updater/core/services/DBUpdaterService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1383830234163" ignored="false" />
     <file path="$PROJECT_DIR$/../../src/core/test/META-INF/ru/axetta/ecafe/processor/core/persistence/CardTempOperation.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1383824020723" ignored="false" />
-    <file path="$PROJECT_DIR$/../../src/core/test/META-INF/ru/axetta/ecafe/processor/core/persistence/SyncHistoryException.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1383824020723" ignored="false" />
     <file path="$PROJECT_DIR$/../../src/core/test/META-INF/ru/axetta/ecafe/processor/core/persistence/User.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1383824020723" ignored="false" />
-    <file path="$PROJECT_DIR$/../../src/core/test/META-INF/ru/axetta/ecafe/processor/core/persistence/CardTemp.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1383824020722" ignored="false" />
-    <file path="$PROJECT_DIR$/../../src/core/test/META-INF/ru/axetta/ecafe/processor/core/persistence/SyncHistory.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1383824020722" ignored="false" />
     <file path="$PROJECT_DIR$/../../src/core/test/META-INF/ru/axetta/ecafe/processor/core/persistence/Visitor.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1383824020719" ignored="false" />
     <file path="$PROJECT_DIR$/../../src/core/test/META-INF/ru/axetta/ecafe/processor/core/persistence/SubscriptionFee.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1383824020719" ignored="false" />
     <file path="$PROJECT_DIR$/../../src/core/test/META-INF/ru/axetta/ecafe/processor/core/persistence/ClientSms.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1383824020719" ignored="false" />
@@ -989,7 +983,7 @@
     <file path="$PROJECT_DIR$/../../../../02/ecafe_relis/src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361363505685" ignored="false" />
     <file path="/QuestionaryResultByOrgReport.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369903079346" ignored="false" />
     <file path="/QuestionaryResultByOrg.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361361503500" ignored="false" />
-    <file path="$USER_HOME$/Desktop/казань/_33/9072out.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361358530570" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../казань/_33/9072out.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361358530570" ignored="false" />
     <file path="/QuestionaryResultByOrg.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361128281095" ignored="false" />
     <file path="/QuestionaryItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366700849244" ignored="false" />
     <file path="dbtable:/testing46cd263e/fb72fd1a-ed90-4305-ac74-7c72f5013d16/apiter.public.cf_qa_questionaries" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1361347899708" ignored="false" />
@@ -1791,7 +1785,7 @@
     <file path="C:/reportserver/src/web/web/WEB-INF/web.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1359706950980" ignored="false" />
     <file path="/BasicReportForContragentJob.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1392112682171" ignored="false" />
     <file path="/ContragentCompletionReportItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1360077103329" ignored="false" />
-    <file path="$USER_HOME$/Desktop/Play20-master/Play20-master/myNewApplication/app/controllers/Application.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1359464575280" ignored="false" />
+    <file path="$PROJECT_DIR$/../../../../../Play20-master/Play20-master/myNewApplication/app/controllers/Application.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1359464575280" ignored="false" />
     <file path="/services-servlet.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1366195698434" ignored="false" />
     <file path="/ResultEnum.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1359450806685" ignored="false" />
     <file path="/ReportDataInfo.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1369813004841" ignored="false" />
@@ -1820,7 +1814,7 @@
     <file path="/User.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1374814633370" ignored="false" />
     <file path="/DigitalSignatureUtils.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1359018849236" ignored="false" />
     <file path="/LoadPaymentsService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1359015695136" ignored="false" />
-    <file path="/view.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395053522788" ignored="false" />
+    <file path="/view.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1396538551340" ignored="false" />
     <file path="/OrgItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1358954809735" ignored="false" />
     <file path="/DAOService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1392099423092" ignored="false" />
     <file path="/ContragentPayItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1358944713712" ignored="false" />
@@ -1844,7 +1838,7 @@
     <file path="/hibernate.cfg.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1359470773211" ignored="false" />
     <file path="/CfOrgs.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1358764216281" ignored="false" />
     <file path="/CfOrgs.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1358764124293" ignored="false" />
-    <file path="/Processor.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395748777549" ignored="false" />
+    <file path="/Processor.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1396531297563" ignored="false" />
     <file path="/DAOUtils.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395063228720" ignored="false" />
     <file path="/WayBillPositionFilter.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1356015719590" ignored="false" />
     <file path="/WayBillPositionListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1356016645427" ignored="false" />
@@ -1871,7 +1865,7 @@
     <file path="/ActOfInventarizationItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1356017496503" ignored="false" />
     <file path="/ActOfInventarizationFilter.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355840015218" ignored="false" />
     <file path="/index.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1392984564492" ignored="false" />
-    <file path="/a.dummy" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395907508870" ignored="false" />
+    <file path="/a.dummy" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1396539639103" ignored="false" />
     <file path="/inventarization_acts.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1385988394693" ignored="false" />
     <file path="/ActOfInventarizationListPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1355842278615" ignored="false" />
     <file path="/fragment.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395918019396" ignored="false" />
@@ -2012,17 +2006,16 @@
     <file path="/SubscriptionFee.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395816065683" ignored="false" />
     <file path="/Circulation.hbm.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395816303471" ignored="false" />
     <file path="$PROJECT_DIR$/../../src/subfeeding/java/ru/axetta/ecafe/processor/web/subfeeding/SubFeedingServlet.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395927852947" ignored="false" />
-    <file path="$PROJECT_DIR$/../../src/org-room/java/ru/axetta/ecafe/processor/web/ui/feed/FeedPlanPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395927852947" ignored="false" />
     <file path="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/service/msk/PupilCatalogFindPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395927852947" ignored="false" />
-    <file path="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/integra/soap/ClientRoomControllerWS.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395929189607" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../trunk/processor/src/subfeeding/web/index.html" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395929189607" ignored="false" />
-    <file path="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395929189607" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../trunk/processor/src/web/web/back-office/include/report/online/good_requests_new_report.jsp" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395929189607" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../trunk/processor/src/subfeeding/web/WEB-INF/web.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395929189607" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../trunk/processor/src/subfeeding/web/WEB-INF/jboss-web.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395929189607" ignored="false" />
     <file path="$PROJECT_DIR$/../../../../trunk/processor/src/subfeeding/web/WEB-INF/app.properties" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395929189607" ignored="false" />
-    <file path="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Client.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395929189607" ignored="false" />
     <file path="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/service/SubscriptionFeedingService.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1395929189607" ignored="false" />
+    <file path="/standalone.xml" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1396519729729" ignored="false" />
+    <file path="/HistoryCardListViewPage.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1396540703980" ignored="false" />
+    <file path="/HistoryCardItem.java" changelist="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" time="1396540633037" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -2282,6 +2275,21 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
+      <breakpoint url="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" line="624" class="ru.axetta.ecafe.processor.core.logic.Processor" package="ru.axetta.ecafe.processor.core.logic">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="REMOVE_AFTER_HIT" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="SUSPEND" value="true" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="true" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
     </line_breakpoints>
     <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_rules />
@@ -2309,7 +2317,35 @@
     </favorites_list>
   </component>
   <component name="FileEditorManager">
-    <leaf />
+    <leaf>
+      <file leaf-file-name="HistoryCard.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/HistoryCard.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="50" column="61" selection-start="961" selection-end="961" vertical-scroll-proportion="1.2108262">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HistoryCardItem.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/card/items/HistoryCardItem.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="8" column="13" selection-start="147" selection-end="147" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="view.jsp" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/view.jsp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="9" column="62" selection-start="396" selection-end="396" vertical-scroll-proportion="-5.8846154">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -2374,15 +2410,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/../../src/web/web/back-office/styles.css" />
-        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/option/option.jsp" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/report/job/ReportJobConstants.java" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/utils/ReportPropertiesUtils.java" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/utils/RuleExpressionUtil.java" />
-        <option value="$PROJECT_DIR$/../../src/subfeeding/java/ru/axetta/ecafe/processor/web/subfeeding/SubFeedingServlet.java" />
-        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Client.java" />
-        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/integra/soap/ClientRoomControllerWS.java" />
-        <option value="$PROJECT_DIR$/../../src/web/web/WEB-INF/jbossws-cxf.xml" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/service/SubscriptionFeedingService.java" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/DashboardByAllOrgReport.java" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuleProcessor.java" />
@@ -2390,6 +2417,15 @@
         <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java" />
         <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/BasicReportJob.java" />
         <option value="$PROJECT_DIR$/../../src/subfeeding/web/WEB-INF/app.properties" />
+        <option value="$APPLICATION_HOME_DIR$/bin/idea.exe.vmoptions" />
+        <option value="C:/home/jbosser/7.1.0/standalone/configuration/standalone.xml" />
+        <option value="$PROJECT_DIR$/../../src/core/java/db/update_2.2.59-2.2.60.sql" />
+        <option value="$PROJECT_DIR$/../../src/core/java/db/update_2.2.60-2.2.61.sql" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java" />
+        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/card/HistoryCardListViewPage.java" />
+        <option value="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/card/items/HistoryCardItem.java" />
+        <option value="$PROJECT_DIR$/../../src/web/web/back-office/include/card/view.jsp" />
+        <option value="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/HistoryCard.java" />
       </list>
     </option>
   </component>
@@ -2489,8 +2525,8 @@
   <component name="ProjectFrameBounds">
     <option name="x" value="-8" />
     <option name="y" value="-8" />
-    <option name="width" value="1696" />
-    <option name="height" value="1026" />
+    <option name="width" value="1456" />
+    <option name="height" value="876" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -2644,12 +2680,318 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
             <PATH_ELEMENT>
               <option name="myItemId" value="processor" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="WEB-INF" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="WEB-INF" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="classes" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="META-INF" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="back-office" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="back-office" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="include" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="back-office" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="include" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="client" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="back-office" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="include" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="card" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="card" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="ui" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="card" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="items" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="web" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
@@ -2676,10 +3018,314 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mail" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="logic" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="daoservices" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="daoservices" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="client" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="daoservices" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="client" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="items" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="client" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="client" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="items" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="card" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="processor" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="db" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
       <pane id="Favorites" />
     </panes>
   </component>
@@ -2736,32 +3382,6 @@
     <property name="JdbcConsole.ResultPageSize" value="1000" />
     <property name="options.searchVisible" value="true" />
     <property name="dynamic.classpath" value="false" />
-  </component>
-  <component name="PublishConfig">
-    <servers>
-      <server id="925b2af0-20b6-4bc4-a6aa-0fb2486416d0">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$/../../src/client-group-updater" />
-            <mapping local="$PROJECT_DIR$/../../src/client-room" />
-            <mapping local="$PROJECT_DIR$/../../src/core" />
-            <mapping local="$PROJECT_DIR$/../../src/dashboard-ws-client" />
-            <mapping local="$PROJECT_DIR$/../../src/testmodule/datatest" />
-            <mapping local="$PROJECT_DIR$/../../src/j2ee" />
-            <mapping local="$PROJECT_DIR$/../../src/org-room" />
-            <mapping local="$PROJECT_DIR$/../../src/payconv" />
-            <mapping local="$PROJECT_DIR$/../../src/pubkey" />
-            <mapping local="$PROJECT_DIR$/../../src/registry-import" />
-            <mapping local="$PROJECT_DIR$/smpp" />
-            <mapping local="$PROJECT_DIR$/../../src/subfeeding" />
-            <mapping local="$PROJECT_DIR$/../../src/synctest" />
-            <mapping local="$PROJECT_DIR$/../../src/testmodule" />
-            <mapping local="$PROJECT_DIR$/../../src/util" />
-            <mapping local="$PROJECT_DIR$/../../src/web" />
-          </mappings>
-        </serverdata>
-      </server>
-    </servers>
   </component>
   <component name="RecentsManager">
     <key name="CreateTestDialog.RecentsKey">
@@ -3884,7 +4504,7 @@
     <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
     <option name="FORCE_UPDATE" value="false" />
     <option name="IGNORE_EXTERNALS" value="false" />
-    <configuration useDefault="true">C:\Users\damir\AppData\Roaming\Subversion</configuration>
+    <configuration useDefault="true">C:\Users\Алмаз\AppData\Roaming\Subversion</configuration>
     <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
     <supportedVersion>125</supportedVersion>
   </component>
@@ -3892,136 +4512,136 @@
     <option name="myMappingRoots">
       <list>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\build\projects" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\build\projects" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\build\projects" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\build\projects" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\build\projects\smpp" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\build\projects\smpp" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\build\projects\smpp" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\build\projects\smpp" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\client-group-updater" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\client-group-updater" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\client-group-updater" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\client-group-updater" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\client-room" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\client-room" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\client-room" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\client-room" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\core" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\core" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\core" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\core" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\dashboard-ws-client" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\dashboard-ws-client" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\dashboard-ws-client" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\dashboard-ws-client" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\j2ee" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\j2ee" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\j2ee" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\j2ee" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\org-room" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\org-room" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\org-room" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\org-room" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\payconv" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\payconv" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\payconv" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\payconv" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\pubkey" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\pubkey" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\pubkey" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\pubkey" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\registry-import" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\registry-import" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\registry-import" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\registry-import" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\subfeeding" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\subfeeding" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\subfeeding" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\subfeeding" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\synctest" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\synctest" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\synctest" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\synctest" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\testmodule" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\testmodule" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\testmodule" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\testmodule" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\testmodule\datatest" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\testmodule\datatest" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\testmodule\datatest" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\testmodule\datatest" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\util" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\util" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\util" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\util" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\web" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\web" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\web" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\web" />
         </SvnCopyRootSimple>
       </list>
     </option>
     <option name="myMoreRealMappingRoots">
       <list>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\build\projects" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\build\projects" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\build\projects" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\build\projects" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\client-group-updater" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\client-group-updater" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\client-group-updater" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\client-group-updater" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\client-room" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\client-room" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\client-room" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\client-room" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\core" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\core" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\core" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\core" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\dashboard-ws-client" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\dashboard-ws-client" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\dashboard-ws-client" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\dashboard-ws-client" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\j2ee" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\j2ee" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\j2ee" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\j2ee" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\org-room" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\org-room" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\org-room" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\org-room" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\payconv" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\payconv" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\payconv" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\payconv" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\pubkey" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\pubkey" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\pubkey" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\pubkey" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\registry-import" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\registry-import" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\registry-import" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\registry-import" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\subfeeding" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\subfeeding" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\subfeeding" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\subfeeding" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\synctest" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\synctest" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\synctest" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\synctest" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\testmodule" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\testmodule" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\testmodule" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\testmodule" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\util" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\util" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\util" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\util" />
         </SvnCopyRootSimple>
         <SvnCopyRootSimple>
-          <option name="myVcsRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\web" />
-          <option name="myCopyRoot" value="D:\workspace\ecafe\alpha_processor\processor\src\web" />
+          <option name="myVcsRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\web" />
+          <option name="myCopyRoot" value="C:\Users\Алмаз\Desktop\workspace\brance\processor\src\web" />
         </SvnCopyRootSimple>
       </list>
     </option>
@@ -4214,33 +4834,35 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1696" height="1026" extended-state="0" />
-    <editor active="false" />
+    <frame x="-8" y="-8" width="1456" height="876" extended-state="7" />
+    <editor active="true" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.34642032" sideWeight="0.249694" order="36" side_tool="false" content_ui="tabs" />
-      <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32986537" sideWeight="0.70893055" order="8" side_tool="false" content_ui="tabs" />
-      <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2607099" sideWeight="0.34566474" order="6" side_tool="true" content_ui="tabs" />
-      <window_info id="JavaEE:App" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2613219" sideWeight="0.1565601" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.11627907" sideWeight="0.6408776" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.43156424" sideWeight="0.249694" order="36" side_tool="false" content_ui="tabs" />
+      <window_info id="JavaEE:App" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.28479198" sideWeight="0.3980447" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Persistence" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23242468" sideWeight="0.25661376" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24837662" sideWeight="0.67814726" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3787529" sideWeight="0.0" order="3" side_tool="false" content_ui="tabs" x="100" y="294" width="710" height="371" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23081683" sideWeight="0.13377193" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32855567" sideWeight="0.5" order="27" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.27761838" sideWeight="0.65363127" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3290993" sideWeight="0.750306" order="9" side_tool="true" content_ui="tabs" />
+      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32855567" sideWeight="0.5" order="27" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3285891" sideWeight="0.6714443" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="28" side_tool="false" content_ui="tabs" />
       <window_info id="JSF" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.10939431" sideWeight="0.10033076" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="28" side_tool="false" content_ui="tabs" />
       <window_info id="CDI" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32986537" sideWeight="0.98039216" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.31907514" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21604279" sideWeight="0.27534685" order="8" side_tool="true" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22154222" sideWeight="0.86720556" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.39756098" sideWeight="0.6187648" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="EJB" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24847561" sideWeight="0.31569967" order="4" side_tool="true" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32802936" sideWeight="0.6893764" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32716763" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23255815" sideWeight="0.79676676" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32681563" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27259684" sideWeight="0.5684357" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32678983" sideWeight="0.4853121" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32986537" sideWeight="0.70893055" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3980447" sideWeight="0.48782468" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.7178771" sideWeight="0.0" order="3" side_tool="false" content_ui="tabs" x="100" y="294" width="710" height="371" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23242468" sideWeight="0.25661376" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.46089387" sideWeight="0.57037944" order="29" side_tool="false" content_ui="tabs" />
+      <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23242468" sideWeight="0.25661376" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22094691" sideWeight="0.86720556" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32802936" sideWeight="0.6893764" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="EJB" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24847561" sideWeight="0.31569967" order="4" side_tool="true" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.39756098" sideWeight="0.6187648" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hibernate Tools" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Phing Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32994652" sideWeight="0.85272145" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Problems" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
@@ -4251,9 +4873,7 @@
       <window_info id="Data Sources" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3894817" sideWeight="0.6774744" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="SQL" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5883134" sideWeight="0.5" order="24" side_tool="false" content_ui="tabs" />
       <window_info id="Atlassian " active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="21" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.37644342" sideWeight="0.48782468" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="APIdoc" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32536522" sideWeight="0.5" order="25" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20323326" sideWeight="0.57037944" order="29" side_tool="false" content_ui="tabs" />
       <window_info id="JProfiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
       <window_info id="JavaRebel Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="32" side_tool="false" content_ui="tabs" />
       <window_info id="JavaRebel" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="33" side_tool="false" content_ui="tabs" />
@@ -4477,184 +5097,142 @@
     </option>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/utils/RuleExpressionUtil.java">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/daoservices/client/items/DayInfo.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="53" column="38" selection-start="1919" selection-end="1919" vertical-scroll-proportion="0.58148146">
+        <state line="9" column="13" selection-start="231" selection-end="231" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/ReportDocumentBuilder.java">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/PaymentReconciliationManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="19" selection-start="332" selection-end="332" vertical-scroll-proportion="0.5277778">
+        <state line="21" column="13" selection-start="680" selection-end="680" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/BasicReportForOrgJob.java">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/logic/Processor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="150" column="39" selection-start="6915" selection-end="6915" vertical-scroll-proportion="0.60912055">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuleProcessor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="492" column="0" selection-start="21274" selection-end="21274" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/LimitFilter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="43" column="24" selection-start="1468" selection-end="1468" vertical-scroll-proportion="0.68798953">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/BasicReportForAllOrgJob.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="122" column="67" selection-start="5451" selection-end="5451" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/RuntimeContext.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="263" column="22" selection-start="11050" selection-end="11050" vertical-scroll-proportion="0.33281493">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/ReportRuleConstants.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="181" column="59" selection-start="9338" selection-end="9338" vertical-scroll-proportion="0.25555557">
+        <state line="645" column="44" selection-start="32636" selection-end="32636" vertical-scroll-proportion="0.0">
           <folding>
-            <element signature="e#0#17990#0" expanded="true" />
+            <element signature="e#0#184894#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/BasicReportJob.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/edit.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="376" column="20" selection-start="14071" selection-end="14071" vertical-scroll-proportion="0.9206843">
+        <state line="185" column="101" selection-start="13401" selection-end="13401" vertical-scroll-proportion="0.2056213">
           <folding>
-            <element signature="initializer##0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getBaseDocumentFilename#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getDefaultReportPeriod#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#BasicReportJob#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#BasicReportJob#1;class#BasicReportJob#0" expanded="false" />
-            <element signature="class#AutoReportRunner#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="class#Builder#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getReportProperties#0;class#Builder#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#setReportProperties#0;class#Builder#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getContragent#0;class#Builder#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#setContragent#0;class#Builder#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getOrg#0;class#Builder#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#setOrg#0;class#Builder#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="class#OrgShortItem#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#OrgShortItem#0;class#OrgShortItem#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#OrgShortItem#1;class#OrgShortItem#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#OrgShortItem#2;class#OrgShortItem#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getIdOfOrg#0;class#OrgShortItem#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#setIdOfOrg#0;class#OrgShortItem#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getShortName#0;class#OrgShortItem#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#setShortName#0;class#OrgShortItem#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getOfficialName#0;class#OrgShortItem#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#setOfficialName#0;class#OrgShortItem#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getSelected#0;class#OrgShortItem#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#setSelected#0;class#OrgShortItem#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getSourceMenuOrg#0;class#OrgShortItem#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#setSourceMenuOrg#0;class#OrgShortItem#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="class#AutoReportBuildJob#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="class#ExecuteEnvironment#0;class#AutoReportBuildJob#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#ExecuteEnvironment#0;class#ExecuteEnvironment#0;class#AutoReportBuildJob#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getExecutorService#0;class#ExecuteEnvironment#0;class#AutoReportBuildJob#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getSessionFactory#0;class#ExecuteEnvironment#0;class#AutoReportBuildJob#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getAutoReportProcessor#0;class#ExecuteEnvironment#0;class#AutoReportBuildJob#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getReportPath#0;class#ExecuteEnvironment#0;class#AutoReportBuildJob#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getTemplateFileName#0;class#ExecuteEnvironment#0;class#AutoReportBuildJob#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getCalendar#0;class#ExecuteEnvironment#0;class#AutoReportBuildJob#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getDateFormat#0;class#ExecuteEnvironment#0;class#AutoReportBuildJob#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getTimeFormat#0;class#ExecuteEnvironment#0;class#AutoReportBuildJob#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getStartDate#0;class#ExecuteEnvironment#0;class#AutoReportBuildJob#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#setStartDate#0;class#ExecuteEnvironment#0;class#AutoReportBuildJob#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getEndDate#0;class#ExecuteEnvironment#0;class#AutoReportBuildJob#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#setEndDate#0;class#ExecuteEnvironment#0;class#AutoReportBuildJob#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getExecutorService#0;class#AutoReportBuildJob#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getRunnable#0;class#AutoReportBuildJob#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="class#AutoReportBuildTask#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#AutoReportBuildTask#0;class#AutoReportBuildTask#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#run#0;class#AutoReportBuildTask#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#createDocumentBuilders#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#BasicReportJob#2;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#initialize#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#BasicReportJob#3;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getStartTime#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#setStartTime#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#setEndTime#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#getEndTime#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#applyDataQueryPeriod#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#calculateDatesForPeriodType#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#calculateYesterdayStart#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#calculateTodayStart#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#calculateMinusOneDay#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#calculatePlusOneDay#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#calculateLastMonthFirstDay#0;class#BasicReportJob#0" expanded="false" />
-            <element signature="method#calculatePlusOneMonth#0;class#BasicReportJob#0" expanded="false" />
+            <marker date="1396512676277" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1396512676277" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1396512676277" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1396512676277" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1396512676277" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1396512676277" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1396512676277" expanded="true" signature="-1:-1" placeholder="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/DashboardByAllOrgReport.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/MainPage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="71" column="0" selection-start="2775" selection-end="2775" vertical-scroll-proportion="0.1626506">
+        <state line="2398" column="16" selection-start="109973" selection-end="109973" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/contragent/addpayment/list.jsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="12" column="35" selection-start="597" selection-end="597" vertical-scroll-proportion="-0.16255443">
+          <folding>
+            <marker date="1396512672360" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1396512672360" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1396512672360" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1396512672360" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1396512672360" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1396512672360" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1396512672360" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1396512672360" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1396512672360" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1396512672360" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1396512672360" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1396512672360" expanded="true" signature="-1:-1" placeholder="{...}" />
+            <marker date="1396512672360" expanded="true" signature="-1:-1" placeholder="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Client.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="68" column="17" selection-start="2756" selection-end="2756" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/card/CardViewPage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="29" column="16" selection-start="746" selection-end="746" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/card/HistoryCardListViewPage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="38" column="48" selection-start="1325" selection-end="1325" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/service/SubscriptionFeedingService.java">
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/Card.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="141" column="29" selection-start="7160" selection-end="7160" vertical-scroll-proportion="0.18928571">
+        <state line="44" column="19" selection-start="1546" selection-end="1546" vertical-scroll-proportion="0.33286715">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/integra/soap/ClientRoomControllerWS.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/client/view.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="4218" column="71" selection-start="198225" selection-end="198225" vertical-scroll-proportion="0.39263803">
+        <state line="14" column="101" selection-start="743" selection-end="752" vertical-scroll-proportion="0.33283132">
           <folding>
-            <element signature="e#170977#171007#0" expanded="true" />
+            <marker date="1396512676379" expanded="true" signature="-1:-1" placeholder="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/subfeeding/java/ru/axetta/ecafe/processor/web/subfeeding/SubFeedingServlet.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/client/ClientCardListViewPage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="244" column="74" selection-start="11674" selection-end="11674" vertical-scroll-proportion="0.30920246">
+        <state line="156" column="50" selection-start="3981" selection-end="3981" vertical-scroll-proportion="0.52307695">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/SyncServlet.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/card/items/ClientItem.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="99" column="59" selection-start="3998" selection-end="3998" vertical-scroll-proportion="0.62738097">
+        <state line="17" column="29" selection-start="486" selection-end="486" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/report/BasicReport.java">
+    <entry file="file://$PROJECT_DIR$/../../src/web/web/back-office/include/card/view.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="186" column="0" selection-start="7360" selection-end="7360" vertical-scroll-proportion="0.12857144">
+        <state line="9" column="62" selection-start="396" selection-end="396" vertical-scroll-proportion="-5.8846154">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../../src/subfeeding/web/WEB-INF/app.properties">
+    <entry file="file://$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/ui/card/items/HistoryCardItem.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="15" selection-start="90" selection-end="90" vertical-scroll-proportion="0.020238096">
+        <state line="8" column="13" selection-start="147" selection-end="147" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/HistoryCard.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="50" column="61" selection-start="961" selection-end="961" vertical-scroll-proportion="1.2108262">
           <folding />
         </state>
       </provider>
@@ -4724,6 +5302,19 @@
             <option name="proportions">
               <list>
                 <option value="0.2705448" />
+                <option value="0.5" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectJDKs.UI">
+        <settings>
+          <last-edited>1.6</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
               </list>
             </option>
           </splitter-proportions>
