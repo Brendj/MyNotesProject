@@ -461,6 +461,13 @@ public class Processor implements SyncProcessor,
         card.setLockReason(lockReason);
         persistenceSession.save(card);
 
+        HistoryCard historyCard = new HistoryCard();
+        historyCard.setCard(card);
+        historyCard.setUpDatetime(new Date());
+        historyCard.setNewOwner(client);
+        historyCard.setInformationAboutCard("Регистрация новой карты № " + card.getCardNo());
+        persistenceSession.save(historyCard);
+
         return card.getIdOfCard();
     }
 
@@ -479,19 +486,6 @@ public class Processor implements SyncProcessor,
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
-
-            Card savedCard = DAOUtils.getCardReference(persistenceSession, idOfCard);
-
-            //История карты при регистрировании нового владельца
-            HistoryCard historyCard = new HistoryCard();
-            historyCard.setCard(savedCard);
-            historyCard.setUpDatetime(new Date());
-            historyCard.setNewOwner(savedCard.getClient());
-            historyCard.setInformationAboutCard("Создание карты № " + savedCard.getCardNo());
-
-            persistenceSession.save(historyCard);
-            persistenceSession.flush();
-
             return idOfCard;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
