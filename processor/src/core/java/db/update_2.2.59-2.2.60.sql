@@ -2,9 +2,9 @@
 --! после финализации они уберутся
 --! Информация для разработчика -- информация для пользователя
 
--- Пакет обновлений 2.2.56
+-- Пакет обновлений 2.2.60
 
-CREATE TABLE cf_user_report_settings
+CREATE TABLE if not exists cf_user_report_settings
 (
   idOfUserReportSetting bigserial NOT NULL,
   numberOfReport integer NOT NULL,
