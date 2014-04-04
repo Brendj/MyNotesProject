@@ -199,8 +199,8 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
 
 
             //String typeCondition = " cf_orders.ordertype<>8 and ";
-            String typeCondition = " (cf_orders.ordertype in (0,1,4,6)) and ";//+
-                                   //" cf_orderdetails.menutype>=:mintype and cf_orderdetails.menutype<=:maxtype and ";
+            String typeCondition = " (cf_orders.ordertype in (0,1,4,5,6)) and " +
+                                   " cf_orderdetails.menutype>=:mintype and cf_orderdetails.menutype<=:maxtype and ";
             String sql = "select cf_orgs.officialname, " + "split_part(cf_goods.fullname, '/', 1) as level1, "
                     + "split_part(cf_goods.fullname, '/', 2) as level2, "
                     + "split_part(cf_goods.fullname, '/', 3) as level3, "
@@ -221,8 +221,8 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
             query.setParameter("start", start.getTime());
             //query.setParameter("start",1357171200000L);
             query.setParameter("end", end.getTime());
-            //query.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
-            //query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+            query.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
+            query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
 
             List<DeliveredServicesItem> result = new ArrayList<DeliveredServicesItem>();
             List res = query.list();
