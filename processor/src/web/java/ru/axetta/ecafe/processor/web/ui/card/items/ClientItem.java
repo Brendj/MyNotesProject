@@ -12,15 +12,19 @@ import java.util.Date;
  */
 public class ClientItem {
 
-    private final Long idOfClient;
-    private final String orgShortName;
+    private Long idOfClient;
+    private String orgShortName;
     private final PersonItem person;
     private final PersonItem contractPerson;
-    private final Long contractId;
-    private final Date contractTime;
-    private final Integer contractState;
+    private Long contractId;
+    private Date contractTime;
+    private Integer contractState;
 
     public String getShortName() {
+        if (contractId == null) {
+            return "";
+        }
+
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(ContractIdFormat.format(contractId)).append(" (").append(AbbreviationUtils
                 .buildAbbreviation(contractPerson.getFirstName(), contractPerson.getSurname(),
@@ -30,13 +34,8 @@ public class ClientItem {
     }
 
     public ClientItem() {
-        this.idOfClient = null;
-        this.orgShortName = null;
         this.person = new PersonItem();
         this.contractPerson = new PersonItem();
-        this.contractId = null;
-        this.contractTime = null;
-        this.contractState = null;
     }
 
     public ClientItem(Client client) {

@@ -5,10 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.card;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Person;
-import ru.axetta.ecafe.processor.core.utils.AbbreviationUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.card.items.ClientItem;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
@@ -26,7 +23,7 @@ import java.util.Date;
  */
 public class CardCreatePage extends BasicWorkspacePage implements ClientSelectPage.CompleteHandler {
 
-    private ClientItem client;
+    private ClientItem client = new ClientItem();
     private Long cardNo;
     private Integer cardType;
     private Integer state;

@@ -56,7 +56,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
-import static ru.axetta.ecafe.processor.core.logic.ClientManager.setCategories;
 
 /**
  * Created by IntelliJ IDEA.
@@ -462,15 +461,6 @@ public class Processor implements SyncProcessor,
         card.setLockReason(lockReason);
         persistenceSession.save(card);
 
-/*        //История если карта новая
-        HistoryCard historyCard = new HistoryCard();
-        historyCard.setCard(card);
-        historyCard.setNewOwner(client);
-        historyCard.setUpDatetime(new Date());
-        historyCard.setInformationAboutCard("Новая карта новый владелец");
-        persistenceSession.update(historyCard);
-        persistenceSession.flush();*/
-
         return card.getIdOfCard();
     }
 
@@ -489,6 +479,19 @@ public class Processor implements SyncProcessor,
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
+
+            Card savedCard = DAOUtils.getCardReference(persistenceSession, idOfCard);
+
+            //История карты при регистрировании нового владельца
+            HistoryCard historyCard = new HistoryCard();
+            historyCard.setCard(savedCard);
+            historyCard.setUpDatetime(new Date());
+            historyCard.setNewOwner(savedCard.getClient());
+            historyCard.setInformationAboutCard("Создание карты № " + savedCard.getCardNo());
+
+            persistenceSession.save(historyCard);
+            persistenceSession.flush();
+
             return idOfCard;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
@@ -533,6 +536,27 @@ public class Processor implements SyncProcessor,
                 lockActiveCards(persistenceSession, clientCards);
             }
 
+            //История карты при смене владельца карты
+            long oldClient = updatedCard.getClient().getIdOfClient();
+            long newClient = newCardOwner.getIdOfClient();
+
+            if (oldClient != newClient) {
+                HistoryCard historyCard = new HistoryCard();
+                historyCard.setCard(updatedCard);
+                historyCard.setUpDatetime(new Date());
+                historyCard.setInformationAboutCard(
+                        "Передача карты другому владельцу: от " + updatedCard.getClient().getContractId() + " к " +
+                                newCardOwner.getContractId());
+                historyCard.setNewOwner(newCardOwner);
+                historyCard.setFormerOwner(updatedCard.getClient());
+
+                persistenceSession.save(historyCard);
+                persistenceSession.flush();
+
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            }
+
             updatedCard.setClient(newCardOwner);
             updatedCard.setCardType(cardType);
             updatedCard.setUpdateTime(new Date());
@@ -545,20 +569,6 @@ public class Processor implements SyncProcessor,
             updatedCard.setUpdateTime(new Date());
             persistenceSession.update(updatedCard);
             persistenceSession.flush();
-
-/*            //История карты при смене владельца
-            HistoryCard historyCard = new HistoryCard();
-            historyCard.setCard(updatedCard);
-            historyCard.setUpDatetime(new Date());
-            historyCard.setInformationAboutCard("Новая информация: " + updatedCard.getIdOfCard());
-            historyCard.setFormerOwner(updatedCard.getClient());
-            historyCard.setNewOwner(updatedCard.getClient());
-
-            persistenceSession.update(historyCard);
-            persistenceSession.flush();*/
-
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -622,6 +632,25 @@ public class Processor implements SyncProcessor,
 
             lockActiveCards(persistenceSession, newCardOwner.getCards());
 
+            final long oldClient = updatedCard.getClient().getIdOfClient();
+            final long newClient = newCardOwner.getIdOfClient();
+
+            //История карты при смене владельца
+            //  if (oldClient != newClient) {
+            HistoryCard historyCard = new HistoryCard();
+            historyCard.setCard(updatedCard);
+            historyCard.setUpDatetime(new Date());
+            historyCard.setInformationAboutCard("Передача карты другому владельцу: " + updatedCard.getIdOfCard());
+            historyCard.setFormerOwner(updatedCard.getClient());
+            historyCard.setNewOwner(newCardOwner);
+
+            persistenceSession.save(historyCard);
+            persistenceSession.flush();
+            // }
+
+            persistenceSession.update(updatedCard);
+            persistenceSession.flush();
+
             updatedCard.setClient(newCardOwner);
             //updatedCard.setCardType(cardType);
             updatedCard.setUpdateTime(new Date());
@@ -632,21 +661,6 @@ public class Processor implements SyncProcessor,
             //updatedCard.setLifeState(lifeState);
             //updatedCard.setExternalId(externalId);
             updatedCard.setUpdateTime(new Date());
-
-            //История карты при смене владельца
-            HistoryCard historyCard = new HistoryCard();
-            historyCard.setCard(updatedCard);
-            historyCard.setUpDatetime(new Date());
-            historyCard.setInformationAboutCard("Новая информация: " + updatedCard.getIdOfCard());
-            historyCard.setFormerOwner(updatedCard.getClient());
-            historyCard.setNewOwner(updatedCard.getClient());
-
-            persistenceSession.save(historyCard);
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-
-            persistenceSession.update(updatedCard);
-            persistenceSession.flush();
 
             persistenceTransaction.commit();
             persistenceTransaction = null;

@@ -10,9 +10,14 @@ public class HistoryCardItem {
 
     private Long idOfHistoryCard;
     private Date upDateTime;
-    private ClientItem formerOwner;
-    private ClientItem newOwner;
+    private final ClientItem formerOwner;
+    private final ClientItem newOwner;
     private String informationAboutCard;
+
+    public HistoryCardItem() {
+        this.formerOwner = new ClientItem();
+        this.newOwner = new ClientItem();
+    }
 
     public HistoryCardItem(Long idOfHistoryCard, Date upDateTime, ClientItem formerOwner, ClientItem newOwner,
             String informationAboutCard) {
@@ -43,16 +48,8 @@ public class HistoryCardItem {
         return formerOwner;
     }
 
-    public void setFormerOwner(ClientItem formerOwner) {
-        this.formerOwner = formerOwner;
-    }
-
     public ClientItem getNewOwner() {
         return newOwner;
-    }
-
-    public void setNewOwner(ClientItem newOwner) {
-        this.newOwner = newOwner;
     }
 
     public String getInformationAboutCard() {

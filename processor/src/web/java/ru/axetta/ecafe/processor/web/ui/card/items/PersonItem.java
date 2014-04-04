@@ -9,16 +9,13 @@ import ru.axetta.ecafe.processor.core.persistence.Person;
 
 public class PersonItem {
 
-    private final String firstName;
-    private final String surname;
-    private final String secondName;
-    private final String idDocument;
+    private String firstName;
+    private String surname;
+    private String secondName;
+    private String idDocument;
 
     public PersonItem() {
-        this.firstName = null;
-        this.surname = null;
-        this.secondName = null;
-        this.idDocument = null;
+
     }
 
     public PersonItem(Person person) {

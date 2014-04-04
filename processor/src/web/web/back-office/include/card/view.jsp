@@ -75,9 +75,9 @@
                 <f:facet name="header">
                     <h:outputText escape="true" value="Прежний владелец" />
                 </f:facet>
-                <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.newOwnerContractId}"
+                <a4j:commandLink rendered="#{item.formerOwnerContractId!=null}" reRender="mainMenu, workspaceForm" value="#{item.formerOwnerContractId}"
                                  styleClass="command-link" action="#{mainPage.showClientViewPage}">
-                    <f:setPropertyActionListener value="#{item.newOwnerIdOfClient}"
+                    <f:setPropertyActionListener value="#{item.formerOwnerIdOfClient}"
                                                  target="#{mainPage.selectedIdOfClient}" />
                 </a4j:commandLink>
             </rich:column>
@@ -85,9 +85,9 @@
                 <f:facet name="header">
                     <h:outputText escape="true" value="Новый владелец" />
                 </f:facet>
-                <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.formerOwnerContractId}"
+                <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.newOwnerContractId}"
                                  styleClass="command-link" action="#{mainPage.showClientViewPage}">
-                    <f:setPropertyActionListener value="#{item.formerOwnerIdOfClient}"
+                    <f:setPropertyActionListener value="#{item.newOwnerIdOfClient}"
                                                  target="#{mainPage.selectedIdOfClient}" />
                 </a4j:commandLink>
             </rich:column>

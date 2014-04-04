@@ -14,36 +14,45 @@ public class HistoryCardListViewPage {
 
     public static class Item {
 
-        private long formerOwnerIdOfClient;
-        private long formerOwnerContractId;
+        private Long formerOwnerIdOfClient;
+        private Long formerOwnerContractId;
         private long newOwnerIdOfClient;
         private long newOwnerContractId;
 
         private Date upDateTime;
         private String informationAboutCard;
 
+        public Item() {
+
+        }
+
         public Item(HistoryCard historyCard) {
             this.upDateTime = historyCard.getUpDatetime();
-            this.formerOwnerIdOfClient = historyCard.getFormerOwner().getIdOfClient();
-            this.formerOwnerContractId = historyCard.getFormerOwner().getContractId();
+            if(historyCard.getFormerOwner()==null){
+                this.formerOwnerIdOfClient = null;
+                this.formerOwnerContractId = null;
+            } else {
+                this.formerOwnerIdOfClient = historyCard.getFormerOwner().getIdOfClient();
+                this.formerOwnerContractId = historyCard.getFormerOwner().getContractId();
+            }
             this.newOwnerIdOfClient = historyCard.getNewOwner().getIdOfClient();
             this.newOwnerContractId = historyCard.getNewOwner().getContractId();
             this.informationAboutCard = historyCard.getInformationAboutCard();
         }
 
-        public long getFormerOwnerIdOfClient() {
+        public Long getFormerOwnerIdOfClient() {
             return formerOwnerIdOfClient;
         }
 
-        public void setFormerOwnerIdOfClient(long formerOwnerIdOfClient) {
+        public void setFormerOwnerIdOfClient(Long formerOwnerIdOfClient) {
             this.formerOwnerIdOfClient = formerOwnerIdOfClient;
         }
 
-        public long getFormerOwnerContractId() {
+        public Long getFormerOwnerContractId() {
             return formerOwnerContractId;
         }
 
-        public void setFormerOwnerContractId(long formerOwnerContractId) {
+        public void setFormerOwnerContractId(Long formerOwnerContractId) {
             this.formerOwnerContractId = formerOwnerContractId;
         }
 

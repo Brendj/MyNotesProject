@@ -2,21 +2,11 @@
 --! после финализации они уберутся
 --! Информация для разработчика -- информация для пользователя
 
--- Пакет обновлений 2.2.59
-
-CREATE TABLE cf_user_report_settings
-(
-  idOfUserReportSetting bigserial NOT NULL,
-  numberOfReport integer NOT NULL,
-  idOfUser bigint NOT NULL,
-  settings text,
-  CONSTRAINT cf_user_report_setting_pk PRIMARY KEY (idOfUserReportSetting),
-  CONSTRAINT cf_user_report_settings_fk_users FOREIGN KEY (idOfUser) REFERENCES cf_users (idofuser)
-);
+-- Пакет обновлений 2.2.61
 
 CREATE TABLE cf_history_card
 (
-  IdOfHistoryCard bigint NOT NULL,
+  IdOfHistoryCard bigserial NOT NULL,
   IdOfCard bigint NOT NULL,
   UpDatetime bigint NOT NULL,
   FormerOwner bigint,
