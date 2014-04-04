@@ -130,6 +130,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
 
             Date generateEndTime = new Date();
             List<DailyReferReportItem> items = findDailyReferItems(session, startTime, endTime, category);
+            //addSample(session, org, startTime, endTime, items);
             //  После получения всего списка, передаем итоговую сумму в кач-ве параметра
             parameterMap.put("totalSum", totalSumm);
 
@@ -153,6 +154,19 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 return new DailyReferReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                         startTime, endTime, items).setHtmlReport(os.toString("UTF-8"));
             }
+        }
+
+        protected DailyReferReportItem addSample(Session session, OrgShortItem org,
+                                                 Date startTime, Date endTime,
+                                                 List<DailyReferReportItem> items) {
+            Set<String> groups = new HashSet<String>();
+            for(DailyReferReportItem i : items) {
+                groups.add(i.getGroup2());
+            }
+            ReferReport.DailyReferReportItem samples [] = ReferReport.Builder.getSampleItems(session, org, startTime, endTime, groups);
+            DailyReferReportItem sampleTotal = new DailyReferReportItem();
+
+            return null;
         }
 
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime, Calendar calendar,
@@ -277,6 +291,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
     }
 
     public static class DailyReferReportItem extends ReferReportItem {
+        private int orderType;
         private String day;         //  день
         private String group1;      //  наименование правила
         private String group2;      //  завтрак / обед
@@ -315,6 +330,15 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             this.children = children;
             this.price = price;
             this.summary = summary;
+            orderType = 1;
+        }
+
+        public int getOrderType() {
+            return orderType;
+        }
+
+        public void setOrderType(int orderType) {
+            this.orderType = orderType;
         }
 
         public String getDay() {

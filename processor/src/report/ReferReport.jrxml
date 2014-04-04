@@ -8,9 +8,9 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
-	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.zoom" value="1.1000000000000008"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="48"/>
+	<property name="ireport.y" value="356"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -104,11 +104,14 @@
 	<parameter name="workdaysCount" class="java.lang.Integer">
 		<defaultValueExpression><![CDATA[0]]></defaultValueExpression>
 	</parameter>
+	<parameter name="periodChildren" class="java.lang.Long"/>
+	<parameter name="periodTotal" class="java.lang.Long"/>
+	<parameter name="periodSummary" class="java.lang.Double"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="227" splitType="Stretch">
+		<band height="203" splitType="Stretch">
 			<elementGroup/>
 			<staticText>
 				<reportElement uuid="24f636d2-0418-42b4-9970-a94414684b99" x="0" y="37" width="713" height="20"/>
@@ -118,7 +121,7 @@
 				<text><![CDATA[СПРАВКА]]></text>
 			</staticText>
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" x="0" y="64" width="713" height="20"/>
+				<reportElement uuid="dd5499d4-6ef9-4fb9-b3d4-962e3f5d8772" x="20" y="57" width="713" height="20"/>
 				<textElement>
 					<font size="12" isBold="true"/>
 				</textElement>
@@ -156,54 +159,75 @@
 	<summary>
 		<band height="508">
 			<staticText>
-				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="0" y="387" width="79" height="20"/>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="20" y="427" width="79" height="20"/>
 				<textElement>
-					<font size="14"/>
+					<font size="11"/>
 				</textElement>
 				<text><![CDATA[Составил: ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="79" y="387" width="265" height="20"/>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="99" y="427" width="265" height="20"/>
 				<textElement>
 					<font size="14"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="474" y="387" width="164" height="20"/>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="494" y="427" width="164" height="20"/>
 				<textElement>
 					<font size="14"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c60a78d9-5fe5-40a1-9c40-c3f67161c809" x="0" y="426" width="79" height="20"/>
+				<reportElement uuid="c60a78d9-5fe5-40a1-9c40-c3f67161c809" x="20" y="466" width="79" height="20"/>
 				<textElement>
-					<font size="14"/>
+					<font size="11"/>
 				</textElement>
 				<text><![CDATA[Проверил: ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="79" y="426" width="265" height="20"/>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="99" y="466" width="265" height="20"/>
 				<textElement>
 					<font size="14"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="638" y="426" width="164" height="20"/>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="611" y="466" width="102" height="20"/>
 				<textElement>
 					<font size="14"/>
 				</textElement>
 				<text><![CDATA[]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="93d15a6e-b020-4510-b4c7-843c0e7dacfa" x="665" y="460" width="137" height="20"/>
+				<reportElement uuid="93d15a6e-b020-4510-b4c7-843c0e7dacfa" x="638" y="486" width="75" height="20"/>
 				<textElement/>
 				<text><![CDATA[      М.П.]]></text>
 			</staticText>
+			<textField>
+				<reportElement uuid="7b895bc5-aabc-4c3d-88e3-658b222b96d9" style="Crosstab Data Text" x="20" y="341" width="300" height="23"/>
+				<textElement>
+					<font fontName="SansSerif" size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Всего будни+субботы"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="395" y="341" width="75" height="23"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
+					<font fontName="SansSerif" size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{periodTotal}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="320" y="341" width="75" height="23"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
+					<font fontName="SansSerif" size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{periodChildren}]]></textFieldExpression>
+			</textField>
 			<subreport>
-				<reportElement uuid="8b328af4-bcbf-410c-be32-23a5aae33c7b" x="0" y="0" width="713" height="100"/>
+				<reportElement uuid="8b328af4-bcbf-410c-be32-23a5aae33c7b" x="0" y="20" width="713" height="100"/>
 				<subreportParameter name="reportType">
 					<subreportParameterExpression><![CDATA["Субботы"]]></subreportParameterExpression>
 				</subreportParameter>
@@ -213,6 +237,48 @@
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource((List)$P{reports}.get(1))]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "ReferReport_subreport.jasper"]]></subreportExpression>
 			</subreport>
+			<staticText>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="20" y="321" width="693" height="20"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="470" y="341" width="75" height="23"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
+					<font fontName="SansSerif" size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[String.format("%.2f", $P{periodSummary})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="20" y="364" width="693" height="20"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="7b895bc5-aabc-4c3d-88e3-658b222b96d9" x="20" y="384" width="300" height="23"/>
+				<textElement textAlignment="Center">
+					<font fontName="SansSerif" size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["кол-во учебных дней будни+субботы " + $P{workdaysCount} + "+" + $P{weekendsCount} + "=" + ($P{workdaysCount} + $P{weekendsCount})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="20" y="407" width="693" height="20"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6b6cb39c-ab2b-41b7-9769-ee832dcf3aa0" x="20" y="0" width="782" height="20"/>
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
 		</band>
 	</summary>
 	<noData>

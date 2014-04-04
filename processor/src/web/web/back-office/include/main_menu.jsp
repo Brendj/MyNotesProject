@@ -847,6 +847,9 @@
                             binding="#{mainPage.deliveredServicesReportPage.mainMenuComponent}"
                             label="Отчет по предоставленным услугам"
                             action="#{mainPage.showDeliveredServicesReportPage}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="referReportMenuItem" binding="#{referReportPage.mainMenuComponent}"
+                            label="Справки расходования средств" action="#{referReportPage.show}"
+                            reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="paymentReportsGroupMenu" binding="#{mainPage.paymentReportsGroupMenu.mainMenuComponent}"
@@ -948,9 +951,6 @@
                         label="Расчет комплексов по льготным правилам"
                         action="#{mainPage.showClientsBenefitsReportPage}" reRender="workspaceForm" />
     <%--@elvariable id="referReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ReferReportPage"--%>
-    <rich:panelMenuItem id="referReportMenuItem" binding="#{referReportPage.mainMenuComponent}"
-                        label="Справки расходования средств" action="#{referReportPage.show}"
-                        reRender="workspaceForm" />
 
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
     <rich:panelMenuItem id="manualReportRunnerMenuItem" binding="#{manualReportRunnerPage.mainMenuComponent}"
