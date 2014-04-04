@@ -13,6 +13,8 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampItem;
 import ru.axetta.ecafe.processor.core.persistence.Contract;
+import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
+import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import org.apache.commons.lang.StringUtils;
@@ -196,8 +198,9 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
             }
 
 
-
-
+            //String typeCondition = " cf_orders.ordertype<>8 and ";
+            String typeCondition = " (cf_orders.ordertype in (0,1,4,6)) and ";//+
+                                   //" cf_orderdetails.menutype>=:mintype and cf_orderdetails.menutype<=:maxtype and ";
             String sql = "select cf_orgs.officialname, " + "split_part(cf_goods.fullname, '/', 1) as level1, "
                     + "split_part(cf_goods.fullname, '/', 2) as level2, "
                     + "split_part(cf_goods.fullname, '/', 3) as level3, "
@@ -208,7 +211,8 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                     + "from cf_orgs " + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
                     + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
                     + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
-                    + "where cf_orderdetails.socdiscount>0 and " + contragentCondition + contractOrgsCondition
+                    + "where cf_orderdetails.socdiscount>0 and " + typeCondition
+                    + contragentCondition + contractOrgsCondition
                     + orgCondition
                     + " cf_orders.createddate between :start and :end "
                     + "group by cf_orgs.idoforg, cf_orgs.officialname, level1, level2, level3, level4, price, address "
@@ -217,6 +221,8 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
             query.setParameter("start", start.getTime());
             //query.setParameter("start",1357171200000L);
             query.setParameter("end", end.getTime());
+            //query.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
+            //query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
 
             List<DeliveredServicesItem> result = new ArrayList<DeliveredServicesItem>();
             List res = query.list();
