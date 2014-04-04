@@ -73,10 +73,10 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         parameterMap.put("endDate", CalendarUtils.dateToString(endTime));
 
 
-        if (StringUtils.isEmpty(getReportProperties().getProperty("idOfMenuSourceOrg"))) {
+        if (StringUtils.isEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG))) {
             throw new Exception("Не указана организация-поставщик меню.");
         }
-        String sourceMenuOrgId = StringUtils.trimToEmpty(getReportProperties().getProperty("idOfMenuSourceOrg"));
+        String sourceMenuOrgId = StringUtils.trimToEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG));
         List<Long> sourceMenuList = new ArrayList<Long>();
         for (String idOfOrg : Arrays.asList(StringUtils.split(sourceMenuOrgId, ','))) {
             sourceMenuList.add(Long.parseLong(idOfOrg));
@@ -208,7 +208,7 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
                 + " WHERE cf_orders.createddate >= :startDate AND cf_orders.createddate <= :endDate and "
                 + " cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
                 + " cf_clients.discountmode = 3 and "  /* берем только льготников */
-                + " cf_orders.ordertype = 4 and "/* смотрим плану льготного питания */
+                + " cf_orders.ordertype in (4, 6) and "/* смотрим плану льготного питания */
                 + " cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS order_data "
                 + "GROUP BY order_data.d, order_data.org";
 

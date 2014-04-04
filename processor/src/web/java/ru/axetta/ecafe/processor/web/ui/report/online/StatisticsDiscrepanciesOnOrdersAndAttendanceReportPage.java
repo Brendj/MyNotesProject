@@ -55,9 +55,8 @@ public class StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage extends Onli
         }
         Date generateTime = new Date();
         DiscrepanciesOnOrdersAndAttendanceBuilder builder = new DiscrepanciesOnOrdersAndAttendanceBuilder();
-        builder.setReportProperties(new Properties());
         String sourceMenuOrgId = StringUtils.join(idOfContragentOrgList.iterator(), ",");
-        builder.getReportProperties().setProperty("idOfMenuSourceOrg", sourceMenuOrgId);
+        builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG, sourceMenuOrgId);
         String idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
         builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
         BasicReportJob report = builder.build(session, startDate, endDate, localCalendar);

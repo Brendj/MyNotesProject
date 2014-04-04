@@ -107,8 +107,7 @@ public class Item {
     }
 
     public Double getPercent() {
-        long reserve = (orderReserveCount==null?0L:orderReserveCount);
-        return Math.abs((requestCount==null || orderCount ==null || requestCount==0)?0.0:(requestCount- orderCount-reserve)*100.0/requestCount);
+        return Math.abs((requestCount==null || orderCount ==null || requestCount==0)?0.0:(requestCount - orderCount)*100.0/requestCount);
     }
 
     public void setOrderCount(Long orderCount) {

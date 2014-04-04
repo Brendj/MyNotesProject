@@ -17,22 +17,16 @@ class OrderCountItem {
 
     private Long totalCount;
     private final Date doneDate;
-    private Long count;
 
     OrderCountItem(Long totalCount, Date doneDate) {
         this.totalCount = totalCount;
         this.doneDate = doneDate;
-        count=1L;
     }
 
     public Long getTotalCount() {
         return totalCount;
     }
 
-    public void setTotalCountAndCount(Long totalCount) {
-        count++;
-        this.totalCount = totalCount;
-    }
 
     public void setTotalCount(Long totalCount) {
         this.totalCount = totalCount;
@@ -42,7 +36,4 @@ class OrderCountItem {
         return doneDate;
     }
 
-    Long getCount() {
-        return count;
-    }
 }
