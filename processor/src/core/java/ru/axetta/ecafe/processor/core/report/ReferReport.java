@@ -171,39 +171,58 @@ public class ReferReport extends BasicReportForAllOrgJob {
             return new JRBeanCollectionDataSource(items);
         }
 
-        public static DailyReferReportItem[] getSampleItems(Session session, OrgShortItem org, Date startTime, Date endTime) {
-            return getSampleItems(session, org, startTime, endTime, null);
-        }
-
         public static DailyReferReportItem[] getSampleItems(Session session, OrgShortItem org,
                                                             Date startTime, Date endTime,
                                                             Set<String> groups) {
-            DailyReferReportItem result [];
-            if(groups == null || groups.size() < 1) {
-                result = new DailyReferReportItem [] { new DailyReferReportItem("БУДНИЕ"),
-                                                       new DailyReferReportItem("ВЫХОДНЫЕ") };
-            } else {
-                result = new DailyReferReportItem [groups.size()];
-                int i = 0;
-                for(String grp : groups) {
-                    result[i] = new DailyReferReportItem(grp);
-                    i++;
-                }
+            Map<String, DailyReferReportItem> items = new HashMap<String, DailyReferReportItem>();
+            for(String g : groups) {
+                DailyReferReportItem i = new DailyReferReportItem(g);
+                i.setGoodName(g);
+                items.put(g, i);
             }
-            Query query = session.createSQLQuery(
-                    "select cast (cf_orders.rsum + cf_orders.socdiscount as decimal) / 100 as price, cf_orders.createddate, cf_goods.nameofgood "
-                    + "from cf_orders "
-                    + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
-                    + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
-                    + "where cf_orders.socdiscount<>0 and cf_orders.idoforg=:idoforg and "
-                    + "      cf_orders.createddate between :start and :end "
-                    + "      and cf_orders.ordertype=:ordertype ");
-            query.setLong("idoforg", org.getIdOfOrg());
-            query.setLong("start", startTime.getTime());
-            query.setLong("end", endTime.getTime());
-            query.setInteger("ordertype", OrderTypeEnumType.DAILY_SAMPLE.ordinal());
+            List res = executeSampleItemsQuery(session, org, startTime, endTime);
             Calendar cal = new GregorianCalendar();
-            List res = query.list();
+            for (Object entry : res) {
+                Object e[] = (Object[]) entry;
+                BigDecimal priceObj   = e[0] == null ? new BigDecimal(0D) : (BigDecimal) e[0];
+                priceObj              = priceObj.setScale(2, BigDecimal.ROUND_HALF_DOWN);
+                long ts               = ((BigInteger) e[1]).longValue();
+                String good           = ((String) e[2]).trim();
+                cal.setTimeInMillis(ts);
+                String groupName = "";
+                if(good.toLowerCase().indexOf(BREAKFAST.toLowerCase()) >= 0) {
+                    groupName = BREAKFAST;
+                }
+                if(good.toLowerCase().indexOf(SNACK.toLowerCase()) >= 0) {
+                    groupName = SNACK;
+                }
+                if(good.toLowerCase().indexOf(LUNCH.toLowerCase()) >= 0) {
+                    groupName = LUNCH;
+                }
+                DailyReferReportItem it = items.get(groupName);
+                if(it == null) {
+                    continue;
+                }
+                it.setPrice(priceObj.doubleValue());
+                it.setChildren(it.getChildren() + 1);
+                it.setSummary(it.getChildren() * it.getPrice());
+            }
+
+            DailyReferReportItem result[] = new DailyReferReportItem[items.size()];
+            int i = 0;
+            for(String k : items.keySet()) {
+                result[i] = items.get(k);
+                i++;
+            }
+            return result;
+        }
+
+        public static DailyReferReportItem[] getSampleItems(Session session, OrgShortItem org,
+                                                            Date startTime, Date endTime) {
+            DailyReferReportItem result [] = new DailyReferReportItem [] { new DailyReferReportItem("БУДНИЕ"),
+                                                   new DailyReferReportItem("ВЫХОДНЫЕ") };
+            List res = executeSampleItemsQuery(session, org, startTime, endTime);
+            Calendar cal = new GregorianCalendar();
             for (Object entry : res) {
                 Object e[] = (Object[]) entry;
                 BigDecimal priceObj   = e[0] == null ? new BigDecimal(0D) : (BigDecimal) e[0];
@@ -219,6 +238,24 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 result[index].setGoodName(good);
             }
             return result;
+        }
+
+        protected static List executeSampleItemsQuery(Session session, OrgShortItem org,
+                                                Date startTime, Date endTime) {
+            Query query = session.createSQLQuery(
+                    "select cast (cf_orderdetails.socdiscount as decimal) / 100 as price, cf_orders.createddate, cf_goods.nameofgood "
+                            + "from cf_orders "
+                            + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
+                            + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
+                            + "where cf_orders.socdiscount<>0 and cf_orders.idoforg=:idoforg and "
+                            + "      cf_orders.createddate between :start and :end "
+                            + "      and cf_orders.ordertype=:ordertype ");
+            query.setLong("idoforg", org.getIdOfOrg());
+            query.setLong("start", startTime.getTime());
+            query.setLong("end", endTime.getTime());
+            query.setInteger("ordertype", OrderTypeEnumType.DAILY_SAMPLE.ordinal());
+            List res = query.list();
+            return res;
         }
         
         private List<DailyReferReportItem> findReferItems(Session session, Date startTime, Date endTime) {

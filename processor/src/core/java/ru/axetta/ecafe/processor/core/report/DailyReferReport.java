@@ -130,7 +130,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
 
             Date generateEndTime = new Date();
             List<DailyReferReportItem> items = findDailyReferItems(session, startTime, endTime, category);
-            //addSample(session, org, startTime, endTime, items);
+            addSamples(session, org, startTime, endTime, items, category);
             //  После получения всего списка, передаем итоговую сумму в кач-ве параметра
             parameterMap.put("totalSum", totalSumm);
 
@@ -156,16 +156,25 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             }
         }
 
-        protected DailyReferReportItem addSample(Session session, OrgShortItem org,
-                                                 Date startTime, Date endTime,
-                                                 List<DailyReferReportItem> items) {
+        protected DailyReferReportItem[] addSamples(Session session, OrgShortItem org,
+                                                    Date startTime, Date endTime,
+                                                    List<DailyReferReportItem> items, String category) {
             Set<String> groups = new HashSet<String>();
             for(DailyReferReportItem i : items) {
                 groups.add(i.getGroup2());
             }
             ReferReport.DailyReferReportItem samples [] = ReferReport.Builder.getSampleItems(session, org, startTime, endTime, groups);
-            DailyReferReportItem sampleTotal = new DailyReferReportItem();
 
+            String name = category;
+            if (category == null || category.length() < 1) {
+                name = OVERALL_SUBCATEGORY_NAME;
+            }
+            for(ReferReport.DailyReferReportItem it : samples) {
+                DailyReferReportItem item = new DailyReferReportItem("СУТОЧНАЯ ПРОБА", name, it.getGoodName(),
+                                                                    it.getChildren(), it.getPrice(), it.getSummary());
+                items.add(item);
+
+            }
             return null;
         }
 
@@ -182,6 +191,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 //categoryClause = " and cf_discountrules.subcategory <> '' ";
             }
 
+            Map<String, DailyReferReportItem> totals = new HashMap<String, DailyReferReportItem>();
             List<DailyReferReportItem> result = new ArrayList<DailyReferReportItem>();
             List res = getReportData(session, org.getIdOfOrg(), startTime.getTime(), endTime.getTime(),
                                      categoryClause);
@@ -201,7 +211,22 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 DailyReferReportItem item = new DailyReferReportItem(ts, name, goodname, children, priceObj.doubleValue(), summaryObj.doubleValue());
                 totalSumm             += summaryObj.doubleValue();
                 result.add(item);
+
+                //  Обновляем тотал объект для питания
+                DailyReferReportItem total = totals.get(item.getGroup2());
+                if(total == null) {
+                    total = new DailyReferReportItem("Итого", name, goodname, 0, 0D, 0D);
+                    total.setPrice(item.getPrice());
+                    totals.put(item.getGroup2(), total);
+                }
+                total.setChildren(total.getChildren() + item.getChildren());
+                total.setTotal(total.getTotal() + item.getTotal());
+                total.setSummary(total.getSummary() + item.getSummary());
             }
+            for(String k : totals.keySet()) {
+                result.add(totals.get(k));
+            }
+
             return result;
         }
     }
@@ -302,7 +327,11 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
         }
 
         public DailyReferReportItem(long ts, String name, String goodname, long children, double price, double summary) {
-            day = dailyItemsFormat.format(new Date(ts));
+            this(dailyItemsFormat.format(new Date(ts)), name,  goodname, children, price, summary);
+        }
+
+        public DailyReferReportItem(String day, String name, String goodname, long children, double price, double summary) {
+            this.day = day;
             if (name.equals(OVERALL_SUBCATEGORY_NAME)) {
                 this.group1 = name;
             } else if (name.length() > 0) {
@@ -317,8 +346,8 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             }
 
             //  Если это суббота и обед, то значение ставим в 0!!!
-            Calendar cal = new GregorianCalendar();
-            cal.setTimeInMillis(ts);
+            /*Calendar cal = new GregorianCalendar();
+            cal.setTimeInMillis(ts);*/
             /*if(this.group2 != null && cal != null) {
                 if (this.group2.equals(ReferReport.LUNCH) &&
                         cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
