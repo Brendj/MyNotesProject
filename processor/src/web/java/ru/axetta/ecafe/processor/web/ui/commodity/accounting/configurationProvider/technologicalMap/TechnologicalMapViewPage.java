@@ -48,8 +48,8 @@ public class TechnologicalMapViewPage extends BasicWorkspacePage{
     private ConfigurationProvider currentConfigurationProvider;
     private TechnologicalMapGroup currentTechnologicalMapGroup;
 
-    @PersistenceContext(unitName = "processorPU")
-    private EntityManager em;
+    //@PersistenceContext(unitName = "processorPU")
+    //private EntityManager em;
     @Autowired
     private DAOService daoService;
     @Autowired
@@ -65,23 +65,20 @@ public class TechnologicalMapViewPage extends BasicWorkspacePage{
     public void onShow() throws Exception {
         selectedTechnologicalMapGroupPage.onShow();
         currentTechnologicalMap = selectedTechnologicalMapGroupPage.getCurrentTechnologicalMap();
+        currentTechnologicalMap = daoService.saveEntity(currentTechnologicalMap);
         if(currentTechnologicalMap.getIdOfConfigurationProvider() !=null){
-            currentConfigurationProvider = em.find(ConfigurationProvider.class, currentTechnologicalMap.getIdOfConfigurationProvider());
+            currentConfigurationProvider = daoService.getConfigurationProvider(currentTechnologicalMap.getIdOfConfigurationProvider());
         }
-        if(currentTechnologicalMap.getTechnologicalMapGroup()!=null){
-            currentTechnologicalMapGroup = currentTechnologicalMap.getTechnologicalMapGroup();
-        }
+        currentTechnologicalMapGroup = daoService.findTechnologicalMapGroupByTechnologicalMap(currentTechnologicalMap);
         reload();
     }
 
     public void reload() throws Exception {
-        currentTechnologicalMap = em.merge(currentTechnologicalMap);
-        TypedQuery<TechnologicalMapProduct> query = em.createQuery("from TechnologicalMapProduct where technologicalMap=:technologicalMap",TechnologicalMapProduct.class);
-        query.setParameter("technologicalMap", currentTechnologicalMap);
-        technologicalMapProducts = query.getResultList();
-         for (TechnologicalMapProduct technologicalMapProduct: technologicalMapProducts){
+        List<TechnologicalMapProduct> technologicalMapProducts =
+                daoService.findTechnologicalMapProductByTechnologicalMap(currentTechnologicalMap.getGlobalId());
+        for (TechnologicalMapProduct technologicalMapProduct: technologicalMapProducts){
             pr.add(technologicalMapProduct.getProduct());
-         }
+        }
     }
 
     public String getPageFilename() {
