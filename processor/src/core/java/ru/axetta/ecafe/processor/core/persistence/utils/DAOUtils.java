@@ -9,10 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodGroup;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.ProductGroup;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -1681,5 +1678,13 @@ public class DAOUtils {
             reportSetting.setSettings(writer.getBuffer().toString());
             persistenceSession.save(reportSetting);
         }
+    }
+
+    public static TechnologicalMapGroup findTechnologicalMapGroupByTechnologicalMap(Session session,
+            TechnologicalMap technologicalMap) {
+        session.refresh(technologicalMap);
+        TechnologicalMapGroup technologicalMapGroup = technologicalMap.getTechnologicalMapGroup();
+        technologicalMapGroup.getNameOfGroup();
+        return technologicalMapGroup;
     }
 }

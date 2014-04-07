@@ -934,6 +934,11 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return findProductByConfigurationProvider(null, null, deletedStatusSelected, orgOwners, productName);
     }
 
+    public TechnologicalMapGroup findTechnologicalMapGroupByTechnologicalMap(TechnologicalMap technologicalMap) {
+        Session session = entityManager.unwrap(Session.class);
+        return DAOUtils.findTechnologicalMapGroupByTechnologicalMap(session, technologicalMap);
+    }
+
     public List<TechnologicalMapGroup> findTechnologicalMapGroupByConfigurationProvider(Long idOfConfigurationProvider, Boolean deletedStatusSelected) {
         TypedQuery<TechnologicalMapGroup> query;
         if(deletedStatusSelected){
@@ -1011,6 +1016,13 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
     public List<Product> findProductByProductGroup(ProductGroup currentProductGroup) {
         Session session = entityManager.unwrap(Session.class);
         return DAOUtils.findProductByProductGroup(session, currentProductGroup);
+    }
+
+    public List<TechnologicalMapProduct> findTechnologicalMapProductByTechnologicalMap(Long idOfTechnologicalMap) {
+        String sql = "from TechnologicalMapProduct where technologicalMap.globalId=:idOfTechnologicalMap and deletedState=false order by globalId";
+        TypedQuery<TechnologicalMapProduct> query = entityManager.createQuery(sql,TechnologicalMapProduct.class);
+        query.setParameter("idOfTechnologicalMap", idOfTechnologicalMap);
+        return query.getResultList();
     }
 
     public List<TechnologicalMap> findTechnologicalMapByConfigurationProvider(Boolean deletedStatusSelected) {
