@@ -461,11 +461,12 @@ public class Processor implements SyncProcessor,
         card.setLockReason(lockReason);
         persistenceSession.save(card);
 
+        //История карты при создании новой карты
         HistoryCard historyCard = new HistoryCard();
         historyCard.setCard(card);
         historyCard.setUpDatetime(new Date());
         historyCard.setNewOwner(client);
-        historyCard.setInformationAboutCard("Регистрация новой карты № " + card.getCardNo());
+        historyCard.setInformationAboutCard("Регистрация новой карты №: " + card.getCardNo());
         persistenceSession.save(historyCard);
 
         return card.getIdOfCard();
@@ -530,25 +531,18 @@ public class Processor implements SyncProcessor,
                 lockActiveCards(persistenceSession, clientCards);
             }
 
-            //История карты при смене владельца карты
-            long oldClient = updatedCard.getClient().getIdOfClient();
-            long newClient = newCardOwner.getIdOfClient();
+            final long oldClient = updatedCard.getClient().getIdOfClient();
+            final long newClient = newCardOwner.getIdOfClient();
 
+            //История карты при обновлении информации
             if (oldClient != newClient) {
                 HistoryCard historyCard = new HistoryCard();
                 historyCard.setCard(updatedCard);
                 historyCard.setUpDatetime(new Date());
-                historyCard.setInformationAboutCard(
-                        "Передача карты другому владельцу: от " + updatedCard.getClient().getContractId() + " к " +
-                                newCardOwner.getContractId());
+                historyCard.setInformationAboutCard("Передача карты №: " + updatedCard.getCardNo() + " другому владельцу");
                 historyCard.setNewOwner(newCardOwner);
                 historyCard.setFormerOwner(updatedCard.getClient());
-
                 persistenceSession.save(historyCard);
-                persistenceSession.flush();
-
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
             }
 
             updatedCard.setClient(newCardOwner);
@@ -562,7 +556,10 @@ public class Processor implements SyncProcessor,
             updatedCard.setExternalId(externalId);
             updatedCard.setUpdateTime(new Date());
             persistenceSession.update(updatedCard);
+
             persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -630,20 +627,15 @@ public class Processor implements SyncProcessor,
             final long newClient = newCardOwner.getIdOfClient();
 
             //История карты при смене владельца
-            //  if (oldClient != newClient) {
-            HistoryCard historyCard = new HistoryCard();
-            historyCard.setCard(updatedCard);
-            historyCard.setUpDatetime(new Date());
-            historyCard.setInformationAboutCard("Передача карты другому владельцу: " + updatedCard.getIdOfCard());
-            historyCard.setFormerOwner(updatedCard.getClient());
-            historyCard.setNewOwner(newCardOwner);
-
-            persistenceSession.save(historyCard);
-            persistenceSession.flush();
-            // }
-
-            persistenceSession.update(updatedCard);
-            persistenceSession.flush();
+            if (oldClient != newClient) {
+                HistoryCard historyCard = new HistoryCard();
+                historyCard.setCard(updatedCard);
+                historyCard.setUpDatetime(new Date());
+                historyCard.setInformationAboutCard("Передача карты №: " + updatedCard.getCardNo() + " другому владельцу");
+                historyCard.setFormerOwner(updatedCard.getClient());
+                historyCard.setNewOwner(newCardOwner);
+                persistenceSession.save(historyCard);
+            }
 
             updatedCard.setClient(newCardOwner);
             //updatedCard.setCardType(cardType);
@@ -655,7 +647,9 @@ public class Processor implements SyncProcessor,
             //updatedCard.setLifeState(lifeState);
             //updatedCard.setExternalId(externalId);
             updatedCard.setUpdateTime(new Date());
+            persistenceSession.update(updatedCard);
 
+            persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
