@@ -100,6 +100,7 @@
 	<field name="price" class="java.lang.Double"/>
 	<field name="summary" class="java.lang.Double"/>
 	<field name="day" class="java.lang.String"/>
+	<field name="ordertype" class="java.lang.Integer"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -174,7 +175,7 @@
 								<textElement textAlignment="Right" verticalAlignment="Middle">
 									<font fontName="SansSerif" isBold="true"/>
 								</textElement>
-								<text><![CDATA[ИТОГО]]></text>
+								<text><![CDATA[ВСЕГО]]></text>
 							</staticText>
 						</cellContents>
 					</crosstabTotalRowHeader>
