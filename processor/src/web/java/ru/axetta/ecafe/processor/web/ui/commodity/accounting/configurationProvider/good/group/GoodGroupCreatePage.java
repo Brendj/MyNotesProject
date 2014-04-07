@@ -63,7 +63,7 @@ public class GoodGroupCreatePage extends BasicWorkspacePage implements Configura
                 return null;
             }
             goodGroup.setCreatedDate(new Date());
-            goodGroup.setDeletedState(true);
+            goodGroup.setDeletedState(false);
             goodGroup.setOrgOwner(org.getIdOfOrg());
             goodGroup.setIdOfConfigurationProvider(currentConfigurationProvider.getIdOfConfigurationProvider());
             goodGroup.setGlobalVersion(daoService.updateVersionByDistributedObjects(GoodGroup.class.getSimpleName()));
