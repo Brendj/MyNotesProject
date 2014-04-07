@@ -357,7 +357,7 @@ public class GoodRequestsNotificationService {
             LOGGER.debug("Disable option notification good request change");
         }
         duration = System.currentTimeMillis() - duration;
-        LOGGER.info("GoodRequestsNotificationService generateTime: " + duration);
+        LOGGER.debug("GoodRequestsNotificationService generateTime: " + duration);
     }
 
     private final static String notificationType = EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE;
