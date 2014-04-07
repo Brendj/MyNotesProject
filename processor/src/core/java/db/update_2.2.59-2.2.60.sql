@@ -4,7 +4,7 @@
 
 -- Пакет обновлений 2.2.60
 
-CREATE TABLE if not exists cf_user_report_settings
+CREATE TABLE cf_user_report_settings
 (
   idOfUserReportSetting bigserial NOT NULL,
   numberOfReport integer NOT NULL,
@@ -13,4 +13,4 @@ CREATE TABLE if not exists cf_user_report_settings
   CONSTRAINT cf_user_report_setting_pk PRIMARY KEY (idOfUserReportSetting),
   CONSTRAINT cf_user_report_settings_fk_users FOREIGN KEY (idOfUser) REFERENCES cf_users (idofuser)
 );
---! ФИНАЛИЗИРОВАН (Кадыров, 140326) НЕ МЕНЯТЬ
+--! ФИНАЛИЗИРОВАН (Кадыров, 140204) НЕ МЕНЯТЬ

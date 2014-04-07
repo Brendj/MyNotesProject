@@ -123,8 +123,8 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
             periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
         } else {
             long diff=end.getTime()-startDate.getTime();
-            int noofdays=(int)(diff/(24*60*60*1000));
-            switch (noofdays){
+            int noOfDays=(int)(diff/(24*60*60*1000));
+            switch (noOfDays){
                 case 0: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY); break;
                 case 6: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK); break;
                 case 13: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK); break;
@@ -152,13 +152,23 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
+        BasicReportJob report = null;
         try {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            BasicReportJob report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
+            report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            if (report != null) {
+        } catch (Exception e) {
+            logger.error("Failed export report : ", e);
+            printError("Ошибка при подготовке отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+        if (report != null) {
+            try {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 JRHtmlExporter exporter = new JRHtmlExporter();
                 exporter.setParameter(JRExporterParameter.JASPER_PRINT, report.getPrint());
@@ -172,36 +182,31 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
                 exporter.exportReport();
                 htmlReport = os.toString("UTF-8");
                 os.close();
+                if(hideGeneratePeriod){
+                    try {
+                        // идет запись
+                        persistenceSession = runtimeContext.createPersistenceSession();
+                        persistenceTransaction = persistenceSession.beginTransaction();
+                        Properties properties = new Properties();
+                        String endGenerateDateStr = CalendarUtils.toStringFullDateTimeWithLocalTimeZone(generateEndDate);
+                        properties.setProperty(generateBeginDateKey, endGenerateDateStr);
+                        DAOUtils.saveReportSettings(persistenceSession, currentUser, UserReportSetting.GOOD_REQUEST_REPORT,
+                                properties);
+                        persistenceTransaction.commit();
+                        persistenceTransaction = null;
+                    } finally {
+                        HibernateUtils.rollback(persistenceTransaction, logger);
+                        HibernateUtils.close(persistenceSession, logger);
+                    }
+                }
+            } catch (Exception e) {
+                printError("Ошибка при построении отчета: "+e.getMessage());
+                logger.error("Failed build report ",e);
             }
-            printMessage("Сводный отчет по заявкам построен");
-        } catch (Exception e) {
-            printError("Ошибка при построении отчета: "+e.getMessage());
-            logger.error("Failed build report ",e);
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
         }
 
-        if(hideGeneratePeriod){
-            try {
-                // идет запись
-                persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                Properties properties = new Properties();
-                String endGenerateDateStr = CalendarUtils.toStringFullDateTimeWithLocalTimeZone(generateEndDate);
-                properties.setProperty(generateBeginDateKey, endGenerateDateStr);
-                DAOUtils.saveReportSettings(persistenceSession, currentUser, UserReportSetting.GOOD_REQUEST_REPORT,
-                        properties);
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-            } catch (Exception e) {
-                logger.error("Failed export report : ", e);
-                printError("Ошибка при подготовке отчета: " + e.getMessage());
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
-            }
-        }
+
+
         return null;
     }
 
@@ -260,38 +265,13 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
+        BasicReportJob report = null;
         try {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            BasicReportJob report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
+            report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
-
-            ServletOutputStream servletOutputStream = response.getOutputStream();
-
-            facesContext.responseComplete();
-            response.setContentType("application/xls");
-            String filename = buildFileName(generateTime, report);
-            response.setHeader("Content-disposition", String.format("inline;filename=%s.xls", filename));
-
-            JRXlsExporter xlsExport = new JRXlsExporter();
-            xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
-            xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
-            xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
-            xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
-            xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-            xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
-            xlsExport.exportReport();
-
-            servletOutputStream.flush();
-            servletOutputStream.close();
-            //if(hideGeneratePeriod){
-            //    saveReportSettings(persistenceSession, currentUser);
-            //}
-
-
         } catch (Exception e) {
             logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
@@ -300,39 +280,55 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
             HibernateUtils.close(persistenceSession, logger);
         }
 
-
-
-        if(hideGeneratePeriod){
+        if(report!=null){
             try {
-                // идет запись
-                persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                Properties properties = new Properties();
-                String endGenerateDateStr = CalendarUtils.toStringFullDateTimeWithLocalTimeZone(generateEndDate);
-                properties.setProperty(generateBeginDateKey, endGenerateDateStr);
-                DAOUtils.saveReportSettings(persistenceSession, currentUser, UserReportSetting.GOOD_REQUEST_REPORT,
-                        properties);
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
+                FacesContext facesContext = FacesContext.getCurrentInstance();
+                HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
 
+                ServletOutputStream servletOutputStream = response.getOutputStream();
+
+                facesContext.responseComplete();
+                response.setContentType("application/xls");
+                String filename = buildFileName(generateTime, report);
+                response.setHeader("Content-disposition", String.format("inline;filename=%s.xls", filename));
+
+                JRXlsExporter xlsExport = new JRXlsExporter();
+                xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
+                xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+                xlsExport.exportReport();
+                servletOutputStream.flush();
+                servletOutputStream.close();
+                if(hideGeneratePeriod){
+                    try {
+                        // идет запись
+                        persistenceSession = runtimeContext.createPersistenceSession();
+                        persistenceTransaction = persistenceSession.beginTransaction();
+                        Properties properties = new Properties();
+                        String endGenerateDateStr = CalendarUtils.toStringFullDateTimeWithLocalTimeZone(generateEndDate);
+                        properties.setProperty(generateBeginDateKey, endGenerateDateStr);
+                        DAOUtils.saveReportSettings(persistenceSession, currentUser, UserReportSetting.GOOD_REQUEST_REPORT,
+                                properties);
+                        persistenceTransaction.commit();
+                        persistenceTransaction = null;
+                    } finally {
+                        HibernateUtils.rollback(persistenceTransaction, logger);
+                        HibernateUtils.close(persistenceSession, logger);
+                    }
+                }
+                printMessage("Сводный отчет по заявкам построен");
             } catch (Exception e) {
                 logger.error("Failed export report : ", e);
                 printError("Ошибка при подготовке отчета: " + e.getMessage());
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
             }
         }
-    }
 
-    //private void writeSettings(UserReportSetting reportSetting) {
-    //    Properties properties = new Properties();
-    //    String endGenerateDateStr = CalendarUtils.toStringFullDateTimeWithLocalTimeZone(generateEndDate);
-    //    properties.setProperty(generateBeginDateKey, endGenerateDateStr);
-    //    StringWriter writer = new StringWriter();
-    //    properties.list(new PrintWriter(writer));
-    //    reportSetting.setSettings(writer.getBuffer().toString());
-    //}
+
+
+    }
 
     public Object clear(){
         idOfOrg=null;
