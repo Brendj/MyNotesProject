@@ -100,7 +100,6 @@
 	<field name="price" class="java.lang.Double"/>
 	<field name="summary" class="java.lang.Double"/>
 	<field name="day" class="java.lang.String"/>
-	<field name="ordertype" class="java.lang.Integer"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -286,7 +285,7 @@
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="SansSerif" size="10"/>
 							</textElement>
-							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure} == null ? 0D : $V{summaryMeasure})]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure})]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -313,7 +312,7 @@
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="SansSerif" size="10"/>
 							</textElement>
-							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure} == null ? 0D : $V{summaryMeasure})]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure})]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -327,7 +326,7 @@
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="SansSerif"/>
 							</textElement>
-							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure} == null ? 0D : $V{summaryMeasure})]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure})]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -341,7 +340,7 @@
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="SansSerif"/>
 							</textElement>
-							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure} == null ? 0D : $V{summaryMeasure})]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure})]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
