@@ -279,14 +279,14 @@
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="SansSerif" size="10"/>
 							</textElement>
-							<textFieldExpression><![CDATA[String.format("%.2f", $V{priceMeasure})]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%.2f", $V{priceMeasure} == null ? 0D : $V{priceMeasure})]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
 							<reportElement uuid="d1ed3afe-59c0-4c9f-aa2f-03185e47011c" style="Crosstab Data Text" x="150" y="0" width="75" height="23"/>
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="SansSerif" size="10"/>
 							</textElement>
-							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure})]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure} == null ? 0D : $V{summaryMeasure})]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -313,11 +313,11 @@
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="SansSerif" size="10"/>
 							</textElement>
-							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure})]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure} == null ? 0D : $V{summaryMeasure})]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="71" columnTotalGroup="group1">
+				<crosstabCell width="71" height="23" columnTotalGroup="group1">
 					<cellContents backcolor="#BFE1FF" mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
@@ -327,7 +327,7 @@
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="SansSerif"/>
 							</textElement>
-							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure})]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure} == null ? 0D : $V{summaryMeasure})]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -341,7 +341,7 @@
 							<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None">
 								<font fontName="SansSerif"/>
 							</textElement>
-							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure})]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%.2f", $V{summaryMeasure} == null ? 0D : $V{summaryMeasure})]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
