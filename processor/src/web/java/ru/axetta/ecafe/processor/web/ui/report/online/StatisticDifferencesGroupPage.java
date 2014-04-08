@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class StatisticDifferencesGroupPage extends BasicWorkspacePage {
 
     public boolean getEligibleToWorkCommodityAccounting() throws Exception {
-        return ru.axetta.ecafe.processor.web.ui.MainPage.getSessionInstance().isEligibleToCommodityAccounting();
+        return true;
     }
 
 }
