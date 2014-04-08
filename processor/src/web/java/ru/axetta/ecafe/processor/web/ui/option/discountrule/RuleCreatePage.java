@@ -47,7 +47,10 @@ public class RuleCreatePage extends BasicWorkspacePage
               "Соц./незащищ. 1-4 кл.(завтрак+обед)",
               "Соц./незащищ. 5-11 кл.(завтрак+обед)",
               "Многодетные 1-4 кл.(завтрак+обед)",
-              "Шк Здоровья 1-4 кл.(завтрак+обед)" };
+              "Шк Здоровья 1-4 кл.(завтрак+обед)",
+
+              "Начальные классы 1-4 (завтрак + обед + полдник)",
+              "Средние и  старшие калссы 5-11 (завтрак + обед + полдник)"};
     private List<Long> idOfCategoryList = new ArrayList<Long>();
     private List<Long> idOfCategoryOrgList = new ArrayList<Long>();
     private String description;

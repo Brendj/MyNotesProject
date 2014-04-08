@@ -296,17 +296,16 @@ public class ReferReport extends BasicReportForAllOrgJob {
         Set<Double> prices = new TreeSet<Double>();
         for (String cat : categories) {
             prices.clear();
+            boolean exists = false;
             //  Поиск итогового объекта
             ReferReportItem workdayItem = new ReferReportItem();
             workdayItem.setLineId(id);
             workdayItem.setName(cat);
             workdayItem.setValue(1);
-            workdays.add(workdayItem);
             ReferReportItem weekendItem = new ReferReportItem();
             weekendItem.setLineId(id);
             weekendItem.setName(cat);
             weekendItem.setValue(1);
-            weekends.add(weekendItem);
 
             //  Листаем значения
             for (DailyReferReportItem i : items) {
@@ -328,6 +327,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
                     continue;
                 }*/
 
+                exists = true;
                 tmp.setTimeInMillis(i.getTs());
                 //  Если запись относится к рабочему дню, то обновляем итог по рабочим
                 if (tmp.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY &&
@@ -346,6 +346,10 @@ public class ReferReport extends BasicReportForAllOrgJob {
             for(Double p : prices) {
                 workdayItem.setSummary(workdayItem.getSummary() + workdayItem.getTotal() * p);
                 weekendItem.setSummary(weekendItem.getSummary() + weekendItem.getTotal() * p);
+            }
+            if(exists) {
+                workdays.add(workdayItem);
+                weekends.add(weekendItem);
             }
             workdayItem.setChildren((long) Math.round((double) workdayItem.getChildren() / workDaysCount));
             weekendItem.setChildren((long) Math.round((double) weekendItem.getChildren() / weekendsCount));
