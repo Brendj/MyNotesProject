@@ -24,3 +24,5 @@ CREATE TABLE cf_history_card
 create index cf_history_card_formerowner_idx on cf_history_card (formerowner);
 create index cf_history_card_newowner_idx on cf_history_card (newowner);
 create index cf_history_card_idofcard_idx on cf_history_card (idofcard);
+
+--! ФИНАЛИЗИРОВАН (Кадыров, 140408) НЕ МЕНЯТЬ
