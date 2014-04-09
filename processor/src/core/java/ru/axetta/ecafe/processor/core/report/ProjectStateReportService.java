@@ -512,6 +512,7 @@ public class ProjectStateReportService {
     @Transactional
     public void doRun() {
         try {
+            log("Project State started..");
             RuntimeContext runtimeContext = null;
             Session session = null;
             try {
@@ -525,7 +526,7 @@ public class ProjectStateReportService {
     
             if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
                 //if (1 == 1) {
-                //logger.info ("Project State is turned off. You have to activate this tool using common Settings");
+                log("Project State is turned off. You have to activate this tool using common Settings");
                 return;
             }
     
@@ -539,7 +540,7 @@ public class ProjectStateReportService {
         } catch (Exception e) {
             logger.error("Failed to buid project state data", e);
         }
-        //logger.info("Project state data builing is complete");
+        log("Project state data builing is complete");
     }
 
     private synchronized void initDictionaries(Session session) throws Exception {
@@ -690,8 +691,8 @@ public class ProjectStateReportService {
                     idOfContragent);
             //logger.error("PROJECT_STATE SQL COMMAND: " + finalSQL);
 
-            org.hibernate.Query q = session.createSQLQuery(finalSQL);
-            //logger.info(t.getReportType() + " :: " + regionName + " :: SQL:__ " + finalSQL);
+            log(t.getReportType() + " :: " + regionName + " :: SQL:__ " + finalSQL);
+            org.hibernate.Query q = session.createSQLQuery(finalSQL);             /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
             List resultList = q.list();//Collections.EMPTY_LIST;
             for (Object entry : resultList) {
                 Object e[] = (Object[]) entry;
@@ -1373,8 +1374,8 @@ public class ProjectStateReportService {
                         + "where cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and "
                         + "      cf_enterevents.evtdatetime >= EXTRACT(EPOCH FROM TIMESTAMP '%MINIMUM_DATE%') * 1000 AND "
                         + "      cf_enterevents.evtdatetime < EXTRACT(EPOCH FROM TIMESTAMP '%MAXIMUM_DATE%') * 1000 and cf_orgs.state<>0 "
-                        + "group by cf_orgs.idoforg "
-                        + "order by cf_orgs.idoforg"
+                        + "group by cf_enterevents.idoforg "
+                        + "order by cf_enterevents.idoforg"
                 /*"select cf_orgs.idoforg, count(distinct cf_enterevents.idofclient) " +
                         "from cf_enterevents, cf_orgs " +
                         "where cf_orgs.idoforg=cf_enterevents.idoforg and " +
@@ -1402,8 +1403,8 @@ public class ProjectStateReportService {
             Map<Long, Long> targetsCount = new HashMap<Long, Long>();
             String finalSQL = applyMacroReplace(sql, reportType, dateAt, dateTo);
             org.hibernate.Query q = session.createSQLQuery(finalSQL);
-            //logger.info(reportType + " :: " + regionName + " :: SQL:__ " + finalSQL);
-            List resultList = q.list();//Collections.EMPTY_LIST;
+            log(reportType + " :: " + regionName + " :: SQL:__ " + finalSQL);
+            List resultList = q.list();//Collections.EMPTY_LIST;                                          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             for (Object entry : resultList) {
                 Object e[] = (Object[]) entry;
                 targetsCount.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).longValue());
@@ -1495,14 +1496,15 @@ public class ProjectStateReportService {
 
     public Map<Object[], Long> getClientsCount(Session session) {
         Map<Object[], Long> clientsCount = new HashMap<Object[], Long>();
-        org.hibernate.Query q = session.createSQLQuery(
-                "select cf_orgs.idoforg, officialname, count(distinct cf_clients.idofclient) as cnt "
-                        + "from cf_orgs "
-                        + "left join cf_friendly_organization on cf_orgs.idoforg=currentorg "
-                        + "left join cf_clients on cf_clients.idoforg=idoffriendlyorg or cf_clients.idoforg=currentorg "
-                        + "where cf_orgs.state<>0 and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " "
-                        + "group by cf_orgs.idoforg, officialname "
-                        + "order by cf_orgs.idoforg"
+        String sql = "select cf_orgs.idoforg, officialname, count(distinct cf_clients.idofclient) as cnt "
+                + "from cf_orgs "
+                + "left join cf_friendly_organization on cf_orgs.idoforg=currentorg "
+                + "left join cf_clients on cf_clients.idoforg=idoffriendlyorg or cf_clients.idoforg=currentorg "
+                + "where cf_orgs.state<>0 and cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " "
+                + "group by cf_orgs.idoforg, officialname "
+                + "order by cf_orgs.idoforg";
+        org.hibernate.Query q = session.createSQLQuery(sql
+
                 /*"select distinct dat.idoforg, dat.officialname, int8(max(dat.cnt)) "
                         + "from (select dat.idoforg, dat.officialname, sum(dat.cnt) as cnt "
                         + "      from (select cf_orgs.idoforg, cf_orgs.officialname, friends.cnt "
@@ -1525,7 +1527,8 @@ public class ProjectStateReportService {
                         + "      where cf_clients.idoforg=cf_orgs.idoforg and cf_orgs.officialname<>'' and cf_orgs.state<>0 "
                         + "      group by cf_orgs.idoforg, cf_orgs.officialname) as dat " + " where dat.cnt<>0 "
                         + "group by dat.idoforg, dat.officialname " + "order by 1"*/);
-        List resultList = q.list();
+        log("Clients count :: SQL:__ " + sql);
+        List resultList = q.list();/*                       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         for (Object entry : resultList) {
             Object e[] = (Object[]) entry;
             clientsCount.put(new Object[]{((BigInteger) e[0]).longValue(), ((String) e[1]).trim()},
@@ -1712,5 +1715,9 @@ public class ProjectStateReportService {
             this.type = type;
             this.value = value;
         }
+    }
+
+    public void log(String message) {
+        logger.info(message);
     }
 }
