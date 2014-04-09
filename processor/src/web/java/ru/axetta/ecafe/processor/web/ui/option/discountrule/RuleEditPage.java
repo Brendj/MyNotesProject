@@ -47,7 +47,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
     private String filter = "Не выбрано";
     private Set<CategoryDiscount> categoryDiscountSet;
     private Integer[] selectedComplexIds;
-    private String subCategory;
+    private int subCategory;
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
     @Autowired
@@ -148,17 +148,18 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
     public List<SelectItem> getSubCategories() throws Exception {
         List<SelectItem> res = new ArrayList<SelectItem>();
         res.add(new SelectItem("", ""));
-        for (String group : RuleCreatePage.SUB_CATEGORIES) {
-            res.add(new SelectItem(group, group));
+        for (int i=0; i<RuleCreatePage.SUB_CATEGORIES.length; i++) {
+            String group = RuleCreatePage.SUB_CATEGORIES[i];
+            res.add(new SelectItem(i, group));
         }
         return res;
     }
 
-    public String getSubCategory() {
+    public int getSubCategory() {
         return subCategory;
     }
 
-    public void setSubCategory(String subCategory) {
+    public void setSubCategory(int subCategory) {
         this.subCategory = subCategory;
     }
 
@@ -219,6 +220,10 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
                           CategoryDiscountEditPage.DISCOUNT_END;
         }
         entity.setDescription(description);
+        String subCategory = "";
+        if(this.subCategory > 0) {
+            subCategory = RuleCreatePage.SUB_CATEGORIES[this.subCategory];
+        }
         entity.setSubCategory(subCategory);
 
         List<Integer> selectedComplex = Arrays.asList(selectedComplexIds);
@@ -324,7 +329,13 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         } else {
             discountRate = 100;
         }
-        subCategory = discountRule.getSubCategory();
+        subCategory = -1;
+        for(int i=0; i<RuleCreatePage.SUB_CATEGORIES.length; i++) {
+            if(RuleCreatePage.SUB_CATEGORIES[i].equals(discountRule.getSubCategory())) {
+                subCategory = i;
+                break;
+            }
+        }
 
 
         List<Integer> comls = new ArrayList<Integer>();

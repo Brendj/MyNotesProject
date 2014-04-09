@@ -41,7 +41,8 @@ import java.util.*;
 public class RuleCreatePage extends BasicWorkspacePage
         implements CategoryListSelectPage.CompleteHandlerList, CategoryOrgListSelectPage.CompleteHandlerList {
     public static final String SUB_CATEGORIES [] = new String []
-            { "Многодетные 5-11 кл.(завтрак+обед)",
+            { "",
+              "Многодетные 5-11 кл.(завтрак+обед)",
               "Шк Здоровья 5-11 кл.(завтрак+обед)",
               "Начальная школа 1-4 кл (завтрак)",
               "Соц./незащищ. 1-4 кл.(завтрак+обед)",
@@ -61,7 +62,7 @@ public class RuleCreatePage extends BasicWorkspacePage
     private int priority;
     private Integer discountRate = 100;
     private Integer[] selectedComplexIds;
-    private String subCategory = "";
+    private int subCategory = -1;
     @Autowired
     private DAOService daoService;
 
@@ -86,17 +87,18 @@ public class RuleCreatePage extends BasicWorkspacePage
     public List<SelectItem> getSubCategories() throws Exception {
         List<SelectItem> res = new ArrayList<SelectItem>();
         res.add(new SelectItem("", ""));
-        for (String group : SUB_CATEGORIES) {
-            res.add(new SelectItem(group, group));
+        for (int i=0; i<SUB_CATEGORIES.length; i++) {
+            String group = SUB_CATEGORIES[i];
+            res.add(new SelectItem(i, group));
         }
         return res;
     }
 
-    public String getSubCategory() {
+    public int getSubCategory() {
         return subCategory;
     }
 
-    public void setSubCategory(String subCategory) {
+    public void setSubCategory(int subCategory) {
         this.subCategory = subCategory;
     }
 
@@ -202,6 +204,10 @@ public class RuleCreatePage extends BasicWorkspacePage
         if (discountRate != null && discountRate != 100) {
             description = CategoryDiscountEditPage.DISCOUNT_START + discountRate +
                     CategoryDiscountEditPage.DISCOUNT_END;
+        }
+        String subCategory = "";
+        if(this.subCategory > 0) {
+            subCategory = SUB_CATEGORIES [this.subCategory];
         }
         discountRule.setSubCategory(subCategory);
         discountRule.setDescription(description);
