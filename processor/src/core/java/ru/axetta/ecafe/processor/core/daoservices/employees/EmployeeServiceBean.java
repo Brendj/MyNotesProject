@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static ru.axetta.ecafe.processor.core.persistence.Person.isEmptyFullNameFields;
 import static ru.axetta.ecafe.processor.core.persistence.Visitor.isEmptyDocumentParams;
@@ -221,7 +222,7 @@ public class EmployeeServiceBean {
         if( isDateEqLtCurrentDate(visitorItem.getDriverLicenceDate()) ||
                 isDateEqLtCurrentDate(visitorItem.getPassportDate()) ||
                 isDateEqLtCurrentDate(visitorItem.getWarTicketDate())){
-            throw new Exception("неверное значение даты окончания действия карты.");
+            throw new Exception("неверная дата выдачи документа.");
         }
 
         if(visitorItem.getIdOfVisitor()==null){
