@@ -36,8 +36,10 @@
         <property name="dateActivateService" column="DateActivateService" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true" update="false"/>
         <property name="lastDatePauseService" column="LastDatePauseService" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="dateDeactivateService" column="DateDeactivateService" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="dateCreateService" column="DateCreateService" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
 
         <property name="wasSuspended" column="WasSuspended" type="java.lang.Boolean"/>
+        <property name="reasonWasSuspended" column="ReasonWasSuspended" type="java.lang.String"/>
 
 
     </class>

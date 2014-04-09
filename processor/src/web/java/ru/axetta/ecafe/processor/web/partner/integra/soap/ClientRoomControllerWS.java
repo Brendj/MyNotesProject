@@ -3867,9 +3867,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public Result createSubscriptionFeeding(@WebParam(name = "contractId") Long contractId, @WebParam(
-            name = "cycleDiagram") CycleDiagramIn cycleDiagramIn, @WebParam(name = "date") Date date) {
+            name = "cycleDiagram") CycleDiagramIn cycleDiagramIn, @WebParam(name = "newDateActivateService") Date newDateActivateService, @WebParam(name = "dateCreateService") Date dateCreateService) {
         authenticateRequest(contractId);
-        return createSubscriptionFeeding(contractId, null, cycleDiagramIn, date);
+        return createSubscriptionFeeding(contractId, null, cycleDiagramIn, newDateActivateService, dateCreateService);
     }
 
     @Override
@@ -3879,9 +3879,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result suspendSubscriptionFeeding(@WebParam(name = "contractId") Long contractId) {
+    public Result suspendSubscriptionFeeding(@WebParam(name = "contractId") Long contractId, @WebParam(name = "reasonWasSuspended") String reasonWasSuspended) {
         authenticateRequest(contractId);
-        return suspendSubscriptionFeeding(contractId, null);
+        return suspendSubscriptionFeeding(contractId, null, reasonWasSuspended);
     }
 
     @Override
@@ -3911,9 +3911,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public Result createSubscriptionFeeding(@WebParam(name = "san") String san, @WebParam(
-            name = "cycleDiagram") CycleDiagramIn cycleDiagramIn,@WebParam(name = "date") Date date) {
+            name = "cycleDiagram") CycleDiagramIn cycleDiagramIn,
+            @WebParam(name = "newDateActivateService") Date newDateActivateService,
+            @WebParam(name = "dateCreateService") Date dateCreateService) {
         authenticateRequest(null);
-        return createSubscriptionFeeding(null, san, cycleDiagramIn, date);
+        return createSubscriptionFeeding(null, san, cycleDiagramIn, newDateActivateService, dateCreateService);
     }
 
     @Override
@@ -3923,9 +3925,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result suspendSubscriptionFeeding(@WebParam(name = "san") String san) {
+    public Result suspendSubscriptionFeeding(@WebParam(name = "san") String san, @WebParam(name = "reasonWasSuspended") String reasonWasSuspended) {
         authenticateRequest(null);
-        return suspendSubscriptionFeeding(null, san);
+        return suspendSubscriptionFeeding(null, san, reasonWasSuspended);
     }
 
     @Override
@@ -3953,7 +3955,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return findComplexesWithSubFeeding(null, san);
     }
 
-    private Result createSubscriptionFeeding(Long contractId, String san, CycleDiagramIn cycleDiagramIn, Date newCreateDate) {
+    //
+    private Result createSubscriptionFeeding(Long contractId, String san, CycleDiagramIn cycleDiagramIn, Date newDateActivateService, Date dateCreateService) {
         RuntimeContext runtimeContext;
         Session session = null;
         Transaction transaction = null;
@@ -3997,7 +4000,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Date date = new Date();
             Date dayBegin = CalendarUtils.truncateToDayOfMonth(date);
             Date dateActivateService = CalendarUtils.addDays(dayBegin, 1 + parser.getDayForbidChange());
-            if(newCreateDate.getTime()<dateActivateService.getTime()){
+            if(newDateActivateService.getTime()<dateActivateService.getTime()){
                 res.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
                 res.description = "Не верная дата активация циклограммы";
                 return res;
@@ -4009,7 +4012,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             sfService.createSubscriptionFeeding(client, client.getOrg(), cycleDiagramIn.getMonday(),
                     cycleDiagramIn.getTuesday(), cycleDiagramIn.getWednesday(), cycleDiagramIn.getThursday(),
-                    cycleDiagramIn.getFriday(), cycleDiagramIn.getSaturday(), newCreateDate);
+                    cycleDiagramIn.getFriday(), cycleDiagramIn.getSaturday(), newDateActivateService, dateCreateService);
             res.resultCode = RC_OK;
             res.description = RC_OK_DESC;
         } catch (Exception ex) {
@@ -4060,7 +4063,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return res;
     }
 
-    public Result suspendSubscriptionFeeding(Long contractId, String san) {
+    public Result suspendSubscriptionFeeding(Long contractId, String san, String reasonWasSuspended) {
         Session session = null;
         Transaction transaction = null;
         Result result = new Result();
@@ -4074,7 +4077,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
                     .getBean(SubscriptionFeedingService.class);
-            sfService.suspendSubscriptionFeeding(client);
+            sfService.suspendSubscriptionFeeding(client, reasonWasSuspended);
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (Exception ex) {

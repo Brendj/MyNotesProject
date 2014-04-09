@@ -11,7 +11,6 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssoc
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.StateDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SubscriberFeedingSettingSettingValue;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
@@ -32,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.text.DateFormat;
 import java.util.*;
@@ -213,7 +211,7 @@ public class SubscriptionFeedingService {
 
     @Transactional(rollbackFor = Exception.class)
     // Приостанавливает подписку АП.
-    public void suspendSubscriptionFeeding(Client client) {
+    public void suspendSubscriptionFeeding(Client client, String reasonWasSuspended) {
         Date date = new Date();
         SubscriptionFeeding sf = findClientSubscriptionFeeding(client);
         sf.setLastDatePauseService(date.before(sf.getDateActivateService()) ? sf.getDateActivateService() : date);
@@ -221,6 +219,7 @@ public class SubscriptionFeedingService {
         DAOService daoService = DAOService.getInstance();
         sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
         sf.setLastUpdate(date);
+        sf.setReasonWasSuspended(reasonWasSuspended);
         entityManager.merge(sf);
     }
 
@@ -238,7 +237,8 @@ public class SubscriptionFeedingService {
     @Transactional(rollbackFor = Exception.class)
     // Подключает подписку на АП. Создает также первую циклограмму.
     public SubscriptionFeeding createSubscriptionFeeding(Client client, Org org, String monday, String tuesday,
-            String wednesday, String thursday, String friday, String saturday, Date newCreateDate) {
+            String wednesday, String thursday, String friday, String saturday, Date newDateActivateService,
+            Date dateCreateService) {
         DAOService daoService = DAOService.getInstance();
         Date date = new Date();
         Date dayBegin = CalendarUtils.truncateToDayOfMonth(date);
@@ -248,7 +248,8 @@ public class SubscriptionFeedingService {
         sf.setOrgOwner(org.getIdOfOrg());
         sf.setIdOfClient(client.getIdOfClient());
         //sf.setGuid();
-        sf.setDateActivateService(newCreateDate);
+        sf.setDateActivateService(newDateActivateService);
+        sf.setDateCreateService(dateCreateService);
         sf.setDeletedState(false);
         sf.setSendAll(SendToAssociatedOrgs.SendToSelf);
         sf.setWasSuspended(false);

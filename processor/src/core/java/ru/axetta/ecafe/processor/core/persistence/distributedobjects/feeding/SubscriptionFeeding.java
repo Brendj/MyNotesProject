@@ -38,6 +38,8 @@ public class SubscriptionFeeding extends DistributedObject{
     private Date lastDatePauseService;
     private Date dateDeactivateService;
     private Boolean wasSuspended;
+    private Date dateCreateService;
+    private String reasonWasSuspended;
 
     @Override
     public void createProjections(Criteria criteria) {
@@ -51,6 +53,8 @@ public class SubscriptionFeeding extends DistributedObject{
         projectionList.add(Projections.property("lastDatePauseService"), "lastDatePauseService");
         projectionList.add(Projections.property("dateDeactivateService"), "dateDeactivateService");
         projectionList.add(Projections.property("wasSuspended"), "wasSuspended");
+        projectionList.add(Projections.property("dateCreateService"), "dateCreateService");
+        projectionList.add(Projections.property("reasonWasSuspended"), "reasonWasSuspended");
         criteria.setProjection(projectionList);
     }
 
@@ -98,7 +102,12 @@ public class SubscriptionFeeding extends DistributedObject{
             XMLUtils.setAttributeIfNotNull(element, "DateDeactivate", df.format(dateDeactivateService));
         }
         XMLUtils.setAttributeIfNotNull(element, "WasSuspended", wasSuspended);
-
+        if (dateCreateService != null) {
+            XMLUtils.setAttributeIfNotNull(element, "DateCreate", df.format(dateCreateService));
+        }
+        if (reasonWasSuspended != null) {
+            XMLUtils.setAttributeIfNotNull(element, "ReasonWasSuspended", df.format(reasonWasSuspended));
+        }
     }
 
     @Override
@@ -140,6 +149,16 @@ public class SubscriptionFeeding extends DistributedObject{
             throw new DistributedObjectException("WasSuspended is not null");
         }
 
+        Date longDateCreateService = XMLUtils.getDateAttributeValue(node, "DateCreate");
+        if (longDateCreateService != null) {
+            setDateCreateService(longDateCreateService);
+        }
+
+        String reasonWasSuspended = XMLUtils.getStringAttributeValue(node, "ReasonWasSuspended", 1024);
+        if (reasonWasSuspended != null) {
+            setReasonWasSuspended(reasonWasSuspended);
+        }
+
         setSendAll(SendToAssociatedOrgs.SendToSelf);
         return this;
     }
@@ -153,6 +172,8 @@ public class SubscriptionFeeding extends DistributedObject{
         setLastDatePauseService(((SubscriptionFeeding) distributedObject).getLastDatePauseService());
         setDateDeactivateService(((SubscriptionFeeding) distributedObject).getDateDeactivateService());
         setWasSuspended(((SubscriptionFeeding) distributedObject).getWasSuspended());
+        setDateCreateService(((SubscriptionFeeding) distributedObject).getDateCreateService());
+        setReasonWasSuspended(((SubscriptionFeeding) distributedObject).getReasonWasSuspended());
     }
 
     // Проверка подписки на актуальность.
@@ -207,5 +228,21 @@ public class SubscriptionFeeding extends DistributedObject{
 
     public void setWasSuspended(Boolean wasSuspended) {
         this.wasSuspended = wasSuspended;
+    }
+
+    public Date getDateCreateService() {
+        return dateCreateService;
+    }
+
+    public void setDateCreateService(Date dateCreateService) {
+        this.dateCreateService = dateCreateService;
+    }
+
+    public String getReasonWasSuspended() {
+        return reasonWasSuspended;
+    }
+
+    public void setReasonWasSuspended(String reasonWasSuspended) {
+        this.reasonWasSuspended = reasonWasSuspended;
     }
 }

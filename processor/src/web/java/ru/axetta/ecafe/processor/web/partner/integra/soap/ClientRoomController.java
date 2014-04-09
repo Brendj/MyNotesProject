@@ -218,13 +218,15 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "createSubscriptionFeeding")
     Result createSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
-            @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn,  @WebParam(name = "date") Date date);
+            @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn,
+            @WebParam(name = "dateActivateService") Date dateActivateService,
+            @WebParam(name = "dateCreateService") Date dateCreateService);
 
     @WebMethod(operationName = "findSubscriptionFeeding")
     SubFeedingResult findSubscriptionFeeding(@WebParam(name = "contractId") Long contractId);
 
     @WebMethod(operationName = "suspendSubscriptionFeeding")
-    Result suspendSubscriptionFeeding(@WebParam(name = "contractId") Long contractId);
+    Result suspendSubscriptionFeeding(@WebParam(name = "contractId") Long contractId, @WebParam(name = "reasonWasSuspended") String reasonWasSuspended);
 
     @WebMethod(operationName = "reopenSubscriptionFeeding")
     Result reopenSubscriptionFeeding(@WebParam(name = "contractId") Long contractId);
@@ -243,13 +245,15 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "createSubscriptionFeedingBySan")
     Result createSubscriptionFeeding(@WebParam(name = "san") String san,
-            @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn, @WebParam(name = "date") Date date);
+            @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn,
+            @WebParam(name = "dateActivateService") Date dateActivateService,
+            @WebParam(name = "dateCreateService") Date dateCreateService);
 
     @WebMethod(operationName = "findSubscriptionFeedingBySan")
     SubFeedingResult findSubscriptionFeeding(@WebParam(name = "san") String san);
 
     @WebMethod(operationName = "suspendSubscriptionFeedingBySan")
-    Result suspendSubscriptionFeeding(@WebParam(name = "san") String san);
+    Result suspendSubscriptionFeeding(@WebParam(name = "san") String san, @WebParam(name = "reasonWasSuspended") String reasonWasSuspended);
 
     @WebMethod(operationName = "reopenSubscriptionFeedingBySan")
     Result reopenSubscriptionFeeding(@WebParam(name = "san") String san);
