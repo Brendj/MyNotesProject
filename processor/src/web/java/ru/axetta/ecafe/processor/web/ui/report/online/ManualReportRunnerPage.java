@@ -97,7 +97,7 @@ public class ManualReportRunnerPage extends OnlineReportPage
         // данные не используются
         startDate = getDefaultStartDate();
         endDate = getDefaultEndDate();
-        fill();
+        RuntimeContext.getAppContext().getBean(ManualReportRunnerPage.class).fill();
     }
 
     public PeriodTypeMenu getPeriodTypeMenu() {
