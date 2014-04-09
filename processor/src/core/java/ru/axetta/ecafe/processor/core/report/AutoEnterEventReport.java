@@ -280,7 +280,8 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
                     + " left join cf_persons p on c.idofperson=p.idofperson "
                     + " left join cf_clientgroups g on "
                     + " g.idofclientgroup=c.idofclientgroup and g.idoforg=c.idoforg "+ typeCondition+ "  AND c.idOfClientGroup!=1100000060"
-                    + " where c.idoforg=:idOfOrg"
+                    //+ " where c.idoforg=:idOfOrg"
+                    + " where e.idoforg=:idOfOrg "
                     + " AND e.evtdatetime>=:startTime AND e.evtdatetime<=:endTime "
                     + typeCondition+ " AND c.idOfClientGroup!=1100000060 "
                     + " order by g.groupname, e.evtdatetime/(1000*60*60*24), p.surname, p.firstname, p.secondname;");
