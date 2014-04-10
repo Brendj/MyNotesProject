@@ -260,7 +260,8 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 + "     where cf_orderdetails.socdiscount<>0 and cf_orgs.idoforg=:idoforg and "
                 + "           cf_orders.createddate between :start and :end "
                 + "           " + orderTypeClause
-                + "           " + categoryClause + ") as data "
+                + "           " + categoryClause +
+                          ") as data "
                 + "group by subcategory, nameofgood, d, price "
                 + "order by 1, 2";
         Query query = session.createSQLQuery(sql);

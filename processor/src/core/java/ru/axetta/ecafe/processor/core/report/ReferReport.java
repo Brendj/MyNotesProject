@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -219,8 +220,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
 
         public static DailyReferReportItem[] getSampleItems(Session session, OrgShortItem org,
                                                             Date startTime, Date endTime) {
-            DailyReferReportItem result [] = new DailyReferReportItem [] { new DailyReferReportItem("БУДНИЕ"),
-                                                   new DailyReferReportItem("ВЫХОДНЫЕ") };
+            List<SampleItem> sampleItems = new ArrayList<SampleItem>();
             List res = executeSampleItemsQuery(session, org, startTime, endTime);
             Calendar cal = new GregorianCalendar();
             for (Object entry : res) {
@@ -233,11 +233,52 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 //  Заносим изменения в соответствующий объект
                 int index = cal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY &&
                             cal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY ? 0 : 1;
-                result[index].setTotal(result[index].getTotal() + 1);
+                sampleItems.add(new SampleItem(priceObj.doubleValue(), ts, good));
+                /*result[index].setTotal(result[index].getTotal() + 1);
                 result[index].setPrice(priceObj.doubleValue());
-                result[index].setGoodName(good);
+                result[index].setGoodName(good);*/
             }
+
+
+            Set<String> weekendCategories = new HashSet<String>();
+            Set<String> workdayCategories = new HashSet<String>();
+            Map<Integer, List<SampleItem>> categories = new HashMap<Integer, List<SampleItem>> ();
+            for(SampleItem i : sampleItems) {
+                cal.setTimeInMillis(i.getCreatedate());
+                int index = cal.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY &&
+                        cal.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY ? 0 : 1;
+                if(index == 0) {
+                    workdayCategories.add(i.getNameOfGood());
+                } else {
+                    weekendCategories.add(i.getNameOfGood());
+                }
+                List<SampleItem> samples = categories.get(index);
+                if(samples == null) {
+                    samples = new ArrayList<SampleItem>();
+                    categories.put(index, samples);
+                }
+                samples.add(i);
+            }
+
+
+            DailyReferReportItem result [] = new DailyReferReportItem [] { new DailyReferReportItem("БУДНИЕ"),
+                                                                           new DailyReferReportItem("ВЫХОДНЫЕ") };
+            result[0].setTotal(workdayCategories.size() == 0 ? 0 : categories.get(0).size() / workdayCategories.size());
+            result[1].setTotal(weekendCategories.size() == 0 ? 0 : categories.get(1).size() / weekendCategories.size());
+            result[0].setSummary(getSampleSummary(categories.get(0)));
+            result[1].setSummary(getSampleSummary(categories.get(1)));
             return result;
+        }
+
+        protected static double getSampleSummary(List<SampleItem> samples) {
+            if(samples == null || samples.size() < 1) {
+                return 0D;
+            }
+            double res = 0D;
+            for(SampleItem si : samples) {
+                res += si.getPrice();
+            }
+            return res;
         }
 
         protected static List executeSampleItemsQuery(Session session, OrgShortItem org,
@@ -249,7 +290,8 @@ public class ReferReport extends BasicReportForAllOrgJob {
                             + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
                             + "where cf_orders.socdiscount<>0 and cf_orders.idoforg=:idoforg and "
                             + "      cf_orders.createddate between :start and :end "
-                            + "      and cf_orders.ordertype=:ordertype ");
+                            + "      and cf_orders.ordertype=:ordertype "
+                            + "order by cf_goods.nameofgood, cf_orders.createddate");
             query.setLong("idoforg", org.getIdOfOrg());
             query.setLong("start", startTime.getTime());
             query.setLong("end", endTime.getTime());
@@ -294,6 +336,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
         List<ReferReportItem> weekends = new ArrayList<ReferReportItem>();
         int id = 0;
         Set<Double> prices = new TreeSet<Double>();
+        Map<String, Integer> feedTypes = getFeedTypesByCategory(items);
         for (String cat : categories) {
             prices.clear();
             boolean exists = false;
@@ -320,7 +363,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
                     prices.add(i.getPrice());
                 }
                 if (i.getGroup2() != null &&
-                    (!i.getGroup2().equals(LUNCH) && !i.getGroup2().equals(SNACK) && cat.indexOf("(завтрак)") < 1)) {
+                    (!i.getGroup2().equals(LUNCH) && !i.getGroup2().equals(SNACK) && !i.getGroup2().equals(BREAKFAST)/* && cat.indexOf("(завтрак)") < 1)*/)) {
                     continue;
                 }
                 /*if (i.getGroup2() != null && !i.getGroup2().equals(LUNCH)) {
@@ -347,6 +390,15 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 workdayItem.setSummary(workdayItem.getSummary() + workdayItem.getTotal() * p);
                 weekendItem.setSummary(weekendItem.getSummary() + weekendItem.getTotal() * p);
             }
+            Integer feedTypesCount = feedTypes.get(cat);
+            if(feedTypesCount == null) {
+                feedTypesCount = 1;
+            }
+            if(feedTypesCount > 1) {
+                workdayItem.setChildren((long) Math.floor(workdayItem.getChildren() / feedTypesCount));
+                workdayItem.setTotal((long) Math.floor(workdayItem.getTotal() / feedTypesCount));
+                workdayItem.setSummary(new BigDecimal(workdayItem.getSummary() / feedTypesCount).setScale(2, RoundingMode.FLOOR).doubleValue());
+            }
             if(exists) {
                 workdays.add(workdayItem);
                 weekends.add(weekendItem);
@@ -368,12 +420,12 @@ public class ReferReport extends BasicReportForAllOrgJob {
         workdaysTestItem.setName("СУТОЧНАЯ ПРОБА");
         workdaysTestItem.setLineId(id);
         workdaysTestItem.setTotal(workdaysSample.getTotal());
-        workdaysTestItem.setSummary(workdaysSample.getTotal() * workdaysSample.getPrice());
+        workdaysTestItem.setSummary(workdaysSample.getSummary());
         ReferReportItem weekendsTestItem = new ReferReportItem();
         weekendsTestItem.setName("СУТОЧНАЯ ПРОБА");
         weekendsTestItem.setLineId(id++);
         weekendsTestItem.setTotal(weekendsSample.getTotal());
-        weekendsTestItem.setSummary(weekendsSample.getTotal() * weekendsSample.getPrice());
+        weekendsTestItem.setSummary(weekendsSample.getSummary());
         workdays.add(workdaysTestItem);
         weekends.add(weekendsTestItem);
 
@@ -415,6 +467,25 @@ public class ReferReport extends BasicReportForAllOrgJob {
         return result;
     }
 
+    protected static Map<String, Integer> getFeedTypesByCategory(List<DailyReferReportItem> items) {
+        Map<String, Set<String>> list = new HashMap<String, Set<String>>();
+        for(DailyReferReportItem i : items) {
+            Set<String> feeds = list.get(i.getName());
+            if(feeds == null) {
+                feeds = new HashSet<String>();
+                list.put(i.getName(), feeds);
+            }
+            feeds.add(i.getGroup2());
+        }
+
+        Map<String, Integer> result = new HashMap<String, Integer>();
+        for(String cat : list.keySet()) {
+            Set<String> catFeeds = list.get(cat);
+            result.put(cat, catFeeds.size());
+        }
+        return result;
+    }
+
     private static final int [] getDaysCount(Session session, long idoforg, Date startTime, Date endTime) {
         int count [] = new int[] {0, 0};    //  0 - будние дние; 1 - выхоные
         Calendar day = getClearCalendar(startTime.getTime());
@@ -422,7 +493,8 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 "select int8(EXTRACT(EPOCH FROM d) * 1000) "
                 + "from (select distinct(date_trunc('day', to_timestamp(cf_orders.createddate / 1000))) as d "
                 + "      from cf_orders "
-                + "      where cf_orders.idoforg=:idoforg and "
+                + "      join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
+                + "      where cf_orderdetails.socdiscount<>0 and cf_orders.idoforg=:idoforg and "
                 + "            cf_orders.createddate between :start and :end) as dates "
                 + "order by 1");
         query.setLong("idoforg", idoforg);
@@ -691,6 +763,30 @@ public class ReferReport extends BasicReportForAllOrgJob {
 
         public void setPeriodSummary(Double periodSummary) {
             this.periodSummary = periodSummary;
+        }
+    }
+
+    public static class SampleItem {
+        protected double price;
+        protected long createdate;
+        protected String nameOfGood;
+
+        public SampleItem(double price, long createdate, String nameOfGood) {
+            this.price = price;
+            this.createdate = createdate;
+            this.nameOfGood = nameOfGood;
+        }
+
+        public double getPrice() {
+            return price;
+        }
+
+        public long getCreatedate() {
+            return createdate;
+        }
+
+        public String getNameOfGood() {
+            return nameOfGood;
         }
     }
 }
