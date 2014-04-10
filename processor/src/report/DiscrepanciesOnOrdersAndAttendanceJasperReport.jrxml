@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DiscrepanciesOnOrdersAndAttendanceJasperReport" pageWidth="974" pageHeight="595" orientation="Landscape" columnWidth="934" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="716ced14-f7b3-4bb2-a948-9b5cfd7d7894">
 	<property name="ireport.zoom" value="1.126972201352367"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="195"/>
 	<property name="ireport.y" value="0"/>
 	<style name="Crosstab Data Text" hAlign="Center"/>
 	<parameter name="beginDate" class="java.lang.String"/>
@@ -86,7 +86,7 @@
 			<staticText>
 				<reportElement uuid="81e58680-4655-4592-9694-80a36b701a77" x="762" y="47" width="69" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[Продано]]></text>
+				<text><![CDATA[Продано, резервникам]]></text>
 			</staticText>
 		</band>
 	</title>
