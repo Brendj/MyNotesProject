@@ -184,7 +184,8 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
             Date doneDate = CalendarUtils.truncateToDayOfMonth(position.getGoodRequest().getDoneDate());
             OrgRequestCountItem item = orgRequestCountItemMap.get(new OrgRequestCountItem(position.getOrgOwner(), doneDate));
             String pathPart3 = position.getGood().getPathPart3();
-            item.addCount(position.getTotalCount()/1000L, pathPart3);
+            String pathPart4 = position.getGood().getPathPart4();
+            item.addCount(position.getTotalCount()/1000L, pathPart3, pathPart4);
         }
 
 
@@ -291,14 +292,10 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
                 final Item e = new Item();
                 e.fillOrgInfo(orgItem);
                 OrgRequestCountItem orgRequestCountItem =orgRequestCountItemMap.get(new OrgRequestCountItem(id, beginDate));
-                if(orgRequestCountItem==null){
+                if(orgRequestCountItem==null || orgRequestCountItem.isEmptyComplex()){
                     e.setRequestCount(0L);
                 } else {
-                    if(orgRequestCountItem.goodCount()==0L){
-                        e.setRequestCount(0L);
-                    } else{
-                        e.setRequestCount(orgRequestCountItem.getTotalCount()/orgRequestCountItem.goodCount());
-                    }
+                    e.setRequestCount(orgRequestCountItem.getRequestCount());
                 }
                 if(dateOrderCountItemMap!=null){
                     OrderCountItem item = dateOrderCountItemMap.get(beginDate);
@@ -339,16 +336,18 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         private long idOfOrg;
         private Date doneDate;
         private long totalCount = 0L;
-        private TreeSet<String> goods = new TreeSet<String>();;
+        private TreeSet<String> pathPart3 = new TreeSet<String>();;
+        private TreeSet<String> pathPart4 = new TreeSet<String>();;
 
         public OrgRequestCountItem(long idOfOrg, Date doneDate) {
             this.idOfOrg = idOfOrg;
             this.doneDate = doneDate;
         }
 
-        public void addCount(long count, String name){
+        public void addCount(long count, String pathPart3, String pathPart4){
             totalCount+=count;
-            goods.add(name);
+            this.pathPart3.add(pathPart3);
+            this.pathPart4.add(pathPart4);
         }
 
         public long getIdOfOrg() {
@@ -363,8 +362,20 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
             return totalCount;
         }
 
-        public int goodCount(){
-            return goods.size();
+        long getRequestCount(){
+            return getTotalCount() * complexGroupCount()/complexCount();
+        }
+
+        public boolean isEmptyComplex(){
+            return pathPart3.isEmpty() && pathPart4.isEmpty();
+        }
+
+        public int complexGroupCount(){
+            return pathPart3.size();
+        }
+
+        public int complexCount(){
+            return pathPart4.size();
         }
 
         @Override
