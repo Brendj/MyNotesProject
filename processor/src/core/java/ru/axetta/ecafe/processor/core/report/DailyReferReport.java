@@ -172,6 +172,11 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             for(ReferReport.DailyReferReportItem it : samples) {
                 DailyReferReportItem item = new DailyReferReportItem("СУТОЧНАЯ ПРОБА", name, it.getGoodName(),
                                                                     it.getChildren(), it.getPrice(), it.getSummary());
+                if(category == null || category.length() < 1) {
+                    if(items != null && items.size() > 0) {
+                        item.setGroup1(items.get(0).getGroup1());
+                    }
+                }
                 items.add(item);
 
             }
@@ -198,9 +203,9 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             for (Object entry : res) {
                 Object e[]            = (Object[]) entry;
                 String name           = (String) e[0];
-                if (category == null || category.length() < 1) {
+                /*if (category == null || category.length() < 1) {
                     name = OVERALL_SUBCATEGORY_NAME;
-                }
+                }*/
                 String goodname       = (String) e[1];
                 long ts               = ((BigInteger) e[2]).longValue();
                 BigDecimal priceObj   = e[3] == null ? new BigDecimal(0D) : (BigDecimal) e[3];
@@ -213,11 +218,11 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 result.add(item);
 
                 //  Обновляем тотал объект для питания
-                DailyReferReportItem total = totals.get(item.getGroup2());
+                DailyReferReportItem total = totals.get(name + " / " + item.getGroup2());
                 if(total == null) {
                     total = new DailyReferReportItem("Итого", name, goodname, 0, 0D, 0D);
                     total.setPrice(item.getPrice());
-                    totals.put(item.getGroup2(), total);
+                    totals.put(name + " / " + item.getGroup2(), total);
                 }
                 total.setChildren(total.getChildren() + item.getChildren());
                 total.setTotal(total.getTotal() + item.getTotal());
