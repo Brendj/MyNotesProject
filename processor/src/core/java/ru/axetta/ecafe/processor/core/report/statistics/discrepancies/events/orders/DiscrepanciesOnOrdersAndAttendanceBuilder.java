@@ -183,60 +183,12 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
             GoodRequestPosition position = (GoodRequestPosition) obj;
             Date doneDate = CalendarUtils.truncateToDayOfMonth(position.getGoodRequest().getDoneDate());
             OrgRequestCountItem item = orgRequestCountItemMap.get(new OrgRequestCountItem(position.getOrgOwner(), doneDate));
-            String fullName = position.getGood().getFullName();
-            item.addCount(position.getTotalCount()/1000L, fullName);
+            String pathPart3 = position.getGood().getPathPart3();
+            item.addCount(position.getTotalCount()/1000L, pathPart3);
         }
 
 
         final ArrayList<Long> orgs = new ArrayList<Long>(orgItems.keySet());
-        //String orgCriteria ="";
-        //if (idOfOrgs!=null && !idOfOrgs.isEmpty() && idOfOrgs.get(0)!=null) {
-        //    orgCriteria =" cf_goods_requests.orgowner IN (:idOfOrgs) ";
-        //} else {
-        //    orgCriteria =" cf_goods_requests.orgowner IN (SELECT idofdestorg FROM cf_menuexchangerules WHERE cf_menuexchangerules.idofsourceorg IN (:idOfSupplier)) ";
-        //}
-        //String goodSQL = "SELECT resultdata.dd, resultdata.orgo AS org, int8(sum(resultdata.tc)*2/sum(resultdata.cg)) FROM ( "
-        //        + " SELECT ddate AS dd, sum(tcount) AS tc, orgo, count(good) AS cg, sum(tcount)/count(good), int8(sum(tcount)/count(good)) FROM "
-        //        + " ( SELECT int8(sum(totalcount) / 1000) AS tcount, cf_goods_requests.DoneDate AS ddate, cf_goods.fullname AS good, "
-        //        + "  cf_goods_requests.orgowner orgo FROM cf_goods_requests_positions "
-        //        + "  LEFT JOIN cf_goods_requests ON cf_goods_requests_positions.IdOfGoodsRequest=cf_goods_requests.IdOfGoodsRequest "
-        //        + "  LEFT JOIN cf_goods ON cf_goods.idofgood=cf_goods_requests_positions.idofgood WHERE "
-        //        + orgCriteria
-        //        + "  AND cf_goods_requests.DoneDate>=:startDate AND cf_goods_requests.DoneDate<=:endDate "
-        //        + "  AND (cf_goods.fullname ILIKE '%завтрак%' OR cf_goods.fullname ILIKE '%обед%' OR cf_goods.fullname ILIKE '%полдник%') "
-        //        + "  AND NOT(cf_goods.fullname ILIKE '%сотрудник%') AND cf_goods.orgowner in (:idOfSupplier) "
-        //        + "  GROUP BY cf_goods_requests.orgowner, cf_goods_requests.DoneDate, cf_goods.fullname "
-        //        + " ) AS rdata GROUP BY rdata.ddate, rdata.orgo) AS resultdata "
-        //        + " GROUP BY resultdata.dd, resultdata.orgo ORDER BY resultdata.dd ";
-        //Query goodQuery = session.createSQLQuery(goodSQL);
-        //goodQuery.setLong("startDate", startTime.getTime());
-        //goodQuery.setLong("endDate", endTime.getTime());
-        //if (idOfOrgs!=null && !idOfOrgs.isEmpty() && idOfOrgs.get(0)!=null) {
-        //    goodQuery.setParameterList("idOfOrgs", idOfOrgs);
-        //}
-        //goodQuery.setParameterList("idOfSupplier", idOfSupplier);
-        //List<Object[]> goodRes = (List<Object[]>) goodQuery.list();
-        //
-        //Map<Long, Map<Date, RequestCountItem>> requestCountMap = new HashMap<Long, Map<Date, RequestCountItem>>();
-        //for (Object[] row : goodRes) {
-        //    Long idOfOrg = ((BigInteger) row[1]).longValue();
-        //    Long totalCount = ((BigInteger) row[2]).longValue();
-        //    Date date  = CalendarUtils.truncateToDayOfMonth(new Date(((BigInteger) row[0]).longValue()));
-        //    Map<Date, RequestCountItem> dateRequestCountItemMap = requestCountMap.get(idOfOrg);
-        //    if(dateRequestCountItemMap == null){
-        //        HashMap<Date, RequestCountItem> value = new HashMap<Date, RequestCountItem>();
-        //        value.put(date, new RequestCountItem(totalCount, date));
-        //        requestCountMap.put(idOfOrg, value);
-        //    } else {
-        //        RequestCountItem item = dateRequestCountItemMap.get(date);
-        //        if(item==null){
-        //            dateRequestCountItemMap.put(date, new RequestCountItem(totalCount, date));
-        //        } else {
-        //            item.setTotalCount(item.getTotalCount()+totalCount);
-        //        }
-        //    }
-        //}
-
         String sql = "SELECT count(distinct client), EXTRACT(EPOCH FROM order_data.d) * 1000, order_data.org "
                 + "FROM ("
                 + " SELECT cf_orders.idofclient AS client, "
@@ -249,6 +201,7 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
                 + " cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
                 + " cf_clients.discountmode = 3 and "  /* берем только льготников */
                 + " cf_orders.ordertype in (4, 6) and cf_orders.state=0 and "/* смотрим плану льготного питания */
+                + " cf_orders.state = 0 and "  /* Учитываем только пробитые заказы */
                 + " cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS order_data "
                 + "GROUP BY order_data.d, order_data.org";
 
@@ -294,6 +247,7 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
                 + " cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
                 + " cf_clients.discountmode = 3 and "  /* берем только льготников */
                 + " cf_orders.ordertype = 6 and "/* План льготного питания, резерв */
+                + " cf_orders.state = 0 and "/* Учитываем только пробитые заказы */
                 + " cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS order_data "
                 + "GROUP BY order_data.d, order_data.org";
 
@@ -336,12 +290,6 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
             while (beginDate.getTime() <= endDate.getTime()) {
                 final Item e = new Item();
                 e.fillOrgInfo(orgItem);
-                //if(dateRequestCountItemMap!=null){
-                //    RequestCountItem item = dateRequestCountItemMap.get(beginDate);
-                //    if(item!=null){
-                //        e.setRequestCount(item.getTotalCount());
-                //    } else e.setRequestCount(0L);
-                //} else e.setRequestCount(0L);
                 OrgRequestCountItem orgRequestCountItem =orgRequestCountItemMap.get(new OrgRequestCountItem(id, beginDate));
                 if(orgRequestCountItem==null){
                     e.setRequestCount(0L);
@@ -627,4 +575,53 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
 //    .addOrder(asc("compositeIdOfOrderDetail.idOfOrg"));
 //if (!idOfOrgs.isEmpty()) {
 //    orderDetailCrit.add(Restrictions.in("compositeIdOfOrderDetail.idOfOrg", idOfOrgs));
+//}
+
+
+//String orgCriteria ="";
+//if (idOfOrgs!=null && !idOfOrgs.isEmpty() && idOfOrgs.get(0)!=null) {
+//    orgCriteria =" cf_goods_requests.orgowner IN (:idOfOrgs) ";
+//} else {
+//    orgCriteria =" cf_goods_requests.orgowner IN (SELECT idofdestorg FROM cf_menuexchangerules WHERE cf_menuexchangerules.idofsourceorg IN (:idOfSupplier)) ";
+//}
+//String goodSQL = "SELECT resultdata.dd, resultdata.orgo AS org, int8(sum(resultdata.tc)*2/sum(resultdata.cg)) FROM ( "
+//        + " SELECT ddate AS dd, sum(tcount) AS tc, orgo, count(good) AS cg, sum(tcount)/count(good), int8(sum(tcount)/count(good)) FROM "
+//        + " ( SELECT int8(sum(totalcount) / 1000) AS tcount, cf_goods_requests.DoneDate AS ddate, cf_goods.fullname AS good, "
+//        + "  cf_goods_requests.orgowner orgo FROM cf_goods_requests_positions "
+//        + "  LEFT JOIN cf_goods_requests ON cf_goods_requests_positions.IdOfGoodsRequest=cf_goods_requests.IdOfGoodsRequest "
+//        + "  LEFT JOIN cf_goods ON cf_goods.idofgood=cf_goods_requests_positions.idofgood WHERE "
+//        + orgCriteria
+//        + "  AND cf_goods_requests.DoneDate>=:startDate AND cf_goods_requests.DoneDate<=:endDate "
+//        + "  AND (cf_goods.fullname ILIKE '%завтрак%' OR cf_goods.fullname ILIKE '%обед%' OR cf_goods.fullname ILIKE '%полдник%') "
+//        + "  AND NOT(cf_goods.fullname ILIKE '%сотрудник%') AND cf_goods.orgowner in (:idOfSupplier) "
+//        + "  GROUP BY cf_goods_requests.orgowner, cf_goods_requests.DoneDate, cf_goods.fullname "
+//        + " ) AS rdata GROUP BY rdata.ddate, rdata.orgo) AS resultdata "
+//        + " GROUP BY resultdata.dd, resultdata.orgo ORDER BY resultdata.dd ";
+//Query goodQuery = session.createSQLQuery(goodSQL);
+//goodQuery.setLong("startDate", startTime.getTime());
+//goodQuery.setLong("endDate", endTime.getTime());
+//if (idOfOrgs!=null && !idOfOrgs.isEmpty() && idOfOrgs.get(0)!=null) {
+//    goodQuery.setParameterList("idOfOrgs", idOfOrgs);
+//}
+//goodQuery.setParameterList("idOfSupplier", idOfSupplier);
+//List<Object[]> goodRes = (List<Object[]>) goodQuery.list();
+//
+//Map<Long, Map<Date, RequestCountItem>> requestCountMap = new HashMap<Long, Map<Date, RequestCountItem>>();
+//for (Object[] row : goodRes) {
+//    Long idOfOrg = ((BigInteger) row[1]).longValue();
+//    Long totalCount = ((BigInteger) row[2]).longValue();
+//    Date date  = CalendarUtils.truncateToDayOfMonth(new Date(((BigInteger) row[0]).longValue()));
+//    Map<Date, RequestCountItem> dateRequestCountItemMap = requestCountMap.get(idOfOrg);
+//    if(dateRequestCountItemMap == null){
+//        HashMap<Date, RequestCountItem> value = new HashMap<Date, RequestCountItem>();
+//        value.put(date, new RequestCountItem(totalCount, date));
+//        requestCountMap.put(idOfOrg, value);
+//    } else {
+//        RequestCountItem item = dateRequestCountItemMap.get(date);
+//        if(item==null){
+//            dateRequestCountItemMap.put(date, new RequestCountItem(totalCount, date));
+//        } else {
+//            item.setTotalCount(item.getTotalCount()+totalCount);
+//        }
+//    }
 //}
