@@ -183,9 +183,9 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
             GoodRequestPosition position = (GoodRequestPosition) obj;
             Date doneDate = CalendarUtils.truncateToDayOfMonth(position.getGoodRequest().getDoneDate());
             OrgRequestCountItem item = orgRequestCountItemMap.get(new OrgRequestCountItem(position.getOrgOwner(), doneDate));
-            String pathPart3 = position.getGood().getPathPart3();
+            //String pathPart3 = position.getGood().getPathPart3();
             String pathPart4 = position.getGood().getPathPart4();
-            item.addCount(position.getTotalCount()/1000L, pathPart3, pathPart4);
+            item.addCount(position.getTotalCount()/1000L, pathPart4);
         }
 
 
@@ -336,7 +336,7 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         private long idOfOrg;
         private Date doneDate;
         private long totalCount = 0L;
-        private TreeSet<String> pathPart3 = new TreeSet<String>();;
+        //private TreeSet<String> pathPart3 = new TreeSet<String>();;
         private TreeSet<String> pathPart4 = new TreeSet<String>();;
 
         public OrgRequestCountItem(long idOfOrg, Date doneDate) {
@@ -344,9 +344,9 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
             this.doneDate = doneDate;
         }
 
-        public void addCount(long count, String pathPart3, String pathPart4){
+        public void addCount(long count, String pathPart4){
             totalCount+=count;
-            this.pathPart3.add(pathPart3);
+            //this.pathPart3.add(pathPart3);
             this.pathPart4.add(pathPart4);
         }
 
@@ -363,16 +363,17 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         }
 
         long getRequestCount(){
-            return getTotalCount() * complexGroupCount()/complexCount();
+            //return getTotalCount() * complexGroupCount()/complexCount();
+            return getTotalCount()/complexCount();
         }
 
         public boolean isEmptyComplex(){
-            return pathPart3.isEmpty() && pathPart4.isEmpty();
+            return /*pathPart3.isEmpty() &&*/ pathPart4.isEmpty();
         }
 
-        public int complexGroupCount(){
-            return pathPart3.size();
-        }
+        //public int complexGroupCount(){
+        //    return pathPart3.size();
+        //}
 
         public int complexCount(){
             return pathPart4.size();
