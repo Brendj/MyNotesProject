@@ -462,7 +462,7 @@ public class Good extends ConfigurationProviderDistributedObject {
         this.userDelete = userDelete;
     }
 
-    String getPathPart4() {
+    public String getPathPart4() {
         return pathPart4;
     }
 
@@ -470,7 +470,7 @@ public class Good extends ConfigurationProviderDistributedObject {
         this.pathPart4 = pathPart4;
     }
 
-    String getPathPart3() {
+    public String getPathPart3() {
         return pathPart3;
     }
 
@@ -478,7 +478,7 @@ public class Good extends ConfigurationProviderDistributedObject {
         this.pathPart3 = pathPart3;
     }
 
-    String getPathPart2() {
+    public String getPathPart2() {
         return pathPart2;
     }
 
@@ -486,7 +486,7 @@ public class Good extends ConfigurationProviderDistributedObject {
         this.pathPart2 = pathPart2;
     }
 
-    String getPathPart1() {
+    public String getPathPart1() {
         return pathPart1;
     }
 
