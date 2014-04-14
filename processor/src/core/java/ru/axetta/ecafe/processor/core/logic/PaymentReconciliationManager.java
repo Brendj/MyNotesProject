@@ -126,9 +126,23 @@ public class PaymentReconciliationManager {
         }
     }
 
+    public PaymentItem findPaymentById(EntityManager em, String paymentId, Contragent ca) {
+        Object[] payment = DAOUtils.getClientPaymentById(em, paymentId, ca);
+        if(payment == null || payment.length < 1) {
+            return null;
+        }
+
+        PaymentItem pi = new PaymentItem();
+        pi.contractId = (Long)payment[0];
+        pi.dt = (Date)payment[1];
+        pi.sum = (Long)payment[2];
+        pi.idOfPayment = (String)payment[3];
+        return pi;
+    }
+
     @Transactional
     public LinkedList<Difference> processRegistry(long idOfContragentAgent, Long idOfContragentTsp, Date dtFrom, Date dtTo,
-            List<RegistryItem> registryItems) throws Exception {
+            List<RegistryItem> registryItems, boolean dateDependent) throws Exception {
         Contragent ca = em.find(Contragent.class, idOfContragentAgent);
         if (ca==null) throw new Exception(String.format("Контрагент не найден: %d", idOfContragentAgent));
         Contragent caReceiver = null;
@@ -150,7 +164,12 @@ public class PaymentReconciliationManager {
         LinkedList<Difference> differences = new LinkedList<Difference>();
         
         for (RegistryItem ri : registryItems) {
-            PaymentItem pi = clientPaymentsMap.get(ri.idOfPayment);
+            PaymentItem pi = null;
+            if(dateDependent) {
+                pi = clientPaymentsMap.get(ri.idOfPayment);
+            } else {
+                pi = findPaymentById(em, ri.idOfPayment, ca);
+            }
             if (pi==null) {
                 differences.add(new Difference(Difference.TYPE_REGISTRY_ITEM_NOT_FOUND, ri, null));
             }

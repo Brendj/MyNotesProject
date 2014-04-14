@@ -48,6 +48,8 @@
             <h:outputText escape="true" value="Дата до (включительно)" styleClass="output-text required-field" />
             <rich:calendar value="#{reconciliationPage.dtTo}" datePattern="dd.MM.yyyy" converter="dateConverter"
                            inputClass="input-text" showWeeksBar="false" />
+            <h:outputText escape="true" value="Не включать даты платежа в сравнение" styleClass="output-text required-field" />
+            <h:selectBooleanCheckbox value="#{reconciliationPage.dateDependent}" styleClass="output-text" />
 
             <h:outputText escape="true" value="Файл реестра" styleClass="output-text required-field" />
             <h:panelGrid columns="2">

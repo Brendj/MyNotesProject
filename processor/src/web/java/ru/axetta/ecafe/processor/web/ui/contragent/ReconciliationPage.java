@@ -46,6 +46,7 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
     private int exportType = 0;
     private DateFormat localDateFormat = CalendarUtils.getDateFormatLocal();
     private LineConfig defaultLineConfig;
+    private boolean dateDependent = true;
 
     @Override
     public String getPageFilename() {
@@ -56,7 +57,15 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
     public void onShow() throws Exception {
         super.onShow();
     }
-    
+
+    public boolean isDateDependent() {
+        return dateDependent;
+    }
+
+    public void setDateDependent(boolean dateDependent) {
+        this.dateDependent = dateDependent;
+    }
+
     public Object processData() {
         if (caAgent == null) {
             printErrorAndClear("Не указан агент");
@@ -85,7 +94,7 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
         this.differencesList = null;
         DateFormat df = CalendarUtils.getDateFormatLocal();
         try {
-            this.differencesList = reconciliationManager.processRegistry(caAgent, caReceiver, dtFrom, dtTo, registryItems);
+            this.differencesList = reconciliationManager.processRegistry(caAgent, caReceiver, dtFrom, dtTo, registryItems, dateDependent);
             this.differencesInfo = "Результаты сверки реестра за период: " + df.format(this.dtFrom) + " - " + df.format(this.dtTo)
                     + ": записей в реестре - " + registryItems.size() + ", различий - " + differencesList.size();
         } catch (Exception e) {
