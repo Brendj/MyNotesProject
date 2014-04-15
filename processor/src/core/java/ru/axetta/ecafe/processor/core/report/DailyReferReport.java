@@ -46,6 +46,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
     public static DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     public static DateFormat dailyItemsFormat = new SimpleDateFormat("dd.MM.yyyy");
     public static final String SUBCATEGORY_PARAMETER = "category";
+    public static final String SHOW_DAILY_SALES_PARAMETER = "dailySales";
     public static final String SUBCATEGORY_ALL = "Все";
     public static final String OVERALL_SUBCATEGORY_NAME = "Сведения о рационах питания, получеченных в отчетном периоде";
 
@@ -115,6 +116,12 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             } catch (Exception e) {
                 category = null;
             }
+            boolean showDailySample = false;
+            try {
+                showDailySample = Boolean.parseBoolean(reportProperties.get(SHOW_DAILY_SALES_PARAMETER).toString());
+            } catch (Exception e) {
+                showDailySample = false;
+            }
             /* Строим параметры для передачи в jasper */
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             calendar.setTime(startTime);
@@ -130,7 +137,9 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
 
             Date generateEndTime = new Date();
             List<DailyReferReportItem> items = findDailyReferItems(session, startTime, endTime, category);
-            addSamples(session, org, startTime, endTime, items, category);
+            if(showDailySample) {
+                addSamples(session, org, startTime, endTime, items, category);
+            }
             //  После получения всего списка, передаем итоговую сумму в кач-ве параметра
             parameterMap.put("totalSum", totalSumm);
 

@@ -21,35 +21,50 @@
 
 <%--@elvariable id="referReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ReferReportPage"--%>
 <h:panelGrid id="referReportGrid" binding="#{referReportPage.pageComponent}" styleClass="borderless-grid">
-    <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
-        <rich:calendar value="#{referReportPage.start}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
-        <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
-        <rich:calendar value="#{referReportPage.end}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+    <h:panelGrid styleClass="borderless-grid">
+        <h:panelGrid columns="2">
+            <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
+            <rich:calendar value="#{referReportPage.start}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+            <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
+            <rich:calendar value="#{referReportPage.end}" datePattern="dd.MM.yyyy"
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
-        <h:outputText escape="true" value="Организация" styleClass="output-text" />
-        <h:panelGroup>
-            <a4j:commandButton value="..." action="#{mainPage.deliveredServicesReportPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" />
-            <h:outputText styleClass="output-text" escape="true" value=" {#{referReportPage.filter}}" />
-        </h:panelGroup>
+            <h:outputText escape="true" value="Организация" styleClass="output-text" />
+            <h:panelGroup>
+                <a4j:commandButton value="..." action="#{mainPage.deliveredServicesReportPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;" />
+                <h:outputText styleClass="output-text" escape="true" value=" {#{referReportPage.filter}}" />
+            </h:panelGroup>
+        </h:panelGrid>
 
-        <h:outputText escape="true" value="Категория" styleClass="output-text" />
-        <h:selectOneMenu id="categoriesList" value="#{referReportPage.category}" style="width:325px;" >
-            <f:selectItems value="#{referReportPage.categories}"/>
-        </h:selectOneMenu>
+        <rich:tabPanel style="width: 500px;" switchType="client">
+            <rich:tab label="Месячный отчет">
+                <a4j:commandButton value="Генерировать" action="#{referReportPage.doGenerateMonthly}"
+                                   reRender="mainMenu, workspaceTogglePanel"
+                                   styleClass="command-button" status="reportGenerateStatus" />
+                <h:commandButton value="Генерировать в Excel" actionListener="#{referReportPage.doGenerateMonthlyExcel}" styleClass="command-button" />
+            </rich:tab>
+            <rich:tab label="Дневной отчет">
+                <h:panelGrid columns="2">
+                    <h:outputText escape="true" value="Категория" styleClass="output-text" />
+                    <h:selectOneMenu id="categoriesList" value="#{referReportPage.category}" style="width:325px;" >
+                        <f:selectItems value="#{referReportPage.categories}"/>
+                    </h:selectOneMenu>
 
-        <a4j:commandButton value="Генерировать месячный отчет" action="#{referReportPage.doGenerateMonthly}"
-                           reRender="mainMenu, workspaceTogglePanel"
-                           styleClass="command-button" status="reportGenerateStatus" />
-        <a4j:commandButton value="Генерировать дневной отчет" action="#{referReportPage.doGenerateDaily}"
-                           reRender="mainMenu, workspaceTogglePanel"
-                           styleClass="command-button" status="reportGenerateStatus" />
-        <h:commandButton value="Генерировать месячный отчет в Excel" actionListener="#{referReportPage.doGenerateMonthlyExcel}" styleClass="command-button" />
-        <h:commandButton value="Генерировать дневной отчет в Excel" actionListener="#{referReportPage.doGenerateDailyExcel}" styleClass="command-button" />
+                    <h:outputText escape="true" value="Отображать Суточную пробу" styleClass="output-text" />
+                    <h:selectBooleanCheckbox value="#{referReportPage.showDailySales}"
+                                             styleClass="output-text" />
+                </h:panelGrid>
+
+                <a4j:commandButton value="Генерировать" action="#{referReportPage.doGenerateDaily}"
+                                   reRender="mainMenu, workspaceTogglePanel"
+                                   styleClass="command-button" status="reportGenerateStatus" />
+                <h:commandButton value="Генерировать в Excel" actionListener="#{referReportPage.doGenerateDailyExcel}" styleClass="command-button" />
+            </rich:tab>
+        </rich:tabPanel>
+
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />

@@ -52,6 +52,7 @@ public class ReferReportPage extends OnlineReportPage {
     private DailyReferReport dailyReport;
     private String category;
     private List<String> categories;
+    private Boolean showDailySales = false;
 
     @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
@@ -120,6 +121,14 @@ public class ReferReportPage extends OnlineReportPage {
     
     private static final int MONTHLY_REPORT = 1;
     private static final int DAILY_REPORT   = 2;
+
+    public Boolean getShowDailySales() {
+        return showDailySales;
+    }
+
+    public void setShowDailySales(Boolean showDailySales) {
+        this.showDailySales = showDailySales;
+    }
 
     public void doGenerateMonthly() {
         RuntimeContext.getAppContext().getBean(ReferReportPage.class).generateHTML(MONTHLY_REPORT);
@@ -245,6 +254,7 @@ public class ReferReportPage extends OnlineReportPage {
         }
         Properties props = new Properties();
         props.setProperty(DailyReferReport.SUBCATEGORY_PARAMETER, category);
+        props.setProperty(DailyReferReport.SHOW_DAILY_SALES_PARAMETER, "" + showDailySales);
         reportBuilder.setReportProperties(props);
         reportBuilder.setOrg(orgItem);
         try {
