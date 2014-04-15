@@ -68,7 +68,7 @@
                                  addControlLabel="Добавить файл" clearControlLabel="Очистить"
                                  clearAllControlLabel="Очистить все" doneLabel="Готово" cancelEntryControlLabel="Отменить"
                                  transferErrorLabel="Ошибка передачи" uploadControlLabel="Загрузка файлов"
-                                 progressLabel="Загрузка" listHeight="150px" maxFilesQuantity="7"
+                                 progressLabel="Загрузка" listHeight="150px" maxFilesQuantity="50"
                                  fileUploadListener="#{reconciliationPage.uploadFileListener}">
                     <f:facet name="label">
                         <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]" />
