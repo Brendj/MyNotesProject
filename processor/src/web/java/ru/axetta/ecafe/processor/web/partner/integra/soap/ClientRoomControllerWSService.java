@@ -22,7 +22,7 @@ import java.net.URL;
  */
 @WebServiceClient(name = "ClientRoomControllerWSService",
         targetNamespace = "http://soap.integra.partner.web.processor.ecafe.axetta.ru/",
-        wsdlLocation = "http://172.18.16.14:8080/processor/soap/client?wsdl")
+        wsdlLocation = "http://localhost:8080/processor/soap/client?wsdl")
 public class ClientRoomControllerWSService
     extends Service
 {
@@ -32,7 +32,7 @@ public class ClientRoomControllerWSService
     static {
         URL url = null;
         try {
-            url = new URL("http://172.18.16.14:8080/processor/soap/client?wsdl");
+            url = new URL("http://localhost:8080/processor/soap/client?wsdl");
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
