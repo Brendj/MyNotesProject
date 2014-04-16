@@ -81,6 +81,7 @@ public class User {
     private Date lastEntryTime;
     private Boolean blocked;
     private String region;
+    private Set<UserOrgs> userOrgses = new HashSet<UserOrgs>();
 
     public String getRoleName() {
         return roleName;
@@ -254,6 +255,14 @@ public class User {
 
     public void setRegion(String region) {
         this.region = region;
+    }
+
+    public Set<UserOrgs> getUserOrgses() {
+        return userOrgses;
+    }
+
+    public void setUserOrgses(Set<UserOrgs> userOrgses) {
+        this.userOrgses = userOrgses;
     }
 
     @Override

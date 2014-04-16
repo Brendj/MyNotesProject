@@ -5,22 +5,20 @@
 package ru.axetta.ecafe.processor.web.ui;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,7 +30,7 @@ import javax.persistence.PersistenceContext;
 
 @Component
 @Scope("session")
-public class UserSettings extends BasicWorkspacePage {
+public class UserSettings extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList {
 
     /* Properties */
     private String userName;
@@ -43,6 +41,9 @@ public class UserSettings extends BasicWorkspacePage {
     private String phone;
     private String email;
     private User currUser = null;
+    protected List<Long> orgItems = new ArrayList<Long>(0);
+    private String orgFilter = "Не выбрано";
+    private String orgIds;
 
     @Autowired
     private RuntimeContext runtimeContext;
@@ -69,6 +70,9 @@ public class UserSettings extends BasicWorkspacePage {
         userName = currUser.getUserName();
         phone = currUser.getPhone();
         email = currUser.getEmail();
+        orgItems.clear();
+        Map<Long, String> orgList = daoService.getUserOrgses(currUser);
+        completeOrgListSelection(orgList);
     }
 
     public User getCurrentUser() throws Exception {
@@ -92,6 +96,8 @@ public class UserSettings extends BasicWorkspacePage {
             currUser.setPhone(phone);
             currUser.setEmail(email);
             currUser = daoService.setUserInfo(currUser);
+
+            daoService.updateInfoCurrentUser(this.orgItems, currUser);
             success = true;
         }
         return success;
@@ -186,5 +192,43 @@ public class UserSettings extends BasicWorkspacePage {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
+        if (orgMap != null) {
+            orgItems = new ArrayList<Long>();
+            if (orgMap.isEmpty()) {
+                orgFilter = "Не выбрано";
+            } else {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (Long idOfOrg : orgMap.keySet()) {
+                    //orgItems.add(new OrgItem(idOfOrg, orgMap.get(idOfOrg)));
+                    orgItems.add(idOfOrg);
+                    stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
+                }
+                orgFilter = stringBuilder.substring(0, stringBuilder.length() - 2);
+            }
+        }
+    }
+
+    public String getGetStringIdOfOrgList() {
+        return orgItems.toString().replaceAll("[^0-9,]","");
+    }
+
+    public String getOrgFilter() {
+        return orgFilter;
+    }
+
+    public void setOrgFilter(String orgFilter) {
+        this.orgFilter = orgFilter;
+    }
+
+    public String getOrgIds() {
+        return orgIds;
+    }
+
+    public void setOrgIds(String orgIds) {
+        this.orgIds = orgIds;
     }
 }

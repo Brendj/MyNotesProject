@@ -16,7 +16,6 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
@@ -1420,5 +1419,29 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
                 contragentReceiver);
         entityManager.persist(ri);
         return ri;
+    }
+
+    public Map<Long, String> getUserOrgses(User currUser) {
+        Session session = entityManager.unwrap(Session.class);
+        session.refresh(currUser);
+        Map<Long, String> map = new HashMap<Long, String>();
+        for (UserOrgs userOrgs : currUser.getUserOrgses()) {
+            final Org org = userOrgs.getOrg();
+            map.put(org.getIdOfOrg(), org.getShortName());
+            //orgList.add(org);
+        }
+        return map;
+    }
+
+    public void updateInfoCurrentUser(List<Long> orgIds, User user) {
+        Session session = entityManager.unwrap(Session.class);
+        session.refresh(user);
+        user.getUserOrgses().clear();
+        session.flush();
+        for (Long orgId : orgIds) {
+            Org org = (Org) session.load(Org.class, orgId);
+            UserOrgs userOrgs = new UserOrgs(user, org);
+            session.save(userOrgs);
+        }
     }
 }

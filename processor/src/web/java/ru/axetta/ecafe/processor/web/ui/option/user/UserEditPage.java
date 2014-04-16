@@ -5,11 +5,13 @@
 package ru.axetta.ecafe.processor.web.ui.option.user;
 
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.UserOrgs;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -18,6 +20,7 @@ import javax.faces.model.SelectItem;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,7 +29,7 @@ import java.util.List;
  * Time: 11:33:54
  * To change this template use File | Settings | File Templates.
  */
-public class UserEditPage extends BasicWorkspacePage implements ContragentListSelectPage.CompleteHandler{
+public class UserEditPage extends BasicWorkspacePage implements ContragentListSelectPage.CompleteHandler, OrgListSelectPage.CompleteHandlerList{
 
     private Long idOfUser;
     private String userName;
@@ -41,11 +44,31 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
     private String roleName;
     private final UserRoleEnumTypeMenu userRoleEnumTypeMenu = new UserRoleEnumTypeMenu();
     private FunctionSelector functionSelector = new FunctionSelector();
-    private String contragentFilter;
+    private String contragentFilter = "Не выбрано";
     private String contragentIds;
+    private String orgIds;
     private Boolean blocked;
     private SelectItem[] regions;
     private String region;
+    private String orgFilter = "Не выбрано";
+    protected List<OrgItem> orgItems = new ArrayList<OrgItem>(0);
+
+    @Override
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
+        if (orgMap != null) {
+            orgItems = new ArrayList<OrgItem>(orgMap.size());
+            if (orgMap.isEmpty()) {
+                orgFilter = "Не выбрано";
+            } else {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (Long idOfOrg : orgMap.keySet()) {
+                    orgItems.add(new OrgItem(idOfOrg, orgMap.get(idOfOrg)));
+                    stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
+                }
+                orgFilter = stringBuilder.substring(0, stringBuilder.length() - 2);
+            }
+        }
+    }
 
     public void setFunctionSelector(FunctionSelector functionSelector) {
         this.functionSelector = functionSelector;
@@ -85,6 +108,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             Contragent contragent = (Contragent) session.load(Contragent.class, it.getIdOfContragent());
             user.getContragents().add(contragent);
         }
+
         if(role.equals(User.DefaultRole.MONITORING)){
             user.setFunctions(functionSelector.getMonitoringFunctions(session));
             user.setRoleName(role.toString());
@@ -106,7 +130,15 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         } else {
             user.setRegion(null);
         }
+        user.getUserOrgses().clear();
         session.update(user);
+        session.flush();
+        for (OrgItem orgItem : orgItems) {
+            Org org = (Org) session.load(Org.class, orgItem.idOfOrg);
+            UserOrgs userOrgs = new UserOrgs(user, org);
+            session.save(userOrgs);
+        }
+        session.refresh(user);
         fill(session, user);
     }
 
@@ -131,6 +163,24 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         this.region = region;
     }
 
+    public String getOrgFilter() {
+        return orgFilter;
+    }
+
+    public void setOrgFilter(String orgFilter) {
+        this.orgFilter = orgFilter;
+    }
+
+    public String getGetStringIdOfOrgList() {
+        return orgItems.toString().replaceAll("[^0-9,]","");
+    }
+
+    @Override
+    public void onShow() throws Exception {
+        orgFilter = "Не выбрано";
+        orgItems.clear();
+    }
+
     public Boolean getIsDefault(){
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
         return role.equals(User.DefaultRole.DEFAULT);
@@ -152,20 +202,45 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
     private void setContragentFilterInfo(List<ContragentItem> contragentItems) {
         StringBuilder str = new StringBuilder();
         StringBuilder ids = new StringBuilder();
-        for (ContragentItem it : contragentItems) {
-            if (str.length() > 0) {
-                str.append("; ");
-                ids.append(",");
+        if (contragentItems.isEmpty()) {
+            contragentFilter = "Не выбрано";
+        } else {
+            for (ContragentItem it : contragentItems) {
+                if (str.length() > 0) {
+                    str.append("; ");
+                    ids.append(",");
+                }
+                str.append(it.getContragentName());
+                ids.append(it.getIdOfContragent());
             }
-            str.append(it.getContragentName());
-            ids.append(it.getIdOfContragent());
+            contragentFilter = str.toString();
         }
-        contragentFilter = str.toString();
         contragentIds = ids.toString();
+    }
+
+    //
+    private void setOrgFilterInfo(List<OrgItem> orgItems) {
+        StringBuilder str = new StringBuilder();
+        StringBuilder ids = new StringBuilder();
+        if (orgItems.isEmpty()) {
+            orgFilter = "Не выбрано";
+        } else {
+            for (OrgItem ot : orgItems) {
+                if (str.length() > 0) {
+                    str.append("; ");
+                    ids.append(",");
+                }
+                str.append(ot.getShortName());
+                ids.append(ot.getIdOfOrg());
+            }
+            orgFilter = str.toString();
+        }
+        orgIds = ids.toString();
     }
 
     private void fill(Session session, User user) throws Exception {
         this.contragentItems.clear();
+        this.orgItems.clear();
         this.idOfUser = user.getIdOfUser();
         this.userName = user.getUserName();
         this.phone = user.getPhone();
@@ -174,7 +249,14 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         for (Contragent c : user.getContragents()) {
             this.contragentItems.add(new ContragentItem(c));
         }
+        for (UserOrgs o : user.getUserOrgses()) {
+            //Org org = (Org) session.load(Org.class, o.getOrg().getIdOfOrg());
+            //this.orgItems.add(o.getOrg().getIdOfOrg());
+            this.orgItems.add(new OrgItem(o.getOrg()));
+        }
         setContragentFilterInfo(contragentItems);
+        setOrgFilterInfo(orgItems);
+
         this.idOfRole = user.getIdOfRole();
         this.roleName = user.getRoleName();
         this.blocked = user.isBlocked();
@@ -205,6 +287,28 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             return contragentName;
         }
 
+    }
+
+    protected static class OrgItem {
+        private final Long idOfOrg;
+        private final String shortName;
+
+        OrgItem(Org org) {
+            this(org.getIdOfOrg(), org.getShortName());
+        }
+
+        public OrgItem(Long idOfOrg, String shortName) {
+            this.idOfOrg = idOfOrg;
+            this.shortName = shortName;
+        }
+
+        public Long getIdOfOrg() {
+            return idOfOrg;
+        }
+
+        public String getShortName() {
+            return shortName;
+        }
     }
 
     /* getters and setters */
@@ -286,6 +390,14 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
 
     public void setContragentIds(String contragentIds) {
         this.contragentIds = contragentIds;
+    }
+
+    public String getOrgIds() {
+        return orgIds;
+    }
+
+    public void setOrgIds(String orgIds) {
+        this.orgIds = orgIds;
     }
 
     public Integer getIdOfRole() {

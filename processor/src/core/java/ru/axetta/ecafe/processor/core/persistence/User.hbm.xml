@@ -39,6 +39,10 @@
             <key column="IdOfUser"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Function" column="IdOfFunction"/>
         </set>
+        <set name="userOrgses" table="CF_Userorgs">
+            <key column="idofuser"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.UserOrgs" column="idofuserorg"/>
+        </set>
     </class>
 </hibernate-mapping>
 

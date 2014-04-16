@@ -61,7 +61,17 @@
             <f:setPropertyActionListener value="#{mainPage.userCreatePage.contragentIds}"
                                          target="#{mainPage.contragentListSelectPage.selectedIds}" />
         </a4j:commandButton>
-        <h:outputText value="#{mainPage.userCreatePage.contragentFilter}" escape="true" styleClass="output-text" />
+        <h:outputText value=" {#{mainPage.userCreatePage.contragentFilter}}" escape="true" styleClass="output-text" />
+    </h:panelGroup>
+
+    <h:outputText escape="true" value="Список организаций" styleClass="output-text" />
+    <h:panelGroup>
+        <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px;" >
+            <f:setPropertyActionListener value="#{mainPage.userCreatePage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+        </a4j:commandButton>
+        <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.userCreatePage.orgFilter}}" />
     </h:panelGroup>
 
     <h:outputText escape="true" value="Регион" styleClass="output-text" />
