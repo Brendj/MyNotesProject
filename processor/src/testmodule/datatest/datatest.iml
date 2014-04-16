@@ -4,7 +4,7 @@
     <facet type="hibernate" name="Hibernate">
       <configuration>
         <datasource-map>
-          <unit-entry name="sessionFactory" value="cedfba61-0f44-4ced-9708-18045311d229" />
+          <unit-entry name="sessionFactory" value="675cc7d7-470a-4806-b8d4-13d87d189397" />
         </datasource-map>
       </configuration>
     </facet>
