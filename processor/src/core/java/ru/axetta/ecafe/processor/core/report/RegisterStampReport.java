@@ -78,11 +78,13 @@ public class RegisterStampReport extends BasicReportForOrgJob {
 
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
             List<GoodItem> allGoods = service.findAllGoods(org.getIdOfOrg(), startTime, endTime );
+            Map<Date, Long> numbers = service.findAllRegistryTalons(org.getIdOfOrg(), startTime, endTime);
             List<RegisterStampReportItem> result = new ArrayList<RegisterStampReportItem>();
             calendar.setTime(startTime);
             GoodItem emptyGoodItem = new GoodItem();
             while (endTime.getTime()>calendar.getTimeInMillis()){
-                String date = timeFormat.format(calendar.getTime());
+                Date time = calendar.getTime();
+                String date = timeFormat.format(time);
                 if(allGoods.isEmpty()){
                     RegisterStampReportItem item = new RegisterStampReportItem(emptyGoodItem,0L,date);
                     RegisterStampReportItem total = new RegisterStampReportItem(emptyGoodItem,0L,"77777");
@@ -92,9 +94,10 @@ public class RegisterStampReport extends BasicReportForOrgJob {
                     result.add(total);
                 } else {
                     for (GoodItem goodItem: allGoods){
+                        String number = numbers.get(time) == null ? "" : Long.toString(numbers.get(time));
                         Long val = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
                                 goodItem.getFullName(), withOutActDiscrepancies);
-                        RegisterStampReportItem item = new RegisterStampReportItem(goodItem,val,date);
+                        RegisterStampReportItem item = new RegisterStampReportItem(goodItem,val,date,number);
                         RegisterStampReportItem total = new RegisterStampReportItem(goodItem,val,"77777");
                         RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem,val,"99999");
                         result.add(allTotal);

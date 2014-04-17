@@ -17,3 +17,20 @@ CREATE TABLE cf_UserOrgs
   CONSTRAINT cf_UserOrgs_Org_fk FOREIGN KEY (idOfOrg) REFERENCES cf_orgs (IdOfOrg),
   CONSTRAINT cf_userorgs_uq UNIQUE (idofuser, idoforg)
 );
+
+CREATE TABLE cf_Registry_Talon
+(
+  idOfRegistryTalon BIGSERIAL NOT NULL,
+  OrgOwner BIGINT,
+  GUID CHARACTER VARYING(36) NOT NULL,
+  DeletedState BOOLEAN NOT NULL DEFAULT FALSE,
+  GlobalVersion BIGINT,
+  GlobalVersionOnCreate BIGINT DEFAULT NULL,
+  CreatedDate BIGINT NOT NULL,
+  LastUpDate BIGINT,
+  DeleteDate BIGINT,
+  SendAll INTEGER NOT NULL DEFAULT 0,
+  Date BIGINT,
+  Number BIGINT,
+  CONSTRAINT cf_registry_talon_pk PRIMARY KEY (idOfRegistryTalon)
+);

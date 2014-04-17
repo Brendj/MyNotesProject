@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.doGroups;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalon;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,5 +19,6 @@ public class SettingsGroup extends AbstractGroup {
     @Override
     protected void fill() {
         doClassMap.put("ECafeSettings", new DOSyncClass(ECafeSettings.class, 0));
+        doClassMap.put("RegistryTalon", new DOSyncClass(RegistryTalon.class, 0));
     }
 }

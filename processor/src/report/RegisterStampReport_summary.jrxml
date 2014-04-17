@@ -33,6 +33,7 @@
 	<field name="level4" class="java.lang.String"/>
 	<field name="qty" class="java.lang.Long"/>
 	<field name="date" class="java.lang.String"/>
+	<field name="number" class="java.lang.String"/>
 	<title>
 		<band splitType="Stretch"/>
 	</title>
@@ -57,9 +58,16 @@
 						<staticText>
 							<reportElement uuid="4fdaccdc-c402-48be-b6d3-9863a43e5733" style="table" mode="Opaque" x="0" y="0" width="116" height="88" backcolor="#EAF0F8"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
-								<font size="11" isBold="true"/>
+								<font isBold="true"/>
 							</textElement>
-							<text><![CDATA[Дата и номер талона]]></text>
+							<text><![CDATA[Дата]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="4fdaccdc-c402-48be-b6d3-9863a43e5733" style="table" mode="Opaque" x="116" y="0" width="100" height="88" backcolor="#EAF0F8"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<text><![CDATA[Номер талона]]></text>
 						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
@@ -77,6 +85,25 @@
 								<textFieldExpression><![CDATA[( $V{date}.equals("77777")? "Итого" :
     ( $V{date}.equals("88888")? "Суточная проба" :
         $V{date}.equals("99999")? "Всего кол-во:" : $V{date}) )]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="number" width="100">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{number}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="e7b0fbec-cd36-42c4-bbaf-40ee91f8bf22" style="table" x="0" y="0" width="100" height="22"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="11" isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{number}]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabRowHeader>
@@ -229,6 +256,21 @@
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell rowTotalGroup="date" columnTotalGroup="level4">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="number">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="number" columnTotalGroup="level1">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="number" columnTotalGroup="level2">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="number" columnTotalGroup="level3">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="number" columnTotalGroup="level4">
 					<cellContents/>
 				</crosstabCell>
 			</crosstab>

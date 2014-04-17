@@ -11,13 +11,13 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalon;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -110,6 +110,22 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         query.setParameter("endDate", endTime);
         query.setResultTransformer(Transformers.aliasToBean(GoodItem.class));
         return  (List<GoodItem>) query.list();
+    }
+
+    /* получение карты по талонам*/
+    @SuppressWarnings("uncheked")
+    public Map<Date, Long> findAllRegistryTalons(Long idOfOrg, Date startTime, Date endTime) {
+        Criteria criteria = getSession().createCriteria(RegistryTalon.class);
+        criteria.add(Restrictions.eq("orgOwner", idOfOrg));
+        criteria.add(Restrictions.between("date", startTime, endTime));
+        List list = criteria.list();
+
+        Map<Date, Long> map = new HashMap<Date, Long>();
+        for (Object lst : list) {
+            RegistryTalon curr = (RegistryTalon) lst;
+            map.put(curr.getDate(), curr.getNumber());
+        }
+        return map;
     }
 
     public List<ClientReportItem> fetchClientReportItem(Date startDate, Date endDate, Long idOfOrg){
