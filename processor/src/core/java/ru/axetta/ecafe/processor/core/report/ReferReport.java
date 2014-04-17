@@ -263,8 +263,10 @@ public class ReferReport extends BasicReportForAllOrgJob {
 
             DailyReferReportItem result [] = new DailyReferReportItem [] { new DailyReferReportItem("БУДНИЕ"),
                                                                            new DailyReferReportItem("ВЫХОДНЫЕ") };
-            result[0].setTotal(workdayCategories.size() == 0 ? 0 : categories.get(0).size() / workdayCategories.size());
-            result[1].setTotal(weekendCategories.size() == 0 ? 0 : categories.get(1).size() / weekendCategories.size());
+            result[0].setTotal(workdayCategories.size() == 0 ? 0 :
+                    new BigDecimal((double) categories.get(0).size() / workdayCategories.size()).setScale(0, RoundingMode.HALF_UP).longValue());
+            result[1].setTotal(weekendCategories.size() == 0 ? 0 :
+                    new BigDecimal((double) categories.get(1).size() / weekendCategories.size()).setScale(0, RoundingMode.HALF_UP).longValue());
             result[0].setSummary(getSampleSummary(categories.get(0)));
             result[1].setSummary(getSampleSummary(categories.get(1)));
             return result;
@@ -383,7 +385,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 else {
                     weekendItem.setChildren(weekendItem.getChildren() + i.getChildren());
                     weekendItem.setTotal(weekendItem.getTotal() + i.getChildren());
-                    weekendItem.setSummary(weekendItem.getSummary() + i.getPrice());
+                    weekendItem.setSummary(weekendItem.getSummary() + i.getSummary());
                 }
             }
             /*for(Double p : prices) {
@@ -395,8 +397,10 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 feedTypesCount = 1;
             }
             if(feedTypesCount > 1) {
-                workdayItem.setChildren((long) Math.floor(workdayItem.getChildren() / feedTypesCount));
-                workdayItem.setTotal((long) Math.floor(workdayItem.getTotal() / feedTypesCount));
+                workdayItem.setChildren(new BigDecimal((double) workdayItem.getChildren() / feedTypesCount).setScale(0, RoundingMode.HALF_UP).longValue());
+                workdayItem.setTotal(new BigDecimal((double) workdayItem.getTotal() / feedTypesCount).setScale(0, RoundingMode.HALF_UP).longValue());
+                weekendItem.setChildren(new BigDecimal((double) workdayItem.getChildren() / feedTypesCount).setScale(0, RoundingMode.HALF_UP).longValue());
+                weekendItem.setTotal(new BigDecimal((double) workdayItem.getTotal() / feedTypesCount).setScale(0, RoundingMode.HALF_UP).longValue());
                 //workdayItem.setSummary(new BigDecimal(workdayItem.getSummary() / feedTypesCount).setScale(2, RoundingMode.FLOOR).doubleValue());
             }
             if(exists) {
