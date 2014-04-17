@@ -377,19 +377,19 @@ public class ReferReport extends BasicReportForAllOrgJob {
                     tmp.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY) {
                     workdayItem.setChildren(workdayItem.getChildren() + i.getChildren());
                     workdayItem.setTotal(workdayItem.getTotal() + i.getChildren());
-                    //workdayItem.setSummary(workdayItem.getSummary() + i.getPrice() * i.getChildren());
+                    workdayItem.setSummary(workdayItem.getSummary() + i.getSummary());
                 }
                 //  Иначе - обновляем данные за субботы
                 else {
                     weekendItem.setChildren(weekendItem.getChildren() + i.getChildren());
                     weekendItem.setTotal(weekendItem.getTotal() + i.getChildren());
-                    //weekendItem.setSummary(weekendItem.getSummary() + i.getPrice() * i.getChildren());
+                    weekendItem.setSummary(weekendItem.getSummary() + i.getPrice());
                 }
             }
-            for(Double p : prices) {
+            /*for(Double p : prices) {
                 workdayItem.setSummary(workdayItem.getSummary() + workdayItem.getTotal() * p);
                 weekendItem.setSummary(weekendItem.getSummary() + weekendItem.getTotal() * p);
-            }
+            }*/
             Integer feedTypesCount = feedTypes.get(cat);
             if(feedTypesCount == null) {
                 feedTypesCount = 1;
@@ -397,7 +397,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
             if(feedTypesCount > 1) {
                 workdayItem.setChildren((long) Math.floor(workdayItem.getChildren() / feedTypesCount));
                 workdayItem.setTotal((long) Math.floor(workdayItem.getTotal() / feedTypesCount));
-                workdayItem.setSummary(new BigDecimal(workdayItem.getSummary() / feedTypesCount).setScale(2, RoundingMode.FLOOR).doubleValue());
+                //workdayItem.setSummary(new BigDecimal(workdayItem.getSummary() / feedTypesCount).setScale(2, RoundingMode.FLOOR).doubleValue());
             }
             if(exists) {
                 workdays.add(workdayItem);
