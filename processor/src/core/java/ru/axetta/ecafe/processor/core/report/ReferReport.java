@@ -399,8 +399,8 @@ public class ReferReport extends BasicReportForAllOrgJob {
             if(feedTypesCount > 1) {
                 workdayItem.setChildren(new BigDecimal((double) workdayItem.getChildren() / feedTypesCount).setScale(0, RoundingMode.HALF_UP).longValue());
                 workdayItem.setTotal(new BigDecimal((double) workdayItem.getTotal() / feedTypesCount).setScale(0, RoundingMode.HALF_UP).longValue());
-                weekendItem.setChildren(new BigDecimal((double) workdayItem.getChildren() / feedTypesCount).setScale(0, RoundingMode.HALF_UP).longValue());
-                weekendItem.setTotal(new BigDecimal((double) workdayItem.getTotal() / feedTypesCount).setScale(0, RoundingMode.HALF_UP).longValue());
+                weekendItem.setChildren(new BigDecimal((double) weekendItem.getChildren() / feedTypesCount).setScale(0, RoundingMode.HALF_UP).longValue());
+                weekendItem.setTotal(new BigDecimal((double) weekendItem.getTotal() / feedTypesCount).setScale(0, RoundingMode.HALF_UP).longValue());
                 //workdayItem.setSummary(new BigDecimal(workdayItem.getSummary() / feedTypesCount).setScale(2, RoundingMode.FLOOR).doubleValue());
             }
             if(exists) {
