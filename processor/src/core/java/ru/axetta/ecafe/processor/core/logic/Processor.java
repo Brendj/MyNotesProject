@@ -97,8 +97,11 @@ public class Processor implements SyncProcessor,
                                 payment.getContractId()), null);
             }
             if (DAOUtils.existClientPayment(persistenceSession, contragent, payment.getIdOfPayment())) {
+                    logger.warn(String.format("Payment request with duplicated attributes IdOfContragent == %s, payment == %s",
+                            idOfContragent,
+                            payment.toString()));
                 return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
-                        PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getCode(),
+                        PaymentProcessResult.OK.getCode(),
                         String.format("%s. IdOfContragent == %s, IdOfPayment == %s",
                                 PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getDescription(), idOfContragent,
                                 payment.getIdOfPayment()), null);
