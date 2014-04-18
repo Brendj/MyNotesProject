@@ -65,12 +65,20 @@
 		<band/>
 	</detail>
 	<lastPageFooter>
-		<band/>
+		<band height="50">
+			<staticText>
+				<reportElement uuid="2a272161-3963-4511-ba55-51fb109f64b4" x="4" y="0" width="234" height="50"/>
+				<textElement>
+					<font size="6"/>
+				</textElement>
+				<text><![CDATA[Через дробь указано количество суточных проб, входящих в общее число заказа (цифра до дроби). Отображение заявок в табличной части ограничено следующим временным промежутком: текущий день + 6 дней вперед. Просмотреть заявки на поставку питания на более длительный срок можно в АРМ Отчетность поставщика питания (Онлайн отчеты > Отчет по заявкам > Сводный отчет по заявкам). ]]></text>
+			</staticText>
+		</band>
 	</lastPageFooter>
 	<summary>
 		<band height="70">
 			<crosstab ignoreWidth="true">
-				<reportElement uuid="329e9ea5-b84b-44ec-ad10-3dc3e45bf055" mode="Transparent" x="0" y="0" width="234" height="70" forecolor="#FFFFFF"/>
+				<reportElement uuid="329e9ea5-b84b-44ec-ad10-3dc3e45bf055" mode="Transparent" x="4" y="0" width="234" height="70" forecolor="#FFFFFF"/>
 				<crosstabHeaderCell>
 					<cellContents style="table">
 						<staticText>
@@ -223,7 +231,7 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="70" height="25" rowTotalGroup="goodName">
+				<crosstabCell width="70" height="26" rowTotalGroup="goodName">
 					<cellContents backcolor="#FFFFFF" mode="Opaque">
 						<textField>
 							<reportElement uuid="272898da-350e-49cf-ba6c-48808e4d3a72" style="table" x="0" y="0" width="70" height="25"/>
