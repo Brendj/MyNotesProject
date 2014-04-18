@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GoodRequestsNewReport" pageWidth="70" pageHeight="140" whenNoDataType="AllSectionsNoDetail" columnWidth="70" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GoodRequestsNewReport" pageWidth="250" pageHeight="70" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="250" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
@@ -8,7 +8,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
-	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.zoom" value="1.9487171000000014"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
@@ -25,6 +25,7 @@
 	<parameter name="overall_all" class="java.lang.Long">
 		<defaultValueExpression><![CDATA[Long.MAX_VALUE - 8]]></defaultValueExpression>
 	</parameter>
+	<parameter name="generateEndDate" class="java.lang.String"/>
 	<field name="orgNum" class="java.lang.Long"/>
 	<field name="officialName" class="java.lang.String"/>
 	<field name="goodName" class="java.lang.String"/>
@@ -43,7 +44,22 @@
 		<band splitType="Stretch"/>
 	</title>
 	<pageHeader>
-		<band/>
+		<band height="20">
+			<staticText>
+				<reportElement uuid="1511861b-b924-4613-b054-6370d8a867cd" x="4" y="0" width="230" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[Время последней выгрузки заявок:]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement uuid="1b7a4497-cd22-45f7-a1d9-2c63f1ca6e15" x="234" y="0" width="210" height="20"/>
+				<textElement verticalAlignment="Middle">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{generateEndDate}]]></textFieldExpression>
+			</textField>
+		</band>
 	</pageHeader>
 	<detail>
 		<band/>
@@ -53,83 +69,19 @@
 	</lastPageFooter>
 	<summary>
 		<band height="70">
-			<crosstab>
-				<reportElement uuid="329e9ea5-b84b-44ec-ad10-3dc3e45bf055" mode="Transparent" x="0" y="0" width="140" height="50" forecolor="#FFFFFF"/>
+			<crosstab ignoreWidth="true">
+				<reportElement uuid="329e9ea5-b84b-44ec-ad10-3dc3e45bf055" mode="Transparent" x="0" y="0" width="234" height="70" forecolor="#FFFFFF"/>
 				<crosstabHeaderCell>
 					<cellContents style="table">
 						<staticText>
-							<reportElement uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f" style="table" mode="Opaque" x="209" y="0" width="164" height="25" backcolor="#F0F8FF"/>
+							<reportElement uuid="a445541c-f3c5-4c0e-bd05-8143c4cefd7f" style="table" mode="Opaque" x="0" y="0" width="164" height="41" backcolor="#F0F8FF"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
-								<font size="10" isBold="true"/>
+								<font isBold="true"/>
 							</textElement>
 							<text><![CDATA[Товар]]></text>
 						</staticText>
-						<staticText>
-							<reportElement uuid="a18cfed3-35d5-44a3-bf9a-c7ea19ca6fbc" style="table" mode="Opaque" x="70" y="0" width="139" height="25" backcolor="#F0F8FF"/>
-							<textElement textAlignment="Center" verticalAlignment="Middle">
-								<font size="10" isBold="true"/>
-							</textElement>
-							<text><![CDATA[Наименование ОУ]]></text>
-						</staticText>
-						<staticText>
-							<reportElement uuid="7761f0ef-0e43-407c-9d37-6bdea874dc36" style="table" mode="Opaque" x="0" y="0" width="70" height="25" backcolor="#F0F8FF"/>
-							<textElement textAlignment="Center" verticalAlignment="Middle">
-								<font size="10" isBold="true"/>
-							</textElement>
-							<text><![CDATA[Номер ОУ]]></text>
-						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
-				<rowGroup name="orgNum" width="70" headerPosition="Middle">
-					<bucket class="java.lang.Long">
-						<bucketExpression><![CDATA[$F{orgNum}]]></bucketExpression>
-					</bucket>
-					<crosstabRowHeader>
-						<cellContents backcolor="#FFFFFF" mode="Transparent" style="table">
-							<textField isBlankWhenNull="true">
-								<reportElement uuid="296ecedd-7681-4642-8f78-eb8d15759642" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="70" height="25"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<textFieldExpression><![CDATA[( $V{orgNum}<Long.MAX_VALUE-50 ? $V{orgNum} : null )]]></textFieldExpression>
-							</textField>
-						</cellContents>
-					</crosstabRowHeader>
-					<crosstabTotalRowHeader>
-						<cellContents backcolor="#000000" mode="Opaque">
-							<staticText>
-								<reportElement uuid="ec5fb42d-c797-4f56-bb08-5413aae98891" style="Crosstab Data Text" x="0" y="0" width="337" height="53" forecolor="#FFFFFF"/>
-								<textElement/>
-								<text><![CDATA[Static text]]></text>
-							</staticText>
-						</cellContents>
-					</crosstabTotalRowHeader>
-				</rowGroup>
-				<rowGroup name="officialName" width="139" totalPosition="End" headerPosition="Middle">
-					<bucket class="java.lang.String">
-						<bucketExpression><![CDATA[$F{officialName}]]></bucketExpression>
-					</bucket>
-					<crosstabRowHeader>
-						<cellContents backcolor="#CCFFFF" mode="Transparent" style="table">
-							<textField>
-								<reportElement uuid="18dfc45b-da22-4cae-956e-0ee2faf2535a" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="139" height="25"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="8"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$V{officialName}]]></textFieldExpression>
-							</textField>
-						</cellContents>
-					</crosstabRowHeader>
-					<crosstabTotalRowHeader>
-						<cellContents backcolor="#000000" mode="Opaque">
-							<staticText>
-								<reportElement uuid="db9ef8af-79e9-4357-bfcd-c8b0cb9d217c" style="Crosstab Data Text" x="0" y="0" width="267" height="3" forecolor="#000000"/>
-								<textElement>
-									<font size="1"/>
-								</textElement>
-								<text><![CDATA[Static text]]></text>
-							</staticText>
-						</cellContents>
-					</crosstabTotalRowHeader>
-				</rowGroup>
 				<rowGroup name="goodName" width="164" totalPosition="End" headerPosition="Middle">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{goodName}]]></bucketExpression>
@@ -137,22 +89,18 @@
 					<crosstabRowHeader>
 						<cellContents mode="Transparent" style="table">
 							<textField>
-								<reportElement uuid="2b0b8916-f6ef-462f-b217-2452810563fe" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="164" height="25"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="8"/>
-								</textElement>
+								<reportElement uuid="2b0b8916-f6ef-462f-b217-2452810563fe" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="164" height="41"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{goodName}]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents backcolor="#005FB3" mode="Opaque">
+						<cellContents backcolor="#FFFFFF" mode="Opaque">
 							<staticText>
-								<reportElement uuid="aa3988b3-1215-43d5-9a9a-313fbae1771a" style="Crosstab Data Text" x="0" y="0" width="128" height="3" forecolor="#005FB3"/>
-								<textElement>
-									<font size="1"/>
-								</textElement>
-								<text><![CDATA[Static text]]></text>
+								<reportElement uuid="eb270153-d16f-43a1-b14a-f6a9e37b49bf" style="table" x="0" y="0" width="164" height="41"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<text><![CDATA[ВСЕГО]]></text>
 							</staticText>
 						</cellContents>
 					</crosstabTotalRowHeader>
@@ -168,14 +116,14 @@
 						<cellContents/>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
-				<columnGroup name="doneDateStr" height="25">
+				<columnGroup name="doneDateStr" height="41">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{doneDateStr}]]></bucketExpression>
 					</bucket>
 					<crosstabColumnHeader>
 						<cellContents backcolor="#FFFFFF" mode="Opaque" style="table">
 							<textField pattern="" isBlankWhenNull="false">
-								<reportElement uuid="2b8c79cb-cab8-4ac5-acd0-f1e499ddd5b6" mode="Opaque" x="0" y="0" width="70" height="25" backcolor="#F0F8FF"/>
+								<reportElement uuid="2b8c79cb-cab8-4ac5-acd0-f1e499ddd5b6" mode="Opaque" x="0" y="0" width="70" height="41" backcolor="#F0F8FF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None">
 									<font isBold="true"/>
 								</textElement>
@@ -205,15 +153,15 @@
 				<measure name="hideLastValueSum" class="java.lang.Integer" calculation="Sum">
 					<measureExpression><![CDATA[$F{hideLastValue}]]></measureExpression>
 				</measure>
-				<crosstabCell width="70" height="26">
+				<crosstabCell width="70" height="42">
 					<cellContents style="table">
 						<textField>
-							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="70" height="25" forecolor="#FFFFFF" backcolor="#FF6666">
+							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="70" height="40" forecolor="#FFFFFF" backcolor="#FF6666">
 								<printWhenExpression><![CDATA[!$V{totalCountMeasure}.equals($V{newTotalCountMeasure}) &&
 !$V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
 							</reportElement>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
-								<font isBold="true"/>
+								<font size="10" isBold="true"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalCountMeasure}+
 ( $V{hideDailySampleSum}==0L || $V{dailySampleMeasure}==0 ? "" : " / "+ $V{dailySampleMeasure} )
@@ -229,33 +177,45 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 ))]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement uuid="67da7250-646f-4951-8566-1635493f6071" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="70" height="25" backcolor="#92D050">
+							<reportElement uuid="67da7250-646f-4951-8566-1635493f6071" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="70" height="40" backcolor="#92D050">
 								<printWhenExpression><![CDATA[$V{totalCountMeasure}.equals($V{newTotalCountMeasure}) &&
 !$V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
 							</reportElement>
-							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="10"/>
+							</textElement>
 							<textFieldExpression><![CDATA[$V{totalCountMeasure}+
 ($V{hideDailySampleSum}==0L || $V{dailySampleMeasure}==0
     ? "" : " / "+ $V{dailySampleMeasure} )]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="70" height="25">
-								<printWhenExpression><![CDATA[$V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
+							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="70" height="40">
+								<printWhenExpression><![CDATA[!Integer.valueOf($V{doneDate}.getDay()).equals(0)
+&& $V{newTotalCountMeasure}.equals(0L)
+
+]]></printWhenExpression>
 							</reportElement>
-							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="10"/>
+							</textElement>
 							<textFieldExpression><![CDATA[$V{totalCountMeasure}+
 ($V{hideDailySampleSum}==0L || $V{dailySampleMeasure}==0
     ? "" : " / "+ $V{dailySampleMeasure} )]]></textFieldExpression>
 						</textField>
-					</cellContents>
-				</crosstabCell>
-				<crosstabCell height="53" rowTotalGroup="orgNum">
-					<cellContents backcolor="#000000" mode="Opaque">
-						<staticText>
-							<reportElement uuid="1debb2be-2115-45eb-9de5-b858558ed04f" style="Crosstab Data Text" x="0" y="0" width="70" height="53" forecolor="#FFFFFF"/>
-							<textElement/>
-							<text><![CDATA[Static text]]></text>
-						</staticText>
+						<textField>
+							<reportElement uuid="317b030e-0775-4653-b428-52ae97c008ec" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="70" height="40" backcolor="#CCCCCC">
+								<printWhenExpression><![CDATA[Integer.valueOf($V{doneDate}.getDay()).equals(0)
+&& $V{newTotalCountMeasure}.equals(0L)
+
+]]></printWhenExpression>
+							</reportElement>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="10"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{totalCountMeasure}+
+($V{hideDailySampleSum}==0L || $V{dailySampleMeasure}==0
+    ? "" : " / "+ $V{dailySampleMeasure} )]]></textFieldExpression>
+						</textField>
 					</cellContents>
 				</crosstabCell>
 				<crosstabCell width="50" columnTotalGroup="doneDateStr">
@@ -267,38 +227,15 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell rowTotalGroup="orgNum" columnTotalGroup="doneDateStr">
-					<cellContents backcolor="#BFE1FF" mode="Opaque">
+				<crosstabCell width="70" height="42" rowTotalGroup="goodName">
+					<cellContents backcolor="#FFFFFF" mode="Opaque">
 						<textField>
-							<reportElement uuid="7154154f-4961-4f44-811b-53c64542f20b" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
-							<textElement/>
-							<textFieldExpression><![CDATA[$V{totalCountMeasure}]]></textFieldExpression>
+							<reportElement uuid="272898da-350e-49cf-ba6c-48808e4d3a72" style="table" x="0" y="0" width="70" height="41"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$V{totalCountMeasure}+
+($V{hideDailySampleSum}==0L || $V{dailySampleMeasure}==0
+    ? "" : " / "+ $V{dailySampleMeasure} )]]></textFieldExpression>
 						</textField>
-					</cellContents>
-				</crosstabCell>
-				<crosstabCell width="70" height="4" rowTotalGroup="officialName">
-					<cellContents backcolor="#000000" mode="Opaque">
-						<staticText>
-							<reportElement uuid="30270492-c0d6-4af8-bb02-c45b81d040c7" style="Crosstab Data Text" x="0" y="0" width="70" height="3" forecolor="#000000" backcolor="#000000"/>
-							<textElement>
-								<font size="1"/>
-							</textElement>
-							<text><![CDATA[Static text]]></text>
-						</staticText>
-					</cellContents>
-				</crosstabCell>
-				<crosstabCell rowTotalGroup="officialName" columnTotalGroup="doneDateStr">
-					<cellContents/>
-				</crosstabCell>
-				<crosstabCell width="70" height="4" rowTotalGroup="goodName">
-					<cellContents backcolor="#005FB3" mode="Opaque">
-						<staticText>
-							<reportElement uuid="59c14182-de93-4b3f-b3c9-6cca48484167" style="Crosstab Data Text" x="0" y="0" width="70" height="3" forecolor="#005FB3" backcolor="#005FB3"/>
-							<textElement>
-								<font size="1"/>
-							</textElement>
-							<text><![CDATA[Static text]]></text>
-						</staticText>
 					</cellContents>
 				</crosstabCell>
 				<crosstabCell rowTotalGroup="goodName" columnTotalGroup="doneDateStr">
@@ -311,12 +248,6 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 					</cellContents>
 				</crosstabCell>
 				<crosstabCell columnTotalGroup="doneDate">
-					<cellContents/>
-				</crosstabCell>
-				<crosstabCell rowTotalGroup="orgNum" columnTotalGroup="doneDate">
-					<cellContents/>
-				</crosstabCell>
-				<crosstabCell rowTotalGroup="officialName" columnTotalGroup="doneDate">
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell rowTotalGroup="goodName" columnTotalGroup="doneDate">
