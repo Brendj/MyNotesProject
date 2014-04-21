@@ -364,4 +364,7 @@ public interface ClientRoomController {
     @WebMethod(operationName = "getSubscriptionFeedingSettingBySan")
     SubscriptionFeedingSettingResult getSubscriptionFeedingSetting(@WebParam(name = "san") String san);
 
+    @WebMethod(operationName = "getSubscriptionFeedingList")
+    SubscriptionFeedingListResult getSubscriptionFeedingList(@WebParam(name = "contractId") Long contractId, @WebParam(name = "currentDay") Date currentDay);
+
 }

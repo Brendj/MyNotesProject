@@ -12,14 +12,16 @@
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
+<%@ page import="ru.axetta.ecafe.processor.web.partner.integra.dataflow.SubscriptionFeedingExt" %>
 <%
     final  Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.subfeeding.pages.plain_jsp");
     @SuppressWarnings("unchecked")
-    SubFeedingResult sf = (SubFeedingResult) request.getAttribute("subscriptionFeeding");
+    //SubFeedingResult sf = (SubFeedingResult) request.getAttribute("subscriptionFeeding");
+     SubscriptionFeedingExt sf = (SubscriptionFeedingExt) request.getAttribute("subscriptionFeeding");
     ClientSummaryExt client = (ClientSummaryExt) request.getAttribute("client");
     final Long subBalance0 = client.getSubBalance0();
     final Long subBalance1 = client.getSubBalance1();
-    String action = sf.getIdOfSubscriptionFeeding() == null ? "activate" : "edit";
+    String action = sf == null ? "activate" : "edit";
     String dateActivate = (String) request.getAttribute("dateActivate");
 %>
 <!DOCTYPE html>
@@ -50,7 +52,7 @@
             $("#complexForm").preventDoubleSubmission();
             $('input:text').button().addClass('ui-textfield');
             $("button").button();
-            var dateActivate = $("#dateActivate").datepicker(<%=(sf.getIdOfSubscriptionFeeding() != null?"disable":"")%>);
+            var dateActivate = $("#dateActivate").datepicker(<%=(sf != null?"disable":"")%>);
             dateActivate.datepicker("option", "minDate", minDateActivate);
             var $cbs = $('.simpleTable input[type="checkbox"]');
             $cbs.each(function() {
@@ -71,10 +73,7 @@
             <%=ContractIdFormat.format(client.getContractId())%></span>
         <span class="contract" style="padding-left: 20px;"><%=client.getFullName()%></span>
         <span style="float: right;">
-             <c:if test="${requestScope.subscriptionFeeding.idOfSubscriptionFeeding!=null}">
-                 <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/view'">Вернуться
-                 </button>
-             </c:if>
+            <button type="button" onclick="history.go(-1)">Вернуться</button>
             <button onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/logout'" name="logout">Выход
             </button>
         </span>
@@ -84,14 +83,14 @@
               action="${pageContext.request.contextPath}/sub-feeding/<%=action%>">
         <div id="infoHeader">
 
-            <c:if test="${requestScope.subscriptionFeeding.idOfSubscriptionFeeding==null}">
+            <c:if test="${requestScope.subscriptionFeeding==null}">
                 <h1>Активировать подписку абонементного питания?</h1>
                 <h2>Для продолжения необходимо заполнить циклограмму.</h2>
                 <label for="dateActivate" style="padding-right: 10px;">Дата начала подписки на услугу АП:</label>
                 <input type="text" name="dateActivate" value="<%=StringEscapeUtils.escapeHtml(dateActivate)%>"
                        id="dateActivate" maxlength="10" required/>
             </c:if>
-            <c:if test="${requestScope.subscriptionFeeding.idOfSubscriptionFeeding!=null}">
+            <c:if test="${requestScope.subscriptionFeeding!=null}">
                 <h1>Редактирование циклограммы питания</h1>
                 <label for="dateActivate" style="padding-right: 10px;">Дата начала подписки на услугу АП:</label>
                 <input type="text" name="dateActivate" value="<%=StringEscapeUtils.escapeHtml(dateActivate)%>"
@@ -171,16 +170,19 @@
                             </div>
                         </fieldset>
 
-                        <c:if test="${requestScope.subscriptionFeeding.idOfSubscriptionFeeding==null}">
+                        <c:if test="${requestScope.subscriptionFeeding==null}">
                             <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/transfer'">
                                 Перевод средств
                             </button>
-                            <button type="submit" name="activate">Активировать</button>
-                            <div style="font-size: 0.8em;">
-                                Нажимая на кнопку "Активировать", Вы соглашаетесь с условиями предоставления услуги.
-                            </div>
+
                         </c:if>
-                        <c:if test="${requestScope.subscriptionFeeding.idOfSubscriptionFeeding!=null}">
+                        <c:if test="${requestScope.subscriptionFeeding!=null}">
+                            <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null && requestScope.subscriptionFeeding.dateActivate==null}">
+                                <button type="submit" name="activate">Активировать</button>
+                                <div style="font-size: 0.8em;">
+                                    Нажимая на кнопку "Активировать", Вы соглашаетесь с условиями предоставления услуги.
+                                </div>
+                            </c:if>
                             <c:if test="${!requestScope.subscriptionFeeding.suspended}">
                                 <button type="submit" name="edit">Сохранить изменения</button>
                             </c:if>

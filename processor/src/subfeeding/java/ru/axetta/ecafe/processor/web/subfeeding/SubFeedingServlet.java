@@ -143,12 +143,23 @@ public class SubFeedingServlet extends HttpServlet {
     private void showSubscriptionFeeding(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
         ClientSummaryResult client = clientRoomController.getSummary(contractId);
-        SubFeedingResult sf = clientRoomController.findSubscriptionFeeding(contractId);
+        //SubFeedingResult sf = clientRoomController.findSubscriptionFeeding(contractId);
         req.setAttribute("client", client.clientSummary);
-        req.setAttribute("subscriptionFeeding", sf);
-        if (sf.getIdOfSubscriptionFeeding() == null) {
-            sendRedirect(req, resp, "/plan");
-        } else {
+        Date currentDay = new Date();
+        SubscriptionFeedingListResult result = clientRoomController.getSubscriptionFeedingList(contractId, currentDay);
+        SubscriptionFeedingExt subscriptionFeeding = null;
+        if(!result.subscriptionFeedingListExt.getS().isEmpty()){
+            for (SubscriptionFeedingExt sf:result.subscriptionFeedingListExt.getS()){
+                if(sf.getDateActivate().before(currentDay) && (sf.getLastDatePause()==null || sf.getLastDatePause().after(currentDay))){
+                    subscriptionFeeding = sf;
+                    break;
+                }
+            }
+        }
+        req.setAttribute("subscriptionFeeding", subscriptionFeeding);
+        //if (sf.getIdOfSubscriptionFeeding() == null) {
+        //    sendRedirect(req, resp, "/plan");
+        //} else {
             DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
             df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
             Date startDate = StringUtils.isBlank(req.getParameter("startDate")) ? null
@@ -156,7 +167,7 @@ public class SubFeedingServlet extends HttpServlet {
             Date endDate = StringUtils.isBlank(req.getParameter("endDate")) ? null
                     : parseDate(req.getParameter("endDate"), df);
             if (startDate == null || endDate == null) {
-                Date[] week = CalendarUtils.getCurrentWeekBeginAndEnd(new Date());
+                Date[] week = CalendarUtils.getCurrentWeekBeginAndEnd(currentDay);
                 startDate = week[0];
                 endDate = week[1];
             }
@@ -167,7 +178,7 @@ public class SubFeedingServlet extends HttpServlet {
             req.setAttribute("startDate", df.format(startDate));
             req.setAttribute("endDate", df.format(endDate));
             outputPage("view", req, resp);
-        }
+        //}
     }
 
     private void activateSubscriptionFeeding(HttpServletRequest req, HttpServletResponse resp) throws Exception {
@@ -238,9 +249,21 @@ public class SubFeedingServlet extends HttpServlet {
     private void showSubscriptionFeedingPlan(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
         ClientSummaryResult client = clientRoomController.getSummary(contractId);
-        SubFeedingResult sf = clientRoomController.findSubscriptionFeeding(contractId);
         req.setAttribute("client", client.clientSummary);
-        req.setAttribute("subscriptionFeeding", sf);
+        //SubFeedingResult sf = clientRoomController.findSubscriptionFeeding(contractId);
+        Date currentDay = new Date();
+        SubscriptionFeedingListResult result = clientRoomController.getSubscriptionFeedingList(contractId, currentDay);
+        SubscriptionFeedingExt subscriptionFeeding = null;
+        if(!result.subscriptionFeedingListExt.getS().isEmpty()){
+            for (SubscriptionFeedingExt sf:result.subscriptionFeedingListExt.getS()){
+                if(sf.getDateActivate().before(currentDay) && (sf.getLastDatePause()==null || sf.getLastDatePause().after(currentDay))){
+                    subscriptionFeeding = sf;
+                    break;
+                }
+            }
+        }
+        req.setAttribute("subscriptionFeeding", subscriptionFeeding);
+        //req.setAttribute("subscriptionFeeding", sf);
         req.setAttribute("complexes",
                 clientRoomController.findComplexesWithSubFeeding(contractId).getComplexInfoList().getList());
         CycleDiagramOut cd = clientRoomController.findClientCycleDiagram(contractId);
@@ -249,7 +272,7 @@ public class SubFeedingServlet extends HttpServlet {
         }
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
-        if(sf.getIdOfSubscriptionFeeding()==null){
+        if(subscriptionFeeding==null){
             SubscriptionFeedingSettingResult settingResult = clientRoomController.getSubscriptionFeedingSetting(
                     contractId);
             Date activationDate = addDays(truncateToDayOfMonth(new Date()), 100);
@@ -260,9 +283,9 @@ public class SubFeedingServlet extends HttpServlet {
                 req.setAttribute(ERROR_MESSAGE, settingResult.description);
             }
             req.setAttribute("dateActivate", df.format(activationDate));
-            req.setAttribute("subscriptionFeeding", sf);
+            req.setAttribute("subscriptionFeeding", subscriptionFeeding);
         } else {
-            req.setAttribute("dateActivate", df.format(sf.getDateActivate()));
+            req.setAttribute("dateActivate", df.format(subscriptionFeeding.getDateActivate()));
         }
         outputPage("plan", req, resp);
     }

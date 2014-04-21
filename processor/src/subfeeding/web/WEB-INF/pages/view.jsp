@@ -16,11 +16,12 @@
     DateFormat tf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
     tf.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
     @SuppressWarnings("unchecked")
-    SubFeedingResult sf = (SubFeedingResult) request.getAttribute("subscriptionFeeding");
+    //SubFeedingResult sf = (SubFeedingResult) request.getAttribute("subscriptionFeeding");
+    SubscriptionFeedingExt sf = (SubscriptionFeedingExt) request.getAttribute("subscriptionFeeding");
     ClientSummaryExt client = (ClientSummaryExt) request.getAttribute("client");
     String subBalance1 = CurrencyStringUtils.copecksToRubles(client.getSubBalance1());
     String subBalance0 = CurrencyStringUtils.copecksToRubles(client.getSubBalance0());
-    boolean wasSuspended = sf.getSuspended() != null && sf.getSuspended();
+    boolean wasSuspended = sf!=null && sf.getSuspended() != null && sf.getSuspended();
     String startDate = (String) request.getAttribute("startDate");
     String endDate = (String) request.getAttribute("endDate");
     PaymentListResult payments = (PaymentListResult) request.getAttribute("payments");
@@ -48,6 +49,10 @@
                 'background':'rgb(104, 153, 104)',
                 'color':'white'
             });
+            $('#disableButton').button().css({
+                'background':'rgb(152, 152, 152)',
+                'color':'white'
+            }).click(function(e){e.preventDefault();return false;});
             var datepickerBegin = $("#datepickerBegin").datepicker({
                 onSelect: function (selected) {
                     $("#datepickerEnd").datepicker("option", "minDate", selected);
@@ -64,6 +69,7 @@
     <span class="contract"><%=ContractIdFormat.format(client.getContractId())%></span>
     <span class="contract" style="padding-left: 20px;"><%=client.getFullName()%></span>
     <span style="float: right;">
+        <%--<button type="button" onclick="history.go(-1)">Вернуться</button>--%>
         <button onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/logout'" name="logout">
             Выход
         </button>
@@ -80,30 +86,71 @@
                 <div class="leftcol">Баланс субсчета АП:</div>
                 <div class="rightcol"><%=subBalance1%> руб.</div>
             </div>
-            <div class="colRow">
-                <div class="leftcol">Дата начала подписки на услугу АП:</div>
-                <div class="rightcol"><%=df.format(sf.getDateActivate())%>
+            <c:if test="${requestScope.subscriptionFeeding!=null}">
+                <div class="colRow">
+                    <div class="leftcol">Дата создания услуги АП:</div>
+                    <div class="rightcol"><%=df.format(sf.getDateCreateService())%>
+                    </div>
                 </div>
-            </div>
-            <div class="colRow">
-                <div class="leftcol">Дата отключения услуги:</div>
-                <div class="rightcol"><%=sf.getDateDeactivate() == null ? "услуга бессрочная"
-                        : df.format(sf.getDateDeactivate())%>
+                <c:if test="${requestScope.subscriptionFeeding.dateActivate==null}">
+                    <div class="colRow">
+                        <div class="leftcol">Дата начала подписки на услугу АП:</div>
+                        <div class="rightcol">Нет подключеий</div>
+                    </div>
+                    <div class="colRow">
+                        <div class="leftcol">Дата отключения услуги:</div>
+                        <div class="rightcol">Нет подключеий</div>
+                    </div>
+                    <div class="colRow">
+                        <div class="leftcol">Состояние услуги:</div>
+                        <div class="rightcol">Нет подключеий</div>
+                    </div>
+                </c:if>
+                <c:if test="${requestScope.subscriptionFeeding.dateActivate!=null}">
+                    <div class="colRow">
+                        <div class="leftcol">Дата начала подписки на услугу АП:</div>
+                        <div class="rightcol"><%=df.format(sf.getDateActivate())%>
+                        </div>
+                    </div>
+                    <div class="colRow">
+                        <div class="leftcol">Дата отключения услуги:</div>
+                        <div class="rightcol"><%=sf.getDateDeactivate() == null ? "услуга бессрочная": df.format(sf.getDateDeactivate())%>
+                        </div>
+                    </div>
+                    <div class="colRow">
+                        <div class="leftcol">Состояние услуги:</div>
+                        <div class="rightcol">
+                            <%
+                                String status = "услуга активна";
+                                if (wasSuspended && sf.getLastDatePause()!=null) {
+                                    boolean reallySuspended = sf.getLastDatePause().after(new Date());
+                                    status = "услуга " + (reallySuspended ? "приостанавливается" : "приостановлена") + " с " + df.format(sf.getLastDatePause());
+                                }
+                                out.print(status);
+                            %>
+                        </div>
+                    </div>
+                </c:if>
+            </c:if>
+            <c:if test="${requestScope.subscriptionFeeding==null}">
+                <div class="colRow">
+                    <div class="leftcol">Дата создания услуги АП:</div>
+                    <div class="rightcol errorMessage">услуга не активна</div>
                 </div>
-            </div>
-            <div class="colRow">
-                <div class="leftcol">Состояние услуги:</div>
-                <div class="rightcol">
-                    <%
-                        String status = "услуга активна";
-                        if (wasSuspended) {
-                            boolean reallySuspended = sf.getLastDatePause().after(new Date());
-                            status = "услуга " + (reallySuspended ? "приостанавливается" : "приостановлена") + " с " + df.format(sf.getLastDatePause());
-                        }
-                        out.print(status);
-                    %>
+                <div class="colRow">
+                    <div class="leftcol">Дата начала подписки на услугу АП:</div>
+                    <div class="rightcol errorMessage">услуга не активна</div>
                 </div>
-            </div>
+                <div class="colRow">
+                    <div class="leftcol">Дата отключения услуги:</div>
+                    <div class="rightcol errorMessage">услуга не активна</div>
+                </div>
+                <div class="colRow">
+                    <div class="leftcol">Состояние услуги:</div>
+                    <div class="rightcol errorMessage">услуга не активна</div>
+                </div>
+            </c:if>
+
             <c:if test="${not empty requestScope.subFeedingError}">
                 <div class="messageDiv errorMessage">${requestScope.subFeedingError}</div>
             </c:if>
@@ -112,15 +159,22 @@
             </c:if>
         </div>
         <div id="manageButtons">
-            <%if (!wasSuspended) {%>
-            <button type="submit" id="pauseButton" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/suspend'">
-                Приостановить услугу
-            </button>
-            <%} else {%>
-            <button type="submit" id="reopenButton" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/reopen'">
-                Возобновить услугу
-            </button>
-            <%}%>
+            <c:if test="${requestScope.subscriptionFeeding!=null}">
+                <%if (!wasSuspended) {%>
+                <button type="submit" id="pauseButton" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/suspend'">
+                    Приостановить подписку
+                </button>
+                <%} else {%>
+                <button type="submit" id="reopenButton" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/reopen'">
+                    Возобновить подписку
+                </button>
+                <%}%>
+            </c:if>
+            <c:if test="${requestScope.subscriptionFeeding==null}">
+                <button id="disableButton">
+                    Возобновить подписку
+                </button>
+            </c:if>
             <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/plan'">
                 Просмотр циклограммы
             </button>
