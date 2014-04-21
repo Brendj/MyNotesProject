@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.ui.monitoring;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.report.GoodRequestsReport;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Query;
@@ -68,7 +67,7 @@ public class OrdersMonitoringReportPage extends BasicWorkspacePage {
                     + "from cf_orgs "
                     + "join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
                     + "where cf_orgs.state=:state");
-            q.setLong("timeout", GoodRequestsReport.REQUESTS_MONITORING_TIMEOUT);
+            q.setLong("timeout", 172800000);
             q.setInteger("state", 1);
             List res = q.list();
             missingCount = ((BigInteger) res.get(0)).intValue();

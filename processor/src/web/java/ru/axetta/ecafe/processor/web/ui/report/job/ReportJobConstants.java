@@ -171,7 +171,6 @@ public class ReportJobConstants {
             new ReportHint(HalfYearSummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(BeneficiarySummaryReport.class.getCanonicalName(), new int[]{}),
             new ReportHint(DeliveredServicesReport.class.getCanonicalName(), new int[]{20/*, 26, 27, 28, 29, 30, 31, 32*/}),
-            new ReportHint(GoodRequestsReport.class.getCanonicalName(), new int[]{20, 3, 27, 28, 29, 30/*, 26, 27, 28, 29, 30, 31, 32*/}),
             new ReportHint(DashboardByAllOrgReport.class.getCanonicalName(), new int[]{31})
     };
 
