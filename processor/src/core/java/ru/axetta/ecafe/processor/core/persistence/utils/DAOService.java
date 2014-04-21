@@ -1444,4 +1444,13 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
             session.save(userOrgs);
         }
     }
+
+	public boolean existsOrgByIdAndTags(Long idOfOrg, String tag) {
+        Session session = entityManager.unwrap(Session.class);
+        Criteria criteria = session.createCriteria(Org.class);
+        criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
+        criteria.add(Restrictions.ilike("tag", tag, MatchMode.ANYWHERE));
+        List list = criteria.list();
+        return list.size()>0;
+    }
 }

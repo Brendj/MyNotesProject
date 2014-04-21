@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.Sub
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
@@ -217,6 +218,10 @@ public class DAOUtils {
 
     public static Org findOrg(Session persistenceSession, long idOfOrg) throws Exception {
         return (Org) persistenceSession.get(Org.class, idOfOrg);
+    }
+
+    public static Order findOrder(Session persistenceSession, Long idOfOrg, Long idOfOrder) throws Exception {
+        return findOrder(persistenceSession, new CompositeIdOfOrder(idOfOrg, idOfOrder));
     }
 
     public static Order findOrder(Session persistenceSession, CompositeIdOfOrder compositeIdOfOrder) throws Exception {
@@ -780,20 +785,16 @@ public class DAOUtils {
         return publicKey;
     }
 
-    //@SuppressWarnings("unchecked")
-    //public static List<AccountTransaction> getAccountTransactionsForOrgSinceTime(Session persistenceSession, Long idOfOrg,
-    //        Date fromDateTime, Date toDateTime, int sourceType) {
-    //    Query query = persistenceSession.createQuery("select at from AccountTransaction at "
-    //            + " where at.transactionTime>=:sinceTime and at.transactionTime<:tillTime and at.sourceType=:sourceType "
-    //            + "and (at.org.idOfOrg=:idOfOrg or at.org.idOfOrg in (select fo.idOfOrg from Org org "
-    //            + "join org.friendlyOrg fo where org.idOfOrg=:idOfOrg))");
-    //    query.setParameter("idOfOrg", idOfOrg);
-    //    query.setParameter("sinceTime", fromDateTime);
-    //    query.setParameter("tillTime", toDateTime);
-    //    query.setParameter("sourceType", sourceType);
-    //    return (List<AccountTransaction>)query.list();
-    //}
-
+    /**
+     * Возвращает список транзакций произведенных в интревале времени, для конкретной организации
+     * и с укзазанием спика необходимого типа транзакций (если список пуст то не будет оганичеваться по данному критерию)
+     * @param persistenceSession ссылка на сессию
+     * @param org ссылка на организацию
+     * @param fromDateTime время с которого учитывается >
+     * @param toDateTime время до которого учитывается <=
+     * @param sourceType список типов транзакций если путо не будет учитываться в криетрии
+     * @return возвращается список транзакций клиентов
+     */
     @SuppressWarnings("unchecked")
     public static List<AccountTransaction> getAccountTransactionsForOrgSinceTime(Session persistenceSession, Org org,
             Date fromDateTime, Date toDateTime, List<Integer> sourceType) {
@@ -801,22 +802,11 @@ public class DAOUtils {
         criteria.add(Restrictions.in("org", org.getFriendlyOrg()));
         criteria.add(Restrictions.gt("transactionTime", fromDateTime)); // >
         criteria.add(Restrictions.le("transactionTime", toDateTime));   // <=
-        criteria.add(Restrictions.in("sourceType", sourceType));
+        if(!CollectionUtils.isEmpty(sourceType)) {
+            criteria.add(Restrictions.in("sourceType", sourceType));
+        }
         return criteria.list();
     }
-
-    //@SuppressWarnings("unchecked")
-    //public static List<AccountTransaction> getAccountTransactionsForOrgSinceTime(Session persistenceSession, Set<Long> idOfOrgs,
-    //        Date fromDateTime, Date toDateTime, int sourceType) {
-    //    Query query = persistenceSession.createQuery("select at from AccountTransaction at, Client c "
-    //            + "where at.transactionTime>=:sinceTime and at.transactionTime<:tillTime and at.sourceType=:sourceType and at.client=c and c.org.idOfOrg in (:idOfOrg)");
-    //    query.setParameterList("idOfOrg", idOfOrgs);
-    //    query.setParameter("sinceTime", fromDateTime);
-    //    query.setParameter("tillTime", toDateTime);
-    //    query.setParameter("sourceType", sourceType);
-    //    return (List<AccountTransaction>)query.list();
-    //}
-
 
     @SuppressWarnings("unchecked")
     public static List<Card> getClientsAndCardsForOrgs(Session persistenceSession, Set<Long> idOfOrgs, List<Long> clientIds) {
