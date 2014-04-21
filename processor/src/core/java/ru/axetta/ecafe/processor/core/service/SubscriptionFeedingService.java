@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -11,6 +12,9 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssoc
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.StateDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SubscriberFeedingSettingSettingValue;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
@@ -35,6 +39,8 @@ import javax.persistence.TypedQuery;
 import java.text.DateFormat;
 import java.util.*;
 
+import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
+
 /**
  * Created with IntelliJ IDEA.
  * User: developer
@@ -46,6 +52,10 @@ import java.util.*;
 public class SubscriptionFeedingService {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(SubscriptionFeedingService.class);
+
+    public static SubscriptionFeedingService getInstance() {
+        return RuntimeContext.getAppContext().getBean(SubscriptionFeedingService.class);
+    }
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
@@ -183,6 +193,25 @@ public class SubscriptionFeedingService {
 
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    public List<SubscriptionFeeding> findSubscriptionFeedingByClient(Client c, Date currentDate) {
+        Session session = entityManager.unwrap(Session.class);
+        DetachedCriteria subQuery = DetachedCriteria.forClass(SubscriptionFeeding.class);
+        subQuery.add(Restrictions.eq("client", c));
+        subQuery.add(Restrictions.eq("deletedState", false));
+        subQuery.add(Restrictions.le("dateCreateService", currentDate));
+        subQuery.add(Restrictions.or(
+                Restrictions.isNull("dateDeactivateService"),
+                Restrictions.gt("dateDeactivateService", currentDate)
+        ));
+        subQuery.setProjection(Projections.max("dateCreateService"));
+        Criteria criteria = session.createCriteria(SubscriptionFeeding.class);
+        criteria.add(Restrictions.eq("client", c));
+        criteria.add(Subqueries.propertyEq("dateCreateService", subQuery));
+        return criteria.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     // Возвращает циклограмму питания, актуальную на текущий день.
     public CycleDiagram findClientCycleDiagram(Client c) {
         Session session = entityManager.unwrap(Session.class);
@@ -211,15 +240,23 @@ public class SubscriptionFeedingService {
 
     @Transactional(rollbackFor = Exception.class)
     // Приостанавливает подписку АП.
-    public void suspendSubscriptionFeeding(Client client, String reasonWasSuspended) {
-        Date date = new Date();
+    public void suspendSubscriptionFeeding(Client client, String reasonWasSuspended) throws Exception {
+        //Date date = new Date();
+        DAOService daoService = DAOService.getInstance();
+        List<ECafeSettings> settings = daoService
+                .geteCafeSettingses(client.getOrg().getIdOfOrg(), SettingsIds.SubscriberFeeding, false);
+        ECafeSettings cafeSettings = settings.get(0);
+        SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) cafeSettings.getSplitSettingValue();
+        Date today = truncateToDayOfMonth(new Date());
+        Date date = CalendarUtils.addDays(today, 1 + parser.getDayForbidChange());
+
         SubscriptionFeeding sf = findClientSubscriptionFeeding(client);
         sf.setLastDatePauseService(date.before(sf.getDateActivateService()) ? sf.getDateActivateService() : date);
         sf.setWasSuspended(true);
-        DAOService daoService = DAOService.getInstance();
+        //DAOService daoService = DAOService.getInstance();
         sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
         sf.setLastUpdate(date);
-        sf.setReasonWasSuspended(reasonWasSuspended);
+        //sf.setReasonWasSuspended(reasonWasSuspended);
         entityManager.merge(sf);
     }
 
@@ -247,7 +284,6 @@ public class SubscriptionFeedingService {
         sf.setClient(client);
         sf.setOrgOwner(org.getIdOfOrg());
         sf.setIdOfClient(client.getIdOfClient());
-        //sf.setGuid();
         sf.setDateActivateService(newDateActivateService);
         sf.setDateCreateService(dateCreateService);
         sf.setDeletedState(false);
@@ -260,12 +296,6 @@ public class SubscriptionFeedingService {
         CycleDiagram cd = findClientCycleDiagram(client);
         // Если осталась активная циклограмма со старой подписки, то ее необходимо удалить.
         // Данная опираеция проводится на стороне АРМ
-        //if (cd != null) {
-        //    cd.setDeletedState(true);
-        //    cd.setStateDiagram(StateDiagram.BLOCK);
-        //    cd.setGlobalVersion(daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName()));
-        //    entityManager.merge(cd);
-        //}
         // Активируем циклограмму сегодняшним днем.
         // Создаем циклограмму если есть на клиента циклограммы то создаем с ожидаем если нет то активную
         createCycleDiagram(client, org, monday, tuesday, wednesday, thursday, friday, saturday, dayBegin, cd==null);
@@ -289,7 +319,6 @@ public class SubscriptionFeedingService {
         } else {
             cd.setStateDiagram(StateDiagram.WAIT);
         }
-        //cd.setGuid(UUID.randomUUID().toString());
         cd.setDeletedState(false);
         cd.setSendAll(SendToAssociatedOrgs.SendToSelf);
         Long version = daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
@@ -398,38 +427,4 @@ public class SubscriptionFeedingService {
         return price;
     }
 
-    //@SuppressWarnings("unchecked")
-    //@Transactional(propagation = Propagation.REQUIRED)
-    //public void activateCycleDiagrams() {
-    //    DAOService daoService = DAOService.getInstance();
-    //    Date today = CalendarUtils.truncateToDayOfMonth(new Date());
-    //    Date tomorrow = CalendarUtils.addDays(today, 1);
-    //    Query updateQuery = entityManager.createQuery(
-    //            "update CycleDiagram cd set cd.stateDiagram = :active, cd.globalVersion = :newVersion "
-    //                    + "where cd.stateDiagram = :wait and cd.deletedState = false and "
-    //                    + "cd.dateActivationDiagram >= :today and cd.dateActivationDiagram < :tomorrow and cd.client.idOfClient = :id");
-    //    Query deleteQuery = entityManager.createQuery(
-    //            "update CycleDiagram cd set cd.stateDiagram = :block, cd.deletedState = true, cd.globalVersion = :newVersion"
-    //                    + " where cd.client.idOfClient = :id and cd.dateActivationDiagram < :today and cd.stateDiagram = :active");
-    //    Query query = entityManager.createQuery(
-    //            "select cd.client.idOfClient from CycleDiagram cd where cd.stateDiagram = :active and cd.deletedState = false")
-    //            .setParameter("active", StateDiagram.ACTIVE);
-    //    List<Long> clientIds = (List<Long>) query.getResultList();
-    //    int activatedCount = 0;
-    //    int blockedCount = 0;
-    //    long version = daoService.updateVersionByDistributedObjects(CycleDiagram.class.getSimpleName());
-    //    for (Long clientId : clientIds) {
-    //        int count = updateQuery.setParameter("active", StateDiagram.ACTIVE).setParameter("newVersion", version)
-    //                .setParameter("wait", StateDiagram.WAIT).setParameter("today", today)
-    //                .setParameter("tomorrow", tomorrow).setParameter("id", clientId).executeUpdate();
-    //        if (count != 0) {
-    //            blockedCount += deleteQuery.setParameter("block", StateDiagram.BLOCK)
-    //                    .setParameter("newVersion", version).setParameter("id", clientId).setParameter("today", today)
-    //                    .setParameter("active", StateDiagram.ACTIVE).executeUpdate();
-    //            activatedCount += count;
-    //        }
-    //    }
-    //    LOGGER.info("Today activated cycle diagrams count: {}", activatedCount);
-    //    LOGGER.info("Today blocked cycle diagrams count: {}", blockedCount);
-    //}
 }

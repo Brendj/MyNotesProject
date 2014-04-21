@@ -218,15 +218,13 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "createSubscriptionFeeding")
     Result createSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
-            @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn,
-            @WebParam(name = "dateActivateService") Date dateActivateService,
-            @WebParam(name = "dateCreateService") Date dateCreateService);
+            @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn,  @WebParam(name = "dateCreateService") Date dateCreateService);
 
     @WebMethod(operationName = "findSubscriptionFeeding")
     SubFeedingResult findSubscriptionFeeding(@WebParam(name = "contractId") Long contractId);
 
     @WebMethod(operationName = "suspendSubscriptionFeeding")
-    Result suspendSubscriptionFeeding(@WebParam(name = "contractId") Long contractId, @WebParam(name = "reasonWasSuspended") String reasonWasSuspended);
+    Result suspendSubscriptionFeeding(@WebParam(name = "contractId") Long contractId);
 
     @WebMethod(operationName = "reopenSubscriptionFeeding")
     Result reopenSubscriptionFeeding(@WebParam(name = "contractId") Long contractId);
@@ -245,15 +243,13 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "createSubscriptionFeedingBySan")
     Result createSubscriptionFeeding(@WebParam(name = "san") String san,
-            @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn,
-            @WebParam(name = "dateActivateService") Date dateActivateService,
-            @WebParam(name = "dateCreateService") Date dateCreateService);
+            @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn, @WebParam(name = "dateCreateService") Date dateCreateService);
 
     @WebMethod(operationName = "findSubscriptionFeedingBySan")
     SubFeedingResult findSubscriptionFeeding(@WebParam(name = "san") String san);
 
     @WebMethod(operationName = "suspendSubscriptionFeedingBySan")
-    Result suspendSubscriptionFeeding(@WebParam(name = "san") String san, @WebParam(name = "reasonWasSuspended") String reasonWasSuspended);
+    Result suspendSubscriptionFeeding(@WebParam(name = "san") String san);
 
     @WebMethod(operationName = "reopenSubscriptionFeedingBySan")
     Result reopenSubscriptionFeeding(@WebParam(name = "san") String san);
@@ -282,5 +278,13 @@ public interface ClientRoomController {
     @WebMethod(operationName = "getSubscriptionFeedingSettingBySan")
     SubscriptionFeedingSettingResult getSubscriptionFeedingSetting(@WebParam(name = "san") String san);
 
+    //@WebMethod(operationName = "getCycleDiagramList")
+    //CycleDiagramList getCycleDiagramList(@WebParam(name = "contractId") Long contractId);
+    //
+    //@WebMethod(operationName = "getCycleDiagramListBySan")
+    //CycleDiagramList getCycleDiagramList(@WebParam(name = "san") String san);
+
+    @WebMethod(operationName = "getSubscriptionFeedingList")
+    SubscriptionFeedingListResult getSubscriptionFeedingList(@WebParam(name = "contractId") Long contractId, @WebParam(name = "currentDay") Date currentDay);
 
 }

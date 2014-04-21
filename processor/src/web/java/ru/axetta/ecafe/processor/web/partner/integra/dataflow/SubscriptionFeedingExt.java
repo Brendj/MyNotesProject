@@ -1,26 +1,24 @@
+
 /*
- * Copyright (c) 2013. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2014. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
+
 import javax.xml.bind.annotation.*;
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
-/**
- * Created with IntelliJ IDEA.
- * User: r.kalimullin
- * Date: 27.11.13
- * Time: 13:44
- */
-
-@XmlRootElement(name = "SubscriptionFeedingInfo")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class SubFeedingResult extends Result implements Serializable {
-
+@XmlType(name = "SubscriptionFeedingExt")
+public class SubscriptionFeedingExt {
     @XmlElement(name = "IdOfSubscriptionFeeding")
     private Long idOfSubscriptionFeeding;
+    @XmlElement(name = "guid")
+    private String guid;
     @XmlElement(name = "DateCreateService")
     @XmlSchemaType(name = "dateTime")
     private Date dateCreateService;
@@ -36,12 +34,38 @@ public class SubFeedingResult extends Result implements Serializable {
     @XmlElement(name = "Suspended")
     private Boolean suspended;
 
+    public SubscriptionFeedingExt(SubscriptionFeeding subscriptionFeeding) {
+        this.idOfSubscriptionFeeding = subscriptionFeeding.getGlobalId();
+        this.guid = subscriptionFeeding.getGuid();
+        this.dateCreateService = subscriptionFeeding.getDateCreateService();
+        this.dateActivate = subscriptionFeeding.getDateActivateService();
+        this.lastDatePause = subscriptionFeeding.getLastDatePauseService();
+        this.dateDeactivate = subscriptionFeeding.getDateDeactivateService();
+        this.suspended = subscriptionFeeding.getWasSuspended();
+    }
+
     public Long getIdOfSubscriptionFeeding() {
         return idOfSubscriptionFeeding;
     }
 
     public void setIdOfSubscriptionFeeding(Long idOfSubscriptionFeeding) {
         this.idOfSubscriptionFeeding = idOfSubscriptionFeeding;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
+    }
+
+    public Date getDateCreateService() {
+        return dateCreateService;
+    }
+
+    public void setDateCreateService(Date dateCreateService) {
+        this.dateCreateService = dateCreateService;
     }
 
     public Date getDateActivate() {
@@ -76,11 +100,6 @@ public class SubFeedingResult extends Result implements Serializable {
         this.suspended = suspended;
     }
 
-    public Date getDateCreateService() {
-        return dateCreateService;
-    }
-
-    public void setDateCreateService(Date dateCreateService) {
-        this.dateCreateService = dateCreateService;
+    public SubscriptionFeedingExt() {
     }
 }

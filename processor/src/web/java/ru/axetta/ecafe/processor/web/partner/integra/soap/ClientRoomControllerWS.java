@@ -19,6 +19,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.StateDiagram;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Circulation;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Publication;
@@ -54,6 +55,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import javax.jws.WebMethod;
@@ -3866,10 +3868,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result createSubscriptionFeeding(@WebParam(name = "contractId") Long contractId, @WebParam(
-            name = "cycleDiagram") CycleDiagramIn cycleDiagramIn, @WebParam(name = "newDateActivateService") Date newDateActivateService, @WebParam(name = "dateCreateService") Date dateCreateService) {
+    public Result createSubscriptionFeeding(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn,  @WebParam(name = "dateCreateService") Date dateCreateService) {
         authenticateRequest(contractId);
-        return createSubscriptionFeeding(contractId, null, cycleDiagramIn, newDateActivateService, dateCreateService);
+        return createSubscriptionFeeding(contractId, null, cycleDiagramIn, dateCreateService, dateCreateService);
     }
 
     @Override
@@ -3879,9 +3881,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result suspendSubscriptionFeeding(@WebParam(name = "contractId") Long contractId, @WebParam(name = "reasonWasSuspended") String reasonWasSuspended) {
+    public Result suspendSubscriptionFeeding(@WebParam(name = "contractId") Long contractId) {
         authenticateRequest(contractId);
-        return suspendSubscriptionFeeding(contractId, null, reasonWasSuspended);
+        return suspendSubscriptionFeeding(contractId, null, "");
     }
 
     @Override
@@ -3910,12 +3912,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result createSubscriptionFeeding(@WebParam(name = "san") String san, @WebParam(
-            name = "cycleDiagram") CycleDiagramIn cycleDiagramIn,
-            @WebParam(name = "newDateActivateService") Date newDateActivateService,
-            @WebParam(name = "dateCreateService") Date dateCreateService) {
+    public Result createSubscriptionFeeding(@WebParam(name = "san") String san,
+            @WebParam(name = "cycleDiagram") CycleDiagramIn cycleDiagramIn,@WebParam(name = "dateCreateService") Date dateCreateService) {
         authenticateRequest(null);
-        return createSubscriptionFeeding(null, san, cycleDiagramIn, newDateActivateService, dateCreateService);
+        return createSubscriptionFeeding(null, san, cycleDiagramIn, dateCreateService, dateCreateService);
     }
 
     @Override
@@ -3925,9 +3925,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result suspendSubscriptionFeeding(@WebParam(name = "san") String san, @WebParam(name = "reasonWasSuspended") String reasonWasSuspended) {
+    public Result suspendSubscriptionFeeding(@WebParam(name = "san") String san) {
         authenticateRequest(null);
-        return suspendSubscriptionFeeding(null, san, reasonWasSuspended);
+        return suspendSubscriptionFeeding(null, san, "");
     }
 
     @Override
@@ -4045,6 +4045,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             SubscriptionFeeding sf = sfService.findClientSubscriptionFeeding(client);
             if (sf != null) {
                 res.setIdOfSubscriptionFeeding(sf.getGlobalId());
+                res.setDateCreateService(sf.getDateCreateService());
                 res.setDateActivate(sf.getDateActivateService());
                 res.setLastDatePause(sf.getLastDatePauseService());
                 res.setDateDeactivate(sf.getDateDeactivateService());
@@ -4082,7 +4083,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
             HibernateUtils.rollback(transaction, logger);
-            logger.error(ex.getMessage());
+            logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
@@ -4110,7 +4111,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
             HibernateUtils.rollback(transaction, logger);
-            logger.error(ex.getMessage());
+            logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
@@ -4228,7 +4229,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
             HibernateUtils.rollback(transaction, logger);
-            logger.error(ex.getMessage());
+            logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
@@ -4278,6 +4279,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public TransferSubBalanceListResult getTransferSubBalanceList(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
+        authenticateRequest(contractId);
         Session session = null;
         Transaction transaction = null;
         TransferSubBalanceListResult result = new TransferSubBalanceListResult();
@@ -4310,7 +4312,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
             HibernateUtils.rollback(transaction, logger);
-            logger.error(ex.getMessage());
+            logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
@@ -4322,6 +4324,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public TransferSubBalanceListResult getTransferSubBalanceList(@WebParam(name = "san") String san,
             @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) {
+        authenticateRequest(null);
         Session session = null;
         Transaction transaction = null;
         TransferSubBalanceListResult result = new TransferSubBalanceListResult();
@@ -4354,7 +4357,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
             HibernateUtils.rollback(transaction, logger);
-            logger.error(ex.getMessage());
+            logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
@@ -4366,6 +4369,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public SubscriptionFeedingSettingResult getSubscriptionFeedingSetting(@WebParam(name = "contractId") Long contractId){
+        authenticateRequest(contractId);
         Session session = null;
         Transaction transaction = null;
         SubscriptionFeedingSettingResult result = new SubscriptionFeedingSettingResult();
@@ -4408,7 +4412,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
             HibernateUtils.rollback(transaction, logger);
-            logger.error(ex.getMessage());
+            logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
@@ -4419,6 +4423,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public SubscriptionFeedingSettingResult getSubscriptionFeedingSetting(@WebParam(name = "san") String san){
+        authenticateRequest(null);
         Session session = null;
         Transaction transaction = null;
         SubscriptionFeedingSettingResult result = new SubscriptionFeedingSettingResult();
@@ -4463,7 +4468,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_OK_DESC;
         } catch (Exception ex) {
             HibernateUtils.rollback(transaction, logger);
-            logger.error(ex.getMessage());
+            logger.error(ex.getMessage(), ex);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
@@ -4472,122 +4477,116 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-}
-
-
-
-/*public ClientsData getClientsByGuardSan(String guardSan) {
-        authenticateRequest(null);
-
-        ClientsData data = new ClientsData();
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
+    //@Override
+    public CycleDiagramList getCycleDiagramList(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+        Session session = null;
+        Transaction transaction = null;
+        CycleDiagramList result = new CycleDiagramList();
         try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
-
-            Criterion exp1 = Restrictions.or(Restrictions.ilike("guardSan", guardSan, MatchMode.EXACT),
-                    Restrictions.ilike("guardSan", guardSan + ";", MatchMode.START));
-            Criterion exp2 = Restrictions.or(Restrictions.like("guardSan", ";" + guardSan, MatchMode.END),
-                    Restrictions.like("guardSan", ";" + guardSan + ";", MatchMode.ANYWHERE));
-            Criterion expression = Restrictions.or(exp1, exp2);
-            clientCriteria.add(expression);
-
-            List<Client> clients = clientCriteria.list();
-
-            data.clientList = new ClientList();
-            for (Client client : clients) {
-                ClientItem clientItem = new ClientItem();
-                clientItem.setContractId(client.getContractId());
-                clientItem.setSan(client.getSan());
-                data.clientList.getClients().add(clientItem);
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = findClient(session, contractId, null, result);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
             }
-            data.resultCode = RC_OK;
-            data.description = "OK";
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed to process client room controller request", e);
-            data.resultCode = RC_INTERNAL_ERROR;
-            data.description = e.toString();
+
+            Criteria criteria = session.createCriteria(CycleDiagram.class);
+            criteria.add(Restrictions.eq("client", client));
+            List<StateDiagram> states = Arrays.asList(StateDiagram.ACTIVE, StateDiagram.WAIT);
+            criteria.add(Restrictions.eq("stateDiagram", states));
+            List list = criteria.list();
+            for (Object obj: list){
+                CycleDiagram cycleDiagram = (CycleDiagram) obj;
+                result.cycleDiagramListExt.getC().add(new CycleDiagramExt(cycleDiagram));
+            }
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
+            HibernateUtils.close(session, logger);
         }
-        return data;
-    }*/
+        return result;
+    }
 
-    /*private void workClientSan(EntityManager entityManager, String guardSan, Result data, List clientList) {
-        if (clientList.size() == 0) {
-            data.resultCode = RC_CLIENT_NOT_FOUND;
-            data.description = RC_CLIENT_NOT_FOUND_DESC;
-        } else if (clientList.size() > 1) {
-            data.resultCode = RC_SEVERAL_CLIENTS_WERE_FOUND;
-            data.description = RC_SEVERAL_CLIENTS_WERE_FOUND_DESC;
-        } else {
-            Object[] clientObject = (Object[]) clientList.get(0);
-            Long idOfClient = ((BigInteger) clientObject[0]).longValue();
-            String clientGuardSan = (String) clientObject[1];
-            if (clientGuardSan == null) {
-                if (data instanceof AttachGuardSanResult) {
-                    Query query = entityManager.createNativeQuery(
-                            "update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
-                    query.setParameter("guardSan", guardSan);
-                    query.setParameter("idOfClient", idOfClient);
-                    query.executeUpdate();
-                    data.resultCode = RC_OK;
-                    data.description = "Ok";
-                } else if (data instanceof DetachGuardSanResult) {
-                    data.resultCode = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS;
-                    data.description = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC;
-                }
-            } else {
-                if (data instanceof AttachGuardSanResult) {
-                    if (isGuardSanExists(guardSan, clientGuardSan)) {
-                        data.resultCode = RC_CLIENT_HAS_THIS_SNILS_ALREADY;
-                        data.description = RC_CLIENT_HAS_THIS_SNILS_ALREADY_DESC;
-                    } else {
-                        String gs = "";
-                        if (clientGuardSan.endsWith(";")) {
-                            gs = clientGuardSan + guardSan;
-                        } else {
-                            gs = clientGuardSan + ";" + guardSan;
-                        }
-                        Query query = entityManager.createNativeQuery(
-                                "update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
-                        query.setParameter("guardSan", gs);
-                        query.setParameter("idOfClient", idOfClient);
-                        query.executeUpdate();
-                        data.resultCode = RC_OK;
-                        data.description = "Ok";
-                    }
-                } else if (data instanceof DetachGuardSanResult) {
-                    if (!isGuardSanExists(guardSan, clientGuardSan)) {
-                        data.resultCode = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS;
-                        data.description = RC_CLIENT_DOES_NOT_HAVE_THIS_SNILS_DESC;
-                    } else {
-                        if (clientGuardSan.contains(";" + guardSan + ";")) {
-                            clientGuardSan = clientGuardSan.replace(";" + guardSan + ";", ";");
-                        } else if (clientGuardSan.startsWith(guardSan + ";")) {
-                            clientGuardSan = clientGuardSan.substring((guardSan + ";").length());
-                        } else if (clientGuardSan.endsWith(";" + guardSan)) {
-                            clientGuardSan = clientGuardSan
-                                    .substring(0, clientGuardSan.length() - (";" + guardSan).length());
-                        } else {
-                            clientGuardSan = clientGuardSan.replace(guardSan, "");
-                        }
-                        Query query = entityManager.createNativeQuery(
-                                "update CF_Clients set GuardSan = :guardSan where IdOfClient = :idOfClient");
-                        query.setParameter("guardSan", clientGuardSan);
-                        query.setParameter("idOfClient", idOfClient);
-                        query.executeUpdate();
-                        data.resultCode = RC_OK;
-                        data.description = "Ok";
-                    }
-                }
+    //@Override
+    public CycleDiagramList getCycleDiagramList(@WebParam(name = "san") String san) {
+        Session session = null;
+        Transaction transaction = null;
+        CycleDiagramList result = new CycleDiagramList();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = findClient(session, null, san, result);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
             }
+
+            Criteria criteria = session.createCriteria(CycleDiagram.class);
+            criteria.add(Restrictions.eq("client", client));
+            List<StateDiagram> states = Arrays.asList(StateDiagram.ACTIVE, StateDiagram.WAIT);
+            criteria.add(Restrictions.eq("stateDiagram", states));
+            List list = criteria.list();
+            for (Object obj: list){
+                CycleDiagram cycleDiagram = (CycleDiagram) obj;
+                result.cycleDiagramListExt.getC().add(new CycleDiagramExt(cycleDiagram));
+            }
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
         }
-    }*/
+        return result;
+    }
+
+    @Override
+    public SubscriptionFeedingListResult getSubscriptionFeedingList(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "currentDay") Date currentDay) {
+
+        Session session = null;
+        Transaction transaction = null;
+        SubscriptionFeedingListResult result = new SubscriptionFeedingListResult();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client client = findClient(session, contractId, null, result);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+            SubscriptionFeedingService subscriptionFeedingService = SubscriptionFeedingService.getInstance();
+            List<SubscriptionFeeding> subscriptionFeedings =
+                    subscriptionFeedingService.findSubscriptionFeedingByClient(client, currentDay);
+            for (SubscriptionFeeding subscriptionFeeding: subscriptionFeedings){
+                 result.subscriptionFeedingListExt.getS().add(new SubscriptionFeedingExt(subscriptionFeeding));
+            }
+
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+
+        return result;
+    }
+
+}
