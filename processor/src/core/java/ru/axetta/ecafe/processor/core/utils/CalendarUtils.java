@@ -86,6 +86,17 @@ public class CalendarUtils {
         calendar.set(Calendar.DAY_OF_MONTH, 1);
     }
 
+    public static Calendar truncateToMonth(Date date) {
+        GregorianCalendar calendar = new GregorianCalendar(RuntimeContext.getInstance().getLocalTimeZone(null));
+        calendar.setTime (date);
+        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        return calendar;
+    }
+
     public static void truncateToDayOfMonth(Calendar calendar) {
         calendar.set(Calendar.MILLISECOND, 0);
         calendar.set(Calendar.SECOND, 0);
