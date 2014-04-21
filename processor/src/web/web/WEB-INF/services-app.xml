@@ -139,10 +139,17 @@
     <!--</task:scheduled-tasks>-->
 
     <!-- Оповещение контргента об изменении заявки, срабатывает каждве 30 минут-->
-    <task:scheduler id="goodRequestsSchedule"/>
-    <task:scheduled-tasks scheduler="goodRequestsSchedule">
-        <task:scheduled ref="goodRequestsNotificationService" method="notifyGoodRequestsReport"
-                        cron="0 0-59/1 * * * ?"/>
+    <!--<task:scheduler id="goodRequestsSchedule"/>-->
+    <!--<task:scheduled-tasks scheduler="goodRequestsSchedule">-->
+        <!--<task:scheduled ref="goodRequestsNotificationService" method="notifyGoodRequestsReport"-->
+                        <!--cron="0 0-59/30 * * * ?"/>-->
+    <!--</task:scheduled-tasks>-->
+
+    <!-- Оповещение контргента о сторнировании заказов производится каждый день ночью за предыдущий день-->
+    <task:scheduler id="orderStateChangeSchedule"/>
+    <task:scheduled-tasks scheduler="orderStateChangeSchedule">
+        <task:scheduled ref="orderStateChangeService" method="notifyOrderStateChange"
+                        cron="0 0 4 * * ?"/>
     </task:scheduled-tasks>
 
 </beans>
