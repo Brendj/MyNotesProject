@@ -27,12 +27,14 @@ public class RegistryTalon extends DistributedObject {
 
     private Date date;
     private long number;
+    private RegistryTalonType talonType;
 
     @Override
     protected void appendAttributes(Element element) {
         XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
         XMLUtils.setAttributeIfNotNull(element, "Date", date);
         XMLUtils.setAttributeIfNotNull(element, "Number", number);
+        XMLUtils.setAttributeIfNotNull(element, "Type", talonType);
     }
 
     @Override
@@ -51,6 +53,10 @@ public class RegistryTalon extends DistributedObject {
         if (longNumber != null) {
             setNumber(longNumber);
         }
+        Integer intType = XMLUtils.getIntegerAttributeValue(node, "Type");
+        if(intType != null){
+            setTalonType(RegistryTalonType.values()[intType]);
+        }
 
         return this;
     }
@@ -60,6 +66,7 @@ public class RegistryTalon extends DistributedObject {
         setOrgOwner(distributedObject.getOrgOwner());
         setNumber(((RegistryTalon) distributedObject).getNumber());
         setDate(((RegistryTalon) distributedObject).getDate());
+        setTalonType(((RegistryTalon) distributedObject).getTalonType());
     }
 
     @Override
@@ -84,6 +91,7 @@ public class RegistryTalon extends DistributedObject {
         projectionList.add(Projections.property("DeleteDate"), "DeleteDate");
         projectionList.add(Projections.property("Date"), "Date");
         projectionList.add(Projections.property("Number"), "Number");
+        projectionList.add(Projections.property("talonType"), "talonType");
         criteria.setProjection(projectionList);
     }
 
@@ -101,5 +109,13 @@ public class RegistryTalon extends DistributedObject {
 
     public void setNumber(long number) {
         this.number = number;
+    }
+
+    public RegistryTalonType getTalonType() {
+        return talonType;
+    }
+
+    public void setTalonType(RegistryTalonType talonType) {
+        this.talonType = talonType;
     }
 }

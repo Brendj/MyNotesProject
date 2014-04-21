@@ -2962,6 +2962,24 @@ CREATE TABLE cf_UserOrgs
   CONSTRAINT cf_userorgs_uq UNIQUE (idofuser, idoforg)
 );
 
+CREATE TABLE cf_Registry_Talon
+(
+  idOfRegistryTalon BIGSERIAL NOT NULL,
+  OrgOwner BIGINT,
+  GUID CHARACTER VARYING(36) NOT NULL,
+  DeletedState BOOLEAN NOT NULL DEFAULT FALSE,
+  GlobalVersion BIGINT,
+  GlobalVersionOnCreate BIGINT DEFAULT NULL,
+  CreatedDate BIGINT NOT NULL,
+  LastUpDate BIGINT,
+  DeleteDate BIGINT,
+  SendAll INTEGER NOT NULL DEFAULT 0,
+  Date BIGINT,
+  Number BIGINT,
+  TalonType integer default 0 not null,
+  CONSTRAINT cf_registry_talon_pk PRIMARY KEY (idOfRegistryTalon)
+);
+
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
   VALUES(2, 2, 61, 140408, 0, '');

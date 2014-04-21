@@ -34,6 +34,7 @@ CREATE TABLE cf_Registry_Talon
   SendAll INTEGER NOT NULL DEFAULT 0,
   Date BIGINT,
   Number BIGINT,
+  TalonType integer default 0 not null,
   CONSTRAINT cf_registry_talon_pk PRIMARY KEY (idOfRegistryTalon)
 );
 
