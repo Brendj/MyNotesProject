@@ -6,20 +6,12 @@ package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.Processor;
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Payment;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Purchase;
-import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.ResPaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.ResPaymentRegistryItem;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +60,7 @@ public class POSPaymentControllerWS extends HttpServlet implements POSPaymentCon
                 Payment payment = new Payment(posPayment.getCardNo(), posPayment.getTime(), posPayment.getOrderDate(), posPayment.getSocDiscount(),
                   posPayment.getTrdDiscount(), posPayment.getGrant(), posPayment.getIdOfClient(), posPayment.getIdOfOrder(), posPayment.getIdOfCashier(),
                         posPayment.getSumByCard(), posPayment.getSumByCash(), posPayment.getrSum(), posPayment.getIdOfPOS(), posPayment.getConfirmerId(),
-                  posPayment.getComments(), OrderTypeEnumType.fromInteger(posPayment.getOrderType()), purchases);
+                        0, posPayment.getComments(), OrderTypeEnumType.fromInteger(posPayment.getOrderType()), purchases);
 
                 ResPaymentRegistryItem resAcc;
                 final PosResPaymentRegistryItem e = new PosResPaymentRegistryItem();
