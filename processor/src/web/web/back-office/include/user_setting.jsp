@@ -34,7 +34,7 @@
                  converter="phoneConverter" />
     <h:outputText escape="true" value="Адрес электронной почты" styleClass="output-text" />
     <h:inputText value="#{userSettings.email}" maxlength="128" styleClass="input-text"/>
-    <h:outputText escape="true" value="Список организаций" styleClass="output-text" />
+    <h:outputText escape="true" value="Список организаций рассылки" styleClass="output-text" />
     <h:panelGroup>
         <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"

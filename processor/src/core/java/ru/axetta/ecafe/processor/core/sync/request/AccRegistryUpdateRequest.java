@@ -40,7 +40,7 @@ public class AccRegistryUpdateRequest {
             if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("CI")) {
                 Long clientId = XMLUtils.getLongAttributeValue(itemNode, "IdOfClient");
                 clientIds.add(clientId);
-                LOGGER.info("counts "+ clientIds.size());
+                LOGGER.debug("counts "+ clientIds.size());
             }
             itemNode = itemNode.getNextSibling();
         }

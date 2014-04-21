@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfContragentClientA
 import ru.axetta.ecafe.processor.core.persistence.Function;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.abstractpage.UvDeletePage;
@@ -322,7 +323,6 @@ public class MainPage {
     private final BasicWorkspacePage goodGroupsGroupPage = new BasicWorkspacePage();
 
     private final ClientPaymentsPage clientPaymentsReportPage = new ClientPaymentsPage();
-    private final GoodRequestsReportPage goodRequestsReportPage = new GoodRequestsReportPage();
     private final GoodRequestsNewReportPage goodRequestsNewReportPage = new GoodRequestsNewReportPage();
     private final DeliveredServicesReportPage deliveredServicesReportPage = new DeliveredServicesReportPage ();
     private final ClientsBenefitsReportPage clientsBenefitsReportPage = new ClientsBenefitsReportPage ();
@@ -1122,6 +1122,7 @@ public class MainPage {
             selectedOrgGroupPage.fill(persistenceSession, selectedIdOfOrg);
             persistenceTransaction.commit();
             persistenceTransaction = null;
+            GoodRequestsChangeAsyncNotificationService.getInstance().refreshAllInformation();
             final String summary = "Данные организации обновлены успешно";
             final FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, summary, null);
             facesContext.addMessage(null, facesMessage);
@@ -1184,6 +1185,7 @@ public class MainPage {
                 orgCreatePage.createOrg(persistenceSession);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
+                GoodRequestsChangeAsyncNotificationService.getInstance().refreshAllInformation();
                 facesContext.addMessage(null,
                         new FacesMessage(FacesMessage.SEVERITY_INFO, "Организация зарегистрирована успешно", null));
             } catch (Exception e) {
@@ -1891,6 +1893,7 @@ public class MainPage {
             selectedContragentGroupPage.fill(persistenceSession, selectedIdOfContragent);
             persistenceTransaction.commit();
             persistenceTransaction = null;
+            GoodRequestsChangeAsyncNotificationService.getInstance().updateContragentItems();
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные контрагента обновлены успешно", null));
             String newRNIPId = RNIPLoadPaymentsService.getRNIPIdFromRemarks(persistenceSession, selectedIdOfContragent);
@@ -1959,6 +1962,7 @@ public class MainPage {
             contragentCreatePage.createContragent(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
+            GoodRequestsChangeAsyncNotificationService.getInstance().updateContragentItems();
             facesContext.addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_INFO, "Контрагент зарегистрирован успешно", null));
         } catch (ContragentCreatePage.ContragentWithClassExistsException e) {
@@ -5217,10 +5221,6 @@ public class MainPage {
         return null;
     }
 
-    public GoodRequestsReportPage getGoodRequestReportPage() {
-        return goodRequestsReportPage;
-    }
-
     public GoodRequestsNewReportPage getGoodRequestsNewReportPage() {
         return goodRequestsNewReportPage;
     }
@@ -5237,29 +5237,7 @@ public class MainPage {
         return discrepanciesDataOnOrdersAndPaymentReportPage;
     }
 
-    public Object showGoodRequestReportPage () {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            goodRequestsReportPage.fill(persistenceSession, getCurrentUser());
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            currentWorkspacePage = goodRequestsReportPage;
-        } catch (Exception e) {
-            logger.error("Failed to set sales report page", e);
-            String summary = "Ошибка при подготовке страницы отчета по запрошенным товарам: " + e.getMessage();
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-        return null;
-    }
+
 
     public Object showGoodRequestNewReportPage () {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -5284,57 +5262,6 @@ public class MainPage {
         }
         updateSelectedMainMenu();
         return null;
-    }
-
-    public Object buildGoodRequestReport() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createReportPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            goodRequestsReportPage.buildReport(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
-        } catch (Exception e) {
-            logger.error("Failed to build sales report", e);
-            facesContext.addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-
-
-        }
-        return null;
-    }
-
-    public void exportGoodRequestReport(javax.faces.event.ActionEvent event) {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createReportPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            goodRequestsReportPage.export(persistenceSession);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            String summary = "Подготовка отчета завершена успешно";
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, summary, null));
-        } catch (Exception e) {
-            logger.error("Failed to build sales report", e);
-            String summary = "Ошибка при подготовке отчета: " + e.getMessage();
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, summary, null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
     }
 
     public Object showDiscrepanciesOnOrdersAndAttendanceReportPage () {

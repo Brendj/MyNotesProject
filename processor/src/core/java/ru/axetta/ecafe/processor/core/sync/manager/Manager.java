@@ -11,8 +11,10 @@ import ru.axetta.ecafe.processor.core.persistence.SyncHistoryException;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConfirm;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConflict;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
 import ru.axetta.ecafe.processor.core.sync.doGroups.DOGroupsFactory;
 import ru.axetta.ecafe.processor.core.sync.doGroups.DOSyncClass;
 import ru.axetta.ecafe.processor.core.sync.doGroups.IDOGroup;
@@ -522,6 +524,7 @@ public class Manager {
     private List<DistributedObject> processDistributedObjectsList(SessionFactory sessionFactory,
             DOSyncClass doSyncClass) {
         LOGGER.debug("processDistributedObjectsList: init");
+        final Date startDate = new Date();
         List<DistributedObject> distributedObjects = incomeDOMap.get(doSyncClass);
         if (doSyncClass.getDoClass() == CycleDiagram.class) {
             Collections.sort(distributedObjects, new Comparator<DistributedObject>() {
@@ -553,6 +556,10 @@ public class Manager {
             if (!(currentResultDOList == null || currentResultDOList.isEmpty())) {
                 currentResultDOList.removeAll(distributedObjectList);
             }
+        }
+        if (doSyncClass.getDoClass() == GoodRequestPosition.class) {
+            final Date endGenerateTime = new Date();
+            GoodRequestsChangeAsyncNotificationService.getInstance().notifyOrg(idOfOrg, startDate, endGenerateTime);
         }
         LOGGER.debug("processDistributedObjectsList: end");
         return distributedObjectList;
@@ -641,15 +648,10 @@ public class Manager {
             persistenceTransaction = null;
         } catch (DistributedObjectException e) {
             // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю
-            // TODO: записать в журнал ошибок
-            //saveException(sessionFactory, e);
             distributedObject.setDistributedObjectException(e);
             errorMessage = "Error processCurrentObject: " + e.getMessage();
             LOGGER.error(errorMessage);
         } catch (Exception e) {
-            // TODO: записать в журнал ошибок
-            //saveException(sessionFactory, e);
-            //errorMessage = e.getMessage();
             distributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
             LOGGER.error(distributedObject.toString(), e);
         } finally {
@@ -708,16 +710,11 @@ public class Manager {
             distributedObject.setGlobalVersion(currentMaxVersion);
             distributedObject.setGlobalVersionOnCreate(currentMaxVersion);
             distributedObject.setCreatedDate(new Date());
-            //distributedObject.beforePersist(persistenceSession, idOfOrg, distributedObject.getGuid());
             persistenceSession.persist(distributedObject);
             distributedObject.setTagName("C");
         }
         // Изменение существующего в БД экземпляра РО.
         if (distributedObject.getTagName().equals("M")) {
-            //if (currentDO == null) {
-            //    final String message = simpleClassName + " NOT_FOUND_VALUE : " + distributedObject.getGuid();
-            //    throw new DistributedObjectException(message);
-            //}
             Long currentVersion = currentDO.getGlobalVersion();
             Long objectVersion = distributedObject.getGlobalVersion();
             currentDO.fill(distributedObject);
@@ -731,7 +728,6 @@ public class Manager {
                 persistenceSession.persist(doConflict);
             }
             currentDO.setTagName("M");
-            //currentDO.beforePersist(persistenceSession, idOfOrg, distributedObject.getGuid());
             currentDO.preProcess(persistenceSession, idOfOrg);
             currentDO.updateVersionFromParent(persistenceSession);
             persistenceSession.update(currentDO);

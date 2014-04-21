@@ -8,6 +8,7 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.SyncHistory;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.UserReportSetting;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -23,6 +24,7 @@ import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Properties;
 
 /**
@@ -63,6 +66,8 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     private String nameFiler;
     private OrgRequestFilterConverter orgRequest = new OrgRequestFilterConverter();
     private User currentUser;
+    //private String lastGoodRequestUpdateDateTiem;
+    private Date lastGoodRequestUpdateDateTime;
 
     // Транзакционный метод
     @Override
@@ -153,18 +158,42 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
+
+        //try {
+        //    try {
+        //        persistenceSession = runtimeContext.createReportPersistenceSession();
+        //        persistenceTransaction = persistenceSession.beginTransaction();
+        //        Criteria syncHistoryCriteria = persistenceSession.createCriteria(SyncHistory.class);
+        //        syncHistoryCriteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        //        syncHistoryCriteria.setProjection(Projections.max("syncEndTime"));
+        //        syncHistoryCriteria.setMaxResults(1);
+        //        Object maxSyncEndTime = syncHistoryCriteria.uniqueResult();
+        //        lastGoodRequestUpdateDateTime = (Date) syncHistoryCriteria.uniqueResult();
+        //        //SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy EE HH:mm:ss", new Locale("ru"));
+        //        persistenceTransaction.commit();
+        //        persistenceTransaction = null;
+        //    } finally {
+        //        HibernateUtils.rollback(persistenceTransaction, logger);
+        //        HibernateUtils.close(persistenceSession, logger);
+        //    }
+        //} catch (Exception warn) {
+        //    logger.warn("cannot parse datetime value", warn);
+        //}
+
         try {
-            persistenceSession = runtimeContext.createReportPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
+            try {
+                persistenceSession = runtimeContext.createReportPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
         } catch (Exception e) {
             logger.error("Failed export report : ", e);
             printError("Ошибка при подготовке отчета: " + e.getMessage());
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
         }
 
         if (report != null) {
@@ -392,6 +421,10 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
 
     public Boolean getHideDailySamplesCount() {
         return hideDailySamplesCount;
+    }
+
+    public Date getLastGoodRequestUpdateDateTime() {
+        return lastGoodRequestUpdateDateTime;
     }
 
     public void setHideDailySamplesCount(Boolean hideDailySamplesCount) {
