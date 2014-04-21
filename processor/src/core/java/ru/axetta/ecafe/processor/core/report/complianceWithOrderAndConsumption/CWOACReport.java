@@ -28,15 +28,14 @@ import java.util.*;
  * User: r.kalimullin
  * Date: 12.09.13
  * Time: 14:24
- * "Отчет по соответствию заказа и потребления резервной группе"
+ * Отчет по соответствию заказа и потребления резервной группе
  */
 
 public class CWOACReport extends BasicReportForAllOrgJob {
 
     private final static Logger logger = LoggerFactory.getLogger(CWOACReport.class);
 
-    public CWOACReport() {
-    }
+    public CWOACReport() {}
 
     public CWOACReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime, Date endTime) {
         super(generateTime, generateDuration, print, startTime, endTime);
@@ -86,15 +85,12 @@ public class CWOACReport extends BasicReportForAllOrgJob {
         @SuppressWarnings("unchecked")
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime) {
             Map<Long, CWOACItem> itemsByOrg = new HashMap<Long, CWOACItem>();
-            Query query = session.createSQLQuery("SELECT \n" +
-                    "o.idoforg, \n" +
-                    "o.shortname, \n" +
-                    "o.district, \n" +
-                    "sum(coalesce(grp.totalcount / 1000, 0)) AS requestCount \n" +
-                    "FROM cf_orgs o LEFT JOIN cf_goods_requests gr on (gr.orgOwner = o.idoforg) \n" +
-                    "LEFT JOIN cf_goods_requests_positions grp ON (gr.IdOfGoodsRequest = grp.IdOfGoodsRequest) \n" +
-                    "LEFT JOIN cf_goods g ON (g.IdOfGood = grp.IdOfGood) \n" +
-                    "WHERE gr.doneDate BETWEEN :startDate AND :endDate \n" +
+            Query query = session.createSQLQuery("SELECT o.idoforg, o.shortname, o.district, " +
+                    "sum(coalesce(grp.totalcount / 1000, 0)) AS requestCount " +
+                    "FROM cf_orgs o LEFT JOIN cf_goods_requests gr on (gr.orgOwner = o.idoforg) " +
+                    "LEFT JOIN cf_goods_requests_positions grp ON (gr.IdOfGoodsRequest = grp.IdOfGoodsRequest) " +
+                    "LEFT JOIN cf_goods g ON (g.IdOfGood = grp.IdOfGood) " +
+                    "WHERE gr.doneDate BETWEEN :startDate AND :endDate " +
                     "GROUP BY o.idoforg, o.shortname, o.district")
                     .setParameter("startDate", startTime.getTime())
                     .setParameter("endDate", endTime.getTime());
@@ -104,18 +100,17 @@ public class CWOACReport extends BasicReportForAllOrgJob {
                         ((BigDecimal) record[3]).longValue());
                 itemsByOrg.put(((BigInteger) record[0]).longValue(), item);
             }
-            query = session.createSQLQuery("SELECT \n" +
-                    "ord.idoforg, \n" +
-                    "sum(CASE WHEN ord.ordertype = 4 OR ord.ordertype = 6 THEN det.qty ELSE 0 END) AS consumedCount, \n" +
-                    "sum(CASE WHEN ord.ordertype = 6 THEN det.qty ELSE 0 END) AS writtenOffCount \n" +
-                    "FROM cf_orders ord JOIN CF_OrderDetails det ON (ord.idoforder = det.idoforder AND ord.idoforg = det.idoforg) \n" +
-                    "JOIN cf_goods g ON (g.IdOfGood = det.IdOfGood) \n" +
-                    "WHERE ord.createddate >= :beginDate AND ord.createddate <= :endDate \n" +
-                    "AND g.IdOfGood IN (SELECT g2.idofgood \n" +
-                    "                   FROM cf_goods_requests gr JOIN cf_goods_requests_positions grp ON (gr.IdOfGoodsRequest = grp.IdOfGoodsRequest) \n" +
-                    "                                             JOIN cf_goods g2 ON (g2.IdOfGood = grp.IdOfGood) \n" +
+            query = session.createSQLQuery("SELECT ord.idoforg, " +
+                    "sum(CASE WHEN ord.ordertype = 4 OR ord.ordertype = 6 THEN det.qty ELSE 0 END) AS consumedCount, " +
+                    "sum(CASE WHEN ord.ordertype = 6 THEN det.qty ELSE 0 END) AS writtenOffCount " +
+                    "FROM cf_orders ord JOIN CF_OrderDetails det ON (ord.idoforder = det.idoforder AND ord.idoforg = det.idoforg) " +
+                    "JOIN cf_goods g ON (g.IdOfGood = det.IdOfGood) " +
+                    "WHERE ord.createddate >= :beginDate AND ord.createddate <= :endDate and ord.state=0 and det.state=0 " +
+                    "AND g.IdOfGood IN (SELECT g2.idofgood " +
+                    "                   FROM cf_goods_requests gr JOIN cf_goods_requests_positions grp ON (gr.IdOfGoodsRequest = grp.IdOfGoodsRequest) " +
+                    "                                             JOIN cf_goods g2 ON (g2.IdOfGood = grp.IdOfGood) " +
                     "                   WHERE gr.doneDate BETWEEN :startDate AND :endDate2 AND gr.orgOwner = ord.idoforg)" +
-                    "GROUP BY ord.idoforg \n" +
+                    "GROUP BY ord.idoforg " +
                     "ORDER BY ord.idoforg")
                     .setParameter("beginDate", startTime.getTime())
                     .setParameter("endDate", endTime.getTime())

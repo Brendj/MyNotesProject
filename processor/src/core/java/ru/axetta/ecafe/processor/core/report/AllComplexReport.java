@@ -20,7 +20,7 @@ import java.util.List;
  * User: rumil
  * Date: 25.01.12
  * Time: 22:55
- * To change this template use File | Settings | File Templates.
+ * Онлайн отчеты -> Отчет по комплексам -> Все комплексы
  */
 public class AllComplexReport extends BasicReport {
     private final List<ComplexItem> complexItems;
@@ -41,11 +41,11 @@ public class AllComplexReport extends BasicReport {
                 orgCondition = orgCondition.substring(0, orgCondition.length() - 4) + ") ";
 
                 String preparedQuery = "select org.officialName, od.menuDetailName, od.rPrice, od.discount, "
-                        + "sum(od.qty) as quantity, " + " min(o.createdDate), max(o.createdDate) "
+                        + "sum(od.qty) as quantity, min(o.createdDate), max(o.createdDate) "
                         + "  from CF_Orders o, CF_OrderDetails od, CF_Orgs org "
-                        + " where o.idOfOrder = od.idOfOrder "
-                        + "   and o.idOfOrg = od.idOfOrg" + "   and org.idOfOrg = od.idOfOrg "
-                        + "   and o.createdDate >= :fromCreatedDate " + "   and o.createdDate <= :toCreatedDate"
+                        + " where o.idOfOrder = od.idOfOrder and o.state=0 and od.state=0 "
+                        + "   and o.idOfOrg = od.idOfOrg and org.idOfOrg = od.idOfOrg "
+                        + "   and o.createdDate >= :fromCreatedDate and o.createdDate <= :toCreatedDate"
                         + "   and (od.menuType >= :fromMenuType and od.menuType <= :toMenuType) "
                         + orgCondition
                         + " group by org.officialName, od.menuDetailName, od.rPrice, od.discount "

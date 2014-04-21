@@ -291,8 +291,9 @@ public class ReferReport extends BasicReportForAllOrgJob {
                             + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
                             + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
                             + "where cf_orders.socdiscount<>0 and cf_orders.idoforg=:idoforg and "
-                            + "      cf_orders.createddate between :start and :end "
-                            + "      and cf_orders.ordertype=:ordertype "
+                            + "  cf_orders.createddate between :start and :end "
+                            + "  and cf_orders.ordertype=:ordertype and"
+                            + "  cf_orders.state=0 and cf_orderdetails.state=0"
                             + "order by cf_goods.nameofgood, cf_orders.createddate");
             query.setLong("idoforg", org.getIdOfOrg());
             query.setLong("start", startTime.getTime());
@@ -498,7 +499,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 + "from (select distinct(date_trunc('day', to_timestamp(cf_orders.createddate / 1000))) as d "
                 + "      from cf_orders "
                 + "      join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
-                + "      where cf_orderdetails.socdiscount<>0 and cf_orders.idoforg=:idoforg and "
+                + "      where cf_orderdetails.socdiscount<>0 and cf_orders.idoforg=:idoforg and cf_orders.state=0 and"
                 + "            cf_orders.createddate between :start and :end) as dates "
                 + "order by 1");
         query.setLong("idoforg", idoforg);

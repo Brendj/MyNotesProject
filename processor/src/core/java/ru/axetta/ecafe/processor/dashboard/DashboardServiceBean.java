@@ -301,7 +301,7 @@ public class DashboardServiceBean {
                 statItem.setFirstDiscountOrderDate((Date) result[2]);
             }
             ////
-            queryText = "SELECT order.org.idOfOrg, count(*) FROM Order order WHERE order.socDiscount > 0 AND order.createTime BETWEEN :dayStart AND :dayEnd GROUP BY order.org.idOfOrg";
+            queryText = "SELECT order.org.idOfOrg, count(*) FROM Order order WHERE order.state=0 and order.socDiscount > 0 AND order.createTime BETWEEN :dayStart AND :dayEnd GROUP BY order.org.idOfOrg";
             query = entityManager.createQuery(queryText);
             query.setParameter("dayStart", dayStartDate);
             query.setParameter("dayEnd", dayEndDate);
@@ -316,7 +316,7 @@ public class DashboardServiceBean {
                 statItem.setNumberOfDiscountOrders((Long) result[1]);
             }
             ////
-            queryText = "SELECT order.org.idOfOrg, count(*) FROM Order order WHERE order.socDiscount = 0 AND order.createTime BETWEEN :dayStart AND :dayEnd GROUP BY order.org.idOfOrg";
+            queryText = "SELECT order.org.idOfOrg, count(*) FROM Order order WHERE order.state=0 and order.socDiscount = 0 AND order.createTime BETWEEN :dayStart AND :dayEnd GROUP BY order.org.idOfOrg";
             query = entityManager.createQuery(queryText);
             query.setParameter("dayStart", dayStartDate);
             query.setParameter("dayEnd", dayEndDate);
@@ -333,7 +333,7 @@ public class DashboardServiceBean {
             ////
             queryText = " select cf_orders.idoforg, count(distinct cf_orders.idoforder) from cf_orders "
                     + " left join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
-                    + " where lower(cf_orderdetails.menugroup)=:groupName "
+                    + " where lower(cf_orderdetails.menugroup)=:groupName and cf_orders.state=0 and cf_orderdetails.state=0 "
                     + " AND cf_orders.createddate BETWEEN :dayStart AND :dayEnd group by cf_orders.idoforg";
             query = entityManager.createNativeQuery(queryText);
             query.setParameter("groupName", "вендинг");
@@ -404,7 +404,7 @@ public class DashboardServiceBean {
                     "FROM cf_orders " +
                     "LEFT JOIN cf_clients ON cf_orders.idofclient=cf_clients.idofclient " +
                     "WHERE cf_orders.createddate BETWEEN :dateAt AND :dateTo AND cf_clients.idOfClientGroup<:studentsMaxValue "
-                    + " AND cf_orders.socdiscount=0" +
+                    + " AND cf_orders.socdiscount=0 and cf_orders.state=0 " +
                     " GROUP BY cf_orders.idoforg";
             q = entityManager.createNativeQuery(sql);
             q.setParameter("dateAt", dayStartDate.getTime());
@@ -667,10 +667,10 @@ public class DashboardServiceBean {
                             + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState = :contractState AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue) AS numOfStaff, "
                             + "(SELECT count(*) FROM EnterEvent eev WHERE eev.org.idOfOrg = org.idOfOrg AND eev.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND eev.evtDateTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentsEnterEvents, "
                             + "(SELECT count(*) FROM EnterEvent eev WHERE eev.org.idOfOrg = org.idOfOrg AND eev.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND eev.evtDateTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffEnterEvents, "
-                            + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount > 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentSocMenu, "
-                            + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount = 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentMenu, "
-                            + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount > 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffSocMenu, "
-                            + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount = 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffMenu "
+                            + "(SELECT count(*) FROM Order order WHERE order.state=0 and order.org.idOfOrg = org.idOfOrg AND order.socDiscount > 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentSocMenu, "
+                            + "(SELECT count(*) FROM Order order WHERE order.state=0 and order.org.idOfOrg = org.idOfOrg AND order.socDiscount = 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentMenu, "
+                            + "(SELECT count(*) FROM Order order WHERE order.state=0 and order.org.idOfOrg = org.idOfOrg AND order.socDiscount > 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffSocMenu, "
+                            + "(SELECT count(*) FROM Order order WHERE order.state=0 and order.org.idOfOrg = org.idOfOrg AND order.socDiscount = 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffMenu "
                             + "FROM Org org LEFT OUTER JOIN org.syncHistoriesInternal sh ";
             if (idOfOrg != null) {
                 queryText += " WHERE org.idOfOrg=:idOfOrg";

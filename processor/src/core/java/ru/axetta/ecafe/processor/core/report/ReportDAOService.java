@@ -469,7 +469,7 @@ public class ReportDAOService {
     }
 
     public long getStatOrdersCount() {
-        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_orders");
+        Query q = entityManager.createNativeQuery("SELECT COUNT(*) FROM cf_orders where cf_orders.state=0");
         return Long.parseLong("" + q.getSingleResult());
     }
 
@@ -484,17 +484,17 @@ public class ReportDAOService {
     }
 
     public long callClientsWithPurchaseOfFoodPayPurchaseReducedPriceMeals() {
-        Query q = entityManager.createNativeQuery("select count(distinct idofclient) from cf_orders o, cf_orderdetails od where o.idoforder=od.idoforder and o.idoforg=od.idoforg ");
+        Query q = entityManager.createNativeQuery("select count(distinct idofclient) from cf_orders o, cf_orderdetails od where o.idoforder=od.idoforder and o.idoforg=od.idoforg and o.state=0 and od.state=0 ");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     public long callClientsWithPurchaseOfMealBenefits() {
-        Query q = entityManager.createNativeQuery("select count(distinct idofclient) from cf_orders o, cf_orderdetails od where o.idoforder=od.idoforder and o.idoforg=od.idoforg and od.menutype>50");
+        Query q = entityManager.createNativeQuery("select count(distinct idofclient) from cf_orders o, cf_orderdetails od where o.idoforder=od.idoforder and o.idoforg=od.idoforg and od.menutype>50 and o.state=0 and od.state=0");
         return Long.parseLong("" + q.getSingleResult());
     }
 
     public long callClientsPayPowerPurchase() {
-        Query q = entityManager.createNativeQuery("select count(distinct idofclient) from cf_orders o, cf_orderdetails od where o.idoforder=od.idoforder and o.idoforg=od.idoforg and od.menutype=0");
+        Query q = entityManager.createNativeQuery("select count(distinct idofclient) from cf_orders o, cf_orderdetails od where o.idoforder=od.idoforder and o.idoforg=od.idoforg and od.menutype=0 and o.state=0 and od.state=0");
         return Long.parseLong("" + q.getSingleResult());
     }
 
@@ -540,7 +540,7 @@ public class ReportDAOService {
             Map<Long, Integer> res = new HashMap<Long, Integer>();
             Query q = entityManager.createNativeQuery("SELECT cf_orders.idoforg, COUNT(DISTINCT cf_orders.idoforder) " +
                     "FROM cf_orders " +
-                    "WHERE cf_orders.createddate BETWEEN :dateAt AND :dateTo " +
+                    "WHERE cf_orders.state=0 and cf_orders.createddate BETWEEN :dateAt AND :dateTo " +
                     "GROUP BY cf_orders.idoforg");
             q.setParameter("dateAt", at.getTime());
             q.setParameter("dateTo", to.getTime());

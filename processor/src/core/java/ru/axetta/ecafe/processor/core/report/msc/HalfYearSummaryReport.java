@@ -12,6 +12,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.*;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExecutorServiceWrappedJob;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
@@ -19,6 +20,7 @@ import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +36,7 @@ import java.util.concurrent.ExecutorService;
  * User: chirikov
  * Date: 05.10.12
  * Time: 15:49
- * To change this template use File | Settings | File Templates.
+ * Сводный отчет по реализации
  */
 public class HalfYearSummaryReport extends BasicReportJob
 {
@@ -56,7 +58,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                 new JasperField("select cf_orderdetails.idoforg, int8(count(qty)) " +
                         "from cf_orderdetails " +
                         "left join cf_orders on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg " +
-                        "where (cf_orderdetails.menutype BETWEEN 50 AND 60) and " +
+                        "where (cf_orderdetails.menutype BETWEEN 50 AND 60)  and cf_orders.state=0 and cf_orderdetails.state=0  and " +
                         "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_START%') * 1000 AND " +
                         "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_END%') * 1000 and " +
                         "cf_orders.socdiscount <> 0 and " +
@@ -69,7 +71,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                         "where (cf_orderdetails.menutype BETWEEN 50 AND 60) and "+
                         "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_START%') * 1000 AND "+
                         "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_END%') * 1000 and "+
-                        "cf_orders.socdiscount <> 0 "+
+                        "cf_orders.socdiscount <> 0  and cf_orders.state=0 and cf_orderdetails.state=0 "+
                         //"and menudetailname LIKE 'Завтрак%' "+
                         "group by cf_orderdetails.idoforg ", Currency.class));
         JASPER_FIELDS.put ("benefitDailyCount",
@@ -83,7 +85,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                         "where (cf_orderdetails.menutype BETWEEN 50 AND 60) and " +
                         "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_START%') * 1000 AND " +
                         "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_END%') * 1000 and " +
-                        "cf_orders.socdiscount <> 0 " +
+                        "cf_orders.socdiscount <> 0 and cf_orders.state=0 and cf_orderdetails.state=0 " +
                         "group by cf_orderdetails.idoforg, cf_orders.createddate) AS o1 " +
                         "group by o1.idoforg, mon) AS o2 " +
                         "group by o2.idoforg", Integer.class));
@@ -102,7 +104,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                         "where (cf_orderdetails.menutype BETWEEN 50 AND 60) and " +
                         "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_START%') * 1000 AND " +
                         "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_END%') * 1000 and " +
-                        "cf_orders.socdiscount = 0 and menudetailname LIKE 'Обед%' " +
+                        "cf_orders.socdiscount = 0 and menudetailname LIKE 'Обед%' and cf_orders.state=0 and cf_orderdetails.state=0 " +
                         "group by cf_orderdetails.idoforg, cf_orders.createddate) AS o1 " +
                         "group by o1.idoforg, mon) AS o2 " +
                         "group by o2.idoforg", Integer.class));
@@ -116,7 +118,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                         "left join cf_orders on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg " +
                         "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_START%') * 1000 AND " +
                         "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%REPORT_PERIOD_END%') * 1000 and " +
-                        "cf_orderdetails.rootmenu <> '' and rprice <> 0 " +
+                        "cf_orderdetails.rootmenu <> '' and rprice <> 0 and cf_orders.state=0 and cf_orderdetails.state=0 " +
                         "group by cf_orderdetails.idoforg, cf_orders.createddate) AS o1 " +
                         "group by o1.idoforg, mon) AS o2 " +
                         "group by o2.idoforg", Currency.class));
@@ -136,7 +138,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "where cf_orderdetails.menutype BETWEEN 50 AND 60 and " +
                             "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
                             "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
-                            "cf_orderdetails.socdiscount <> 0 and menudetailname LIKE '%1-4%' and qty <> 0 " +
+                            "cf_orderdetails.socdiscount <> 0 and menudetailname LIKE '%1-4%' and qty <> 0  and cf_orders.state=0 and cf_orderdetails.state=0 " +
                             "group by cf_orders.idoforg " +
                             "order by cf_orders.idoforg", Integer.class));
             JASPER_FIELDS.put ("m" + i + "_1-4AvgMonthly",
@@ -146,7 +148,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "where cf_orderdetails.menutype BETWEEN 50 AND 60 and " +
                             "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
                             "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
-                            "cf_orderdetails.socdiscount <> 0 and menudetailname LIKE '%1-4%' and qty <> 0 " +
+                            "cf_orderdetails.socdiscount <> 0 and menudetailname LIKE '%1-4%' and qty <> 0 and cf_orders.state=0 and cf_orderdetails.state=0 " +
                             "group by cf_orders.idoforg " +
                             "order by cf_orders.idoforg", Currency.class));
             JASPER_FIELDS.put ("m" + i + "_1-4SummMonthly",
@@ -156,7 +158,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "where cf_orderdetails.menutype BETWEEN 50 AND 60 and " +
                             "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
                             "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
-                            "cf_orderdetails.socdiscount <> 0 and menudetailname LIKE '%1-4%' and qty <> 0 " +
+                            "cf_orderdetails.socdiscount <> 0 and menudetailname LIKE '%1-4%' and qty <> 0  and cf_orders.state=0 and cf_orderdetails.state=0 " +
                             "group by cf_orders.idoforg " +
                             "order by cf_orders.idoforg", Currency.class));
 
@@ -167,7 +169,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "where cf_orderdetails.menutype BETWEEN 50 AND 60 and " +
                             "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
                             "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
-                            "cf_orderdetails.socdiscount <> 0 and menudetailname LIKE '5-11%' and qty <> 0 " +
+                            "cf_orderdetails.socdiscount <> 0 and menudetailname LIKE '5-11%' and qty <> 0  and cf_orders.state=0 and cf_orderdetails.state=0 " +
                             "group by cf_orders.idoforg " +
                             "order by cf_orders.idoforg", Integer.class));
             JASPER_FIELDS.put ("m" + i + "_5-11AvgMonthly",
@@ -177,7 +179,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "where cf_orderdetails.menutype BETWEEN 50 AND 60 and " +
                             "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
                             "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
-                            "cf_orderdetails.socdiscount <> 0 and menudetailname LIKE '%5-11%' and qty <> 0 " +
+                            "cf_orderdetails.socdiscount <> 0 and menudetailname LIKE '%5-11%' and qty <> 0 and cf_orders.state=0 and cf_orderdetails.state=0 " +
                             "group by cf_orders.idoforg " +
                             "order by cf_orders.idoforg", Currency.class));
             JASPER_FIELDS.put ("m" + i + "_5-11SummMonthly",
@@ -187,7 +189,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "where cf_orderdetails.menutype BETWEEN 50 AND 60 and " +
                             "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
                             "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
-                            "cf_orderdetails.socdiscount <> 0 and menudetailname LIKE '%5-11%' and qty <> 0 " +
+                            "cf_orderdetails.socdiscount <> 0 and menudetailname LIKE '%5-11%' and qty <> 0  and cf_orders.state=0 and cf_orderdetails.state=0 " +
                             "group by cf_orders.idoforg " +
                             "order by cf_orders.idoforg", Currency.class));
             JASPER_FIELDS.put ("m" + i + "_payerCountMonthly",
@@ -202,7 +204,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "from cf_orders " +
                             "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
                             "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
-                            "socdiscount=0 " +
+                            "socdiscount=0 and cf_orders.state=0 and cf_orderdetails.state=0 " +
                             "group by cf_orders.idoforg", Currency.class));
             JASPER_FIELDS.put ("m" + i + "_canteenSummMonthly",  ////////////////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     new JasperField ("", Currency.class));
@@ -213,7 +215,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "from cf_orders " +
                             "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
                             "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
-                            "socdiscount<>0 " +
+                            "socdiscount<>0  and cf_orders.state=0 and cf_orderdetails.state=0 " +
                             "group by cf_orders.idoforg, cf_orders.createddate) AS o1 " +
                             "group by o1.idoforg, d) AS o2 " +
                             "group by idoforg", Integer.class));
@@ -225,7 +227,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "left join cf_orderdetails on cf_orders.idoforg=cf_orderdetails.idoforg and cf_orders.idoforder=cf_orderdetails.idoforder " +
                             "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
                             "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
-                            "cf_orderdetails.socdiscount<>0 " +
+                            "cf_orderdetails.socdiscount<>0 and cf_orders.state=0 and cf_orderdetails.state=0 " +
                             "group by cf_orders.idoforg, cf_orders.createddate) AS o1 " +
                             "group by o1.idoforg, d) AS o2 " +
                             "group by idoforg", Currency.class));
@@ -236,7 +238,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "from cf_orders " +
                             "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
                             "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
-                            "socdiscount=0 "+
+                            "socdiscount=0 and cf_orders.state=0 and cf_orderdetails.state=0  "+
                             "group by cf_orders.idoforg, cf_orders.createddate) AS o1 " +
                             "group by o1.idoforg, d) AS o2 " +
                             "group by idoforg", Integer.class));
@@ -247,7 +249,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "from cf_orders " +
                             "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
                             "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
-                            "socdiscount=0 " +
+                            "socdiscount=0 and cf_orders.state=0 and cf_orderdetails.state=0 " +
                             "group by cf_orders.idoforg, cf_orders.createddate) AS o1 " +
                             "group by o1.idoforg, d) AS o2 " +
                             "group by idoforg", Integer.class));
@@ -259,7 +261,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "left join cf_orderdetails on cf_orders.idoforg=cf_orderdetails.idoforg and cf_orders.idoforder=cf_orderdetails.idoforder " +
                             "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
                             "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 and " +
-                            "cf_orderdetails.socdiscount=0 " +
+                            "cf_orderdetails.socdiscount=0  and cf_orders.state=0 and cf_orderdetails.state=0 " +
                             "group by cf_orders.idoforg, cf_orders.createddate) AS o1 " +
                             "group by o1.idoforg, d) AS o2 " +
                             "group by idoforg", Currency.class));
@@ -272,99 +274,70 @@ public class HalfYearSummaryReport extends BasicReportJob
                             "from CF_Orders " +
                             "left outer join CF_Clients  on CF_Clients.IdOfClient=CF_Orders.IdOfClient " +
                             "where cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_START%') * 1000 AND " +
-                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000 " +
+                            "EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MONTH_END%') * 1000  and cf_orders.state=0 and cf_orderdetails.state=0 " +
                             "group by CF_Orders.IdOfOrg, cf_orders.createddate) AS o1 " +
                             "group by o1.idoforg, d) AS o2 " + "group by idoforg", Integer.class));
         }
     }
     private static final Logger logger = LoggerFactory.getLogger (HalfYearSummaryReport.class);
 
-
-
-
-
-    public HalfYearSummaryReport()
-    {
-    }
-
+    public HalfYearSummaryReport(){}
 
     public HalfYearSummaryReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
-            Date endTime)
-    {
+            Date endTime){
         super (generateTime, generateDuration, print, startTime, endTime);
     }
 
     public void initialize (Date startTime, Date endTime, String templateFilename,
-            SessionFactory sessionFactory, Calendar calendar)
-    {
+            SessionFactory sessionFactory, Calendar calendar){
         super.initialize (startTime, endTime, templateFilename, sessionFactory, calendar);
     }
 
 
     public HalfYearSummaryReport(Date startTime, Date endTime, String templateFilename, SessionFactory sessionFactory,
-            Calendar calendar)
-    {
+            Calendar calendar){
         initialize(startTime, endTime, templateFilename, sessionFactory, calendar);
     }
 
-
     @Override
-    public String getReportDistinctText ()
-    {
-        return "";
-    }
-
+    public String getReportDistinctText (){return "";}
 
     public BasicReportJob createInstance (Date startTime, Date endTime, String templateFilename,
-            SessionFactory sessionFactory, Calendar calendar)
-    {
-        return new HalfYearSummaryReport(startTime, endTime, templateFilename,
-                sessionFactory, calendar);
+            SessionFactory sessionFactory, Calendar calendar){
+        return new HalfYearSummaryReport(startTime, endTime, templateFilename, sessionFactory, calendar);
     }
 
-
-    public Builder createCustomBuilder (String templateFilename)
-    {
+    public Builder createCustomBuilder (String templateFilename){
         return new Builder (templateFilename);
     }
-
 
     @Override
     public BasicReportForAllOrgJob.Builder createBuilder(String templateFilename) {
         return null;
     }
 
-
-    public Logger getLogger ()
-    {
+    public Logger getLogger (){
         return logger;
     }
 
     @Override
-    public int getDefaultReportPeriod ()
-    {
+    public int getDefaultReportPeriod (){
         return REPORT_PERIOD_PREV_PREV_PREV_DAY;
     }
 
-
-    public Class getMyClass ()
-    {
+    public Class getMyClass (){
         return HalfYearSummaryReport.class;
     }
 
 
-    protected void prepare ()
-    {
-        if (!hasPrint() && templateFilename != null && sessionFactory != null)
-        {
-            templateFilename = AutoReportGenerator
-                    .restoreFilename(RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath(),
-                            templateFilename);
+    protected void prepare (){
+        if (!hasPrint() && templateFilename != null && sessionFactory != null){
+            String templatesPath = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
+            templateFilename = AutoReportGenerator.restoreFilename(templatesPath, templateFilename);
             Builder builder = createCustomBuilder (templateFilename);
             Session session = null;
             org.hibernate.Transaction transaction = null;
-            try
-            {
+            try{
                 session = sessionFactory.openSession ();
                 /*transaction = BasicReport.createTransaction (session);
                 transaction.begin ();*/
@@ -375,13 +348,11 @@ public class HalfYearSummaryReport extends BasicReportJob
                 /*transaction.commit ();
                 transaction = null;*/
             }
-            catch (Exception e)
-            {
-                getLogger ().error (String.format ("Failed at report lazy-build \"%s\"",
-                        BasicReportForOrgJob.class), e);
+            catch (Exception e){
+                String message = String.format("Failed at report lazy-build \"%s\"", HalfYearSummaryReport.class);
+                getLogger().error(message, e);
             }
-            finally
-            {
+            finally{
                 HibernateUtils.rollback (transaction, getLogger ());
                 HibernateUtils.close (session, getLogger ());
             }
@@ -390,23 +361,20 @@ public class HalfYearSummaryReport extends BasicReportJob
 
 
     @Override
-    public AutoReportRunner getAutoReportRunner()
-    {
+    public AutoReportRunner getAutoReportRunner(){
         return new AutoReportRunner ()
         {
             @Override
             public void run (AutoReportBuildTask autoReportBuildTask)
             {
-                if (logger.isDebugEnabled ())
-                {
+                if (logger.isDebugEnabled ()){
                     logger.debug (String.format ("Building auto reports \"%s\"", getMyClass ().getCanonicalName ()));
                 }
                 String classPropertyValue = getMyClass ().getCanonicalName ();
                 List <AutoReport> autoReports = new LinkedList <AutoReport> ();
                 Session session = null;
-                org.hibernate.Transaction transaction = null;
-                try
-                {
+                Transaction transaction = null;
+                try{
                     session = autoReportBuildTask.sessionFactory.openSession ();
                     transaction = BasicReport.createTransaction(session);
                     transaction.begin ();
@@ -427,12 +395,10 @@ public class HalfYearSummaryReport extends BasicReportJob
                             new AutoReportProcessor.ProcessTask (autoReportBuildTask.autoReportProcessor, autoReports,
                                     autoReportBuildTask.documentBuilders));
                 }
-                catch (Exception e)
-                {
+                catch (Exception e){
                     logger.error (String.format ("Failed at building auto reports \"%s\"", classPropertyValue), e);
                 }
-                finally
-                {
+                finally{
                     HibernateUtils.rollback (transaction, logger);
                     HibernateUtils.close (session, logger);
                 }
@@ -440,19 +406,12 @@ public class HalfYearSummaryReport extends BasicReportJob
         };
     }
 
+    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob{}
 
-    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob
-    {
-    }
-
-
-    public static class Builder extends ExecutorServiceWrappedJob
-    {
+    public static class Builder extends ExecutorServiceWrappedJob{
         private final String templateFilename;
 
-
-        public Builder (String templateFilename)
-        {
+        public Builder (String templateFilename){
             this.templateFilename = templateFilename;
         }
 
@@ -466,17 +425,16 @@ public class HalfYearSummaryReport extends BasicReportJob
             return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
 
-        public HalfYearSummaryReport build (Session session, Date startTime, Date endTime, Calendar calendar) throws Exception
-        {
-            try
-            {
+        public HalfYearSummaryReport build (Session session, Date startTime, Date endTime, Calendar calendar) throws Exception{
+            try{
                 Date generateDate = new Date ();
+
                 Calendar cal = Calendar.getInstance ();
                 cal.setTime(generateDate);
                 cal.set(Calendar.HOUR, 0);
                 cal.set(Calendar.MINUTE, 0);
                 cal.set(Calendar.SECOND, 0);
-                cal.set (Calendar.DAY_OF_MONTH, 1);
+                cal.set(Calendar.DAY_OF_MONTH, 1);
 
 
                 Map <String, Object> parameterMap = new HashMap <String, Object> ();
@@ -487,8 +445,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                 parameterMap.put ("generateDate", String.format("%1$te.%1$tm.%1$tY", generateDate));
 
 
-                if (cal.get (Calendar.MONTH) < 6)
-                {
+                if (cal.get (Calendar.MONTH) < 6){
                     parameterMap.put ("Month0", "Январь");
                     parameterMap.put ("Month1", "Февраль");
                     parameterMap.put ("Month2", "Март");
@@ -496,8 +453,7 @@ public class HalfYearSummaryReport extends BasicReportJob
                     parameterMap.put ("Month4", "Май");
                     parameterMap.put ("Month5", "Июнь");
                 }
-                else
-                {
+                else{
                     parameterMap.put ("Month0", "Июль");
                     parameterMap.put ("Month1", "Август");
                     parameterMap.put ("Month2", "Сентябрь");
@@ -505,25 +461,20 @@ public class HalfYearSummaryReport extends BasicReportJob
                     parameterMap.put ("Month4", "Ноябрь");
                     parameterMap.put ("Month5", "Декабрь");
                 }
-
-
-
                 JasperPrint jasperPrint = JasperFillManager.fillReport (templateFilename, parameterMap,
                         createDataSource (session, parameterMap, cal));
                 Date generateEndTime = new Date();
                 return new HalfYearSummaryReport(generateDate, generateEndTime.getTime() - generateDate.getTime(),
                         jasperPrint, startTime, endTime);
             }
-            catch (Exception e)
-            {
-                e.printStackTrace();
+            catch (Exception e){
+                logger.error("HalfYearSummaryReport.Builder error", e);
                 throw e;
             }
         }
 
 
-        private JRDataSource createDataSource (Session session, Map <String, Object> params, Calendar cal) throws Exception
-        {
+        private JRDataSource createDataSource (Session session, Map <String, Object> params, Calendar cal) throws Exception{
             Map <Long, MyRow> rows = initList (session);
             fillValues (session, rows, "studentsCount", params);
             fillValues (session, rows, "benefitBreakfastsCount", params);
@@ -533,8 +484,7 @@ public class HalfYearSummaryReport extends BasicReportJob
             fillValues (session, rows, "canteenDailySum", params);
             fillValues (session, rows, "doNotEatCount", params);
             // Для каждого месяца, выполняем SQL для последующего их заполнения
-            for (int i=0; i<6; i++)
-            {
+            for (int i=0; i<6; i++){
                 cal.set (Calendar.MONTH, i + 0);
                 params.put ("monthStart", new Date (cal.getTimeInMillis ()));
                 cal.set (Calendar.MONTH, i + 1 + 0);
@@ -563,8 +513,7 @@ public class HalfYearSummaryReport extends BasicReportJob
 
 
         /* В данном методе заполняются все поля, которые могут быть получены одним запросом */
-        private Map <Long, MyRow> initList (Session session)
-        {
+        private Map <Long, MyRow> initList (Session session){
             Map <Long, MyRow> result = new HashMap <Long, MyRow> ();
             Query q = session.createSQLQuery ("SELECT cf_orgs.idoforg, cf_orgs.shortname " +
                     "FROM cf_orders " +
@@ -572,15 +521,13 @@ public class HalfYearSummaryReport extends BasicReportJob
                     "group by cf_orgs.idoforg " +
                     "ORDER BY cf_orgs.shortname");
             List list = q.list ();
-            for (Object o : list)
-            {
+            for (Object o : list){
                 Object entry [] = (Object []) o;
                 long id = ((BigInteger) entry [0]).longValue ();
                 MyRow row = new MyRow (id);
                 String name = (String) entry [1];
                 row.put ("name", name);
-                if (name.lastIndexOf ("№") > 1)
-                {
+                if (name.lastIndexOf ("№") > 1){
                     row.put ("no", name.substring (name.lastIndexOf ("№") + 1).trim ());
                 }
                 result.put (id, row);
@@ -598,46 +545,36 @@ public class HalfYearSummaryReport extends BasicReportJob
                    fieldName - имя поля, к которому будет привязано значение
          */
         private void fillValues (Session session, Map <Long, MyRow> rows,
-                String fieldName, Map <String, Object> params)
-        {
+                String fieldName, Map <String, Object> params){
             JasperField field = JASPER_FIELDS.get (fieldName);
-            if (field.getSQL () == null || field.getSQL ().length () < 1)
-            {
+            if (field.getSQL () == null || field.getSQL ().length () < 1){
                 return;
             }
             Query q = session.createSQLQuery (useMacroReplace (field.getSQL (), params));
             List list = q.list ();
-            for (Object o : list)
-            {
+            for (Object o : list){
                 Object entry [] = (Object []) o;
-                try
-                {
+                try{
                     long id = ((BigInteger) entry [0]).longValue ();
                     MyRow row = rows.get (id);
-                    if (row == null)
-                    {
+                    if (row == null){
                         continue;
                     }
-                    if (field.getClazz () == BigInteger.class || field.getClazz () == Integer.class)
-                    {
+                    if (field.getClazz () == BigInteger.class || field.getClazz () == Integer.class){
                         row.put (fieldName, ((BigInteger) entry [1]).intValue());
                     }
 
-                    if (field.getClazz () == Currency.class)
-                    {
-                        try
-                        {
+                    if (field.getClazz () == Currency.class){
+                        try{
                             row.put(fieldName, ((BigDecimal) entry[1]).intValue ());
                         }
-                        catch (Exception e)
-                        {
+                        catch (Exception e){
                             row.put(fieldName, ((BigInteger) entry[1]).intValue ());
                         }
                     }
                     continue;
                 }
-                catch (Exception e)
-                {
+                catch (Exception e){
                     logger.info ("Failed to put entry for [" + fieldName + "] " + entry [0] + " the value is " + entry [1]);
                 }
             }

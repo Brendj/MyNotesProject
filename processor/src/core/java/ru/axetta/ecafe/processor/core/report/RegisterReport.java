@@ -25,12 +25,11 @@ import java.util.*;
  * User: Frozen
  * Date: 11.03.12
  * Time: 13:46
- * To change this template use File | Settings | File Templates.
+ * РЕЕСТР талонов льготного питания.
  */
 public class RegisterReport extends BasicReportForOrgJob {
 
-    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
-    }
+    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {}
 
     public static class Builder extends BasicReportJob.Builder {
 
@@ -185,7 +184,7 @@ public class RegisterReport extends BasicReportForOrgJob {
                 " FROM CF_ORDERS o, CF_ORDERDETAILS od, CF_CLIENTS c, CF_CLIENTGROUPS cg " +
                 " WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg and cg.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND (o.idofclient=c.idofclient) AND (c.idofclientgroup=cg.idofclientgroup) AND "+
                 " (od.MenuType>=:typeComplex1 OR od.MenuType<=:typeComplex10) AND (od.RPrice=0 AND od.Discount>0) AND " +
-                " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) AND " +
+                " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) and o.state=0 and od.state=0 AND " +
                 " (od.menuDetailName = 'Обед' OR od.menuDetailName = 'Завтрак' OR od.menuDetailName = 'Полдник')" +
                 " group by xdt, od.menuDetailName, cg.groupname "+
                 " order by xdt, od.menuDetailName;");
@@ -251,7 +250,6 @@ public class RegisterReport extends BasicReportForOrgJob {
         }
 
     }
-
 
     public RegisterReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime, Date endTime,
             Long idOfOrg) {

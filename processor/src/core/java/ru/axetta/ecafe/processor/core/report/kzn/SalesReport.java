@@ -27,12 +27,11 @@ import java.util.*;
  * User: kolpakov
  * Date: 14.03.11
  * Time: 0:14
- * To change this template use File | Settings | File Templates.
+ * Отчет по продажам
  */
 public class SalesReport extends BasicReportForOrgJob {
 
-    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
-    }
+    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {}
 
     public static class Builder extends BasicReportJob.Builder {
 
@@ -110,7 +109,7 @@ public class SalesReport extends BasicReportForOrgJob {
             Query complexQuery_0 = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice) as SUM1, SUM(od.Qty*od.Discount) as SUM2" +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
                     "(od.MenuType=:typeComplex1 OR od.MenuType=:typeComplex2 OR od.MenuType=:typeComplex4 OR od.MenuType=:typeComplex5 OR od.MenuType=:typeComplex10) AND (od.rPrice>0) AND " +
-                    "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime)");
+                    "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) and o.state=0 and od.state=0 ");
 
             complexQuery_0.setParameter("idOfOrg", org.getIdOfOrg());
             complexQuery_0.setParameter("typeComplex1", OrderDetail.TYPE_COMPLEX_0); // централизованный 11-18
@@ -130,7 +129,7 @@ public class SalesReport extends BasicReportForOrgJob {
             Query freeComplexQuery = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.Discount)" +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
                     "(od.MenuType>=:typeComplex1 OR od.MenuType<=:typeComplex10) AND (od.RPrice=0 AND od.Discount>0) AND " +
-                    "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime)");
+                    "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) and o.state=0 and od.state=0 ");
 
             freeComplexQuery.setParameter("idOfOrg", org.getIdOfOrg());
             freeComplexQuery.setParameter("typeComplex1", OrderDetail.TYPE_COMPLEX_MIN);
@@ -146,7 +145,7 @@ public class SalesReport extends BasicReportForOrgJob {
             Query complexQuery_1 = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice) as SUM1, SUM(od.Qty*od.Discount) as SUM2" +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
                     "(od.MenuType=:typeComplex3 OR od.MenuType=:typeComplex4) AND (od.rPrice<>od.Discount) AND " +
-                    "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime)");
+                    "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) and o.state=0 and od.state=0 ");
 
             complexQuery_1.setParameter("idOfOrg", org.getIdOfOrg());
             complexQuery_1.setParameter("typeComplex3", OrderDetail.TYPE_COMPLEX_2); // ГПД централизованный
@@ -163,7 +162,7 @@ public class SalesReport extends BasicReportForOrgJob {
             Query mealsSelfProductionQuery = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice) as SUM1, SUM(od.Qty*od.Discount) as SUM2" +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
                     "(od.MenuType=:typeDish) AND (od.MenuOrigin=:menuOrigin0 OR od.MenuOrigin=:menuOrigin1 OR od.MenuOrigin=:menuOrigin2) AND" +
-                    "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime)");
+                    "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) and o.state=0 and od.state=0 ");
 
             mealsSelfProductionQuery.setParameter("idOfOrg", org.getIdOfOrg());
             mealsSelfProductionQuery.setParameter("typeDish", OrderDetail.TYPE_DISH_ITEM);
@@ -181,7 +180,7 @@ public class SalesReport extends BasicReportForOrgJob {
             Query mealsBoughtQuery = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice) as SUM1, SUM(od.Qty*od.Discount) as SUM2" +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
                     "(od.MenuType=:typeDish) AND (od.MenuOrigin=:menuOrigin) AND" +
-                    "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime)");
+                    "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) and o.state=0 and od.state=0 ");
 
             mealsBoughtQuery.setParameter("idOfOrg", org.getIdOfOrg());
             mealsBoughtQuery.setParameter("typeDish", OrderDetail.TYPE_DISH_ITEM);
@@ -197,7 +196,7 @@ public class SalesReport extends BasicReportForOrgJob {
             Query totalQuery = session.createSQLQuery("SELECT COUNT(*), SUM(od.Qty*od.RPrice) as SUM1, SUM(od.Qty*od.Discount) as SUM2" +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
                     "(od.MenuType=:typeDish OR (od.MenuType>=:complexType0 AND od.MenuType<=:complexType9)) AND (od.rPrice>0) AND" +
-                    "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime)");
+                    "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) and o.state=0 and od.state=0 ");
 
             totalQuery.setParameter("idOfOrg", org.getIdOfOrg());
             totalQuery.setParameter("typeDish", OrderDetail.TYPE_DISH_ITEM);
@@ -213,7 +212,7 @@ public class SalesReport extends BasicReportForOrgJob {
             ////
             Query mealsQuery = session.createSQLQuery("SELECT od.MenuOrigin, od.MenuDetailName, COUNT(*), od.RPrice, SUM(od.Qty*od.RPrice)" +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
-                    "(od.MenuType=:typeDish) AND " +
+                    "(od.MenuType=:typeDish)  and o.state=0 and od.state=0 AND " +
                     "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) GROUP BY od.MenuOrigin, od.MenuDetailName, od.RPrice ORDER BY od.MenuOrigin, od.MenuDetailName");
 
             mealsQuery.setParameter("idOfOrg", org.getIdOfOrg());
@@ -238,7 +237,6 @@ public class SalesReport extends BasicReportForOrgJob {
         }
 
     }
-
 
     public SalesReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime, Date endTime,
             Long idOfOrg) {

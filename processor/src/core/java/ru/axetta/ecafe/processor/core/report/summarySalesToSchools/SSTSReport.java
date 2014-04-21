@@ -35,7 +35,7 @@ import java.util.*;
  * User: r.kalimullin
  * Date: 23.09.13
  * Time: 12:23
- * "Сводный отчет по продажам школам"
+ * Сводный отчет по продажам в школах
  */
 
 public class SSTSReport extends BasicReportForContragentJob {
@@ -120,6 +120,8 @@ public class SSTSReport extends BasicReportForContragentJob {
             Criteria criteria = session.createCriteria(OrderDetail.class, "details")
                     .createAlias("details.order", "o", JoinType.INNER_JOIN)
                     .createAlias("details.org", "org", JoinType.INNER_JOIN)
+                    .add(Restrictions.eq("state",0))
+                    .add(Restrictions.eq("o.state",0))
                     .add(Restrictions.eq("org.defaultSupplier", contragent))
                     .add(Restrictions.between("o.createTime", startTime, endTime))
                     .addOrder(Order.asc("org.shortName"))

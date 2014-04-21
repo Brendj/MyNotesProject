@@ -23,7 +23,8 @@ import java.util.*;
  * User: Developer
  * Date: 17.10.2009
  * Time: 14:09:39
- * To change this template use File | Settings | File Templates.
+ * Продажи по продукции
+ * Организации -> {Выбранная организация} -> Отчет по покупкам
  */
 public class OrgOrderReport extends BasicReport {
 
@@ -472,7 +473,7 @@ public class OrgOrderReport extends BasicReport {
         private static TotalSums getTotalOrderSums(Session session, Date startTime, Date endTime, Client client)
                 throws Exception {
             Query query = session.createQuery(
-                    "select sum(sumByCard), sum(sumByCash), sum(socDiscount), sum(trdDiscount), sum(grantSum) from Order where client = ? and createTime >= ? and createTime < ?");
+                    "select sum(sumByCard), sum(sumByCash), sum(socDiscount), sum(trdDiscount), sum(grantSum) from Order where state=0 and client = ? and createTime >= ? and createTime < ?");
             query.setParameter(0, client);
             query.setParameter(1, startTime);
             query.setParameter(2, endTime);

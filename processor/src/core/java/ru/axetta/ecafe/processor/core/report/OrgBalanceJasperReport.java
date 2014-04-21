@@ -34,7 +34,7 @@ import java.util.concurrent.ExecutorService;
  * User: Developer
  * Date: 17.10.2009
  * Time: 14:09:39
- * To change this template use File | Settings | File Templates.
+ * Отчет по балансу клиентов учреждения
  */
 public class OrgBalanceJasperReport extends BasicJasperReport {
 
@@ -263,7 +263,7 @@ public class OrgBalanceJasperReport extends BasicJasperReport {
         private static TotalSums getTotalClientOrderSums(Session session, Date baseTime, Client client)
                 throws Exception {
             Query query = session.createQuery(
-                    "select sum(clientOrder.sumByCard) as SUM1, sum(clientOrder.sumByCash) as SUM2, "/*sum(clientOrder.discount)*/+" from Order clientOrder where clientOrder.client = ? and clientOrder.createTime < ?");
+                    "select sum(clientOrder.sumByCard) as SUM1, sum(clientOrder.sumByCash) as SUM2 from Order clientOrder where clientOrder.state=0 and clientOrder.client = ? and clientOrder.createTime < ?");
             query.setParameter(0, client);
             query.setParameter(1, baseTime);
             Object[] result = (Object[]) query.uniqueResult();

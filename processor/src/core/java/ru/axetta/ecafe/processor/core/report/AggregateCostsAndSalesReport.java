@@ -16,9 +16,10 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
-
 import java.text.DecimalFormat;
 import java.util.*;
+
+/* Мониторинг -> Отчет по показателям цен и продаж */
 
 public class AggregateCostsAndSalesReport extends BasicReport {
 
@@ -70,7 +71,7 @@ public class AggregateCostsAndSalesReport extends BasicReport {
                 // объем продаж и средний чек
                 queryStringBuffer = new StringBuffer("select count(o.id.idOfOrg), sum(o.RSum) from Order o where"
                         + " o.createTime > " + startDate.getTime() + " and o.createTime < " + endDate.getTime()
-                        + " and (o.RSum > 0) and (");
+                        + " and (o.RSum > 0) and o.state=0 and (");
                 for (Long curOrg : workingOrgSet) {
                     queryStringBuffer.append("o.id.idOfOrg = ");
                     queryStringBuffer.append(curOrg);
@@ -144,7 +145,7 @@ public class AggregateCostsAndSalesReport extends BasicReport {
 
                 // средняя месячная трата
                 queryStringBuffer = new StringBuffer("select sum(o.RSum) from Order o where"
-                        + " o.createTime > " + startDate.getTime() + " and o.createTime < " + endDate.getTime()
+                        + " o.createTime > " + startDate.getTime() + " and o.state=0 and o.createTime < " + endDate.getTime()
                         + " and o.RSum > 0 and (");
                 for (Long curOrg : workingOrgSet) {
                     queryStringBuffer.append("o.id.idOfOrg = ");
@@ -217,15 +218,13 @@ public class AggregateCostsAndSalesReport extends BasicReport {
             long endTime = endCal.getTimeInMillis();
 
             double tmpDays = (endTime - startTime) / MILLISECONDS_IN_DAY;
-            long result = Math.round(tmpDays);
-            return result;
+            return Math.round(tmpDays);
         }
 
         private Org getOrgById(Session session, Long idOfOrg) {
             Criteria orgCriteria = session.createCriteria(Org.class);
             orgCriteria.add(Restrictions.eq("idOfOrg", idOfOrg));
-            Org org = (Org) orgCriteria.uniqueResult();
-            return org;
+            return (Org) orgCriteria.uniqueResult();
         }
 
     }

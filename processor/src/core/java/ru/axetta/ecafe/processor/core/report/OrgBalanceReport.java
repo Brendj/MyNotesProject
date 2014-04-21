@@ -35,7 +35,8 @@ import java.util.concurrent.ExecutorService;
  * User: Developer
  * Date: 17.10.2009
  * Time: 14:09:39
- * To change this template use File | Settings | File Templates.
+ * Отчет по балансу клиентов учреждения
+ * Организации -> {Выбранная организация} -> Отчет по балансу
  */
 public class OrgBalanceReport extends BasicReport {
 
@@ -434,7 +435,7 @@ public class OrgBalanceReport extends BasicReport {
         private static TotalSums getTotalClientOrderSums(Session session, Date baseTime, Client client)
                 throws Exception {
             Query query = session.createQuery(
-                    "select sum(clientOrder.sumByCard), sum(clientOrder.sumByCash)"+/*, sum(clientOrder.discount)*/" from Order clientOrder where clientOrder.client = ? and clientOrder.createTime < ?");
+                    "select sum(clientOrder.sumByCard), sum(clientOrder.sumByCash)"+/*, sum(clientOrder.discount)*/" from Order clientOrder where clientOrder.state=0 and clientOrder.client = ? and clientOrder.createTime < ?");
             query.setParameter(0, client);
             query.setParameter(1, baseTime);
             Object[] result = (Object[]) query.uniqueResult();

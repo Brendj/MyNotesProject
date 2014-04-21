@@ -24,7 +24,7 @@ import java.util.*;
  * User: Frozen
  * Date: 11.03.12
  * Time: 13:46
- * To change this template use File | Settings | File Templates.
+ * Продажи за месяц
  */
 public class OrgOrderByDaysReport extends BasicReportForOrgJob {
 
@@ -130,7 +130,7 @@ public class OrgOrderByDaysReport extends BasicReportForOrgJob {
             Query query = session.createSQLQuery("SELECT o.CreatedDate, SUM(od.Qty*od.RPrice) as SUM, SUM(od.Qty) as COUNT, od.menudetailname "
                 + "FROM CF_ORDERS o,  CF_ORDERDETAILS od "
                 + "WHERE (o.idOfOrg=:idOfOrg) AND (od.idOfOrder=o.idOfOrder) AND (od.RPrice > 0) "
-                + "AND (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) "
+                + "AND (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) and o.state=0 and od.state=0 "
                 + "group by o.CreatedDate, od.menudetailname "
                 + "order by od.menudetailname;");
 

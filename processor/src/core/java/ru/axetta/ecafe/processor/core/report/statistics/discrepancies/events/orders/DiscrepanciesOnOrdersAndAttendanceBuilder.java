@@ -43,7 +43,7 @@ import static org.hibernate.criterion.Order.asc;
  * User: damir
  * Date: 03.02.14
  * Time: 14:03
- * To change this template use File | Settings | File Templates.
+ * Онлайн отчеты -> Статистика по расхождениям данных -> Статистика расхождения данных по заказам и оплате
  */
 public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAllOrgJob.Builder{
 
@@ -183,7 +183,6 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
             GoodRequestPosition position = (GoodRequestPosition) obj;
             Date doneDate = CalendarUtils.truncateToDayOfMonth(position.getGoodRequest().getDoneDate());
             OrgRequestCountItem item = orgRequestCountItemMap.get(new OrgRequestCountItem(position.getOrgOwner(), doneDate));
-            //String pathPart3 = position.getGood().getPathPart3();
             String pathPart4 = position.getGood().getPathPart4();
             item.addCount(position.getTotalCount()/1000L, pathPart4);
         }
@@ -283,7 +282,6 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         List<Item> items = new ArrayList<Item>();
         for (Long id: orgs){
             OrgItem orgItem = orgItems.get(id);
-            //Map<Date, RequestCountItem> dateRequestCountItemMap = requestCountMap.get(id);
             Map<Date, OrderCountItem> dateOrderCountItemMap = orderCountMap.get(id);
             Map<Date, OrderCountItem> dateOrderReserveCountItemMap = orderReserveCountMap.get(id);
             beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
@@ -336,7 +334,6 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         private long idOfOrg;
         private Date doneDate;
         private long totalCount = 0L;
-        //private TreeSet<String> pathPart3 = new TreeSet<String>();;
         private TreeSet<String> pathPart4 = new TreeSet<String>();;
 
         public OrgRequestCountItem(long idOfOrg, Date doneDate) {
@@ -346,7 +343,6 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
 
         public void addCount(long count, String pathPart4){
             totalCount+=count;
-            //this.pathPart3.add(pathPart3);
             this.pathPart4.add(pathPart4);
         }
 
@@ -363,17 +359,14 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         }
 
         long getRequestCount(){
-            //return getTotalCount() * complexGroupCount()/complexCount();
             return getTotalCount()/complexCount();
         }
 
         public boolean isEmptyComplex(){
-            return /*pathPart3.isEmpty() &&*/ pathPart4.isEmpty();
+            return pathPart4.isEmpty();
         }
 
-        //public int complexGroupCount(){
-        //    return pathPart3.size();
-        //}
+
 
         public int complexCount(){
             return pathPart4.size();

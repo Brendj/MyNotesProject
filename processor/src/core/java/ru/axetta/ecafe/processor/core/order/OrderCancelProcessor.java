@@ -2,7 +2,7 @@
  * Copyright (c) 2010. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.service;
+package ru.axetta.ecafe.processor.core.order;
 
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfOrder;
 

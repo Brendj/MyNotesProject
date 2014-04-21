@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
  * User: Developer
  * Date: 17.10.2009
  * Time: 14:09:39
- * To change this template use File | Settings | File Templates.
+ * Отчет по реализации за месяц (для школ)
  */
 public class OrgOrderCategoryReport extends BasicReportForOrgJob {
 
@@ -246,7 +246,7 @@ public class OrgOrderCategoryReport extends BasicReportForOrgJob {
             List<OrderCategoryItem> cashBuffetOrderCategoryItems = createOrderCategoryItems(buffetOrderCategories);
 
             Query ordersQuery = session.createQuery(
-                    "from Order clientOrder where clientOrder.client = ? and (clientOrder.createTime between ? and ?)");
+                    "from Order clientOrder where clientOrder.state=0 and clientOrder.client = ? and (clientOrder.createTime between ? and ?)");
             ordersQuery.setParameter(1, startTime);
             ordersQuery.setParameter(2, endTime);
 
@@ -271,6 +271,7 @@ public class OrgOrderCategoryReport extends BasicReportForOrgJob {
                     boolean hasComplexDetails = false;
                     Set<OrderDetail> orderDetails = order.getOrderDetails();
                     for (OrderDetail orderDetail : orderDetails) {
+                        if(orderDetail.getState()==1) continue;
                         long totalDetailSum =
                                 (orderDetail.getRPrice() - orderDetail.getDiscount()) * orderDetail.getQty();
                         String orderCategory = orderDetail.getRootMenu();

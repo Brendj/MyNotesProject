@@ -15,6 +15,9 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Онлайн отчеты -> Отчет по комплексам -> Бесплатные комплексы
+ */
 public class FreeComplexReport extends BasicReport {
     private final List<ComplexItem> complexItems;
 
@@ -36,7 +39,7 @@ public class FreeComplexReport extends BasicReport {
                 String preparedQuery = "select org.officialName, od.menuDetailName, od.rPrice, od.discount, "
                         + "sum(od.qty) as quantity, " + " min(o.createdDate), max(o.createdDate) "
                         + "  from CF_Orders o, CF_OrderDetails od, CF_Orgs org "
-                        + " where o.idOfOrder = od.idOfOrder "
+                        + " where o.idOfOrder = od.idOfOrder and o.state=0 and od.state=0 "
                         + "   and o.idOfOrg = od.idOfOrg" + "   and org.idOfOrg = od.idOfOrg "
                         + "   and o.createdDate >= :fromCreatedDate " + "   and o.createdDate <= :toCreatedDate"
                         + "   and (od.menuType >= :fromMenuType and od.menuType <= :toMenuType) " + orgCondition

@@ -27,18 +27,23 @@ import java.io.ByteArrayOutputStream;
 import java.text.DateFormatSymbols;
 import java.util.*;
 
+/**
+ * Отчет по реализации
+ */
+
 public class DailySalesByGroupsReport extends BasicReportForOrgJob {
+
+    private static final Logger logger = LoggerFactory.getLogger(DailySalesByGroupsReport.class);
+
     public static final String PARAM_GROUP_BY_MENU_GROUP = "groupByMenuGroup";
     public static final String PARAM_MENU_GROUPS = "menuGroups";
     public static final String PARAM_INCLUDE_COMPLEX = "includeComplex";
 
-    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
-    }
+    private String htmlReport;
 
-
+    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {}
 
     public static class Builder extends BasicReportJob.Builder {
-
 
         public static class MealRow implements Comparable<MealRow> {
             //private int menuOrigin = 0;
@@ -90,7 +95,6 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
         private final String templateFilename;
         private boolean exportToHTML = false;
-
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
@@ -160,7 +164,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 Query complexQuery_1 = session.createSQLQuery("SELECT od.MenuType, SUM(od.Qty) as qtySum, od.RPrice, SUM(od.Qty*od.RPrice), od.menuDetailName, od.discount, od.socdiscount, o.grantsum" +
                         " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
                         " (od.MenuType>=:typeComplexMin AND od.MenuType<=:typeComplexMax) AND (od.rPrice>0) AND " +
-                        " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) "
+                        " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) and o.state=0 and od.state=0 "
                         + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.menuDetailName, od.discount, od.socdiscount, o.grantsum");
 
                 complexQuery_1.setParameter("idOfOrg", org.getIdOfOrg());
@@ -206,7 +210,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 Query freeComplexQuery1 = session.createSQLQuery("SELECT od.MenuType, SUM(od.Qty) as qtySum, od.RPrice, SUM(od.Qty*(od.RPrice+od.socdiscount)), od.menuDetailName, od.socdiscount " +
                         " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND " +
                         " (od.MenuType>=:typeComplexMin OR od.MenuType<=:typeComplexMax) AND (od.RPrice=0 AND od.Discount>0) AND " +
-                        " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) "
+                        " (o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) and o.state=0 and od.state=0"
                         + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.socdiscount");
 
                 freeComplexQuery1.setParameter("idOfOrg", org.getIdOfOrg());
@@ -257,7 +261,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
             Query mealsQuery = session.createSQLQuery(String.format("SELECT od.%s, od.MenuDetailName, SUM(od.qty) as qtySum, od.RPrice, SUM(od.Qty*od.RPrice)" +
                     " FROM CF_ORDERS o,CF_ORDERDETAILS od WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND" +
-                    "(od.MenuType=:typeDish) AND " +
+                    "(od.MenuType=:typeDish) and o.state=0 and od.state=0 AND " +
                     "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) %s"
                     + "GROUP BY od.%s, od.MenuDetailName, od.RPrice "
                     + "ORDER BY od.%s, od.MenuDetailName", groupByField, menuGroupsCondition==null?"":"AND od.MenuGroup IN ("+menuGroupsCondition+") ", groupByField, groupByField));
@@ -356,17 +360,13 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
         }
     }
 
-
     public DailySalesByGroupsReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
             Date endTime, Long idOfOrg) {
         super(generateTime, generateDuration, print, startTime, endTime,
                 idOfOrg);    //To change body of overridden methods use File | Settings | File Templates.
     }
-    private static final Logger logger = LoggerFactory.getLogger(DailySalesByGroupsReport.class);
-    private String htmlReport;
 
     public DailySalesByGroupsReport() {}
-
 
     public DailySalesByGroupsReport setHtmlReport(String htmlReport) {
         this.htmlReport = htmlReport;

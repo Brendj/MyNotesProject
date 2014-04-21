@@ -240,7 +240,7 @@ public class ContragentOrderCategoryReport extends BasicJasperReport {
             List<OrderCategoryItem> cashBuffetOrderCategoryItems = createOrderCategoryItems(buffetOrderCategories);
 
             Query ordersQuery = session.createQuery(
-                    "from Order clientOrder where clientOrder.client = ? and (clientOrder.createTime between ? and ?)");
+                    "from Order clientOrder where clientOrder.state=0 and clientOrder.client = ? and (clientOrder.createTime between ? and ?)");
             ordersQuery.setParameter(1, startTime);
             ordersQuery.setParameter(2, endTime);
 
@@ -258,7 +258,7 @@ public class ContragentOrderCategoryReport extends BasicJasperReport {
                 // lookup contragent account
                 for (Iterator i=ccAccountList.iterator();i.hasNext();) {
                     ContragentClientAccount ccAccount=(ContragentClientAccount)i.next();
-                    if (ccAccount.getClient().getIdOfClient()==client.getIdOfClient()) {
+                    if (ccAccount.getClient().getIdOfClient().equals(client.getIdOfClient())) {
                         accountId=ccAccount.getIdOfAccount();
                         i.remove();
                         break;
@@ -289,6 +289,7 @@ public class ContragentOrderCategoryReport extends BasicJasperReport {
                     boolean hasComplexDetails = false;
                     Set<OrderDetail> orderDetails = order.getOrderDetails();
                     for (OrderDetail orderDetail : orderDetails) {
+                        if(orderDetail.getState()==1) continue;
                         long totalDetailSum =
                                 (orderDetail.getRPrice() - orderDetail.getDiscount()) * orderDetail.getQty();
                         String orderCategory = orderDetail.getRootMenu();

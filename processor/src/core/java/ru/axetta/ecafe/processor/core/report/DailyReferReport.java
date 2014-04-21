@@ -33,7 +33,7 @@ import java.util.*;
  * User: chirikov
  * Date: 16.12.13
  * Time: 17:32
- * To change this template use File | Settings | File Templates.
+ * РАЗБИВКА ОТЧЕТА ПО БЕСПЛАТНОМУ ПИТАНИЮ
  */
 public class DailyReferReport extends BasicReportForAllOrgJob {
 
@@ -55,11 +55,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
         return items;
     }
 
-
-    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
-
-    }
-
+    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {}
 
     public static class Builder extends BasicReportForAllOrgJob.Builder {
 
@@ -272,7 +268,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 + "     join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
                 + "     join cf_discountrules on cf_discountrules.idofrule=cf_orderdetails.idofrule "
                 + "     where cf_orderdetails.socdiscount<>0 and cf_orgs.idoforg=:idoforg and "
-                + "           cf_orders.createddate between :start and :end "
+                + "           cf_orderdetails.state=0 and cf_orders.state=0 and cf_orders.createddate between :start and :end "
                 + "           " + orderTypeClause
                 + "           " + categoryClause +
                           ") as data "

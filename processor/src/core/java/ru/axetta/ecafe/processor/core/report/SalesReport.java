@@ -15,6 +15,10 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+/**
+ *  Онлайн отчеты -> Отчет по продажам
+ */
+
 public class SalesReport extends BasicReport {
 
     private final List<SalesItem> salesItems;
@@ -28,13 +32,13 @@ public class SalesReport extends BasicReport {
             if (!idOfOrgList.isEmpty()) {
                 String preparedQuery =
                           "select org.officialName, od.MenuDetailName, od.MenuOutput, od.MenuOrigin, od.rPrice, "
-                        + " od.discount, sum(od.qty) as quantity, min(o.createdDate), max(o.createdDate) \n"
-                        + "from CF_Orders o join CF_OrderDetails od on (o.idOfOrder = od.idOfOrder and o.idOfOrg = od.idOfOrg) \n"
+                        + " od.discount, sum(od.qty) as quantity, min(o.createdDate), max(o.createdDate) "
+                        + "from CF_Orders o join CF_OrderDetails od on (o.idOfOrder = od.idOfOrder and o.idOfOrg = od.idOfOrg) "
                         + "                 join CF_Orgs org on (org.idOfOrg = od.idOfOrg) \n"
-                        + "where o.createdDate >= :fromCreatedDate and o.createdDate <= :toCreatedDate and od.menuType = :menuType \n"
-                        + " and (org.idOfOrg in (:orgs) or org.idOfOrg in "
-                        + "  (select me.IdOfDestOrg from CF_MenuExchangeRules me where me.IdOfSourceOrg in (:destOrgs))) \n"
-                        + "group by org.officialName, od.menuDetailName, od.MenuOrigin, od.rPrice, od.MenuOutput, od.discount \n"
+                        + "where o.createdDate >= :fromCreatedDate and o.createdDate <= :toCreatedDate and od.menuType = :menuType "
+                        + "  and o.state=0 and od.state=0 and (org.idOfOrg in (:orgs) or org.idOfOrg in "
+                        + "  (select me.IdOfDestOrg from CF_MenuExchangeRules me where me.IdOfSourceOrg in (:destOrgs))) "
+                        + "group by org.officialName, od.menuDetailName, od.MenuOrigin, od.rPrice, od.MenuOutput, od.discount "
                         + "order by org.officialName, od.MenuOrigin, od.menuDetailName";
                 Query query = session.createSQLQuery(preparedQuery);
                 long startDateLong = startDate.getTime();

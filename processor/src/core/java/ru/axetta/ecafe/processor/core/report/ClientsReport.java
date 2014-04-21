@@ -25,12 +25,11 @@ import java.util.*;
  * User: Frozen
  * Date: 11.03.12
  * Time: 13:46
- * To change this template use File | Settings | File Templates.
+ * Отчет - продажи по клиентам
  */
 public class ClientsReport extends BasicReportForOrgJob {
 
-    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
-    }
+    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {}
 
     public static class Builder extends BasicReportJob.Builder {
 
@@ -106,11 +105,13 @@ public class ClientsReport extends BasicReportForOrgJob {
             List<ClientsReportItem> resultRows = new LinkedList<ClientsReportItem>();
             Calendar c = Calendar.getInstance();
             Query query = session.createSQLQuery
-                   ("select cf_orders.CreatedDate, sum(cf_orders.rsum/100), trim(both ' ' from cf_persons.firstname), trim(both ' ' from cf_persons.surname), trim(both ' ' from cf_persons.secondname) "
+                   ("select cf_orders.CreatedDate, sum(cf_orders.rsum/100), trim(both ' ' from cf_persons.firstname), "
+                    + " trim(both ' ' from cf_persons.surname), trim(both ' ' from cf_persons.secondname) "
                     + "from cf_orders "
                     + "left join cf_clients on cf_orders.idofclient=cf_clients.idofclient "
                     + "left join cf_persons on cf_clients.idofperson=cf_persons.idofperson "
-                    + "where cf_orders.idoforg=:idOfOrg and cf_orders.CreatedDate>=:startTime AND cf_orders.CreatedDate<=:endTime AND (cf_orders.rsum > 0) "
+                    + "where cf_orders.state=0 and cf_orders.idoforg=:idOfOrg and cf_orders.CreatedDate>=:startTime "
+                    + "AND cf_orders.CreatedDate<=:endTime AND (cf_orders.rsum > 0) "
                     + "group by cf_orders.CreatedDate, cf_persons.firstname, cf_persons.surname, cf_persons.secondname "
                     + "order by trim(both ' ' from cf_persons.surname), trim(both ' ' from cf_persons.firstname), trim(both ' ' from cf_persons.secondname), cf_orders.CreatedDate");
                     /*("SELECT o.CreatedDate, sum(od.rPrice) AS SUM1, p.firstname, p.surname, p.secondname "

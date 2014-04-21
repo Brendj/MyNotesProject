@@ -228,7 +228,7 @@ public class ContragentOrderReport extends BasicJasperReport {
             clientListCriteria.setFetchMode("person", FetchMode.JOIN);
 
             Query ordersQuery = session.createQuery(
-                    "from Order clientOrder where clientOrder.client = ? and (clientOrder.sumByCash = 0) and (clientOrder.createTime between ? and ?) order by clientOrder.createTime");
+                    "from Order clientOrder where clientOrder.state=0 and clientOrder.client = ? and (clientOrder.sumByCash = 0) and (clientOrder.createTime between ? and ?) order by clientOrder.createTime");
             ordersQuery.setParameter(1, startTime);
             ordersQuery.setParameter(2, endTime);
 
@@ -281,6 +281,7 @@ public class ContragentOrderReport extends BasicJasperReport {
                     boolean hasComplexDetails = false;
                     Set<OrderDetail> orderDetails = order.getOrderDetails();
                     for (OrderDetail orderDetail : orderDetails) {
+                        if(orderDetail.getState()==1) continue;
                         long totalDetailSum =
                                 (orderDetail.getRPrice() - orderDetail.getDiscount()) * orderDetail.getQty();
                         String orderCategory = orderDetail.getRootMenu();

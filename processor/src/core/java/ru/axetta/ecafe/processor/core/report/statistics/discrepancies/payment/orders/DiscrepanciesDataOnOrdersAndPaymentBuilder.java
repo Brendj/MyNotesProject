@@ -32,6 +32,7 @@ import java.util.*;
  * Date: 30.01.14
  * Time: 14:49
  * Отчет "Статистика о расхождении данных по заказам и оплате"
+ * Онлайн отчеты -> Статистика по расхождениям данных -> Статистика по актам расхождений
  */
 
 public class DiscrepanciesDataOnOrdersAndPaymentBuilder extends BasicReportForAllOrgJob.Builder {
@@ -118,6 +119,7 @@ public class DiscrepanciesDataOnOrdersAndPaymentBuilder extends BasicReportForAl
                 .createAlias("ordersInternal", "ord")
                 .createAlias("ord.orderDetailsInternal", "ord_det")
                 .add(Restrictions.eq("ord.orderType", OrderTypeEnumType.CORRECTION_TYPE))
+                .add(Restrictions.eq("state",0))
                 .add(Restrictions.ge("ord.createTime", startTime))
                 .add(Restrictions.lt("ord.createTime", endTime))
                 .add(Restrictions.in("idOfOrg", orgItems.keySet()))

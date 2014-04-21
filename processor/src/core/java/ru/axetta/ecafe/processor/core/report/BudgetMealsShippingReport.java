@@ -28,7 +28,7 @@ import java.util.*;
  * User: r.kalimullin
  * Date: 01.11.13
  * Time: 16:42
- * "Отчет по отгрузке бюджетного питания резервной группы."
+ * Отчет по отгрузке бюджетного питания резервной группы
  */
 
 public class BudgetMealsShippingReport extends BasicReportForOrgJob {
@@ -85,11 +85,11 @@ public class BudgetMealsShippingReport extends BasicReportForOrgJob {
         private JRDataSource createDataSource(Session session, Date startTime, Date endTime) {
             String sql =
                     "select ord.client.idOfClient, ord.client.person.surname, ord.client.person.firstName, ord.client.person.secondName, "
-                            + " ord.client.clientGroup.groupName, ord.createTime, g.pathPart3, g.pathPart4, sum(det.qty) \n"
-                            + "from Order ord join ord.orderDetailsInternal det join ord.org o join det.good g \n" +
-                            "where ord.createTime between :startTime and :endTime and ord.orderType = :orderType and ord.org.idOfOrg = :idOfOrg " +
-                            " and det.menuType >= :minType and det.menuType <= :maxType \n" +
-                            "group by ord.client.idOfClient, ord.client.person.surname, ord.client.person.firstName, "
+                            + " ord.client.clientGroup.groupName, ord.createTime, g.pathPart3, g.pathPart4, sum(det.qty) "
+                            + " from Order ord join ord.orderDetailsInternal det join ord.org o join det.good g "
+                            + " where ord.state=0 and det.state=0 and ord.createTime between :startTime and :endTime and ord.orderType = :orderType and ord.org.idOfOrg = :idOfOrg "
+                            + " and det.menuType >= :minType and det.menuType <= :maxType "
+                            + " group by ord.client.idOfClient, ord.client.person.surname, ord.client.person.firstName, "
                             + " ord.client.person.secondName, ord.client.clientGroup.groupName, ord.createTime, g.pathPart3, g.pathPart4";
             Query q = session.createQuery(sql)
                     .setParameter("startTime", startTime)

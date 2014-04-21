@@ -21,7 +21,7 @@ import java.util.*;
  * User: chirikov
  * Date: 29.10.12
  * Time: 14:44
- * To change this template use File | Settings | File Templates.
+ * Онлайн отчеты -> Свод по услугам
  */
 public class TotalServicesReport extends BasicReport {
 
@@ -90,7 +90,7 @@ public class TotalServicesReport extends BasicReport {
                             "from cf_orgs " +
                             "left join cf_orders on cf_orders.idoforg = cf_orgs.idoforg " +
                             "left join cf_clients on cf_clients.idofclient = cf_orders.idofclient " +
-                            "where cf_orgs.state=1 and cf_orders.socdiscount<>0 and " +
+                            "where cf_orgs.state=1 and cf_orders.socdiscount<>0 and cf_orders.state=0 and " +
                             "cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and "
                             +
                             "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(startDate)
@@ -102,7 +102,7 @@ public class TotalServicesReport extends BasicReport {
                             "from cf_orgs " +
                             "left join cf_orders on cf_orders.idoforg = cf_orgs.idoforg " +
                             "left join cf_clients on cf_clients.idofclient = cf_orders.idofclient " +
-                            "where cf_orgs.state=1 and cf_orders.socdiscount<>0 and " +
+                            "where cf_orgs.state=1 and cf_orders.socdiscount<>0  and cf_orders.state=0 and " +
                             "cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and "
                             +
                             "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '" + df.format(startDate)
@@ -114,7 +114,7 @@ public class TotalServicesReport extends BasicReport {
                             "from cf_orgs " +
                             "left join cf_orders on cf_orders.idoforg = cf_orgs.idoforg " +
                             "left join cf_clients on cf_clients.idofclient = cf_orders.idofclient " +
-                            "where cf_orgs.state=1 and " +
+                            "where cf_orgs.state=1  and cf_orders.state=0 and " +
                             "cf_clients.idOfClientGroup<" + ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue() + " and "
                             +
                             "cf_orders.createddate between EXTRACT(EPOCH FROM TIMESTAMP '" + df.format(startDate)

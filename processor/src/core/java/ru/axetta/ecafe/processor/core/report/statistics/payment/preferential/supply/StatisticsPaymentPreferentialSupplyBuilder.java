@@ -39,7 +39,7 @@ import java.util.*;
  * User: damir
  * Date: 20.01.14
  * Time: 12:01
- * To change this template use File | Settings | File Templates.
+ * Онлайн отчеты -> Статистика по расхождениям данных -> Статистика оплаты льготного питания
  */
 public class StatisticsPaymentPreferentialSupplyBuilder extends BasicReportForContragentJob.Builder {
 
@@ -150,6 +150,7 @@ public class StatisticsPaymentPreferentialSupplyBuilder extends BasicReportForCo
                 Criteria allOrdersCountCriteria = session.createCriteria(OrderDetail.class);
                 allOrdersCountCriteria.createCriteria("order", "ord");
                 allOrdersCountCriteria.add(Restrictions.ne("ord.orderType", OrderTypeEnumType.CORRECTION_TYPE));
+                allOrdersCountCriteria.add(Restrictions.eq("state",0));
                 allOrdersCountCriteria.add(Restrictions.between("ord.createTime", startTime, time));
                 allOrdersCountCriteria.add(Restrictions.eq("compositeIdOfOrderDetail.idOfOrg", idOfOrg));
                 allOrdersCountCriteria.setProjection(Projections.projectionList().add(Projections.sum("qty")));
@@ -159,6 +160,7 @@ public class StatisticsPaymentPreferentialSupplyBuilder extends BasicReportForCo
                 /* Подсчет количества товаров с учетом корректировки */
                 Criteria actualPresenceCriteria = session.createCriteria(OrderDetail.class);
                 actualPresenceCriteria.createCriteria("order", "ord");
+                actualPresenceCriteria.add(Restrictions.eq("state", 0));
                 actualPresenceCriteria.add(Restrictions.between("ord.createTime", startTime, time));
                 actualPresenceCriteria.add(Restrictions.eq("compositeIdOfOrderDetail.idOfOrg", idOfOrg));
                 actualPresenceCriteria.setProjection(Projections.projectionList().add(Projections.sum("qty")));

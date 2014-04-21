@@ -42,7 +42,7 @@ import java.util.*;
  * User: chirikov
  * Date: 06.05.13
  * Time: 13:37
- * To change this template use File | Settings | File Templates.
+ * Онлайн отчеты -> Льготное питание -> Отчет по предоставленным услугам
  */
 public class DeliveredServicesReport extends BasicReportForAllOrgJob {
 
@@ -211,10 +211,9 @@ public class DeliveredServicesReport extends BasicReportForAllOrgJob {
                     + "from cf_orgs " + "left join cf_orders on cf_orgs.idoforg=cf_orders.idoforg "
                     + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
                     + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
-                    + "where cf_orderdetails.socdiscount>0 and " + typeCondition
-                    + contragentCondition + contractOrgsCondition
-                    + orgCondition
-                    + " cf_orders.createddate between :start and :end "
+                    + "where cf_orderdetails.socdiscount>0 and cf_orders.state=0 and cf_orderdetails.state=0 and "
+                    + typeCondition + contragentCondition + contractOrgsCondition + orgCondition
+                    + " cf_orders.createddate between :start and :end  "
                     + "group by cf_orgs.idoforg, cf_orgs.officialname, level1, level2, level3, level4, price, address "
                     + "order by cf_orgs.idoforg, cf_orgs.officialname, level1, level2, level3, level4";
             Query query = session.createSQLQuery(sql);//.createQuery(sql);

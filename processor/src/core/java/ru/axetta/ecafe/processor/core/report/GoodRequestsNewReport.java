@@ -17,6 +17,7 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
@@ -34,6 +35,8 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
     final public static String P_HIDE_LAST_VALUE = "hideLastValue";
     final public static String P_GENERATE_BEGIN_DATE = "generateBeginDate";
     final public static String P_GENERATE_END_DATE = "generateEndDate";
+    final public static String P_HIDE_TOTAL_ROW = "hideTotalRow";
+
 
     public static class Builder extends BasicReportForAllOrgJob.Builder {
 
@@ -73,15 +76,24 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             String hideDailySampleProperty = reportProperties.getProperty(P_HIDE_DAILY_SAMPLE_COUNT, "false");
             final int hideDailySampleValue = Boolean.parseBoolean(hideDailySampleProperty)?0:1;
 
+            String fillDayOffProperty = reportProperties.getProperty(P_HIDE_DAILY_SAMPLE_COUNT, "false");
+            final int fillDayOffValue = Boolean.parseBoolean(fillDayOffProperty)?0:1;
+
             String hideLastValueProperty = reportProperties.getProperty(P_HIDE_LAST_VALUE, "false");
             final int hideLastValue = Boolean.parseBoolean(hideLastValueProperty)?0:1;
+
+            String hideTotalRowProperty = reportProperties.getProperty(P_HIDE_TOTAL_ROW, "false");
+            final boolean hideTotalRow = Boolean.parseBoolean(hideTotalRowProperty);
 
             String defaultGenerateTime = Long.toString(System.currentTimeMillis());
             long generateBeginDate = Long.parseLong(reportProperties.getProperty(P_GENERATE_BEGIN_DATE, defaultGenerateTime));
             Date generateBeginTime = new Date(generateBeginDate);
             // на час
-            long generateEndDate = Long.parseLong(reportProperties.getProperty(P_GENERATE_END_DATE, defaultGenerateTime+60*60*1000));
+            long generateEndDate = Long.parseLong(reportProperties.getProperty(P_GENERATE_END_DATE, Long.toString(System.currentTimeMillis()+60*60*1000)));
             Date generateEndTime = new Date(generateEndDate);
+
+            SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy EE HH:mm:ss", new Locale("ru"));
+            parameterMap.put(P_GENERATE_END_DATE, format.format(generateEndTime));
 
             String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
             List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
@@ -101,7 +113,7 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             //parameterMap.put("overall",Long.toString(OVERALL));
             //parameterMap.put("overall_all",Long.toString(OVERALL_TOTAL));
             GoodRequestsNewReportService service = new GoodRequestsNewReportService(session,
-                    OVERALL, OVERALL_TOTAL, OVERALL_TOTAL_TITLE, OVERALL_TITLE);
+                    OVERALL, OVERALL_TOTAL, OVERALL_TOTAL_TITLE, OVERALL_TITLE, hideTotalRow);
 
             return new JRBeanCollectionDataSource(service.buildRepotItems(startTime, endTime, nameFilter, orgFilter,
                     hideDailySampleValue, generateBeginTime, generateEndTime, idOfOrgList, idOfMenuSourceOrgList,

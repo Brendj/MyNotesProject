@@ -21,7 +21,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Go
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
-import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
+import ru.axetta.ecafe.processor.core.order.OrderCancelProcessor;
 import ru.axetta.ecafe.processor.core.sync.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardRequestProcessor;
@@ -110,18 +110,23 @@ public class Processor implements SyncProcessor,
             Integer subBalanceNum = null;
             Long  contractId=null;
 
-            if(payment.getContractId()!=null){
-                String contractIdstr = String.valueOf(payment.getContractId());
-                if(ContractIdGenerator.luhnTest(contractIdstr)){
-                    subBalanceNum = 0;
-                    contractId = payment.getContractId();
-                } else {
-                    int len = contractIdstr.length();
-                    if(len>2 && ContractIdGenerator.luhnTest(contractIdstr.substring(0, len - 2))){
-                        subBalanceNum = Integer.parseInt(contractIdstr.substring(len-2));
-                        contractId = Long.parseLong(contractIdstr.substring(0, len-2));
+            Boolean enableSubBalanceOperation = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_SUB_BALANCE_OPERATION);
+            if(enableSubBalanceOperation){
+                if(payment.getContractId()!=null){
+                    String contractIdstr = String.valueOf(payment.getContractId());
+                    if(ContractIdGenerator.luhnTest(contractIdstr)){
+                        subBalanceNum = 0;
+                        contractId = payment.getContractId();
+                    } else {
+                        int len = contractIdstr.length();
+                        if(len>2 && ContractIdGenerator.luhnTest(contractIdstr.substring(0, len - 2))){
+                            subBalanceNum = Integer.parseInt(contractIdstr.substring(len-2));
+                            contractId = Long.parseLong(contractIdstr.substring(0, len-2));
+                        }
                     }
                 }
+            } else {
+                contractId = payment.getContractId();
             }
 
             if(contractId==null) {
@@ -142,8 +147,6 @@ public class Processor implements SyncProcessor,
                                 PaymentProcessResult.CLIENT_NOT_FOUND.getDescription(), idOfContragent,
                                 payment.getContractId(), payment.getClientId()), null);
             }
-
-            Boolean enableSubBalanceOperation = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_SUB_BALANCE_OPERATION);
 
             if(subBalanceNum!=null && subBalanceNum>1 && enableSubBalanceOperation) {
                 return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
@@ -302,7 +305,7 @@ public class Processor implements SyncProcessor,
                 }
                 case TYPE_COMMODITY_ACCOUNTING:{
                     // обработка синхронизации параметров клиента
-                    response = buildCommodityAccounyingSyncResponse(request);
+                    response = buildCommodityAccountingSyncResponse(request);
                     break;
                 }
             }
@@ -976,7 +979,7 @@ public class Processor implements SyncProcessor,
     }
 
     /* Do process full synchronization */
-    private SyncResponse buildCommodityAccounyingSyncResponse(SyncRequest request) throws Exception {
+    private SyncResponse buildCommodityAccountingSyncResponse(SyncRequest request) throws Exception {
 
         Long idOfPacket = null;
         SyncHistory syncHistory = null; // регистируются и заполняются только для полной синхронизации
@@ -1688,21 +1691,26 @@ public class Processor implements SyncProcessor,
                         String.format("Organization no found, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
                                 payment.getIdOfOrder()));
             }
-            // Check order existence
-            if (DAOUtils.existOrder(persistenceSession, idOfOrg, payment.getIdOfOrder())) {
-                Order order = DAOUtils
-                        .findOrder(persistenceSession, new CompositeIdOfOrder(idOfOrg, payment.getIdOfOrder()));
-                // if order == payment (may be last sync result was not transferred to client)
-                Long orderCardNo = order.getCard() == null ? null : order.getCard().getCardNo();
-                if ((("" + orderCardNo).equals("" + payment.getCardNo())) && (order.getCreateTime()
-                        .equals(payment.getTime())) && (order.getSumByCard().equals(payment.getSumByCard()))) {
-                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 0,
-                            "Order is already registered");
-                } else {
-                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 110, String.format(
-                            "Order already registered but attributes differ, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
-                            payment.getIdOfOrder()));
-                }
+
+            CompositeIdOfOrder compositeIdOfOrder = new CompositeIdOfOrder(idOfOrg, payment.getIdOfOrder());
+            Order order = DAOUtils.findOrder(persistenceSession, compositeIdOfOrder);
+
+            if(payment.isCommit()){
+
+                // Check order existence
+                //if (DAOUtils.existOrder(persistenceSession, idOfOrg, payment.getIdOfOrder())) {
+                if (order!=null) {
+                    // if order == payment (may be last sync result was not transferred to client)
+                    Long orderCardNo = order.getCard() == null ? null : order.getCard().getCardNo();
+                    if ((("" + orderCardNo).equals("" + payment.getCardNo())) && (order.getCreateTime()
+                            .equals(payment.getTime())) && (order.getSumByCard().equals(payment.getSumByCard()))) {
+                        return new ResPaymentRegistryItem(payment.getIdOfOrder(), 0,
+                                "Order is already registered");
+                    } else {
+                        return new ResPaymentRegistryItem(payment.getIdOfOrder(), 110, String.format(
+                                "Order already registered but attributes differ, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
+                                payment.getIdOfOrder()));
+                    }
                 /* updateOrderDetails(persistenceSession, order, payment);
                 // Commit data model transaction
                 persistenceSession.flush();
@@ -1712,167 +1720,190 @@ public class Processor implements SyncProcessor,
                         String.format("Order is already registered, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
                                 payment.getIdOfOrder()));
                                 */
-            }
-            // If cardNo specified - load card from data model
-            Card card = null;
-            Long cardNo = payment.getCardNo();
-            if (null != cardNo) {
-                card = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
-                if (null == card) {
-                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 200,
-                            String.format("Unknown card, IdOfOrg == %s, IdOfOrder == %s, CardNo == %s", idOfOrg,
-                                    payment.getIdOfOrder(), cardNo));
                 }
-            }
-            // If client specified - load client from data model
-            Client client = null;
-            Long idOfClient = payment.getIdOfClient();
-            if (null != idOfClient) {
-                client = DAOUtils.findClient(persistenceSession, idOfClient);
-                // Check client existance
+                // If cardNo specified - load card from data model
+                Card card = null;
+                Long cardNo = payment.getCardNo();
+                if (null != cardNo) {
+                    card = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+                    if (null == card) {
+                        return new ResPaymentRegistryItem(payment.getIdOfOrder(), 200,
+                                String.format("Unknown card, IdOfOrg == %s, IdOfOrder == %s, CardNo == %s", idOfOrg,
+                                        payment.getIdOfOrder(), cardNo));
+                    }
+                }
+                // If client specified - load client from data model
+                Client client = null;
+                Long idOfClient = payment.getIdOfClient();
+                if (null != idOfClient) {
+                    client = DAOUtils.findClient(persistenceSession, idOfClient);
+                    // Check client existance
 
-                if (null == client) {
-                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 210,
-                            String.format("Unknown client, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s", idOfOrg,
-                                    payment.getIdOfOrder(), idOfClient));
+                    if (null == client) {
+                        return new ResPaymentRegistryItem(payment.getIdOfOrder(), 210,
+                                String.format("Unknown client, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s", idOfOrg,
+                                        payment.getIdOfOrder(), idOfClient));
+                    }
                 }
-            }
-            if (null != card) {
-                if (null == client) {
-                    // Client is specified if card is specified
-                    client = card.getClient();
-                } else if (!card.getClient().getIdOfClient().equals(client.getIdOfClient())) {
-                    // Specified client isn't the owner of the specified card
-                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 230, String.format(
-                            "Client isn't the owner of the specified card, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s, CardNo == %s",
-                            idOfOrg, payment.getIdOfOrder(), idOfClient, cardNo));
+                if (null != card) {
+                    if (null == client) {
+                        // Client is specified if card is specified
+                        client = card.getClient();
+                    } else if (!card.getClient().getIdOfClient().equals(client.getIdOfClient())) {
+                        // Specified client isn't the owner of the specified card
+                        return new ResPaymentRegistryItem(payment.getIdOfOrder(), 230, String.format(
+                                "Client isn't the owner of the specified card, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s, CardNo == %s",
+                                idOfOrg, payment.getIdOfOrder(), idOfClient, cardNo));
+                    }
                 }
-            }
-            if (null != client && card != null) {
-                if (Card.ACTIVE_STATE != card.getState()) {
-                    Card newCard = client.findActiveCard(persistenceSession, card);
-                    if (logger.isWarnEnabled()) {
-                        if (!newCard.getIdOfCard().equals(card.getIdOfCard())) {
-                            logger.warn(
-                                    String.format("Specified card is inactive. Client: %s, Card: %s. Will use card: %s",
-                                            client.toString(), card.toString(), newCard.toString()));
+                if (null != client && card != null) {
+                    if (Card.ACTIVE_STATE != card.getState()) {
+                        Card newCard = client.findActiveCard(persistenceSession, card);
+                        if (logger.isWarnEnabled()) {
+                            if (!newCard.getIdOfCard().equals(card.getIdOfCard())) {
+                                logger.warn(
+                                        String.format("Specified card is inactive. Client: %s, Card: %s. Will use card: %s",
+                                                client.toString(), card.toString(), newCard.toString()));
+                            }
+                        }
+                        card = newCard;
+                    }
+                }
+                // If client is specified - check if client is registered for the specified organization
+                // or for one of friendly organizations of specified one
+                Set<Long> idOfFriendlyOrgSet = DAOUtils.getIdOfFriendlyOrg(persistenceSession, idOfOrg);
+                if (null != client) {
+                    Org clientOrg = client.getOrg();
+                    if (!clientOrg.getIdOfOrg().equals(idOfOrg) && !idOfFriendlyOrgSet.contains(clientOrg.getIdOfOrg())) {
+                        //
+                        errorClientIds.add(idOfClient);
+                        //return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 220, String.format(
+                        //        "Client isn't registered for the specified organization, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s",
+                        //        idOfOrg, payment.getIdOfOrder(), idOfClient));
+                    }
+                }
+                // Card check
+                if (null != card) {
+                    //if (Card.ACTIVE_STATE != card.getState()) {
+                    //    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 320, String.format(
+                    //            "Card is locked, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s, CardNo == %s", idOfOrg,
+                    //            payment.getIdOfOrder(), idOfClient, cardNo));
+                    //}
+                    //if (null == card.getIssueTime()) {
+                    //    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 330, String.format(
+                    //            "Card wasn't issued, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s, CardNo == %s",
+                    //            idOfOrg, payment.getIdOfOrder(), idOfClient, cardNo));
+                    //}
+                    //if (payment.getTime().before(card.getIssueTime())) {
+                    //    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 340, String.format(
+                    //            "Card wasn't issued at payment time, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s, CardNo == %s",
+                    //            idOfOrg, payment.getIdOfOrder(), idOfClient, cardNo));
+                    //}
+                    //if (!payment.getTime().before(card.getValidTime())) {
+                    //    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 350, String.format(
+                    //            "Card wasn't valid at payment time, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s, CardNo == %s",
+                    //            idOfOrg, payment.getIdOfOrder(), idOfClient, cardNo));
+                    //}
+                }
+                // Verify spicified sums to be valid non negative numbers
+                if (payment.getSumByCard() < 0 || payment.getSumByCash() < 0 || payment.getSocDiscount() < 0
+                        || payment.getRSum() < 0 || payment.getGrant() < 0) {
+                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 250,
+                            String.format("Negative sum(s) are specified, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
+                                    payment.getIdOfOrder()));
+                }
+                if (0 != payment.getSumByCard() && card == null) {
+                    // Check if card is specified
+                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 240, String.format(
+                            "Payment has card part but doesn't specify CardNo, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s",
+                            idOfOrg, payment.getIdOfOrder(), idOfClient));
+                }
+                // Create order
+                RuntimeContext.getFinancialOpsManager()
+                        .createOrderCharge(persistenceSession, payment, idOfOrg, client, card, payment.getConfirmerId());
+                long totalPurchaseDiscount = 0;
+                long totalPurchaseRSum = 0;
+                // Register order details (purchase)
+                for (Purchase purchase : payment.getPurchases()) {
+                    if (null != DAOUtils.findOrderDetail(persistenceSession,
+                            new CompositeIdOfOrderDetail(idOfOrg, purchase.getIdOfOrderDetail()))) {
+                        return new ResPaymentRegistryItem(payment.getIdOfOrder(), 120, String.format(
+                                "Order detail is already registered, IdOfOrg == %s, IdOfOrder == %s, IdOfOrderDetail == %s",
+                                idOfOrg, payment.getIdOfOrder(), purchase.getIdOfOrderDetail()));
+                    }
+                    if (purchase.getDiscount() < 0 || purchase.getrPrice() < 0 /*|| purchase.getQty() < 0*/) {
+                        return new ResPaymentRegistryItem(payment.getIdOfOrder(), 250, String.format(
+                                "Negative Discount or rPrice are specified, IdOfOrg == %s, IdOfOrder == %s, Discount == %s, Discount == %s",
+                                idOfOrg, payment.getIdOfOrder(), purchase.getDiscount(), purchase.getrPrice()));
+                    }
+                    OrderDetail orderDetail = new OrderDetail(
+                            new CompositeIdOfOrderDetail(idOfOrg, purchase.getIdOfOrderDetail()), payment.getIdOfOrder(),
+                            purchase.getQty(), purchase.getDiscount(), purchase.getSocDiscount(), purchase.getrPrice(),
+                            purchase.getName(), purchase.getRootMenu(), purchase.getMenuGroup(), purchase.getMenuOrigin(),
+                            purchase.getMenuOutput(), purchase.getType());
+                    if (purchase.getItemCode() != null) {
+                        orderDetail.setItemCode(purchase.getItemCode());
+                    }
+                    if (purchase.getIdOfRule() != null) {
+                        orderDetail.setIdOfRule(purchase.getIdOfRule());
+                    }
+                    if (purchase.getGuidOfGoods() != null) {
+                        Good good = DAOUtils.findGoodByGuid(persistenceSession, purchase.getGuidOfGoods());
+                        if (good != null) {
+                            orderDetail.setGood(good);
                         }
                     }
-                    card = newCard;
+                    persistenceSession.save(orderDetail);
+                    totalPurchaseDiscount += purchase.getDiscount() * Math.abs(purchase.getQty());
+                    totalPurchaseRSum += purchase.getrPrice() * Math.abs(purchase.getQty());
                 }
-            }
-            // If client is specified - check if client is registered for the specified organization
-            // or for one of friendly organizations of specified one
-            Set<Long> idOfFriendlyOrgSet = DAOUtils.getIdOfFriendlyOrg(persistenceSession, idOfOrg);
-            if (null != client) {
-                Org clientOrg = client.getOrg();
-                if (!clientOrg.getIdOfOrg().equals(idOfOrg) && !idOfFriendlyOrgSet.contains(clientOrg.getIdOfOrg())) {
-                    //
-                    errorClientIds.add(idOfClient);
-                    //return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 220, String.format(
-                    //        "Client isn't registered for the specified organization, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s",
-                    //        idOfOrg, payment.getIdOfOrder(), idOfClient));
+                // Check payment sums
+                if (totalPurchaseRSum != payment.getRSum() || totalPurchaseDiscount != payment.getSocDiscount() + payment
+                        .getTrdDiscount() + payment.getGrant()) {
+                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 300,
+                            String.format("Invalid total sum by order, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
+                                    payment.getIdOfOrder()));
                 }
-            }
-            // Card check
-            if (null != card) {
-                //if (Card.ACTIVE_STATE != card.getState()) {
-                //    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 320, String.format(
-                //            "Card is locked, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s, CardNo == %s", idOfOrg,
-                //            payment.getIdOfOrder(), idOfClient, cardNo));
-                //}
-                //if (null == card.getIssueTime()) {
-                //    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 330, String.format(
-                //            "Card wasn't issued, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s, CardNo == %s",
-                //            idOfOrg, payment.getIdOfOrder(), idOfClient, cardNo));
-                //}
-                //if (payment.getTime().before(card.getIssueTime())) {
-                //    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 340, String.format(
-                //            "Card wasn't issued at payment time, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s, CardNo == %s",
-                //            idOfOrg, payment.getIdOfOrder(), idOfClient, cardNo));
-                //}
-                //if (!payment.getTime().before(card.getValidTime())) {
-                //    return new SyncResponse.ResPaymentRegistry.Item(payment.getIdOfOrder(), 350, String.format(
-                //            "Card wasn't valid at payment time, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s, CardNo == %s",
-                //            idOfOrg, payment.getIdOfOrder(), idOfClient, cardNo));
-                //}
-            }
-            // Verify spicified sums to be valid non negative numbers
-            if (payment.getSumByCard() < 0 || payment.getSumByCash() < 0 || payment.getSocDiscount() < 0
-                    || payment.getRSum() < 0 || payment.getGrant() < 0) {
-                return new ResPaymentRegistryItem(payment.getIdOfOrder(), 250,
-                        String.format("Negative sum(s) are specified, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
-                                payment.getIdOfOrder()));
-            }
-            if (0 != payment.getSumByCard() && card == null) {
-                // Check if card is specified
-                return new ResPaymentRegistryItem(payment.getIdOfOrder(), 240, String.format(
-                        "Payment has card part but doesn't specify CardNo, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s",
-                        idOfOrg, payment.getIdOfOrder(), idOfClient));
-            }
-            // Create order
-            RuntimeContext.getFinancialOpsManager()
-                    .createOrderCharge(persistenceSession, payment, idOfOrg, client, card, payment.getConfirmerId());
-            long totalPurchaseDiscount = 0;
-            long totalPurchaseRSum = 0;
-            // Register order details (purchase)
-            for (Purchase purchase : payment.getPurchases()) {
-                if (null != DAOUtils.findOrderDetail(persistenceSession,
-                        new CompositeIdOfOrderDetail(idOfOrg, purchase.getIdOfOrderDetail()))) {
-                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 120, String.format(
-                            "Order detail is already registered, IdOfOrg == %s, IdOfOrder == %s, IdOfOrderDetail == %s",
-                            idOfOrg, payment.getIdOfOrder(), purchase.getIdOfOrderDetail()));
+                if (payment.getRSum() != payment.getSumByCard() + payment.getSumByCash()) {
+                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 310,
+                            String.format("Invalid sum of order card and cash payments, IdOfOrg == %s, IdOfOrder == %s",
+                                    idOfOrg, payment.getIdOfOrder()));
                 }
-                if (purchase.getDiscount() < 0 || purchase.getrPrice() < 0 /*|| purchase.getQty() < 0*/) {
-                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 250, String.format(
-                            "Negative Discount or rPrice are specified, IdOfOrg == %s, IdOfOrder == %s, Discount == %s, Discount == %s",
-                            idOfOrg, payment.getIdOfOrder(), purchase.getDiscount(), purchase.getrPrice()));
+
+                // Commit data model transaction
+                persistenceSession.flush();
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+
+                // !!!!! ОПОВЕЩЕНИЕ ПО СМС !!!!!!!!
+                /* в случее если ананимного зака мы не знаем клиента */
+                /* не оповещаем в случае пробития корректировачных заказов */
+                if(client!=null && !payment.getOrderType().equals(OrderTypeEnumType.CORRECTION_TYPE)){
+                    RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                            .sendNotificationAsync(client, EventNotificationService.MESSAGE_PAYMENT,
+                                    generatePaymentNotificationParams(persistenceSession, client, payment));
                 }
-                OrderDetail orderDetail = new OrderDetail(
-                        new CompositeIdOfOrderDetail(idOfOrg, purchase.getIdOfOrderDetail()), payment.getIdOfOrder(),
-                        purchase.getQty(), purchase.getDiscount(), purchase.getSocDiscount(), purchase.getrPrice(),
-                        purchase.getName(), purchase.getRootMenu(), purchase.getMenuGroup(), purchase.getMenuOrigin(),
-                        purchase.getMenuOutput(), purchase.getType());
-                if (purchase.getItemCode() != null) {
-                    orderDetail.setItemCode(purchase.getItemCode());
-                }
-                if (purchase.getIdOfRule() != null) {
-                    orderDetail.setIdOfRule(purchase.getIdOfRule());
-                }
-                if (purchase.getGuidOfGoods() != null) {
-                    Good good = DAOUtils.findGoodByGuid(persistenceSession, purchase.getGuidOfGoods());
-                    if (good != null) {
-                        orderDetail.setGood(good);
+            } else {
+                // TODO: есть ли необходимость оповещать клиента о сторне?
+                // отмена заказа
+                if (null != order) {
+                    // Update client balance
+                    Client client = order.getClient();
+                    if (null != client) {
+                        RuntimeContext.getFinancialOpsManager().cancelOrder(persistenceSession, order);
+                        persistenceSession.flush();
+                        persistenceTransaction.commit();
+                        persistenceTransaction = null;
+                    } else {
+                        return new ResPaymentRegistryItem(payment.getIdOfOrder(), 210,
+                                String.format("Unknown client, IdOfOrg == %s, IdOfOrder == %s, IdOfClient == %s", idOfOrg,
+                                        payment.getIdOfOrder(), client.getIdOfClient()));
                     }
+                } else {
+                    return new ResPaymentRegistryItem(payment.getIdOfOrder(), 0, String.format(
+                            "Unknown order, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
+                            payment.getIdOfOrder()));
                 }
-                persistenceSession.save(orderDetail);
-                totalPurchaseDiscount += purchase.getDiscount() * Math.abs(purchase.getQty());
-                totalPurchaseRSum += purchase.getrPrice() * Math.abs(purchase.getQty());
-            }
-            // Check payment sums
-            if (totalPurchaseRSum != payment.getRSum() || totalPurchaseDiscount != payment.getSocDiscount() + payment
-                    .getTrdDiscount() + payment.getGrant()) {
-                return new ResPaymentRegistryItem(payment.getIdOfOrder(), 300,
-                        String.format("Invalid total sum by order, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
-                                payment.getIdOfOrder()));
-            }
-            if (payment.getRSum() != payment.getSumByCard() + payment.getSumByCash()) {
-                return new ResPaymentRegistryItem(payment.getIdOfOrder(), 310,
-                        String.format("Invalid sum of order card and cash payments, IdOfOrg == %s, IdOfOrder == %s",
-                                idOfOrg, payment.getIdOfOrder()));
-            }
-
-            // Commit data model transaction
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-
-            // !!!!! ОПОВЕЩЕНИЕ ПО СМС !!!!!!!!
-            /* в случее если ананимного зака мы не знаем клиента */
-            if(client!=null && !payment.getOrderType().equals(OrderTypeEnumType.CORRECTION_TYPE)){
-                RuntimeContext.getAppContext().getBean(EventNotificationService.class)
-                        .sendNotificationAsync(client, EventNotificationService.MESSAGE_PAYMENT,
-                                generatePaymentNotificationParams(persistenceSession, client, payment));
             }
 
             // Return no errors
@@ -2365,27 +2396,10 @@ public class Processor implements SyncProcessor,
                 idOfOrgSet.add(o.getIdOfOrg());
             }
             idOfOrgSet.add(idOfOrg);
-
-            //for (Object[] v : DAOUtils.getClientsAndCardsForOrgs(persistenceSession, idOfOrgSet, clientIds)) {
-            //    Client client = (Client) v[0];
-            //    if (client.getClientGroup() == null || (!client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()
-            //            .equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) && !client.getClientGroup()
-            //            .getCompositeIdOfClientGroup().getIdOfClientGroup()
-            //            .equals(ClientGroup.Predefined.CLIENT_DELETED.getValue()))) {
-            //        Card card = (Card) v[1];
-            //        accRegistry.addItem(new SyncResponse.AccRegistry.Item(client, card));
-            //    }
-            //}
             List<Card> cards = DAOUtils.getClientsAndCardsForOrgs(persistenceSession, idOfOrgSet, clientIds);
             for (Card card : cards) {
                 Client client = card.getClient();
                 accRegistry.addItem(new SyncResponse.AccRegistry.Item(card));
-                //if (client.getClientGroup() == null || (!client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup()
-                //        .equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue()) && !client.getClientGroup()
-                //        .getCompositeIdOfClientGroup().getIdOfClientGroup()
-                //        .equals(ClientGroup.Predefined.CLIENT_DELETED.getValue()))) {
-                //    accRegistry.addItem(new SyncResponse.AccRegistry.Item(card));
-                //}
             }
 						 // Добавляем карты перемещенных клиентов.
             if(clientIds==null || clientIds.isEmpty()){
@@ -2396,12 +2410,6 @@ public class Processor implements SyncProcessor,
                     }
                 }
             }
-            /*Org organization = DAOUtils.getOrgReference(persistenceSession, idOfOrg);
-            for (Client client : organization.getClients()) {
-                for (Card card : client.getCards()) {
-                    accRegistry.addItem(new SyncResponse.AccRegistry.Item(card));
-                }
-            } */
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -2423,7 +2431,8 @@ public class Processor implements SyncProcessor,
             Date currentDate = new Date();
             List<Integer> transactionSourceTypes = Arrays.asList(
                     AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE,
-                    AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE);
+                    AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE,
+                    AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE);
             persistenceSession.refresh(org);
             List<AccountTransaction> accountTransactionList = DAOUtils
                     .getAccountTransactionsForOrgSinceTime(persistenceSession, org, fromDateTime, currentDate,
@@ -2444,35 +2453,6 @@ public class Processor implements SyncProcessor,
         }
         return accIncRegistry;
     }
-
-    //private SyncResponse.AccIncRegistry getAccIncRegistry(Long idOfOrg, Date fromDateTime) throws Exception {
-    //    SyncResponse.AccIncRegistry accIncRegistry = new SyncResponse.AccIncRegistry();
-    //    Session persistenceSession = null;
-    //    Transaction persistenceTransaction = null;
-    //    try {
-    //        persistenceSession = persistenceSessionFactory.openSession();
-    //        persistenceTransaction = persistenceSession.beginTransaction();
-    //
-    //        Date currentDate = new Date();
-    //        List<AccountTransaction> accountTransactionList = DAOUtils
-    //                .getAccountTransactionsForOrgSinceTime(persistenceSession, idOfOrg, fromDateTime, currentDate,
-    //                        AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE);
-    //        for (AccountTransaction accountTransaction : accountTransactionList) {
-    //            SyncResponse.AccIncRegistry.Item accIncItem = new SyncResponse.AccIncRegistry.Item(
-    //                    accountTransaction.getIdOfTransaction(), accountTransaction.getClient().getIdOfClient(),
-    //                    accountTransaction.getTransactionTime(), accountTransaction.getTransactionSum(), accountTransaction.getTransactionSubBalance1Sum());
-    //            accIncRegistry.addItem(accIncItem);
-    //        }
-    //        accIncRegistry.setDate(currentDate);
-    //
-    //        persistenceTransaction.commit();
-    //        persistenceTransaction = null;
-    //    } finally {
-    //        HibernateUtils.rollback(persistenceTransaction, logger);
-    //        HibernateUtils.close(persistenceSession, logger);
-    //    }
-    //    return accIncRegistry;
-    //}
 
     private SyncResponse.ClientRegistry processSyncClientRegistry(Long idOfOrg,
             SyncRequest.ClientRegistryRequest clientRegistryRequest, List<Long> errorClientIds) throws Exception {

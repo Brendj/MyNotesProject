@@ -106,7 +106,7 @@ public class OrderDetailsGroupByMenuOriginReport extends BasicReportForAllOrgJob
 
             Query query = session.createSQLQuery("SELECT cf_orderdetails.menuorigin,  count(*), sum(cf_orders.rsum)"
                     + "  FROM public.cf_orders, public.cf_orderdetails"
-                    + "  WHERE (cf_orders.createddate>=:startTime AND cf_orders.createddate<=:endTime AND cf_orders.idoforder = cf_orderdetails.idoforder) group by cf_orderdetails.menuorigin;");
+                    + "  WHERE (cf_orders.createddate>=:startTime AND cf_orders.createddate<=:endTime  and cf_orders.state=0 and cf_orderdetails.state=0 AND cf_orders.idoforder = cf_orderdetails.idoforder) group by cf_orderdetails.menuorigin;");
             query.setParameter("startTime", startTime.getTime());
             query.setParameter("endTime", endTime.getTime());
             List list = query.list();

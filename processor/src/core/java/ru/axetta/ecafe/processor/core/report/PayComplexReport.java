@@ -15,6 +15,10 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Онлайн отчеты -> Отчет по комплексам -> Платные комплексы
+ */
+
 public class PayComplexReport extends BasicReport {
     private final List<ComplexItem> complexItems;
 
@@ -34,15 +38,15 @@ public class PayComplexReport extends BasicReport {
                 orgCondition = orgCondition.substring(0, orgCondition.length() - 4) + ") ";
 
                 String preparedQuery = "select org.officialName, od.menuDetailName, od.rPrice, od.discount, "
-                        + "sum(od.qty) as quantity, " + " min(o.createdDate), max(o.createdDate) "
+                        + "sum(od.qty) as quantity, min(o.createdDate), max(o.createdDate) "
                         + "  from CF_Orders o, CF_OrderDetails od, CF_Orgs org "
                         + " where o.idOfOrder = od.idOfOrder "
-                        + "   and o.idOfOrg = od.idOfOrg" + "   and org.idOfOrg = od.idOfOrg "
-                        + "   and o.createdDate >= :fromCreatedDate " + "   and o.createdDate <= :toCreatedDate"
+                        + "   and o.idOfOrg = od.idOfOrg and org.idOfOrg = od.idOfOrg "
+                        + "   and o.createdDate >= :fromCreatedDate and o.createdDate <= :toCreatedDate"
                         + "   and (od.menuType >= :fromMenuType and od.menuType <= :toMenuType) "
                         + orgCondition
                         //+ "   and (((od.rPrice + od.discount) <> od.discount and o.trdDiscount is null) or"
-                        + "   and (od.socDiscount = 0) "
+                        + "   and (od.socDiscount = 0) and o.state=0 and od.state=0 "
                         + " group by org.officialName, od.menuDetailName, od.rPrice, od.discount "
                         + " order by org.officialName, od.menuDetailName";
                 List resultList = null;
