@@ -4,8 +4,10 @@
 
 -- Пакет обновлений 2.2.62
 
+ALTER TABLE cf_subscriber_feeding ALTER COLUMN dateActivateService DROP NOT NULL;
 ALTER TABLE cf_subscriber_feeding ADD COLUMN dateCreateService BIGINT;
-ALTER TABLE cf_subscriber_feeding ADD COLUMN reasonWasSuspended CHARACTER VARYING(1024);
+UPDATE cf_subscriber_feeding SET dateCreateService=dateActivateService;
+-- ALTER TABLE cf_subscriber_feeding ADD COLUMN reasonWasSuspended CHARACTER VARYING(1024);
 
 CREATE TABLE cf_UserOrgs
 (
@@ -34,3 +36,24 @@ CREATE TABLE cf_Registry_Talon
   Number BIGINT,
   CONSTRAINT cf_registry_talon_pk PRIMARY KEY (idOfRegistryTalon)
 );
+
+--
+alter table cf_contragents add column OrderNotifyMailList text default null;
+
+-- Сучность сохранения отменных заказов
+CREATE TABLE CF_CanceledOrders (
+  idOfCanceledOrder BIGSERIAL   NOT NULL,
+  IdOfOrg           BIGINT        NOT NULL,
+  IdOfOrder         BIGINT        NOT NULL,
+  idOfTransaction   BIGINT        ,
+  CreatedDate       BIGINT        NOT NULL,
+  CONSTRAINT CF_CanceledOrders_pk PRIMARY KEY (idOfCanceledOrder),
+  CONSTRAINT CF_CanceledOrders_IdOfOrg_fk FOREIGN KEY (IdOfOrg)
+  REFERENCES CF_Orgs (IdOfOrg),
+  CONSTRAINT CF_CanceledOrders_IdOfOrg_IdOfOrder_fk FOREIGN KEY (IdOfOrg, IdOfOrder)
+  REFERENCES CF_Orders (IdOfOrg, IdOfOrder),
+  CONSTRAINT CF_CanceledOrders_IdOfOrg_idOfTransaction_fk FOREIGN KEY (idOfTransaction)
+  REFERENCES CF_Transactions(idOfTransaction)
+);
+
+create index CF_CanceledOrders_fk_idx on CF_CanceledOrders(idoforg, idoforder);

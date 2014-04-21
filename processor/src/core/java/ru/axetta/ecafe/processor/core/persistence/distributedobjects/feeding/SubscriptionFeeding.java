@@ -38,8 +38,10 @@ public class SubscriptionFeeding extends DistributedObject{
     private Date lastDatePauseService;
     private Date dateDeactivateService;
     private Boolean wasSuspended;
+    /* юридическая дата подписки, всегда присутствует */
     private Date dateCreateService;
-    private String reasonWasSuspended;
+    /* коментарии причина отказа */
+    //private String reasonWasSuspended;
 
     @Override
     public void createProjections(Criteria criteria) {
@@ -54,7 +56,7 @@ public class SubscriptionFeeding extends DistributedObject{
         projectionList.add(Projections.property("dateDeactivateService"), "dateDeactivateService");
         projectionList.add(Projections.property("wasSuspended"), "wasSuspended");
         projectionList.add(Projections.property("dateCreateService"), "dateCreateService");
-        projectionList.add(Projections.property("reasonWasSuspended"), "reasonWasSuspended");
+        //projectionList.add(Projections.property("reasonWasSuspended"), "reasonWasSuspended");
         criteria.setProjection(projectionList);
     }
 
@@ -105,9 +107,9 @@ public class SubscriptionFeeding extends DistributedObject{
         if (dateCreateService != null) {
             XMLUtils.setAttributeIfNotNull(element, "DateCreate", df.format(dateCreateService));
         }
-        if (reasonWasSuspended != null) {
-            XMLUtils.setAttributeIfNotNull(element, "ReasonWasSuspended", df.format(reasonWasSuspended));
-        }
+        //if (reasonWasSuspended != null) {
+        //    XMLUtils.setAttributeIfNotNull(element, "ReasonWasSuspended", df.format(reasonWasSuspended));
+        //}
     }
 
     @Override
@@ -125,21 +127,19 @@ public class SubscriptionFeeding extends DistributedObject{
             throw new DistributedObjectException("Client is empty");
         }
 
-        Date longDateActivateService = XMLUtils.getDateAttributeValue(node, "DateActivate");
-        if (longDateActivateService != null){
-            setDateActivateService(longDateActivateService);
-        } else {
-            throw new DistributedObjectException("DateActivate is not null");
+        Date dateDateActivateService = XMLUtils.getDateAttributeValue(node, "DateActivate");
+        if (dateDateActivateService != null){
+            setDateActivateService(dateDateActivateService);
         }
 
-        Date longLastDatePauseService = XMLUtils.getDateAttributeValue(node, "LastDatePause");
-        if (longLastDatePauseService != null){
-            setLastDatePauseService(longLastDatePauseService);
+        Date dateLastDatePauseService = XMLUtils.getDateAttributeValue(node, "LastDatePause");
+        if (dateLastDatePauseService != null){
+            setLastDatePauseService(dateLastDatePauseService);
         }
 
-        Date longDateDeactivateService = XMLUtils.getDateAttributeValue(node, "DateDeactivate");
-        if (longDateDeactivateService != null){
-            setDateDeactivateService(longDateDeactivateService);
+        Date dateDateDeactivateService = XMLUtils.getDateAttributeValue(node, "DateDeactivate");
+        if (dateDateDeactivateService != null){
+            setDateDeactivateService(dateDateDeactivateService);
         }
 
         Boolean boolWasSuspended = XMLUtils.getBooleanAttributeValue(node, "WasSuspended");
@@ -149,15 +149,17 @@ public class SubscriptionFeeding extends DistributedObject{
             throw new DistributedObjectException("WasSuspended is not null");
         }
 
-        Date longDateCreateService = XMLUtils.getDateAttributeValue(node, "DateCreate");
-        if (longDateCreateService != null) {
-            setDateCreateService(longDateCreateService);
+        Date dateDateCreateService = XMLUtils.getDateAttributeValue(node, "DateCreateService");
+        if (dateDateCreateService != null) {
+            setDateCreateService(dateDateCreateService);
+        } else {
+            throw new DistributedObjectException("DateCreateService is not null");
         }
 
-        String reasonWasSuspended = XMLUtils.getStringAttributeValue(node, "ReasonWasSuspended", 1024);
-        if (reasonWasSuspended != null) {
-            setReasonWasSuspended(reasonWasSuspended);
-        }
+        //String reasonWasSuspended = XMLUtils.getStringAttributeValue(node, "ReasonWasSuspended", 1024);
+        //if (reasonWasSuspended != null) {
+        //    setReasonWasSuspended(reasonWasSuspended);
+        //}
 
         setSendAll(SendToAssociatedOrgs.SendToSelf);
         return this;
@@ -173,7 +175,7 @@ public class SubscriptionFeeding extends DistributedObject{
         setDateDeactivateService(((SubscriptionFeeding) distributedObject).getDateDeactivateService());
         setWasSuspended(((SubscriptionFeeding) distributedObject).getWasSuspended());
         setDateCreateService(((SubscriptionFeeding) distributedObject).getDateCreateService());
-        setReasonWasSuspended(((SubscriptionFeeding) distributedObject).getReasonWasSuspended());
+        //setReasonWasSuspended(((SubscriptionFeeding) distributedObject).getReasonWasSuspended());
     }
 
     // Проверка подписки на актуальность.
@@ -238,11 +240,11 @@ public class SubscriptionFeeding extends DistributedObject{
         this.dateCreateService = dateCreateService;
     }
 
-    public String getReasonWasSuspended() {
-        return reasonWasSuspended;
-    }
-
-    public void setReasonWasSuspended(String reasonWasSuspended) {
-        this.reasonWasSuspended = reasonWasSuspended;
-    }
+    //public String getReasonWasSuspended() {
+    //    return reasonWasSuspended;
+    //}
+    //
+    //public void setReasonWasSuspended(String reasonWasSuspended) {
+    //    this.reasonWasSuspended = reasonWasSuspended;
+    //}
 }

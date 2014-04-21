@@ -2866,12 +2866,12 @@ CREATE TABLE cf_subscriber_feeding
   LastUpDate bigint,
   DeleteDate bigint,
   SendAll integer NOT NULL DEFAULT 0,
-
-  DateActivateService bigint NOT NULL,
+  DateActivateService bigint,
   LastDatePauseService bigint,
   DateDeactivateService bigint,
   ServiceState integer NOT NULL DEFAULT 0,
   WasSuspended boolean NOT NULL DEFAULT false,
+  dateCreateService bigint NOT NULL,
   CONSTRAINT cf_service_subscriber_feeding_pk PRIMARY KEY (IdOfServiceSubscriberFeeding),
   CONSTRAINT cf_service_subscriber_feeding_clients_fk FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
 );
@@ -2933,7 +2933,36 @@ CREATE TABLE cf_user_report_settings
   CONSTRAINT cf_user_report_settings_fk_users FOREIGN KEY (idOfUser) REFERENCES cf_users (idofuser)
 );
 
+-- v62
+-- Сучность сохранения отменных заказов
+CREATE TABLE CF_CanceledOrders (
+  idOfCanceledOrder BIGSERIAL   NOT NULL,
+  IdOfOrg           BIGINT        NOT NULL,
+  IdOfOrder         BIGINT        NOT NULL,
+  idOfTransaction   BIGINT        ,
+  CreatedDate       BIGINT        NOT NULL,
+  CONSTRAINT CF_CanceledOrders_pk PRIMARY KEY (idOfCanceledOrder),
+  CONSTRAINT CF_CanceledOrders_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg),
+  CONSTRAINT CF_CanceledOrders_IdOfOrg_IdOfOrder_fk FOREIGN KEY (IdOfOrg, IdOfOrder)
+  REFERENCES CF_Orders (IdOfOrg, IdOfOrder),
+  CONSTRAINT CF_CanceledOrders_IdOfOrg_idOfTransaction_fk FOREIGN KEY (idOfTransaction)
+  REFERENCES CF_Transactions(idOfTransaction)
+);
+
+create index CF_CanceledOrders_fk_idx on CF_CanceledOrders(idoforg, idoforder);
+
+CREATE TABLE cf_UserOrgs
+(
+  IdOfUserOrg bigserial NOT NULL,
+  idOfUser bigint NOT NULL,
+  idOfOrg bigint NOT NULL,
+  CONSTRAINT cf_UserOrg_pk PRIMARY KEY (IdOfUserOrg),
+  CONSTRAINT cf_UserOrgs_User_fk FOREIGN KEY (idOfUser) REFERENCES cf_users (IdOfUser),
+  CONSTRAINT cf_UserOrgs_Org_fk FOREIGN KEY (idOfOrg) REFERENCES cf_orgs (IdOfOrg),
+  CONSTRAINT cf_userorgs_uq UNIQUE (idofuser, idoforg)
+);
+
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
 insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
-  VALUES(2, 2, 55, 200110, 0, '');
+  VALUES(2, 2, 61, 140408, 0, '');
 

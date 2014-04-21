@@ -39,7 +39,7 @@
         <property name="dateCreateService" column="DateCreateService" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
 
         <property name="wasSuspended" column="WasSuspended" type="java.lang.Boolean"/>
-        <property name="reasonWasSuspended" column="ReasonWasSuspended" type="java.lang.String"/>
+        <!--<property name="reasonWasSuspended" column="ReasonWasSuspended" type="java.lang.String"/>-->
 
 
     </class>
