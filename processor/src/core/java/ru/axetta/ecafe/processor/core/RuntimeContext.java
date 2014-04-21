@@ -31,7 +31,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.AutoReportPostman;
 import ru.axetta.ecafe.processor.core.report.AutoReportProcessor;
-import ru.axetta.ecafe.processor.core.service.OrderCancelProcessor;
+import ru.axetta.ecafe.processor.core.order.OrderCancelProcessor;
 import ru.axetta.ecafe.processor.core.sms.ClientSmsDeliveryStatusUpdater;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.MessageIdGenerator;
@@ -687,6 +687,7 @@ public class RuntimeContext implements ApplicationContextAware {
 
                 /*Session session = entityManager.unwrap(Session.class);
                 List<Long> cardno = Arrays.asList(76877938L,
+                        76877938L,
                         78243442L,
                         79956602L,
                         73398642L,
@@ -736,7 +737,13 @@ public class RuntimeContext implements ApplicationContextAware {
                         2563708724L,
                         3301054260L,
                         2788706148L,
-                        2502105140L);
+                        2502105140L,
+                        2146113332L,
+                        178263860L,
+                        1157044020L,
+                        2316308164L,
+                        74065866L,
+                        2629134025L);
                 Query q = session.createQuery("from Card where cardNo in :cardno");
                 q.setParameterList("cardno", cardno);
                 List<Card> cards = q.list();
@@ -744,6 +751,15 @@ public class RuntimeContext implements ApplicationContextAware {
                 while (cardIterator.hasNext()){
                     Card card = cardIterator.next();
                     session.delete(card);
+                }
+
+                q = session.createQuery("from CardTemp where cardNo in :cardno");
+                q.setParameterList("cardno", cardno);
+                List<CardTemp> cardTemps = q.list();
+                Iterator<CardTemp> cardTempIterator = cardTemps.iterator();
+                while (cardIterator.hasNext()){
+                    CardTemp cardTemp = cardTempIterator.next();
+                    session.delete(cardTemp);
                 }*/
 
                 /**
