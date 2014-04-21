@@ -1,8 +1,8 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.payment.registry;
 
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.sync.LoadContext;
-import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -38,6 +38,7 @@ public class Payment {
     private final long sumByCash;
     private final long RSum;
     private final Long idOfPOS;
+    private final int state;
     private final String comments;
     private final OrderTypeEnumType orderType;
     private final List<Purchase> posPurchases;
@@ -104,13 +105,20 @@ public class Payment {
             orderType = Integer.parseInt(orderTypeStr);
         }
 
+        // статус заказа 0 - проведен (значение по умолчанию), 1 - отменен
+        int state=0;
+        String stateStr = getStringValueNullSafe(namedNodeMap, "State");
+        if (stateStr != null) {
+            state = Integer.parseInt(stateStr);
+        }
+
         return new Payment(cardNo, date, orderDate, socDiscount, trdDiscount, grant, idOfClient, idOfOrder,
-                idOfCashier, sumByCard, sumByCash, rSum, idOfPOS,confirmerId,comments, OrderTypeEnumType.fromInteger(orderType), purchases);
+                idOfCashier, sumByCard, sumByCash, rSum, idOfPOS,confirmerId, state, comments, OrderTypeEnumType.fromInteger(orderType), purchases);
     }
 
     public Payment(Long cardNo, Date time, Date orderDate, long socDiscount, long trdDiscount, long grant, Long idOfClient,
             long idOfOrder, long idOfCashier, long sumByCard, long sumByCash, long RSum, Long idOfPOS, Long confirmerId,
-            String comments, OrderTypeEnumType orderType, List<Purchase> posPurchases) {
+            int state, String comments, OrderTypeEnumType orderType, List<Purchase> posPurchases) {
         this.cardNo = cardNo;
         this.time = time;
         this.orderDate = orderDate;
@@ -125,6 +133,7 @@ public class Payment {
         this.sumByCash = sumByCash;
         this.RSum = RSum;
         this.idOfPOS = idOfPOS;
+        this.state = state;
         this.comments = comments;
         this.orderType = orderType;
         this.posPurchases = posPurchases;
@@ -196,5 +205,13 @@ public class Payment {
 
     public List<Purchase> getPurchases() {
         return posPurchases;
+    }
+
+    /**
+     * информирует статус заказа
+     * @return true - заказ пробит, false - заказ отменен
+     */
+    public boolean isCommit() {
+        return state== Order.STATE_COMMITED;
     }
 }
