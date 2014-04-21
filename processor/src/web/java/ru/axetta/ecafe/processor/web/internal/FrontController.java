@@ -14,6 +14,8 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -590,11 +592,16 @@ public class FrontController extends HttpServlet {
         logger.debug("checkRequestValidity");
         checkRequestValidity(orgId);
 
+        boolean isExistsOrgByIdAndTags = DAOService.getInstance().existsOrgByIdAndTags(orgId, "СИНХРОНИЗАЦИЯ_РЕЕСТРЫ");
+
         LinkedList<RegisterClientResult> results = new LinkedList<RegisterClientResult>();
         for (ClientDesc cd : clientDescList) {
             try {
                 //ClientManager.ClientFieldConfig fc = ClientDesc.buildClientFieldConfig(cd);
                 logger.debug("create FieldConfig");
+                if(isExistsOrgByIdAndTags && !ClientGroup.predefinedGroupNames().contains(cd.group)){
+                    throw new FrontControllerException("Запрещена регистрация учащихся, используйте синхронизацию с Реестрами");
+                }
                 ClientManager.ClientFieldConfig fc = new ClientManager.ClientFieldConfig();
                 logger.debug("check client params");
                 if (cd.contractSurname!=null) {
