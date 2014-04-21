@@ -60,46 +60,6 @@ public class ClientDAOService extends AbstractDAOService {
     }
 
     @SuppressWarnings("unchecked")
-    public List<ClientGroup> getClientGroupsByOrg(Long idOfOrg){
-        Criteria criteria = getSession().createCriteria(ClientGroup.class);
-        criteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
-        criteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
-        criteria.add(Restrictions.lt("compositeIdOfClientGroup.idOfClientGroup", 1100000000L));
-        return (List<ClientGroup>) criteria.list();
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<ReportOnNutritionItem> generateReport(Long idOfOrg, ClientGroup clientGroup, Date startDate, Date endDate){
-        Criteria criteria = getSession().createCriteria(OrderDetail.class, "details");
-        criteria.createAlias("details.order","ord", JoinType.LEFT_OUTER_JOIN);
-        criteria.createAlias("ord.org","org", JoinType.LEFT_OUTER_JOIN);
-        criteria.createAlias("ord.client","client", JoinType.LEFT_OUTER_JOIN);
-        criteria.createAlias("client.person","person", JoinType.LEFT_OUTER_JOIN);
-        criteria.createAlias("client.clientGroup","clientgroup", JoinType.LEFT_OUTER_JOIN);
-        criteria.add(Restrictions.eq("org.id", idOfOrg));
-        criteria.add(Restrictions.eq("client.clientGroup", clientGroup));
-        criteria.add(Restrictions.between("ord.createTime", startDate, endDate));
-        criteria.addOrder(Order.desc("ord.createTime"));
-        criteria.addOrder(Order.asc("person.surname"));
-        criteria.setProjection(Projections.projectionList()
-                .add(Projections.sqlGroupProjection(
-                        "(case when {alias}.menuType>=50 then 1 when {alias}.menuType=0 then 0 else -1 end) as menuType",
-                        "{alias}.menuType", new String[]{"menuType"}, new Type[]{new IntegerType()}))
-                .add(Projections.groupProperty("client.id"))
-                .add(Projections.property("client.balance"),"balance")
-                .add(Projections.groupProperty("person.id"))
-                .add(Projections.property("person.surname"), "surname")
-                .add(Projections.property("person.firstName"), "firstName")
-                .add(Projections.property("person.secondName"), "secondName")
-                .add(Projections.groupProperty("clientgroup.groupName"), "groupName")
-                .add(Projections.groupProperty("ord.createTime"),"createTime")
-                .add(Projections.sum("RPrice"),"price")
-        );
-        criteria.setResultTransformer(Transformers.aliasToBean(ReportOnNutritionItem.class));
-        return (List<ReportOnNutritionItem>) criteria.list();
-    }
-
-    @SuppressWarnings("unchecked")
     public List<ReportOnNutritionItem> generateReportOnNutritionByWeekReport(Long idOfOrg, Date startDate, Date endDate){
         Criteria criteria = getSession().createCriteria(OrderDetail.class,"details");
         criteria.createAlias("details.order","ord", JoinType.LEFT_OUTER_JOIN);
@@ -108,6 +68,8 @@ public class ClientDAOService extends AbstractDAOService {
         criteria.createAlias("client.person","person", JoinType.LEFT_OUTER_JOIN);
         criteria.createAlias("client.clientGroup","clientgroup", JoinType.LEFT_OUTER_JOIN);
         criteria.add(Restrictions.eq("org.id", idOfOrg));
+        criteria.add(Restrictions.eq("details.state",0));
+        criteria.add(Restrictions.eq("ord.state",0));
         //criteria.add(Restrictions.eq("ord.org", org));
         //criteria.add(Restrictions.eq("client.clientGroup", clientGroup));
         criteria.add(Restrictions.between("ord.createTime", startDate, endDate));

@@ -36,7 +36,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
                 "   and orderdetail.idoforder = cforder.idoforder" +
                 " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
-                " where cforder.createddate>=:startDate and cforder.createddate<=:endDate and orderdetail.socdiscount>0 and" +
+                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate>=:startDate and cforder.createddate<=:endDate and orderdetail.socdiscount>0 and" +
                 " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"' and " +
                 " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
                 " (cforder.ordertype in (0,1,4,6) or (cforder.ordertype=8 "
@@ -66,7 +66,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
                 "   and orderdetail.idoforder = cforder.idoforder" +
                 " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
-                " where cforder.createddate between :startDate and :endDate and orderdetail.socdiscount>0 and" +
+                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate between :startDate and :endDate and orderdetail.socdiscount>0 and" +
                 " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
                 " cforder.idoforg=:idoforg and good.fullname like '"+fullname+"' and" +
                 " cforder.ordertype in (5) ";
@@ -98,7 +98,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 + "good.pathPart4 as pathPart4,good.pathPart2 as pathPart2, good.pathPart1 as pathPart1, good.fullName as fullName "
                 + " from OrderDetail details "
                 + " left join details.good good left join details.order ord left join ord.org o "
-                + " where ord.orderType in :orderType and details.good is not null and o.idOfOrg=:idOfOrg and "
+                + " where ord.state=0 and details.state=0 and ord.orderType in :orderType and details.good is not null and o.idOfOrg=:idOfOrg and "
                 + " ord.createTime between :startDate and :endDate and "
                 + " details.menuType >= :mintype and details.menuType <=:maxtype order by fullName";
         Query query = getSession().createQuery(sql);
@@ -134,6 +134,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         if(idOfOrg!=null) {
             criteriaOrder.add(Restrictions.eq("compositeIdOfOrder.idOfOrg", idOfOrg));
         }
+        criteriaOrder.add(Restrictions.eq("state", 0));
         criteriaOrder.add(Restrictions.between("createTime", startDate, endDate));
         criteriaOrder.add(Restrictions.gt("sumByCard", 0L));
         criteriaOrder.addOrder(org.hibernate.criterion.Order.asc("compositeIdOfOrder.idOfOrder"));
@@ -145,6 +146,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 float sumByCash = order.getSumByCash() / 100.0f;
                 Set<OrderDetail> details = order.getOrderDetails();
                 for (OrderDetail detail: details){
+                    if(detail.getState()!=0) continue;
                     Long idOfOrderDetail = detail.getCompositeIdOfOrderDetail().getIdOfOrderDetail();
                     Long contractId = client.getContractId();
                     String fullName = client.getPerson().getFullName();
@@ -165,6 +167,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
             } else {
                 Set<OrderDetail> details = order.getOrderDetails();
                 for (OrderDetail detail: details){
+                    if(detail.getState()==1) continue;
                     Long idOfOrderDetail = detail.getCompositeIdOfOrderDetail().getIdOfOrderDetail();
                     Long contractId = client.getContractId();
                     String fullName = client.getPerson().getFullName();

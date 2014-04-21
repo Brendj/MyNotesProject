@@ -68,6 +68,8 @@
     <h:selectBooleanCheckbox value="#{mainPage.contragentCreatePage.needAccountTranslate}" styleClass="output-text" />
     <h:outputText escape="true"  value="Список рассылки сводного отчета по заявкам" styleClass="output-text" />
     <h:inputText value="#{mainPage.contragentCreatePage.requestNotifyMailList}" maxlength="128" styleClass="input-text" />
+    <h:outputText escape="true"  value="Список рассылки по отмененным заказам" styleClass="output-text" />
+    <h:inputText value="#{mainPage.contragentCreatePage.requestNotifyMailList}" maxlength="128" styleClass="input-text" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />

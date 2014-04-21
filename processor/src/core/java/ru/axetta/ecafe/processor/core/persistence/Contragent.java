@@ -51,6 +51,7 @@ public class Contragent {
     private String mobile;
     private String email;
     private String requestNotifyMailList;
+    private String orderNotifyMailList;
     private String fax;
     private String remarks;
     private String inn;
@@ -211,6 +212,18 @@ public class Contragent {
             this.requestNotifyMailList = requestNotifyEmailAddress.trim();
         } else {
             this.requestNotifyMailList = requestNotifyEmailAddress;
+        }
+    }
+
+    public String getOrderNotifyMailList() {
+        return orderNotifyMailList;
+    }
+
+    public void setOrderNotifyMailList(String orderNotifyMailList) {
+        if(StringUtils.trimToNull(orderNotifyMailList)!=null){
+            this.orderNotifyMailList = orderNotifyMailList.trim();
+        } else {
+            this.orderNotifyMailList = orderNotifyMailList;
         }
     }
 

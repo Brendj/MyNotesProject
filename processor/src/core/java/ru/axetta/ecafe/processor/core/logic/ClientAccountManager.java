@@ -59,4 +59,23 @@ public class ClientAccountManager {
         DAOUtils.changeClientBalance(session, client.getIdOfClient(), -transaction.getTransactionSum());
         return cancelTransaction;
     }
+
+    public static AccountTransaction cancelAccountTransaction(Session session, AccountTransaction transaction,
+            Date transactionTime, Integer subBalance) throws Exception {
+        final Client client = transaction.getClient();
+        final Long subBalanceNum = client.getContractId() * 100 + subBalance;
+        String source = Long.toString(transaction.getIdOfTransaction());
+        Long transactionSum = transaction.getTransactionSum();
+        AccountTransaction cancelTransaction = new AccountTransaction(client, null, subBalanceNum, -transactionSum, source,
+                    AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE, transactionTime);
+        cancelTransaction.setOrg(transaction.getOrg());
+        session.save(cancelTransaction);
+
+        DAOUtils.changeClientBalance(session, client.getIdOfClient(), -transactionSum);
+        if(subBalance>0){
+            DAOUtils.changeClientSubBalance(session, client.getIdOfClient(), transactionSum, subBalance, client.getSubBalanceIsNull(subBalance));
+            client.addSubBalanceNotForSave(transactionSum, subBalance);
+        }
+        return cancelTransaction;
+    }
 }

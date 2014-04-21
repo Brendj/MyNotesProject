@@ -87,6 +87,7 @@ public class ContragentCreatePage extends BasicWorkspacePage {
     private String mobile;
     private String email;
     private String requestNotifyMailList;
+    private String orderNotifyMailList;
     private String fax;
     private String remarks;
     private String inn;
@@ -188,6 +189,14 @@ public class ContragentCreatePage extends BasicWorkspacePage {
 
     public void setRequestNotifyMailList(String requestNotifyMailList) {
         this.requestNotifyMailList = requestNotifyMailList;
+    }
+
+    public String getOrderNotifyMailList() {
+        return orderNotifyMailList;
+    }
+
+    public void setOrderNotifyMailList(String orderNotifyMailList) {
+        this.orderNotifyMailList = orderNotifyMailList;
     }
 
     public String getFax() {
@@ -317,6 +326,7 @@ public class ContragentCreatePage extends BasicWorkspacePage {
         contragent.setMobile(this.mobile);
         contragent.setEmail(this.email);
         contragent.setRequestNotifyMailList(requestNotifyMailList);
+        contragent.setOrderNotifyMailList(orderNotifyMailList);
         contragent.setFax(this.fax);
         contragent.setRemarks(this.remarks.trim());
         contragent.setInn(this.inn.trim());
@@ -327,7 +337,6 @@ public class ContragentCreatePage extends BasicWorkspacePage {
         contragent.setAccount(this.account.trim());
         contragent.setPublicKeyGOSTAlias(this.publicKeyGOSTAlias);
         session.save(contragent);
-
         updateContragentRNIP(session, contragent);
     }
 

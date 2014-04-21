@@ -73,6 +73,8 @@
                  styleClass="input-text" />
     <h:outputText escape="true" value="Список рассылки сводного отчета по заявкам" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.contragentViewPage.requestNotifyMailList}" styleClass="input-text" />
+    <h:outputText escape="true" value="Список рассылки по отмененным заказам" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.contragentViewPage.orderNotifyMailList}" styleClass="input-text" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <h:outputText escape="true" value="Заметки" styleClass="output-text" />

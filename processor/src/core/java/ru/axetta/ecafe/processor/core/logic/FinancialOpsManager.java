@@ -185,7 +185,20 @@ public class FinancialOpsManager {
             od.setState(OrderDetail.STATE_CANCELED);
             session.save(od);
         }
-        ClientAccountManager.cancelAccountTransaction(session, order.getTransaction(), new Date());
+
+        CanceledOrder canceledOrder = new CanceledOrder(order, order.getOrg());
+
+        if(0!=order.getSumByCard()){
+            AccountTransaction transaction = order.getTransaction();
+            canceledOrder.setIdOfTransaction(transaction.getIdOfTransaction());
+            if(order.getOrderType()!=null && order.getOrderType().equals(OrderTypeEnumType.SUBSCRIPTION_FEEDING)){
+                ClientAccountManager.cancelAccountTransaction(session, transaction, new Date(), 1);
+            } else {
+                ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
+            }
+        }
+
+        session.save(canceledOrder);
 
         Long sumByCard = order.getSumByCard();
         Long budgetSum = order.getSocDiscount() + order.getGrantSum();
