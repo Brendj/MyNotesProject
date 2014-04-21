@@ -19,6 +19,7 @@ import org.hibernate.sql.JoinType;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -58,6 +59,12 @@ public class AccompanyingDocument extends LibraryDistributedObject {
         XMLUtils.setAttributeIfNotNull(element, "AccompanyingDocumentNumber", accompanyingDocumentNumber);
         XMLUtils.setAttributeIfNotNull(element, "GuidTypeOfAccompanyingDocument", guidTypeOfAccompanyingDocument);
         XMLUtils.setAttributeIfNotNull(element, "GuidSource", guidSource);
+    }
+
+    @Override
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
+            String currentLastGuid, Integer currentLimit) throws Exception {
+        return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
     }
 
     @Override

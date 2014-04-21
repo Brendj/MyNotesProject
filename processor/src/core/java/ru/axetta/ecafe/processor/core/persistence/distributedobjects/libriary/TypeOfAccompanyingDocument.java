@@ -18,6 +18,7 @@ import org.hibernate.criterion.Restrictions;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -55,6 +56,12 @@ public class TypeOfAccompanyingDocument extends LibraryDistributedObject {
             distributedObjectException.setData(typeOfAccompanyingDocument.getGuid());
             throw  distributedObjectException;
         }
+    }
+
+    @Override
+    public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
+            String currentLastGuid, Integer currentLimit) throws Exception {
+        return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
     }
 
     @Override
