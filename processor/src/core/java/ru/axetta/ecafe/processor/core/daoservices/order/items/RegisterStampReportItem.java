@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.core.daoservices.order.items;
 
+import java.util.Date;
+
 /**
  * Created with IntelliJ IDEA.
  * User: damir
@@ -15,12 +17,13 @@ public class RegisterStampReportItem {
     private Long qty;
     private String date;
     private String number;
+    private Date dateTime;
 
-    public RegisterStampReportItem(GoodItem goodItem, Long qty, String date) {
-        this(goodItem, qty, date, null);
+    public RegisterStampReportItem(GoodItem goodItem, Long qty, String date, Date dateTime) {
+        this(goodItem, qty, date, null, dateTime);
     }
 
-    public RegisterStampReportItem(GoodItem goodItem, Long qty, String date, String number) {
+    public RegisterStampReportItem(GoodItem goodItem, Long qty, String date, String number, Date dateTime) {
         this.level1 = goodItem.getPathPart1();
         this.level2 = goodItem.getPathPart2();
         this.level3 = goodItem.getPathPart3();
@@ -28,6 +31,7 @@ public class RegisterStampReportItem {
         this.qty = qty;
         this.date = date;
         this.number = number;
+        this.dateTime = dateTime;
     }
 
     public String getLevel1() {
@@ -84,5 +88,13 @@ public class RegisterStampReportItem {
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    public Date getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(Date dateTime) {
+        this.dateTime = dateTime;
     }
 }

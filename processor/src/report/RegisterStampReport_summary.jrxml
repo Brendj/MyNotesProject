@@ -34,6 +34,7 @@
 	<field name="qty" class="java.lang.Long"/>
 	<field name="date" class="java.lang.String"/>
 	<field name="number" class="java.lang.String"/>
+	<field name="dateTime" class="java.util.Date"/>
 	<title>
 		<band splitType="Stretch"/>
 	</title>
@@ -71,6 +72,17 @@
 						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
+				<rowGroup name="dateTime" width="0">
+					<bucket class="java.util.Date">
+						<bucketExpression><![CDATA[$F{dateTime}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents/>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
 				<rowGroup name="date" width="116">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{date}]]></bucketExpression>
@@ -82,9 +94,7 @@
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="11"/>
 								</textElement>
-								<textFieldExpression><![CDATA[( $V{date}.equals("77777")? "Итого" :
-    ( $V{date}.equals("88888")? "Суточная проба" :
-        $V{date}.equals("99999")? "Всего кол-во:" : $V{date}) )]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{date}]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabRowHeader>
@@ -271,6 +281,21 @@
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell rowTotalGroup="number" columnTotalGroup="level4">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="dateTime">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="dateTime" columnTotalGroup="level1">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="dateTime" columnTotalGroup="level2">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="dateTime" columnTotalGroup="level3">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="dateTime" columnTotalGroup="level4">
 					<cellContents/>
 				</crosstabCell>
 			</crosstab>

@@ -8,6 +8,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampReportItem;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -86,9 +87,9 @@ public class RegisterStampReport extends BasicReportForOrgJob {
                 Date time = calendar.getTime();
                 String date = timeFormat.format(time);
                 if(allGoods.isEmpty()){
-                    RegisterStampReportItem item = new RegisterStampReportItem(emptyGoodItem,0L,date);
-                    RegisterStampReportItem total = new RegisterStampReportItem(emptyGoodItem,0L,"77777");
-                    RegisterStampReportItem allTotal = new RegisterStampReportItem(emptyGoodItem,0L,"99999");
+                    RegisterStampReportItem item = new RegisterStampReportItem(emptyGoodItem,0L,date, time);
+                    RegisterStampReportItem total = new RegisterStampReportItem(emptyGoodItem,0L,"Итого", CalendarUtils.addDays(endTime, 1));
+                    RegisterStampReportItem allTotal = new RegisterStampReportItem(emptyGoodItem,0L,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
                     result.add(allTotal);
                     result.add(item);
                     result.add(total);
@@ -97,9 +98,9 @@ public class RegisterStampReport extends BasicReportForOrgJob {
                         String number = numbers.get(time) == null ? "" : Long.toString(numbers.get(time));
                         Long val = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
                                 goodItem.getFullName(), withOutActDiscrepancies);
-                        RegisterStampReportItem item = new RegisterStampReportItem(goodItem,val,date,number);
-                        RegisterStampReportItem total = new RegisterStampReportItem(goodItem,val,"77777");
-                        RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem,val,"99999");
+                        RegisterStampReportItem item = new RegisterStampReportItem(goodItem,val,date,number, time);
+                        RegisterStampReportItem total = new RegisterStampReportItem(goodItem,val,"Итого", CalendarUtils.addDays(endTime, 1));
+                        RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem,val,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
                         result.add(allTotal);
                         result.add(item);
                         result.add(total);
@@ -108,16 +109,16 @@ public class RegisterStampReport extends BasicReportForOrgJob {
                 calendar.add(Calendar.DATE,1);
             }
             if(allGoods.isEmpty()){
-                RegisterStampReportItem dailySampleItem = new RegisterStampReportItem(emptyGoodItem,0L,"88888");
-                RegisterStampReportItem allTotal = new RegisterStampReportItem(emptyGoodItem,0L,"99999");
+                RegisterStampReportItem dailySampleItem = new RegisterStampReportItem(emptyGoodItem,0L,"Суточная проба", CalendarUtils.addDays(endTime, 2));
+                RegisterStampReportItem allTotal = new RegisterStampReportItem(emptyGoodItem,0L,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
                 result.add(allTotal);
                 result.add(dailySampleItem);
             } else {
                 for (GoodItem goodItem: allGoods){
                     Long val = service.buildRegisterStampDailySampleValue(org.getIdOfOrg(), startTime, endTime,
                             goodItem.getFullName());
-                    RegisterStampReportItem dailySampleItem = new RegisterStampReportItem(goodItem,val,"88888");
-                    RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem,val,"99999");
+                    RegisterStampReportItem dailySampleItem = new RegisterStampReportItem(goodItem,val,"Суточная проба", CalendarUtils.addDays(endTime, 2));
+                    RegisterStampReportItem allTotal = new RegisterStampReportItem(goodItem,val,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
                     result.add(allTotal);
                     result.add(dailySampleItem);
                 }
