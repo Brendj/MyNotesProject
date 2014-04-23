@@ -6,13 +6,13 @@ package ru.axetta.ecafe.processor.core.partner.nsi;
 
 import com.sun.xml.internal.ws.client.BindingProviderProperties;
 import com.sun.xml.internal.ws.developer.JAXWSProperties;
-import generated.nsiws.nsi.beans.Context;
-import generated.nsiws.nsi.beans.QueryResult;
-import generated.nsiws.nsi.services.NSIService;
-import generated.nsiws.nsi.services.NSIServiceService;
-import generated.nsiws.nsi.services.in.NSIRequestType;
-import generated.nsiws.nsi.services.out.NSIResponseType;
-import generated.nsiws.rev110801.*;
+import generated.nsiws2.com.rstyle.nsi.beans.Context;
+import generated.nsiws2.com.rstyle.nsi.beans.QueryResult;
+import generated.nsiws2.com.rstyle.nsi.services.NSIService;
+import generated.nsiws2.com.rstyle.nsi.services.NSIServiceService;
+import generated.nsiws2.com.rstyle.nsi.services.in.NSIRequestType;
+import generated.nsiws2.com.rstyle.nsi.services.out.NSIResponseType;
+import generated.nsiws2.ru.gosuslugi.smev.rev110801.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
@@ -146,8 +146,8 @@ public class MskNSIService {
         request.getMessage().setDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
         request.getMessage().setExchangeType("test_ex_type");
         request.getMessage().setServiceCode("test service code");
-        request.setMessageData(new MessageDataType());
-        request.getMessageData().setAppData(new AppDataType());
+        request.setMessageData(new ExtMessageDataType());
+        request.getMessageData().setAppData(new ExtAppDataType());
         request.getMessageData().getAppData().setContext(new Context());
         request.getMessageData().getAppData().getContext().setUser(Config.getUser());
         request.getMessageData().getAppData().getContext().setPassword(Config.getPassword());
