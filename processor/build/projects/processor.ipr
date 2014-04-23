@@ -585,10 +585,11 @@
         </library>
       </libraries>
     </data-source>
-    <data-source source="LOCAL" name="Local Stand Data Source" product="" version="" jdbc-version="" driver-name="" driver-version="" uuid="225e21f8-d312-4780-aa94-b5ee2ffc7bbc">
+    <data-source source="LOCAL" name="Local Stand Data Source" product="PostgreSQL" version="9.2.3" jdbc-version="4.0" driver-name="PostgreSQL Native Driver" driver-version="PostgreSQL 9.1 JDBC4 (build 901)" uuid="225e21f8-d312-4780-aa94-b5ee2ffc7bbc">
+      <identifier-quote-string>&quot;</identifier-quote-string>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://corp.axetta-server:5432/amoscow</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/ecafe_moscow_db_1</jdbc-url>
       <user-name>postgres</user-name>
       <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
       <libraries>
@@ -1712,7 +1713,15 @@
         <root url="jar://$USER_HOME$/.ideaLibSources/hibernate-core-4.0.1.Final-sources.jar!/" />
         <root url="jar://$USER_HOME$/.ideaLibSources/hibernate-jpa-2.0-api-1.0.1.Final-sources.jar!/" />
         <root url="jar://$USER_HOME$/.ideaLibSources/hibernate-entitymanager-4.0.1.Final-sources.jar!/" />
+        <root url="jar://$USER_HOME$/.ideaLibSources/jboss-logging-3.1.0.GA-sources.jar!/" />
       </SOURCES>
+    </library>
+    <library name="infinispan-core-5.1.2.FINAL">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/infinispan/infinispan-core-5.1.2.FINAL.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
     </library>
     <library name="jasperlib">
       <CLASSES>
@@ -1728,6 +1737,14 @@
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/jrobin-1.5.9.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/javamelody-1.33.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="jboss-jaxrs-api_1.1_spec-1.0.0.Final">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/rest/jboss-jaxrs-api_1.1_spec-1.0.0.Final.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/rest/resteasy-jaxrs-2.3.2.Final.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

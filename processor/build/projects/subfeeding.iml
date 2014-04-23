@@ -23,6 +23,8 @@
     <orderEntry type="library" scope="PROVIDED" name="commons" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="jboss_J2EE" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="slf4j-api-1.5.6" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="jboss-jaxrs-api_1.1_spec-1.0.0.Final" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="guava" level="project" />
   </component>
 </module>
 
