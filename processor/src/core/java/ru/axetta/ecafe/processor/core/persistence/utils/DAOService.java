@@ -634,7 +634,36 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
 
     
     public List<Contragent> getContragentsList() {
-        TypedQuery<Contragent> query = entityManager.createQuery("from Contragent", Contragent.class);
+        /*TypedQuery<Contragent> query = entityManager.createQuery("from Contragent", Contragent.class);
+        List<Contragent> result = query.getResultList();
+
+        if (result.isEmpty()) {
+            return null;
+        }
+        return result;*/
+        return getContragentsList(null);
+    }
+
+    public List<Contragent> getContragentsListFromOrders() {
+        String q = "SELECT distinct c from Contragent c, Order o WHERE o.contragent=c";
+        TypedQuery<Contragent> query = entityManager.createQuery(q, Contragent.class);
+        List<Contragent> result = query.getResultList();
+        if (result.isEmpty()) {
+            return null;
+        }
+        return result;
+    }
+
+
+    public List<Contragent> getContragentsList(Integer classId) {
+        String q = "from Contragent";
+        if(classId != null) {
+            q += " c WHERE c.classId=:classId order by idOfContragent";
+        }
+        TypedQuery<Contragent> query = entityManager.createQuery(q, Contragent.class);
+        if(classId != null) {
+            query.setParameter("classId", classId);
+        }
         List<Contragent> result = query.getResultList();
 
         if (result.isEmpty()) {

@@ -15,6 +15,8 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.hibernate.Session;
 import org.slf4j.LoggerFactory;
@@ -74,6 +76,11 @@ public class ProjectStateReportService {
     private static final int REFILL_PROGRESS_0_CHART = 1001;
     private static final int REFILL_PROGRESS_1_CHART = 1002;
     private static final int REFILL_PROGRESS_2_CHART = 1003;
+    private static final int FISCAL_CHART_DATA = 2000;
+    private static final int FISCAL_CHART_1_DATA = 2001;
+    private static final int FISCAL_CHART_2_DATA = 2002;
+    private static final int FISCAL_CHART_3_DATA = 2003;
+    private static final int CONTRAGENTS_CHART_DATA = 3000;
     private static final int DISCOUNT_FLOWCHARTS_DATE_INCREMENT = -259200000; // 3 дня
 
 
@@ -476,7 +483,76 @@ public class ProjectStateReportService {
                 {ValueType.TEXT, "ОУ"}, {ValueType.NUMBER, "Проход (%)", RATING_CHART_1_DATA}, {ValueType.NUMBER, "Платное питание (%)", RATING_CHART_2_DATA},
                 {ValueType.TEXT, "Льготное питание", RATING_CHART_3_DATA}, {ValueType.NUMBER, "Рейтинг (%)", RATING_CHART_4_DATA}, {ValueType.TEXT, "Округ", RATING_CHART_5_DATA},},
                 RATING_CHART_DATA));
+
+        TYPES.put("FiscalChart", new ComplexType(new Type[]{
+                new SimpleType(
+                          "select '' || EXTRACT(EPOCH FROM current_timestamp) * 1000 as d, int8(sum(regOrgSrc.balance) / 100) / 1000 as v "
+                        + "from cf_clients regOrgSrc "
+                        + REGION_SENSITIVE_JOIN + " "
+                        + "where 1=1 "
+                        + REGION_SENSITIVE_CLAUSE + " "
+                        + "group by 1", FISCAL_CHART_1_DATA).setIncremental(true),
+
+                new SimpleType(
+                          "select '' || EXTRACT(EPOCH FROM d) * 1000 as d, int8(sum(v) / 100) / 1000 as v "
+                        + "from (select regOrgSrc.rsum as v, date_trunc('day', to_timestamp(regOrgSrc.orderdate / 1000)) as d "
+                        + "      from cf_orders regOrgSrc "
+                        + REGION_SENSITIVE_JOIN + " "
+                        + "      where regOrgSrc.socdiscount=0 and regOrgSrc.orderdate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 "
+                        + REGION_SENSITIVE_CLAUSE + " "
+                        + "            and regOrgSrc.orderdate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000) as oo "
+                        + "group by d", FISCAL_CHART_2_DATA).setIncremental(true),
+
+                new SimpleType(
+                        "select '' || EXTRACT(EPOCH FROM d) * 1000 as d, int8(sum(v) / 100) / 1000 as v "
+                        + "from (select t.transactionsum as v, date_trunc('day', to_timestamp(t.transactiondate / 1000)) as d "
+                        + "      from cf_transactions t "
+                        + "      join cf_clients regOrgSrc on t.idofclient=regOrgSrc.idofclient "
+                        + REGION_SENSITIVE_JOIN + " "
+                        + "      where t.transactiondate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and "
+                        + "            t.transactiondate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 "
+                        + REGION_SENSITIVE_CLAUSE + " and "
+                        + "            t.transactionsum>0) as oo "
+                        + "group by 1", FISCAL_CHART_3_DATA).setIncremental(true) }, new Object[][]{
+                {ValueType.DATE, "Год"}, {ValueType.NUMBER, "Остатки на лицевых счетах (тыс. руб.)", FISCAL_CHART_1_DATA},
+                {ValueType.NUMBER, "Суммы платных дневных продаж (тыс. руб.)", FISCAL_CHART_2_DATA},
+                {ValueType.NUMBER, "Сумма пополнений (тыс. руб.)", FISCAL_CHART_3_DATA} }, FISCAL_CHART_DATA));
+
+        //initContragentsChartType();
     }
+
+    private static void initContragetsChartType() {
+        if(TYPES.get("ContragentsChart") != null) {
+            return;
+        }
+
+
+        List<Contragent> contragents = DAOService.getInstance().getContragentsListFromOrders();//.getContragentsList(Contragent.TSP);
+        if(contragents != null) {
+            Type [] types = new Type[contragents.size()];
+            for(int i=0; i<contragents.size(); i++) {
+                types[i] = new SimpleType(
+                        "select '' || EXTRACT(EPOCH FROM d) * 1000 as d, int8(sum(v) / 100) / 1000 as v "
+                                + "from (select regOrgSrc.rsum as v, date_trunc('day', to_timestamp(regOrgSrc.orderdate / 1000)) as d "
+                                + "      from cf_orders regOrgSrc "
+                                + REGION_SENSITIVE_JOIN + " "
+                                + "      where regOrgSrc.socdiscount=0 and regOrgSrc.orderdate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and "
+                                + "            regOrgSrc.orderdate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 and "
+                                + "            regOrgSrc.idofcontragent=" + contragents.get(i).getIdOfContragent() + " "
+                                + REGION_SENSITIVE_JOIN + " "
+                                + "      ) as oo "
+                                + "group by d", CONTRAGENTS_CHART_DATA + i + 1).setIncremental(true);
+            }
+            Object[][] props = new Object[contragents.size() + 1][2];
+            props [0] = new Object[] { ValueType.DATE, "Год" };
+            for(int i=0; i<contragents.size(); i++) {
+                Contragent cc = contragents.get(i);
+                props [i + 1] = new Object [] {ValueType.NUMBER, cc.getContragentName(), CONTRAGENTS_CHART_DATA + i + 1};
+            }
+            TYPES.put("ContragentsChart", new ComplexType(types, props, CONTRAGENTS_CHART_DATA));
+        }
+    }
+
 
     private static final String INSERT_SQL = "INSERT INTO cf_projectstate_data (GenerationDate, Period, Region, Type, StringKey, StringValue, Comments) VALUES (?, ?, ?, ?, ?, ?, ?)";
     private static final String DELETE_SQL = "DELETE FROM cf_projectstate_data WHERE Period=? AND Type=? and Region=?";
@@ -529,7 +605,8 @@ public class ProjectStateReportService {
                 log("Project State is turned off. You have to activate this tool using common Settings");
                 return;
             }
-    
+
+            initContragetsChartType();
             Map<Integer, Boolean> clearedTypes = new HashMap<Integer, Boolean>();
             try {
                 for (String t : TYPES.keySet()) {
@@ -728,9 +805,9 @@ public class ProjectStateReportService {
 
 
 
-        /*cal.set(Calendar.YEAR, 2013);
+        /*cal.set(Calendar.YEAR, 2014);
         cal.set(Calendar.MONTH, Calendar.MARCH);
-        cal.set(Calendar.DAY_OF_MONTH, 24);*/
+        cal.set(Calendar.DAY_OF_MONTH, 1);*/
 
 
         return cal;
