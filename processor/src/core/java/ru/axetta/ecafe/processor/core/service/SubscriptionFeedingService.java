@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
+import com.google.common.collect.Lists;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
@@ -238,9 +240,52 @@ public class SubscriptionFeedingService {
         return (CycleDiagram) criteria.uniqueResult();
     }
 
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    // Возвращает циклограмму, действующую в определенный день.
+    public CycleDiagram findCycleDiagramByClient(Client client) {
+        Date currentDay = CalendarUtils.truncateToDayOfMonth(new Date());
+        Session session = entityManager.unwrap(Session.class);
+        DetachedCriteria subQuery = DetachedCriteria.forClass(CycleDiagram.class);
+        subQuery.add(Restrictions.eq("client", client));
+        subQuery.add(Restrictions.eq("deletedState", false));
+        subQuery.add(Restrictions.in("stateDiagram", new Object[]{StateDiagram.WAIT, StateDiagram.ACTIVE}));
+        subQuery.add(Restrictions.le("dateActivationDiagram", currentDay));
+        subQuery.setProjection(Projections.max("dateActivationDiagram"));
+        if(subQuery.getExecutableCriteria(session).uniqueResult()!=null){
+            Criteria criteria = session.createCriteria(CycleDiagram.class);
+            criteria.add(Restrictions.eq("client", client));
+            criteria.add(Restrictions.eq("deletedState", false));
+            criteria.add(Subqueries.propertyEq("dateActivationDiagram", subQuery));
+            return (CycleDiagram) criteria.uniqueResult();
+        } else return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    // Возвращает циклограмму, действующую в определенный день.
+    public CycleDiagram findCycleDiagramByClient(Client client, Date currentDay) {
+        currentDay = CalendarUtils.truncateToDayOfMonth(currentDay);
+        Session session = entityManager.unwrap(Session.class);
+        DetachedCriteria subQuery = DetachedCriteria.forClass(CycleDiagram.class);
+        subQuery.add(Restrictions.eq("client", client));
+        subQuery.add(Restrictions.eq("deletedState", false));
+        subQuery.add(Restrictions.in("stateDiagram", new Object[]{StateDiagram.WAIT, StateDiagram.ACTIVE}));
+        subQuery.add(Restrictions.ge("dateActivationDiagram", currentDay));
+        subQuery.setProjection(Projections.min("dateActivationDiagram"));
+        if(subQuery.getExecutableCriteria(session).uniqueResult()!=null){
+            Criteria criteria = session.createCriteria(CycleDiagram.class);
+            criteria.add(Restrictions.eq("client", client));
+            criteria.add(Restrictions.eq("deletedState", false));
+            criteria.add(Subqueries.propertyEq("dateActivationDiagram", subQuery));
+            return (CycleDiagram) criteria.uniqueResult();
+        } else return null;
+    }
+
+
     @Transactional(rollbackFor = Exception.class)
     // Приостанавливает подписку АП.
-    public void suspendSubscriptionFeeding(Client client, String reasonWasSuspended) throws Exception {
+    public void suspendSubscriptionFeeding(Client client) throws Exception {
         //Date date = new Date();
         DAOService daoService = DAOService.getInstance();
         List<ECafeSettings> settings = daoService
@@ -261,10 +306,72 @@ public class SubscriptionFeedingService {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    // Приостанавливает подписку АП.
+    public void suspendSubscriptionFeeding(Client client, Date endPauseDate) throws Exception {
+        //Date date = new Date();
+        DAOService daoService = DAOService.getInstance();
+        List<ECafeSettings> settings = daoService
+                .geteCafeSettingses(client.getOrg().getIdOfOrg(), SettingsIds.SubscriberFeeding, false);
+        ECafeSettings cafeSettings = settings.get(0);
+        SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) cafeSettings.getSplitSettingValue();
+        Date today = truncateToDayOfMonth(endPauseDate);
+        //Date date = CalendarUtils.addDays(today, 1 + parser.getDayForbidChange());
+
+        SubscriptionFeeding sf = findClientSubscriptionFeeding(client);
+        //sf.setLastDatePauseService(today.before(sf.getDateActivateService()) ? sf.getDateActivateService() : today);
+        sf.setLastDatePauseService(today);
+        sf.setWasSuspended(true);
+        sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
+        sf.setLastUpdate(new Date());
+        entityManager.merge(sf);
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
     // Возобновляет подписку АП.
     public void reopenSubscriptionFeeding(Client client) {
         SubscriptionFeeding sf = findClientSubscriptionFeeding(client);
         sf.setWasSuspended(false);
+        DAOService daoService = DAOService.getInstance();
+        sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
+        sf.setLastUpdate(new Date());
+        entityManager.merge(sf);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    // Возобновляет подписку АП.
+    public void reopenSubscriptionFeeding(Client client, Date endReopenDate) {
+        SubscriptionFeeding lassf = findClientSubscriptionFeeding(client);
+        DAOService daoService = DAOService.getInstance();
+        SubscriptionFeeding sf = new SubscriptionFeeding();
+        sf.setClient(client);
+        sf.setOrgOwner(lassf.getOrgOwner());
+        sf.setIdOfClient(client.getIdOfClient());
+        sf.setDateActivateService(endReopenDate);
+        sf.setDateCreateService(lassf.getDateCreateService());
+        sf.setDeletedState(false);
+        sf.setSendAll(SendToAssociatedOrgs.SendToSelf);
+        sf.setWasSuspended(false);
+        sf.setCreatedDate(new Date());
+        Long version = daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName());
+        sf.setGlobalVersionOnCreate(version);
+        sf.setGlobalVersion(version);
+        entityManager.persist(sf);
+        //sf.setWasSuspended(false);
+        //sf.setLastDatePauseService(null);
+        //DAOService daoService = DAOService.getInstance();
+        //sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
+        //sf.setLastUpdate(new Date());
+        //entityManager.merge(sf);
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    // Возобновляет подписку АП.
+    public void cancelSubscriptionFeeding(Client client) {
+        SubscriptionFeeding sf = findClientSubscriptionFeeding(client);
+        sf.setWasSuspended(false);
+        sf.setLastDatePauseService(null);
         DAOService daoService = DAOService.getInstance();
         sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
         sf.setLastUpdate(new Date());
@@ -301,6 +408,25 @@ public class SubscriptionFeedingService {
         createCycleDiagram(client, org, monday, tuesday, wednesday, thursday, friday, saturday, dayBegin, cd==null);
 
         return sf;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    // Подключает подписку на АП. Создает также первую циклограмму.
+    public CycleDiagram editSubscriptionFeeding(Client client, Org org, String monday, String tuesday, String wednesday,
+            String thursday, String friday, String saturday, Date dateActivationDiagram) {
+        DAOService daoService = DAOService.getInstance();
+        Date date = new Date();
+        Date dayBegin = CalendarUtils.truncateToDayOfMonth(date);
+        List<SubscriptionFeeding> list = findSubscriptionFeedingByClient(client, dayBegin);
+        SubscriptionFeeding sf = list.get(0);
+        sf.setDateActivateService(dateActivationDiagram);
+        Long version = daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName());
+        sf.setGlobalVersionOnCreate(version);
+        sf.setGlobalVersion(version);
+        entityManager.persist(sf);
+        return createCycleDiagram(client, org, monday, tuesday, wednesday, thursday, friday, saturday, dateActivationDiagram, true);
+
+        //return sf;
     }
 
     @Transactional(rollbackFor = Exception.class)

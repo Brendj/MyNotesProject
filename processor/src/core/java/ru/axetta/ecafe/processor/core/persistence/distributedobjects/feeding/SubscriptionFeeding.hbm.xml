@@ -6,7 +6,8 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding" table="cf_subscriber_feeding">
+    <class name="ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding"
+           table="cf_subscriber_feeding">
         <id name="globalId" column="IdOfServiceSubscriberFeeding" type="long">
             <generator class="identity"/>
         </id>
@@ -18,28 +19,37 @@
 
         <property name="guid" column="GUID" type="string" length="36" not-null="true" unique="true"/>
 
-        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true" update="false"/>
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
         <property name="lastUpdate" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="deleteDate" column="DeleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="sendAll" column="SendAll">
             <type name="org.hibernate.type.EnumType">
-                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs</param>
-                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+                <param name="enumClass">
+                    ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs
+                </param>
+                <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+                <param name="type">4</param>
             </type>
         </property>
         <!-- End Global params -->
 
         <property name="orgOwner" column="OrgOwner" type="long"/>
         <!--<property name="idOfClient" column="IdOfClient" type="long"/>-->
-        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient" not-null="false"/>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client"
+                     column="IdOfClient" not-null="false"/>
 
-        <property name="dateActivateService" column="DateActivateService" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true" update="false"/>
-        <property name="lastDatePauseService" column="LastDatePauseService" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
-        <property name="dateDeactivateService" column="DateDeactivateService" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
-        <property name="dateCreateService" column="DateCreateService" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="dateActivateService" column="DateActivateService"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="lastDatePauseService" column="LastDatePauseService"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="dateDeactivateService" column="DateDeactivateService"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="dateCreateService" column="DateCreateService"
+                  type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true" update="false"/>
 
         <property name="wasSuspended" column="WasSuspended" type="java.lang.Boolean"/>
-        <!--<property name="reasonWasSuspended" column="ReasonWasSuspended" type="java.lang.String"/>-->
+        <property name="reasonWasSuspended" column="ReasonWasSuspended" type="java.lang.String"/>
 
 
     </class>

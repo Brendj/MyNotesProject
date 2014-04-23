@@ -64,11 +64,11 @@
         <span class="contract"><%=ContractIdFormat.format(client.getContractId())%></span>
         <span class="contract" style="padding-left: 20px;"><%=client.getFullName()%></span>
         <span style="float: right;">
-        <%--<button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/view'">Вернуться--%>
-        <%--</button>--%>
-            <button type="button" onclick="history.go(-1)">Вернуться
-            </button>
-        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/logout'" name="logout">Выход
+        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/view'">
+            Вернуться
+        </button>
+        <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/logout'" name="logout">
+            Выход
         </button>
         </span>
     </div>

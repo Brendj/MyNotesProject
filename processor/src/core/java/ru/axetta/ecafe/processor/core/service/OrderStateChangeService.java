@@ -363,7 +363,7 @@ public class OrderStateChangeService {
         writer.write("<body>");
         String beginDateStr = StringEscapeUtils.escapeHtml(timeFormat.format(beginDate));
         String endDateStr = StringEscapeUtils.escapeHtml(timeFormat.format(endDate));
-        String datePeriod = String.format("<p>В период c %s по %s были  следующие заказы:</p>",beginDateStr, endDateStr);
+        String datePeriod = String.format("<p>В период c %s по %s были изменены следующие заказы:</p>",beginDateStr, endDateStr);
         writer.write(datePeriod);
         writer.write("<table border=\"1\" cellpadding=\"0\" cellspacing=\"0\">");
         writer.write("<tr>");
@@ -423,7 +423,7 @@ public class OrderStateChangeService {
             totalGrantSum+=orderItem.getGrantSum();
             writer.write("</p></td>");
 
-            writer.write("<td align=\"center\"><p style=\"margin: 10px;\">");
+            writer.write("<td align=\"center\">");
             writer.write("<table border=\"1\" cellpadding=\"0\" cellspacing=\"0\">");
             //writer.write("<tr>");
             //writer.write("<th align=\"center\"><p style=\"margin: 10px;\">");
@@ -441,7 +441,7 @@ public class OrderStateChangeService {
             }
             //writer.write("</tr>");
             writer.write("</table>");
-            writer.write("</p></td>");
+            writer.write("</td>");
 
             writer.write("<td align=\"center\"><p style=\"margin: 10px;\">");
             writer.write(StringEscapeUtils.escapeHtml(orderItem.getState()));

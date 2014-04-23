@@ -7,7 +7,7 @@
 ALTER TABLE cf_subscriber_feeding ALTER COLUMN dateActivateService DROP NOT NULL;
 ALTER TABLE cf_subscriber_feeding ADD COLUMN dateCreateService BIGINT;
 UPDATE cf_subscriber_feeding SET dateCreateService=dateActivateService;
--- ALTER TABLE cf_subscriber_feeding ADD COLUMN reasonWasSuspended CHARACTER VARYING(1024);
+ALTER TABLE cf_subscriber_feeding ADD COLUMN reasonWasSuspended CHARACTER VARYING(1024);
 
 CREATE TABLE cf_UserOrgs
 (
@@ -27,13 +27,13 @@ CREATE TABLE cf_Registry_Talon
   GUID CHARACTER VARYING(36) NOT NULL,
   DeletedState BOOLEAN NOT NULL DEFAULT FALSE,
   GlobalVersion BIGINT,
-  GlobalVersionOnCreate BIGINT DEFAULT NULL,
+  GlobalVersionOnCreate BIGINT NOT NULL,
   CreatedDate BIGINT NOT NULL,
   LastUpDate BIGINT,
   DeleteDate BIGINT,
   SendAll INTEGER NOT NULL DEFAULT 0,
-  Date BIGINT,
-  Number BIGINT,
+  TalonDate BIGINT,
+  TalonNumber BIGINT,
   TalonType integer default 0 not null,
   CONSTRAINT cf_registry_talon_pk PRIMARY KEY (idOfRegistryTalon)
 );

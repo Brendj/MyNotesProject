@@ -123,7 +123,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         Map<Date, Long> map = new HashMap<Date, Long>();
         for (Object lst : list) {
             RegistryTalon curr = (RegistryTalon) lst;
-            map.put(curr.getDate(), curr.getNumber());
+            map.put(curr.getTalonDate(), curr.getNumber());
         }
         return map;
     }

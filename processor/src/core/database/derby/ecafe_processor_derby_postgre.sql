@@ -2871,7 +2871,8 @@ CREATE TABLE cf_subscriber_feeding
   DateDeactivateService bigint,
   ServiceState integer NOT NULL DEFAULT 0,
   WasSuspended boolean NOT NULL DEFAULT false,
-  dateCreateService bigint NOT NULL,
+  DateCreateService bigint NOT NULL,
+  ReasonWasSuspended CHARACTER VARYING(1024),
   CONSTRAINT cf_service_subscriber_feeding_pk PRIMARY KEY (IdOfServiceSubscriberFeeding),
   CONSTRAINT cf_service_subscriber_feeding_clients_fk FOREIGN KEY (IdOfClient) REFERENCES cf_clients (IdOfClient)
 );
@@ -2974,8 +2975,8 @@ CREATE TABLE cf_Registry_Talon
   LastUpDate BIGINT,
   DeleteDate BIGINT,
   SendAll INTEGER NOT NULL DEFAULT 0,
-  Date BIGINT,
-  Number BIGINT,
+  TalonDate BIGINT,
+  TalonNumber BIGINT,
   TalonType integer default 0 not null,
   CONSTRAINT cf_registry_talon_pk PRIMARY KEY (idOfRegistryTalon)
 );

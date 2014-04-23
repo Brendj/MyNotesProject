@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.subfeeding;
 
+import com.google.common.collect.Lists;
+
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -95,18 +97,25 @@ public class SubFeedingServlet extends HttpServlet {
                 showSubscriptionFeeding(req, resp);
             } else if (path.equals("/activate")) {
                 activateSubscriptionFeeding(req, resp);
+            } else if (path.equals("/create")) {
+                createClientDiagram(req, resp);
             } else if (path.equals("/suspend")) {
                 suspendSubscriptionFeeding(req, resp);
             } else if (path.equals("/reopen")) {
                 reopenSubscriptionFeeding(req, resp);
+            } else if (path.equals("/cancel")) {
+                cancelSubscriptionFeeding(req, resp);
             } else if (path.equals("/plan")) {
                 showSubscriptionFeedingPlan(req, resp);
             } else if (path.equals("/edit")) {
-                editSubscriptionFeedingPlan(req, resp);
+                //editSubscriptionFeedingPlan(req, resp);
+                editCycleDiagramPlan(req, resp);
             } else if (path.equals("/logout")) {
                 logout(req, resp);
             } else if (path.equals("/transfer")) {
                 processBalanceTransfer(req, resp);
+            } else if (path.equals("/demo")) {
+
             } else {
                 sendRedirect(req, resp, "/index");
             }
@@ -145,40 +154,144 @@ public class SubFeedingServlet extends HttpServlet {
         ClientSummaryResult client = clientRoomController.getSummary(contractId);
         //SubFeedingResult sf = clientRoomController.findSubscriptionFeeding(contractId);
         req.setAttribute("client", client.clientSummary);
-        Date currentDay = new Date();
+        final Date currentDay = new Date();
         SubscriptionFeedingListResult result = clientRoomController.getSubscriptionFeedingList(contractId, currentDay);
         SubscriptionFeedingExt subscriptionFeeding = null;
-        if(!result.subscriptionFeedingListExt.getS().isEmpty()){
-            for (SubscriptionFeedingExt sf:result.subscriptionFeedingListExt.getS()){
-                if(sf.getDateActivate().before(currentDay) && (sf.getLastDatePause()==null || sf.getLastDatePause().after(currentDay))){
-                    subscriptionFeeding = sf;
+        List<SubscriptionFeedingExt> feedingExts = result.subscriptionFeedingListExt.getS();
+        if(!feedingExts.isEmpty()){
+            for (SubscriptionFeedingExt sf: Lists.reverse(feedingExts)){
+                subscriptionFeeding = sf;
+                if((sf.getDateActivate() ==null || sf.getDateActivate().before(currentDay)) && (sf.getLastDatePause()==null || sf.getLastDatePause().after(currentDay))){
                     break;
                 }
             }
         }
         req.setAttribute("subscriptionFeeding", subscriptionFeeding);
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+        df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+        Date startDate = StringUtils.isBlank(req.getParameter("startDate")) ? null
+                : parseDate(req.getParameter("startDate"), df);
+        Date endDate = StringUtils.isBlank(req.getParameter("endDate")) ? null
+                : parseDate(req.getParameter("endDate"), df);
+        if (startDate == null || endDate == null) {
+            Date[] week = CalendarUtils.getCurrentWeekBeginAndEnd(currentDay);
+            startDate = week[0];
+            endDate = week[1];
+        }
+        Long subBalanceNumber = Long.parseLong(contractId + "01");
+        req.setAttribute("payments", clientRoomController.getPaymentList(subBalanceNumber, startDate, endDate));
+        req.setAttribute("purchases", clientRoomController.getPurchaseList(subBalanceNumber, startDate, endDate));
+        req.setAttribute("transfers", clientRoomController.getTransferSubBalanceList(contractId, startDate, endDate));
+        req.setAttribute("startDate", df.format(startDate));
+        req.setAttribute("endDate", df.format(endDate));
+
+        final Date truncateCurrentDate = truncateToDayOfMonth(currentDay);
+        Date activationDate = addDays(truncateCurrentDate, 1);
+        if(subscriptionFeeding!=null && subscriptionFeeding.getDateActivate()!=null){
+            SubscriptionFeedingSettingResult settingResult = clientRoomController.getSubscriptionFeedingSetting(
+                    contractId);
+            if (settingResult.resultCode == 0) {
+                int dayForbidChange = settingResult.subscriptionFeedingSettingExt.getDayForbidChange();
+                activationDate = addDays(truncateToDayOfMonth(truncateCurrentDate), 1 + dayForbidChange);
+                if(subscriptionFeeding.getDateActivate().after(activationDate)){
+                    activationDate =  subscriptionFeeding.getDateActivate();
+                } else {
+                    if(subscriptionFeeding.getDateActivate().before(currentDay)){
+                        activationDate = addDays(truncateCurrentDate, 1 + dayForbidChange);
+                    } else {
+                        activationDate = addDays(truncateToDayOfMonth(subscriptionFeeding.getDateActivate()), 1 + dayForbidChange);
+                    }
+                }
+            } else {
+                req.setAttribute(ERROR_MESSAGE, settingResult.description);
+            }
+        } else {
+            SubscriptionFeedingSettingResult settingResult = clientRoomController.getSubscriptionFeedingSetting(
+                    contractId);
+            if (settingResult.resultCode == 0) {
+                int dayForbidChange = settingResult.subscriptionFeedingSettingExt.getDayForbidChange();
+                activationDate = addDays(truncateCurrentDate, 1 + dayForbidChange);
+            } else {
+                req.setAttribute(ERROR_MESSAGE, settingResult.description);
+            }
+        }
+        req.setAttribute("activationDate", activationDate);
+
+        // = (CycleDiagramExt) request.getAttribute("cycleDiagram");
+        CycleDiagramList list = clientRoomController.getCurrentCycleDiagramList(contractId);
+        CycleDiagramExt currentCycleDiagramExt = null;
+        if(!list.cycleDiagramListExt.getC().isEmpty()){
+            currentCycleDiagramExt = list.cycleDiagramListExt.getC().get(0);
+        }
+
+        req.setAttribute("currentCycleDiagram", currentCycleDiagramExt);
+
+        Date date = currentCycleDiagramExt==null? currentDay : currentCycleDiagramExt.getDateActivationDiagram();
+        CycleDiagramList nextList = clientRoomController.getNextCycleDiagramList(contractId, date);
+        CycleDiagramExt nextCycleDiagramExt = null;
+        if(!nextList.cycleDiagramListExt.getC().isEmpty()){
+            nextCycleDiagramExt = list.cycleDiagramListExt.getC().get(0);
+        }
+
+        req.setAttribute("nextCycleDiagram", nextCycleDiagramExt);
+
+
+        outputPage("view", req, resp);
+
         //if (sf.getIdOfSubscriptionFeeding() == null) {
         //    sendRedirect(req, resp, "/plan");
         //} else {
+        //    DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+        //    df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+        //    Date startDate = StringUtils.isBlank(req.getParameter("startDate")) ? null
+        //            : parseDate(req.getParameter("startDate"), df);
+        //    Date endDate = StringUtils.isBlank(req.getParameter("endDate")) ? null
+        //            : parseDate(req.getParameter("endDate"), df);
+        //    if (startDate == null || endDate == null) {
+        //        Date[] week = CalendarUtils.getCurrentWeekBeginAndEnd(currentDay);
+        //        startDate = week[0];
+        //        endDate = week[1];
+        //    }
+        //    Long subBalanceNumber = Long.parseLong(contractId + "01");
+        //    req.setAttribute("payments", clientRoomController.getPaymentList(subBalanceNumber, startDate, endDate));
+        //    req.setAttribute("purchases", clientRoomController.getPurchaseList(subBalanceNumber, startDate, endDate));
+        //    req.setAttribute("transfers", clientRoomController.getTransferSubBalanceList(contractId, startDate, endDate));
+        //    req.setAttribute("startDate", df.format(startDate));
+        //    req.setAttribute("endDate", df.format(endDate));
+        //    outputPage("view", req, resp);
+        //}
+    }
+
+    //create
+    private void createClientDiagram(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
+        if (checkComplexesChecked(req)) {
+            //CycleDiagramIn cycle = getSubFeedingPlan(req);
+            CycleDiagramExt cycle = buildSubFeedingPlan(req);
+
             DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
             df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
-            Date startDate = StringUtils.isBlank(req.getParameter("startDate")) ? null
-                    : parseDate(req.getParameter("startDate"), df);
-            Date endDate = StringUtils.isBlank(req.getParameter("endDate")) ? null
-                    : parseDate(req.getParameter("endDate"), df);
-            if (startDate == null || endDate == null) {
-                Date[] week = CalendarUtils.getCurrentWeekBeginAndEnd(currentDay);
-                startDate = week[0];
-                endDate = week[1];
+            Date activateDate = StringUtils.isBlank(req.getParameter("activateDate")) ? null
+                    : parseDate(req.getParameter("activateDate"), df);
+
+            cycle.setDateActivationDiagram(activateDate);
+
+            //CycleDiagramResult res = clientRoomController.createCycleDiagram(contractId, cycle);
+            CycleDiagramResult res = clientRoomController.createNewSubscriptionFeeding(contractId, cycle);
+
+            //Result res = clientRoomController.createSubscriptionFeeding(contractId, cycle, activateDate);
+            if (res.resultCode == 0) {
+                //req.setAttribute("cycleDiagram", res.cycleDiagramExt);
+                req.setAttribute(SUCCESS_MESSAGE, "Циклограмма успешно создана.");
+                showSubscriptionFeeding(req, resp);
+            } else {
+                req.setAttribute(ERROR_MESSAGE, res.description);
+                showSubscriptionFeedingPlan(req, resp);
             }
-            Long subBalanceNumber = Long.parseLong(contractId + "01");
-            req.setAttribute("payments", clientRoomController.getPaymentList(subBalanceNumber, startDate, endDate));
-            req.setAttribute("purchases", clientRoomController.getPurchaseList(subBalanceNumber, startDate, endDate));
-            req.setAttribute("transfers", clientRoomController.getTransferSubBalanceList(contractId, startDate, endDate));
-            req.setAttribute("startDate", df.format(startDate));
-            req.setAttribute("endDate", df.format(endDate));
-            outputPage("view", req, resp);
-        //}
+        } else {
+            req.setAttribute(ERROR_MESSAGE, "Для активации подписки АП необходимо заполнить циклограмму.");
+            showSubscriptionFeedingPlan(req, resp);
+        }
     }
 
     private void activateSubscriptionFeeding(HttpServletRequest req, HttpServletResponse resp) throws Exception {
@@ -188,10 +301,10 @@ public class SubFeedingServlet extends HttpServlet {
 
             DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
             df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
-            Date dateActivate = StringUtils.isBlank(req.getParameter("dateActivate")) ? null
-                    : parseDate(req.getParameter("dateActivate"), df);
+            Date activateDate = StringUtils.isBlank(req.getParameter("activateDate")) ? null
+                    : parseDate(req.getParameter("activateDate"), df);
 
-            Result res = clientRoomController.createSubscriptionFeeding(contractId, cycle, dateActivate);
+            Result res = clientRoomController.createSubscriptionFeeding(contractId, cycle, activateDate);
             if (res.resultCode == 0) {
                 req.setAttribute(SUCCESS_MESSAGE, "Подписка успешно подключена.");
                 showSubscriptionFeeding(req, resp);
@@ -230,7 +343,52 @@ public class SubFeedingServlet extends HttpServlet {
         showSubscriptionFeedingPlan(req, resp);
     }
 
+    private void editCycleDiagramPlan(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
+        if (checkComplexesChecked(req)) {
+            CycleDiagramExt cycle = buildSubFeedingPlan(req);
+            if (isPlanChanged(req, cycle)) {
+                DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+                df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+                Date activateDate = StringUtils.isBlank(req.getParameter("activateDate")) ? null
+                        : parseDate(req.getParameter("activateDate"), df);
+                cycle.setDateActivationDiagram(activateDate);
+                CycleDiagramResult res = clientRoomController.editCycleDiagramPlan(contractId, cycle);
+                if (res.resultCode == 0) {
+                    String stringDate = df.format(res.cycleDiagramExt.getDateActivationDiagram());
+                    String message = "Изменения циклограммы успешно сохранены. Изменения вступят в силу " + stringDate;
+                    req.setAttribute(SUCCESS_MESSAGE, message);
+                } else {
+                    req.setAttribute(ERROR_MESSAGE, res.description);
+                }
+            } else {
+                sendRedirect(req, resp, "/plan");
+                return;
+            }
+        } else {
+            req.setAttribute(ERROR_MESSAGE, "Для сохранения циклограммы необходимо ее заполнить.");
+        }
+        showSubscriptionFeedingPlan(req, resp);
+    }
+
+
     private boolean isPlanChanged(HttpServletRequest req, CycleDiagramIn cycle) {
+        Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
+        CycleDiagramOut cd = clientRoomController.findClientCycleDiagram(contractId);
+        Map<Integer, List<String>> activeComplexes = splitPlanComplexes(cd);
+        for (Map.Entry<Integer, List<String>> entry : activeComplexes.entrySet()) {
+            int dayNumber = entry.getKey();
+            String newValue = cycle.getDayValue(dayNumber);
+            boolean isEqual = CollectionUtils.isEqualCollection(entry.getValue(),
+                    Arrays.asList(StringUtils.split(StringUtils.defaultString(newValue), ';')));
+            if (!isEqual) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isPlanChanged(HttpServletRequest req, CycleDiagramExt cycle) {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
         CycleDiagramOut cd = clientRoomController.findClientCycleDiagram(contractId);
         Map<Integer, List<String>> activeComplexes = splitPlanComplexes(cd);
@@ -256,8 +414,8 @@ public class SubFeedingServlet extends HttpServlet {
         SubscriptionFeedingExt subscriptionFeeding = null;
         if(!result.subscriptionFeedingListExt.getS().isEmpty()){
             for (SubscriptionFeedingExt sf:result.subscriptionFeedingListExt.getS()){
-                if(sf.getDateActivate().before(currentDay) && (sf.getLastDatePause()==null || sf.getLastDatePause().after(currentDay))){
-                    subscriptionFeeding = sf;
+                subscriptionFeeding = sf;
+                if((sf.getDateActivate()==null || sf.getDateActivate().before(currentDay)) && (sf.getLastDatePause()==null || sf.getLastDatePause().after(currentDay))){
                     break;
                 }
             }
@@ -267,26 +425,30 @@ public class SubFeedingServlet extends HttpServlet {
         req.setAttribute("complexes",
                 clientRoomController.findComplexesWithSubFeeding(contractId).getComplexInfoList().getList());
         CycleDiagramOut cd = clientRoomController.findClientCycleDiagram(contractId);
-        if (cd.getGlobalId() != null) {
-            req.setAttribute("activeComplexes", splitPlanComplexes(cd));
-        }
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
-        if(subscriptionFeeding==null){
-            SubscriptionFeedingSettingResult settingResult = clientRoomController.getSubscriptionFeedingSetting(
-                    contractId);
-            Date activationDate = addDays(truncateToDayOfMonth(new Date()), 100);
-            if (settingResult.resultCode == 0) {
-                int dayForbidChange = settingResult.subscriptionFeedingSettingExt.getDayForbidChange();
-                activationDate = addDays(truncateToDayOfMonth(new Date()), 1 + dayForbidChange);
-            } else {
-                req.setAttribute(ERROR_MESSAGE, settingResult.description);
-            }
-            req.setAttribute("dateActivate", df.format(activationDate));
-            req.setAttribute("subscriptionFeeding", subscriptionFeeding);
+        SubscriptionFeedingSettingResult settingResult = clientRoomController.getSubscriptionFeedingSetting(
+                contractId);
+        Date activationDate = addDays(truncateToDayOfMonth(new Date()), 1);
+        if (settingResult.resultCode == 0) {
+            int dayForbidChange = settingResult.subscriptionFeedingSettingExt.getDayForbidChange();
+            activationDate = addDays(truncateToDayOfMonth(new Date()), 1 + dayForbidChange);
         } else {
-            req.setAttribute("dateActivate", df.format(subscriptionFeeding.getDateActivate()));
+            req.setAttribute(ERROR_MESSAGE, settingResult.description);
         }
+        if (cd.getGlobalId() != null) {
+            req.setAttribute("activeComplexes", splitPlanComplexes(cd));
+            //req.setAttribute("dateActivate", df.format(cd.getDateActivationDiagram()));
+            if(activationDate.before(cd.getDateActivationDiagram())){
+                activationDate = cd.getDateActivationDiagram();
+            }
+        }
+        req.setAttribute("dateActivate", df.format(activationDate));
+
+        if(subscriptionFeeding==null){
+            req.setAttribute("subscriptionFeeding", subscriptionFeeding);
+        }
+
         outputPage("plan", req, resp);
     }
 
@@ -316,6 +478,20 @@ public class SubFeedingServlet extends HttpServlet {
         return cycle;
     }
 
+    private CycleDiagramExt buildSubFeedingPlan(HttpServletRequest req) throws Exception {
+        CycleDiagramExt cycle = new CycleDiagramExt();
+        for (String key: req.getParameterMap().keySet()){
+            if (key.contains(COMPLEX_PARAM_PREFIX)) {
+                String[] ids = StringUtils.split(key, '_');
+                String complexId = ids[2];
+                int dayNumber = Integer.parseInt(ids[3]);
+                String prevValue = cycle.getDayValue(dayNumber);
+                cycle.setDayValue(dayNumber, prevValue == null ? complexId : (prevValue + ";" + complexId));
+            }
+        }
+        return cycle;
+    }
+
     private boolean checkComplexesChecked(HttpServletRequest request) {
         boolean flag = false;
         for (String key : request.getParameterMap().keySet()) {
@@ -329,7 +505,12 @@ public class SubFeedingServlet extends HttpServlet {
 
     private void suspendSubscriptionFeeding(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
-        Result res = clientRoomController.suspendSubscriptionFeeding(contractId);
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+        df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+        Date endPauseDate = StringUtils.isBlank(req.getParameter("endPauseDate")) ? null
+                : parseDate(req.getParameter("endPauseDate"), df);
+        Result res = clientRoomController.suspendSubscriptionFeedingToDay(contractId, endPauseDate);
+
         if (res.resultCode == 0) {
             sendRedirect(req, resp, "/view");
         } else {
@@ -340,9 +521,26 @@ public class SubFeedingServlet extends HttpServlet {
 
     private void reopenSubscriptionFeeding(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
-        Result res = clientRoomController.reopenSubscriptionFeeding(contractId);
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+        df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+        Date endReopenDate = StringUtils.isBlank(req.getParameter("endReopenDate")) ? null
+                : parseDate(req.getParameter("endReopenDate"), df);
+        Result res = clientRoomController.reopenSubscriptionFeedingToDay(contractId, endReopenDate);
         if (res.resultCode == 0) {
             req.setAttribute(SUCCESS_MESSAGE, "Подписка возобновлена.");
+        } else {
+            req.setAttribute(ERROR_MESSAGE, res.description);
+        }
+        showSubscriptionFeeding(req, resp);
+    }
+
+    private void cancelSubscriptionFeeding(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+        Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
+        DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+        df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
+        Result res = clientRoomController.cancelSubscriptionFeeding(contractId);
+        if (res.resultCode == 0) {
+            req.setAttribute(SUCCESS_MESSAGE, "Приостановка подпики отменена.");
         } else {
             req.setAttribute(ERROR_MESSAGE, res.description);
         }
