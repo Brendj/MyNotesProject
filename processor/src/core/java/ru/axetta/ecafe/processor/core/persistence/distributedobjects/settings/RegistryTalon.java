@@ -25,14 +25,14 @@ import java.util.List;
 
 public class RegistryTalon extends DistributedObject {
 
-    private Date date;
+    private Date talonDate;
     private long number;
     private RegistryTalonType talonType;
 
     @Override
     protected void appendAttributes(Element element) {
         XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
-        XMLUtils.setAttributeIfNotNull(element, "Date", date);
+        XMLUtils.setAttributeIfNotNull(element, "Date", talonDate);
         XMLUtils.setAttributeIfNotNull(element, "Number", number);
         XMLUtils.setAttributeIfNotNull(element, "Type", talonType);
     }
@@ -48,7 +48,7 @@ public class RegistryTalon extends DistributedObject {
             setOrgOwner(longOrgOwner);
         Date dateDate = XMLUtils.getDateAttributeValue(node, "Date");
         if (dateDate != null)
-            setDate(dateDate);
+            setTalonDate(dateDate);
         Long longNumber = XMLUtils.getLongAttributeValue(node, "Number");
         if (longNumber != null) {
             setNumber(longNumber);
@@ -65,7 +65,7 @@ public class RegistryTalon extends DistributedObject {
     public void fill(DistributedObject distributedObject) {
         setOrgOwner(distributedObject.getOrgOwner());
         setNumber(((RegistryTalon) distributedObject).getNumber());
-        setDate(((RegistryTalon) distributedObject).getDate());
+        setTalonDate(((RegistryTalon) distributedObject).getTalonDate());
         setTalonType(((RegistryTalon) distributedObject).getTalonType());
     }
 
@@ -79,28 +79,19 @@ public class RegistryTalon extends DistributedObject {
     @Override
     public void createProjections(Criteria criteria) {
         ProjectionList projectionList = Projections.projectionList();
-        projectionList.add(Projections.property("guid"), "guid");
-        projectionList.add(Projections.property("globalId"), "globalId");
-        projectionList.add(Projections.property("globalVersion"), "globalVersion");
-        projectionList.add(Projections.property("deletedState"), "deletedState");
-        projectionList.add(Projections.property("orgOwner"), "orgOwner");
-
-        projectionList.add(Projections.property("GlobalVersionOnCreate"), "GlobalVersionOnCreate");
-        projectionList.add(Projections.property("CreatedDate"), "CreatedDate");
-        projectionList.add(Projections.property("LastUpDate"), "LastUpDate");
-        projectionList.add(Projections.property("DeleteDate"), "DeleteDate");
-        projectionList.add(Projections.property("Date"), "Date");
-        projectionList.add(Projections.property("Number"), "Number");
+        addDistributedObjectProjectionList(projectionList);
+        projectionList.add(Projections.property("talonDate"), "talonDate");
+        projectionList.add(Projections.property("number"), "number");
         projectionList.add(Projections.property("talonType"), "talonType");
         criteria.setProjection(projectionList);
     }
 
-    public Date getDate() {
-        return date;
+    public Date getTalonDate() {
+        return talonDate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setTalonDate(Date talonDate) {
+        this.talonDate = talonDate;
     }
 
     public long getNumber() {
