@@ -17,7 +17,7 @@ import javax.xml.ws.WebServiceFeature;
  * Generated source version: 2.2
  * 
  */
-@WebServiceClient(name = "NSIServiceService", targetNamespace = "http://rstyle.com/nsi/services", wsdlLocation = "http://10.126.216.2:4422/em/nsiws2/v2/services/NSIService/WEB-INF/wsdl/NSIService.wsdl")
+@WebServiceClient(name = "NSIServiceService", targetNamespace = "http://rstyle.com/nsi/services", wsdlLocation = "http://10.126.216.2:4422/em/nsiws/v2/services/NSIService/WEB-INF/wsdl/NSIService.wsdl")
 public class NSIServiceService
     extends Service
 {
@@ -30,7 +30,7 @@ public class NSIServiceService
         URL url = null;
         WebServiceException e = null;
         try {
-            url = new URL("http://10.126.216.2:4422/em/nsiws2/v2/services/NSIService/WEB-INF/wsdl/NSIService.wsdl");
+            url = new URL("http://10.126.216.2:4422/em/nsiws/v2/services/NSIService/WEB-INF/wsdl/NSIService.wsdl");
         } catch (MalformedURLException ex) {
             e = new WebServiceException(ex);
         }

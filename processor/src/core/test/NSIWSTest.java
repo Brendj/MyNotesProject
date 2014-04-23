@@ -15,21 +15,25 @@ import javax.xml.bind.*;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.net.URL;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 
-import generated.nsiws.nsi.beans.Context;
-import generated.nsiws.nsi.beans.QueryResult;
-import generated.nsiws.nsi.services.NSIService;
-import generated.nsiws.nsi.services.NSIServiceService;
-import generated.nsiws.nsi.services.in.NSIRequestType;
-import generated.nsiws.nsi.services.out.NSIResponseType;
-import generated.nsiws.rev110801.*;
+import com.sun.xml.internal.ws.client.BindingProviderProperties;
+import com.sun.xml.internal.ws.developer.JAXWSProperties;
+import generated.nsiws2.com.rstyle.nsi.beans.Context;
+import generated.nsiws2.com.rstyle.nsi.beans.QueryResult;
+import generated.nsiws2.com.rstyle.nsi.services.NSIService;
+import generated.nsiws2.com.rstyle.nsi.services.NSIServiceService;
+import generated.nsiws2.com.rstyle.nsi.services.in.NSIRequestType;
+import generated.nsiws2.com.rstyle.nsi.services.out.NSIResponseType;
+import generated.nsiws2.ru.gosuslugi.smev.rev110801.*;
 
 public class NSIWSTest {
 
@@ -47,10 +51,11 @@ public class NSIWSTest {
         System.out.println(x);
         */
 
-        NSIServiceService nsiServicePort = new NSIServiceService();
+        String url = "http://10.126.216.2:4422/em/nsiws/v2/services/NSIService/WEB-INF/wsdl/NSIService.wsdl";
+        NSIServiceService nsiServicePort = new NSIServiceService(new URL(url.toLowerCase().contains("wsdl")?url:(url + "?wsdl")),
+                new QName("http://rstyle.com/nsi/services", "NSIServiceService"));
         NSIService nsiService = nsiServicePort.getNSIService();
         NSIRequestType request = new NSIRequestType();
-        String url = "http://localhost:2000/nsiws/services/NSIService";
         BindingProvider provider = (BindingProvider)nsiService;
         provider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
 
@@ -71,8 +76,8 @@ public class NSIWSTest {
         request.getMessage().setDate(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
         request.getMessage().setExchangeType("test_ex_type");
         request.getMessage().setServiceCode("test service code");
-        request.setMessageData(new MessageDataType());
-        request.getMessageData().setAppData(new AppDataType());
+        request.setMessageData(new ExtMessageDataType());
+        request.getMessageData().setAppData(new ExtAppDataType());
         request.getMessageData().getAppData().setContext(new Context());
         request.getMessageData().getAppData().getContext().setUser("UEK_SOAP");
         request.getMessageData().getAppData().getContext().setPassword("la0d6xxw");
