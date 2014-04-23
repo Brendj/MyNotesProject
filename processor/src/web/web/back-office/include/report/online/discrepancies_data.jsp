@@ -6,7 +6,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%--@elvariable id="discrepanciesDataOnOrdersAndPaymentReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.DiscrepanciesDataOnOrdersAndPaymentReportPage"--%>
-<h:panelGrid id="discrepanciesDataOnOrdersAndPaymentReportPageGrid" binding="#{discrepanciesDataOnOrdersAndPaymentReportPage.pageComponent}" styleClass="borderless-grid">
+<h:panelGrid id="discrepanciesDataOnOrdersAndPaymentReportPageGrid" binding="#{mainPage.discrepanciesDataOnOrdersAndPaymentReportPage.pageComponent}" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
         <rich:calendar value="#{discrepanciesDataOnOrdersAndPaymentReportPage.startDate}" datePattern="dd.MM.yyyy"
@@ -17,25 +17,29 @@
 
         <h:outputText escape="true" value="Поставщик меню" styleClass="output-text required-field" />
         <h:panelGroup>
-            <a4j:commandButton value="..." action="#{discrepanciesDataOnOrdersAndPaymentReportPage.showOrgSelectPage}"
-                               reRender="modalOrgSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
+            <a4j:commandButton value="..." action="#{mainPage.discrepanciesDataOnOrdersAndPaymentReportPage.showContragentListSelectPage}"
+                               reRender="modalOrgListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="2" target="#{mainPage.orgSelectPage.supplierFilter}" />
+                <f:setPropertyActionListener value="2" target="#{mainPage.orgListSelectPage.filterMode}" />
+                <f:setPropertyActionListener value="#{mainPage.discrepanciesDataOnOrdersAndPaymentReportPage.contragentStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
+                <f:setPropertyActionListener value="Выбор контрагента" target="#{mainPage.orgFilterPageName}"/>
             </a4j:commandButton>
-            <h:outputText styleClass="output-text" escape="true"
-                          value=" {#{discrepanciesDataOnOrdersAndPaymentReportPage.sourceMenuOrgFilter}}" />
+            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.discrepanciesDataOnOrdersAndPaymentReportPage.contragentFilter}}" />
         </h:panelGroup>
 
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
         <h:panelGroup>
             <a4j:commandButton value="..."
-                               action="#{discrepanciesDataOnOrdersAndPaymentReportPage.showOrgListSelectPage}"
+                               action="#{mainPage.discrepanciesDataOnOrdersAndPaymentReportPage.showOrgListSelectPage}"
                                reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;" />
-            <h:outputText styleClass="output-text" escape="true"
-                          value=" {#{discrepanciesDataOnOrdersAndPaymentReportPage.orgFilter}}" />
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />
+                <f:setPropertyActionListener
+                        value="#{mainPage.discrepanciesDataOnOrdersAndPaymentReportPage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+            </a4j:commandButton>
+            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.discrepanciesDataOnOrdersAndPaymentReportPage.filter}}" />
         </h:panelGroup>
 
         <a4j:commandButton value="Генерировать отчет" action="#{discrepanciesDataOnOrdersAndPaymentReportPage.buildReportHTML}"

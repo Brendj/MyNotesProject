@@ -13,7 +13,6 @@ import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.context.annotation.Scope;
@@ -24,7 +23,6 @@ import javax.faces.event.ActionEvent;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -35,10 +33,8 @@ import java.util.Properties;
 
 @Component
 @Scope(value = "session")
-public class DiscrepanciesDataOnOrdersAndPaymentReportPage extends OnlineReportPage {
+public class DiscrepanciesDataOnOrdersAndPaymentReportPage extends OnlineReportWithContragentPage {
 
-    private String sourceMenuOrgFilter = "Не выбрано";
-    private String orgFilter = "Не выбрано";
     private String htmlReport;
 
     @Override
@@ -50,34 +46,9 @@ public class DiscrepanciesDataOnOrdersAndPaymentReportPage extends OnlineReportP
         return htmlReport;
     }
 
-    public String getSourceMenuOrgFilter() {
-        return sourceMenuOrgFilter;
-    }
-
-    public String getOrgFilter() {
-        return orgFilter;
-    }
-
-    public Object showOrgListSelectPage() {
-        MainPage.getSessionInstance().showOrgListSelectPage();
-        return null;
-    }
-
     public Object showOrgSelectPage() {
         MainPage.getSessionInstance().showOrgSelectPage();
         return null;
-    }
-
-    @Override
-    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
-        super.completeOrgSelection(session, idOfOrg);
-        sourceMenuOrgFilter = filter;
-    }
-
-    @Override
-    public void completeOrgListSelection(Map<Long, String> orgMap) throws HibernateException {
-        super.completeOrgListSelection(orgMap);
-        orgFilter = filter;
     }
 
     private DiscrepanciesDataOnOrdersAndPaymentJasperReport buildReport() {
@@ -102,7 +73,7 @@ public class DiscrepanciesDataOnOrdersAndPaymentReportPage extends OnlineReportP
         } catch (Exception e) {
             HibernateUtils.rollback(persistenceTransaction, getLogger());
             getLogger().error("Filed build DiscrepanciesDataOnOrdersAndPaymentJasperReport", e);
-            printError("Ошибка при построении отчета: "+ e.getMessage());
+            printError("Ошибка при построении отчета: " + e.getMessage());
             //logAndPrintMessage("Ошибка при построении отчета:", e.getMessage());
         } finally {
             HibernateUtils.close(session, getLogger());
@@ -157,5 +128,8 @@ public class DiscrepanciesDataOnOrdersAndPaymentReportPage extends OnlineReportP
         } catch (Exception e) {
             logAndPrintMessage("Ошибка при выгрузке отчета:", e);
         }
+    }
+
+    public void fill() throws Exception {
     }
 }

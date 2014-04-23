@@ -5374,7 +5374,7 @@ public class MainPage {
     public Object showDiscrepanciesDataOnOrdersAndPaymentReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
-            //aggregateGoodRequestReportPage.fill();
+            discrepanciesDataOnOrdersAndPaymentReportPage.fill();
             currentWorkspacePage = discrepanciesDataOnOrdersAndPaymentReportPage;
         } catch (Exception e) {
             logger.error("Failed to set sales report page", e);

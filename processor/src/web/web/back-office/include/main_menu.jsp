@@ -912,9 +912,10 @@
 
         <%--@elvariable id="discrepanciesDataOnOrdersAndPaymentReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.DiscrepanciesDataOnOrdersAndPaymentReportPage"--%>
         <rich:panelMenuItem id="discrepanciesDataOnOrdersAndPaymentReportMenuItem"
-                            binding="#{discrepanciesDataOnOrdersAndPaymentReportPage.mainMenuComponent}"
+                            binding="#{mainPage.discrepanciesDataOnOrdersAndPaymentReportPage.mainMenuComponent}"
                             label="Статистика по актам расхождений"
-                            action="#{discrepanciesDataOnOrdersAndPaymentReportPage.show}" reRender="workspaceForm" />
+                            action="#{mainPage.showDiscrepanciesDataOnOrdersAndPaymentReportPage}"
+                            reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="salesReportMenuItem" binding="#{mainPage.salesReportPage.mainMenuComponent}"
