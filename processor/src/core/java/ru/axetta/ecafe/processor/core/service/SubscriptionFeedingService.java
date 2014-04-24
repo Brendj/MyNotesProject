@@ -195,6 +195,28 @@ public class SubscriptionFeedingService {
 
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    // Возвращает подписку АП, действующую на текущий день.
+    public List<SubscriptionFeeding> findSubscriptionFeedingByClient(Client c) {
+        Session session = entityManager.unwrap(Session.class);
+        Date now = new Date();
+        DetachedCriteria subQuery = DetachedCriteria.forClass(SubscriptionFeeding.class);
+        subQuery.add(Restrictions.eq("client", c));
+        subQuery.add(Restrictions.eq("deletedState", false));
+        subQuery.add(Restrictions.isNotNull("dateActivateService"));
+        subQuery.add(Restrictions.le("dateActivateService", now));
+        subQuery.add(Restrictions.or(
+                Restrictions.isNull("dateDeactivateService"),
+                Restrictions.gt("dateDeactivateService", now)
+        ));
+        subQuery.setProjection(Projections.max("dateCreateService"));
+        Criteria criteria = session.createCriteria(SubscriptionFeeding.class);
+        criteria.add(Restrictions.eq("client", c));
+        criteria.add(Subqueries.propertyEq("dateActivateService", subQuery));
+        return criteria.list();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public List<SubscriptionFeeding> findSubscriptionFeedingByClient(Client c, Date currentDate) {
         Session session = entityManager.unwrap(Session.class);
         DetachedCriteria subQuery = DetachedCriteria.forClass(SubscriptionFeeding.class);
@@ -222,6 +244,29 @@ public class SubscriptionFeedingService {
         criteria.add(Restrictions.eq("deletedState", false));
         criteria.add(Restrictions.eq("stateDiagram", StateDiagram.ACTIVE));
         return (CycleDiagram) criteria.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    // Возвращает циклограмму питания, актуальную на текущий день.
+    public CycleDiagram findActiveCycleDiagram(Client c, Date day) {
+        Session session = entityManager.unwrap(Session.class);
+        Criteria criteria = session.createCriteria(CycleDiagram.class);
+        criteria.add(Restrictions.eq("client", c));
+        criteria.add(Restrictions.eq("dateActivationDiagram", day));
+        criteria.add(Restrictions.eq("deletedState", false));
+        criteria.add(Restrictions.eq("stateDiagram", StateDiagram.ACTIVE));
+        return (CycleDiagram) criteria.uniqueResult();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Transactional(propagation = Propagation.SUPPORTS)
+    // Возвращает циклограмму питания, актуальную на текущий день.
+    public void blockingCycleDiagram(CycleDiagram diagram) {
+        Session session = entityManager.unwrap(Session.class);
+        session.refresh(diagram);
+        diagram.setStateDiagram(StateDiagram.BLOCK);
+        session.save(diagram);
     }
 
     @SuppressWarnings("unchecked")
