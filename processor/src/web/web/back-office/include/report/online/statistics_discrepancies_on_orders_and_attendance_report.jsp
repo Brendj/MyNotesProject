@@ -39,7 +39,7 @@
                 <f:setPropertyActionListener value="#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.contragentStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
                 <f:setPropertyActionListener value="Выбор контрагента" target="#{mainPage.orgFilterPageName}"/>
             </a4j:commandButton>
-            <h:outputText styleClass="output-text" escape="true" value="{#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.contragentFilter}}" />
+            <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.contragentFilter}}" />
         </h:panelGroup>
 
         <h:outputText styleClass="output-text" escape="true" value="Организация" />
