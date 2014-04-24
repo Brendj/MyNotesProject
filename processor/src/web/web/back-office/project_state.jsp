@@ -185,8 +185,8 @@ google.load('visualization', '1', {packages: ['table']});
 google.setOnLoadCallback (drawActivityCharts);
 //google.setOnLoadCallback (drawUniqueChart);
 /*var inter;
-var inter2;
-var inter3;*/
+ var inter2;
+ var inter3;*/
 var methodsStack;
 
 function executeNext () {
@@ -370,6 +370,35 @@ function drawRatingAscChart()
     //executeNext();
 }
 
+function drawFiscalChart ()
+{
+    //clearInterval (inter);
+
+    var container = document.getElementById('fiscalChart');
+    var chart = new google.visualization.LineChart(container);
+    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=FiscalChart');
+    //&period=' + $("#select_period_01").val() + '&region=' + $("#select_region_01").val());
+    var options = { title: 'Финансовые показатели', width: '100%', height: '100%', legend: {position: 'right', alignment: 'end'},
+        chartArea: {width: '70%', height: '80%', left: '50'}, fontSize: 11};
+    var queryWrapper = new QueryWrapper(query, chart, options, container);
+    queryWrapper.sendAndDraw();
+    //executeNext();
+}
+
+function drawContragentsChart ()
+{
+    var container = document.getElementById('contragentsChart');
+    var chart = new google.visualization.AreaChart(container);
+    var query = new google.visualization.Query ('<%= externalURL %>/processor/prj-state?type=ContragentsChart');
+    //&period=' + $("#select_period_02").val() + '&region=' + $("#select_region_04").val());
+    var options = { title: 'Показатели контрагентов', vAxis: {maxValue: 100}, width: '100%', height: '100%', legend: {position: 'bottom'},
+        chartArea: {width: '90%', height: '70%', left: '50'}, fontSize: 11};
+    var queryWrapper = new QueryWrapper(query, chart, options, container);
+    queryWrapper.sendAndDraw();
+}
+
+
+
 function drawToolbar() {
     var components = [
         {type: 'csv', datasource: '<%= externalURL %>/processor/prj-state?type=OrgsRatingChart&encoding=cyr'}
@@ -382,7 +411,7 @@ function drawToolbar() {
 function drawRatingCharts ()
 {
     /*inter = setInterval(drawRatingDescChart, 10);
-    inter2 = setInterval(drawRatingAscChart, 10);*/
+     inter2 = setInterval(drawRatingAscChart, 10);*/
     methodsStack = ["drawRatingDescChart", "drawRatingAscChart"];
     executeNext();
 }
@@ -412,8 +441,8 @@ function drawUniqueCharts () {
 function drawRefillCharts ()
 {
     /*inter = setInterval(drawRefillChart, 10);
-    inter2 = setInterval(drawRefillAvgChart, 10);
-    inter3 = setInterval(drawRefillProgressChart, 10);*/
+     inter2 = setInterval(drawRefillAvgChart, 10);
+     inter3 = setInterval(drawRefillProgressChart, 10);*/
     methodsStack = ["drawRefillChart", "drawRefillAvgChart", "drawRefillProgressChart"];
     executeNext();
 }
@@ -430,6 +459,8 @@ function initPeriods ()
     initPeriodsFor (document.getElementById ('select_period_01'));
     initPeriodsFor (document.getElementById ('select_period_011'));
     initPeriodsFor (document.getElementById ('select_period_02'));
+    initPeriodsFor (document.getElementById ('select_period_08'));
+    initPeriodsFor (document.getElementById ('select_period_09'));
 }
 
 function initPeriodsFor (container)
@@ -486,6 +517,8 @@ function addPeriod (container, title, value)
         <li><a href="#tabs-5" onclick="drawBenefitsCharts()">Показатели числа льготников<br/>по питанию в общем составе<br/> учащихся</a></li>
         <li><a href="#tabs-6" onclick="draw('drawVisitorsChart')">Посещаемость</a></li>
         <li><a href="#tabs-7" onclick="drawRatingCharts()">Рейтинг ОУ</a></li>
+        <li><a href="#tabs-8" onclick="drawFiscalChart()">Финансовые показатели</a></li>
+        <li><a href="#tabs-9" onclick="drawContragentsChart()">Показатели контрагентов</a></li>
     </ul>
     <div id="tabs-1" style="padding: 0px; margin: 0px">
         <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_01" name="period" onchange="drawActivityCharts()"></select></div>
@@ -542,6 +575,16 @@ function addPeriod (container, title, value)
 
             </tr>
         </table>
+    </div>
+    <div id="tabs-8" style="padding: 0px; margin: 0px">
+        <!--<div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_08" name="period" onchange="drawFiscalChart()"></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_08" name="region" onchange="drawFiscalChart()"><%= regionsStr %></select></div>-->
+        <div id="fiscalChart" style="width: 100%; height: 310px;"></div><br/>
+    </div>
+    <div id="tabs-9" style="padding: 0px; margin: 0px">
+        <!--<div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_period_09" name="period" onchange="drawContragentsChart()"></select></div>
+        <div width="100%" style="text-align: right"><select style="font-size: 10pt" id="select_region_09" name="region" onchange="drawContragentsChart()"><%= regionsStr %></select></div>-->
+        <div id="contragentsChart" style="width: 100%; height: 410px;"></div><br/>
     </div>
 </div>
 <script>
