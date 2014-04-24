@@ -12,7 +12,6 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConfirm;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConflict;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.CycleDiagram;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
 import ru.axetta.ecafe.processor.core.sync.doGroups.DOGroupsFactory;
@@ -526,19 +525,6 @@ public class Manager {
         LOGGER.debug("processDistributedObjectsList: init");
         final Date startDate = new Date();
         List<DistributedObject> distributedObjects = incomeDOMap.get(doSyncClass);
-        if (doSyncClass.getDoClass() == CycleDiagram.class) {
-            Collections.sort(distributedObjects, new Comparator<DistributedObject>() {
-                @Override
-                public int compare(DistributedObject o1, DistributedObject o2) {
-                    int res = o1.getDeletedState().equals(o2.getDeletedState()) ? 0
-                            : (o1.getDeletedState() == Boolean.TRUE ? -1 : 1);
-                    if (res != 0) {
-                        return res;
-                    }
-                    return o1.getGuid().compareTo(o2.getGuid());
-                }
-            });
-        }
         List<DistributedObject> distributedObjectList = new ArrayList<DistributedObject>();
         LOGGER.debug("processDistributedObjectsList: init data");
         if (!distributedObjects.isEmpty()) {
