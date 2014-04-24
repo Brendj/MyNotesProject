@@ -14,7 +14,8 @@ public class SubscriberFeedingSettingSettingValue  extends AbstractParserBySetti
     private int dayRequest; // Количество дней, на которые оформляются заявки на поставку
     private int dayDeActivate;   // Количество дней, пропустив которые, клиент приостанавливает свою подписку
     private boolean enableFeeding;   // Включить автоматическую приостановку/возобновление подписок на услугу АП в зависимости от посещения учреждения
-    private int dayForbidChange; // Количество дней, в течение которых запрещено редактировать заявки
+    //private int dayForbidChange; // Количество дней, в течение которых запрещено редактировать заявки
+    private int hoursForbidChange; // Количество часов, в течение которых запрещено редактировать заявки
 
     public SubscriberFeedingSettingSettingValue(String[] values) throws ParseException {
         super(values);
@@ -25,12 +26,14 @@ public class SubscriberFeedingSettingSettingValue  extends AbstractParserBySetti
         this.dayRequest = Integer.parseInt(values[0]);
         this.dayDeActivate = Integer.parseInt(values[1]);
         this.enableFeeding = values[2].equals("1");
-        this.dayForbidChange = Integer.parseInt(values[3]);
+        //this.dayForbidChange = Integer.parseInt(values[3]);
+        this.hoursForbidChange = Integer.parseInt(values[3]);
     }
 
     @Override
     public String build() {
-        return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + dayForbidChange + ";";
+        //return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + dayForbidChange + ";";
+        return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + hoursForbidChange + ";";
     }
 
     @Override
@@ -62,11 +65,19 @@ public class SubscriberFeedingSettingSettingValue  extends AbstractParserBySetti
         this.enableFeeding = enableFeeding;
     }
 
-    public int getDayForbidChange() {
-        return dayForbidChange;
+    //public int getDayForbidChange() {
+    //    return dayForbidChange;
+    //}
+    //
+    //public void setDayForbidChange(int dayForbidChange) {
+    //    this.dayForbidChange = dayForbidChange;
+    //}
+
+    public int getHoursForbidChange() {
+        return hoursForbidChange;
     }
 
-    public void setDayForbidChange(int dayForbidChange) {
-        this.dayForbidChange = dayForbidChange;
+    public void setHoursForbidChange(int hoursForbidChange) {
+        this.hoursForbidChange = hoursForbidChange;
     }
 }

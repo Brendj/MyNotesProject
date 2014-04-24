@@ -3999,8 +3999,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     .getSplitSettingValue();
             Date date = new Date();
             Date dayBegin = CalendarUtils.truncateToDayOfMonth(date);
-            Date dateActivateService = CalendarUtils.addDays(dayBegin, 1 + parser.getDayForbidChange());
-            if(newDateActivateService.getTime()<dateActivateService.getTime()){
+
+            final int hoursForbidChange = parser.getHoursForbidChange();
+            int dayForbidChange = (hoursForbidChange %24==0? hoursForbidChange /24: hoursForbidChange /24+1);
+            Date dayForbid = CalendarUtils.addDays(date, dayForbidChange);
+            if(dayForbid.getHours()>=12){
+                dayForbid = CalendarUtils.addOneDay(date);
+            }
+
+            //Date dateActivateService = CalendarUtils.addDays(dayBegin, 1 + parser.getDayForbidChange());
+            if(newDateActivateService.getTime()<dayForbid.getTime()){
                 res.resultCode = RC_ERROR_CREATE_SUBSCRIPTION_FEEDING;
                 res.description = "Не верная дата активация циклограммы";
                 return res;
@@ -4146,18 +4154,27 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) cafeSettings
                     .getSplitSettingValue();
 
-            Date today = truncateToDayOfMonth(new Date());
-            Date activationDate = CalendarUtils.addDays(today, 1 + parser.getDayForbidChange());
+            //Date today = truncateToDayOfMonth(new Date());
+            //Date activationDate = CalendarUtils.addDays(today, 1 + parser.getDayForbidChange());
             // Если день активации выпадает на выходной - воскресенье, то берем понедельник.
-            if (!CalendarUtils.isWorkingDate(activationDate)) {
-                activationDate = CalendarUtils.addDays(activationDate, 1);
+            //if (!CalendarUtils.isWorkingDate(activationDate)) {
+            //    activationDate = CalendarUtils.addDays(activationDate, 1);
+            //}
+
+            Date currentDay = new Date();
+            final int hoursForbidChange = parser.getHoursForbidChange();
+            int dayForbidChange = (hoursForbidChange %24==0? hoursForbidChange /24: hoursForbidChange /24+1);
+            Date dayForbid = CalendarUtils.addDays(currentDay, dayForbidChange);
+            if(dayForbid.getHours()>=12){
+                dayForbid = CalendarUtils.addOneDay(currentDay);
             }
+
             SubscriptionFeedingService sfService = RuntimeContext.getAppContext()
                     .getBean(SubscriptionFeedingService.class);
             CycleDiagram cd = sfService
                     .editCycleDiagram(client, client.getOrg(), cycleDiagramIn.getMonday(), cycleDiagramIn.getTuesday(),
                             cycleDiagramIn.getWednesday(), cycleDiagramIn.getThursday(), cycleDiagramIn.getFriday(),
-                            cycleDiagramIn.getSaturday(), activationDate);
+                            cycleDiagramIn.getSaturday(), dayForbid);
             result = new CycleDiagramOut(cd);
             transaction.commit();
             result.resultCode = RC_OK;
@@ -4404,7 +4421,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) settings.getSplitSettingValue();
             SubscriptionFeedingSettingExt settingExt = new SubscriptionFeedingSettingExt();
             settingExt.setDayDeActivate(parser.getDayDeActivate());
-            settingExt.setDayForbidChange(parser.getDayForbidChange());
+            Date currentDay = new Date();
+            final int hoursForbidChange = parser.getHoursForbidChange();
+            int dayForbidChange = (hoursForbidChange %24==0? hoursForbidChange /24: hoursForbidChange /24+1);
+            Date dayForbid = CalendarUtils.addDays(currentDay, dayForbidChange);
+            if(dayForbid.getHours()>=12){
+                dayForbidChange++;
+            }
+            settingExt.setDayForbidChange(dayForbidChange);
             settingExt.setDayRequest(parser.getDayRequest());
             settingExt.setEnableFeeding(parser.isEnableFeeding());
             result.subscriptionFeedingSettingExt = settingExt;
@@ -4460,7 +4484,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) settings.getSplitSettingValue();
             SubscriptionFeedingSettingExt settingExt = new SubscriptionFeedingSettingExt();
             settingExt.setDayDeActivate(parser.getDayDeActivate());
-            settingExt.setDayForbidChange(parser.getDayForbidChange());
+            Date currentDay = new Date();
+            final int hoursForbidChange = parser.getHoursForbidChange();
+            int dayForbidChange = (hoursForbidChange %24==0? hoursForbidChange /24: hoursForbidChange /24+1);
+            Date dayForbid = CalendarUtils.addDays(currentDay, dayForbidChange);
+            if(dayForbid.getHours()>=12){
+                dayForbidChange++;
+            }
+            settingExt.setDayForbidChange(dayForbidChange);
+            //settingExt.setDayForbidChange(parser.getDayForbidChange());
             settingExt.setDayRequest(parser.getDayRequest());
             settingExt.setEnableFeeding(parser.isEnableFeeding());
             result.subscriptionFeedingSettingExt = settingExt;

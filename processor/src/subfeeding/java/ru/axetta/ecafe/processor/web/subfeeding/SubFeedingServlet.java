@@ -185,21 +185,20 @@ public class SubFeedingServlet extends HttpServlet {
         req.setAttribute("startDate", df.format(startDate));
         req.setAttribute("endDate", df.format(endDate));
 
-        final Date truncateCurrentDate = truncateToDayOfMonth(currentDay);
-        Date activationDate = addDays(truncateCurrentDate, 1);
+        Date activationDate = addDays(currentDay, 1);
         if(subscriptionFeeding!=null && subscriptionFeeding.getDateActivate()!=null){
             SubscriptionFeedingSettingResult settingResult = clientRoomController.getSubscriptionFeedingSetting(
                     contractId);
             if (settingResult.resultCode == 0) {
                 int dayForbidChange = settingResult.subscriptionFeedingSettingExt.getDayForbidChange();
-                activationDate = addDays(truncateToDayOfMonth(truncateCurrentDate), 1 + dayForbidChange);
+                activationDate = addDays(currentDay, dayForbidChange);
                 if(subscriptionFeeding.getDateActivate().after(activationDate)){
                     activationDate =  subscriptionFeeding.getDateActivate();
                 } else {
                     if(subscriptionFeeding.getDateActivate().before(currentDay)){
-                        activationDate = addDays(truncateCurrentDate, 1 + dayForbidChange);
+                        activationDate = addDays(currentDay, dayForbidChange);
                     } else {
-                        activationDate = addDays(truncateToDayOfMonth(subscriptionFeeding.getDateActivate()), 1 + dayForbidChange);
+                        activationDate = addDays(truncateToDayOfMonth(subscriptionFeeding.getDateActivate()), dayForbidChange);
                     }
                 }
             } else {
@@ -210,7 +209,7 @@ public class SubFeedingServlet extends HttpServlet {
                     contractId);
             if (settingResult.resultCode == 0) {
                 int dayForbidChange = settingResult.subscriptionFeedingSettingExt.getDayForbidChange();
-                activationDate = addDays(truncateCurrentDate, 1 + dayForbidChange);
+                activationDate = addDays(currentDay, dayForbidChange);
             } else {
                 req.setAttribute(ERROR_MESSAGE, settingResult.description);
             }
@@ -429,10 +428,10 @@ public class SubFeedingServlet extends HttpServlet {
         df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
         SubscriptionFeedingSettingResult settingResult = clientRoomController.getSubscriptionFeedingSetting(
                 contractId);
-        Date activationDate = addDays(truncateToDayOfMonth(new Date()), 1);
+        Date activationDate = addDays(currentDay, 1);
         if (settingResult.resultCode == 0) {
             int dayForbidChange = settingResult.subscriptionFeedingSettingExt.getDayForbidChange();
-            activationDate = addDays(truncateToDayOfMonth(new Date()), 1 + dayForbidChange);
+            activationDate = addDays(currentDay, dayForbidChange);
         } else {
             req.setAttribute(ERROR_MESSAGE, settingResult.description);
         }

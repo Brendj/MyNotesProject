@@ -337,15 +337,22 @@ public class SubscriptionFeedingService {
                 .geteCafeSettingses(client.getOrg().getIdOfOrg(), SettingsIds.SubscriberFeeding, false);
         ECafeSettings cafeSettings = settings.get(0);
         SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) cafeSettings.getSplitSettingValue();
-        Date today = truncateToDayOfMonth(new Date());
-        Date date = CalendarUtils.addDays(today, 1 + parser.getDayForbidChange());
+        //Date today = truncateToDayOfMonth(new Date());
+        //Date date = CalendarUtils.addDays(today, 1 + parser.getDayForbidChange());
+        Date currentDay = new Date();
 
         SubscriptionFeeding sf = findClientSubscriptionFeeding(client);
-        sf.setLastDatePauseService(date.before(sf.getDateActivateService()) ? sf.getDateActivateService() : date);
+        final int hoursForbidChange = parser.getHoursForbidChange();
+        int dayForbidChange = (hoursForbidChange %24==0? hoursForbidChange /24: hoursForbidChange /24+1);
+        Date dayForbid = CalendarUtils.addDays(currentDay, dayForbidChange);
+        if(dayForbid.getHours()>=12){
+            dayForbid = CalendarUtils.addOneDay(currentDay);
+        }
+        sf.setLastDatePauseService(dayForbid);
         sf.setWasSuspended(true);
         //DAOService daoService = DAOService.getInstance();
         sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));
-        sf.setLastUpdate(date);
+        sf.setLastUpdate(currentDay);
         //sf.setReasonWasSuspended(reasonWasSuspended);
         entityManager.merge(sf);
     }
@@ -360,10 +367,8 @@ public class SubscriptionFeedingService {
         ECafeSettings cafeSettings = settings.get(0);
         SubscriberFeedingSettingSettingValue parser = (SubscriberFeedingSettingSettingValue) cafeSettings.getSplitSettingValue();
         Date today = truncateToDayOfMonth(endPauseDate);
-        //Date date = CalendarUtils.addDays(today, 1 + parser.getDayForbidChange());
 
         SubscriptionFeeding sf = findClientSubscriptionFeeding(client);
-        //sf.setLastDatePauseService(today.before(sf.getDateActivateService()) ? sf.getDateActivateService() : today);
         sf.setLastDatePauseService(today);
         sf.setWasSuspended(true);
         sf.setGlobalVersion(daoService.updateVersionByDistributedObjects(SubscriptionFeeding.class.getSimpleName()));

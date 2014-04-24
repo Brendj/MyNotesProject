@@ -278,8 +278,10 @@
                 <f:selectItem itemValue="false"/>
             </h:selectBooleanCheckbox>
 
-            <h:outputText escape="true" value="Количество дней, в течение которых запрещено редактировать заявки" styleClass="output-text" />
-            <h:inputText value="#{settingCreatePage.parserBySettingValue.dayForbidChange}" styleClass="input-text" style="width: 207px"/>
+            <h:outputText escape="true" value="Количество часов, в течение которых запрещено редактировать заявки" styleClass="output-text" />
+            <%--<h:inputText value="#{settingCreatePage.parserBySettingValue.hoursForbidChange}" styleClass="input-text" style="width: 207px"/>--%>
+            <rich:inputNumberSlider inputClass="input-text" value="#{settingCreatePage.parserBySettingValue.hoursForbidChange}"
+                                    maxValue="72" step="3" minValue="3" showToolTip="true" />
         </h:panelGrid>
 
         <h:panelGrid columns="2" id="settingsCreateReplacingMissingBeneficiariesSettingPanelGrid" rendered="#{settingCreatePage.settingsIds==5}" >
