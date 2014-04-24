@@ -149,7 +149,7 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     public Object buildReportHTML() {
         if (validateFormData())  return null;
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String templateFilename = checkIsExistFile();
+        String templateFilename = checkIsExistFile("_summary.jasper");
         if (StringUtils.isEmpty(templateFilename)) {
             return null;
         }
@@ -239,9 +239,9 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         return null;
     }
 
-    private String checkIsExistFile() {
+    private String checkIsExistFile(String suffix) {
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-        String templateShortFileName = GoodRequestsNewReport.class.getSimpleName() + "_summary.jasper";
+        String templateShortFileName = GoodRequestsNewReport.class.getSimpleName() + suffix;
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
         if(!(new File(templateFilename)).exists()){
             printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
@@ -287,7 +287,7 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     public void exportToXLS(ActionEvent actionEvent){
         if (validateFormData()) return;
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String templateFilename = checkIsExistFile();
+        String templateFilename = checkIsExistFile("_export.jasper");
         if (StringUtils.isEmpty(templateFilename)) return ;
         Date generateTime = new Date();
         GoodRequestsNewReport.Builder builder = new GoodRequestsNewReport.Builder(templateFilename);

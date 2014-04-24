@@ -83,24 +83,24 @@ public class OrgSelectPage extends BasicPage {
     }
     //action="#{}"
 
-    public void fill(Session session) throws Exception {
+    public void fill(Session session, List<Long> idOfMenuSourceOrgList) throws Exception {
         this.idOfContragent = null;
         this.idOfContract = null;
-        this.items = retrieveOrgs(session);
+        this.items = retrieveOrgs(session, idOfMenuSourceOrgList);
     }
 
-    public void fill(Long idOfContragent, Long idOfContract, Session session) throws Exception {
+    public void fill(Long idOfContragent, Long idOfContract, Session session, List<Long> idOfMenuSourceOrgList) throws Exception {
         this.idOfContragent = idOfContragent;
         this.idOfContract = idOfContract;
         this.filter="";
         this.tagFilter="";
         this.idFilter="";
-        this.items = retrieveOrgs(session);
+        this.items = retrieveOrgs(session, idOfMenuSourceOrgList);
         idFilter = "";
     }
 
-    public void fill(Session session, Long idOfOrg) throws Exception {
-        List<OrgShortItem> items = retrieveOrgs(session);
+    public void fill(Session session, Long idOfOrg, List<Long> idOfMenuSourceOrgList) throws Exception {
+        List<OrgShortItem> items = retrieveOrgs(session, idOfMenuSourceOrgList);
         OrgShortItem selectedItem = new OrgShortItem();
         if (null != idOfOrg) {
 
@@ -121,7 +121,7 @@ public class OrgSelectPage extends BasicPage {
     }
 
     @SuppressWarnings("unchecked")
-    private List<OrgShortItem> retrieveOrgs(Session session) throws HibernateException {
+    private List<OrgShortItem> retrieveOrgs(Session session, List<Long> idOfMenuSourceOrgList) throws HibernateException {
         Criteria criteria = session.createCriteria(Org.class);
         //  Ограничение оргов, которые позволено видеть пользователю
         try {
@@ -156,6 +156,10 @@ public class OrgSelectPage extends BasicPage {
                 criterion = Restrictions.not(criterion);
             }
             criteria.add(criterion);
+        }
+
+        if(supplierFilter==1 &&  idOfMenuSourceOrgList!=null && !idOfMenuSourceOrgList.isEmpty() && idOfMenuSourceOrgList.get(0)!=null){
+            criteria.createAlias("sourceMenuOrgs", "sm").add(Restrictions.in("sm.idOfOrg", idOfMenuSourceOrgList));
         }
 
         criteria.setProjection(Projections.projectionList()

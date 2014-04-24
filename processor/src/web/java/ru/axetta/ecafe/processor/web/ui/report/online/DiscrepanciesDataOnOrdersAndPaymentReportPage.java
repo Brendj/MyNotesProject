@@ -4,6 +4,7 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.msc.DiscrepanciesDataOnOrdersAndPaymentJasperReport;
@@ -15,15 +16,14 @@ import ru.axetta.ecafe.processor.web.ui.MainPage;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.util.Properties;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * User: r.kalimullin
@@ -31,11 +31,13 @@ import java.util.Properties;
  * Time: 17:19
  */
 
-@Component
-@Scope(value = "session")
+//@Component
+//@Scope(value = "session")
 public class DiscrepanciesDataOnOrdersAndPaymentReportPage extends OnlineReportWithContragentPage {
 
     private String htmlReport;
+    private String menuSourceOrgFilter;
+    private String eduOrgListFilter;
 
     @Override
     public String getPageFilename() {
@@ -51,31 +53,59 @@ public class DiscrepanciesDataOnOrdersAndPaymentReportPage extends OnlineReportW
         return null;
     }
 
-    private DiscrepanciesDataOnOrdersAndPaymentJasperReport buildReport() {
+    @Override
+    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
+        this.idOfOrg = idOfOrg;
+        if (this.idOfOrg == null) {
+            menuSourceOrgFilter = "Не выбрано";
+        } else {
+            Org org = (Org)session.load(Org.class, this.idOfOrg);
+            idOfContragentOrgList = Arrays.asList(idOfOrg);
+            menuSourceOrgFilter = org.getShortName();
+        }
+    }
 
+    @Override
+    public String getFilter() {
+        final List<Long> oldIdOfContragentOrgList1 = MainPage.getSessionInstance().getIdOfContragentOrgList();
+        if(oldIdOfContragentOrgList1 !=null && !oldIdOfContragentOrgList1.containsAll(idOfContragentOrgList)){
+            idOfOrgList.clear();
+            eduOrgListFilter = "Не выбрано";
+        }
+        return super.getFilter();
+    }
+
+    private DiscrepanciesDataOnOrdersAndPaymentJasperReport buildReport() {
+        //if (idOfContragentOrgList==null || idOfContragentOrgList.isEmpty()) {
+        //    printError("Не указана организация-поставщик меню");
+        //    return null;
+        //}
+        if (idOfOrg==null) {
+                printError("Не указана организация-поставщик меню");
+                return null;
+        }
         BasicReportJob report = null;
+        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath()
+                + "DiscrepanciesDataOnOrdersAndPaymentJasperReport.jasper";
+        DiscrepanciesDataOnOrdersAndPaymentBuilder builder = new DiscrepanciesDataOnOrdersAndPaymentBuilder(
+                templateFilename);
+        builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG, Long.toString(idOfOrg));
+        String idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
+        builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
         Session session = null;
         Transaction persistenceTransaction = null;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = session.beginTransaction();
-            AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-            String templateFilename = autoReportGenerator.getReportsTemplateFilePath()
-                    + "DiscrepanciesDataOnOrdersAndPaymentJasperReport.jasper";
-            DiscrepanciesDataOnOrdersAndPaymentBuilder builder = new DiscrepanciesDataOnOrdersAndPaymentBuilder(
-                    templateFilename);
-            builder.setReportProperties(new Properties());
-            builder.getReportProperties().setProperty("idOfMenuSourceOrg", idOfOrg == null ? "" : idOfOrg.toString());
-            String idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
-            builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
             report = builder.build(session, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
+            persistenceTransaction = null;
         } catch (Exception e) {
-            HibernateUtils.rollback(persistenceTransaction, getLogger());
             getLogger().error("Filed build DiscrepanciesDataOnOrdersAndPaymentJasperReport", e);
             printError("Ошибка при построении отчета: " + e.getMessage());
-            //logAndPrintMessage("Ошибка при построении отчета:", e.getMessage());
         } finally {
+            HibernateUtils.rollback(persistenceTransaction, getLogger());
             HibernateUtils.close(session, getLogger());
         }
         return (DiscrepanciesDataOnOrdersAndPaymentJasperReport) report;
@@ -131,5 +161,13 @@ public class DiscrepanciesDataOnOrdersAndPaymentReportPage extends OnlineReportW
     }
 
     public void fill() throws Exception {
+    }
+
+    public String getMenuSourceOrgFilter() {
+        return menuSourceOrgFilter;
+    }
+
+    public String getEduOrgListFilter() {
+        return eduOrgListFilter;
     }
 }
