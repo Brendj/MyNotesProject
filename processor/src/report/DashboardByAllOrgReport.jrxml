@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DashboardByAllOrgReport" pageWidth="2048" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="2008" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="cef189e6-3382-4a25-b65f-5c466f79db78">
-	<property name="ireport.zoom" value="0.385543289429534"/>
+	<property name="ireport.zoom" value="1.9487171000000136"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="0"/>
+	<property name="ireport.y" value="213"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -255,35 +255,35 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{numberOfNonStudentClients}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
+			<textField pattern="###0" isBlankWhenNull="true">
 				<reportElement uuid="7a863f2c-f362-4458-9872-091eb22887bb" style="table" x="879" y="0" width="26" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{numberOfStudentsWithEnterEventsPercent}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{numberOfStudentsWithEnterEventsPercent}*100]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
+			<textField pattern="###0" isBlankWhenNull="true">
 				<reportElement uuid="da5bc399-951b-4ed6-961f-ed56695ed354" style="table" x="1053" y="0" width="31" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{numberOfStudentsWithDiscountOrdersPercent}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{numberOfStudentsWithDiscountOrdersPercent}*100]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
+			<textField pattern="###0" isBlankWhenNull="true">
 				<reportElement uuid="e51e5197-4ccd-4445-83b0-37f89270ff92" style="table" x="1390" y="0" width="27" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{numberOfStudentsWithPayedOrdersPercent}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{numberOfStudentsWithPayedOrdersPercent}*100]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
+			<textField pattern="###0" isBlankWhenNull="true">
 				<reportElement uuid="66d59e05-cb65-4db6-af83-2445845c7aa5" style="table" x="905" y="0" width="24" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{numberOfEmployeesWithEnterEventsPercent}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{numberOfEmployeesWithEnterEventsPercent}*100]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
+			<textField pattern="###0" isBlankWhenNull="true">
 				<reportElement uuid="eda0209d-8081-4554-bc34-6a8ae6b0494f" style="table" x="1084" y="0" width="31" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{numberOfEmployeesWithDiscountOrdersPercent}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{numberOfEmployeesWithDiscountOrdersPercent}*100]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
+			<textField pattern="###0" isBlankWhenNull="true">
 				<reportElement uuid="dcc0af07-7a2f-4fe1-bc97-807a1ab23727" style="table" x="1417" y="0" width="25" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{numberOfEmployeesWithPayedOrdersPercent}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{numberOfEmployeesWithPayedOrdersPercent}*100]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement uuid="bbb4fac5-8573-4911-ae45-1c2ce4e22e5e" style="table" x="606" y="0" width="53" height="23"/>
