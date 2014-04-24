@@ -16,9 +16,8 @@ public class ContractIdGeneratorTest {
 
     @Test
     public void testLuhnTest() throws Exception {
-        System.out.println("00200154 " + ContractIdGenerator.luhnTest("00200154"));
-        System.out.println("200154 " + ContractIdGenerator.luhnTest("200154"));
-        System.out.println("617827200 " + ContractIdGenerator.luhnTest("617827200"));
+        System.out.println("12525 " + ContractIdGenerator.luhnTest("12525"));
+        System.out.println("125 " + ContractIdGenerator.luhnTest("125"));
     }
 
     //@Test
