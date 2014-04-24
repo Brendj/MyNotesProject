@@ -174,7 +174,7 @@ public class ReferReport extends BasicReportForAllOrgJob {
 
         public static DailyReferReportItem[] getSampleItems(Session session, OrgShortItem org,
                                                             Date startTime, Date endTime,
-                                                            Set<String> groups) {
+                                                            Set<String> groups, boolean isOverallReport) {
             Map<String, DailyReferReportItem> items = new HashMap<String, DailyReferReportItem>();
             for(String g : groups) {
                 DailyReferReportItem i = new DailyReferReportItem(g);
@@ -191,14 +191,18 @@ public class ReferReport extends BasicReportForAllOrgJob {
                 String good           = ((String) e[2]).trim();
                 cal.setTimeInMillis(ts);
                 String groupName = "";
-                if(good.toLowerCase().indexOf(BREAKFAST.toLowerCase()) >= 0) {
-                    groupName = BREAKFAST;
-                }
-                if(good.toLowerCase().indexOf(SNACK.toLowerCase()) >= 0) {
-                    groupName = SNACK;
-                }
-                if(good.toLowerCase().indexOf(LUNCH.toLowerCase()) >= 0) {
-                    groupName = LUNCH;
+                if(isOverallReport) {
+                    groupName = good.toUpperCase() + " кл.";
+                } else {
+                    if(good.toLowerCase().indexOf(BREAKFAST.toLowerCase()) >= 0) {
+                        groupName = BREAKFAST;
+                    }
+                    if(good.toLowerCase().indexOf(SNACK.toLowerCase()) >= 0) {
+                        groupName = SNACK;
+                    }
+                    if(good.toLowerCase().indexOf(LUNCH.toLowerCase()) >= 0) {
+                        groupName = LUNCH;
+                    }
                 }
                 DailyReferReportItem it = items.get(groupName);
                 if(it == null) {

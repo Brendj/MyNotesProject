@@ -100,6 +100,7 @@
 	<field name="price" class="java.lang.Double"/>
 	<field name="summary" class="java.lang.Double"/>
 	<field name="day" class="java.lang.String"/>
+	<field name="index" class="java.lang.Integer"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -146,7 +147,24 @@
 						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
-				<rowGroup name="day" width="200" totalPosition="End">
+				<rowGroup name="index" width="0">
+					<bucket class="java.lang.Integer">
+						<bucketExpression><![CDATA[$F{index}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField>
+								<reportElement uuid="942919c1-50e2-4093-9bdd-f97fa6a8434b" style="Crosstab Data Text" x="0" y="0" width="0" height="23"/>
+								<textElement/>
+								<textFieldExpression><![CDATA[$V{index}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="day" width="200">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{day}]]></bucketExpression>
 					</bucket>
@@ -348,6 +366,15 @@
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell rowTotalGroup="day" columnTotalGroup="group2">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="index">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="index" columnTotalGroup="group1">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="index" columnTotalGroup="group2">
 					<cellContents/>
 				</crosstabCell>
 			</crosstab>
