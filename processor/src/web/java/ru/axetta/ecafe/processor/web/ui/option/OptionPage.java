@@ -64,6 +64,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean recalculateBenefits;
     private Boolean syncRegisterClients;
     private String syncRegisterURL;
+    private String syncRegisterWSDL;
     private String syncRegisterUser;
     private String syncRegisterPassword;
     private String syncRegisterCompany;
@@ -324,6 +325,14 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void setSyncRegisterURL(String syncRegisterURL) {
         this.syncRegisterURL = syncRegisterURL;
+    }
+
+    public String getSyncRegisterWSDL() {
+        return syncRegisterWSDL;
+    }
+
+    public void setSyncRegisterWSDL(String syncRegisterWSDL) {
+        this.syncRegisterWSDL = syncRegisterWSDL;
     }
 
     public String getSyncRegisterUser() {
@@ -649,6 +658,7 @@ public class OptionPage extends BasicWorkspacePage {
         recalculateBenefits = runtimeContext.getOptionValueBool(Option.OPTION_BENEFITS_RECALC_ON);
         syncRegisterClients = runtimeContext.getOptionValueBool(Option.OPTION_MSK_NSI_AUTOSYNC_ON);
         syncRegisterURL = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_URL);
+        syncRegisterWSDL = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_WSDL_URL);
         syncRegisterUser = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_USER);
         syncRegisterPassword = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_PASSWORD);
         syncRegisterCompany = runtimeContext.getOptionValueString(Option.OPTION_MSK_NSI_COMPANY);
@@ -771,6 +781,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_BENEFITS_RECALC_ON, recalculateBenefits);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_AUTOSYNC_ON, syncRegisterClients);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_URL, syncRegisterURL);
+            runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_WSDL_URL, syncRegisterWSDL);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_USE_TESTING_SERVICE, syncRegisterIsTestingService);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_USER, syncRegisterUser);
             runtimeContext.setOptionValue(Option.OPTION_MSK_NSI_PASSWORD, syncRegisterPassword);

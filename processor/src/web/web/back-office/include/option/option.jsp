@@ -277,6 +277,8 @@
                     <h:selectBooleanCheckbox value="#{optionPage.syncRegisterClients}" styleClass="output-text" />
                     <h:outputText escape="true" value="URL сервиса" styleClass="output-text" />
                     <h:inputText value="#{optionPage.syncRegisterURL}" styleClass="input-text" size="40" />
+                    <h:outputText escape="true" value="WSDL сервиса" styleClass="output-text" />
+                    <h:inputText value="#{optionPage.syncRegisterWSDL}" styleClass="input-text" size="40" />
                     <h:outputText escape="true" value="Является тестовым сервисом"
                                                        styleClass="output-text" />
                     <h:selectBooleanCheckbox value="#{optionPage.syncRegisterIsTestingService}" styleClass="output-text" />

@@ -90,7 +90,8 @@ public class Option {
             OPTION_RECONCILIATION_SETTING=100045,
             OPTION_FRON_CONTROLLER_REQ_IP_MASK=100046,
 
-            OPTION_SYNCH_CLEANUP_ON=100047
+            OPTION_SYNCH_CLEANUP_ON=100047,
+            OPTION_MSK_NSI_WSDL_URL=100048
 
     ;
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
@@ -136,7 +137,8 @@ public class Option {
             OPTION_PROJECT_STATE_REPORT_ON, "0",
             OPTION_EXTERNAL_URL, "http://localhost:8080",
             OPTION_BENEFITS_RECALC_ON, "0", OPTION_MSK_NSI_AUTOSYNC_ON, "0", OPTION_MSK_NSI_AUTOSYNC_UPD_TIME, null,
-            OPTION_MSK_NSI_URL, "http://localhost:2000/nsiws/services/NSIService",
+            OPTION_MSK_NSI_URL, "http://10.126.216.2:4422/em/nsiws/v2/services/NSIService",
+            OPTION_MSK_NSI_WSDL_URL, "http://10.126.216.2:4422/em/nsiws/v2/services/NSIService/WEB-INF/wsdl/NSIService.wsdl",
             OPTION_MSK_NSI_USER, "UEK_SOAP",
             OPTION_MSK_NSI_PASSWORD, "la0d6xxw",
             OPTION_MSK_NSI_COMPANY, "dogm_nsi",

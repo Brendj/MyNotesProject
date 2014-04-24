@@ -59,6 +59,10 @@ public class MskNSIService {
             return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_MSK_NSI_URL);
         }
 
+        public static String getWsdl() {
+            return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_MSK_NSI_WSDL_URL);
+        }
+
         public static String getUser() {
             return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_MSK_NSI_USER);
         }
@@ -102,13 +106,11 @@ public class MskNSIService {
         if (nsiService != null) {
             return;
         }
-        String url = Config.getUrl();
-        logger.info("Trying NSI service: " + url);
-        nsiServicePort = new NSIServiceService(new URL(url.toLowerCase().contains("wsdl")?url:(url + "?wsdl")),
+        String wsdl = Config.getWsdl();
+        logger.info("Trying NSI service: " + wsdl);
+        nsiServicePort = new NSIServiceService(new URL(wsdl.toLowerCase().contains("wsdl")?wsdl:(wsdl + "?wsdl")),
                 new QName("http://rstyle.com/nsi/services", "NSIServiceService"));
         nsiService = nsiServicePort.getNSIService();
-
-
     }
 
     public List<QueryResult> executeQuery(String queryText) throws Exception {
@@ -123,6 +125,12 @@ public class MskNSIService {
         BindingProvider provider = (BindingProvider) nsiService;
         provider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
         provider.getRequestContext().put("set-jaxb-validation-event-handler", false);
+        provider.getRequestContext().put("schema-validation-enabled", false);
+
+        System.setProperty("set-jaxb-validation-event-handler", "false");
+        System.setProperty("schema-validation-enabled", "false");
+        System.setProperty("com.sun.xml.internal.ws.transport.http.HttpAdapter.dump", "true");
+        System.setProperty("com.sun.xml.ws.assembler.client", "true");
         /*provider.getRequestContext().put("com.sun.xml.ws.request.timeout", 15000);
         setTimeouts (provider, new Long (60000), new Long (180000));*/
         //provider.getRequestContext().put("jaxb-validation-event-handle", null);
