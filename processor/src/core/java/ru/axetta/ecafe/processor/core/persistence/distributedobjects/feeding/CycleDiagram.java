@@ -91,14 +91,22 @@ public class CycleDiagram extends DistributedObject{
         } catch (Exception e) {
             throw new DistributedObjectException(e.getMessage());
         }
-        SubscriptionFeedingService sfService = RuntimeContext.getAppContext().getBean(SubscriptionFeedingService.class);
-        CycleDiagram cd = sfService.findClientCycleDiagram(client);
-        // Проверка на случай, если циклограмма была активирована как на вебе, так и на клиенте.
-        if (cd != null && isActual() && !cd.getGuid().equals(guid)) {
-            DistributedObjectException doe = new DistributedObjectException("CycleDiagram DATA_EXIST_VALUE");
-            doe.setData(cd.getGuid());
-            throw doe;
+        /* При синхронизации пришла активная циклограмма */
+        if(isActual()){
+            /* проверяем, есть ли на текущую дату активная циклограмма */
+            SubscriptionFeedingService sfService = SubscriptionFeedingService.getInstance();
+            CycleDiagram cd = sfService.findActiveCycleDiagram(client, this.dateActivationDiagram);
+            /* записываем заблокированной текущую диаграмму */
+            if(cd != null){
+                stateDiagram = StateDiagram.BLOCK;
+            }
         }
+        // Проверка на случай, если циклограмма была активирована как на вебе, так и на клиенте.
+        //if (cd != null && isActual() && !cd.getGuid().equals(guid)) {
+        //    DistributedObjectException doe = new DistributedObjectException("CycleDiagram DATA_EXIST_VALUE");
+        //    doe.setData(cd.getGuid());
+        //    throw doe;
+        //}
     }
 
     @Override
