@@ -52,10 +52,10 @@ public class DiscrepanciesDataOnOrdersAndPaymentBuilder extends BasicReportForAl
         if (StringUtils.isEmpty(this.templateFilename)) {
             throw new Exception("Не найден файл шаблона.");
         }
-        if (StringUtils.isEmpty(getReportProperties().getProperty("idOfMenuSourceOrg"))) {
+        if (StringUtils.isEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG))) {
             throw new Exception("Не указана организация-поставщик меню.");
         }
-        Long sourceMenuOrgId = Long.parseLong(getReportProperties().getProperty("idOfMenuSourceOrg"));
+        Long sourceMenuOrgId = Long.parseLong(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG));
         String idOfOrgs = StringUtils.trimToEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
         List<Long> idOfOrgList = new ArrayList<Long>();
         for (String idOfOrg : Arrays.asList(StringUtils.split(idOfOrgs, ','))) {
