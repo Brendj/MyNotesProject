@@ -48,8 +48,6 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
         }
         
         if (parseResult.getParam("CARDID")!=null) {
-            //String cardId = parseResult.getReqParam("CARDID");
-            //Long clId =RuntimeContext.getAppContext().getBean(DAOService.class).getContractIdByCardNo(cardId);
             Long cardId = Long.decode(parseResult.getReqParam("CARDID"));
             Long clId =RuntimeContext.getAppContext().getBean(DAOService.class).getContractIdByCardNo(cardId);
             if (clId == null) throw new CardNotFoundException("Card not found: "+cardId);
@@ -97,7 +95,11 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
         vals.addLast("OPID");
         vals.addLast(response.getPaymentId());
         vals.addLast("RES");
-        vals.addLast(response.getResultCode());
+        if(response.getResultCode()==140){
+            vals.addLast(0);
+        } else {
+            vals.addLast(response.getResultCode());
+        }
         vals.addLast("DESC");
         vals.addLast(response.getResultDescription());
         if (response.getBalance()!=null) {

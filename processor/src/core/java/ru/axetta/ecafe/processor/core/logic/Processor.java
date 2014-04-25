@@ -101,7 +101,7 @@ public class Processor implements SyncProcessor,
                             idOfContragent,
                             payment.toString()));
                 return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
-                        PaymentProcessResult.OK.getCode(),
+                        PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getCode(),
                         String.format("%s. IdOfContragent == %s, IdOfPayment == %s",
                                 PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getDescription(), idOfContragent,
                                 payment.getIdOfPayment()), null);
