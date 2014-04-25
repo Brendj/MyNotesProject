@@ -270,7 +270,7 @@ public class DashboardServiceBean {
                 statItem.setNumberOfClientsWithoutCard(Long.parseLong("" + result[1]));
             }
             ////
-            queryText = "SELECT eev.org.idOfOrg, count(*), min(eev.evtDateTime) FROM EnterEvent eev WHERE  (eev.idOfCard!=null or eev.idOfTempCard!=null) and eev.evtDateTime BETWEEN :dayStart AND :dayEnd GROUP BY eev.org.idOfOrg";
+            queryText = "SELECT eev.org.idOfOrg, count(distinct eev.client.idOfClient), min(eev.evtDateTime) FROM EnterEvent eev WHERE  (eev.idOfCard!=null or eev.idOfTempCard!=null) and eev.evtDateTime BETWEEN :dayStart AND :dayEnd GROUP BY eev.org.idOfOrg";
             query = entityManager.createQuery(queryText);
             query.setParameter("dayStart", dayStartDate);
             query.setParameter("dayEnd", dayEndDate);
@@ -305,7 +305,7 @@ public class DashboardServiceBean {
                 statItem.setFirstDiscountOrderDate((Date) result[2]);
             }
             ////
-            queryText = "SELECT order.org.idOfOrg, count(*) FROM Order order WHERE order.state=0 and order.socDiscount > 0 AND order.createTime BETWEEN :dayStart AND :dayEnd GROUP BY order.org.idOfOrg";
+            queryText = "SELECT order.org.idOfOrg, count(distinct order.client.idOfClient) FROM Order order WHERE order.state=0 and order.socDiscount > 0 AND order.createTime BETWEEN :dayStart AND :dayEnd GROUP BY order.org.idOfOrg";
             query = entityManager.createQuery(queryText);
             query.setParameter("dayStart", dayStartDate);
             query.setParameter("dayEnd", dayEndDate);
@@ -320,7 +320,7 @@ public class DashboardServiceBean {
                 statItem.setNumberOfDiscountOrders((Long) result[1]);
             }
             ////
-            queryText = "SELECT order.org.idOfOrg, count(*) FROM Order order WHERE order.state=0 and order.socDiscount = 0 AND order.createTime BETWEEN :dayStart AND :dayEnd GROUP BY order.org.idOfOrg";
+            queryText = "SELECT order.org.idOfOrg, count(distinct order.client.idOfClient) FROM Order order WHERE order.state=0 and order.socDiscount = 0 AND order.createTime BETWEEN :dayStart AND :dayEnd GROUP BY order.org.idOfOrg";
             query = entityManager.createQuery(queryText);
             query.setParameter("dayStart", dayStartDate);
             query.setParameter("dayEnd", dayEndDate);
@@ -365,7 +365,7 @@ public class DashboardServiceBean {
 
             //  Заполняем процентные показатели
             Map<Long, Integer> studentEnters = new HashMap<Long, Integer>();
-            String sql = "SELECT cf_enterevents.idoforg, COUNT(cf_enterevents.idofclient) " +
+            String sql = "SELECT cf_enterevents.idoforg, COUNT(distinct cf_enterevents.idofclient) " +
                     "FROM cf_enterevents " +
                     "LEFT JOIN cf_clients ON cf_enterevents.idoforg=cf_clients.idoforg AND cf_enterevents.idofclient=cf_clients.idofclient "
                     +
@@ -384,7 +384,7 @@ public class DashboardServiceBean {
             }
 
             Map<Long, Integer> employeeEnters = new HashMap<Long, Integer>();
-            sql = "SELECT cf_enterevents.idoforg, COUNT(cf_enterevents.idofclient) " +
+            sql = "SELECT cf_enterevents.idoforg, COUNT(distinct cf_enterevents.idofclient) " +
                     "FROM cf_enterevents " +
                     "LEFT JOIN cf_clients ON cf_enterevents.idoforg=cf_clients.idoforg AND cf_enterevents.idofclient=cf_clients.idofclient "
                     +
@@ -440,7 +440,7 @@ public class DashboardServiceBean {
             }
 
             Map<Long, Integer> studentDiscounts = new HashMap<Long, Integer>();
-            sql = "SELECT cf_enterevents.idoforg, COUNT(cf_enterevents.idofclient) " +
+            sql = "SELECT cf_enterevents.idoforg, COUNT(distinct cf_enterevents.idofclient) " +
                     "FROM cf_enterevents " +
                     "LEFT JOIN cf_clients ON cf_enterevents.idoforg=cf_clients.idoforg AND cf_enterevents.idofclient=cf_clients.idofclient "
                     +
@@ -458,7 +458,7 @@ public class DashboardServiceBean {
                 studentDiscounts.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
             }
             Map<Long, Integer> employeeDiscounts = new HashMap<Long, Integer>();
-            sql = "SELECT cf_enterevents.idoforg, COUNT(cf_enterevents.idofclient) " +
+            sql = "SELECT cf_enterevents.idoforg, COUNT(distinct cf_enterevents.idofclient) " +
                     "FROM cf_enterevents " +
                     "LEFT JOIN cf_clients ON cf_enterevents.idoforg=cf_clients.idoforg AND cf_enterevents.idofclient=cf_clients.idofclient "
                     +
@@ -494,7 +494,7 @@ public class DashboardServiceBean {
                 studentUniqueOrders.put(((BigInteger) e[0]).longValue(), ((BigInteger) e[1]).intValue());
             }
             Map<Long, Integer> employeeUniqueOrders = new HashMap<Long, Integer>();
-            sql = "SELECT cf_enterevents.idoforg, COUNT(cf_enterevents.idofclient) " +
+            sql = "SELECT cf_enterevents.idoforg, COUNT(distinct cf_enterevents.idofclient) " +
                     "FROM cf_enterevents " +
                     "LEFT JOIN cf_clients ON cf_enterevents.idoforg=cf_clients.idoforg AND cf_enterevents.idofclient=cf_clients.idofclient "
                     +
@@ -571,72 +571,6 @@ public class DashboardServiceBean {
             for (Map.Entry<Long, DashboardResponse.OrgBasicStatItem> e : orgStats.entrySet()) {
                 basicStats.getOrgBasicStatItems().add(e.getValue());
             }
-
-
-            /*
-            HashMap<Long, DashboardResponse.OrgBasicStatItem> orgStats = new HashMap<Long, DashboardResponse.OrgBasicStatItem>();
-            if (idOfOrg!=null) queryText+=" WHERE org.idOfOrg=:idOfOrg";
-            Query query = entityManager.createQuery(queryText);
-            query.setParameter("contractState", Client.ACTIVE_CONTRACT_STATE);
-            List queryResult = query.getResultList();
-
-
-            orgBasicStatItem.setNumberOfClients((Long)result[n++]);
-            orgBasicStatItem.setNumberOfEnterEvents((Long)result[n++]);
-            orgBasicStatItem.setNumberOfDiscountOrders((Long)result[n++]);
-            orgBasicStatItem.setNumberOfPayOrders((Long)result[n++]);
-
-
-
-            String queryText = "SELECT org.idOfOrg, org.officialName, org.district, org.location, org.tag, org.lastSuccessfulBalanceSync, "
-                                                + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState=:contractState) AS numOfClients, "
-                                                + "(SELECT count(*) FROM EnterEvent eev WHERE eev.org.idOfOrg = org.idOfOrg AND eev.evtDateTime BETWEEN :dayStart AND :dayEnd) AS numOfEnterEvents, "
-                                                + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount > 0 AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfSocOrders, "
-                                                + "(SELECT count(*) FROM Order order WHERE order.org.idOfOrg = org.idOfOrg AND order.socDiscount = 0 AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfPayOrders "
-                                                + "FROM Org org";
-            if (idOfOrg!=null) queryText+=" WHERE org.idOfOrg=:idOfOrg";
-            Query query = entityManager.createQuery(queryText);
-
-            if (idOfOrg!=null) query.setParameter("idOfOrg", idOfOrg);
-            query.setParameter("contractState", Client.ACTIVE_CONTRACT_STATE);
-
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(dt);
-            int month = cal.get(Calendar.MONTH);
-            int year = cal.get(Calendar.YEAR);
-            int dom = cal.get(Calendar.DAY_OF_MONTH);
-
-            Calendar dayStart = Calendar.getInstance();
-            dayStart.set(year, month, dom, 0, 0, 0);
-            Calendar dayEnd = Calendar.getInstance();
-            dayEnd.set(year, month, dom + 1, 0, 0, 0);
-
-            Date dayStartDate = dayStart.getTime();
-            Date dayEndDate = dayEnd.getTime();
-
-            query.setParameter("dayStart", dayStartDate);
-            query.setParameter("dayEnd", dayEndDate);
-
-            List queryResult = query.getResultList();
-
-            for (Object object : queryResult) {
-                DashboardResponse.OrgBasicStatItem orgBasicStatItem = new DashboardResponse.OrgBasicStatItem();
-                Object[] result = (Object[]) object;
-
-                int n=0;
-                orgBasicStatItem.setIdOfOrg((Long) result[n++]);
-                orgBasicStatItem.setOrgName((String) result[n++]);
-                orgBasicStatItem.setOrgDistrict((String) result[n++]);
-                orgBasicStatItem.setOrgLocation((String) result[n++]);
-                orgBasicStatItem.setOrgTag((String) result[n++]);
-                orgBasicStatItem.setOrgNameNumber(Org.extractOrgNumberFromName(orgBasicStatItem.getOrgName()));
-                orgBasicStatItem.setLastSuccessfulBalanceSyncTime((Date)result[n++]);
-                orgBasicStatItem.setNumberOfClients((Long)result[n++]);
-                orgBasicStatItem.setNumberOfEnterEvents((Long)result[n++]);
-                orgBasicStatItem.setNumberOfDiscountOrders((Long)result[n++]);
-                orgBasicStatItem.setNumberOfPayOrders((Long)result[n++]);
-                basicStats.getOrgBasicStatItems().add(orgBasicStatItem);
-            }*/
         } catch (Exception e) {
             txManager.rollback(status);
             throw e;
@@ -669,12 +603,12 @@ public class DashboardServiceBean {
                             + "(SELECT ish FROM SyncHistory ish WHERE ish.syncStartTime = max(sh.syncStartTime)) AS lastSyncHistoryRecord, "
                             + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState = :contractState AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue) AS numOfStudents, "
                             + "(SELECT count(*) FROM Client cl WHERE cl.org.idOfOrg = org.idOfOrg AND cl.contractState = :contractState AND cl.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue) AS numOfStaff, "
-                            + "(SELECT count(*) FROM EnterEvent eev WHERE eev.org.idOfOrg = org.idOfOrg AND eev.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND eev.evtDateTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentsEnterEvents, "
-                            + "(SELECT count(*) FROM EnterEvent eev WHERE eev.org.idOfOrg = org.idOfOrg AND eev.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND eev.evtDateTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffEnterEvents, "
-                            + "(SELECT count(*) FROM Order order WHERE order.state=0 and order.org.idOfOrg = org.idOfOrg AND order.socDiscount > 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentSocMenu, "
-                            + "(SELECT count(*) FROM Order order WHERE order.state=0 and order.org.idOfOrg = org.idOfOrg AND order.socDiscount = 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentMenu, "
-                            + "(SELECT count(*) FROM Order order WHERE order.state=0 and order.org.idOfOrg = org.idOfOrg AND order.socDiscount > 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffSocMenu, "
-                            + "(SELECT count(*) FROM Order order WHERE order.state=0 and order.org.idOfOrg = org.idOfOrg AND order.socDiscount = 0 AND order.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND order.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffMenu "
+                            + "(SELECT count(distinct eev.client.idOfClient) FROM EnterEvent eev WHERE eev.org.idOfOrg = org.idOfOrg AND eev.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND eev.evtDateTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentsEnterEvents, "
+                            + "(SELECT count(distinct eev.client.idOfClient) FROM EnterEvent eev WHERE eev.org.idOfOrg = org.idOfOrg AND eev.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND eev.evtDateTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffEnterEvents, "
+                            + "(SELECT count(distinct ord.client.idOfClient) FROM Order ord WHERE ord.state=0 and ord.org.idOfOrg = org.idOfOrg AND ord.socDiscount > 0 AND ord.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND ord.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentSocMenu, "
+                            + "(SELECT count(distinct ord.client.idOfClient) FROM Order ord WHERE ord.state=0 and ord.org.idOfOrg = org.idOfOrg AND ord.socDiscount = 0 AND ord.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :studentsMinValue AND :studentsMaxValue AND ord.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStudentMenu, "
+                            + "(SELECT count(distinct ord.client.idOfClient) FROM Order ord WHERE ord.state=0 and ord.org.idOfOrg = org.idOfOrg AND ord.socDiscount > 0 AND ord.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND ord.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffSocMenu, "
+                            + "(SELECT count(distinct ord.client.idOfClient) FROM Order ord WHERE ord.state=0 and ord.org.idOfOrg = org.idOfOrg AND ord.socDiscount = 0 AND ord.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup BETWEEN :staffMinValue AND :staffMaxValue AND ord.createTime BETWEEN :dayStart AND :dayEnd) AS numOfStaffMenu "
                             + "FROM Org org LEFT OUTER JOIN org.syncHistoriesInternal sh ";
             if (idOfOrg != null) {
                 queryText += " WHERE org.idOfOrg=:idOfOrg";
