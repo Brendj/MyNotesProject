@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DashboardByAllOrgReport" pageWidth="2048" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="2008" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="cef189e6-3382-4a25-b65f-5c466f79db78">
-	<property name="ireport.zoom" value="1.9487171000000136"/>
+	<property name="ireport.zoom" value="0.9090909090909156"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="213"/>
+	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -67,112 +67,112 @@
 				<text><![CDATA[Ид.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="829fed7f-4ddd-4b6c-9a65-d5dba07252b5" style="table" x="84" y="0" width="233" height="23"/>
+				<reportElement uuid="829fed7f-4ddd-4b6c-9a65-d5dba07252b5" style="table" x="84" y="0" width="333" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Наименование]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2201a92d-1d80-4b4f-b777-672d75d28bcf" style="table" x="1602" y="0" width="88" height="23"/>
+				<reportElement uuid="2201a92d-1d80-4b4f-b777-672d75d28bcf" style="table" x="1702" y="0" width="88" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Тэги]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c683acf5-6df1-415e-b1db-4933a03afcf0" style="table" x="1528" y="0" width="74" height="23"/>
+				<reportElement uuid="c683acf5-6df1-415e-b1db-4933a03afcf0" style="table" x="1628" y="0" width="74" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Район]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="a2586c94-96c2-40c6-9002-923f1e91b9f4" style="table" x="1690" y="0" width="88" height="23"/>
+				<reportElement uuid="a2586c94-96c2-40c6-9002-923f1e91b9f4" style="table" x="1790" y="0" width="88" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Локация]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="059557fa-9b63-4778-9623-2738b748502e" style="table" x="317" y="0" width="103" height="23"/>
+				<reportElement uuid="059557fa-9b63-4778-9623-2738b748502e" style="table" x="417" y="0" width="103" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[После. синхр. бал.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2019fb19-0e0c-4eaf-aad0-a702f2df86f7" style="table" x="659" y="0" width="111" height="23"/>
+				<reportElement uuid="2019fb19-0e0c-4eaf-aad0-a702f2df86f7" style="table" x="759" y="0" width="111" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Событий проходов]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="ef7eeb64-3070-41e0-a16d-e2835083f6e7" style="table" x="770" y="0" width="109" height="23"/>
+				<reportElement uuid="ef7eeb64-3070-41e0-a16d-e2835083f6e7" style="table" x="870" y="0" width="109" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Первый проход]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="d8b32e73-5088-4c07-ac89-803a96a37b8c" style="table" x="929" y="0" width="87" height="23"/>
+				<reportElement uuid="d8b32e73-5088-4c07-ac89-803a96a37b8c" style="table" x="1029" y="0" width="87" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Льготных заказов]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="bfcddee5-cfeb-4b0a-b6b8-439c5f0c08ac" style="table" x="1016" y="0" width="37" height="23"/>
+				<reportElement uuid="bfcddee5-cfeb-4b0a-b6b8-439c5f0c08ac" style="table" x="1116" y="0" width="37" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Первая транз. льготн. питания]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="d27e0c52-c362-458b-8041-df3f3be97055" style="table" x="1115" y="0" width="118" height="23"/>
+				<reportElement uuid="d27e0c52-c362-458b-8041-df3f3be97055" style="table" x="1215" y="0" width="118" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Платных заказов]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="ce7791f3-9e1e-434b-98ea-f67aa8272c17" style="table" x="1233" y="0" width="157" height="23"/>
+				<reportElement uuid="ce7791f3-9e1e-434b-98ea-f67aa8272c17" style="table" x="1333" y="0" width="157" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Первая транз. платн. питания]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2508663f-4ca6-4ce0-af9e-3d5b0a12fdd8" style="table" x="420" y="0" width="36" height="23"/>
+				<reportElement uuid="2508663f-4ca6-4ce0-af9e-3d5b0a12fdd8" style="table" x="520" y="0" width="36" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Дети]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="8ee57052-dde4-4c86-b320-0cf1dcf22c63" style="table" x="456" y="0" width="64" height="23"/>
+				<reportElement uuid="8ee57052-dde4-4c86-b320-0cf1dcf22c63" style="table" x="556" y="0" width="64" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Родители]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c8278ce3-6256-41a9-9d30-201be2b3dbe9" style="table" x="520" y="0" width="86" height="23"/>
+				<reportElement uuid="c8278ce3-6256-41a9-9d30-201be2b3dbe9" style="table" x="620" y="0" width="86" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Сотруд. и др.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="2ff50a46-66aa-42f3-94aa-df4b50f99fdb" style="table" x="879" y="0" width="26" height="23"/>
+				<reportElement uuid="2ff50a46-66aa-42f3-94aa-df4b50f99fdb" style="table" x="979" y="0" width="26" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[%У]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="531e7ee3-83f8-4e0d-8982-effcf48ec578" style="table" x="1053" y="0" width="31" height="23"/>
+				<reportElement uuid="531e7ee3-83f8-4e0d-8982-effcf48ec578" style="table" x="1153" y="0" width="31" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[%У]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="46876a1b-d842-4ae3-aa61-07e418f47934" style="table" x="1390" y="0" width="27" height="23"/>
+				<reportElement uuid="46876a1b-d842-4ae3-aa61-07e418f47934" style="table" x="1490" y="0" width="27" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[%У]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="64106c86-cf0d-4ead-96d4-580e055fda90" style="table" x="905" y="0" width="24" height="23"/>
+				<reportElement uuid="64106c86-cf0d-4ead-96d4-580e055fda90" style="table" x="1005" y="0" width="24" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[%С]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="93e0a155-932d-4bbb-8959-31850c6caeb4" style="table" x="1084" y="0" width="31" height="23"/>
+				<reportElement uuid="93e0a155-932d-4bbb-8959-31850c6caeb4" style="table" x="1184" y="0" width="31" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[%С]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="4ad9d3c7-b970-4511-8b64-229cedd5a20a" style="table" x="1417" y="0" width="25" height="23"/>
+				<reportElement uuid="4ad9d3c7-b970-4511-8b64-229cedd5a20a" style="table" x="1517" y="0" width="25" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[%С]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="152d7964-a10c-4ee3-a328-251b0f6acf70" style="table" x="606" y="0" width="53" height="23"/>
+				<reportElement uuid="152d7964-a10c-4ee3-a328-251b0f6acf70" style="table" x="706" y="0" width="53" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Без карт]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="eaea8d47-9093-4245-9c09-217e6aaa3b6b" style="table" x="1442" y="0" width="86" height="23"/>
+				<reportElement uuid="eaea8d47-9093-4245-9c09-217e6aaa3b6b" style="table" x="1542" y="0" width="86" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Продажи вендинг]]></text>
 			</staticText>
@@ -191,107 +191,107 @@
 				<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="4fc7cf6d-5497-4383-94c0-f325933af19a" style="table" x="84" y="0" width="233" height="23"/>
+				<reportElement uuid="4fc7cf6d-5497-4383-94c0-f325933af19a" style="table" x="84" y="0" width="333" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{orgName}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="0387d996-8ecc-402a-bdd8-5217e40ed77b" style="table" x="1528" y="0" width="74" height="23"/>
+				<reportElement uuid="0387d996-8ecc-402a-bdd8-5217e40ed77b" style="table" x="1628" y="0" width="74" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{orgDistrict}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="ca9929aa-fbdc-4674-9651-a005a5ccdfdc" style="table" x="1690" y="0" width="88" height="23"/>
+				<reportElement uuid="ca9929aa-fbdc-4674-9651-a005a5ccdfdc" style="table" x="1790" y="0" width="88" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{orgLocation}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd.MM.yyyy HH:mm" isBlankWhenNull="true">
-				<reportElement uuid="222c64d2-3cf4-436e-b80b-400ad81e229e" style="table" x="317" y="0" width="103" height="23"/>
+				<reportElement uuid="222c64d2-3cf4-436e-b80b-400ad81e229e" style="table" x="417" y="0" width="103" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{lastSuccessfulBalanceSyncTime}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="98b03845-353e-40ad-893a-fdb63ae2ff12" style="table" x="659" y="0" width="111" height="23"/>
+				<reportElement uuid="98b03845-353e-40ad-893a-fdb63ae2ff12" style="table" x="759" y="0" width="111" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{numberOfEnterEvents}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd.MM.yyyy HH:mm" isBlankWhenNull="true">
-				<reportElement uuid="80acff2c-f5d6-4299-b655-2fd1b53bf765" style="table" x="770" y="0" width="109" height="23"/>
+				<reportElement uuid="80acff2c-f5d6-4299-b655-2fd1b53bf765" style="table" x="870" y="0" width="109" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{lastEnterEvent}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="b087a6c2-2ed2-4452-abfb-55e253071c41" style="table" x="929" y="0" width="87" height="23"/>
+				<reportElement uuid="b087a6c2-2ed2-4452-abfb-55e253071c41" style="table" x="1029" y="0" width="87" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{numberOfDiscountOrders}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd.MM.yyyy HH:mm" isBlankWhenNull="true">
-				<reportElement uuid="54fe3b50-b3bf-49fc-98ff-058b22fa8549" style="table" x="1016" y="0" width="37" height="23"/>
+				<reportElement uuid="54fe3b50-b3bf-49fc-98ff-058b22fa8549" style="table" x="1116" y="0" width="37" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{firstDiscountOrderDate}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="fdbae801-6b05-493e-abaf-9b85f2e7fdd5" style="table" x="1115" y="0" width="118" height="23"/>
+				<reportElement uuid="fdbae801-6b05-493e-abaf-9b85f2e7fdd5" style="table" x="1215" y="0" width="118" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{numberOfPayOrders}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd.MM.yyyy HH:mm" isBlankWhenNull="true">
-				<reportElement uuid="b50f6904-8714-413d-be27-13557b2deae8" style="table" x="1233" y="0" width="157" height="23"/>
+				<reportElement uuid="b50f6904-8714-413d-be27-13557b2deae8" style="table" x="1333" y="0" width="157" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{firstPayOrderDate}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="b51effa1-cd1b-4057-a8b8-831c92fe353c" style="table" x="420" y="0" width="36" height="23"/>
+				<reportElement uuid="b51effa1-cd1b-4057-a8b8-831c92fe353c" style="table" x="520" y="0" width="36" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{numberOfChildrenClients}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="a3db2ed3-64f8-420d-8a44-9063e04d1093" style="table" x="456" y="0" width="64" height="23"/>
+				<reportElement uuid="a3db2ed3-64f8-420d-8a44-9063e04d1093" style="table" x="556" y="0" width="64" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{numberOfParentsClients}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="7a52201c-af9f-40a2-ae15-3bffcda30752" style="table" x="520" y="0" width="86" height="23"/>
+				<reportElement uuid="7a52201c-af9f-40a2-ae15-3bffcda30752" style="table" x="620" y="0" width="86" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{numberOfNonStudentClients}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0" isBlankWhenNull="true">
-				<reportElement uuid="7a863f2c-f362-4458-9872-091eb22887bb" style="table" x="879" y="0" width="26" height="23"/>
+				<reportElement uuid="7a863f2c-f362-4458-9872-091eb22887bb" style="table" x="979" y="0" width="26" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{numberOfStudentsWithEnterEventsPercent}*100]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0" isBlankWhenNull="true">
-				<reportElement uuid="da5bc399-951b-4ed6-961f-ed56695ed354" style="table" x="1053" y="0" width="31" height="23"/>
+				<reportElement uuid="da5bc399-951b-4ed6-961f-ed56695ed354" style="table" x="1153" y="0" width="31" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{numberOfStudentsWithDiscountOrdersPercent}*100]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0" isBlankWhenNull="true">
-				<reportElement uuid="e51e5197-4ccd-4445-83b0-37f89270ff92" style="table" x="1390" y="0" width="27" height="23"/>
+				<reportElement uuid="e51e5197-4ccd-4445-83b0-37f89270ff92" style="table" x="1490" y="0" width="27" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{numberOfStudentsWithPayedOrdersPercent}*100]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0" isBlankWhenNull="true">
-				<reportElement uuid="66d59e05-cb65-4db6-af83-2445845c7aa5" style="table" x="905" y="0" width="24" height="23"/>
+				<reportElement uuid="66d59e05-cb65-4db6-af83-2445845c7aa5" style="table" x="1005" y="0" width="24" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{numberOfEmployeesWithEnterEventsPercent}*100]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0" isBlankWhenNull="true">
-				<reportElement uuid="eda0209d-8081-4554-bc34-6a8ae6b0494f" style="table" x="1084" y="0" width="31" height="23"/>
+				<reportElement uuid="eda0209d-8081-4554-bc34-6a8ae6b0494f" style="table" x="1184" y="0" width="31" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{numberOfEmployeesWithDiscountOrdersPercent}*100]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0" isBlankWhenNull="true">
-				<reportElement uuid="dcc0af07-7a2f-4fe1-bc97-807a1ab23727" style="table" x="1417" y="0" width="25" height="23"/>
+				<reportElement uuid="dcc0af07-7a2f-4fe1-bc97-807a1ab23727" style="table" x="1517" y="0" width="25" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{numberOfEmployeesWithPayedOrdersPercent}*100]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="bbb4fac5-8573-4911-ae45-1c2ce4e22e5e" style="table" x="606" y="0" width="53" height="23"/>
+				<reportElement uuid="bbb4fac5-8573-4911-ae45-1c2ce4e22e5e" style="table" x="706" y="0" width="53" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{numberOfClientsWithoutCard}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="768d989f-663a-4401-b464-7674caef41b4" style="table" x="1442" y="0" width="86" height="23"/>
+				<reportElement uuid="768d989f-663a-4401-b464-7674caef41b4" style="table" x="1542" y="0" width="86" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{numberOfVendingOrders}]]></textFieldExpression>
 			</textField>
@@ -301,7 +301,7 @@
 				<textFieldExpression><![CDATA[$F{orgNameNumber}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="bc5d9b7d-4b0e-4267-bdee-081e74ee6288" style="table" x="1602" y="0" width="88" height="23"/>
+				<reportElement uuid="bc5d9b7d-4b0e-4267-bdee-081e74ee6288" style="table" x="1702" y="0" width="88" height="23"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{orgTag}]]></textFieldExpression>
 			</textField>
