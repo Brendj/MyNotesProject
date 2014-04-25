@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.dashboard;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.dashboard.data.DashboardResponse;
 
@@ -137,6 +136,25 @@ public class DashboardServiceBean {
     }
 
     public DashboardResponse.OrgBasicStats getOrgBasicStats(Date dt, Long idOfOrg, int orgStatus) throws Exception {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(dt);
+        int month = cal.get(Calendar.MONTH);
+        int year = cal.get(Calendar.YEAR);
+        int dom = cal.get(Calendar.DAY_OF_MONTH);
+
+        Calendar dayStart = Calendar.getInstance();
+        dayStart.set(year, month, dom, 0, 0, 0);
+        Calendar dayEnd = Calendar.getInstance();
+        dayEnd.set(year, month, dom + 1, 0, 0, 0);
+
+        Date dayStartDate = dayStart.getTime();
+        Date dayEndDate = dayEnd.getTime();
+        return getOrgBasicStats(dayStartDate, dayEndDate, idOfOrg, orgStatus);
+    }
+
+    //public DashboardResponse.OrgBasicStats getOrgBasicStats(Date dt, Long idOfOrg, int orgStatus) throws Exception {
+    public DashboardResponse.OrgBasicStats getOrgBasicStats(Date dayStartDate, Date dayEndDate, Long idOfOrg,
+            int orgStatus) throws Exception {
         DefaultTransactionDefinition def = new DefaultTransactionDefinition();
         def.setPropagationBehavior(TransactionDefinition.PROPAGATION_SUPPORTS);
         def.setReadOnly(true);
@@ -144,20 +162,6 @@ public class DashboardServiceBean {
         def.setTimeout(600 * 1000);
         DashboardResponse.OrgBasicStats basicStats = new DashboardResponse.OrgBasicStats();
         try {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(dt);
-            int month = cal.get(Calendar.MONTH);
-            int year = cal.get(Calendar.YEAR);
-            int dom = cal.get(Calendar.DAY_OF_MONTH);
-
-            Calendar dayStart = Calendar.getInstance();
-            dayStart.set(year, month, dom, 0, 0, 0);
-            Calendar dayEnd = Calendar.getInstance();
-            dayEnd.set(year, month, dom + 1, 0, 0, 0);
-
-            Date dayStartDate = dayStart.getTime();
-            Date dayEndDate = dayEnd.getTime();
-
             String queryText = "SELECT org.idOfOrg, org.officialName, org.district, org.location, org.tag, org.lastSuccessfulBalanceSync FROM Org org WHERE 1 = 1";
             if (idOfOrg != null) {
                 queryText += " AND org.idOfOrg = :idOfOrg";

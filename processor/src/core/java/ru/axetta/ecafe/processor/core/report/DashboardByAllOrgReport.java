@@ -72,7 +72,8 @@ public class DashboardByAllOrgReport extends BasicReportForAllOrgJob {
             int orgFilter = Integer.parseInt(reportProperties.getProperty(P_ORG_STATE, "1"));
 
             DashboardServiceBean dashboardService = RuntimeContext.getAppContext().getBean(DashboardServiceBean.class);
-            DashboardResponse.OrgBasicStats orgBasicStats = dashboardService.getOrgBasicStats(endTime, null, orgFilter);
+            //2 parameter startTime, endTime was endTime
+            DashboardResponse.OrgBasicStats orgBasicStats = dashboardService.getOrgBasicStats(startTime, endTime, null, orgFilter);
             return new JRBeanCollectionDataSource(orgBasicStats.getOrgBasicStatItems());
         }
 
