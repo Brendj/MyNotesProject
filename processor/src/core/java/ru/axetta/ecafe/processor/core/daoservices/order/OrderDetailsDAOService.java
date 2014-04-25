@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalon;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalonType;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -118,6 +119,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         Criteria criteria = getSession().createCriteria(RegistryTalon.class);
         criteria.add(Restrictions.eq("orgOwner", idOfOrg));
         criteria.add(Restrictions.between("date", startTime, endTime));
+        criteria.add(Restrictions.eq("talonType", RegistryTalonType.Benefit_Plan));
         List list = criteria.list();
 
         Map<Date, Long> map = new HashMap<Date, Long>();
