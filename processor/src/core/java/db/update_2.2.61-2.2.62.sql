@@ -4,11 +4,21 @@
 
 -- Пакет обновлений 2.2.62
 
-ALTER TABLE cf_subscriber_feeding ALTER COLUMN dateActivateService DROP NOT NULL;
+-- Добавляем колонку с датой регистрации услуги
 ALTER TABLE cf_subscriber_feeding ADD COLUMN dateCreateService BIGINT;
+-- Для старых подписок дата установится датой активации подписки
 UPDATE cf_subscriber_feeding SET dateCreateService=dateActivateService;
+-- снимает ограничение дата активации может быть пустой
+ALTER TABLE cf_subscriber_feeding ALTER COLUMN dateActivateService DROP NOT NULL;
+-- ставим ограничение на дату регистрации услуги
+ALTER TABLE cf_subscriber_feeding ALTER COLUMN dateCreateService SET NOT NULL;
+-- причина отключения подписки, не используется
 ALTER TABLE cf_subscriber_feeding ADD COLUMN reasonWasSuspended CHARACTER VARYING(1024);
 
+-- список рассылок по сторнированным заказам
+alter table cf_contragents add column OrderNotifyMailList text default null;
+
+-- связка пользователи организации по рассылкам увидомлений по изменнным заказам
 CREATE TABLE cf_UserOrgs
 (
   IdOfUserOrg bigserial NOT NULL,
@@ -20,6 +30,7 @@ CREATE TABLE cf_UserOrgs
   CONSTRAINT cf_userorgs_uq UNIQUE (idofuser, idoforg)
 );
 
+-- справочник номеров талона
 CREATE TABLE cf_Registry_Talon
 (
   idOfRegistryTalon BIGSERIAL NOT NULL,
@@ -38,9 +49,6 @@ CREATE TABLE cf_Registry_Talon
   CONSTRAINT cf_registry_talon_pk PRIMARY KEY (idOfRegistryTalon)
 );
 
---
-alter table cf_contragents add column OrderNotifyMailList text default null;
-
 -- Сучность сохранения отменных заказов
 CREATE TABLE CF_CanceledOrders (
   idOfCanceledOrder BIGSERIAL   NOT NULL,
@@ -49,12 +57,10 @@ CREATE TABLE CF_CanceledOrders (
   idOfTransaction   BIGINT        ,
   CreatedDate       BIGINT        NOT NULL,
   CONSTRAINT CF_CanceledOrders_pk PRIMARY KEY (idOfCanceledOrder),
-  CONSTRAINT CF_CanceledOrders_IdOfOrg_fk FOREIGN KEY (IdOfOrg)
-  REFERENCES CF_Orgs (IdOfOrg),
-  CONSTRAINT CF_CanceledOrders_IdOfOrg_IdOfOrder_fk FOREIGN KEY (IdOfOrg, IdOfOrder)
-  REFERENCES CF_Orders (IdOfOrg, IdOfOrder),
-  CONSTRAINT CF_CanceledOrders_IdOfOrg_idOfTransaction_fk FOREIGN KEY (idOfTransaction)
-  REFERENCES CF_Transactions(idOfTransaction)
+  CONSTRAINT CF_CanceledOrders_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg),
+  CONSTRAINT CF_CanceledOrders_IdOfOrg_IdOfOrder_fk FOREIGN KEY (IdOfOrg, IdOfOrder) REFERENCES CF_Orders (IdOfOrg, IdOfOrder),
+  CONSTRAINT CF_CanceledOrders_IdOfOrg_idOfTransaction_fk FOREIGN KEY (idOfTransaction) REFERENCES CF_Transactions(idOfTransaction)
 );
-
 create index CF_CanceledOrders_fk_idx on CF_CanceledOrders(idoforg, idoforder);
+
+--! ФИНАЛИЗИРОВАН (Кадыров, 140425) НЕ МЕНЯТЬ
