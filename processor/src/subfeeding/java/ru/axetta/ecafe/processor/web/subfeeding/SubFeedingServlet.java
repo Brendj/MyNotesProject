@@ -114,8 +114,6 @@ public class SubFeedingServlet extends HttpServlet {
                 logout(req, resp);
             } else if (path.equals("/transfer")) {
                 processBalanceTransfer(req, resp);
-            } else if (path.equals("/demo")) {
-
             } else {
                 sendRedirect(req, resp, "/index");
             }
@@ -152,7 +150,6 @@ public class SubFeedingServlet extends HttpServlet {
     private void showSubscriptionFeeding(HttpServletRequest req, HttpServletResponse resp) throws Exception {
         Long contractId = ClientAuthToken.loadFrom(req.getSession()).getContractId();
         ClientSummaryResult client = clientRoomController.getSummary(contractId);
-        //SubFeedingResult sf = clientRoomController.findSubscriptionFeeding(contractId);
         req.setAttribute("client", client.clientSummary);
         final Date currentDay = new Date();
         SubscriptionFeedingListResult result = clientRoomController.getSubscriptionFeedingList(contractId, currentDay);
@@ -234,31 +231,7 @@ public class SubFeedingServlet extends HttpServlet {
 
         req.setAttribute("nextCycleDiagram", nextCycleDiagramExt);
 
-
         outputPage("view", req, resp);
-
-        //if (sf.getIdOfSubscriptionFeeding() == null) {
-        //    sendRedirect(req, resp, "/plan");
-        //} else {
-        //    DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-        //    df.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
-        //    Date startDate = StringUtils.isBlank(req.getParameter("startDate")) ? null
-        //            : parseDate(req.getParameter("startDate"), df);
-        //    Date endDate = StringUtils.isBlank(req.getParameter("endDate")) ? null
-        //            : parseDate(req.getParameter("endDate"), df);
-        //    if (startDate == null || endDate == null) {
-        //        Date[] week = CalendarUtils.getCurrentWeekBeginAndEnd(currentDay);
-        //        startDate = week[0];
-        //        endDate = week[1];
-        //    }
-        //    Long subBalanceNumber = Long.parseLong(contractId + "01");
-        //    req.setAttribute("payments", clientRoomController.getPaymentList(subBalanceNumber, startDate, endDate));
-        //    req.setAttribute("purchases", clientRoomController.getPurchaseList(subBalanceNumber, startDate, endDate));
-        //    req.setAttribute("transfers", clientRoomController.getTransferSubBalanceList(contractId, startDate, endDate));
-        //    req.setAttribute("startDate", df.format(startDate));
-        //    req.setAttribute("endDate", df.format(endDate));
-        //    outputPage("view", req, resp);
-        //}
     }
 
     //create

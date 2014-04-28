@@ -27,7 +27,7 @@ public class SubFeedingAuthFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         operationsList = Arrays.asList("/activate", "/suspend", "/view", "/reopen", "/logout", "/plan", "/edit",
-                "/transfer", "/cancel", "/demo");
+                "/transfer", "/cancel");
     }
 
     @Override
