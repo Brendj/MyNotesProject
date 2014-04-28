@@ -18,6 +18,8 @@ import org.hibernate.Session;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.sql.JoinType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -94,6 +96,8 @@ public class SubscriptionFeeding extends DistributedObject{
         return toSelfProcess(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
     }
 
+    private static final Logger LOG = LoggerFactory.getLogger(SubscriptionFeeding.class);
+
     @Override
     protected void appendAttributes(Element element) {
         XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
@@ -158,13 +162,18 @@ public class SubscriptionFeeding extends DistributedObject{
         if (dateDateCreateService != null) {
             setDateCreateService(dateDateCreateService);
         } else {
-            throw new DistributedObjectException("DateCreateService is not null");
+            LOG.warn("DateCreateService is not null: "+toString());
+            if(dateDateActivateService!=null){
+                setDateCreateService(dateDateActivateService);
+            } else {
+                throw new DistributedObjectException("DateActivateService is null, because DateCreateService is null");
+            }
         }
 
-        String reasonWasSuspended = XMLUtils.getStringAttributeValue(node, "ReasonWasSuspended", 1024);
-        if (reasonWasSuspended != null) {
-            setReasonWasSuspended(reasonWasSuspended);
-        }
+        //String reasonWasSuspended = XMLUtils.getStringAttributeValue(node, "ReasonWasSuspended", 1024);
+        //if (reasonWasSuspended != null) {
+        //    setReasonWasSuspended(reasonWasSuspended);
+        //}
 
         setSendAll(SendToAssociatedOrgs.SendToSelf);
         return this;
@@ -251,5 +260,15 @@ public class SubscriptionFeeding extends DistributedObject{
 
     public void setReasonWasSuspended(String reasonWasSuspended) {
         this.reasonWasSuspended = reasonWasSuspended;
+    }
+
+    @Override
+    public String toString() {
+        return "SubscriptionFeeding{" +
+                "id=" + globalId +
+                "idOfOrg=" + orgOwner +
+                "guid=" + guid +
+                "idOfClient=" + idOfClient +
+                '}';
     }
 }
