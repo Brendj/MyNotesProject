@@ -305,7 +305,7 @@ public class DashboardServiceBean {
                 statItem.setFirstDiscountOrderDate((Date) result[2]);
             }
             ////
-            queryText = "SELECT order.org.idOfOrg, count(distinct order.client.idOfClient) FROM Order order WHERE order.state=0 and order.socDiscount > 0 AND order.createTime BETWEEN :dayStart AND :dayEnd GROUP BY order.org.idOfOrg";
+            queryText = "SELECT ord.org.idOfOrg, count(distinct ord.client.idOfClient) FROM Order ord WHERE ord.state=0 and ord.socDiscount > 0 AND ord.createTime BETWEEN :dayStart AND :dayEnd GROUP BY ord.org.idOfOrg";
             query = entityManager.createQuery(queryText);
             query.setParameter("dayStart", dayStartDate);
             query.setParameter("dayEnd", dayEndDate);
@@ -320,7 +320,7 @@ public class DashboardServiceBean {
                 statItem.setNumberOfDiscountOrders((Long) result[1]);
             }
             ////
-            queryText = "SELECT order.org.idOfOrg, count(distinct order.client.idOfClient) FROM Order order WHERE order.state=0 and order.socDiscount = 0 AND order.createTime BETWEEN :dayStart AND :dayEnd GROUP BY order.org.idOfOrg";
+            queryText = "SELECT ord.org.idOfOrg, count(distinct ord.client.idOfClient) FROM Order ord WHERE ord.state=0 and ord.socDiscount = 0 AND ord.createTime BETWEEN :dayStart AND :dayEnd GROUP BY ord.org.idOfOrg";
             query = entityManager.createQuery(queryText);
             query.setParameter("dayStart", dayStartDate);
             query.setParameter("dayEnd", dayEndDate);

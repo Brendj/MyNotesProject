@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -338,6 +339,7 @@ public class ContragentCreatePage extends BasicWorkspacePage {
         contragent.setPublicKeyGOSTAlias(this.publicKeyGOSTAlias);
         session.save(contragent);
         updateContragentRNIP(session, contragent);
+        GoodRequestsChangeAsyncNotificationService.getInstance().updateContragentItem(session, contragent);
     }
 
     public void updateContragentRNIP (Session session, Contragent contragent) throws Exception {

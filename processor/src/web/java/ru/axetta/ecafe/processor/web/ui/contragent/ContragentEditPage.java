@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.contragent;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
@@ -368,6 +369,7 @@ public class ContragentEditPage extends BasicWorkspacePage {
         contragent.setKpp(kpp.trim());
         contragent.setOgrn(ogrn.trim());
         session.update(contragent);
+        GoodRequestsChangeAsyncNotificationService.getInstance().updateContragentItem(session, contragent);
         fill(contragent);
     }
 

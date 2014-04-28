@@ -11,6 +11,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.UserOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -247,6 +248,17 @@ public class GoodRequestsChangeAsyncNotificationService {
         contragentItems = getInstance().findContragentItems();
     }
 
+    public void updateContragentItem(Session session, Contragent contragent) throws Exception{
+        final Long idOfContragent = contragent.getIdOfContragent();
+        ContragentItem item = contragentItems.get(idOfContragent);
+        if(item ==null){
+            item = new ContragentItem(idOfContragent, contragent.getRequestNotifyMailList());
+            contragentItems.put(idOfContragent, item);
+        } else {
+            item.setRequestNotifyMailList(contragent.getRequestNotifyMailList());
+        }
+    }
+
     public void updateOrgItems(){
         orgItems = getInstance().findOrgItems();
     }
@@ -283,12 +295,14 @@ public class GoodRequestsChangeAsyncNotificationService {
 
     public void addEmailFromUser(Session persistenceSession, Long idOfOrg, List<String> addresses){
         Criteria criteria = persistenceSession.createCriteria(UserOrgs.class);
-        //criteria.createAlias("org", "o");
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
         List list = criteria.list();
         for (Object o: list){
             UserOrgs userOrgs = (UserOrgs) o;
-            addresses.add(userOrgs.getUser().getEmail());
+            if(userOrgs.getUser()!=null && StringUtils.isNotEmpty(userOrgs.getUser().getEmail())){
+                List<String> strings = Arrays.asList(StringUtils.split(userOrgs.getUser().getEmail(), ";"));
+                addresses.addAll(strings);
+            }
         }
     }
 
@@ -300,11 +314,9 @@ public class GoodRequestsChangeAsyncNotificationService {
         for (Object obj: res){
             Object[] row = (Object[]) obj;
             String requestNotifyMailList = row[1]==null?"":row[1].toString();
-            if(StringUtils.isNotEmpty(requestNotifyMailList)){
-                Long idOfContragent = Long.valueOf(row[0].toString());
-                if(!items.containsKey(idOfContragent)) {
-                    items.put(idOfContragent, new ContragentItem(idOfContragent, requestNotifyMailList));
-                }
+            Long idOfContragent = Long.valueOf(row[0].toString());
+            if(!items.containsKey(idOfContragent)) {
+                items.put(idOfContragent, new ContragentItem(idOfContragent, requestNotifyMailList));
             }
         }
         return items;

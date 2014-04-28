@@ -118,7 +118,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
     public Map<Date, Long> findAllRegistryTalons(Long idOfOrg, Date startTime, Date endTime) {
         Criteria criteria = getSession().createCriteria(RegistryTalon.class);
         criteria.add(Restrictions.eq("orgOwner", idOfOrg));
-        criteria.add(Restrictions.between("date", startTime, endTime));
+        criteria.add(Restrictions.between("talonDate", startTime, endTime));
         criteria.add(Restrictions.eq("talonType", RegistryTalonType.Benefit_Plan));
         List list = criteria.list();
 
