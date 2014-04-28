@@ -74,14 +74,14 @@
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
-							<text><![CDATA[Наименование ОУ]]></text>
+							<text><![CDATA[Наименование ОО]]></text>
 						</staticText>
 						<staticText>
 							<reportElement uuid="7761f0ef-0e43-407c-9d37-6bdea874dc36" style="table" mode="Opaque" x="0" y="0" width="36" height="34" backcolor="#F0F8FF"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
-							<text><![CDATA[№ ОУ]]></text>
+							<text><![CDATA[№ ОО]]></text>
 						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
