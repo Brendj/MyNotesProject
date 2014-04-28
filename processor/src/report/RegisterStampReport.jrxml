@@ -33,6 +33,8 @@
 	<field name="level4" class="java.lang.String"/>
 	<field name="qty" class="java.lang.Long"/>
 	<field name="date" class="java.lang.String"/>
+	<field name="dateTime" class="java.util.Date"/>
+	<field name="number" class="java.lang.String"/>
 	<title>
 		<band height="117" splitType="Stretch">
 			<textField>
@@ -124,20 +126,62 @@
 		<band height="282">
 			<crosstab>
 				<reportElement uuid="c05f0635-bc65-44c7-a7bb-562e36a68d6b" style="table" mode="Transparent" x="0" y="0" width="70" height="45" backcolor="#FFFFFF"/>
-				<rowGroup name="date" width="70">
+				<crosstabHeaderCell>
+					<cellContents>
+						<staticText>
+							<reportElement uuid="df4bb767-00bb-470b-b14b-4b271f422067" style="table" x="0" y="0" width="88" height="55"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<text><![CDATA[Дата]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="7b449804-5cd1-4dcb-b5b0-076b323c9454" style="table" x="88" y="0" width="100" height="55"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<text><![CDATA[Номер талона]]></text>
+						</staticText>
+					</cellContents>
+				</crosstabHeaderCell>
+				<rowGroup name="dateTime" width="0">
+					<bucket class="java.util.Date">
+						<bucketExpression><![CDATA[$F{dateTime}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents/>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="date" width="88">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{date}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
-						<cellContents backcolor="#F0F8FF" mode="Opaque" style="Crosstab Data Text">
+						<cellContents mode="Transparent" style="Crosstab Data Text">
 							<textField isBlankWhenNull="true">
-								<reportElement uuid="27d19ada-5c6d-4ac8-9948-2ff7229ae8a8" style="table" positionType="Float" x="0" y="0" width="70" height="13"/>
-								<textElement textAlignment="Center">
+								<reportElement uuid="27d19ada-5c6d-4ac8-9948-2ff7229ae8a8" style="table" positionType="Float" x="0" y="0" width="88" height="14"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>
-								<textFieldExpression><![CDATA[( $V{date}.equals("77777")? "Итого" :
-    ( $V{date}.equals("88888")? "Суточная проба" :
-        $V{date}.equals("99999")? "Всего кол-во:" : $V{date}) )]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{date}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="number" width="100">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{number}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="a670d140-92d1-4df7-ac5c-3d3209b375b6" style="table" x="0" y="0" width="100" height="14"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{number}]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabRowHeader>
@@ -150,10 +194,10 @@
 						<bucketExpression><![CDATA[$F{level1}]]></bucketExpression>
 					</bucket>
 					<crosstabColumnHeader>
-						<cellContents backcolor="#F0F8FF" mode="Opaque" style="Crosstab Data Text">
+						<cellContents mode="Transparent" style="Crosstab Data Text">
 							<textField isBlankWhenNull="true">
 								<reportElement uuid="110f8844-8b1a-43c6-aea4-11997a8fec3b" style="table" positionType="Float" x="0" y="0" width="70" height="13"/>
-								<textElement textAlignment="Center">
+								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{level1}]]></textFieldExpression>
@@ -169,10 +213,10 @@
 						<bucketExpression><![CDATA[$F{level2}]]></bucketExpression>
 					</bucket>
 					<crosstabColumnHeader>
-						<cellContents backcolor="#F0F8FF" mode="Opaque" style="Crosstab Data Text">
+						<cellContents mode="Transparent" style="Crosstab Data Text">
 							<textField isBlankWhenNull="true">
 								<reportElement uuid="88cf8190-15fc-45d9-8f8e-601081fcded0" style="table" positionType="Float" x="0" y="0" width="70" height="13"/>
-								<textElement textAlignment="Center">
+								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{level2}]]></textFieldExpression>
@@ -191,7 +235,7 @@
 						<cellContents>
 							<textField isBlankWhenNull="true">
 								<reportElement uuid="50c1d000-5857-4a6f-b60c-8f447e7eb91d" style="table" x="0" y="0" width="70" height="15"/>
-								<textElement textAlignment="Center">
+								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{level3}]]></textFieldExpression>
@@ -202,15 +246,15 @@
 						<cellContents/>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
-				<columnGroup name="level4" height="17" headerPosition="Stretch">
+				<columnGroup name="level4" height="14" headerPosition="Stretch">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{level4}]]></bucketExpression>
 					</bucket>
 					<crosstabColumnHeader>
 						<cellContents>
 							<textField isBlankWhenNull="true">
-								<reportElement uuid="0794bb42-2f65-446a-a5b1-5fe852753477" style="table" x="0" y="0" width="70" height="15"/>
-								<textElement textAlignment="Center">
+								<reportElement uuid="0794bb42-2f65-446a-a5b1-5fe852753477" style="table" x="0" y="0" width="70" height="14"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{level4}]]></textFieldExpression>
@@ -224,11 +268,11 @@
 				<measure name="qtyMeasure" class="java.lang.Long" calculation="Sum">
 					<measureExpression><![CDATA[$F{qty}]]></measureExpression>
 				</measure>
-				<crosstabCell width="70" height="15">
+				<crosstabCell width="70" height="14">
 					<cellContents style="Crosstab Data Text">
 						<textField>
-							<reportElement uuid="9c7ea58c-6de3-4896-a460-802f45f87561" style="table" positionType="Float" x="0" y="0" width="70" height="13"/>
-							<textElement textAlignment="Center">
+							<reportElement uuid="9c7ea58c-6de3-4896-a460-802f45f87561" style="table" positionType="Float" x="0" y="0" width="70" height="14"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{qtyMeasure}]]></textFieldExpression>
@@ -236,7 +280,7 @@
 					</cellContents>
 				</crosstabCell>
 				<crosstabCell height="25" rowTotalGroup="date">
-					<cellContents backcolor="#BFE1FF" mode="Opaque">
+					<cellContents mode="Opaque">
 						<textField>
 							<reportElement uuid="f7d5145f-87b8-4041-8ff6-a64b67f09230" style="Crosstab Data Text" x="0" y="0" width="50" height="25"/>
 							<textElement/>
@@ -245,7 +289,7 @@
 					</cellContents>
 				</crosstabCell>
 				<crosstabCell width="50" columnTotalGroup="level1">
-					<cellContents backcolor="#005FB3" mode="Opaque">
+					<cellContents mode="Opaque">
 						<textField>
 							<reportElement uuid="7c01d104-96d3-4512-a683-dd8c764b7dc2" style="Crosstab Data Text" x="0" y="0" width="50" height="25" forecolor="#FFFFFF"/>
 							<textElement/>
@@ -290,6 +334,36 @@
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell rowTotalGroup="date" columnTotalGroup="level4">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="dateTime">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="dateTime" columnTotalGroup="level1">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="dateTime" columnTotalGroup="level2">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="dateTime" columnTotalGroup="level3">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="dateTime" columnTotalGroup="level4">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="number">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="number" columnTotalGroup="level1">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="number" columnTotalGroup="level2">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="number" columnTotalGroup="level3">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="number" columnTotalGroup="level4">
 					<cellContents/>
 				</crosstabCell>
 			</crosstab>

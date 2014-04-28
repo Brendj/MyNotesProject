@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.daoservices.order;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.ClientReportItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
@@ -13,6 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalon;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalonType;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -125,7 +127,10 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         Map<Date, Long> map = new HashMap<Date, Long>();
         for (Object lst : list) {
             RegistryTalon curr = (RegistryTalon) lst;
-            map.put(curr.getTalonDate(), curr.getNumber());
+            Calendar calendar = Calendar.getInstance(RuntimeContext.getInstance().getLocalTimeZone(null));
+            calendar.setTime(curr.getTalonDate());
+            CalendarUtils.truncateToDayOfMonth(calendar);
+            map.put(calendar.getTime(), curr.getNumber());
         }
         return map;
     }

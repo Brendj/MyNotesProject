@@ -130,7 +130,7 @@
 							<textField isBlankWhenNull="true">
 								<reportElement uuid="110f8844-8b1a-43c6-aea4-11997a8fec3b" style="table" positionType="Float" mode="Opaque" x="0" y="0" width="96" height="22" backcolor="#EAF0F8"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="11" isBold="true"/>
+									<font size="11" isBold="false"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{level1}]]></textFieldExpression>
 							</textField>
@@ -149,7 +149,7 @@
 							<textField isBlankWhenNull="true">
 								<reportElement uuid="88cf8190-15fc-45d9-8f8e-601081fcded0" style="table" positionType="Float" mode="Opaque" x="0" y="0" width="96" height="22" backcolor="#EAF0F8"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="11" isBold="true"/>
+									<font size="11" isBold="false"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{level2}]]></textFieldExpression>
 							</textField>
@@ -168,7 +168,7 @@
 							<textField isBlankWhenNull="true">
 								<reportElement uuid="50c1d000-5857-4a6f-b60c-8f447e7eb91d" style="table" mode="Opaque" x="0" y="0" width="96" height="22" backcolor="#EAF0F8"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="11" isBold="true"/>
+									<font size="11" isBold="false"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{level3}]]></textFieldExpression>
 							</textField>
@@ -187,7 +187,7 @@
 							<textField isBlankWhenNull="true">
 								<reportElement uuid="0794bb42-2f65-446a-a5b1-5fe852753477" style="table" mode="Opaque" x="0" y="0" width="96" height="22" backcolor="#EAF0F8"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="11" isBold="true"/>
+									<font size="11" isBold="false"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{level4}]]></textFieldExpression>
 							</textField>
