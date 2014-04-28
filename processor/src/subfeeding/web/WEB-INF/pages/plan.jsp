@@ -23,7 +23,7 @@
     ClientSummaryExt client = (ClientSummaryExt) request.getAttribute("client");
     final Long subBalance0 = client.getSubBalance0();
     final Long subBalance1 = client.getSubBalance1();
-    String action = sf == null ? "demo" : sf.getDateActivate() == null ? "create" : "edit";
+    String action = sf == null || sf.getDateActivate() == null ? "create" : "edit";
     String activateDate = (String) request.getAttribute("dateActivate");
 %>
 <!DOCTYPE html>
@@ -185,7 +185,7 @@
                         <c:if test="${requestScope.subscriptionFeeding==null}">
                             <button id="disableButton">Активировать</button>
                             <div style="font-size: 0.8em;">
-                                Нажимая на кнопку "Активировать", Вы соглашаетесь с условиями предоставления услуги.
+                    Для активации циклограммы необходимо обратиться в образовательную организацию и подключить услугу.
                             </div>
                         </c:if>
                         <c:if test="${requestScope.subscriptionFeeding!=null}">
@@ -193,7 +193,7 @@
                                 <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null && requestScope.subscriptionFeeding.dateActivate==null}">
                                     <button type="submit" name="activate">Активировать</button>
                                     <div style="font-size: 0.8em;">
-                                        Нажимая на кнопку "Активировать", Вы соглашаетесь с условиями предоставления услуги.
+                                   Нажимая на кнопку "Активировать", Вы соглашаетесь с условиями предоставления услуги.
                                     </div>
                                 </c:if>
                                 <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null && requestScope.subscriptionFeeding.dateActivate!=null}">

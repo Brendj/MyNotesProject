@@ -142,12 +142,17 @@
     <c:if test="${not empty requestScope.subFeedingSuccess}">
         <div class="messageDiv successMessage">${requestScope.subFeedingSuccess}</div>
     </c:if>
+    <c:if test="${empty requestScope.subFeedingSuccess && empty requestScope.subFeedingError && requestScope.subscriptionFeeding==null}">
+        <div class="messageDiv errorMessage">
+            Для активации необходимо обратиться в образовательную организацию и подключить услугу.
+        </div>
+    </c:if>
 </div>
 <div id="manageButtons">
 <c:choose>
 <c:when test="${requestScope.subscriptionFeeding==null}">
     <button id="disableButton">
-        Возобновить подписку
+        Активировать подписку
     </button>
     <button type="button" onclick="location.href = '${pageContext.request.contextPath}/sub-feeding/plan'">
         Просмотр циклограммы
@@ -181,7 +186,6 @@
 </c:when>
 <%-- Подпика приостановлена --%>
 <c:when test="${requestScope.subscriptionFeeding.lastDatePause!=null}">
-    <%-- Подписка остановлена TODO: с датой разобраться + кнопка ниже календаря--%>
     <% if (sf.getLastDatePause().before(new Date())) { %>
     <form method="post" enctype="application/x-www-form-urlencoded"
           action="${pageContext.request.contextPath}/sub-feeding/reopen">
