@@ -1485,10 +1485,11 @@ public class DAOUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<CardTempOperation> getRegistrTempCardOperationByOrg(Session session, Long idOfOrg) {
-        Query query = session.createQuery("from CardTempOperation oper where oper.org.id = :idOfOrg and oper.operationType=0");
-        query.setParameter("idOfOrg", idOfOrg);
-        return query.list();
+    public static List<CardTempOperation> getRegistrationTempCardOperationByOrg(Session session, Long idOfOrg) {
+        Criteria criteria = session.createCriteria(CardTempOperation.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("operationType", CardOperationStation.REGISTRATION));
+        return criteria.list();
     }
 
     public static String extraxtORGNFromOrgByIdOfOrg(Session session, long idOfOrg) {

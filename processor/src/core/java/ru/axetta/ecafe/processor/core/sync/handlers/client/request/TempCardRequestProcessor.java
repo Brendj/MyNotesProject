@@ -37,7 +37,7 @@ public class TempCardRequestProcessor extends AbstractProcessor<TempCardOperatio
     @Override
     public TempCardOperationData process() throws Exception {
         List<TempCardOperationElement> tempCardOperationElements = new ArrayList<TempCardOperationElement>();
-        List<CardTempOperation> cardTempList = DAOUtils.getRegistrTempCardOperationByOrg(session, idOfOrg);
+        List<CardTempOperation> cardTempList = DAOUtils.getRegistrationTempCardOperationByOrg(session, idOfOrg);
         for (CardTempOperation operation: cardTempList){
             tempCardOperationElements.add(new TempCardOperationElement(operation));
             Long cartNo = operation.getCardTemp().getCardNo();

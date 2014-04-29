@@ -3377,12 +3377,13 @@ final boolean checkTempCard = (ee.getIdOfTempCard() == null && e.getIdOfTempCard
         }
         CardTemp cardTemp = DAOUtils.findCardTempByCardNo(persistenceSession, cardNo);
         if (cardTemp != null) {
-            if (cardTemp.getCardPrintedNo() != null && !cardTemp.getCardPrintedNo().equals(cardPrintedNo)) {
+            if(cardTemp.getOrg().getIdOfOrg().equals(idOfOrg)){
                 cardTemp.setCardPrintedNo(cardPrintedNo);
             } else {
+                String orgInfo = org.getIdOfOrg()+":"+org.getOfficialName()+" '"+org.getAddress()+"'";
                 throw new Exception(
-                        String.format("Временная карта уже зарегистрирована на клиента: %s. Статус карты - %s.",
-                                cardTemp.getClient().getIdOfClient(), cardTemp.getCardStation()));
+                        String.format("Временная карта уже зарегистрирована в другой организации: %s. Статус карты - %s.",
+                                orgInfo, cardTemp.getCardStation()));
             }
         } else {
             cardTemp = new CardTemp(org, cardNo, cardPrintedNo);
