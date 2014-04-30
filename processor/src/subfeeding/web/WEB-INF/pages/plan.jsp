@@ -32,10 +32,12 @@
     <title>Абонементное питание</title>
     <jsp:include page="include/header.jsp"/>
     <script src="${pageContext.request.contextPath}/resources/scripts/tools.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/scripts/jquery.tmpl.js"></script>
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/styles/plan.css"/>
     <script>
         var subBalance0 = <%=subBalance0%>;
         var subBalance1 = <%=subBalance1%>;
+        var diagram;
         var total = 0;
         var minActivateDate = new Date('<%=activateDate%>'.replace(/(\d+)\.(\d+)\.(\d+)/, '$2/$1/$3'));
         function formatSum(sum){
@@ -43,14 +45,33 @@
         }
         function updateTotalValue() {
             $('#totalweek').text(formatSum(total));$('#totalmonth').text(formatSum(4 * total));
-            //$('#totalweek1').text(formatSum(subBalance1 - total));//$('#totalmonth1').text(formatSum(subBalance1 - 4 * total));
         }
         function addUp(choice){
             var num = parseInt(choice.value);
+            var rowNum = parseInt(choice.name.split('_')[0]);
+            var colNum = parseInt(choice.name.split('_')[1]);
+            console.log(colNum);
+            for (var i=0;i<diagram.list.length;i++){
+                if(diagram.list[i].idOfComplex==rowNum){
+                    var checked = diagram.list[rowNum].checkarr[colNum]==0;
+                    console.log(checked);
+                    diagram.list[i].checked[colNum]=checked?1:0;
+                }
+            }
+            //console.log(diagram);
+            //var checked = diagram.list[rowNum].checked[colNum]==0;
+            //diagram.list[rowNum].checked[colNum]=checked?1:0;
+            //console.log(checked);
+            //console.log(diagram);
             total += choice.checked?num:-num;
             updateTotalValue();
         }
         $(function () {
+            $.getJSON('${pageContext.request.contextPath}/rest/diagram/diagram.json',function(data){
+                diagram = data;
+                $('#complexRowTmpl').tmpl(data.list).appendTo('#simpleTable');
+                total = data.weekSum;updateTotalValue();
+            });
             $("#complexForm").preventDoubleSubmission();
             $('input:text').button().addClass('ui-textfield');
             $("button").button();
@@ -58,7 +79,7 @@
             $cbs.each(function() {
                 total += this.checked?parseInt(this.value):0;
             });
-            updateTotalValue();
+
             $('#disableButton').button().css({
                 'background': 'rgb(152, 152, 152)',
                 'color': 'white'
@@ -113,100 +134,66 @@
             <c:if test="${not empty requestScope.subFeedingSuccess}">
                 <div class="messageDiv successMessage">${requestScope.subFeedingSuccess}</div>
             </c:if>
-
         </div>
         <div id="cycleDiagram">
-                <div class="simpleTable">
-                    <div class="simpleRow simpleTableHeader">
-                        <div class="simpleCell wideCell">Комплекс</div>
-                        <div class="simpleCell">ПН</div>
-                        <div class="simpleCell">ВТ</div>
-                        <div class="simpleCell">СР</div>
-                        <div class="simpleCell">ЧТ</div>
-                        <div class="simpleCell">ПТ</div>
-                        <div class="simpleCell">СБ</div>
-                    </div>
-            <%
-                @SuppressWarnings("unchecked")
-                List<ComplexInfoExt> complexes = (List<ComplexInfoExt>) request.getAttribute("complexes");
-                if (complexes == null) {
-                    complexes = Collections.emptyList();
-                }
-                @SuppressWarnings("unchecked")
-                Map<Integer, List<String>> activeComplexes = (Map<Integer, List<String>>) request.getAttribute("activeComplexes");
-                for (ComplexInfoExt complex : complexes) {
-            %>
-                    <div class="simpleRow">
-                        <div class="simpleCell complexName">
-                            <%=complex.getComplexName() + " - " + CurrencyStringUtils
-                                    .copecksToRubles(complex.getCurrentPrice()) + " руб"%>
-                        </div>
-                <%
-                    for (int i = 1; i <= 6; i++) {
-                        String key = complex.getIdOfComplex() + "_" + i;
-                        boolean checked = activeComplexes != null && activeComplexes.get(i)
-                                .contains(String.valueOf(complex.getIdOfComplex()));
-                %>
-                        <div class="simpleCell">
-                            <label><input type="checkbox"
-                                          name="complex_option_<%=key%>" value="<%=complex.getCurrentPrice()%>"
-                                          title="" <%=checked ? "checked" : ""%>
-                                          onchange="addUp(this);"/></label>
-                        </div>
-                <%
-                    }
-                %>
-                    </div>
-            <%
-                }
-            %>
-                    <div class="simpleTableFooter">
-                        <fieldset class="ui-widget ui-widget-content">
-                            <legend class="ui-widget-header ui-corner-all"><div>Расчетная информация</div></legend>
-                            <div class="simpleTable" style="margin: 0">
-                                <%--<div class="simpleRow simpleTableHeader">
-                                    <div class="simpleCell"></div>
-                                    <div class="simpleCell" style="text-align: right;">Сумма</div>
-                                    <div class="simpleCell wideCell" style="text-align: right;">Баланс за вычетом суммы</div>
-                                </div>--%>
-                                <div class="simpleRow">
-                                    <div class="simpleCell wideCell" style="text-align: left;">Расчетная стоимость 1-ой недели:</div>
-                                    <div class="simpleCell" id="totalweek" style="text-align: right;"></div>
-                                    <%--<div class="simpleCell" id="totalweek1" style="text-align: right;"></div>--%>
-                                </div>
-                                <div class="simpleRow" style="border: 0">
-                                    <div class="simpleCell" style="text-align: left;">Расчетная стоимость 4-х недель:</div>
-                                    <div class="simpleCell" id="totalmonth" style="text-align: right;"></div>
-                                    <%--<div class="simpleCell" id="totalmonth1" style="text-align: right;"></div>--%>
-                                </div>
+            <div id="simpleTable" class="simpleTable">
+                <div class="simpleRow simpleTableHeader">
+                    <div class="simpleCell wideCell">Комплекс</div>
+                    <div class="simpleCell">ПН</div>
+                    <div class="simpleCell">ВТ</div>
+                    <div class="simpleCell">СР</div>
+                    <div class="simpleCell">ЧТ</div>
+                    <div class="simpleCell">ПТ</div>
+                    <div class="simpleCell">СБ</div>
+                </div>
+                <div class="simpleTableFooter">
+                    <fieldset class="ui-widget ui-widget-content">
+                        <legend class="ui-widget-header ui-corner-all"><div>Расчетная информация</div></legend>
+                        <div class="simpleTable" style="margin: 0">
+                            <div class="simpleRow">
+                                <div class="simpleCell wideCell" style="text-align: left;">Расчетная стоимость 1-ой недели:</div>
+                                <div class="simpleCell" id="totalweek" style="text-align: right;"></div>
                             </div>
-                        </fieldset>
-
-                        <c:if test="${requestScope.subscriptionFeeding==null}">
-                            <button id="disableButton">Активировать</button>
-                            <div style="font-size: 0.8em;">
-                    Для активации циклограммы необходимо обратиться в образовательную организацию и подключить услугу.
+                            <div class="simpleRow" style="border: 0">
+                                <div class="simpleCell" style="text-align: left;">Расчетная стоимость 4-х недель:</div>
+                                <div class="simpleCell" id="totalmonth" style="text-align: right;"></div>
                             </div>
-                        </c:if>
-                        <c:if test="${requestScope.subscriptionFeeding!=null}">
-                            <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null}">
-                                <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null && requestScope.subscriptionFeeding.dateActivate==null}">
-                                    <button type="submit" name="activate">Активировать</button>
-                                    <div style="font-size: 0.8em;">
-                                   Нажимая на кнопку "Активировать", Вы соглашаетесь с условиями предоставления услуги.
-                                    </div>
-                                </c:if>
-                                <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null && requestScope.subscriptionFeeding.dateActivate!=null}">
-                                    <button type="submit" name="edit">Сохранить изменения</button>
-                                </c:if>
+                        </div>
+                    </fieldset>
+                    <c:if test="${requestScope.subscriptionFeeding==null}">
+                        <button id="disableButton">Активировать</button>
+                        <div style="font-size: 0.8em;">
+                            Для активации циклограммы необходимо обратиться в образовательную организацию и подключить услугу.
+                        </div>
+                    </c:if>
+                    <c:if test="${requestScope.subscriptionFeeding!=null}">
+                        <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null}">
+                            <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null && requestScope.subscriptionFeeding.dateActivate==null}">
+                                <button type="submit" name="activate">Активировать</button>
+                                <div style="font-size: 0.8em;">
+                                    Нажимая на кнопку "Активировать", Вы соглашаетесь с условиями предоставления услуги.
+                                </div>
                             </c:if>
-                            <%--<c:if test="${!requestScope.subscriptionFeeding.suspended}">--%>
-                                <%--<button type="submit" name="edit">Сохранить изменения</button>--%>
-                            <%--</c:if>--%>
+                            <c:if test="${requestScope.subscriptionFeeding.dateCreateService!=null && requestScope.subscriptionFeeding.dateActivate!=null}">
+                                <button type="submit" name="edit">Сохранить изменения</button>
+                            </c:if>
                         </c:if>
-                    </div>
+                    </c:if>
                 </div>
             </div>
+            <script id="complexRowTmpl" type="text/x-jquery-tmpl">
+                <div class="simpleRow">
+                    <div class="simpleCell complexName">{{= name }} - {{= formatSum(price)}}</div>
+                    {{each(weekDay, value) checkarr}}
+                        <div class="simpleCell">
+                            <label><input type="checkbox" name='{{= idOfComplex }}_{{= weekDay }}'
+                                           title="" onchange="addUp(this);"  value='{{= price}}'
+                                {{if value == 1}}checked{{/if}} /></label>
+                        </div>
+                    {{/each}}
+                </div>
+            </script>
+        </div>
         </form>
     </div>
 </div>
