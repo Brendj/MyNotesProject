@@ -20,13 +20,13 @@ import java.net.URL;
 @Singleton
 public class Configurations {
 
-    private ClientRoomController port;
+    private ClientRoomControllerWSService port;
 
     public void createClientRoomController(String wsdlUrl) throws Exception{
-        this.port = new ClientRoomControllerWSService(new URL(wsdlUrl)).getClientRoomControllerWSPort();
+        this.port = new ClientRoomControllerWSService(new URL(wsdlUrl));
     }
 
     public ClientRoomController getPort() {
-        return port;
+        return port.getClientRoomControllerWSPort();
     }
 }

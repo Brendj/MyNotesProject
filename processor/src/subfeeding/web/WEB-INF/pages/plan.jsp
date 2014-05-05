@@ -17,7 +17,6 @@
     tf.setTimeZone(TimeZone.getTimeZone("Europe/Moscow"));
     final  Logger logger = LoggerFactory.getLogger("ru.axetta.ecafe.processor.web.subfeeding.pages.plain_jsp");
     @SuppressWarnings("unchecked")
-    //SubFeedingResult sf = (SubFeedingResult) request.getAttribute("subscriptionFeeding");
     SubscriptionFeedingExt sf = (SubscriptionFeedingExt) request.getAttribute("subscriptionFeeding");
     CycleDiagramExt currentCycleDiagram = (CycleDiagramExt) request.getAttribute("currentCycleDiagram");
     ClientSummaryExt client = (ClientSummaryExt) request.getAttribute("client");
@@ -46,31 +45,30 @@
         function updateTotalValue() {
             $('#totalweek').text(formatSum(total));$('#totalmonth').text(formatSum(4 * total));
         }
+        function updateEmptyTotalValue() {
+            $('#totalweek').text('-');$('#totalmonth').text('-');
+        }
         function addUp(choice){
             var num = parseInt(choice.value);
             var rowNum = parseInt(choice.name.split('_')[0]);
             var colNum = parseInt(choice.name.split('_')[1]);
-            console.log(colNum);
             for (var i=0;i<diagram.list.length;i++){
                 if(diagram.list[i].idOfComplex==rowNum){
-                    var checked = diagram.list[rowNum].checkarr[colNum]==0;
-                    console.log(checked);
-                    diagram.list[i].checked[colNum]=checked?1:0;
+                    var checked = diagram.list[i].checkarr[colNum]==0;
+                    diagram.list[i].checkarr[colNum]=checked?1:0;
                 }
             }
-            //console.log(diagram);
-            //var checked = diagram.list[rowNum].checked[colNum]==0;
-            //diagram.list[rowNum].checked[colNum]=checked?1:0;
-            //console.log(checked);
-            //console.log(diagram);
             total += choice.checked?num:-num;
             updateTotalValue();
         }
         $(function () {
+            $('.complexName').parent().hide();
+            updateEmptyTotalValue();
             $.getJSON('${pageContext.request.contextPath}/rest/diagram/diagram.json',function(data){
                 diagram = data;
                 $('#complexRowTmpl').tmpl(data.list).appendTo('#simpleTable');
                 total = data.weekSum;updateTotalValue();
+                $('.complexName').parent().show();
             });
             $("#complexForm").preventDoubleSubmission();
             $('input:text').button().addClass('ui-textfield');
@@ -78,6 +76,32 @@
             var $cbs = $('.simpleTable input[type="checkbox"]');
             $cbs.each(function() {
                 total += this.checked?parseInt(this.value):0;
+            });
+
+            $('#previous').button().click(function(e){
+                $('.complexName').parent().hide();
+                updateEmptyTotalValue();
+                $.getJSON('${pageContext.request.contextPath}/rest/diagram/diagram.json',function(data){
+                    diagram = data;
+                    var parent = $('.complexName').parent();
+                    parent.remove();
+                    $('#complexRowTmpl').tmpl(data.list).appendTo('#simpleTable');
+                    total = data.weekSum;updateTotalValue();
+                    parent.show();
+                });
+            });
+
+            $('#next').button().click(function(e){
+                $('.complexName').parent().hide();
+                updateEmptyTotalValue();
+                $.getJSON('${pageContext.request.contextPath}/rest/diagram/diagram.json',function(data){
+                    diagram = data;
+                    var parent = $('.complexName').parent();
+                    parent.remove();
+                    $('#complexRowTmpl').tmpl(data.list).appendTo('#simpleTable');
+                    total = data.weekSum;updateTotalValue();
+                    parent.show();
+                });
             });
 
             $('#disableButton').button().css({
@@ -136,6 +160,8 @@
             </c:if>
         </div>
         <div id="cycleDiagram">
+            <a id="previous" href="#">Предыдущий</a>
+            <a id="next" href="#">Следующий</a>
             <div id="simpleTable" class="simpleTable">
                 <div class="simpleRow simpleTableHeader">
                     <div class="simpleCell wideCell">Комплекс</div>

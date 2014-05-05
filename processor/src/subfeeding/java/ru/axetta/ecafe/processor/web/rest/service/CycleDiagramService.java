@@ -17,12 +17,15 @@ import org.slf4j.LoggerFactory;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -40,7 +43,6 @@ public class CycleDiagramService {
 
     @EJB
     private Configurations configurations;
-
 
     @GET
     @Path("/list.json")
@@ -65,7 +67,51 @@ public class CycleDiagramService {
     @GET
     @Path("/diagram.json")
     @Produces(MediaType.APPLICATION_JSON)
-    public CycleDiagramItem getDiagram(@Context HttpServletRequest req) {
+    public CycleDiagramItem currDiagram(@Context HttpServletRequest request,
+                                        @Context HttpServletResponse response) throws ServletException, IOException {
+        ClientAuthToken token = ClientAuthToken.loadFrom(request.getSession());
+        CycleDiagramItem cycleDiagramItem = new CycleDiagramItem();
+        if(token==null) {
+            request.getRequestDispatcher ("../../index.html").forward(request, response);
+            //return cycleDiagramItem;
+        }
+        try {
+            ClientRoomController clientRoomController = configurations.getPort();
+            final Long contractId = token.getContractId();
+            ComplexInfoResult result = clientRoomController.findComplexesWithSubFeeding(contractId);
+            if (result.resultCode==0){
+                CycleDiagramOut cd = clientRoomController.findClientCycleDiagram(contractId);
+                cycleDiagramItem.setDiagramDate(cd.getDateActivationDiagram());
+                Long weekPrice = 0L;
+                Map<Integer, List<String>> active = splitPlanComplexes(cd);
+                List<ComplexItem> complexItemList = new ArrayList<ComplexItem>();
+                for (ComplexInfoExt complexInfoExt: result.getComplexInfoList().getList()){
+                    final ComplexItem complexItem = new ComplexItem();
+                    complexItem.setIdOfComplex(complexInfoExt.getIdOfComplex());
+                    complexItem.setName(complexInfoExt.getComplexName());
+                    complexItem.setPrice(complexInfoExt.getCurrentPrice());
+                    Integer[] checked = new Integer[6];
+                    for (int i=0; i<checked.length; i++){
+                        boolean flag = active.get(i + 1).contains(Long.toString(complexInfoExt.getIdOfComplex()));
+                        checked[i] = flag?1:0;
+                        weekPrice += flag?complexInfoExt.getCurrentPrice():0;
+                    }
+                    complexItem.setCheckarr(checked);
+                    complexItemList.add(complexItem);
+                }
+                cycleDiagramItem.setWeekSum(weekPrice);
+                cycleDiagramItem.setList(complexItemList);
+            }
+        } catch (Exception e) {
+            logger.error("error", e);
+        }
+        return cycleDiagramItem;
+    }
+
+    @GET
+    @Path("/nextdiagram.json")
+    @Produces(MediaType.APPLICATION_JSON)
+    public CycleDiagramItem nextDiagram(@Context HttpServletRequest req) {
         ClientAuthToken token = ClientAuthToken.loadFrom(req.getSession());
         CycleDiagramItem cycleDiagramItem = new CycleDiagramItem();
         if(token!=null) {
@@ -101,7 +147,6 @@ public class CycleDiagramService {
         }
         return cycleDiagramItem;
     }
-
 
     private Map<Integer, List<String>> splitPlanComplexes(CycleDiagramOut cd) {
         Map<Integer, List<String>> activeComplexes = new HashMap<Integer, List<String>>();
