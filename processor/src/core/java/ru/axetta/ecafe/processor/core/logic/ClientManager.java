@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.DetachedCriteria;
@@ -793,25 +794,87 @@ public class ClientManager {
         for (ClientAllocationRule rule : list) {
             Set<Client> clientSet = rule.isTempClient() ? res.get("TemporaryClients") : res.get("RegularClients");
             Org clientOrg = rule.getSourceOrg();
-            if (clientOrg.getFriendlyOrg().isEmpty()) {
-                clientSet.addAll(findMatchedAllocatedClients(clientOrg, rule.getGroupFilter()));
-            } else {
-                for (Org friendlyOrg : clientOrg.getFriendlyOrg()) {
-                    clientSet.addAll(findMatchedAllocatedClients(friendlyOrg, rule.getGroupFilter()));
-                }
+            //if (clientOrg.getFriendlyOrg().isEmpty()) {
+            //    clientSet.addAll(findMatchedAllocatedClients(clientOrg, rule.getGroupFilter()));
+            //} else {
+            //    for (Org friendlyOrg : clientOrg.getFriendlyOrg()) {
+            //        clientSet.addAll(findMatchedAllocatedClients(friendlyOrg, rule.getGroupFilter()));
+            //    }
+            //}
+            final Set<Org> friendlyOrg = clientOrg.getFriendlyOrg();
+            List<Long> idOfOrgList = new ArrayList<Long>(friendlyOrg.size());
+            for (Org org : friendlyOrg) {
+                idOfOrgList.add(org.getIdOfOrg());
             }
+            List<Long> idOfClientGroups = findMatchedClientGroupsByRegExAndOrg(session, idOfOrgList, rule.getGroupFilter());
+            List<Client> clients = findClientsByInOrgAndInGroups(session, idOfOrgList, idOfClientGroups);
+            clientSet.addAll(clients);
         }
         return res;
     }
 
-    public static List<Client> findMatchedAllocatedClients(Org clientOrg, String regExp) {
+    //public static List<Client> findMatchedAllocatedClients(Org clientOrg, String regExp) {
+    //    List<Client> res = new ArrayList<Client>();
+    //    for (Client client : clientOrg.getClients()) {
+    //        boolean addClient =
+    //                client.getClientGroup() != null && client.getClientGroup().getGroupName().matches(regExp);
+    //        if (addClient) {
+    //            res.add(client);
+    //        }
+    //    }
+    //    return res;
+    //}
+
+    public static List<Client> findMatchedAllocatedClients(Session session, Long idOfOrg, String regExp) {
         List<Client> res = new ArrayList<Client>();
-        for (Client client : clientOrg.getClients()) {
-            boolean addClient =
-                    client.getClientGroup() != null && client.getClientGroup().getGroupName().matches(regExp);
-            if (addClient) {
-                res.add(client);
-            }
+
+        String sql = "SELECT idofclientgroup FROM cf_clientgroups where groupname ~ '"+regExp+"'";
+        Query query = session.createSQLQuery(sql);
+        List idOfClientGroupResult = query.list();
+        List<Long> idOfClientGroups = new ArrayList<Long>(idOfClientGroupResult.size());
+        for (Object obj : idOfClientGroupResult){
+            Long value = Long.valueOf(obj.toString());
+            idOfClientGroups.add(value);
+        }
+
+        Criteria criteria = session.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.isNotNull("idOfClientGroup"));
+        criteria.add(Restrictions.in("idOfClientGroup", idOfClientGroups));
+        List list = criteria.list();
+        for (Object obj : list) {
+            Client client = (Client) obj;
+            res.add(client);
+        }
+        return res;
+    }
+
+    public static List<Long> findMatchedClientGroupsByRegExAndOrg(Session session, List<Long> idOfOrg, String regExp) {
+        String sql = "SELECT idofclientgroup FROM cf_clientgroups where groupname ~ '"+regExp+"' and idoforg in (:idoforg)";
+        Query query = session.createSQLQuery(sql);
+        query.setParameterList("idoforg", idOfOrg);
+        List idOfClientGroupResult = query.list();
+        List<Long> idOfClientGroups = new ArrayList<Long>(idOfClientGroupResult.size());
+        for (Object obj : idOfClientGroupResult){
+            Long value = Long.valueOf(obj.toString());
+            idOfClientGroups.add(value);
+        }
+        return idOfClientGroups;
+    }
+
+    public static List<Client> findClientsByInOrgAndInGroups(Session session,
+                                                             List<Long> idOfOrgList,
+                                                             List<Long> idOfClientGroupList) {
+        List<Client> res = new ArrayList<Client>();
+
+        Criteria criteria = session.createCriteria(Client.class);
+        criteria.add(Restrictions.in("org.idOfOrg", idOfOrgList));
+        criteria.add(Restrictions.isNotNull("idOfClientGroup"));
+        criteria.add(Restrictions.in("idOfClientGroup", idOfClientGroupList));
+        List list = criteria.list();
+        for (Object obj : list) {
+            Client client = (Client) obj;
+            res.add(client);
         }
         return res;
     }
@@ -824,7 +887,7 @@ public class ClientManager {
             tr.commit();
         } catch (Exception ex) {
             HibernateUtils.rollback(tr, logger);
-            logger.error(ex.getMessage());
+            logger.error(ex.getMessage(), ex);
             throw new RuntimeException(ex.getMessage());
         }
     }

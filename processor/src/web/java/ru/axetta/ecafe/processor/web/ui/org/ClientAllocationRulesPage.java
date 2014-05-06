@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -142,13 +143,21 @@ public class ClientAllocationRulesPage extends BasicWorkspacePage implements Org
             }
         }
         org = DAOUtils.findOrg(session, rule.getSourceOrg().getIdOfOrg());
-        if (org.getFriendlyOrg().isEmpty()) {
-            clients.addAll(ClientManager.findMatchedAllocatedClients(org, rule.getGroupFilter()));
-        } else {
-            for (Org frOrg : org.getFriendlyOrg()) {
-                clients.addAll(ClientManager.findMatchedAllocatedClients(frOrg, rule.getGroupFilter()));
-            }
+        //if (org.getFriendlyOrg().isEmpty()) {
+        //    clients.addAll(ClientManager.findMatchedAllocatedClients(org, rule.getGroupFilter()));
+        //} else {
+        //    for (Org frOrg : org.getFriendlyOrg()) {
+        //        clients.addAll(ClientManager.findMatchedAllocatedClients(frOrg, rule.getGroupFilter()));
+        //    }
+        //}
+        final Set<Org> friendlyOrg = org.getFriendlyOrg();
+        List<Long> idOfOrgList = new ArrayList<Long>(friendlyOrg.size());
+        for (Org o : friendlyOrg) {
+            idOfOrgList.add(o.getIdOfOrg());
         }
+        List<Long> idOfClientGroups = ClientManager.findMatchedClientGroupsByRegExAndOrg(session, idOfOrgList, rule.getGroupFilter());
+        List<Client> friendlyClients = ClientManager.findClientsByInOrgAndInGroups(session, idOfOrgList, idOfClientGroups);
+        clients.addAll(friendlyClients);
         ClientManager.updateClientVersionTransactional(session, clients);
     }
 
