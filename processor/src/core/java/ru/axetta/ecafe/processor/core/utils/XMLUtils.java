@@ -162,6 +162,17 @@ public class XMLUtils {
         return result;
     }
 
+    public static List<Node> findNodesWithNameEqualsTo(Node parentNode, String name) {
+        List<Node> result = new ArrayList<Node>();
+        Node child = parentNode.getFirstChild();
+        while (child != null) {
+            if (Node.ELEMENT_NODE == child.getNodeType() && name.equalsIgnoreCase(child.getNodeName()))
+                result.add(child);
+            child = child.getNextSibling();
+        }
+        return result;
+    }
+
     public static Node findFirstChildElement(Node node, String name) {
         Node currNode = node.getFirstChild();
         while (null != currNode) {

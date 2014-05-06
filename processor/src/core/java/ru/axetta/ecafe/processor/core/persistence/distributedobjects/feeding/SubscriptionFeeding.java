@@ -76,17 +76,17 @@ public class SubscriptionFeeding extends DistributedObject{
         } catch (Exception e) {
             throw new DistributedObjectException(e.getMessage());
         }
-        SubscriptionFeedingService sfService = RuntimeContext.getAppContext().getBean(SubscriptionFeedingService.class);
-        List<SubscriptionFeeding> subscriptionFeedings = sfService.findSubscriptionFeedingByClient(client);
+        //SubscriptionFeedingService sfService = RuntimeContext.getAppContext().getBean(SubscriptionFeedingService.class);
+        //List<SubscriptionFeeding> subscriptionFeedings = sfService.findSubscriptionFeedingByClient(client);
         // Если уже есть у клиента актуальная подписка и с АРМа приходит тоже актулаьная, то АРМовскую "разворачиваем".
         // Потому что не может быть у клиента двух актуальных подписок на АП !
-        for (SubscriptionFeeding sf: Lists.reverse(subscriptionFeedings)){
-            if (isActual() && !sf.getGuid().equals(guid)) {
-                DistributedObjectException doe = new DistributedObjectException("SubscriptionFeeding DATA_EXIST_VALUE");
-                doe.setData(sf.getGuid());
-                throw doe;
-            }
-        }
+        //for (SubscriptionFeeding sf: Lists.reverse(subscriptionFeedings)){
+        //    if (isActual() && !sf.getGuid().equals(guid)) {
+        //        DistributedObjectException doe = new DistributedObjectException("SubscriptionFeeding DATA_EXIST_VALUE");
+        //        doe.setData(sf.getGuid());
+        //        throw doe;
+        //    }
+        //}
 
     }
 

@@ -114,11 +114,14 @@ public class Manager {
     public void buildRO(Node roNode) throws Exception {
 
         // Если группы явно не указаны, то пока берем все.
-        Node confirmNode = XMLUtils.findFirstChildElement(roNode, "Confirm");
-        if (confirmNode != null)
+        //Node confirmNode = XMLUtils.findFirstChildElement(roNode, "Confirm");
         // Обработка секции <Confirm>
-        {
-            buildConfirmNode(confirmNode);
+        List<Node> confirmNodes = XMLUtils.findNodesWithNameEqualsTo(roNode, "Confirm");
+        for (Node confirmNode: confirmNodes){
+            if (confirmNode != null)
+            {
+                buildConfirmNode(confirmNode);
+            }
         }
         // Получаем секции РО, которые будем обрабатывать.
         List<Node> doNodeList = XMLUtils.findNodesWithNameNotEqualsTo(roNode, "Confirm");
