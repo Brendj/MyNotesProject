@@ -68,7 +68,7 @@ public abstract class DistributedObject{
                 mainRestriction.add(andRestr);
                 criteria.add(mainRestriction);
             } else {
-                criteria.add(Restrictions.ge("globalVersion", currentMaxVersion));
+                criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
             }
         } else {
             criteria.add(Restrictions.gt("globalVersion", currentMaxVersion));
