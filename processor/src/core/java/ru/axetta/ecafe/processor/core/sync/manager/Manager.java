@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.manager;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.DOVersionRepository;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.SyncHistory;
@@ -526,7 +527,8 @@ public class Manager {
     private List<DistributedObject> processDistributedObjectsList(SessionFactory sessionFactory,
             DOSyncClass doSyncClass) {
         LOGGER.debug("processDistributedObjectsList: init");
-        final Date startDate = new Date();
+        Calendar calendarStart = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
+        final Date startDate = calendarStart.getTime();
         List<DistributedObject> distributedObjects = incomeDOMap.get(doSyncClass);
         List<DistributedObject> distributedObjectList = new ArrayList<DistributedObject>();
         LOGGER.debug("processDistributedObjectsList: init data");
@@ -547,7 +549,9 @@ public class Manager {
             }
         }
         if (doSyncClass.getDoClass() == GoodRequestPosition.class) {
-            final Date endGenerateTime = new Date();
+            Calendar calendarEnd = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
+            calendarEnd.add(Calendar.MINUTE, 1);
+            final Date endGenerateTime = calendarEnd.getTime();
             GoodRequestsChangeAsyncNotificationService.getInstance().notifyOrg(idOfOrg, startDate, endGenerateTime);
         }
         LOGGER.debug("processDistributedObjectsList: end");

@@ -96,7 +96,8 @@ public class GoodRequestsChangeAsyncNotificationService {
             boolean isEmptyRequests = true;
             try {
                 try {
-                    persistenceSession = runtimeContext.createReportPersistenceSession();
+                    //persistenceSession = runtimeContext.createReportPersistenceSession();
+                    persistenceSession = runtimeContext.createPersistenceSession();
                     persistenceTransaction = persistenceSession.beginTransaction();
                     Criteria requestCriteria = persistenceSession.createCriteria(GoodRequestPosition.class);
                     requestCriteria.createAlias("goodRequest", "gr");
@@ -141,7 +142,8 @@ public class GoodRequestsChangeAsyncNotificationService {
             String htmlReport="";
             try {
                 try {
-                    persistenceSession = runtimeContext.createReportPersistenceSession();
+                    //persistenceSession = runtimeContext.createReportPersistenceSession();
+                    persistenceSession = runtimeContext.createPersistenceSession();
                     persistenceTransaction = persistenceSession.beginTransaction();
                     reportJob = builder.build(persistenceSession, startDate, endDate, localCalendar);
                     persistenceTransaction.commit();
@@ -196,6 +198,7 @@ public class GoodRequestsChangeAsyncNotificationService {
                 try {
                     try {
                         persistenceSession = runtimeContext.createReportPersistenceSession();
+                        //persistenceSession = runtimeContext.createPersistenceSession();
                         persistenceTransaction = persistenceSession.beginTransaction();
                         addEmailFromClient(persistenceSession, idOfOrg, addresses);
                         persistenceTransaction.commit();
@@ -211,6 +214,7 @@ public class GoodRequestsChangeAsyncNotificationService {
                 try {
                     try {
                         persistenceSession = runtimeContext.createReportPersistenceSession();
+                        //persistenceSession = runtimeContext.createPersistenceSession();
                         persistenceTransaction = persistenceSession.beginTransaction();
                         addEmailFromUser(persistenceSession, idOfOrg, addresses);
                         persistenceTransaction.commit();
@@ -289,7 +293,13 @@ public class GoodRequestsChangeAsyncNotificationService {
             clientCriteria.add(Property.forName("idOfClient").in(staffClientQuery));
             clientCriteria.setProjection(Property.forName("email"));
             List<String> address = clientCriteria.list();
-            addresses.addAll(address);
+            for (String addres: address){
+                if(StringUtils.isNotEmpty(addres)){
+                    List<String> strings = Arrays.asList(StringUtils.split(addres, ";"));
+                    addresses.addAll(strings);
+                }
+            }
+            //addresses.addAll(address);
         }
     }
 
