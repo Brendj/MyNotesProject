@@ -221,7 +221,8 @@ public class ImportRegisterClientsService {
                     cl == null ? null : cl.getPerson().getSecondName(), updateClient);
             if (pupil.getGroup() != null) {
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP, pupil.getGroup(),
-                        cl == null ? null : cl.getClientGroup().getGroupName(), updateClient);
+                        cl == null || cl.getClientGroup() == null ?
+                                                null : cl.getClientGroup().getGroupName(), updateClient);
             } else {
                 //  Если группа у клиента не указана, то перемещаем его в Другие
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP,
