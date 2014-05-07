@@ -517,7 +517,6 @@ public class ProjectStateReportService {
                 {ValueType.DATE, "Год"}, {ValueType.NUMBER, "Остатки на лицевых счетах (тыс. руб.)", FISCAL_CHART_1_DATA},
                 {ValueType.NUMBER, "Суммы платных дневных продаж (тыс. руб.)", FISCAL_CHART_2_DATA},
                 {ValueType.NUMBER, "Сумма пополнений (тыс. руб.)", FISCAL_CHART_3_DATA} }, FISCAL_CHART_DATA));
-
         //initContragentsChartType();
     }
 
@@ -561,7 +560,7 @@ public class ProjectStateReportService {
     private static final String SELECT_SQL = "SELECT StringKey, StringValue FROM cf_projectstate_data WHERE Type=? and Period=(select max(period) from cf_projectstate_data where type=? and region=?) and Region=? order by Period DESC, StringKey";
     private static final String PERIODIC_SELECT_SQL = "SELECT distinct StringKey, StringValue FROM cf_projectstate_data WHERE INT8(StringKey) <= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 and INT8(StringKey) >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND Type=? AND Region=? order by StringKey";
     private static final String PERIODIC_AVG_SELECT_SQL =
-            "SELECT distinct substring(StringKey from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), " + PERIODIC_AVG_COL + " "
+            "SELECT distinct substring(StringKey from '[^[:alnum:]]* {0,1}№ {0,1}(\\w*-?\\w*)'), " + PERIODIC_AVG_COL + " "
                     + "FROM cf_projectstate_data "
                     + "WHERE period <= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 and "
                     + "      period >= EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 AND "
@@ -606,7 +605,7 @@ public class ProjectStateReportService {
                 return;
             }
 
-            initContragetsChartType();
+            //initContragetsChartType();
             Map<Integer, Boolean> clearedTypes = new HashMap<Integer, Boolean>();
             try {
                 for (String t : TYPES.keySet()) {
@@ -826,7 +825,7 @@ public class ProjectStateReportService {
 
         /*cal.set(Calendar.YEAR, 2014);
         cal.set(Calendar.MONTH, Calendar.FEBRUARY);
-        cal.set(Calendar.DAY_OF_MONTH, 28);*/
+        cal.set(Calendar.DAY_OF_MONTH, 27);*/
 
         return cal;
     }
