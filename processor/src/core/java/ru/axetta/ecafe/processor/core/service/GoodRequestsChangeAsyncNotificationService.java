@@ -42,6 +42,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.*;
 
 
@@ -93,6 +95,7 @@ public class GoodRequestsChangeAsyncNotificationService {
             localCalendar.add(Calendar.MILLISECOND, -1);
             Date endDate = localCalendar.getTime();
             /* проверим есть ли измененые заявки на неделю */
+            List goodRequestPositionList = new ArrayList();
             boolean isEmptyRequests = true;
             try {
                 try {
@@ -108,7 +111,7 @@ public class GoodRequestsChangeAsyncNotificationService {
                     dateDisjunction.add(Restrictions.between("createdDate", beginGenerateTime, endGenerateTime));
                     dateDisjunction.add(Restrictions.between("lastUpdate", beginGenerateTime, endGenerateTime));
                     requestCriteria.add(dateDisjunction);
-                    List goodRequestPositionList = requestCriteria.list();
+                    goodRequestPositionList = requestCriteria.list();
                     isEmptyRequests = goodRequestPositionList.isEmpty();
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
@@ -119,13 +122,26 @@ public class GoodRequestsChangeAsyncNotificationService {
             } catch (Exception e) {
                 LOGGER.error("Failed export report : ", e);
             }
+            String message = "";
+            message+=" current time "+(new Date());
+            message+=" beginGenTime "+beginGenerateTime;
+            message+=" endGenerateTime "+endGenerateTime;
+            message+=" goodRequestPosition count "+goodRequestPositionList.size();
             /* если заявок на данный период нет ничего не делаем */
-            if(isEmptyRequests) return;
+            if(isEmptyRequests) {
+                LOGGER.debug("IdOfOrg: "+idOfOrg+" goodRequestPosition empty: goodRequestPosition count:"+goodRequestPositionList.size());
+                return;
+            }
 
             OrgItem item = orgItems.get(idOfOrg);
-            AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
-            String templateShortFileName = GoodRequestsNewReport.class.getSimpleName() + "_notify.jasper";
-            String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
+            //AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
+            //String templateShortFileName = GoodRequestsNewReport.class.getSimpleName() + "_notify.jasper";
+            //String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
+            String templateFilename = checkIsExistFile("_notify.jasper");
+            if(StringUtils.isEmpty(templateFilename)){
+                LOGGER.debug("IdOfOrg: "+idOfOrg+" template not found");
+                return;
+            }
             GoodRequestsNewReport.Builder builder = new GoodRequestsNewReport.Builder(templateFilename);
             Properties properties = new Properties();
             properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, Long.toString(item.getIdOfOrg()));
@@ -175,20 +191,22 @@ public class GoodRequestsChangeAsyncNotificationService {
                 } catch (Exception e) {
                     LOGGER.error("Failed build report ",e);
                 }
+            } else {
+                LOGGER.debug("IdOfOrg: "+idOfOrg+" reportJob is null");
             }
             //boolean sended = false;
             if(StringUtils.isNotEmpty(htmlReport)){
-                //try {
-                //    String fileName = getClass().getSimpleName() + "-" + System.currentTimeMillis() + ".html";
-                //    File file = new File(fileName);
-                //    FileOutputStream outputStream = new FileOutputStream(file);
-                //    outputStream.write(htmlReport.getBytes());
-                //    outputStream.flush();
-                //    outputStream.close();
-                //    LOGGER.info(String.format("save report file '%s'", fileName));
-                //} catch (Exception e){
-                //    LOGGER.error("Cannot save report file", e);
-                //}
+                try {
+                    String fileName = getClass().getSimpleName() + "-" + System.currentTimeMillis() + ".html";
+                    File file = new File(fileName);
+                    FileOutputStream outputStream = new FileOutputStream(file);
+                    outputStream.write(htmlReport.getBytes());
+                    outputStream.flush();
+                    outputStream.close();
+                    LOGGER.debug(String.format("save report file '%s'", fileName));
+                } catch (Exception e){
+                    LOGGER.error("Cannot save report file", e);
+                }
                 //String[] values = {"address", item.address, "shortOrgName", item.shortName, "reportValues", htmlReport};
                 List<String> strings = Arrays
                         .asList(StringUtils.split(item.getDefaultSupplier().requestNotifyMailList, ";"));
@@ -234,13 +252,28 @@ public class GoodRequestsChangeAsyncNotificationService {
                          //sended |= eventNotificationService.sendEmail(address, EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
                         try {
                             runtimeContext.getPostman().postNotificationEmail(address, emailSubject, htmlReport);
+                            LOGGER.debug(message +" send '"+address+"'");
                         } catch (Exception e) {
                             LOGGER.error("Failed to post event", e);
                         }
                     }
                 }
+            } else {
+                LOGGER.debug("IdOfOrg: "+idOfOrg+" email text is empty");
             }
+        } else {
+            LOGGER.debug("this org not notify: "+ idOfOrg);
         }
+    }
+
+    private String checkIsExistFile(String suffix) {
+        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+        String templateShortFileName = GoodRequestsNewReport.class.getSimpleName() + suffix;
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
+        if(!(new File(templateFilename)).exists()){
+            return null;
+        }
+        return templateFilename;
     }
 
     public void refreshAllInformation() {
