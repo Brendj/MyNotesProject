@@ -1,0 +1,165 @@
+package ru.axetta.ecafe.processor.core.report;
+
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+
+import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem1;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampPaidReportItem;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+
+import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.text.DateFormat;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: a.anvarov
+ */
+
+public class RegisterStampPaidReport extends BasicReportForOrgJob {
+
+    private final static Logger logger = LoggerFactory.getLogger(RegisterStampPaidReport.class);
+
+    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
+
+    }
+
+    public static class Builder extends BasicReportJob.Builder {
+
+        private final String templateFilename;
+
+        public Builder(String templateFilename) {
+            this.templateFilename = templateFilename;
+        }
+
+        @Override
+        public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
+            Date generateTime = new Date();
+            Map<String, Object> parameterMap = new HashMap<String, Object>();
+            parameterMap.put("idOfOrg", org.getIdOfOrg());
+            parameterMap.put("orgName", org.getOfficialName());
+            calendar.setTime(startTime);
+            int month = calendar.get(Calendar.MONTH);
+            parameterMap.put("day", calendar.get(Calendar.DAY_OF_MONTH));
+            parameterMap.put("month", month + 1);
+            parameterMap.put("monthName", new DateFormatSymbols().getMonths()[month]);
+            parameterMap.put("year", calendar.get(Calendar.YEAR));
+            parameterMap.put("startDate", startTime);
+            parameterMap.put("endDate", endTime);
+
+            calendar.setTime(startTime);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
+                    createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
+            Date generateEndTime = new Date();
+            return new RegisterStampPaidReport(generateTime, generateEndTime.getTime() - generateTime.getTime(), jasperPrint,
+                    startTime, endTime, org.getIdOfOrg());
+        }
+
+        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
+                Calendar calendar, Map<String, Object> parameterMap) throws Exception {
+            boolean withOutActDiscrepancies = false;
+
+            OrderDetailsDAOService service = new OrderDetailsDAOService();
+            service.setSession(session);
+
+            List<GoodItem1> allGoods = service.findAllGoodsPay(org.getIdOfOrg(), startTime, endTime);
+            Map<Date, Long> numbers = service.findAllRegistryTalonsPaid(org.getIdOfOrg(), startTime, endTime);
+
+            DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
+            List<RegisterStampPaidReportItem> result = new ArrayList<RegisterStampPaidReportItem>();
+            calendar.setTime(startTime);
+            GoodItem1 emptyGoodItem = new GoodItem1();
+
+            while (endTime.getTime() > calendar.getTimeInMillis()) {
+                Date time = calendar.getTime();
+                String date = timeFormat.format(time);
+                if (allGoods.isEmpty()) {
+                    RegisterStampPaidReportItem item = new RegisterStampPaidReportItem(emptyGoodItem,0L,date, time);
+                    RegisterStampPaidReportItem total = new RegisterStampPaidReportItem(emptyGoodItem,0L,"Итого", CalendarUtils.addDays(endTime, 1));
+                    RegisterStampPaidReportItem allTotal = new RegisterStampPaidReportItem(emptyGoodItem,0L,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
+                    result.add(allTotal);
+                    result.add(item);
+                    result.add(total);
+                } else {
+                    for (GoodItem1 goodItem: allGoods) {
+                        String number = numbers.get(time) == null ? "" : Long.toString(numbers.get(time));
+                        Long val = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
+                                goodItem.getFullName(), withOutActDiscrepancies);
+                        RegisterStampPaidReportItem item = new RegisterStampPaidReportItem(goodItem,val,date,number, time);
+                        RegisterStampPaidReportItem total = new RegisterStampPaidReportItem(goodItem,val,"Итого", CalendarUtils.addDays(endTime, 1));
+                        RegisterStampPaidReportItem allTotal = new RegisterStampPaidReportItem(goodItem,val,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
+                        result.add(allTotal);
+                        result.add(item);
+                        result.add(total);
+                    }
+                }
+                calendar.add(Calendar.DATE, 1);
+            }
+            if(allGoods.isEmpty()){
+                RegisterStampPaidReportItem dailySampleItem = new RegisterStampPaidReportItem(emptyGoodItem,0L,"Суточная проба", CalendarUtils.addDays(endTime, 2));
+                RegisterStampPaidReportItem allTotal = new RegisterStampPaidReportItem(emptyGoodItem,0L,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
+                result.add(allTotal);
+                result.add(dailySampleItem);
+            } else {
+                for (GoodItem1 goodItem: allGoods){
+                    Long val = service.buildRegisterStampDailySampleValue(org.getIdOfOrg(), startTime, endTime,
+                            goodItem.getFullName());
+                    RegisterStampPaidReportItem dailySampleItem = new RegisterStampPaidReportItem(goodItem,val,"Суточная проба", CalendarUtils.addDays(endTime, 2));
+                    RegisterStampPaidReportItem allTotal = new RegisterStampPaidReportItem(goodItem,val,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
+                    result.add(allTotal);
+                    result.add(dailySampleItem);
+                }
+            }
+            //RegisterStampPaidReportItem registerStampPaidReportItem = new RegisterStampPaidReportItem(emptyGoodItem, 0L, "", new Date(), 1L, 1L);
+            //registerStampPaidReportItem.setPrice(1L);
+            //registerStampPaidReportItem.setTotal(1L);
+            //registerStampPaidReportItem.setNumber("1");
+            //registerStampPaidReportItem.setDate("");
+            //registerStampPaidReportItem.setDateTime(new Date());
+            //registerStampPaidReportItem.setQty(1L);
+            //registerStampPaidReportItem.setLevel1("");
+            //registerStampPaidReportItem.setLevel2("");
+            //registerStampPaidReportItem.setLevel3("");
+            //registerStampPaidReportItem.setLevel4("");
+            //registerStampPaidReportItem.setDate("");
+            //result.add(registerStampPaidReportItem);
+            return new JRBeanCollectionDataSource(result);
+        }
+    }
+
+    public RegisterStampPaidReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
+            Date endTime, Long idOfOrg) {
+        super(generateTime, generateDuration, print, startTime, endTime, idOfOrg);
+    }
+
+    public RegisterStampPaidReport() {}
+
+    @Override
+    public BasicReportForOrgJob createInstance() {
+        return new RegisterStampPaidReport();
+    }
+
+    @Override
+    public BasicReportJob.Builder createBuilder(String templateFilename) {
+        return new Builder(templateFilename);
+    }
+
+    @Override
+    public Logger getLogger() {
+        return logger;
+    }
+
+    @Override
+    public int getDefaultReportPeriod() {
+        return REPORT_PERIOD_PREV_MONTH;
+    }
+}

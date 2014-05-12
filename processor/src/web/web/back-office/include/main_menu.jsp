@@ -852,6 +852,14 @@
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
+    <rich:panelMenuGroup id="paidFoodGroupMenu" binding="#{mainPage.paidFoodGroupMenu.mainMenuComponent}"
+                         label="Платное питание" reRender="#{mainPage.eligibleToViewMealsReports}">
+        <a4j:support event="onclick" action="#{mainPage.showPaidFoodGroupMenu}" reRender="workspaceForm" />
+        <%--@elvariable id="registerStampPaidPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampPaidPage"--%>
+        <rich:panelMenuItem id="registerStampPaidReportMenuItem" binding="#{registerStampPaidPage.mainMenuComponent}"
+                            label="Реестр" action="#{registerStampPaidPage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
+
     <rich:panelMenuGroup id="paymentReportsGroupMenu" binding="#{mainPage.paymentReportsGroupMenu.mainMenuComponent}"
                          label="Отчеты по пополнениям" rendered="#{mainPage.eligibleToViewRefillReports}">
         <a4j:support event="onclick" action="#{mainPage.showPaymentReportsGroupMenu}" reRender="workspaceForm" />

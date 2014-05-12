@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.ClientReportItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem1;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
@@ -115,13 +116,61 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         return  (List<GoodItem>) query.list();
     }
 
-    /* получение карты по талонам*/
+    /* получаем список всех платников */
+    @SuppressWarnings("unchecked")
+    public List<GoodItem1> findAllGoodsPay(Long idOfOrg, Date startTime, Date endTime){
+        Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>();
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.DEFAULT);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.UNKNOWN);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.DAILY_SAMPLE);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.CORRECTION_TYPE);
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.PAY_PLAN);
+        String sql = "select distinct good.globalId as globalId, good.pathPart3 as pathPart3, "
+                + " good.pathPart4 as pathPart4,good.pathPart2 as pathPart2, good.pathPart1 as pathPart1, good.fullName as fullName "
+                + " , details.RPrice as price"
+                + " from OrderDetail details "
+                + " left join details.good good left join details.order ord left join ord.org o "
+                + " where ord.state=0 and details.state=0 and ord.orderType in :orderType and details.good is not null and o.idOfOrg=:idOfOrg and "
+                + " ord.createTime between :startDate and :endDate and "
+                + " details.menuType >= :mintype and details.menuType <=:maxtype order by fullName";
+        Query query = getSession().createQuery(sql);
+        query.setParameterList("orderType",orderTypeEnumTypeSet);
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("startDate",startTime);
+        query.setParameter("endDate", endTime);
+        query.setResultTransformer(Transformers.aliasToBean(GoodItem1.class));
+        return  (List<GoodItem1>) query.list();
+    }
+
+    /* получение карты по талонам */
     @SuppressWarnings("uncheked")
     public Map<Date, Long> findAllRegistryTalons(Long idOfOrg, Date startTime, Date endTime) {
         Criteria criteria = getSession().createCriteria(RegistryTalon.class);
         criteria.add(Restrictions.eq("orgOwner", idOfOrg));
         criteria.add(Restrictions.between("talonDate", startTime, endTime));
         criteria.add(Restrictions.eq("talonType", RegistryTalonType.Benefit_Plan));
+        List list = criteria.list();
+
+        Map<Date, Long> map = new HashMap<Date, Long>();
+        for (Object lst : list) {
+            RegistryTalon curr = (RegistryTalon) lst;
+            Calendar calendar = Calendar.getInstance(RuntimeContext.getInstance().getLocalTimeZone(null));
+            calendar.setTime(curr.getTalonDate());
+            CalendarUtils.truncateToDayOfMonth(calendar);
+            map.put(calendar.getTime(), curr.getNumber());
+        }
+        return map;
+    }
+
+    @SuppressWarnings("uncheked")
+    public Map<Date, Long> findAllRegistryTalonsPaid(Long idOfOrg, Date startTime, Date endTime) {
+        Criteria criteria = getSession().createCriteria(RegistryTalon.class);
+        criteria.add(Restrictions.eq("orgOwner", idOfOrg));
+        criteria.add(Restrictions.between("talonDate", startTime, endTime));
+        criteria.add(Restrictions.eq("talonType", RegistryTalonType.Pay_Plan));
         List list = criteria.list();
 
         Map<Date, Long> map = new HashMap<Date, Long>();

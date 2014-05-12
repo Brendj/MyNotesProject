@@ -293,6 +293,7 @@ public class MainPage {
     private final BasicWorkspacePage discountGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage goodRequestsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage budgetFoodGroupMenu = new BasicWorkspacePage();
+    private final BasicWorkspacePage paidFoodGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage paymentReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage activityReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage informReportsGroupMenu = new BasicWorkspacePage();
@@ -4981,6 +4982,10 @@ public class MainPage {
         return budgetFoodGroupMenu;
     }
 
+    public BasicWorkspacePage getPaidFoodGroupMenu() {
+        return paidFoodGroupMenu;
+    }
+
     public BasicWorkspacePage getRepositoryUtilityGroupMenu() {
         return repositoryUtilityGroupMenu;
     }
@@ -5005,6 +5010,12 @@ public class MainPage {
 
     public Object showBudgetFoodGroupMenu () {
         currentWorkspacePage = budgetFoodGroupMenu;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showPaidFoodGroupMenu () {
+        currentWorkspacePage = paidFoodGroupMenu;
         updateSelectedMainMenu();
         return null;
     }
