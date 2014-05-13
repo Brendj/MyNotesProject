@@ -38,19 +38,16 @@
 	<field name="price" class="java.lang.Long"/>
 	<field name="total" class="java.lang.Long"/>
 	<title>
-		<band splitType="Stretch"/>
-	</title>
-	<pageHeader>
-		<band height="34">
+		<band height="25" splitType="Stretch">
 			<textField>
-				<reportElement uuid="9fbd8069-3cb1-443d-b51d-47ad80924603" x="0" y="0" width="100" height="34"/>
+				<reportElement uuid="9fbd8069-3cb1-443d-b51d-47ad80924603" x="0" y="0" width="414" height="25"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="14"/>
 				</textElement>
 				<textFieldExpression><![CDATA[String.format("Реестр по платному  питанию")]]></textFieldExpression>
 			</textField>
 		</band>
-	</pageHeader>
+	</title>
 	<detail>
 		<band/>
 	</detail>
@@ -63,7 +60,7 @@
 	<summary>
 		<band height="45" splitType="Stretch">
 			<crosstab>
-				<reportElement uuid="c05f0635-bc65-44c7-a7bb-562e36a68d6b" style="table" mode="Transparent" x="0" y="0" width="70" height="45" backcolor="#EAF0F8"/>
+				<reportElement uuid="c05f0635-bc65-44c7-a7bb-562e36a68d6b" style="table" mode="Transparent" x="0" y="0" width="100" height="45" backcolor="#EAF0F8"/>
 				<crosstabHeaderCell>
 					<cellContents backcolor="#EAF0F8" mode="Transparent">
 						<staticText>
@@ -242,7 +239,7 @@
 				<measure name="priceMeasure" class="java.lang.Long">
 					<measureExpression><![CDATA[$F{price}]]></measureExpression>
 				</measure>
-				<measure name="totalM" class="java.lang.Long">
+				<measure name="totalM" class="java.lang.Long" calculation="Sum">
 					<measureExpression><![CDATA[$F{total}]]></measureExpression>
 				</measure>
 				<crosstabCell width="300" height="23">

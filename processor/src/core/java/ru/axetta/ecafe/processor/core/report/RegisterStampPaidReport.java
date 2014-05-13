@@ -6,7 +6,6 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
-import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem1;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampPaidReportItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -60,8 +59,8 @@ public class RegisterStampPaidReport extends BasicReportForOrgJob {
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, org, startTime, endTime, (Calendar) calendar.clone(), parameterMap));
             Date generateEndTime = new Date();
-            return new RegisterStampPaidReport(generateTime, generateEndTime.getTime() - generateTime.getTime(), jasperPrint,
-                    startTime, endTime, org.getIdOfOrg());
+            return new RegisterStampPaidReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
+                    jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
         private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime,
@@ -71,7 +70,7 @@ public class RegisterStampPaidReport extends BasicReportForOrgJob {
             OrderDetailsDAOService service = new OrderDetailsDAOService();
             service.setSession(session);
 
-            List<GoodItem1> allGoods = service.findAllGoodsPay(org.getIdOfOrg(), startTime, endTime);
+            List<GoodItem1> allGoods = service.findAllGoodsPaid(org.getIdOfOrg(), startTime, endTime);
             Map<Date, Long> numbers = service.findAllRegistryTalonsPaid(org.getIdOfOrg(), startTime, endTime);
 
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
@@ -85,53 +84,21 @@ public class RegisterStampPaidReport extends BasicReportForOrgJob {
                 if (allGoods.isEmpty()) {
                     RegisterStampPaidReportItem item = new RegisterStampPaidReportItem(emptyGoodItem,0L,date, time);
                     RegisterStampPaidReportItem total = new RegisterStampPaidReportItem(emptyGoodItem,0L,"Итого", CalendarUtils.addDays(endTime, 1));
-                    RegisterStampPaidReportItem allTotal = new RegisterStampPaidReportItem(emptyGoodItem,0L,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
-                    result.add(allTotal);
                     result.add(item);
                     result.add(total);
                 } else {
-                    for (GoodItem1 goodItem: allGoods) {
+                    for (GoodItem1 goodItem : allGoods) {
                         String number = numbers.get(time) == null ? "" : Long.toString(numbers.get(time));
-                        Long val = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
+                        Long val = service.buildRegisterStampBodyValuePaid(org.getIdOfOrg(), calendar.getTime(),
                                 goodItem.getFullName(), withOutActDiscrepancies);
                         RegisterStampPaidReportItem item = new RegisterStampPaidReportItem(goodItem,val,date,number, time);
                         RegisterStampPaidReportItem total = new RegisterStampPaidReportItem(goodItem,val,"Итого", CalendarUtils.addDays(endTime, 1));
-                        RegisterStampPaidReportItem allTotal = new RegisterStampPaidReportItem(goodItem,val,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
-                        result.add(allTotal);
                         result.add(item);
                         result.add(total);
                     }
                 }
                 calendar.add(Calendar.DATE, 1);
             }
-            if(allGoods.isEmpty()){
-                RegisterStampPaidReportItem dailySampleItem = new RegisterStampPaidReportItem(emptyGoodItem,0L,"Суточная проба", CalendarUtils.addDays(endTime, 2));
-                RegisterStampPaidReportItem allTotal = new RegisterStampPaidReportItem(emptyGoodItem,0L,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
-                result.add(allTotal);
-                result.add(dailySampleItem);
-            } else {
-                for (GoodItem1 goodItem: allGoods){
-                    Long val = service.buildRegisterStampDailySampleValue(org.getIdOfOrg(), startTime, endTime,
-                            goodItem.getFullName());
-                    RegisterStampPaidReportItem dailySampleItem = new RegisterStampPaidReportItem(goodItem,val,"Суточная проба", CalendarUtils.addDays(endTime, 2));
-                    RegisterStampPaidReportItem allTotal = new RegisterStampPaidReportItem(goodItem,val,"Всего кол-во:", CalendarUtils.addDays(endTime, 3));
-                    result.add(allTotal);
-                    result.add(dailySampleItem);
-                }
-            }
-            //RegisterStampPaidReportItem registerStampPaidReportItem = new RegisterStampPaidReportItem(emptyGoodItem, 0L, "", new Date(), 1L, 1L);
-            //registerStampPaidReportItem.setPrice(1L);
-            //registerStampPaidReportItem.setTotal(1L);
-            //registerStampPaidReportItem.setNumber("1");
-            //registerStampPaidReportItem.setDate("");
-            //registerStampPaidReportItem.setDateTime(new Date());
-            //registerStampPaidReportItem.setQty(1L);
-            //registerStampPaidReportItem.setLevel1("");
-            //registerStampPaidReportItem.setLevel2("");
-            //registerStampPaidReportItem.setLevel3("");
-            //registerStampPaidReportItem.setLevel4("");
-            //registerStampPaidReportItem.setDate("");
-            //result.add(registerStampPaidReportItem);
             return new JRBeanCollectionDataSource(result);
         }
     }
@@ -141,7 +108,8 @@ public class RegisterStampPaidReport extends BasicReportForOrgJob {
         super(generateTime, generateDuration, print, startTime, endTime, idOfOrg);
     }
 
-    public RegisterStampPaidReport() {}
+    public RegisterStampPaidReport() {
+    }
 
     @Override
     public BasicReportForOrgJob createInstance() {

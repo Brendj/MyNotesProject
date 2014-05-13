@@ -65,6 +65,38 @@ public class OrderDetailsDAOService extends AbstractDAOService {
     }
 
     @SuppressWarnings("unchecked")
+    public Long buildRegisterStampBodyValuePaid(Long idOfOrg, Date start, String fullname,
+            boolean includeActDiscrepancies) {
+        String sql = "select sum(orderdetail.qty) from cf_orders cforder" +
+                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
+                " and orderdetail.idoforder = cforder.idoforder" +
+                " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
+                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate>=:startDate and cforder.createddate<=:endDate and orderdetail.socdiscount>0 and"
+                +
+                " cforder.idoforg=:idoforg and good.fullname like '" + fullname + "' and " +
+                " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
+                " (cforder.ordertype=3 or (cforder.ordertype=8 " + (includeActDiscrepancies ? " "
+                : " and orderdetail.qty>=0 ") + " )) ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype", OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("startDate", start.getTime());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+        calendar.add(Calendar.DATE, 1);
+        long endTime = calendar.getTimeInMillis() - 1;
+        query.setParameter("endDate", endTime);
+        List list = query.list();
+
+        if (list == null || list.isEmpty() || list.get(0) == null) {
+            return 0L;
+        } else {
+            return new Long(list.get(0).toString());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
     public Long buildRegisterStampDailySampleValue(Long idOfOrg, Date start, Date end, String fullname) {
         String sql ="select sum(orderdetail.qty) from cf_orders cforder" +
                 " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
@@ -118,13 +150,8 @@ public class OrderDetailsDAOService extends AbstractDAOService {
 
     /* получаем список всех платников */
     @SuppressWarnings("unchecked")
-    public List<GoodItem1> findAllGoodsPay(Long idOfOrg, Date startTime, Date endTime){
+    public List<GoodItem1> findAllGoodsPaid(Long idOfOrg, Date startTime, Date endTime){
         Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>();
-        orderTypeEnumTypeSet.add(OrderTypeEnumType.DEFAULT);
-        orderTypeEnumTypeSet.add(OrderTypeEnumType.UNKNOWN);
-        orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN);
-        orderTypeEnumTypeSet.add(OrderTypeEnumType.DAILY_SAMPLE);
-        orderTypeEnumTypeSet.add(OrderTypeEnumType.CORRECTION_TYPE);
         orderTypeEnumTypeSet.add(OrderTypeEnumType.PAY_PLAN);
         String sql = "select distinct good.globalId as globalId, good.pathPart3 as pathPart3, "
                 + " good.pathPart4 as pathPart4,good.pathPart2 as pathPart2, good.pathPart1 as pathPart1, good.fullName as fullName "
