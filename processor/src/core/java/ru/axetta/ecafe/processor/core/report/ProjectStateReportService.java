@@ -495,12 +495,12 @@ public class ProjectStateReportService {
 
                 new SimpleType(
                           "select '' || EXTRACT(EPOCH FROM d) * 1000 as d, int8(sum(v) / 100) / 1000 as v "
-                        + "from (select regOrgSrc.rsum as v, date_trunc('day', to_timestamp(regOrgSrc.orderdate / 1000)) as d "
+                        + "from (select regOrgSrc.rsum as v, date_trunc('day', to_timestamp(regOrgSrc.createddate / 1000)) as d "
                         + "      from cf_orders regOrgSrc "
                         + REGION_SENSITIVE_JOIN + " "
-                        + "      where regOrgSrc.socdiscount=0 and regOrgSrc.orderdate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 "
+                        + "      where regOrgSrc.socdiscount=0 and regOrgSrc.createddate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 "
                         + REGION_SENSITIVE_CLAUSE + " "
-                        + "            and regOrgSrc.orderdate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000) as oo "
+                        + "            and regOrgSrc.createddate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000) as oo "
                         + "group by d", FISCAL_CHART_2_DATA).setIncremental(true),
 
                 new SimpleType(
@@ -532,11 +532,11 @@ public class ProjectStateReportService {
             for(int i=0; i<contragents.size(); i++) {
                 types[i] = new SimpleType(
                         "select '' || EXTRACT(EPOCH FROM d) * 1000 as d, int8(sum(v) / 100) / 1000 as v "
-                                + "from (select regOrgSrc.rsum as v, date_trunc('day', to_timestamp(regOrgSrc.orderdate / 1000)) as d "
+                                + "from (select regOrgSrc.rsum as v, date_trunc('day', to_timestamp(regOrgSrc.createddate / 1000)) as d "
                                 + "      from cf_orders regOrgSrc "
                                 + REGION_SENSITIVE_JOIN + " "
-                                + "      where regOrgSrc.socdiscount=0 and regOrgSrc.orderdate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and "
-                                + "            regOrgSrc.orderdate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 and "
+                                + "      where regOrgSrc.socdiscount=0 and regOrgSrc.createddate>=EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MINIMUM_DATE%') * 1000 and "
+                                + "            regOrgSrc.createddate<EXTRACT(EPOCH FROM TIMESTAMP WITH TIME ZONE '%MAXIMUM_DATE%') * 1000 and "
                                 + "            regOrgSrc.idofcontragent=" + contragents.get(i).getIdOfContragent() + " "
                                 + REGION_SENSITIVE_JOIN + " "
                                 + "      ) as oo "
