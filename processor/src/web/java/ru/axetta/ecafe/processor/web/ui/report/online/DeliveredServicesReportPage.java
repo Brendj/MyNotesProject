@@ -46,6 +46,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage
     private String htmlReport;
     private final CCAccountFilter contragentFilter = new CCAccountFilter();
     private final ContractFilter contractFilter= new ContractFilter();
+    protected static final int MILLIS_IN_DAY = 86400000;
 
     public String getPageFilename() {
         return "report/online/delivered_services_report";
@@ -111,6 +112,7 @@ public class DeliveredServicesReportPage extends OnlineReportPage
                 }
             }
             Session session = RuntimeContext.getInstance().createReportPersistenceSession();
+            fixDates();
             DeliveredServicesReport deliveredServicesReport = builder.build(session,startDate, endDate, localCalendar,contragentFilter.getContragent().getIdOfContragent(),
                     contractFilter.getContract().getIdOfContract());
 
@@ -158,10 +160,16 @@ public class DeliveredServicesReportPage extends OnlineReportPage
                 reportBuilder.setOrg(new BasicReportJob.OrgShortItem(org.getIdOfOrg(), org.getShortName(), org.getOfficialName()));
             }
         }
+        fixDates();
         this.deliveredServices = reportBuilder.build(session, startDate, endDate, localCalendar,
                                                     contragentFilter.getContragent().getIdOfContragent(),
                                                     contractFilter.getContract().getIdOfContract());
         htmlReport = deliveredServices.getHtmlReport();
     }
 
+    protected void fixDates() {
+        if(startDate.after(endDate)) {
+            startDate.setTime(endDate.getTime() - MILLIS_IN_DAY);
+        }
+    }
 }
