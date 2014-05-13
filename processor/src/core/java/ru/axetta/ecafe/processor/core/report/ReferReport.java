@@ -99,9 +99,6 @@ public class ReferReport extends BasicReportForAllOrgJob {
         }
 
         public ReferReport doBuild(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
-            if(org == null) {
-                throw new IllegalArgumentException("Не указана организация");
-            }
             if(startTime == null || endTime == null) {
                 throw new IllegalArgumentException("Не задан период");
             }
@@ -118,20 +115,24 @@ public class ReferReport extends BasicReportForAllOrgJob {
             parameterMap.put("year", calendar.get(Calendar.YEAR));*/
             parameterMap.put("startDate", DailyReferReport.dailyItemsFormat.format(startTime));
             parameterMap.put("endDate", DailyReferReport.dailyItemsFormat.format(endTime));
-            parameterMap.put("orgName", org.getShortName());
             parameterMap.put("SUBREPORT_DIR", RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath());
+            Object o = reportProperties.getProperty("region");
+            if(org == null && o == null) {
+                throw new IllegalArgumentException("Не указана организация или регион");
+            }
+            parameterMap.put("orgName", org != null ? org.getShortName() : (String) o);
 
 
             //  Получение рабочих и выходных дней
             PeriodResult periodResult = new PeriodResult();
             Date generateEndTime = new Date();
-            int counts [] = getDaysCount(session, org.getIdOfOrg(), startTime, endTime);
+            int counts [] = getDaysCount(session, org == null ? null : org.getIdOfOrg(), startTime, endTime);
             int workDaysCount = counts [0];
             int weekendsCount = counts [1];
             //  Загрузка данных из БД
-            List<DailyReferReportItem> items = findReferItems(session, startTime, endTime);
+            List<DailyReferReportItem> items = findReferItems(session, startTime, endTime, o != null ? (String) o : null);
             List<String> categories = DAOUtils.getDiscountRuleSubcategories(session);                   //  Данные по дням
-            DailyReferReportItem samples [] = Builder.getSampleItems(session, org, startTime, endTime);    //  Хранится 2 объекта с данными по пробе
+            DailyReferReportItem samples [] = Builder.getSampleItems(session, org, startTime, endTime, o != null ? (String) o : null);    //  Хранится 2 объекта с данными по пробе
             //  Соединение всего вместе
             List<List<ReferReportItem>> total = getTotalItems(workDaysCount, weekendsCount, items, categories,
                     samples[0], samples[1], periodResult);
@@ -174,14 +175,14 @@ public class ReferReport extends BasicReportForAllOrgJob {
 
         public static DailyReferReportItem[] getSampleItems(Session session, OrgShortItem org,
                                                             Date startTime, Date endTime,
-                                                            Set<String> groups, boolean isOverallReport) {
+                                                            Set<String> groups, boolean isOverallReport, String region) {
             Map<String, DailyReferReportItem> items = new HashMap<String, DailyReferReportItem>();
             for(String g : groups) {
                 DailyReferReportItem i = new DailyReferReportItem(g);
                 i.setGoodName(g);
                 items.put(g, i);
             }
-            List res = executeSampleItemsQuery(session, org, startTime, endTime);
+            List res = executeSampleItemsQuery(session, org, startTime, endTime, region);
             Calendar cal = new GregorianCalendar();
             for (Object entry : res) {
                 Object e[] = (Object[]) entry;
@@ -223,9 +224,9 @@ public class ReferReport extends BasicReportForAllOrgJob {
         }
 
         public static DailyReferReportItem[] getSampleItems(Session session, OrgShortItem org,
-                                                            Date startTime, Date endTime) {
+                                                            Date startTime, Date endTime, String region) {
             List<SampleItem> sampleItems = new ArrayList<SampleItem>();
-            List res = executeSampleItemsQuery(session, org, startTime, endTime);
+            List res = executeSampleItemsQuery(session, org, startTime, endTime, region);
             Calendar cal = new GregorianCalendar();
             for (Object entry : res) {
                 Object e[] = (Object[]) entry;
@@ -288,18 +289,28 @@ public class ReferReport extends BasicReportForAllOrgJob {
         }
 
         protected static List executeSampleItemsQuery(Session session, OrgShortItem org,
-                                                Date startTime, Date endTime) {
+                                                Date startTime, Date endTime, String region) {
+            String orgJoin = "";
+            String regionClause = "";
+            String orgClause = "";
+            if(org == null) {
+                orgJoin = " join cf_orgs on cf_orgs.idoforg=cf_orders.idoforg ";
+                regionClause = " cf_orgs.district='" + region + "' and ";
+            } else {
+                orgClause = " cf_orders.idoforg=" + org.getIdOfOrg() + " and ";
+            }
             Query query = session.createSQLQuery(
                     "select cast (cf_orderdetails.socdiscount as decimal) / 100 as price, cf_orders.createddate, cf_goods.nameofgood "
                             + "from cf_orders "
                             + "join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
                             + "join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
-                            + "where cf_orders.socdiscount<>0 and cf_orders.idoforg=:idoforg and "
+                            + orgJoin
+                            + "where cf_orders.socdiscount<>0 and " + orgClause + regionClause
                             + "  cf_orders.createddate between :start and :end "
                             + "  and cf_orders.ordertype=:ordertype and"
                             + "  cf_orders.state=0 and cf_orderdetails.state=0"
                             + "order by cf_goods.nameofgood, cf_orders.createddate");
-            query.setLong("idoforg", org.getIdOfOrg());
+            //query.setLong("idoforg", org.getIdOfOrg());
             query.setLong("start", startTime.getTime());
             query.setLong("end", endTime.getTime());
             query.setInteger("ordertype", OrderTypeEnumType.DAILY_SAMPLE.ordinal());
@@ -307,10 +318,10 @@ public class ReferReport extends BasicReportForAllOrgJob {
             return res;
         }
         
-        private List<DailyReferReportItem> findReferItems(Session session, Date startTime, Date endTime) {
+        private List<DailyReferReportItem> findReferItems(Session session, Date startTime, Date endTime, String region) {
             List<DailyReferReportItem> result = new ArrayList<DailyReferReportItem>();
-            List res = DailyReferReport.getReportData(session, org.getIdOfOrg(), startTime.getTime(), endTime.getTime(),
-                                                      " and cf_discountrules.subcategory <> ''");
+            List res = DailyReferReport.getReportData(session, org == null ? null : org.getIdOfOrg(), startTime.getTime(), endTime.getTime(),
+                                                      " and cf_discountrules.subcategory <> ''", region);
                         //"and cf_discountrules.subcategory = 'Многодетные 5-11 кл.(завтрак+обед)' and nameofgood='Обед 5-11' ");
             for (Object entry : res) {
                 Object e[]            = (Object[]) entry;
@@ -495,18 +506,22 @@ public class ReferReport extends BasicReportForAllOrgJob {
         return result;
     }
 
-    private static final int [] getDaysCount(Session session, long idoforg, Date startTime, Date endTime) {
+    private static final int [] getDaysCount(Session session, Long idoforg, Date startTime, Date endTime) {
         int count [] = new int[] {0, 0};    //  0 - будние дние; 1 - выхоные
         Calendar day = getClearCalendar(startTime.getTime());
+        String orgRestrict = "";
+        if(idoforg != null) {
+            orgRestrict = " cf_orders.idoforg=" + idoforg + " and ";
+        }
         Query query = session.createSQLQuery(
                 "select int8(EXTRACT(EPOCH FROM d) * 1000) "
                 + "from (select distinct(date_trunc('day', to_timestamp(cf_orders.createddate / 1000))) as d "
                 + "      from cf_orders "
                 + "      join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
-                + "      where cf_orderdetails.socdiscount<>0 and cf_orders.idoforg=:idoforg and cf_orders.state=0 and"
+                + "      where cf_orderdetails.socdiscount<>0 and cf_orders.state=0 and "+ orgRestrict
                 + "            cf_orders.createddate between :start and :end) as dates "
                 + "order by 1");
-        query.setLong("idoforg", idoforg);
+        //query.setLong("idoforg", idoforg);
         query.setLong("start", startTime.getTime());
         query.setLong("end", endTime.getTime());
         List<BigInteger> dates = (List<BigInteger>) query.list();

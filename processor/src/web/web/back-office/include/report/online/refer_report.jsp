@@ -37,6 +37,11 @@
                                    styleClass="command-link" style="width: 25px;" />
                 <h:outputText styleClass="output-text" escape="true" value=" {#{referReportPage.filter}}" />
             </h:panelGroup>
+
+            <h:outputText escape="true" value="Регион" styleClass="output-text" />
+            <h:selectOneMenu id="regionsList" value="#{referReportPage.region}" style="width:325px;" >
+                <f:selectItems value="#{referReportPage.regions}"/>
+            </h:selectOneMenu>
         </h:panelGrid>
 
         <rich:tabPanel style="width: 500px;" switchType="client">

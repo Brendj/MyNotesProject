@@ -1482,4 +1482,9 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         List list = criteria.list();
         return list.size()>0;
     }
+
+    public List<String> getRegions() {
+        Session session = (Session) entityManager.getDelegate();
+        return DAOUtils.getRegions(session);
+    }
 }

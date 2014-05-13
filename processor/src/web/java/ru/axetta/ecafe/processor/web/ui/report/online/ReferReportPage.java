@@ -51,6 +51,7 @@ public class ReferReportPage extends OnlineReportPage {
     private ReferReport monthlyReport;
     private DailyReferReport dailyReport;
     private String category;
+    private String region;
     private List<String> categories;
     private Boolean showDailySales = false;
 
@@ -72,6 +73,24 @@ public class ReferReportPage extends OnlineReportPage {
 
     public void setEnd(Date end) {
         this.end = end;
+    }
+
+    public List<SelectItem> getRegions() {
+        List<String> regions = DAOService.getInstance().getRegions();
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        items.add(new SelectItem(""));
+        for(String reg : regions) {
+            items.add(new SelectItem(reg));
+        }
+        return items;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
     }
 
     public List<SelectItem> getCategories() {
@@ -236,6 +255,8 @@ public class ReferReportPage extends OnlineReportPage {
         } else {
             reportBuilder = new ReferReport.Builder();
         }
+        Properties props = addRegionProperty(null, region);
+        reportBuilder.setReportProperties(props);
         reportBuilder.setOrg(orgItem);
         try {
             monthlyReport = reportBuilder.build(session, start, end, cal);
@@ -255,6 +276,7 @@ public class ReferReportPage extends OnlineReportPage {
         Properties props = new Properties();
         props.setProperty(DailyReferReport.SUBCATEGORY_PARAMETER, category);
         props.setProperty(DailyReferReport.SHOW_DAILY_SALES_PARAMETER, "" + showDailySales);
+        addRegionProperty(props, region);
         reportBuilder.setReportProperties(props);
         reportBuilder.setOrg(orgItem);
         try {
@@ -337,5 +359,15 @@ public class ReferReportPage extends OnlineReportPage {
 
     public String getHtmlReport() {
         return htmlReport;
+    }
+
+    public Properties addRegionProperty(Properties props, String region) {
+        if(props == null) {
+            props = new Properties();
+        }
+        if(region != null && region.trim().length() > 0) {
+            props.put("region", region);
+        }
+        return props;
     }
 }

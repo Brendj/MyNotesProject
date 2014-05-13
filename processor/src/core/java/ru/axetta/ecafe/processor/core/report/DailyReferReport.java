@@ -96,9 +96,6 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
         }
 
         public DailyReferReport doBuild(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
-            if(org == null) {
-                throw new IllegalArgumentException("Не указана организация");
-            }
             if(startTime == null || endTime == null) {
                 throw new IllegalArgumentException("Не задан период");
             }
@@ -130,13 +127,17 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             parameterMap.put("year", calendar.get(Calendar.YEAR));*/
             parameterMap.put("startDate", dailyItemsFormat.format(startTime));
             parameterMap.put("endDate", dailyItemsFormat.format(endTime));
-            parameterMap.put("orgName", org.getShortName());
+            Object o = reportProperties.getProperty("region");
+            if(org == null && o == null) {
+                throw new IllegalArgumentException("Не указана организация или регион");
+            }
+            parameterMap.put("orgName", org == null ? (String) o : org.getShortName());
 
 
             Date generateEndTime = new Date();
-            List<DailyReferReportItem> items = findDailyReferItems(session, startTime, endTime, category);
+            List<DailyReferReportItem> items = findDailyReferItems(session, startTime, endTime, category, o != null ? (String) o : null);
             if(showDailySample) {
-                addSamples(session, org, startTime, endTime, items, category);
+                addSamples(session, org, startTime, endTime, items, category, o != null ? (String) o : null);
             }
             calculateOverall(items, isOverallReport(category));
             //  После получения всего списка, передаем итоговую сумму в кач-ве параметра
@@ -230,7 +231,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
 
         protected DailyReferReportItem[] addSamples(Session session, OrgShortItem org,
                                                     Date startTime, Date endTime,
-                                                    List<DailyReferReportItem> items, String category) {
+                                                    List<DailyReferReportItem> items, String category, String region) {
             boolean isOverallReport = isOverallReport(category);
             Set<String> groups = new HashSet<String>();
             for(DailyReferReportItem i : items) {
@@ -242,7 +243,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 }
                 groups.add(grp);
             }
-            ReferReport.DailyReferReportItem samples [] = ReferReport.Builder.getSampleItems(session, org, startTime, endTime, groups, isOverallReport);
+            ReferReport.DailyReferReportItem samples [] = ReferReport.Builder.getSampleItems(session, org, startTime, endTime, groups, isOverallReport, region);
 
             String name = category;
             if (category == null || category.length() < 1) {
@@ -275,7 +276,7 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
             return new JRBeanCollectionDataSource(items);
         }
 
-        private List<DailyReferReportItem> findDailyReferItems(Session session, Date startTime, Date endTime, String category) {
+        private List<DailyReferReportItem> findDailyReferItems(Session session, Date startTime, Date endTime, String category, String region) {
             String categoryClause = "";
             if (category != null && category.length() > 0) {
                 categoryClause = " and cf_discountrules.subcategory = '" + category + "' ";
@@ -285,8 +286,8 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
 
             Map<String, DailyReferReportItem> totals = new HashMap<String, DailyReferReportItem>();
             List<DailyReferReportItem> result = new ArrayList<DailyReferReportItem>();
-            List res = getReportData(session, org.getIdOfOrg(), startTime.getTime(), endTime.getTime(),
-                                     categoryClause);
+            List res = getReportData(session, org == null ? null : org.getIdOfOrg(), startTime.getTime(), endTime.getTime(),
+                                     categoryClause, region);
             for (Object entry : res) {
                 Object e[]            = (Object[]) entry;
                 String name           = (String) e[0];
@@ -323,16 +324,24 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
         }
     }
 
-    public static final List getReportData(Session session, long idoforg, long start, long end,
-            String categoryClause) {
+    public static final List getReportData(Session session, Long idoforg, long start, long end,
+            String categoryClause, String region) {
         return getReportData(session, idoforg, start, end, categoryClause,
-                             " and ordertype<>" + OrderTypeEnumType.DAILY_SAMPLE.ordinal());
+                             " and ordertype<>" + OrderTypeEnumType.DAILY_SAMPLE.ordinal(), region);
     }
     
-    public static final List getReportData(Session session, long idoforg, long start, long end, 
-                                           String categoryClause, String orderTypeClause) {
+    public static final List getReportData(Session session, Long idoforg, long start, long end,
+                                           String categoryClause, String orderTypeClause, String region) {
         if(categoryClause.length() < 1) {
             categoryClause = " and cf_discountrules.subcategory<>'' ";
+        }
+        String regionClause = "";
+        if(region != null && region.trim().length() > 0) {
+            regionClause = " and cf_orgs.district='" + region + "' ";
+        }
+        String orgClause = "";
+        if(idoforg != null) {
+            orgClause = " cf_orgs.idoforg=" + idoforg + " and ";
         }
         String sql =
                   "select subcategory, nameofgood, "
@@ -349,15 +358,16 @@ public class DailyReferReport extends BasicReportForAllOrgJob {
                 + "     join cf_orderdetails on cf_orders.idoforder=cf_orderdetails.idoforder and cf_orders.idoforg=cf_orderdetails.idoforg "
                 + "     join cf_goods on cf_orderdetails.idofgood=cf_goods.idofgood "
                 + "     join cf_discountrules on cf_discountrules.idofrule=cf_orderdetails.idofrule "
-                + "     where cf_orderdetails.socdiscount<>0 and cf_orgs.idoforg=:idoforg and "
+                + "     where cf_orderdetails.socdiscount<>0 and " + orgClause
                 + "           cf_orderdetails.state=0 and cf_orders.state=0 and cf_orders.createddate between :start and :end "
+                + "           " + regionClause
                 + "           " + orderTypeClause
                 + "           " + categoryClause +
                           ") as data "
                 + "group by subcategory, nameofgood, d, price "
                 + "order by 1, 2";
         Query query = session.createSQLQuery(sql);
-        query.setLong("idoforg", idoforg);
+        //query.setLong("idoforg", idoforg);
         query.setLong("start", start);
         query.setLong("end", end);
         return query.list();
