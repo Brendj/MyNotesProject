@@ -39,7 +39,9 @@ public class RegisterStampPaidReportItem {
         this.number = number;
         this.dateTime = dateTime;
         this.price = goodItem.getPrice();
-        this.total = goodItem.getPrice()*qty;
+        if (goodItem.getPrice() != null) {
+            this.total = goodItem.getPrice() * qty;
+        }
     }
 
     public Long getPrice() {
