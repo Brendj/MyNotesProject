@@ -171,6 +171,35 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         List goodRequestPositionList = goodRequestPositionCriteria.list();
         Date  beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
         Date  endDate = CalendarUtils.truncateToDayOfMonth(endTime);
+        List<GoodRequestItem> goodRequestItems = new ArrayList<GoodRequestItem>();
+        //Map<GoodRequestItem, GoodRequestItem> goodRequestItemHashMap = new HashMap<GoodRequestItem, GoodRequestItem>();
+        for (Object obj: goodRequestPositionList){
+            GoodRequestPosition position = (GoodRequestPosition) obj;
+            Date doneDate = CalendarUtils.truncateToDayOfMonth(position.getGoodRequest().getDoneDate());
+            long idoforg = position.getOrgOwner();
+            long totalCount = (position.getTotalCount()==null?0L:position.getTotalCount());
+            long dailySampleCount = (position.getDailySampleCount()==null?0L:position.getDailySampleCount());
+            long count = (totalCount-dailySampleCount)/1000L;
+            String fullname = position.getGood().getFullName();
+            String part3 = position.getGood().getPathPart3();
+            //GoodRequestItem item = goodRequestItemHashMap.get(new GoodRequestItem(idoforg, doneDate, fullname));
+            GoodRequestItem requestItem = new GoodRequestItem(idoforg, doneDate, part3);
+            int index = goodRequestItems.indexOf(requestItem);
+            if(index>=0){
+                requestItem = goodRequestItems.get(index);
+                requestItem.addGoodCount(fullname, count);
+                goodRequestItems.set(index, requestItem);
+            } else {
+                requestItem.addGoodCount(fullname, count);
+                goodRequestItems.add(requestItem);
+            }
+            //OrgRequestCountItem item = orgRequestCountItemMap.get(new OrgRequestCountItem(position.getOrgOwner(), doneDate));
+            //String pathPart4 = position.getGood().getPathPart4();
+            //item.addCount(position.getTotalCount()/1000L, pathPart4);
+
+        }
+
+
         Map<OrgRequestCountItem, OrgRequestCountItem> orgRequestCountItemMap = new HashMap<OrgRequestCountItem, OrgRequestCountItem>();
         for (long id: orgItems.keySet()){
             while (beginDate.getTime() <= endDate.getTime()) {
@@ -178,14 +207,24 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
                 orgRequestCountItemMap.put(item, item);
                 beginDate = CalendarUtils.addDays(beginDate, 1);
             }
+            beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
         }
-        for (Object obj: goodRequestPositionList){
-            GoodRequestPosition position = (GoodRequestPosition) obj;
-            Date doneDate = CalendarUtils.truncateToDayOfMonth(position.getGoodRequest().getDoneDate());
-            OrgRequestCountItem item = orgRequestCountItemMap.get(new OrgRequestCountItem(position.getOrgOwner(), doneDate));
-            String pathPart4 = position.getGood().getPathPart4();
-            item.addCount(position.getTotalCount()/1000L, pathPart4);
+
+        for (GoodRequestItem position: goodRequestItems){
+            //GoodRequestPosition position = (GoodRequestPosition) obj;
+            OrgRequestCountItem item = orgRequestCountItemMap.get(new OrgRequestCountItem(position.getIdOfOrg(), position.getDoneDate()));
+            item.setTotalCount(item.getTotalCount()+position.getMaxValue());
+            //String pathPart4 = position.getGood().getPathPart4();
+            //item.addCount(position.getTotalCount()/1000L, pathPart4);
         }
+
+        //for (Object obj: g+oodRequestPositionList){
+        //    GoodRequestPosition position = (GoodRequestPosition) obj;
+        //    Date doneDate = CalendarUtils.truncateToDayOfMonth(position.getGoodRequest().getDoneDate());
+        //    OrgRequestCountItem item = orgRequestCountItemMap.get(new OrgRequestCountItem(position.getOrgOwner(), doneDate));
+        //    //String pathPart4 = position.getGood().getPathPart4();
+        //    //item.addCount(position.getTotalCount()/1000L, pathPart4);
+        //}
 
 
         final ArrayList<Long> orgs = new ArrayList<Long>(orgItems.keySet());
@@ -199,7 +238,7 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
                 + " join cf_menuexchangerules on cf_menuexchangerules.idofdestorg=cf_orders.idoforg "
                 + " WHERE cf_orders.createddate >= :startDate AND cf_orders.createddate <= :endDate and "
                 + " cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
-                + " cf_clients.discountmode = 3 and "  /* берем только льготников */
+                //+ " cf_clients.discountmode = 3 and "  /* берем только льготников */
                 + " cf_orders.ordertype in (4, 6) and cf_orders.state=0 and "/* смотрим плану льготного питания */
                 + " cf_orders.state = 0 and "  /* Учитываем только пробитые заказы */
                 + " cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS order_data "
@@ -245,7 +284,7 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
                 + " join cf_menuexchangerules on cf_menuexchangerules.idofdestorg=cf_orders.idoforg "
                 + " WHERE cf_orders.createddate >= :startDate AND cf_orders.createddate <= :endDate and "
                 + " cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
-                + " cf_clients.discountmode = 3 and "  /* берем только льготников */
+                //+ " cf_clients.discountmode = 3 and "  /* берем только льготников */
                 + " cf_orders.ordertype = 6 and "/* План льготного питания, резерв */
                 + " cf_orders.state = 0 and "/* Учитываем только пробитые заказы */
                 + " cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS order_data "
@@ -290,10 +329,11 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
                 final Item e = new Item();
                 e.fillOrgInfo(orgItem);
                 OrgRequestCountItem orgRequestCountItem =orgRequestCountItemMap.get(new OrgRequestCountItem(id, beginDate));
-                if(orgRequestCountItem==null || orgRequestCountItem.isEmptyComplex()){
+                if(orgRequestCountItem==null /*|| orgRequestCountItem.isEmptyComplex()*/){
                     e.setRequestCount(0L);
                 } else {
-                    e.setRequestCount(orgRequestCountItem.getRequestCount());
+                    //e.setRequestCount(orgRequestCountItem.getRequestCount());
+                    e.setRequestCount(orgRequestCountItem.getTotalCount());
                 }
                 if(dateOrderCountItemMap!=null){
                     OrderCountItem item = dateOrderCountItemMap.get(beginDate);
@@ -330,6 +370,158 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         return new DiscrepanciesOnOrdersAndAttendanceReport(items);
     }
 
+    protected static class GoodRequestItem{
+        private long idOfOrg;
+        private Date doneDate;
+        private String pathPart3;
+        private Map<String, Long> nameCountMap = new HashMap<String, Long>();
+
+        public GoodRequestItem(long idOfOrg, Date doneDate, String pathPart3) {
+            this.idOfOrg = idOfOrg;
+            this.doneDate = doneDate;
+            this.pathPart3 = pathPart3;
+        }
+
+        public void addGoodCount(String fullName, Long count){
+            Long totalCount = nameCountMap.get(fullName);
+            if(totalCount!=null){
+                totalCount+=count;
+            } else {
+                nameCountMap.put(fullName, count);
+            }
+        }
+
+        public long getMaxValue(){
+            long max = 0L;
+            for (long count: nameCountMap.values()){
+                max = Math.max(max, count);
+            }
+            return max;
+        }
+
+        public long getIdOfOrg() {
+            return idOfOrg;
+        }
+
+        public void setIdOfOrg(long idOfOrg) {
+            this.idOfOrg = idOfOrg;
+        }
+
+        public Date getDoneDate() {
+            return doneDate;
+        }
+
+        public void setDoneDate(Date doneDate) {
+            this.doneDate = doneDate;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            GoodRequestItem item = (GoodRequestItem) o;
+
+            if (idOfOrg != item.idOfOrg) {
+                return false;
+            }
+            if (!doneDate.equals(item.doneDate)) {
+                return false;
+            }
+            if (!pathPart3.equals(item.pathPart3)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = (int) (idOfOrg ^ (idOfOrg >>> 32));
+            result = 31 * result + doneDate.hashCode();
+            result = 31 * result + pathPart3.hashCode();
+            return result;
+        }
+    }
+
+    protected static class OrgGoodRequestCountItem{
+        private long idOfOrg;
+        private Date doneDate;
+        private String pathPart3;
+
+        public OrgGoodRequestCountItem(long idOfOrg, Date doneDate) {
+            this.idOfOrg = idOfOrg;
+            this.doneDate = doneDate;
+        }
+
+        public OrgGoodRequestCountItem(long idOfOrg, Date doneDate, String pathPart3) {
+            this.idOfOrg = idOfOrg;
+            this.doneDate = doneDate;
+            this.pathPart3 = pathPart3;
+        }
+
+        public long getIdOfOrg() {
+            return idOfOrg;
+        }
+
+        public void setIdOfOrg(long idOfOrg) {
+            this.idOfOrg = idOfOrg;
+        }
+
+        public Date getDoneDate() {
+            return doneDate;
+        }
+
+        public void setDoneDate(Date doneDate) {
+            this.doneDate = doneDate;
+        }
+
+        public String getPathPart3() {
+            return pathPart3;
+        }
+
+        public void setPathPart3(String pathPart3) {
+            this.pathPart3 = pathPart3;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            OrgGoodRequestCountItem that = (OrgGoodRequestCountItem) o;
+
+            if (idOfOrg != that.idOfOrg) {
+                return false;
+            }
+            if (!doneDate.equals(that.doneDate)) {
+                return false;
+            }
+            if (!pathPart3.equals(that.pathPart3)) {
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = (int) (idOfOrg ^ (idOfOrg >>> 32));
+            result = 31 * result + doneDate.hashCode();
+            result = 31 * result + pathPart3.hashCode();
+            return result;
+        }
+    }
+
+
     protected static class OrgRequestCountItem {
         private long idOfOrg;
         private Date doneDate;
@@ -339,6 +531,10 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         public OrgRequestCountItem(long idOfOrg, Date doneDate) {
             this.idOfOrg = idOfOrg;
             this.doneDate = doneDate;
+        }
+
+        public void setTotalCount(long totalCount) {
+            this.totalCount = totalCount;
         }
 
         public void addCount(long count, String pathPart4){
