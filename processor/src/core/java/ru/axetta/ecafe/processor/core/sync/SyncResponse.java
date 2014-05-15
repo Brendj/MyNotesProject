@@ -985,6 +985,7 @@ public class SyncResponse {
             private String categoryDiscounts;
             private Boolean operationor;
             private String complexesMap;
+            private String subCategory;
 
             public String getComplexesMap() {
                 return complexesMap;
@@ -1028,28 +1029,7 @@ public class SyncResponse {
                 this.priority = discountRule.getPriority();
                 this.operationor = discountRule.getOperationOr();
                 this.complexesMap = discountRule.getComplexesMap();
-            }
-
-
-            public DCRI(long idOfRule, String description, String categoryDiscounts, int complex0, int complex1,
-                    int complex2, int complex3, int complex4, int complex5, int complex6, int complex7, int complex8,
-                    int complex9, int priority, Boolean operationor, String complexesMap) {
-                this.idOfRule = idOfRule;
-                this.description = description;
-                this.categoryDiscounts = categoryDiscounts;
-                this.complex0 = complex0;
-                this.complex1 = complex1;
-                this.complex2 = complex2;
-                this.complex3 = complex3;
-                this.complex4 = complex4;
-                this.complex5 = complex5;
-                this.complex6 = complex6;
-                this.complex7 = complex7;
-                this.complex8 = complex8;
-                this.complex9 = complex9;
-                this.priority = priority;
-                this.operationor = operationor;
-                this.complexesMap = complexesMap;
+                this.subCategory = discountRule.getSubCategory();
             }
 
             public long getIdOfRule() {
@@ -1100,6 +1080,10 @@ public class SyncResponse {
                 return complex9;
             }
 
+            public String getSubCategory() {
+                return subCategory;
+            }
+
             public Element toElement(Document document) throws Exception {
                 Element element = document.createElement("DCRI");
                 element.setAttribute("IdOfRule", Long.toString(this.idOfRule));
@@ -1120,6 +1104,7 @@ public class SyncResponse {
                 if(StringUtils.isNotEmpty(complexesMap)){
                     element.setAttribute("ComplexesMap", this.complexesMap);
                 }
+                element.setAttribute("SubCategory", this.subCategory);
                 return element;
             }
 
@@ -1130,7 +1115,7 @@ public class SyncResponse {
                         + ", complex2=" + complex2 + ", complex3=" + complex3 + ", complex4=" + complex4 + ", complex5="
                         + complex5 + ", complex6=" + complex6 + ", complex7=" + complex7 + ", complex8=" + complex8
                         + ", complex9=" + complex9 + ", priority=" + priority +", operationor=" +operationor
-                        +", complexesMap=\'" +complexesMap  +'\'' +'}';
+                        +", complexesMap=\'" +complexesMap  +'\'' + ", subCategory='" + subCategory + '\'' +'}';
             }
         }
 
