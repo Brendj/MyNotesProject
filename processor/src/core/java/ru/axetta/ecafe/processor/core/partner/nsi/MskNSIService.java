@@ -6,8 +6,7 @@ package ru.axetta.ecafe.processor.core.partner.nsi;
 
 import com.sun.xml.internal.ws.client.BindingProviderProperties;
 import com.sun.xml.internal.ws.developer.JAXWSProperties;
-import generated.nsiws2.com.rstyle.nsi.beans.Context;
-import generated.nsiws2.com.rstyle.nsi.beans.QueryResult;
+import generated.nsiws2.com.rstyle.nsi.beans.*;
 import generated.nsiws2.com.rstyle.nsi.services.NSIService;
 import generated.nsiws2.com.rstyle.nsi.services.NSIServiceService;
 import generated.nsiws2.com.rstyle.nsi.services.in.NSIRequestType;
@@ -45,6 +44,7 @@ import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;*/
 @Scope("singleton")
 public class MskNSIService {
 
+    public static final String TYPE_STRING = "STRING";
     private static final Logger logger = LoggerFactory.getLogger(MskNSIService.class);
     public static final String COMMENT_MANUAL_IMPORT = "{Ручной импорт из Реестров}";
     public static final String COMMENT_AUTO_IMPORT = "{Импорт из Реестров %s}";
@@ -113,11 +113,11 @@ public class MskNSIService {
         nsiService = nsiServicePort.getNSIService();
     }
 
-    public List<QueryResult> executeQuery(String queryText) throws Exception {
-        return executeQuery(queryText, -1);
+    public List<Item> executeQuery(SearchPredicateInfo searchPredicateInfo) throws Exception {
+        return executeQuery(searchPredicateInfo, -1);
     }
 
-    public List<QueryResult> executeQuery(String queryText, int importIteration) throws Exception {
+    public List<Item> executeQuery(SearchPredicateInfo searchPredicateInfo, int importIteration) throws Exception {
         init();
 
         String url = Config.getUrl();
@@ -160,17 +160,18 @@ public class MskNSIService {
         request.getMessageData().getAppData().getContext().setUser(Config.getUser());
         request.getMessageData().getAppData().getContext().setPassword(Config.getPassword());
         request.getMessageData().getAppData().getContext().setCompany(Config.getCompany());
+        buildSearchPredicate(request, searchPredicateInfo);
         if (importIteration >= 0) {
             request.getMessageData().getAppData().setFrom(new Long(1 + SERVICE_ROWS_LIMIT * (importIteration - 1)));
             request.getMessageData().getAppData().setLimit(SERVICE_ROWS_LIMIT);
         }
-        request.getMessageData().getAppData().setQuery(queryText);
+        //request.getMessageData().getAppData().setQuery(queryText);
 
-        NSIResponseType response = nsiService.getQueryResults(request);
+        NSIResponseType response = nsiService.searchItemsInCatalog(request); //.getQueryResults(request);
         if (response.getMessageData().getAppData() != null
                 && response.getMessageData().getAppData().getGeneralResponse() != null &&
                 response.getMessageData().getAppData().getGeneralResponse().getQueryResult() != null) {
-            return response.getMessageData().getAppData().getGeneralResponse().getQueryResult();
+            return response.getMessageData().getAppData().getGeneralResponse().getItem();
         } else {
             JAXBContext jc = JAXBContext.newInstance(NSIResponseType.class.getPackage().getName());
             Marshaller m = jc.createMarshaller();
@@ -197,7 +198,7 @@ public class MskNSIService {
        "item['РОУ XML/Статус записи']!='Удаленный' and "+
        "item['РОУ XML/Краткое наименование учреждения'] like '"+orgGuid+"'
         */
-        String query = "select \n" + "item['РОУ XML/GUID Образовательного учреждения'],\n"
+        /*String query = "select \n" + "item['РОУ XML/GUID Образовательного учреждения'],\n"
                 + "item['РОУ XML/Краткое наименование учреждения'],\n" + "item['РОУ XML/Официальный адрес'],\n"
                 + "item['РОУ XML/Дата изменения (число)']\n"
                 + "from catalog('Реестр образовательных учреждений') where \n"
@@ -207,16 +208,45 @@ public class MskNSIService {
         }
         if (StringUtils.isNotEmpty(orgGuid)) {
             query += " and item['РОУ XML/GUID Образовательного учреждения']='" + orgGuid + "'";
+        }*/
+
+
+        SearchPredicateInfo searchPredicateInfo = new SearchPredicateInfo();
+        searchPredicateInfo.setCatalogName("Реестр образовательных учреждений");
+        if (!StringUtils.isBlank(orgName)) {
+            SearchPredicate search = new SearchPredicate();
+            search.setAttributeName("Краткое наименование учреждения");
+            search.setAttributeType(TYPE_STRING);
+            search.setAttributeValue("%" + orgName + "%");
+            search.setAttributeOp("like");
+            searchPredicateInfo.addSearchPredicate(search);
         }
-        List<QueryResult> queryResults = executeQuery(query);
+        if(!StringUtils.isBlank(orgGuid)) {
+            SearchPredicate search = new SearchPredicate();
+            search.setAttributeName("GUID Образовательного учреждения");
+            search.setAttributeType(TYPE_STRING);
+            search.setAttributeValue(orgGuid);
+            search.setAttributeOp("=");
+            searchPredicateInfo.addSearchPredicate(search);
+        }
+
+
+        List<Item> queryResults = executeQuery(searchPredicateInfo);
         LinkedList<OrgInfo> list = new LinkedList<OrgInfo>();
-        for (QueryResult qr : queryResults) {
+        for (Item i : queryResults) {
             OrgInfo orgInfo = new OrgInfo();
-            orgInfo.guid = qr.getQrValue().get(0);
-            //orgInfo.number = qr.getQrValue().get(1);
-            orgInfo.shortName = qr.getQrValue().get(1);
-            orgInfo.address = qr.getQrValue().get(2);
-            orgInfo.number = Org.extractOrgNumberFromName(orgInfo.shortName);
+            for(Attribute attr : i.getAttribute()) {
+                if(attr.getName().equals("Краткое наименование учреждения")) {
+                    orgInfo.shortName = attr.getValue().get(0).getValue();
+                    orgInfo.number = Org.extractOrgNumberFromName(orgInfo.shortName);
+                }
+                if (attr.getName().equals("GUID Образовательного учреждения")) {
+                    orgInfo.guid = attr.getValue().get(0).getValue();
+                }
+                if (attr.getName().equals("Адрес")) {
+                    orgInfo.address = attr.getValue().get(0).getValue();
+                }
+            }
 
             orgInfo.guid = orgInfo.guid == null ? null : orgInfo.guid.trim();
             orgInfo.shortName = orgInfo.shortName == null ? null : orgInfo.shortName.trim();
@@ -294,7 +324,7 @@ public class MskNSIService {
             pupilInfo.secondName = pupilInfo.secondName == null ? null : pupilInfo.secondName.trim();
             pupilInfo.guid = pupilInfo.guid == null ? null : pupilInfo.guid.trim();
             pupilInfo.group = pupilInfo.group == null ? null : pupilInfo.group.trim();
-            
+
             list.add(pupilInfo);
         }
         return list;
@@ -306,7 +336,7 @@ public class MskNSIService {
         /*
         От Козлова
         */
-        String tbl = getNSIWorkTable();
+        /*String tbl = getNSIWorkTable();
         String orgFilter = "";
         if (guids != null && guids.size() > 0) {
             for (String guid : guids) {
@@ -353,12 +383,107 @@ public class MskNSIService {
             if (secondName != null && secondName.length() > 0) {
                 query += " and item['" + tbl + "/Отчество'] = '" + secondName + "'";
             }
+        }*/
+
+        SearchPredicateInfo searchPredicateInfo = new SearchPredicateInfo();
+        searchPredicateInfo.setCatalogName("Реестр обучаемых");
+        if (guids != null && guids.size() > 0) {
+            for (String guid : guids) {
+                SearchPredicate search = new SearchPredicate();
+                search.setAttributeName("GUID образовательного учреждения");
+                search.setAttributeType(TYPE_STRING);
+                search.setAttributeValue(guid);
+                search.setAttributeOp("=");
+                searchPredicateInfo.addSearchPredicate(search);
+            }
+        }
+        if(!StringUtils.isBlank(familyName)) {
+            SearchPredicate search = new SearchPredicate();
+            search.setAttributeName("Фамилия");
+            search.setAttributeType(TYPE_STRING);
+            if(guids != null && guids.size() > 0) {
+                search.setAttributeValue("%" + familyName + "%");
+                search.setAttributeOp("like");
+            } else {
+                search.setAttributeValue(familyName);
+                search.setAttributeOp("=");
+            }
+            searchPredicateInfo.addSearchPredicate(search);
+        }
+        if(!StringUtils.isBlank(firstName)) {
+            SearchPredicate search = new SearchPredicate();
+            search.setAttributeName("Имя");
+            search.setAttributeType(TYPE_STRING);
+            if(guids != null && guids.size() > 0) {
+                search.setAttributeValue("%" + firstName + "%");
+                search.setAttributeOp("like");
+            } else {
+                search.setAttributeValue(firstName);
+                search.setAttributeOp("=");
+            }
+            searchPredicateInfo.addSearchPredicate(search);
+        }
+        if(!StringUtils.isBlank(secondName)) {
+            SearchPredicate search = new SearchPredicate();
+            search.setAttributeName("Отчество");
+            search.setAttributeType(TYPE_STRING);
+            if(guids != null && guids.size() > 0) {
+                search.setAttributeValue("%" + secondName + "%");
+                search.setAttributeOp("like");
+            } else {
+                search.setAttributeValue(secondName);
+                search.setAttributeOp("=");
+            }
+            searchPredicateInfo.addSearchPredicate(search);
         }
 
-
-        List<QueryResult> queryResults = executeQuery(query, importIteration);
+        List<Item> queryResults = executeQuery(searchPredicateInfo, importIteration);
         LinkedList<ImportRegisterClientsService.ExpandedPupilInfo> list = new LinkedList<ImportRegisterClientsService.ExpandedPupilInfo>();
-        for (QueryResult qr : queryResults) {
+        for(Item i : queryResults) {
+            ImportRegisterClientsService.ExpandedPupilInfo pupilInfo = new ImportRegisterClientsService.ExpandedPupilInfo();
+            for(Attribute attr : i.getAttribute()) {
+                if (attr.getName().equals("Фамилия")) {
+                    pupilInfo.familyName = attr.getValue().get(0).getValue();
+                }
+                if (attr.getName().equals("Имя")) {
+                    pupilInfo.firstName = attr.getValue().get(0).getValue();
+                }
+                if (attr.getName().equals("Отчество")) {
+                    pupilInfo.secondName = attr.getValue().get(0).getValue();
+                }
+                if (attr.getName().equals("GUID")) {
+                    pupilInfo.guid = attr.getValue().get(0).getValue();
+                }
+                if (attr.getName().equals("Дата рождения")) {
+                    pupilInfo.birthDate = attr.getValue().get(0).getValue();
+                }
+                if (attr.getName().equals("Текущий класс или группа")) {
+                    pupilInfo.group = attr.getValue().get(0).getValue();
+                }
+                /*if (attr.getName().equals("Дата зачисления")) {
+                    pupilInfo.created = attr.getValue().get(0).getValue();
+                }
+                if (attr.getName().equals("")) {
+                    pupilInfo.deleted = attr.getValue().get(0).getValue();
+                }*/
+                if (attr.getName().equals("GUID образовательного учреждения")) {
+                    pupilInfo.guidOfOrg = attr.getValue().get(0).getValue();
+                }
+                /*if (attr.getName().equals("")) {
+                    pupilInfo.recordState = attr.getValue().get(0).getValue();
+                }*/
+
+            }
+
+            pupilInfo.familyName = pupilInfo.familyName == null ? null : pupilInfo.familyName.trim();
+            pupilInfo.firstName = pupilInfo.firstName == null ? null : pupilInfo.firstName.trim();
+            pupilInfo.secondName = pupilInfo.secondName == null ? null : pupilInfo.secondName.trim();
+            pupilInfo.guid = pupilInfo.guid == null ? null : pupilInfo.guid.trim();
+            pupilInfo.group = pupilInfo.group == null ? null : pupilInfo.group.trim();
+
+            list.add(pupilInfo);
+        }
+        /*for (QueryResult qr : queryResults) {
             ImportRegisterClientsService.ExpandedPupilInfo pupilInfo = new ImportRegisterClientsService.ExpandedPupilInfo();
             pupilInfo.familyName = qr.getQrValue().get(0);
             pupilInfo.firstName = qr.getQrValue().get(1);
@@ -378,7 +503,7 @@ public class MskNSIService {
             pupilInfo.group = pupilInfo.group == null ? null : pupilInfo.group.trim();
 
             list.add(pupilInfo);
-        }
+        }*/
         return list;
     }
 
@@ -408,6 +533,39 @@ public class MskNSIService {
             requestContext.put(keyInternalRequestTimeout, requestTimeout);
             requestContext.put(keyRequestTimeout, (int) requestTimeout.longValue());
             requestContext.put(BindingProviderProperties.REQUEST_TIMEOUT, (int) requestTimeout.longValue());
+        }
+    }
+
+    public void buildSearchPredicate(NSIRequestType request, SearchPredicateInfo searchPredicateInfo) {
+        request.getMessageData().getAppData().setCatalogName(searchPredicateInfo.getCatalogName());
+        List<SearchPredicate> searchList = request.getMessageData().getAppData().getSearchPredicate();
+
+        if(searchPredicateInfo.getSearchPredicates() != null) {
+            searchList.addAll(searchPredicateInfo.getSearchPredicates());
+        }
+    }
+
+    protected class SearchPredicateInfo {
+        private String catalogName;
+        private List<SearchPredicate> searchPredicates;
+
+        public String getCatalogName() {
+            return catalogName;
+        }
+
+        public void setCatalogName(String catalogName) {
+            this.catalogName = catalogName;
+        }
+
+        public List<SearchPredicate> getSearchPredicates() {
+            return searchPredicates;
+        }
+
+        public void addSearchPredicate(SearchPredicate searchPredicate) {
+            if(searchPredicates == null) {
+                searchPredicates = new ArrayList<SearchPredicate>();
+            }
+            searchPredicates.add(searchPredicate);
         }
     }
 }
