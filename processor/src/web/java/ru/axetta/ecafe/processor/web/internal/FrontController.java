@@ -592,7 +592,7 @@ public class FrontController extends HttpServlet {
         logger.debug("checkRequestValidity");
         checkRequestValidity(orgId);
 
-        boolean isExistsOrgByIdAndTags = DAOService.getInstance().existsOrgByIdAndTags(orgId, "СИНХРОНИЗАЦИЯ_РЕЕСТРЫ");
+        boolean isExistsOrgByIdAndTags = DAOService.getInstance().existsOrgByIdAndTags(orgId, "БЛОК_РЕГ_УЧ");
 
         LinkedList<RegisterClientResult> results = new LinkedList<RegisterClientResult>();
         for (ClientDesc cd : clientDescList) {
