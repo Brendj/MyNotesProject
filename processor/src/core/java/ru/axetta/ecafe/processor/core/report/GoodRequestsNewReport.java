@@ -35,6 +35,7 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
     final public static String P_HIDE_LAST_VALUE = "hideLastValue";
     final public static String P_GENERATE_BEGIN_DATE = "generateBeginDate";
     final public static String P_GENERATE_END_DATE = "generateEndDate";
+    final public static String P_LAST_CREATE_OR_UPDATE_DATE = "lastCreateOrUpdateDate";
     final public static String P_HIDE_TOTAL_ROW = "hideTotalRow";
 
 
@@ -92,8 +93,11 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             long generateEndDate = Long.parseLong(reportProperties.getProperty(P_GENERATE_END_DATE, Long.toString(System.currentTimeMillis()+60*60*1000)));
             Date generateEndTime = new Date(generateEndDate);
 
+            long lastCreateOrUpdateDate = Long.parseLong(reportProperties.getProperty(P_LAST_CREATE_OR_UPDATE_DATE, defaultGenerateTime));
+            Date lastCreateOrUpdateDateTime = new Date(lastCreateOrUpdateDate);
+
             SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy EE HH:mm:ss", new Locale("ru"));
-            parameterMap.put(P_GENERATE_END_DATE, format.format(generateEndTime));
+            parameterMap.put(P_GENERATE_END_DATE, format.format(lastCreateOrUpdateDateTime));
 
             String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
             List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));

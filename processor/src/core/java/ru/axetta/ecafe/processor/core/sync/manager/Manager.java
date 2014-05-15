@@ -550,9 +550,10 @@ public class Manager {
         }
         if (doSyncClass.getDoClass() == GoodRequestPosition.class) {
             Calendar calendarEnd = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
+            final Date lastCreateOrUpdateDate = calendarEnd.getTime();
             calendarEnd.add(Calendar.MINUTE, 1);
             final Date endGenerateTime = calendarEnd.getTime();
-            GoodRequestsChangeAsyncNotificationService.getInstance().notifyOrg(idOfOrg, startDate, endGenerateTime);
+            GoodRequestsChangeAsyncNotificationService.getInstance().notifyOrg(idOfOrg, startDate, endGenerateTime, lastCreateOrUpdateDate);
         }
         LOGGER.debug("processDistributedObjectsList: end");
         return distributedObjectList;

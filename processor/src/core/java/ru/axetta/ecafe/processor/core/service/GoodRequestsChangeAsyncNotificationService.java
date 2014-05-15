@@ -80,7 +80,8 @@ public class GoodRequestsChangeAsyncNotificationService {
     }
 
     @Async
-    public void notifyOrg(final Long idOfOrg, final Date beginGenerateTime, final Date endGenerateTime) {
+    public void notifyOrg(final Long idOfOrg, final Date beginGenerateTime,
+                          final Date endGenerateTime, final Date lastCreateOrUpdateDate) {
         //if (!runtimeContext.isMainNode()) {
         //    return;
         //}
@@ -148,6 +149,7 @@ public class GoodRequestsChangeAsyncNotificationService {
             properties.setProperty(GoodRequestsNewReport.P_HIDE_GENERATE_PERIOD, Boolean.toString(true));
             properties.setProperty(GoodRequestsNewReport.P_GENERATE_BEGIN_DATE, Long.toString(beginGenerateTime.getTime()));
             properties.setProperty(GoodRequestsNewReport.P_GENERATE_END_DATE, Long.toString(endGenerateTime.getTime()));
+            properties.setProperty(GoodRequestsNewReport.P_LAST_CREATE_OR_UPDATE_DATE, Long.toString(lastCreateOrUpdateDate.getTime()));
             properties.setProperty(GoodRequestsNewReport.P_HIDE_MISSED_COLUMNS, Boolean.toString(isHideMissedCol));
             properties.setProperty(GoodRequestsNewReport.P_HIDE_DAILY_SAMPLE_COUNT, Boolean.toString(false));
             properties.setProperty(GoodRequestsNewReport.P_HIDE_LAST_VALUE, Boolean.toString(false));
