@@ -468,7 +468,7 @@ public class OrderStateChangeService {
         writer.write("<td></td>");
         writer.write("</tr>");
         writer.write("</table>");
-        String message = String.format("Отчеты, содержащие данные по этим заказам, могли изменится.");
+        String message = String.format("Отчеты, содержащие данные по этим заказам, могли измениться.");
         writer.write("<p><b>"+StringEscapeUtils.escapeHtml(message)+"</b></p>");
         writer.write("</body>");
         writer.write("</html>");
