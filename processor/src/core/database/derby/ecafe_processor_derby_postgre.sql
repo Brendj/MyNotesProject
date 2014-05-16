@@ -133,6 +133,7 @@ CREATE TABLE CF_ClientGroups (
   CONSTRAINT CF_ClientGroups_pk PRIMARY KEY (IdOfOrg, IdOfClientGroup),
   CONSTRAINT CF_ClientGroups_IdOfOrg_fk FOREIGN KEY (IdOfOrg) REFERENCES CF_Orgs (IdOfOrg)
 );
+CREATE INDEX cf_clientgroups_idoforg_idx ON cf_clientgroups USING btree (idoforg); --v63
 
 CREATE TABLE CF_Clients (
   IdOfClient              BIGINT            NOT NULL,
@@ -179,8 +180,9 @@ CREATE TABLE CF_Clients (
   CONSTRAINT CF_Clients_IdOfContractPerson_fk FOREIGN KEY (IdOfContractPerson) REFERENCES CF_Persons (IdOfPerson)
 );
 
-CREATE index "cf_clients_externalid_idx" ON CF_Clients (ExternalId);
-CREATE index "cf_clients_clientguid_idx" ON CF_Clients (ClientGUID);
+CREATE index cf_clients_externalid_idx ON CF_Clients (ExternalId);
+CREATE index cf_clients_clientguid_idx ON CF_Clients (ClientGUID);
+CREATE INDEX cf_clients_idoforg_idx ON cf_clients USING btree (idoforg); --v63
 
 CREATE TABLE CF_ContragentClientAccounts (
   IdOfContragent          BIGINT            NOT NULL,
@@ -2952,6 +2954,8 @@ CREATE TABLE CF_CanceledOrders (
 
 create index CF_CanceledOrders_fk_idx on CF_CanceledOrders(idoforg, idoforder);
 
+-- v62
+-- Связка пользователь организация для получения уведомления об изменении заявок менеджеру
 CREATE TABLE cf_UserOrgs
 (
   IdOfUserOrg bigserial NOT NULL,
@@ -2963,6 +2967,8 @@ CREATE TABLE cf_UserOrgs
   CONSTRAINT cf_userorgs_uq UNIQUE (idofuser, idoforg)
 );
 
+-- v62
+-- Номера талонов для реестра талонов
 CREATE TABLE cf_Registry_Talon
 (
   idOfRegistryTalon BIGSERIAL NOT NULL,
@@ -2982,6 +2988,6 @@ CREATE TABLE cf_Registry_Talon
 );
 
 -- НЕ ЗАБЫВАТЬ ИЗМЕНЯТЬ ПРИ ВЫПУСКЕ НОВОЙ ВЕРСИИ
-insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum, BuildVersionNum, UpdateTime, CommitText)
-  VALUES(2, 2, 61, 140408, 0, '');
+insert into CF_Schema_version_info(MajorVersionNum, MiddleVersionNum, MinorVersionNum,
+                                   BuildVersionNum, UpdateTime, CommitText) VALUES(2, 2, 63, 140515, 0, '');
 
