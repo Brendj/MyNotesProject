@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
 import ru.axetta.ecafe.processor.core.persistence.MenuExchangeRule;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
@@ -162,7 +163,8 @@ public class OrgListSelectPage extends BasicPage {
         return supplierFilterDisabled;
     }
 
-    public void fill(Session session, String orgFilter, Boolean isUpdate, List<Long> idOfContragentOrgList) throws Exception {
+    public void fill(Session session, String orgFilter, Boolean isUpdate, List<Long> idOfContragentOrgList,
+            List<Long> idOfContragentList) throws Exception {
         if(isUpdate) {
             updateSelectedOrgs();
         } else {
@@ -180,20 +182,21 @@ public class OrgListSelectPage extends BasicPage {
             } catch (Exception e){}
         }
         ///
-        List<OrgShortItem> items = retrieveOrgs(session, idOfContragentOrgList);
+        List<OrgShortItem> items = retrieveOrgs(session, idOfContragentOrgList, idOfContragentList);
         for (OrgShortItem orgShortItem: items){
             orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
         }
         this.items = items;
     }
 
-    public void fill(Session session, Boolean isUpdate, List<Long> idOfContragentOrgList) throws Exception {
+    public void fill(Session session, Boolean isUpdate, List<Long> idOfContragentOrgList,
+            List<Long> idOfContragentList) throws Exception {
         if(isUpdate) {
             updateSelectedOrgs();
         } else {
             selectedOrgs.clear();
         }
-        List<OrgShortItem> items = retrieveOrgs(session, idOfContragentOrgList);
+        List<OrgShortItem> items = retrieveOrgs(session, idOfContragentOrgList, idOfContragentList);
         for (OrgShortItem orgShortItem: items){
             orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
         }
@@ -210,14 +213,16 @@ public class OrgListSelectPage extends BasicPage {
         }
     }
 
-    private List<OrgShortItem> retrieveOrgs(Session session, List<Long> idOfContragentOrgList) throws HibernateException {
+    private List<OrgShortItem> retrieveOrgs(Session session, List<Long> idOfContragentOrgList,
+            List<Long> idOfContragentList)
+            throws HibernateException {
         deselectAllItems();
-        return retrieveOrgs(session, filter, tagFilter, supplierFilter, idFilter, idOfContragentOrgList);
+        return retrieveOrgs(session, filter, tagFilter, supplierFilter, idFilter, idOfContragentOrgList, idOfContragentList);
     }
 
     @SuppressWarnings("unchecked")
     public static List<OrgShortItem> retrieveOrgs(Session session, String filter, String tagFilter,
-            int supplierFilter, String idFilter, List<Long> idOfContragentOrgList) throws HibernateException {
+            int supplierFilter, String idFilter, List<Long> idOfContragentOrgList,List<Long> idOfContragentList) throws HibernateException {
         Criteria criteria = session.createCriteria(Org.class);
         criteria.addOrder(Order.asc("idOfOrg"));
         //  Ограничение оргов, которые позволено видеть пользователю
@@ -227,11 +232,11 @@ public class OrgListSelectPage extends BasicPage {
         } catch (Exception e) {
         }
         if (StringUtils.isNotEmpty(filter)) {
-            criteria.add(Restrictions.or(Restrictions.like("shortName", filter, MatchMode.ANYWHERE),
-                    Restrictions.like("officialName", filter, MatchMode.ANYWHERE)));
+            criteria.add(Restrictions.or(Restrictions.ilike("shortName", filter, MatchMode.ANYWHERE),
+                    Restrictions.ilike("officialName", filter, MatchMode.ANYWHERE)));
         }
         if (StringUtils.isNotEmpty(tagFilter)) {
-            criteria.add(Restrictions.like("tag", tagFilter, MatchMode.ANYWHERE));
+            criteria.add(Restrictions.ilike("tag", tagFilter, MatchMode.ANYWHERE));
         }
         if (idFilter != null && idFilter.length() > 0) {
             try {
@@ -241,6 +246,9 @@ public class OrgListSelectPage extends BasicPage {
         }
         if(supplierFilter==1 &&  idOfContragentOrgList!=null && !idOfContragentOrgList.isEmpty() && idOfContragentOrgList.get(0)!=null){
             criteria.createAlias("sourceMenuOrgs", "sm").add(Restrictions.in("sm.idOfOrg", idOfContragentOrgList));
+        }
+        if(!CollectionUtils.isEmpty(idOfContragentList)){
+            criteria.add(Restrictions.in("defaultSupplier.idOfContragent", idOfContragentList));
         }
         if (supplierFilter != 0) {
             Criteria destMenuExchangeCriteria = session.createCriteria(MenuExchangeRule.class);

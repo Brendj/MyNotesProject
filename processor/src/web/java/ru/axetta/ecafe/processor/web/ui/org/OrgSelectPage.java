@@ -130,11 +130,11 @@ public class OrgSelectPage extends BasicPage {
         } catch (Exception e) {
         }
         if (StringUtils.isNotEmpty(filter)) {
-            criteria.add(Restrictions.or(Restrictions.like("shortName", filter, MatchMode.ANYWHERE),
-                    Restrictions.like("officialName", filter, MatchMode.ANYWHERE)));
+            criteria.add(Restrictions.or(Restrictions.ilike("shortName", filter, MatchMode.ANYWHERE),
+                    Restrictions.ilike("officialName", filter, MatchMode.ANYWHERE)));
         }
         if (StringUtils.isNotEmpty(tagFilter)) {
-            criteria.add(Restrictions.like("shortName", tagFilter, MatchMode.ANYWHERE));
+            criteria.add(Restrictions.ilike("tag", tagFilter, MatchMode.ANYWHERE));
         }
         if (idFilter != null && idFilter.length() > 0) {
             try {
