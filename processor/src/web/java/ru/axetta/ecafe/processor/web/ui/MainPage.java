@@ -111,6 +111,7 @@ public class MainPage {
       * иначе отобразится весь список организаций без проставленных галочек*/
     private String orgFilterOfSelectOrgListSelectPage = "";
     private List<Long> idOfContragentOrgList = null;
+    private List<Long> idOfContragentList = null;
     private int multiContrFlag = 0;
     private String classTypes;
     private String selectedMenuDataXML;
@@ -229,6 +230,7 @@ public class MainPage {
     private final SyncReportPage syncReportPage = new SyncReportPage();
     private final StatusSyncReportPage statusSyncReportPage = new StatusSyncReportPage();
     private final ClientReportPage clientReportPage = new ClientReportPage();
+    private final ClientBalanceByDayReportPage clientBalanceByDayReportPage = new ClientBalanceByDayReportPage();
     private final EnterEventReportPage enterEventReportPage = new EnterEventReportPage();
     private final BasicWorkspacePage configurationGroupPage = new BasicWorkspacePage();
     private final ConfigurationPage configurationPage = new ConfigurationPage();
@@ -294,6 +296,7 @@ public class MainPage {
     private final BasicWorkspacePage goodRequestsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage budgetFoodGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage paidFoodGroupMenu = new BasicWorkspacePage();
+    private final BasicWorkspacePage subscriptionFeedingGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage paymentReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage activityReportsGroupMenu = new BasicWorkspacePage();
     private final BasicWorkspacePage informReportsGroupMenu = new BasicWorkspacePage();
@@ -488,6 +491,7 @@ public class MainPage {
     public void updateSelectedMainMenu() {
         UIComponent mainMenuComponent = currentWorkspacePage.getMainMenuComponent();
         idOfContragentOrgList = null;
+        idOfContragentList = null;
         if (null != mainMenuComponent) {
             mainMenu.setValue(mainMenuComponent.getId());
         }
@@ -1510,9 +1514,10 @@ public class MainPage {
                 orgListSelectPage.setFilter("");
                 orgListSelectPage.setTagFilter("");
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                    orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList);
+                    orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
                 } else {
-                    orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false, idOfContragentOrgList);
+                    orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false,
+                            idOfContragentOrgList, idOfContragentList);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -1547,9 +1552,10 @@ public class MainPage {
                 orgListSelectPage.setFilter("");
                 orgListSelectPage.setTagFilter("");
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                    orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList);
+                    orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
                 } else {
-                    orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false, idOfContragentOrgList);
+                    orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, false,
+                            idOfContragentOrgList, idOfContragentList);
                 }
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -1603,6 +1609,14 @@ public class MainPage {
         return idOfContragentOrgList;
     }
 
+    public List<Long> getIdOfContragentList() {
+        return idOfContragentList;
+    }
+
+    public void setIdOfContragentList(List<Long> idOfContragentList) {
+        this.idOfContragentList = idOfContragentList;
+    }
+
     public Object updateOrgListSelectPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
@@ -1613,11 +1627,10 @@ public class MainPage {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
-                orgListSelectPage.fill(persistenceSession, true, idOfContragentOrgList);
+                orgListSelectPage.fill(persistenceSession, true, idOfContragentOrgList, idOfContragentList);
             } else {
-                orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, true, idOfContragentOrgList);
+                orgListSelectPage.fill(persistenceSession, orgFilterOfSelectOrgListSelectPage, true, idOfContragentOrgList, idOfContragentList);
             }
-            //orgListSelectPage.fill(persistenceSession);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -4986,6 +4999,10 @@ public class MainPage {
         return paidFoodGroupMenu;
     }
 
+    public BasicWorkspacePage getSubscriptionFeedingGroupMenu() {
+        return subscriptionFeedingGroupMenu;
+    }
+
     public BasicWorkspacePage getRepositoryUtilityGroupMenu() {
         return repositoryUtilityGroupMenu;
     }
@@ -5016,6 +5033,12 @@ public class MainPage {
 
     public Object showPaidFoodGroupMenu () {
         currentWorkspacePage = paidFoodGroupMenu;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showSubscriptionFeedingGroupMenu() {
+        currentWorkspacePage = subscriptionFeedingGroupMenu;
         updateSelectedMainMenu();
         return null;
     }
@@ -5675,6 +5698,49 @@ public class MainPage {
         return "showEnterEventCSVList";
     }
 
+    public ClientBalanceByDayReportPage getClientBalanceByDayReportPage() {
+        return clientBalanceByDayReportPage;
+    }
+
+    public Object showClientBalanceByDayReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = clientBalanceByDayReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set ClientBalanceByDayreport page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета: " + e.getMessage(),
+                            null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    //public Object buildClientBalanceByDayReport() {
+    //    FacesContext facesContext = FacesContext.getCurrentInstance();
+    //    RuntimeContext runtimeContext = null;
+    //    Session persistenceSession = null;
+    //    Transaction persistenceTransaction = null;
+    //    try {
+    //        runtimeContext = RuntimeContext.getInstance();
+    //        persistenceSession = runtimeContext.createReportPersistenceSession();
+    //        persistenceTransaction = persistenceSession.beginTransaction();
+    //        clientBalanceByDayReportPage.buildReport(persistenceSession);
+    //        persistenceTransaction.commit();
+    //        persistenceTransaction = null;
+    //        facesContext.addMessage(null,
+    //                new FacesMessage(FacesMessage.SEVERITY_INFO, "Подготовка отчета завершена успешно", null));
+    //    } catch (Exception e) {
+    //        logger.error("Failed to build client report", e);
+    //        facesContext.addMessage(null,
+    //                new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке отчета: " + e.getMessage(), null));
+    //    } finally {
+    //        HibernateUtils.rollback(persistenceTransaction, logger);
+    //        HibernateUtils.close(persistenceSession, logger);
+    //    }
+    //    return null;
+    //}
+
     public ClientReportPage getClientReportPage() {
         return clientReportPage;
     }
@@ -5714,8 +5780,6 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-
-
         }
         return null;
     }

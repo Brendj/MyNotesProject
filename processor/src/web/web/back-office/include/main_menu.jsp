@@ -860,6 +860,14 @@
                             label="Реестр талонов" action="#{registerStampPaidPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
+    <rich:panelMenuGroup id="subscriptionFeedingGroupMenu" binding="#{mainPage.subscriptionFeedingGroupMenu.mainMenuComponent}"
+                         label="Абонементное питание" reRender="#{mainPage.eligibleToViewMealsReports}">
+        <a4j:support event="onclick" action="#{mainPage.showSubscriptionFeedingGroupMenu}" reRender="workspaceForm" />
+        <%--@elvariable id="registerStampSubscriptionFeedingPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampSubscriptionFeedingPage"--%>
+        <rich:panelMenuItem id="registerStampSubscriptionFeedingReportMenuItem" binding="#{registerStampSubscriptionFeedingPage.mainMenuComponent}"
+                            label="Реестр талонов" action="#{registerStampSubscriptionFeedingPage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
+
     <rich:panelMenuGroup id="paymentReportsGroupMenu" binding="#{mainPage.paymentReportsGroupMenu.mainMenuComponent}"
                          label="Отчеты по пополнениям" rendered="#{mainPage.eligibleToViewRefillReports}">
         <a4j:support event="onclick" action="#{mainPage.showPaymentReportsGroupMenu}" reRender="workspaceForm" />
@@ -941,6 +949,10 @@
 
     <rich:panelMenuItem id="clientReportMenuItem" binding="#{mainPage.clientReportPage.mainMenuComponent}"
                         label="Отчет по учащимся" action="#{mainPage.showClientReportPage}" reRender="workspaceForm" />
+
+    <rich:panelMenuItem id="сlientBalanceByDayReportMenuItem" binding="#{mainPage.clientBalanceByDayReportPage.mainMenuComponent}"
+                        label="Баланс клиентов на дату" action="#{mainPage.showClientBalanceByDayReportPage}" reRender="workspaceForm" />
+
     <rich:panelMenuItem id="currentPositionReportMenuItem"
                         binding="#{mainPage.currentPositionsReportPage.mainMenuComponent}"
                         label="Просмотр текущих позиций" action="#{mainPage.showCurrentPositionsReportPage}"

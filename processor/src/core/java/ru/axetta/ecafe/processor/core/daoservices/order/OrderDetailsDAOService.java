@@ -56,7 +56,6 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         long endTime = calendar.getTimeInMillis()-1;
         query.setParameter("endDate", endTime);
         List list = query.list();
-
         if(list==null || list.isEmpty() || list.get(0)==null){
             return  0L;
         } else {
@@ -71,8 +70,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
                 " and orderdetail.idoforder = cforder.idoforder" +
                 " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
-                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate>=:startDate and cforder.createddate<=:endDate and orderdetail.socdiscount>0 and"
-                +
+                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate>=:startDate and cforder.createddate<=:endDate and" +
                 " cforder.idoforg=:idoforg and good.fullname like '" + fullname + "' and " +
                 " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
                 " (cforder.ordertype=3 or (cforder.ordertype=8 " + (includeActDiscrepancies ? " "
@@ -88,7 +86,6 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         long endTime = calendar.getTimeInMillis() - 1;
         query.setParameter("endDate", endTime);
         List list = query.list();
-
         if (list == null || list.isEmpty() || list.get(0) == null) {
             return 0L;
         } else {
@@ -96,6 +93,37 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    public Long buildRegisterStampBodyValueSubscriptionFeeding(Long idOfOrg, Date start, String fullname,
+            boolean includeActDiscrepancies) {
+        String sql = "select sum(orderdetail.qty) from cf_orders cforder" +
+                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
+                " and orderdetail.idoforder = cforder.idoforder" +
+                " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
+                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate>=:startDate and cforder.createddate<=:endDate and" +
+                " cforder.idoforg=:idoforg and good.fullname like '" + fullname + "' and " +
+                " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
+                " (cforder.ordertype=7 or (cforder.ordertype=8 " + (includeActDiscrepancies ? " "
+                : " and orderdetail.qty>=0 ") + " )) ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype", OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("startDate", start.getTime());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+        calendar.add(Calendar.DATE, 1);
+        long endTime = calendar.getTimeInMillis() - 1;
+        query.setParameter("endDate", endTime);
+        List list = query.list();
+        if (list == null || list.isEmpty() || list.get(0) == null) {
+            return 0L;
+        } else {
+            return new Long(list.get(0).toString());
+        }
+    }
+
+    /* Подсчет суточной пробы для льготного питания*/
     @SuppressWarnings("unchecked")
     public Long buildRegisterStampDailySampleValue(Long idOfOrg, Date start, Date end, String fullname) {
         String sql ="select sum(orderdetail.qty) from cf_orders cforder" +
@@ -120,7 +148,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         }
     }
 
-    /* получаем список всех  */
+    /* получаем список всех товаров для льготного питания */
     @SuppressWarnings("unchecked")
     public List<GoodItem> findAllGoods(Long idOfOrg, Date startTime, Date endTime){
         Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>();
@@ -148,11 +176,35 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         return  (List<GoodItem>) query.list();
     }
 
-    /* получаем список всех платников */
+    /* получаем список всех товаров для платного питания */
     @SuppressWarnings("unchecked")
     public List<GoodItem1> findAllGoodsPaid(Long idOfOrg, Date startTime, Date endTime){
         Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>();
         orderTypeEnumTypeSet.add(OrderTypeEnumType.PAY_PLAN);
+        String sql = "select distinct good.globalId as globalId, good.pathPart3 as pathPart3, "
+                + " good.pathPart4 as pathPart4,good.pathPart2 as pathPart2, good.pathPart1 as pathPart1, good.fullName as fullName "
+                + " , details.RPrice as price"
+                + " from OrderDetail details "
+                + " left join details.good good left join details.order ord left join ord.org o "
+                + " where ord.state=0 and details.state=0 and ord.orderType in :orderType and details.good is not null and o.idOfOrg=:idOfOrg and "
+                + " ord.createTime between :startDate and :endDate and "
+                + " details.menuType >= :mintype and details.menuType <=:maxtype order by fullName";
+        Query query = getSession().createQuery(sql);
+        query.setParameterList("orderType",orderTypeEnumTypeSet);
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("startDate",startTime);
+        query.setParameter("endDate", endTime);
+        query.setResultTransformer(Transformers.aliasToBean(GoodItem1.class));
+        return  (List<GoodItem1>) query.list();
+    }
+
+    /* получаем список всех товаров для абонементного питания питания */
+    @SuppressWarnings("unchecked")
+    public List<GoodItem1> findAllGoodsSubscriptionFeeding(Long idOfOrg, Date startTime, Date endTime){
+        Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<OrderTypeEnumType>();
+        orderTypeEnumTypeSet.add(OrderTypeEnumType.SUBSCRIPTION_FEEDING);
         String sql = "select distinct good.globalId as globalId, good.pathPart3 as pathPart3, "
                 + " good.pathPart4 as pathPart4,good.pathPart2 as pathPart2, good.pathPart1 as pathPart1, good.fullName as fullName "
                 + " , details.RPrice as price"
@@ -198,6 +250,25 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         criteria.add(Restrictions.eq("orgOwner", idOfOrg));
         criteria.add(Restrictions.between("talonDate", startTime, endTime));
         criteria.add(Restrictions.eq("talonType", RegistryTalonType.Pay_Plan));
+        List list = criteria.list();
+
+        Map<Date, Long> map = new HashMap<Date, Long>();
+        for (Object lst : list) {
+            RegistryTalon curr = (RegistryTalon) lst;
+            Calendar calendar = Calendar.getInstance(RuntimeContext.getInstance().getLocalTimeZone(null));
+            calendar.setTime(curr.getTalonDate());
+            CalendarUtils.truncateToDayOfMonth(calendar);
+            map.put(calendar.getTime(), curr.getNumber());
+        }
+        return map;
+    }
+
+    @SuppressWarnings("uncheked")
+    public Map<Date, Long> findAllRegistryTalonsSubscriptionFeeding(Long idOfOrg, Date startTime, Date endTime) {
+        Criteria criteria = getSession().createCriteria(RegistryTalon.class);
+        criteria.add(Restrictions.eq("orgOwner", idOfOrg));
+        criteria.add(Restrictions.between("talonDate", startTime, endTime));
+        criteria.add(Restrictions.eq("talonType", RegistryTalonType.Subscriber_Feeding_Plan));
         List list = criteria.list();
 
         Map<Date, Long> map = new HashMap<Date, Long>();

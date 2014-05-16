@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RegisterStampPaidReport" pageWidth="536" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="516" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.2" value="rowGroup"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.1" value="pageHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
+	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
+	<property name="ireport.zoom" value="1.6105100000000125"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table" fill="Solid">
+		<box>
+			<pen lineWidth="1.0" lineColor="#C0C0C0"/>
+		</box>
+	</style>
+	<style name="Crosstab Data Text" hAlign="Center"/>
+	<parameter name="idOfOrg" class="java.lang.Long"/>
+	<parameter name="orgName" class="java.lang.String"/>
+	<parameter name="monthName" class="java.lang.String"/>
+	<parameter name="month" class="java.lang.Integer"/>
+	<parameter name="year" class="java.lang.Integer"/>
+	<parameter name="day" class="java.lang.Integer"/>
+	<parameter name="startTime" class="java.lang.Long"/>
+	<parameter name="endTime" class="java.lang.Long"/>
+	<parameter name="startDate" class="java.util.Date"/>
+	<parameter name="endDate" class="java.util.Date"/>
+	<field name="level1" class="java.lang.String"/>
+	<field name="level2" class="java.lang.String"/>
+	<field name="level3" class="java.lang.String"/>
+	<field name="level4" class="java.lang.String"/>
+	<field name="qty" class="java.lang.Long"/>
+	<field name="date" class="java.lang.String"/>
+	<field name="number" class="java.lang.String"/>
+	<field name="dateTime" class="java.util.Date"/>
+	<field name="price" class="java.lang.Long"/>
+	<field name="total" class="java.lang.Long"/>
+	<title>
+		<band height="115" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="dc144c0e-e5b5-4f1d-8de1-3f04a0e603cc" x="0" y="0" width="516" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Реестр талонов по абонементному  питанию]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="6e9885dd-9b51-4bfa-8836-d36465eee1b4" x="0" y="20" width="516" height="55"/>
+				<textElement textAlignment="Center" verticalAlignment="Bottom">
+					<font fontName="SansSerif" size="14" isBold="true" isUnderline="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[String.format("%s", $P{orgName})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="0456d598-ace8-440d-827e-df022715e87b" x="0" y="75" width="516" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Top">
+					<font fontName="SansSerif" size="8"/>
+				</textElement>
+				<text><![CDATA[(наименование Получателя услуг)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="812d05f0-e1a3-4bee-9dd6-d0d10bf882e0" x="0" y="95" width="70" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Период c]]></text>
+			</staticText>
+			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
+				<reportElement uuid="3fe7fbc9-09c5-4dc8-9ada-0faf0a615290" x="70" y="95" width="70" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{startDate}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd.MM.yy" isBlankWhenNull="true">
+				<reportElement uuid="e2cb2dfc-0985-49ff-b446-ab02d51501f9" x="210" y="95" width="70" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{endDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="5e951368-ab12-4e96-8f66-c68e8446f3b5" x="140" y="95" width="70" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[по]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band/>
+	</detail>
+	<pageFooter>
+		<band/>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="41">
+			<staticText>
+				<reportElement uuid="5074b9cb-5186-4a02-bfca-d8f405ec1dd9" x="0" y="20" width="516" height="20"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[      М.П.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e4630b56-edd7-42f7-987a-cf4ac852747f" x="0" y="0" width="210" height="20"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Составил_________________( Исполнитель)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="80f043c6-0376-49f0-ac58-f6d6be99d0ff" x="210" y="0" width="306" height="20"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Проверил ________________ (Получатель услуг)]]></text>
+			</staticText>
+		</band>
+	</lastPageFooter>
+	<summary>
+		<band height="47" splitType="Stretch">
+			<crosstab>
+				<reportElement uuid="c05f0635-bc65-44c7-a7bb-562e36a68d6b" style="table" mode="Transparent" x="0" y="0" width="516" height="45" backcolor="#EAF0F8"/>
+				<crosstabHeaderCell>
+					<cellContents backcolor="#FFFFFF" mode="Transparent">
+						<staticText>
+							<reportElement uuid="4fdaccdc-c402-48be-b6d3-9863a43e5733" style="table" mode="Transparent" x="0" y="0" width="116" height="118" backcolor="#EAF0F8"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<text><![CDATA[Дата]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="4fdaccdc-c402-48be-b6d3-9863a43e5733" style="table" mode="Transparent" x="116" y="0" width="100" height="118" backcolor="#EAF0F8"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<text><![CDATA[Номер талона]]></text>
+						</staticText>
+					</cellContents>
+				</crosstabHeaderCell>
+				<rowGroup name="dateTime" width="0">
+					<bucket class="java.util.Date">
+						<bucketExpression><![CDATA[$F{dateTime}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents/>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="date" width="116">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{date}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque" style="table">
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="27d19ada-5c6d-4ac8-9948-2ff7229ae8a8" style="table" positionType="Float" x="0" y="0" width="116" height="22"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{date}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="number" width="100">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{number}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="e7b0fbec-cd36-42c4-bbaf-40ee91f8bf22" style="table" x="0" y="0" width="100" height="22"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="11" isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{number}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<columnGroup name="level1" height="22" totalPosition="End" headerPosition="Stretch">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{level1}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque" style="table">
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="110f8844-8b1a-43c6-aea4-11997a8fec3b" style="table" positionType="Float" mode="Transparent" x="0" y="0" width="300" height="22" backcolor="#FFFFFF"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="11" isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{level1}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents backcolor="#FFFFFF" mode="Transparent" style="Crosstab Data Text">
+							<staticText>
+								<reportElement uuid="48d28d2d-4ca2-431b-862a-abff46809e79" style="table" mode="Transparent" x="0" y="0" width="60" height="118"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[ВСЕГО]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<columnGroup name="level2" height="22" headerPosition="Stretch">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{level2}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque" style="table">
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="88cf8190-15fc-45d9-8f8e-601081fcded0" style="table" positionType="Float" mode="Transparent" x="0" y="0" width="300" height="22" backcolor="#FFFFFF"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="11" isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{level2}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents style="Crosstab Data Text"/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<columnGroup name="level3" height="22" headerPosition="Stretch">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{level3}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#FFFFFF" mode="Opaque" style="table">
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="50c1d000-5857-4a6f-b60c-8f447e7eb91d" style="table" positionType="Float" mode="Transparent" x="0" y="0" width="300" height="22" backcolor="#FFFFFF"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="11" isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{level3}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<columnGroup name="level4" height="52" headerPosition="Stretch">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{level4}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents backcolor="#FFFFFF" mode="Transparent" style="table">
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="0794bb42-2f65-446a-a5b1-5fe852753477" style="table" positionType="Float" mode="Transparent" x="0" y="0" width="300" height="22" backcolor="#EAF0F8"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="11" isBold="false"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{level4}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="3ce5201c-b5c3-4a9b-9266-cd3b69d8b02e" style="table" mode="Transparent" x="0" y="22" width="100" height="30"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Кол-во (шт)]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="6e95f086-60da-4d8a-8be4-42b920b92fec" style="table" mode="Transparent" x="100" y="22" width="100" height="30"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Цена]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="c1b320b8-7c72-4bf8-b3af-75201fc8608d" style="table" mode="Transparent" x="200" y="22" width="100" height="30"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Итого]]></text>
+							</staticText>
+						</cellContents>
+					</crosstabColumnHeader>
+					<crosstabTotalColumnHeader>
+						<cellContents/>
+					</crosstabTotalColumnHeader>
+				</columnGroup>
+				<measure name="qtyMeasure" class="java.lang.Long" calculation="Sum">
+					<measureExpression><![CDATA[$F{qty}]]></measureExpression>
+				</measure>
+				<measure name="priceMeasure" class="java.lang.Long">
+					<measureExpression><![CDATA[$F{price}]]></measureExpression>
+				</measure>
+				<measure name="totalM" class="java.lang.Long" calculation="Sum">
+					<measureExpression><![CDATA[$F{total}]]></measureExpression>
+				</measure>
+				<crosstabCell width="300" height="23">
+					<cellContents style="Crosstab Data Text">
+						<textField isBlankWhenNull="true">
+							<reportElement uuid="9c7ea58c-6de3-4896-a460-802f45f87561" style="table" positionType="Float" x="0" y="0" width="100" height="22"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="11"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{qtyMeasure}]]></textFieldExpression>
+						</textField>
+						<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+							<reportElement uuid="5b50e9f0-bc6f-47ac-8a45-353b48038474" style="table" x="100" y="0" width="100" height="22"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="11"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{qtyMeasure}==0L ? 0L : ((double)(Long.valueOf($V{priceMeasure}.toString())))/100]]></textFieldExpression>
+						</textField>
+						<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+							<reportElement uuid="7fd1a7f7-ad07-40bd-8c92-f7757445601b" style="table" x="200" y="0" width="100" height="22"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="11"/>
+							</textElement>
+							<textFieldExpression><![CDATA[((double)(Long.valueOf($V{totalM}.toString())))/100]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell height="25" rowTotalGroup="date">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<textField>
+							<reportElement uuid="f7d5145f-87b8-4041-8ff6-a64b67f09230" style="table" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{qtyMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="60" height="23" columnTotalGroup="level1">
+					<cellContents backcolor="#FFFFFF" mode="Opaque">
+						<textField pattern="###0.00;-###0.00" isBlankWhenNull="true">
+							<reportElement uuid="7c01d104-96d3-4512-a683-dd8c764b7dc2" style="table" x="0" y="0" width="60" height="22" forecolor="#000000"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="11"/>
+							</textElement>
+							<textFieldExpression><![CDATA[((double)(Long.valueOf($V{totalM}.toString())))/100]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="date" columnTotalGroup="level1">
+					<cellContents backcolor="#005FB3" mode="Opaque">
+						<textField>
+							<reportElement uuid="a468e195-3d2f-4db6-853e-67dedf18212c" style="table" x="0" y="0" width="50" height="25" forecolor="#FFFFFF"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{qtyMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="50" columnTotalGroup="level2">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<textField>
+							<reportElement uuid="5471e5f2-284c-40a3-9861-70039fe2e9b4" style="table" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{qtyMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="date" columnTotalGroup="level2">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<textField>
+							<reportElement uuid="0d10c88a-1b6b-459a-a2b4-5d15932f1e20" style="table" x="0" y="0" width="50" height="25"/>
+							<textElement/>
+							<textFieldExpression><![CDATA[$V{qtyMeasure}]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell columnTotalGroup="level3">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="date" columnTotalGroup="level3">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell columnTotalGroup="level4">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="date" columnTotalGroup="level4">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="number">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="number" columnTotalGroup="level1">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="number" columnTotalGroup="level2">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="number" columnTotalGroup="level3">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="number" columnTotalGroup="level4">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="dateTime">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="dateTime" columnTotalGroup="level1">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="dateTime" columnTotalGroup="level2">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="dateTime" columnTotalGroup="level3">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="dateTime" columnTotalGroup="level4">
+					<cellContents/>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+</jasperReport>
