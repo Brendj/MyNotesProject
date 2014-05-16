@@ -18,9 +18,13 @@
         <table class="borderless-grid" width="100%">
             <tr>
                 <td style="text-align: left;">
-                    <h:panelGrid styleClass="borderless-grid">
+                    <h:panelGrid styleClass="borderless-grid" columns="2">
                         <h:inputText value="#{mainPage.contragentSelectPage.selectedItem.contragentName}"
                                      readonly="true" size="64" styleClass="input-text" />
+                        <a4j:commandLink styleClass="command-link">
+                            <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                            <a4j:support event="onclick" action="#{mainPage.contragentSelectPage.cancelFilter}" reRender="modalContragentSelectorForm"/>
+                        </a4j:commandLink>
                     </h:panelGrid>
                     <h:panelGrid columns="4" styleClass="borderless-grid">
                         <h:outputText escape="true" value="Фильтр: " styleClass="output-text" />

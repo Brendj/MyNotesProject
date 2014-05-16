@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.contragent;
 
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
+import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -87,6 +88,11 @@ public class ContragentSelectPage extends BasicPage {
         return selectedItem;
     }
 
+    public Object cancelFilter() {
+        selectedItem = new Item();
+        return null;
+    }
+
     public void setSelectedItem(Item selected) {
         if (null == selected) {
             this.selectedItem = new Item();
@@ -142,7 +148,7 @@ public class ContragentSelectPage extends BasicPage {
         } catch (Exception e) {
         }
         if (StringUtils.isNotEmpty(filter)) {
-            criteria.add(Restrictions.like("contragentName", filter, MatchMode.ANYWHERE));
+            criteria.add(Restrictions.ilike("contragentName", filter, MatchMode.ANYWHERE));
         }
         if(StringUtils.isNotEmpty(classTypesString)) {
             String[] classTypes = classTypesString.split(",");
