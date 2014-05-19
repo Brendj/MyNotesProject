@@ -53,17 +53,12 @@
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.filter}}" />
         </h:panelGroup>
     </h:panelGrid>
-    <h:panelGrid styleClass="borderless-grid" columns="4">
+    <h:panelGrid styleClass="borderless-grid" columns="3">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildDiscrepanciesOnOrdersAndAttendanceReport}"
                            reRender="mainMenu, workspaceTogglePanel, statisticsDiscrepanciesOnOrdersAndAttendanceReportPageReportPanelGrid"
                            styleClass="command-button"
                            status="statisticsDiscrepanciesOnOrdersAndAttendanceReportGenerateStatus" />
-        <a4j:status id="statisticsDiscrepanciesOnOrdersAndAttendanceReportGenerateStatus" onstart="onstartloading()"
-                    onstop="onstoploading()">
-            <f:facet name="start">
-                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
-            </f:facet>
-        </a4j:status>
+
         <h:commandButton value="Выгрузить в Excel"
                          actionListener="#{mainPage.exportDiscrepanciesOnOrdersAndAttendanceReport}"
                          styleClass="command-button" />
@@ -72,10 +67,16 @@
                          actionListener="#{mainPage.exportDiscrepanciesOnOrdersAndAttendanceReportSum}"
                          styleClass="command-button" />
     </h:panelGrid>
+    <a4j:status id="statisticsDiscrepanciesOnOrdersAndAttendanceReportGenerateStatus" onstart="onstartloading()"
+                onstop="onstoploading()">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+        </f:facet>
+    </a4j:status>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
-    <h:panelGrid styleClass="borderless-grid">
-        <rich:dataTable id="itemsReportTable"
+    <h:panelGrid styleClass="borderless-grid" columns="1">
+        <rich:dataTable id="itemsReportTable" style="width: 940px;"
             value="#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.report.items}"
                         var="item" rowKeyVar="row" rows="20" footerClass="data-table-footer"
                         columnClasses="left-aligned-column">
@@ -168,9 +169,7 @@
                 </rich:datascroller>
             </f:facet>
         </rich:dataTable>
-    </h:panelGrid>
-    <h:panelGrid>
-        <rich:dataTable id="totalItemsReportTable"
+        <rich:dataTable id="totalItemsReportTable" style="width: 940px;"
                         value="#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.report.itemTotals}"
                         var="itemTotals" rowKeyVar="row" rows="5" footerClass="data-table-footer"
                         columnClasses="left-aligned-column">
@@ -272,5 +271,8 @@
                 </rich:datascroller>
             </f:facet>
         </rich:dataTable>
+    </h:panelGrid>
+    <h:panelGrid>
+
     </h:panelGrid>
 </h:panelGrid>
