@@ -52,17 +52,30 @@
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.filter}}" />
         </h:panelGroup>
-
+    </h:panelGrid>
+    <h:panelGrid styleClass="borderless-grid" columns="4">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildDiscrepanciesOnOrdersAndAttendanceReport}"
                            reRender="mainMenu, workspaceTogglePanel, statisticsDiscrepanciesOnOrdersAndAttendanceReportPageReportPanelGrid"
-                           styleClass="command-button" status="statisticsDiscrepanciesOnOrdersAndAttendanceReportGenerateStatus" />
-        <a4j:status id="statisticsDiscrepanciesOnOrdersAndAttendanceReportGenerateStatus"
-                    onstart="onstartloading()" onstop="onstoploading()">
+                           styleClass="command-button"
+                           status="statisticsDiscrepanciesOnOrdersAndAttendanceReportGenerateStatus" />
+        <a4j:status id="statisticsDiscrepanciesOnOrdersAndAttendanceReportGenerateStatus" onstart="onstartloading()"
+                    onstop="onstoploading()">
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
             </f:facet>
         </a4j:status>
+        <h:commandButton value="Выгрузить в Excel"
+                         actionListener="#{mainPage.exportDiscrepanciesOnOrdersAndAttendanceReport}"
+                         styleClass="command-button" />
+
+        <h:commandButton value="Выгрузить в Excel итоговую таблицу"
+                         actionListener="#{mainPage.exportDiscrepanciesOnOrdersAndAttendanceReportSum}"
+                         styleClass="command-button" />
+        <rich:message styleClass="message" errorClass="error-messages" infoClass="info-messages"
+                      warnClass="warn-messages" />
     </h:panelGrid>
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
     <h:panelGrid styleClass="borderless-grid">
         <rich:dataTable id="itemsReportTable"
             value="#{mainPage.discrepanciesOnOrdersAndAttendanceReportPage.report.items}"
@@ -262,12 +275,4 @@
             </f:facet>
         </rich:dataTable>
     </h:panelGrid>
-    <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.exportDiscrepanciesOnOrdersAndAttendanceReport}"
-                     styleClass="command-button" />
-    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                   warnClass="warn-messages" />
-    <h:commandButton value="Выгрузить в Excel итоговую таблицу" actionListener="#{mainPage.exportDiscrepanciesOnOrdersAndAttendanceReportSum}"
-                     styleClass="command-button"/>
-    <rich:message styleClass="message" errorClass="error-messages" infoClass="info-messages"
-                  warnClass="warn-messages" />
 </h:panelGrid>
