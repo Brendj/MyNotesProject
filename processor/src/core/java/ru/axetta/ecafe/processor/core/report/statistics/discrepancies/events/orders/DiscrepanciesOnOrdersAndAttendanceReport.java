@@ -16,12 +16,18 @@ import java.util.List;
 public class DiscrepanciesOnOrdersAndAttendanceReport {
 
     private final List<Item> items;
+    private final List<ItemTotal> itemTotals;
 
-    public DiscrepanciesOnOrdersAndAttendanceReport(List<Item> items) {
+    public DiscrepanciesOnOrdersAndAttendanceReport(List<Item> items, List<ItemTotal> itemTotals) {
         this.items = items;
+        this.itemTotals = itemTotals;
     }
 
     public List<Item> getItems() {
         return items;
+    }
+
+    public List<ItemTotal> getItemTotals() {
+        return itemTotals;
     }
 }

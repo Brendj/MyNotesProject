@@ -4,11 +4,14 @@
 
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
-import net.sf.jasperreports.engine.export.*;
+import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
+import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.events.orders.DiscrepanciesOnOrdersAndAttendanceBuilder;
 import ru.axetta.ecafe.processor.core.report.statistics.discrepancies.events.orders.DiscrepanciesOnOrdersAndAttendanceReport;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -20,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,21 +39,23 @@ public class StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage extends Onli
         return "report/online/statistics_discrepancies_on_orders_and_attendance_report";
     }
 
+
+
     public DiscrepanciesOnOrdersAndAttendanceReport getReport() {
         return report;
     }
 
     public void buildReport(Session session) throws Exception{
-        if(idOfContragentOrgList==null || idOfContragentOrgList.isEmpty()){
-            throw new Exception("Выберите список поставщиков");
+        if(CollectionUtils.isEmpty(idOfOrgList) && CollectionUtils.isEmpty(idOfContragentOrgList)){
+            throw new Exception("Выберите список организаций или поставщиков");
         }
         DiscrepanciesOnOrdersAndAttendanceBuilder builder = new DiscrepanciesOnOrdersAndAttendanceBuilder();
         this.report = builder.build(session, idOfContragentOrgList, idOfOrgList, localCalendar, startDate, endDate);
     }
 
     public void export(Session session) throws Exception{
-        if(idOfContragentOrgList==null || idOfContragentOrgList.isEmpty()){
-            throw new Exception("Выберите список поставщиков");
+        if(CollectionUtils.isEmpty(idOfOrgList) && CollectionUtils.isEmpty(idOfContragentOrgList)){
+            throw new Exception("Выберите список организаций или поставщиков");
         }
         Date generateTime = new Date();
         DiscrepanciesOnOrdersAndAttendanceBuilder builder = new DiscrepanciesOnOrdersAndAttendanceBuilder();
@@ -81,6 +85,38 @@ public class StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage extends Onli
         }
     }
 
+    public void exportSum(Session session) throws Exception{
+        if(CollectionUtils.isEmpty(idOfOrgList) && CollectionUtils.isEmpty(idOfContragentOrgList)){
+            throw new Exception("Выберите список организаций или поставщиков");
+        }
+        Date generateTime = new Date();
+        DiscrepanciesOnOrdersAndAttendanceBuilder builder = new DiscrepanciesOnOrdersAndAttendanceBuilder();
+        String sourceMenuOrgId = StringUtils.join(idOfContragentOrgList.iterator(), ",");
+        builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG, sourceMenuOrgId);
+        String idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
+        builder.getReportProperties().setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
+        BasicReportJob report = builder.build2(session, startDate, endDate, localCalendar);
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        if (report != null) {
+            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+            ServletOutputStream servletOutputStream = response.getOutputStream();
+            facesContext.responseComplete();
+            response.setContentType("application/xls");
+            String filename2 = buildFileName2(generateTime, report);
+            response.setHeader("Content-disposition", String.format("inline;filename=%s.xls", filename2));
+            //response.setHeader("Content-disposition", "inline;filename=DiscrepanciesOnOrdersAndAttendanceReport.xls");
+            JRXlsExporter xlsExport = new JRXlsExporter();
+            xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
+            xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+            xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+            xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+            xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+            xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+            xlsExport.exportReport();
+            servletOutputStream.close();
+        }
+    }
+
     public void fill() throws Exception{}
 
     private String buildFileName(Date generateTime, BasicReportJob report) {
@@ -88,5 +124,12 @@ public class StatisticsDiscrepanciesOnOrdersAndAttendanceReportPage extends Onli
         String reportDistinctText = report.getReportDistinctText();
         String format = timeFormat.format(generateTime);
         return String.format("%s-%s-%s", "DiscrepanciesOnOrdersAndAttendanceReport", reportDistinctText, format);
+    }
+
+    private String buildFileName2(Date generateTime, BasicReportJob report) {
+        DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss");
+        String reportDistinctText = report.getReportDistinctText();
+        String format = timeFormat.format(generateTime);
+        return String.format("%s-%s-%s", "DiscrepanciesOnOrdersAndAttendanceReportSum", reportDistinctText, format);
     }
 }

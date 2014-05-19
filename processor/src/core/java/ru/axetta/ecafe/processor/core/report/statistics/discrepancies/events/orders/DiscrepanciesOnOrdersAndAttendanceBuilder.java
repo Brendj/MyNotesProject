@@ -19,6 +19,7 @@ import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.msc.DiscrepanciesOnOrdersAndAttendanceJasperReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -76,9 +77,9 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         parameterMap.put("endDate", CalendarUtils.dateToString(endTime));
 
 
-        if (StringUtils.isEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG))) {
+      /*  if (StringUtils.isEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG))) {
             throw new Exception("Не указана организация-поставщик меню.");
-        }
+        }*/
         String sourceMenuOrgId = StringUtils.trimToEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG));
         List<Long> sourceMenuList = new ArrayList<Long>();
         for (String idOfOrg : Arrays.asList(StringUtils.split(sourceMenuOrgId, ','))) {
@@ -114,20 +115,78 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         }
     }
 
+    public BasicReportJob build2(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
+        Date generateTime = new Date();
+            /* Строим параметры для передачи в jasper */
+        Map<String, Object> parameterMap = new HashMap<String, Object>();
+        calendar.setTime(startTime);
+        int month = calendar.get(Calendar.MONTH);
+        parameterMap.put("day", calendar.get(Calendar.DAY_OF_MONTH));
+        parameterMap.put("month", month + 1);
+        parameterMap.put("monthName", new DateFormatSymbols().getMonths()[month]);
+        parameterMap.put("year", calendar.get(Calendar.YEAR));
+        parameterMap.put("beginDate", CalendarUtils.dateToString(startTime));
+        parameterMap.put("endDate", CalendarUtils.dateToString(endTime));
+
+
+      /*  if (StringUtils.isEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG))) {
+            throw new Exception("Не указана организация-поставщик меню.");
+        }*/
+        String sourceMenuOrgId = StringUtils.trimToEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG));
+        List<Long> sourceMenuList = new ArrayList<Long>();
+        for (String idOfOrg : Arrays.asList(StringUtils.split(sourceMenuOrgId, ','))) {
+            sourceMenuList.add(Long.parseLong(idOfOrg));
+        }
+
+        String idOfOrgs = StringUtils.trimToEmpty(getReportProperties().getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
+        List<Long> idOfOrgList = new ArrayList<Long>();
+        for (String idOfOrg : Arrays.asList(StringUtils.split(idOfOrgs, ','))) {
+            idOfOrgList.add(Long.parseLong(idOfOrg));
+        }
+        Date generateEndTime = new Date();
+        DiscrepanciesOnOrdersAndAttendanceReport report = build(session, sourceMenuList, idOfOrgList, calendar, startTime, endTime);
+        JRDataSource dataSource = new JRBeanCollectionDataSource(report.getItemTotals());
+
+        String summaryTemplateFileName = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath()
+                + DiscrepanciesOnOrdersAndAttendanceJasperReport.class.getSimpleName() + "_summary.jasper";
+
+        JasperPrint jasperPrint = JasperFillManager.fillReport(summaryTemplateFileName, parameterMap, dataSource);
+        //  Если имя шаблона присутствует, значит строится для джаспера
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            JRHtmlExporter exporter = new JRHtmlExporter();
+            exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+            exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
+            exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
+            exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
+            exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
+            exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
+            exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
+            exporter.exportReport();
+            final long l = generateEndTime.getTime() - generateTime.getTime();
+            return new DiscrepanciesOnOrdersAndAttendanceJasperReport(generateTime, l,jasperPrint, startTime, endTime);
+    }
+
     public DiscrepanciesOnOrdersAndAttendanceReport build(Session session, List<Long> idOfSupplier, List<Long> idOfOrgs,
             Calendar calendar, Date startTime, Date endTime) throws  Exception{
 
         Criteria catCriteria = session.createCriteria(Org.class)
                 .createAlias("categoriesInternal", "cat", JoinType.LEFT_OUTER_JOIN)
-                .createAlias("sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN)
-                .add(Restrictions.in("sm.idOfOrg", idOfSupplier))
+                //.createAlias("sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN)
+                //.add(Restrictions.in("sm.idOfOrg", idOfSupplier))
                 .setProjection(Projections.projectionList().add(Projections.property("idOfOrg"))
                         .add(Projections.property("type")).add(Projections.property("shortName"))
                         .add(Projections.property("address")).add(Projections.property("cat.idOfCategoryOrg"))
                         .add(Projections.property("cat.categoryName")).add(Projections.property("district")))
                 .addOrder(asc("idOfOrg"));
-        if (!idOfOrgs.isEmpty()) {
+        //if (!idOfOrgs.isEmpty()) {
+        //    catCriteria.add(Restrictions.in("idOfOrg", idOfOrgs));
+        //}
+        if (!CollectionUtils.isEmpty(idOfOrgs)) {
             catCriteria.add(Restrictions.in("idOfOrg", idOfOrgs));
+        }
+        if (!CollectionUtils.isEmpty(idOfSupplier)) {
+            catCriteria.createAlias("sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN);
+            catCriteria.add(Restrictions.in("sm.idOfOrg", idOfSupplier));
         }
         catCriteria.add(Restrictions.ne("type", OrganizationType.SUPPLIER));
         List<Object[]> catRes = (List<Object[]>) catCriteria.list();
@@ -227,6 +286,13 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
         //}
 
 
+        String str;
+        if (!CollectionUtils.isEmpty(idOfSupplier)) {
+           str = " and cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS order_data GROUP BY order_data.d, order_data.org";
+        } else {
+            str = ") AS order_data GROUP BY order_data.d, order_data.org";
+        }
+
         final ArrayList<Long> orgs = new ArrayList<Long>(orgItems.keySet());
         String sql = "SELECT count(distinct client), EXTRACT(EPOCH FROM order_data.d) * 1000, order_data.org "
                 + "FROM ("
@@ -240,14 +306,13 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
                 + " cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
                 //+ " cf_clients.discountmode = 3 and "  /* берем только льготников */
                 + " cf_orders.ordertype in (4, 6) and cf_orders.state=0 and "/* смотрим плану льготного питания */
-                + " cf_orders.state = 0 and "  /* Учитываем только пробитые заказы */
-                + " cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS order_data "
-                + "GROUP BY order_data.d, order_data.org";
-
+                + " cf_orders.state = 0" + str; /* Учитываем только пробитые заказы */
         Query query = session.createSQLQuery(sql);
         query.setLong("startDate", startTime.getTime());
         query.setLong("endDate", endTime.getTime());
-        query.setParameterList("idOfSupplier", idOfSupplier);
+        if (!CollectionUtils.isEmpty(idOfSupplier)) {
+            query.setParameterList("idOfSupplier", idOfSupplier);
+        }
         List<Object[]> res = query.list();
 
         Map<Long, Map<Date, OrderCountItem>> orderCountMap = new HashMap<Long, Map<Date, OrderCountItem>>();
@@ -286,14 +351,14 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
                 + " cf_clients.idofclientgroup<1100000000 and "  /* берем только детей */
                 //+ " cf_clients.discountmode = 3 and "  /* берем только льготников */
                 + " cf_orders.ordertype = 6 and "/* План льготного питания, резерв */
-                + " cf_orders.state = 0 and "/* Учитываем только пробитые заказы */
-                + " cf_menuexchangerules.idofsourceorg in (:idOfSupplier)) AS order_data "
-                + "GROUP BY order_data.d, order_data.org";
+                + " cf_orders.state = 0" + str;/* Учитываем только пробитые заказы */
 
         query = session.createSQLQuery(sql);
         query.setLong("startDate", startTime.getTime());
         query.setLong("endDate", endTime.getTime());
-        query.setParameterList("idOfSupplier", idOfSupplier);
+        if (!CollectionUtils.isEmpty(idOfSupplier)) {
+            query.setParameterList("idOfSupplier", idOfSupplier);
+        }
         res = query.list();
 
         Map<Long, Map<Date, OrderCountItem>> orderReserveCountMap = new HashMap<Long, Map<Date, OrderCountItem>>();
@@ -367,7 +432,75 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
             }
         }
 
-        return new DiscrepanciesOnOrdersAndAttendanceReport(items);
+        List<ItemTotal> itemTotals = new ArrayList<ItemTotal>();
+        List<Long> orgIds = new ArrayList<Long>();
+        Iterator iterator = items.iterator();
+        Item itm = items.get(0);
+        orgIds.add(itm.getIdOfOrg());
+
+        Long totalRequestCount = 0L;
+        Long totalForecastQty = 0L;
+        Long totalOrderCount = 0L;
+        Long totalOrderReserveCount = 0L;
+
+        Map<Long, ItemTotal> itemTotalMap = new HashMap<Long, ItemTotal>();
+
+        while (iterator.hasNext()) {
+            Item itemTo = (Item) iterator.next();
+            if (itm.getIdOfOrg().equals(itemTo.getIdOfOrg())) {
+                totalRequestCount += itemTo.getRequestCount();
+                if (itemTo.getForecastQty() != null) {
+                    totalForecastQty += itemTo.getForecastQty();
+                }
+                totalOrderCount += itemTo.getOrderCount();
+                totalOrderReserveCount += itemTo.getOrderReserveCount();
+            } else {
+                ItemTotal itemTotal = new ItemTotal(itm.getDistrict(), itm.getOrgTypeCategory(), itm.getShortName(),
+                        itm.getNumber(), itm.getAddress(), totalRequestCount, totalForecastQty, totalOrderCount,
+                        totalOrderReserveCount, itm.getIdOfOrg());
+
+                itemTotalMap.put(itm.getIdOfOrg(), itemTotal);
+
+                totalRequestCount = 0L;
+                totalForecastQty = 0L;
+                totalOrderCount = 0L;
+                totalOrderReserveCount = 0L;
+
+                itm = itemTo;
+                orgIds.add(itemTo.getIdOfOrg());
+                itemTotals.add(itemTotal);
+            }
+        }
+
+        totalRequestCount = 0L;
+        totalForecastQty = 0L;
+        totalOrderCount = 0L;
+        totalOrderReserveCount = 0L;
+
+        Iterator itr = items.iterator();
+        int n = orgIds.size();
+        Item itemOld = new Item();
+        while (itr.hasNext()) {
+            Item itemTo = (Item) itr.next();
+            if (orgIds.get(n - 1).equals(itemTo.getIdOfOrg())) {
+                totalRequestCount += itemTo.getRequestCount();
+                if (itemTo.getForecastQty() != null) {
+                    totalForecastQty += itemTo.getForecastQty();
+                }
+                totalOrderCount += itemTo.getOrderCount();
+                totalOrderReserveCount += itemTo.getOrderReserveCount();
+                itemOld = itemTo;
+            }
+        }
+
+        ItemTotal itemTotal = new ItemTotal(itemOld.getDistrict(), itemOld.getOrgTypeCategory(), itemOld.getShortName(),
+                itemOld.getNumber(), itemOld.getAddress(), totalRequestCount, totalForecastQty, totalOrderCount,
+                totalOrderReserveCount, itemOld.getIdOfOrg());
+
+        itemTotalMap.put(itemOld.getIdOfOrg(), itemTotal);
+        itemTotals.add(itemTotal);
+
+        return new DiscrepanciesOnOrdersAndAttendanceReport(items, itemTotals);
     }
 
     protected static class GoodRequestItem{
