@@ -170,13 +170,13 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
             Calendar calendar, Date startTime, Date endTime) throws  Exception{
 
         Criteria catCriteria = session.createCriteria(Org.class)
-                .createAlias("categoriesInternal", "cat", JoinType.LEFT_OUTER_JOIN)
+                /*.createAlias("categoriesInternal", "cat", JoinType.LEFT_OUTER_JOIN)*/
                 //.createAlias("sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN)
                 //.add(Restrictions.in("sm.idOfOrg", idOfSupplier))
                 .setProjection(Projections.projectionList().add(Projections.property("idOfOrg"))
                         .add(Projections.property("type")).add(Projections.property("shortName"))
-                        .add(Projections.property("address")).add(Projections.property("cat.idOfCategoryOrg"))
-                        .add(Projections.property("cat.categoryName")).add(Projections.property("district")))
+                        .add(Projections.property("address"))/*.add(Projections.property("cat.idOfCategoryOrg"))*/
+                        /*.add(Projections.property("cat.categoryName"))*/.add(Projections.property("district")))
                 .addOrder(asc("idOfOrg"));
         //if (!idOfOrgs.isEmpty()) {
         //    catCriteria.add(Restrictions.in("idOfOrg", idOfOrgs));
@@ -197,11 +197,11 @@ public class DiscrepanciesOnOrdersAndAttendanceBuilder extends BasicReportForAll
             OrganizationType orgType = (OrganizationType) row[1];
             String shortName = StringUtils.defaultString((String) row[2]);
             String address = StringUtils.defaultString((String) row[3]);
-            Long idOfCategory = (Long) row[4];
-            String categoryName = (String) row[5];
-            String district = (String) row[6];
-            String category = idOfCategory == null ? (orgType == null ? "" : orgType.toString())
-                    : StringUtils.defaultString(categoryName);
+            /*Long idOfCategory = (Long) row[4];
+            String categoryName = (String) row[5];*/
+            String district = (String) row[4];
+            String category = /*idOfCategory == null ? */(orgType == null ? "" : orgType.toString())
+                    /*: StringUtils.defaultString(categoryName)*/;
             OrgItem orgItem = orgItems.get(idOfOrg);
             if (orgItem == null) {
                 orgItems.put(idOfOrg, new OrgItem(idOfOrg, district, shortName, address, category));
