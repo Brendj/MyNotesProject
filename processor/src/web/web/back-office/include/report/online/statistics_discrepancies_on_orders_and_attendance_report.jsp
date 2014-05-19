@@ -71,8 +71,6 @@
         <h:commandButton value="Выгрузить в Excel итоговую таблицу"
                          actionListener="#{mainPage.exportDiscrepanciesOnOrdersAndAttendanceReportSum}"
                          styleClass="command-button" />
-        <rich:message styleClass="message" errorClass="error-messages" infoClass="info-messages"
-                      warnClass="warn-messages" />
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
