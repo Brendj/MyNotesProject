@@ -384,8 +384,8 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             Client client = ClientProxy.getClient(controller);
             HTTPConduit conduit = (HTTPConduit) client.getConduit();
             HTTPClientPolicy policy = conduit.getClient();
-            policy.setReceiveTimeout(10 * 60 * 1000);
-            policy.setConnectionTimeout(10 * 60 * 1000);
+            policy.setReceiveTimeout(30 * 60 * 1000);
+            policy.setConnectionTimeout(30 * 60 * 1000);
             return controller;
         } catch (java.lang.Exception e) {
             logger.error("Failed to intialize FrontControllerService", e);
