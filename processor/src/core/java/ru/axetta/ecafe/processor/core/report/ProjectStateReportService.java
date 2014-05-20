@@ -605,7 +605,7 @@ public class ProjectStateReportService {
                 return;
             }
 
-            //initContragetsChartType();
+            initContragetsChartType();
             Map<Integer, Boolean> clearedTypes = new HashMap<Integer, Boolean>();
             try {
                 for (String t : TYPES.keySet()) {
