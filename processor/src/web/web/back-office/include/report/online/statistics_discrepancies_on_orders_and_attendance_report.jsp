@@ -55,7 +55,7 @@
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" columns="3">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildDiscrepanciesOnOrdersAndAttendanceReport}"
-                           reRender="mainMenu, workspaceTogglePanel, statisticsDiscrepanciesOnOrdersAndAttendanceReportPageReportPanelGrid"
+                           reRender="workspaceTogglePanel, statisticsDiscrepanciesOnOrdersAndAttendanceReportPageReportPanelGrid"
                            styleClass="command-button"
                            status="statisticsDiscrepanciesOnOrdersAndAttendanceReportGenerateStatus" />
 
