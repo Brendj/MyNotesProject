@@ -57,7 +57,7 @@
         </h:panelGroup>
 
         <a4j:commandButton value="Генерировать отчет" action="#{statisticsPaymentPreferentialSupplyReportPage.buildReport}"
-                           reRender="mainMenu, workspaceTogglePanel, statisticsPaymentPreferentialSupplyReportPanelGrid"
+                           reRender="workspaceTogglePanel, statisticsPaymentPreferentialSupplyReportPanelGrid"
                            styleClass="command-button" status="statisticsPaymentPreferentialSupplyReportGenerateStatus" />
         <a4j:status id="statisticsPaymentPreferentialSupplyReportGenerateStatus">
             <f:facet name="start">

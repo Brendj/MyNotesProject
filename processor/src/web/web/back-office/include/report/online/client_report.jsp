@@ -27,7 +27,7 @@
     </a4j:outputPanel>
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildClientReport}"
-                           reRender="mainMenu, workspaceTogglePanel, clientReportTable" styleClass="command-button"
+                           reRender="workspaceTogglePanel, clientReportTable" styleClass="command-button"
                            status="clientReportGenerateStatus" />
         <a4j:status id="clientReportGenerateStatus">
             <f:facet name="start">

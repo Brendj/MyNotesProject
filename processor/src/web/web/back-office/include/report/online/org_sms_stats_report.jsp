@@ -35,7 +35,7 @@
         </h:selectOneMenu>--%>
 
         <a4j:commandButton value="Генерировать отчет" action="#{orgSmsStatsReportPage.doGenerate}"
-                           reRender="mainMenu, workspaceTogglePanel, reportPanel"
+                           reRender="workspaceTogglePanel, reportPanel"
                            styleClass="command-button" status="reportGenerateStatus" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">

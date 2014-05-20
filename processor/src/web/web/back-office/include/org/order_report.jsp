@@ -18,7 +18,7 @@
         <rich:calendar value="#{mainPage.orgOrderReportPage.endDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                        inputClass="input-text" showWeeksBar="false" />
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildOrgOrderReport}"
-                           reRender="mainMenu, workspaceTogglePanel, orgOrderReportTable" styleClass="command-button"
+                           reRender="workspaceTogglePanel, orgOrderReportTable" styleClass="command-button"
                            status="orgOrderReportGenerateStatus"/>
         <a4j:status id="orgOrderReportGenerateStatus">
             <f:facet name="start">

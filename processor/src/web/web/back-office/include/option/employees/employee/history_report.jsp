@@ -21,7 +21,7 @@
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
         <a4j:commandButton value="Генерировать отчет" action="#{employeeHistoryReportPage.buildReport}"
-                           reRender="mainMenu, workspaceTogglePanel, employeeHistoryReportTable"
+                           reRender="workspaceTogglePanel, employeeHistoryReportTable"
                            styleClass="command-button" status="reportGenerateStatus" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">

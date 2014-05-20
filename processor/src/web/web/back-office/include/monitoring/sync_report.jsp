@@ -26,7 +26,7 @@
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.syncReportPage.filter}}" />
         </h:panelGroup>
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildSyncReport}"
-                           reRender="mainMenu, workspaceTogglePanel, syncReportTable"
+                           reRender="workspaceTogglePanel, syncReportTable"
                            styleClass="command-button" status="sReportGenerateStatus" />
         <a4j:status id="sReportGenerateStatus">
             <f:facet name="start">

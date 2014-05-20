@@ -23,7 +23,7 @@
         </h:panelGrid>
         <h:panelGrid styleClass="borderless-grid">
             <a4j:commandButton value="Генерировать отчет" action="#{orgOfContractsReportPage.build}"
-                               reRender="mainMenu, workspaceTogglePanel, orgOfContractsReportTable"
+                               reRender="workspaceTogglePanel, orgOfContractsReportTable"
                                styleClass="command-button" status="reportGenerateStatus" />
             <a4j:status id="reportGenerateStatus">
                 <f:facet name="start">

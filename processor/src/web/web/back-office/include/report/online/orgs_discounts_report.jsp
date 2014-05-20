@@ -20,7 +20,7 @@
 <h:panelGrid id="orgsDiscountReportPanelGrid" binding="#{mainPage.allOrgsDiscountsReportPage.pageComponent}" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildAllOrgsDiscountsReport}"
-                           reRender="mainMenu, workspaceTogglePanel, orgsDiscountsReportTable, testPanelGrid"
+                           reRender="workspaceTogglePanel, orgsDiscountsReportTable, testPanelGrid"
                            styleClass="commandButton" status="sReportGeneratorStatus" />
         <a4j:status id="sReportGenerateStatus">
             <f:facet name="start">

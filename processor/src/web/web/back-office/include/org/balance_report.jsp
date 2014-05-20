@@ -15,7 +15,7 @@
         <rich:calendar value="#{mainPage.orgBalanceReportPage.baseDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildOrgBalanceReport}"
-                           reRender="mainMenu, workspaceTogglePanel, orgBalanceReportTable"
+                           reRender="workspaceTogglePanel, orgBalanceReportTable"
                            styleClass="command-button" status="orgBalanceReportGenerateStatus"/>
     </h:panelGrid>
     <a4j:status id="orgBalanceReportGenerateStatus">

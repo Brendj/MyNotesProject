@@ -57,7 +57,7 @@
         </h:panelGroup>
 
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildDeliveredServicesReport}"
-                           reRender="mainMenu, workspaceTogglePanel"
+                           reRender="workspaceTogglePanel"
                            styleClass="command-button" status="reportGenerateStatus" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">

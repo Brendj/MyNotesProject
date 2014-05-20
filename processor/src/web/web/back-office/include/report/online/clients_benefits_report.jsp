@@ -26,7 +26,7 @@
         <h:selectBooleanCheckbox value="#{mainPage.clientsBenefitsReportPage.hideMissedColumns}" styleClass="output-text" />
 
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildClientsBenefitsReportPage }"
-                           reRender="mainMenu, workspaceTogglePanel, clientsBenefitsReportTable"
+                           reRender="workspaceTogglePanel, clientsBenefitsReportTable"
                            styleClass="command-button" status="reportGenerateStatus" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">

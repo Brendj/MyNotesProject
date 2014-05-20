@@ -38,7 +38,7 @@
             <h:outputText styleClass="output-text" id="enterEventFilter" escape="true" value=" {#{mainPage.enterEventReportPage.filter}}" />
         </h:panelGroup>
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildEnterEventReport}"
-                           reRender="mainMenu, workspaceTogglePanel, enterEventReportTable"
+                           reRender="workspaceTogglePanel, enterEventReportTable"
                            styleClass="command-button" status="reportGenerateStatus" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">

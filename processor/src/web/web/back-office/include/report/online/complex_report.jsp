@@ -26,7 +26,7 @@
             <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.complexReportPage.filter}}" />
         </h:panelGroup>
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildComplexReport}"
-                           reRender="mainMenu, workspaceTogglePanel, complexReportTable"
+                           reRender="workspaceTogglePanel, complexReportTable"
                            styleClass="command-button" status="cReportGenerateStatus" />
         <a4j:status id="cReportGenerateStatus">
             <f:facet name="start">

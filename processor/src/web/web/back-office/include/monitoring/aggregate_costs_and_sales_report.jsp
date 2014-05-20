@@ -30,7 +30,7 @@
             <h:outputText styleClass="output-text" escape="true" value=" {#{aggregateCostsAndSalesReportPage.filter}}" />
         </h:panelGrid>
         <a4j:commandButton value="Генерировать отчет" action="#{aggregateCostsAndSalesReportPage.buildReport}"
-                           reRender="mainMenu, workspaceTogglePanel, costsAndSalesReportTable"
+                           reRender="workspaceTogglePanel, costsAndSalesReportTable"
                            styleClass="command-button" status="sReportGenerateStatus" />
         <a4j:status id="sReportGenerateStatus">
             <f:facet name="start">

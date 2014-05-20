@@ -11,7 +11,7 @@
 <h:panelGrid styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildStatusSyncReport}"
-                           reRender="mainMenu, workspaceTogglePanel, statusSyncReportTable"
+                           reRender="workspaceTogglePanel, statusSyncReportTable"
                            styleClass="command-button" status="statusSyncReportGenerateStatus" />
         <a4j:status id="statusSyncReportGenerateStatus">
             <f:facet name="start">

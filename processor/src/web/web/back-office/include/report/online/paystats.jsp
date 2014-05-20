@@ -19,7 +19,7 @@
         <rich:calendar value="#{payStatsPage.toDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
                        inputClass="input-text" showWeeksBar="false" />
         <a4j:commandButton value="Генерировать отчет" action="#{payStatsPage.updateData}"
-                           reRender="mainMenu, workspaceTogglePanel, payStatsPageReportTable"
+                           reRender="workspaceTogglePanel, payStatsPageReportTable"
                            styleClass="command-button" />
         <a4j:status>
             <f:facet name="start">

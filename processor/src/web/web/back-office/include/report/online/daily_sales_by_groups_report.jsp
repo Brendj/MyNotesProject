@@ -37,7 +37,7 @@
         <h:inputText value="#{dailySalesByGroupsReportPage.menuGroups}" styleClass="output-text"/>
 
         <a4j:commandButton value="Генерировать отчет" action="#{dailySalesByGroupsReportPage.buildReport}"
-                           reRender="mainMenu, workspaceTogglePanel"
+                           reRender="workspaceTogglePanel"
                            styleClass="command-button" status="reportGenerateStatus" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">

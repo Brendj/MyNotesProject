@@ -18,7 +18,7 @@
         <rich:calendar value="#{totalServicesReportPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
         <a4j:commandButton value="Генерировать отчет" action="#{totalServicesReportPage.executeReport}"
-                           reRender="mainMenu, workspaceTogglePanel, itemsReportTable"
+                           reRender="workspaceTogglePanel, itemsReportTable"
                            styleClass="command-button" status="reportGenerateStatus" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">

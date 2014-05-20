@@ -80,7 +80,7 @@
             </h:selectOneMenu>
 
             <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildDetailedGoodRequestReport}"
-                               reRender="mainMenu, workspaceTogglePanel, detailedGoodRequestTable"
+                               reRender="workspaceTogglePanel, detailedGoodRequestTable"
                                styleClass="command-button" status="sReportGenerateStatus" />
         </h:panelGrid>
 

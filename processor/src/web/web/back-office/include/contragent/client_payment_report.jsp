@@ -17,7 +17,7 @@
         <rich:calendar value="#{mainPage.contragentClientPaymentReportPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.buildContragentClientPaymentReport}"
-                           reRender="mainMenu, workspaceTogglePanel, contragentClientPaymentReportTable"
+                           reRender="workspaceTogglePanel, contragentClientPaymentReportTable"
                            styleClass="command-button" />
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid">
