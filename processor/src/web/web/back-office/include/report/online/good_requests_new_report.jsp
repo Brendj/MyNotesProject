@@ -35,10 +35,11 @@
         <h:panelGrid styleClass="borderless-grid" columns="2">
 
             <h:outputText styleClass="output-text" escape="true" value="Поставщик" />
-            <h:panelGroup>
+            <h:panelGroup id="contragetFilter">
                 <a4j:commandButton value="..."
                                    action="#{mainPage.goodRequestsNewReportPage.showContragentListSelectPage}"
                                    reRender="modalOrgListSelectorPanel"
+                                   disabled="#{mainPage.goodRequestsNewReportPage.applyUserSettings}"
                                    oncomplete="if (#{facesContext.maximumSeverity == null})
                                         #{rich:component('modalOrgListSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;">
@@ -53,11 +54,12 @@
             </h:panelGroup>
 
             <h:outputText styleClass="output-text" escape="true" value="Организация" />
-            <h:panelGroup>
+            <h:panelGroup id="orgFilter">
                 <a4j:commandButton value="..." action="#{mainPage.goodRequestsNewReportPage.showOrgListSelectPage}"
                                    reRender="modalOrgListSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null})
                                         #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                   disabled="#{mainPage.goodRequestsNewReportPage.applyUserSettings}"
                                    styleClass="command-link" style="width: 25px;">
                     <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />
                     <f:setPropertyActionListener value="#{mainPage.goodRequestsNewReportPage.getStringIdOfOrgList}"
@@ -66,7 +68,13 @@
                 <h:outputText styleClass="output-text" escape="true"
                               value=" {#{mainPage.goodRequestsNewReportPage.filter}}" />
             </h:panelGroup>
-
+            <h:outputText escape="true" value="Формировать по Списку организаций рассылки" styleClass="output-text" />
+            <h:selectBooleanCheckbox value="#{mainPage.goodRequestsNewReportPage.applyUserSettings}"
+                                     styleClass="output-text">
+                <a4j:support event="onclick" reRender="contragetFilter, orgFilter"
+                             actionListener="#{mainPage.goodRequestsNewReportPage.applyOfOrgList}" ajaxSingle="true" />
+            </h:selectBooleanCheckbox>
+            <%--Добавить варниг сообщ--%>
             <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
             <rich:calendar value="#{mainPage.goodRequestsNewReportPage.startDate}" datePattern="dd.MM.yyyy"
                            converter="dateConverter" inputClass="input-text"

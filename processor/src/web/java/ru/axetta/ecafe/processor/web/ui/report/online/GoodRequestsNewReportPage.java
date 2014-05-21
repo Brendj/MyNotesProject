@@ -8,11 +8,13 @@ import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.SyncHistory;
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.UserOrgs;
 import ru.axetta.ecafe.processor.core.persistence.UserReportSetting;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.report.*;
+import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.report.BasicReportJob;
+import ru.axetta.ecafe.processor.core.report.GoodRequestsNewReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -21,11 +23,8 @@ import ru.axetta.ecafe.processor.web.ui.converter.OrgRequestFilterConverter;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
-import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,12 +33,13 @@ import javax.faces.event.ActionEvent;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Properties;
 
 /**
@@ -61,6 +61,7 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     private Date generateEndDate = new Date();
     private Boolean hideMissedColumns = true;
     private Boolean hideDailySamplesCount = false;
+    private Boolean applyUserSettings = false;
     private Boolean hideGeneratePeriod = false;
     private Boolean hideLastValue = false;
     private String nameFiler;
@@ -68,6 +69,48 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     private User currentUser;
     //private String lastGoodRequestUpdateDateTiem;
     private Date lastGoodRequestUpdateDateTime;
+
+    //Метод транзакционный
+    public void applyOfOrgList(ActionEvent ae) {
+        if (applyUserSettings) {
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                try {
+                    persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
+                    persistenceTransaction = persistenceSession.beginTransaction();
+
+                    persistenceSession.refresh(currentUser);
+
+                    idOfOrgList = new ArrayList<Long>();
+                    if (currentUser.getUserOrgses().isEmpty()){
+                        filter = "Не выбрано";
+                        printMessage("Список организаций рассылки не заполнен");
+                        idOfOrgList = null;
+
+                    }
+                    else {
+                        filter = "";
+                        for(UserOrgs userOrgs: currentUser.getUserOrgses()) {
+                            idOfOrgList.add(userOrgs.getOrg().getIdOfOrg());
+                            filter = filter.concat(userOrgs.getOrg().getShortName() + "; ");
+                        }
+                        filter = filter.substring(0, filter.length() - 1);
+                    }
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
+                } finally {
+                    HibernateUtils.rollback(persistenceTransaction, logger);
+                    //HibernateUtils.close(persistenceSession, logger);
+                }
+            } catch (Exception e) {
+                logger.error("Failed export report : ", e);
+                printError("Ошибка при подготовке отчета: " + e.getMessage());
+            }
+        } else {
+            filter = "Не выбрано";
+        }
+    }
 
     // Транзакционный метод
     @Override
@@ -469,6 +512,14 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
 
     public String getNameFiler() {
         return nameFiler;
+    }
+
+    public Boolean getApplyUserSettings() {
+        return applyUserSettings;
+    }
+
+    public void setApplyUserSettings(Boolean applyUserSettings) {
+        this.applyUserSettings = applyUserSettings;
     }
 
     public Boolean getHideGeneratePeriod() {
