@@ -494,7 +494,7 @@ public class ProjectStateReportService {
                         + "group by 1", FISCAL_CHART_1_DATA).setIncremental(true),
 
                 new SimpleType(
-                          "select '' || EXTRACT(EPOCH FROM d) * 1000 as d, int8(sum(v) / 100) / 1000 as v "
+                          "select '' || EXTRACT(EPOCH FROM date_trunc('day', current_timestamp)) * 1000 as d, int8(sum(v) / 100) / 1000 as v "
                         + "from (select regOrgSrc.rsum as v, date_trunc('day', to_timestamp(regOrgSrc.createddate / 1000)) as d "
                         + "      from cf_orders regOrgSrc "
                         + REGION_SENSITIVE_JOIN + " "
