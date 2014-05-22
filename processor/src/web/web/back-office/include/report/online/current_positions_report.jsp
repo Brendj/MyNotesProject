@@ -11,7 +11,7 @@
 <h:panelGrid id="currentPositionsReportPanelGrid" binding="#{mainPage.currentPositionsReportPage.pageComponent}" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Обновить" action="#{mainPage.buildCurrentPositionsReport}"
-                           reRender="mainMenu, workspaceTogglePanel, currentPositionsReportTable"
+                           reRender="workspaceTogglePanel, currentPositionsReportTable"
                            styleClass="command-button" status="currentPositionsReportGenerateStatus" />
         <a4j:status id="currentPositionsReportGenerateStatus">
             <f:facet name="start">
@@ -73,7 +73,7 @@
         </rich:dataTable>
         <h:commandButton value="Выгрузить в CSV" action="#{mainPage.showCurrentPositionCSVList}" styleClass="command-button" />
         <a4j:commandButton value="Выполнить перерасчет текущих позиций (длительная операция)" action="#{mainPage.countCurrentPositions}"
-                           reRender="mainMenu, workspaceTogglePanel, currentPositionsReportTable"
+                           reRender="workspaceTogglePanel, currentPositionsReportTable"
                            styleClass="command-button" status="currentPositionsReportGenerateStatus"
                            rendered="#{mainPage.eligibleToCountCurrentPositions}" />
     </h:panelGrid>

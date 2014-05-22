@@ -50,7 +50,7 @@
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Обновить" action="#{commonStatsPage.updateData}"
-                           reRender="mainMenu, workspaceTogglePanel, commonStatsTable"
+                           reRender="workspaceTogglePanel, commonStatsTable"
                            styleClass="command-button" />
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
