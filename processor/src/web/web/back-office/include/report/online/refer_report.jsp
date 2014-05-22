@@ -38,7 +38,7 @@
                 <h:outputText styleClass="output-text" escape="true" value=" {#{referReportPage.filter}}" />
             </h:panelGroup>
 
-            <h:outputText escape="true" value="Регион" styleClass="output-text" />
+            <h:outputText escape="true" value="Округ" styleClass="output-text" />
             <h:selectOneMenu id="regionsList" value="#{referReportPage.region}" style="width:325px;" >
                 <f:selectItems value="#{referReportPage.regions}"/>
             </h:selectOneMenu>
@@ -47,7 +47,7 @@
         <rich:tabPanel style="width: 500px;" switchType="client">
             <rich:tab label="Месячный отчет">
                 <a4j:commandButton value="Генерировать" action="#{referReportPage.doGenerateMonthly}"
-                                   reRender="mainMenu, workspaceTogglePanel"
+                                   reRender="workspaceTogglePanel"
                                    styleClass="command-button" status="reportGenerateStatus" />
                 <h:commandButton value="Генерировать в Excel" actionListener="#{referReportPage.doGenerateMonthlyExcel}" styleClass="command-button" />
             </rich:tab>
@@ -64,7 +64,7 @@
                 </h:panelGrid>
 
                 <a4j:commandButton value="Генерировать" action="#{referReportPage.doGenerateDaily}"
-                                   reRender="mainMenu, workspaceTogglePanel"
+                                   reRender="workspaceTogglePanel"
                                    styleClass="command-button" status="reportGenerateStatus" />
                 <h:commandButton value="Генерировать в Excel" actionListener="#{referReportPage.doGenerateDailyExcel}" styleClass="command-button" />
             </rich:tab>
