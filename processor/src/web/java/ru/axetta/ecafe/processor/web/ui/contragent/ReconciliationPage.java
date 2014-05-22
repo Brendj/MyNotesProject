@@ -46,7 +46,7 @@ public class ReconciliationPage extends BasicWorkspacePage implements Contragent
     private int exportType = 0;
     private DateFormat localDateFormat = CalendarUtils.getDateFormatLocal();
     private LineConfig defaultLineConfig;
-    private boolean dateDependent = true;
+    private boolean dateDependent = false;
 
     @Override
     public String getPageFilename() {
