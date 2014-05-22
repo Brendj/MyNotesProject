@@ -221,7 +221,7 @@
 				<crosstabCell width="57" height="41">
 					<cellContents style="table">
 						<textField>
-							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="57" height="25" forecolor="#FFFFFF" backcolor="#FF6666">
+							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="57" height="41" forecolor="#FFFFFF" backcolor="#FF6666">
 								<printWhenExpression><![CDATA[!$V{totalCountMeasure}.equals($V{newTotalCountMeasure}) &&
 !$V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
 							</reportElement>
@@ -242,7 +242,7 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 ))]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement uuid="67da7250-646f-4951-8566-1635493f6071" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="57" height="25" backcolor="#92D050">
+							<reportElement uuid="67da7250-646f-4951-8566-1635493f6071" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="57" height="41" backcolor="#92D050">
 								<printWhenExpression><![CDATA[$V{totalCountMeasure}.equals($V{newTotalCountMeasure}) &&
 !$V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
 							</reportElement>
@@ -254,7 +254,7 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
     ? "" : " / "+ $V{dailySampleMeasure} )]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="57" height="40">
+							<reportElement uuid="231375ae-43c8-4e27-bc2f-2f82281f4282" positionType="Float" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" mode="Opaque" x="0" y="0" width="57" height="41">
 								<printWhenExpression><![CDATA[$V{newTotalCountMeasure}.equals(0L)]]></printWhenExpression>
 							</reportElement>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
