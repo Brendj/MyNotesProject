@@ -33,8 +33,8 @@ public class DBUpdater {
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
-    @Autowired(required = false)
-    private RuntimeContext runtimeContext;
+    //@Autowired(required = false)
+    //private RuntimeContext runtimeContext;
 
 
     private int[] INITIAL_DB_VERSION;
@@ -87,7 +87,7 @@ public class DBUpdater {
             }
             boolean bUpdated = false;
             /* если схема верии не пусто и если сервер запущен под MAIN узлом */
-            if (curSchemaVer !=null && runtimeContext.isMainNode()) {
+            if (curSchemaVer !=null && RuntimeContext.getInstance().isMainNode()) {
                 for (;;) {
                     String curVerStr = String.format("%d.%d.%d", curSchemaVer.getMajorVersionNum(), curSchemaVer.getMiddleVersionNum(), curSchemaVer
                             .getMinorVersionNum());
