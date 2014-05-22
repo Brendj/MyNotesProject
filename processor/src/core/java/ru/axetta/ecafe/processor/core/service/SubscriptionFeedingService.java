@@ -24,10 +24,7 @@ import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.Subqueries;
+import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +32,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
@@ -59,93 +59,140 @@ public class SubscriptionFeedingService {
         return RuntimeContext.getAppContext().getBean(SubscriptionFeedingService.class);
     }
 
+    private Calendar localCalendar;
+    private DateFormat dateFormat;
+
+    @PostConstruct
+    public void init(){
+        try {
+            dateFormat = CalendarUtils.getDateFormatLocal();
+        } catch (Exception e) {
+            dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        }
+        try {
+            localCalendar = RuntimeContext.getInstance().getLocalCalendar(null);
+        } catch (Exception e) {
+            localCalendar = Calendar.getInstance();
+        }
+    }
+
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
     @Autowired
     private EventNotificationService enService;
 
-    @Transactional
-    public void notifyClientsAboutSubscriptionFeeding() throws Exception {
-        final Date currentDate = new Date();
-        final Date withdrawDate = CalendarUtils.addDays(currentDate, 7);
-        DateFormat df = CalendarUtils.getDateFormatLocal();
-        String withdrawDateStr = df.format(withdrawDate);
-        String sql = "from CycleDiagram ccd where ccd.stateDiagram=0";
-        TypedQuery<CycleDiagram> typedQuery = entityManager.createQuery(sql, CycleDiagram.class);
-        List<CycleDiagram> cycleDiagrams = typedQuery.getResultList();
-        if(LOGGER.isDebugEnabled()){
-            LOGGER.debug("cycleDiagrams count=" + cycleDiagrams.size());
+    /**
+     * Метод оповещает об отключении АП из за отсутсвия средств на субсчете
+     */
+    public void notifyDeactivateClients(){
+        SubscriptionFeedingService instance = SubscriptionFeedingService.getInstance();
+        final Date currentDay = new Date();
+        List list = instance.findNotifyClientsDeactivate(currentDay);
+        if(list.isEmpty()) LOGGER.debug("clients empty");
+        for (Object obj: list){
+            Client client = (Client) obj;
+            final String contractId = String.format("%s01", String.valueOf(client.getContractId()));
+            String[] values = new String[]{"contractId", contractId};
+            enService.sendNotification(client, EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS, values);
         }
-        if(!cycleDiagrams.isEmpty()){
-            for (CycleDiagram cycleDiagram: cycleDiagrams){
-                final Client client = cycleDiagram.getClient();
-                Long subBalance = client.getSubBalance1();
-                Date deactivateDate = null;
-                sql = "from SubscriptionFeeding where wasSuspended=false and client=:client and dateDeactivateService>=:currentDate";
-                TypedQuery<SubscriptionFeeding> subscriptionFeedingQuery = entityManager.createQuery(sql, SubscriptionFeeding.class);
-                subscriptionFeedingQuery.setParameter("client", client);
-                subscriptionFeedingQuery.setParameter("currentDate", currentDate);
-                subscriptionFeedingQuery.setMaxResults(1);
-                List<SubscriptionFeeding> subscriptionFeedings = subscriptionFeedingQuery.getResultList();
-                if(subscriptionFeedings!=null && !subscriptionFeedings.isEmpty()){
-                    deactivateDate = subscriptionFeedings.get(0).getDateDeactivateService();
-                }
-                boolean sendNotification = true;
-                if(LOGGER.isDebugEnabled()){
-                    LOGGER.debug("SubscriptionFeeding deactivateDate=" + deactivateDate);
-                }
-                if(deactivateDate!=null){
-                    sendNotification = deactivateDate.compareTo(withdrawDate)>0;
-                }
-                if(LOGGER.isDebugEnabled()){
-                    LOGGER.debug("sendNotification=" + sendNotification);
-                }
-                final String contractId = String.format("%s01", String.valueOf(client.getContractId()));
-                if(sendNotification){
-                    if(subBalance==null || subBalance==0L){
-                        withdrawDateStr = df.format(CalendarUtils.addDays(currentDate, 1));
-                        subBalance = 0L;
-                    }
-                    if(subBalance - cycleDiagram.getWeekPrice()<0){
-                        String[] values = {
-                                "contractId", contractId, "withdrawDate", withdrawDateStr,
-                                "balance", CurrencyStringUtils.copecksToRubles(subBalance)};
-                        enService.sendNotification(client, EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING, values);
-                    }
-                } else {
-                    if(deactivateDate!=null){
-                        long[] days = new long[7];
-                        days[0] = cycleDiagram.getSundayPrice();
-                        days[1] = cycleDiagram.getMondayPrice();
-                        days[2] = cycleDiagram.getTuesdayPrice();
-                        days[3] = cycleDiagram.getWednesdayPrice();
-                        days[4] = cycleDiagram.getThursdayPrice();
-                        days[5] = cycleDiagram.getFridayPrice();
-                        days[6] = cycleDiagram.getSaturdayPrice();
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.setTime(currentDate);
-                        final long currentBalance = subBalance;
-                        int dayWeek = calendar.get(Calendar.DAY_OF_WEEK);
-                        if(LOGGER.isDebugEnabled()){
-                            LOGGER.debug("Current Day: "+ dayWeek);
-                        }
-                        for (int i=dayWeek; i<dayWeek+7; i++){
-                            subBalance = subBalance-days[i%7];
-                            final Date date = CalendarUtils.addDays(currentDate, i - 5);
-                            if(subBalance-days[i%7]<0 && date.compareTo(deactivateDate)<0 ){
-                                withdrawDateStr = df.format(date);
-                                String[] values = {"contractId", contractId, "withdrawDate", withdrawDateStr,
-                                                   "balance", CurrencyStringUtils.copecksToRubles(currentBalance)};
-                                enService.sendNotification(client, EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING, values);
-                                break;
-                            }
+    }
 
-                        }
-                    }
+    /**
+     * Метод оповещает о не достатке средств оплаты АП на ближайшую неделю
+     * При условии что дата отключения или паузы бедет более чем через неделю
+     * TODO: добавить взятие даты паузы или отключения последней циклограммы для уточнения даты
+     */
+    public void notifyClients(){
+        SubscriptionFeedingService instance = SubscriptionFeedingService.getInstance();
+        final Date currentDay = new Date();
+        List list = instance.findNotifyClients(currentDay);
+        if(list.isEmpty()) LOGGER.debug("clients empty");
+        //Date lastWeekDay = new Date();
+        //lastWeekDay = CalendarUtils.addDays(lastWeekDay, 7);
+        for (Object obj: list){
+            Object[] row = (Object[]) obj;
+            Client client = (Client) row[0];
+            CycleDiagram diagram = (CycleDiagram) row[1];
+            final String contractId = String.format("%s01", String.valueOf(client.getContractId()));
+            final Long subBalance = client.getSubBalance1();
+            long[] days = new long[7];
+            days[0] = diagram.getSundayPrice();
+            days[1] = diagram.getMondayPrice();
+            days[2] = diagram.getTuesdayPrice();
+            days[3] = diagram.getWednesdayPrice();
+            days[4] = diagram.getThursdayPrice();
+            days[5] = diagram.getFridayPrice();
+            days[6] = diagram.getSaturdayPrice();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(currentDay);
+            long currentBalance = subBalance;
+            int dayWeek = calendar.get(Calendar.DAY_OF_WEEK);
+            String[] values = null;
+            for (int i=dayWeek; i<dayWeek+7; i++){
+                currentBalance = currentBalance-days[i%7];
+                final Date date = CalendarUtils.addDays(currentDay, i - dayWeek+1);
+                if(currentBalance<=0){
+                    values = new String[]{"contractId", contractId, "withdrawDate", dateFormat.format(date),
+                                          "balance", CurrencyStringUtils.copecksToRubles(subBalance)};
+                    break;
                 }
             }
+            if(values!=null){
+                enService.sendNotification(client, EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING, values);
+            }
         }
+    }
+
+
+    /**
+     * Метод возвращает список активных циклограмм на указанную дату
+     * @param date дата
+     * @return список подписок
+     */
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    // Возвращает циклограмму, действующую в определенный день.
+    public List findNotifyClients(final Date date) {
+        Date nextWeekDay = new Date();
+        nextWeekDay = CalendarUtils.addDays(nextWeekDay, 7);
+        final String sql = "select cl, cd from CycleDiagram cd left join cd.client cl where cd.stateDiagram=0 and "
+                + " exists (from SubscriptionFeeding sf "
+                + "  where sf.dateCreateService<:currentDate and sf.dateActivateService<:currentDate  "
+                + "  and (sf.lastDatePauseService is null or sf.lastDatePauseService>:nextWeekDay) "
+                + "  and (sf.dateDeactivateService is null or sf.dateDeactivateService>:nextWeekDay) and sf.client=cl and sf.deletedState=false) "
+                + " and not (cl.subBalance1 is null) and cl.subBalance1>0 and"
+                + " cl.subBalance1-cd.mondayPrice-cd.tuesdayPrice-cd.wednesdayPrice-cd.thursdayPrice-cd.fridayPrice-cd.saturdayPrice-cd.sundayPrice<=0 and "
+                + " cd.dateActivationDiagram = ( select max(incd.dateActivationDiagram) from CycleDiagram incd where incd.client=cl "
+                + "and incd.dateActivationDiagram<:currentDate and incd.deletedState=false)";
+        Query cycleDiagramTypedQuery = entityManager.createQuery(sql);
+        cycleDiagramTypedQuery.setParameter("currentDate", date);
+        cycleDiagramTypedQuery.setParameter("nextWeekDay", nextWeekDay);
+        return cycleDiagramTypedQuery.getResultList();
+    }
+
+
+    /**
+     * Метод возвращает список активных циклограмм на указанную дату
+     * @param date дата
+     * @return список подписок
+     */
+    @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    // Возвращает циклограмму, действующую в определенный день.
+    public List findNotifyClientsDeactivate(final Date date) {
+        final String sql = "select cl from CycleDiagram cd left join cd.client cl where cd.stateDiagram=0 and "
+                + " exists (from SubscriptionFeeding sf "
+                + "  where sf.dateCreateService<:currentDate and sf.dateActivateService<:currentDate  "
+                + "  and (sf.lastDatePauseService is null or sf.lastDatePauseService>:currentDate) "
+                + "  and (sf.dateDeactivateService is null or sf.dateDeactivateService>:currentDate) and sf.client=cl and sf.deletedState=false) "
+                + " and not (cl.subBalance1 is null) and "
+                + " cl.subBalance1<=0 and "
+                + " cd.dateActivationDiagram = ( select max(incd.dateActivationDiagram) from CycleDiagram incd where incd.client=cl "
+                + "and incd.dateActivationDiagram<:currentDate and incd.deletedState=false)";
+        Query cycleDiagramTypedQuery = entityManager.createQuery(sql);
+        cycleDiagramTypedQuery.setParameter("currentDate", date);
+        return cycleDiagramTypedQuery.getResultList();
     }
 
     @SuppressWarnings("unchecked")
@@ -257,16 +304,6 @@ public class SubscriptionFeedingService {
         criteria.add(Restrictions.eq("deletedState", false));
         criteria.add(Restrictions.eq("stateDiagram", StateDiagram.ACTIVE));
         return (CycleDiagram) criteria.uniqueResult();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Transactional(propagation = Propagation.SUPPORTS)
-    // Возвращает циклограмму питания, актуальную на текущий день.
-    public void blockingCycleDiagram(CycleDiagram diagram) {
-        Session session = entityManager.unwrap(Session.class);
-        session.refresh(diagram);
-        diagram.setStateDiagram(StateDiagram.BLOCK);
-        session.save(diagram);
     }
 
     @SuppressWarnings("unchecked")

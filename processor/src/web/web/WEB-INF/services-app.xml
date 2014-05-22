@@ -116,7 +116,8 @@
     <!-- Оповещение клиента об недостатке средств в субсчет для оплаты АП, срабатывает каждый день в 16 часов вечера -->
     <task:scheduler id="subscriptionFeedingSchedule"/>
     <task:scheduled-tasks scheduler="subscriptionFeedingSchedule">
-        <task:scheduled ref="subscriptionFeedingService" method="notifyClientsAboutSubscriptionFeeding" cron="0 0 16 * * ?"/>
+        <task:scheduled ref="subscriptionFeedingService" method="notifyClients" cron="0 0 16 * * ?"/>
+        <task:scheduled ref="subscriptionFeedingService" method="notifyDeactivateClients" cron="0 0 16 * * ?"/>
     </task:scheduled-tasks>
 
     <!-- Активация клиентских циклограмм питания. Срабатывает каждый день в 0:30 часа ночи. -->
