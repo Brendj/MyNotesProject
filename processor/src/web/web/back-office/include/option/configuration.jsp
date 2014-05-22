@@ -13,10 +13,10 @@
         <h:inputTextarea rows="40" cols="140" value="#{mainPage.configurationPage.configurationText}" styleClass="input-text" />
         <h:panelGroup>
             <a4j:commandButton value="Сохранить" action="#{mainPage.saveConfiguration}"
-                               reRender="mainMenu, workspaceTogglePanel, configurationPanelGrid"
+                               reRender="workspaceTogglePanel, configurationPanelGrid"
                                styleClass="command-button" />
             <a4j:commandButton value="Отмена" action="#{mainPage.configurationPage.cancelConfiguration}"
-                               reRender="mainMenu, workspaceTogglePanel, configurationPanelGrid"
+                               reRender="workspaceTogglePanel, configurationPanelGrid"
                                styleClass="command-button" />
         </h:panelGroup>
     </h:panelGrid>

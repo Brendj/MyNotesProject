@@ -206,7 +206,7 @@
         </rich:dataTable>
 
         <a4j:commandButton value="Добавить банк" action="#{bankListPage.addBank}"
-                                    reRender="mainMenu, workspaceTogglePanel, optionPanelGrid" styleClass="command-button" />
+                                    reRender="workspaceTogglePanel, optionPanelGrid" styleClass="command-button" />
 
     </rich:tab>
 
@@ -388,9 +388,9 @@
 <h:panelGroup style="margin-top: 10px">
 
     <a4j:commandButton value="Сохранить" action="#{optionPage.save}"
-                            reRender="mainMenu, workspaceTogglePanel, optionPanelGrid" styleClass="command-button" />
+                            reRender="workspaceTogglePanel, optionPanelGrid" styleClass="command-button" />
     <a4j:commandButton value="Отмена" action="#{optionPage.cancel}"
-                            reRender="mainMenu, workspaceTogglePanel, optionPanelGrid" styleClass="command-button" />
+                            reRender="workspaceTogglePanel, optionPanelGrid" styleClass="command-button" />
 </h:panelGroup>
 <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages" warnClass="warn-messages" />
 </h:panelGrid>
