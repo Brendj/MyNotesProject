@@ -106,7 +106,7 @@ public class ClientPaymentsReport extends BasicReport {
                 if (discounts == null) {
                     discounts = 0L;
                 }
-                String orgName = orgNumber == null ? orgFullName : orgNumber;
+                String orgName = orgFullName;//orgNumber == null ? orgFullName : orgNumber;
                 ClientPaymentItem item = new ClientPaymentItem(idOfOrg, orgName, agent, 0L, sales, discounts);
                 items.add(item);
             }
@@ -126,7 +126,7 @@ public class ClientPaymentsReport extends BasicReport {
                 if (payments == null) {
                     continue;
                 }
-                String orgName = orgNumber == null ? orgFullName : orgNumber;
+                String orgName = orgFullName;//orgNumber == null ? orgFullName : orgNumber;
                 ClientPaymentItem item = lookupOrgById(items, idOfOrg);
                 if (item == null) {
                     item = new ClientPaymentItem(idOfOrg, orgName, agent, payments, 0L, 0L);
