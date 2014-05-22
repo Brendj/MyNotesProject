@@ -11,7 +11,6 @@
         <version name="version" column="Version" type="long"/>
         <property name="clientRegistryVersion" column="ClientRegistryVersion" type="long" not-null="true"
                   insert="false"/>
-        <property name="smsId" column="SmsId" type="string" length="16" not-null="true" insert="false"/>
     </class>
 </hibernate-mapping>
 

@@ -20,14 +20,6 @@
         <!--<many-to-one name="userDelete" column="IdOfUserDelete" class="ru.axetta.ecafe.processor.core.persistence.User" />-->
         <many-to-one name="userEdit" column="IdOfUserEdit" class="ru.axetta.ecafe.processor.core.persistence.User" />
 
-
-        <set name="products" lazy="true" cascade="all">
-            <key>
-                <column name="idofconfigurationprovider"/>
-            </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Product"/>
-        </set>
-
         <set name="orgInternal" lazy="false" cascade="all">
             <key>
                 <column name="idOfConfigurationProvider"/>
