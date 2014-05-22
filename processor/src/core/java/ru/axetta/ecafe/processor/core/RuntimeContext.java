@@ -52,7 +52,14 @@ import ru.axetta.ecafe.util.DigitalSignatureUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.*;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.LongType;
+import org.hibernate.type.Type;
 import org.quartz.Scheduler;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
@@ -684,83 +691,6 @@ public class RuntimeContext implements ApplicationContextAware {
                 for (GoodComplaintPossibleCauses possibleCauses : GoodComplaintPossibleCauses.values()) {
                     entityManager.persist(possibleCauses);
                 }
-
-                /*Session session = entityManager.unwrap(Session.class);
-                List<Long> cardno = Arrays.asList(76877938L,
-                        76877938L,
-                        78243442L,
-                        79956602L,
-                        73398642L,
-                        72300018L,
-                        68407770L,
-                        75941754L,
-                        68605850L,
-                        73260466L,
-                        71904938L,
-                        69696474L,
-                        76900250L,
-                        82162722L,
-                        76997338L,
-                        2361081787L,
-                        3973791419L,
-                        741371593L,
-                        2335903428L,
-                        1796869828L,
-                        272970932L,
-                        177739572L,
-                        126558275L,
-                        129646482L,
-                        1253182916L,
-                        1590433588L,
-                        962461748L,
-                        1809454900L,
-                        3037597380L,
-                        2524446772L,
-                        1520047924L,
-                        387539139L,
-                        3360030772L,
-                        1160452148L,
-                        477525884L,
-                        3526823620L,
-                        1575947716L,
-                        1209473076L,
-                        116850884L,
-                        126578765L,
-                        4225754920L,
-                        3444572212L,
-                        51058740L,
-                        3826388676L,
-                        2686127812L,
-                        1356142388L,
-                        3812101828L,
-                        737086916L,
-                        2563708724L,
-                        3301054260L,
-                        2788706148L,
-                        2502105140L,
-                        2146113332L,
-                        178263860L,
-                        1157044020L,
-                        2316308164L,
-                        74065866L,
-                        2629134025L);
-                Query q = session.createQuery("from Card where cardNo in :cardno");
-                q.setParameterList("cardno", cardno);
-                List<Card> cards = q.list();
-                Iterator<Card> cardIterator = cards.iterator();
-                while (cardIterator.hasNext()){
-                    Card card = cardIterator.next();
-                    session.delete(card);
-                }
-
-                q = session.createQuery("from CardTemp where cardNo in :cardno");
-                q.setParameterList("cardno", cardno);
-                List<CardTemp> cardTemps = q.list();
-                Iterator<CardTemp> cardTempIterator = cardTemps.iterator();
-                while (cardIterator.hasNext()){
-                    CardTemp cardTemp = cardTempIterator.next();
-                    session.delete(cardTemp);
-                }*/
 
                 /**
                  * Инициализируем список ролей для комплексов
