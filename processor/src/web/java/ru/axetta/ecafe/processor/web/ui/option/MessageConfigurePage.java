@@ -42,6 +42,11 @@ public class MessageConfigurePage extends BasicWorkspacePage {
     private String paymentEmailMessageText;
     private String paymentSMSMessageText;
 
+    private String notificationSubscriptionFeedingSMSText;
+    private String notificationSubscriptionFeedingNotSuccessSMSText;
+    private String notificationSubscriptionFeedingSubject;
+    private String notificationSubscriptionFeedingEmailMessageText;
+
     private String smsSubscriptionFeeSMSText;
     private String smsSubFeeWithdrawSuccessfulSMSText;
     private String smsSubFeeWithdrawNotSuccessfulSMSText;
@@ -52,6 +57,8 @@ public class MessageConfigurePage extends BasicWorkspacePage {
 
     private String goodRequestChangeEmailMessageText;
     private String goodRequestChangeEmailSubject;
+    private String notificationSubscriptionFeedingWithdrawNotSuccessSubject;
+    private String notificationSubscriptionFeedingWithdrawNotSuccessEmailMessageText;
 
     @Resource
     EventNotificationService eventNotificationService;
@@ -89,6 +96,14 @@ public class MessageConfigurePage extends BasicWorkspacePage {
                 EventNotificationService.MESSAGE_PAYMENT, EventNotificationService.TYPE_EMAIL_TEXT);
         paymentSMSMessageText = eventNotificationService.getNotificationText(
                 EventNotificationService.MESSAGE_PAYMENT, EventNotificationService.TYPE_SMS);
+        notificationSubscriptionFeedingSMSText = eventNotificationService.
+                getNotificationText(EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING, EventNotificationService.TYPE_SMS);
+        notificationSubscriptionFeedingNotSuccessSMSText = eventNotificationService
+                .getNotificationText(EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS, EventNotificationService.TYPE_SMS);
+        notificationSubscriptionFeedingSubject = eventNotificationService
+                .getNotificationText(EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING, EventNotificationService.TYPE_EMAIL_SUBJECT);
+        notificationSubscriptionFeedingEmailMessageText = eventNotificationService
+                .getNotificationText(EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING,EventNotificationService.TYPE_EMAIL_TEXT);
         smsSubscriptionFeeSMSText = eventNotificationService
                 .getNotificationText(EventNotificationService.NOTIFICATION_SMS_SUBSCRIPTION_FEE,
                         EventNotificationService.TYPE_SMS);
@@ -114,6 +129,10 @@ public class MessageConfigurePage extends BasicWorkspacePage {
         goodRequestChangeEmailMessageText = eventNotificationService
                 .getNotificationText(EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE,
                         EventNotificationService.TYPE_EMAIL_TEXT);
+        notificationSubscriptionFeedingWithdrawNotSuccessSubject = eventNotificationService.getNotificationText(EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS,
+                EventNotificationService.TYPE_EMAIL_SUBJECT);
+        notificationSubscriptionFeedingWithdrawNotSuccessEmailMessageText = eventNotificationService.getNotificationText(EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS,
+                EventNotificationService.TYPE_EMAIL_TEXT);
     }
 
     public Object save() throws Exception {
@@ -151,6 +170,15 @@ public class MessageConfigurePage extends BasicWorkspacePage {
                     paymentEmailMessageText,
                     EventNotificationService.MESSAGE_PAYMENT, EventNotificationService.TYPE_SMS,
                     paymentSMSMessageText,
+                    ////
+                    EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING, EventNotificationService.TYPE_SMS,
+                    notificationSubscriptionFeedingSMSText,
+                    EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS, EventNotificationService.TYPE_SMS,
+                    notificationSubscriptionFeedingNotSuccessSMSText,
+                    EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING, EventNotificationService.TYPE_EMAIL_SUBJECT,
+                    notificationSubscriptionFeedingSubject,
+                    EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING,EventNotificationService.TYPE_EMAIL_TEXT,
+                    notificationSubscriptionFeedingEmailMessageText,
                     EventNotificationService.NOTIFICATION_SMS_SUBSCRIPTION_FEE, EventNotificationService.TYPE_SMS,
                     smsSubscriptionFeeSMSText,
                     EventNotificationService.NOTIFICATION_SMS_SUB_FEE_WITHDRAW_SUCCESS,
@@ -168,7 +196,12 @@ public class MessageConfigurePage extends BasicWorkspacePage {
                     EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, EventNotificationService.TYPE_EMAIL_TEXT,
                     goodRequestChangeEmailMessageText,
                     EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, EventNotificationService.TYPE_EMAIL_SUBJECT,
-                    goodRequestChangeEmailSubject
+                    goodRequestChangeEmailSubject,
+                    ////
+                    EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS, EventNotificationService.TYPE_EMAIL_SUBJECT,
+                    notificationSubscriptionFeedingWithdrawNotSuccessSubject,
+                    EventNotificationService.NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS, EventNotificationService.TYPE_EMAIL_TEXT,
+                    notificationSubscriptionFeedingWithdrawNotSuccessEmailMessageText
             });
 
             printMessage("Настройки сохранены.");
@@ -295,6 +328,58 @@ public class MessageConfigurePage extends BasicWorkspacePage {
 
     public void setPaymentSMSMessageText(String paymentSMSMessageText) {
         this.paymentSMSMessageText = paymentSMSMessageText;
+    }
+
+    public String getNotificationSubscriptionFeedingSMSText() {
+        return notificationSubscriptionFeedingSMSText;
+    }
+
+    public void setNotificationSubscriptionFeedingSMSText(String notificationSubscriptionFeedingSMSText) {
+        this.notificationSubscriptionFeedingSMSText = notificationSubscriptionFeedingSMSText;
+    }
+
+    public String getNotificationSubscriptionFeedingNotSuccessSMSText() {
+        return notificationSubscriptionFeedingNotSuccessSMSText;
+    }
+
+    public void setNotificationSubscriptionFeedingNotSuccessSMSText(
+            String notificationSubscriptionFeedingNotSuccessSMSText) {
+        this.notificationSubscriptionFeedingNotSuccessSMSText = notificationSubscriptionFeedingNotSuccessSMSText;
+    }
+
+    public String getNotificationSubscriptionFeedingSubject() {
+        return notificationSubscriptionFeedingSubject;
+    }
+
+    public void setNotificationSubscriptionFeedingSubject(String notificationSubscriptionFeedingSubject) {
+        this.notificationSubscriptionFeedingSubject = notificationSubscriptionFeedingSubject;
+    }
+
+    public String getNotificationSubscriptionFeedingEmailMessageText() {
+        return notificationSubscriptionFeedingEmailMessageText;
+    }
+
+    public void setNotificationSubscriptionFeedingEmailMessageText(
+            String notificationSubscriptionFeedingEmailMessageText) {
+        this.notificationSubscriptionFeedingEmailMessageText = notificationSubscriptionFeedingEmailMessageText;
+    }
+
+    public String getNotificationSubscriptionFeedingWithdrawNotSuccessSubject() {
+        return notificationSubscriptionFeedingWithdrawNotSuccessSubject;
+    }
+
+    public void setNotificationSubscriptionFeedingWithdrawNotSuccessSubject(
+            String notificationSubscriptionFeedingWithdrawNotSuccessSubject) {
+        this.notificationSubscriptionFeedingWithdrawNotSuccessSubject = notificationSubscriptionFeedingWithdrawNotSuccessSubject;
+    }
+
+    public String getNotificationSubscriptionFeedingWithdrawNotSuccessEmailMessageText() {
+        return notificationSubscriptionFeedingWithdrawNotSuccessEmailMessageText;
+    }
+
+    public void setNotificationSubscriptionFeedingWithdrawNotSuccessEmailMessageText(
+            String notificationSubscriptionFeedingWithdrawNotSuccessEmailMessageText) {
+        this.notificationSubscriptionFeedingWithdrawNotSuccessEmailMessageText = notificationSubscriptionFeedingWithdrawNotSuccessEmailMessageText;
     }
 
     public String getSmsSubscriptionFeeSMSText() {

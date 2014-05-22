@@ -104,6 +104,35 @@
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>
+        <rich:tab label="SMS-уведомление сервис АП" id="ap-SMS">
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Текст уведомляющего сообщения:" styleClass="output-text" />
+                <h:inputTextarea rows="10" cols="40" value="#{messageConfigurePage.notificationSubscriptionFeedingSMSText}"
+                                 styleClass="input-text" />
+                <h:outputText escape="true" value="Текст (неудачное списание):" styleClass="output-text" />
+                <h:inputTextarea rows="10" cols="40" value="#{messageConfigurePage.notificationSubscriptionFeedingNotSuccessSMSText}"
+                                 styleClass="input-text" />
+                <h:outputText escape="true" value="Ключевые слова:" styleClass="output-text" />
+                <h:panelGrid>
+                    <h:outputText value="[contractId] - номер лицевого счета" styleClass="output-text" />
+                    <h:outputText value="[withdrawDate] - дата списания абон. платы" styleClass="output-text" />
+                </h:panelGrid>
+            </h:panelGrid>
+        </rich:tab>
+        <rich:tab label="E-mail уведомление о состоянии субсчета абонентского питания" id="stateSubaccounts-Email">
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Тема:" styleClass="output-text" />
+                <h:inputText value="#{messageConfigurePage.notificationSubscriptionFeedingSubject}" size="80" maxlength="128" styleClass="input-text" />
+                <h:outputText escape="true" value="Текст:" styleClass="output-text" />
+                <h:inputTextarea id="stateSubaccounts-Email-text" rows="15" cols="80" value="#{messageConfigurePage.notificationSubscriptionFeedingEmailMessageText}" styleClass="input-text" />
+                <h:outputText escape="true" value="Ключевые слова:" styleClass="output-text" />
+                <h:panelGrid>
+                    <h:outputText value="[contractId] - номер лицевого счета" styleClass="output-text" />
+                    <h:outputText value="[balance] - текущий баланс лицевого счета" styleClass="output-text" />
+                    <h:outputText value="[withdrawDate] - дата списания абон. платы" styleClass="output-text" />
+                </h:panelGrid>
+            </h:panelGrid>
+        </rich:tab>
         <rich:tab label="E-mail уведомления о пополнении баланса" id="balance-Email">
             <h:panelGrid styleClass="borderless-grid" columns="2">
                 <h:outputText escape="true" value="Тема:" styleClass="output-text" />
@@ -212,14 +241,29 @@
                 </h:panelGrid>
             </h:panelGrid>
         </rich:tab>
+        <rich:tab label="E-mail уведомление о состоянии подписки абонентского питания" id="subscriptionState-Email">
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Тема:" styleClass="output-text" />
+                <h:inputText value="#{messageConfigurePage.notificationSubscriptionFeedingWithdrawNotSuccessSubject}"
+                             size="80" maxlength="128" styleClass="input-text" />
+                <h:outputText escape="true" value="Текст:" styleClass="output-text" />
+                <h:inputTextarea rows="15" cols="80"
+                                 value="#{messageConfigurePage.notificationSubscriptionFeedingWithdrawNotSuccessEmailMessageText}"
+                                 styleClass="input-text" />
+                <h:outputText escape="true" value="Ключевые слова:" styleClass="output-text" />
+                <h:panelGrid>
+                    <h:outputText value="[contractId] - дата оповещения" styleClass="output-text" />
+                </h:panelGrid>
+            </h:panelGrid>
+        </rich:tab>
     </rich:tabPanel>
 
     <h:panelGroup style="margin-top: 10px">
         <a4j:commandButton value="Сохранить" action="#{messageConfigurePage.save}"
-                           reRender="mainMenu, workspaceTogglePanel, messageConfigurePanelGrid"
+                           reRender="workspaceTogglePanel, messageConfigurePanelGrid"
                            styleClass="command-button"/>
         <a4j:commandButton value="Отмена" action="#{messageConfigurePage.cancel}"
-                           reRender="mainMenu, workspaceTogglePanel, messageConfigurePanelGrid"
+                           reRender="workspaceTogglePanel, messageConfigurePanelGrid"
                            styleClass="command-button" />
     </h:panelGroup>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"

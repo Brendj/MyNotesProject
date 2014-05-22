@@ -101,7 +101,7 @@ public class EventNotificationService {
             NOTIFICATION_SUBSCRIPTION_FEEDING + "." + TYPE_SMS,
             "Л/с: [contractId] Сервис АП: не забудьте пополнить баланс до [withdrawDate]",
             NOTIFICATION_SUBSCRIPTION_FEEDING + "." + TYPE_EMAIL_SUBJECT,
-            "Уведомление о состоянии субсчета абоненского питания",
+            "Уведомление о состоянии субсчета абонентского питания",
             NOTIFICATION_SUBSCRIPTION_FEEDING + "." + TYPE_EMAIL_TEXT,
             "<html>\n<body>\nУважаемый клиент, <br/><br/>\n\n"
                     + "не забудьте пополнить баланс до [withdrawDate]. <br/>\n"
@@ -131,7 +131,7 @@ public class EventNotificationService {
             NOTIFICATION_GOOD_REQUEST_CHANGE + "." + TYPE_EMAIL_SUBJECT,
             "Уведомление об изменении заявки [shortOrgName] - [address]",
             NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS + "." + TYPE_EMAIL_SUBJECT,
-            "Уведомление о состоянии подписки абоненского питания",
+            "Уведомление о состоянии подписки абонентского питания",
             NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS + "." + TYPE_EMAIL_TEXT,
             "<html>\n<body>\nУважаемый клиент, <br/><br/>\n\n"
                     + "По лицевому счету [contractId] "
