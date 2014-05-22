@@ -27,6 +27,7 @@ public class ClientPaymentsReport extends BasicReport {
 
     private static final String SALES_SQL =
                         "select "
+                      + "cf_orgs.idoforg, "
                       + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
                       + "cf_contragents.contragentname, "
                       + "int8(sum(cf_orders.rsum)) as sales, "
@@ -37,10 +38,11 @@ public class ClientPaymentsReport extends BasicReport {
                       + "                       cf_orders.createddate between :fromCreatedDate and :toCreatedDate "
                       + "left join cf_contragents on cf_orders.idofcontragent=cf_contragents.idofcontragent and cf_contragents.classid = :contragentType "
                       + "where cf_orgs.idOfOrg in (:ids) "
-                      + "group by cf_orgs.officialname, cf_contragents.contragentname "
-                      + "order by cf_orgs.officialname, cf_contragents.contragentname";
+                      + "group by cf_orgs.idoforg, cf_orgs.shortname, cf_contragents.contragentname "
+                      + "order by cf_orgs.shortname, cf_contragents.contragentname";
     private static final String TRANSACTIONS_SQL =
                         "select "
+                      + "cf_orgs.idoforg, "
                       + "substring(cf_orgs.officialname from '[^[:alnum:]]* {0,1}№ {0,1}([0-9]*)'), "
                       + "cf_contragents.contragentname, "
                       + "int8(sum(cf_clientpayments.paysum)) as payments, "
@@ -52,8 +54,8 @@ public class ClientPaymentsReport extends BasicReport {
                       + "join cf_clientpayments on cf_clientpayments.idoftransaction=cf_transactions.idoftransaction "
                       + "left join cf_contragents on cf_orgs.defaultSupplier=cf_contragents.idofcontragent and cf_contragents.classid = :contragentType "
                       + "where cf_orgs.idOfOrg in (:ids) "
-                      + "group by cf_orgs.officialname, cf_contragents.contragentname "
-                      + "order by cf_orgs.officialname";
+                      + "group by cf_orgs.idoforg, cf_orgs.shortname, cf_contragents.contragentname "
+                      + "order by cf_orgs.shortname";
 
     private final List<ClientPaymentItem> items;
 
@@ -83,16 +85,17 @@ public class ClientPaymentsReport extends BasicReport {
         private void parseSales (List<ClientPaymentItem> items, List res) {
             for (Object result : res) {
                 Object[] o = (Object[]) result;
-                String orgNumber = (String) o[0];
-                String agent = (String) o[1];
-                String orgFullName = (String) o[4];
+                long idOfOrg = ((BigInteger) o[0]).longValue();
+                String orgNumber = (String) o[1];
+                String agent = (String) o[2];
+                String orgFullName = (String) o[5];
                 Long sales = null;
                 Long discounts = null;
                 if (o[2] != null) {
-                    sales = ((BigInteger) o[2]).longValue();
+                    sales = ((BigInteger) o[3]).longValue();
                 }
                 if (o[3] != null) {
-                    discounts = ((BigInteger) o[3]).longValue();
+                    discounts = ((BigInteger) o[4]).longValue();
                 }
                 if (sales == null && discounts == null) {
                     continue;
@@ -104,7 +107,7 @@ public class ClientPaymentsReport extends BasicReport {
                     discounts = 0L;
                 }
                 String orgName = orgNumber == null ? orgFullName : orgNumber;
-                ClientPaymentItem item = new ClientPaymentItem(orgName, agent, 0L, sales, discounts);
+                ClientPaymentItem item = new ClientPaymentItem(idOfOrg, orgName, agent, 0L, sales, discounts);
                 items.add(item);
             }
         }
@@ -112,20 +115,21 @@ public class ClientPaymentsReport extends BasicReport {
         private void parseTransactions (List<ClientPaymentItem> items, List res) {
             for (Object result : res) {
                 Object[] o = (Object[]) result;
-                String orgNumber = (String) o[0];
-                String agent = (String) o[1];
-                String orgFullName = (String) o[3];
+                long idOfOrg = ((BigInteger) o[0]).longValue();
+                String orgNumber = (String) o[1];
+                String agent = (String) o[2];
+                String orgFullName = (String) o[4];
                 Long payments = null;
                 if (o[2] != null) {
-                    payments = ((BigInteger) o[2]).longValue();
+                    payments = ((BigInteger) o[3]).longValue();
                 }
                 if (payments == null) {
                     continue;
                 }
                 String orgName = orgNumber == null ? orgFullName : orgNumber;
-                ClientPaymentItem item = lookupOrgByName(items, orgName);
+                ClientPaymentItem item = lookupOrgById(items, idOfOrg);
                 if (item == null) {
-                    item = new ClientPaymentItem(orgName, agent, payments, 0L, 0L);
+                    item = new ClientPaymentItem(idOfOrg, orgName, agent, payments, 0L, 0L);
                     items.add(item);
                 }
                 item.setPayments(payments);
@@ -138,6 +142,18 @@ public class ClientPaymentsReport extends BasicReport {
             }
             for (ClientPaymentItem i : items) {
                 if (i.getOrgName().equals(orgName)) {
+                    return i;
+                }
+            }
+            return null;
+        }
+
+        private ClientPaymentItem lookupOrgById (List<ClientPaymentItem> items, long idOfOrg) {
+            if (items == null || items.size() < 1) {
+                return null;
+            }
+            for (ClientPaymentItem i : items) {
+                if (i.getIdOfOrg() == idOfOrg) {
                     return i;
                 }
             }
@@ -158,12 +174,16 @@ public class ClientPaymentsReport extends BasicReport {
 
     public static class ClientPaymentItem {
 
+        private final long idOfOrg; // ID организации
         private final String orgName; // Наименование организации
         private final String agent; // Наименование контрагента
         private Long payments; // Сумма платежей
         private Long sales; // Сумма продаж
         private Long discounts; // Сумма льготных продаж
 
+        public long getIdOfOrg() {
+            return idOfOrg;
+        }
 
         public String getOrgName () {
             return orgName;
@@ -200,7 +220,8 @@ public class ClientPaymentsReport extends BasicReport {
         }
 
 
-        public ClientPaymentItem(String orgName, String agent, Long payments, Long sales, Long discounts) {
+        public ClientPaymentItem(long idOfOrg, String orgName, String agent, Long payments, Long sales, Long discounts) {
+            this.idOfOrg = idOfOrg;
             this.orgName = orgName;
             this.agent = agent;
             this.payments = payments;
