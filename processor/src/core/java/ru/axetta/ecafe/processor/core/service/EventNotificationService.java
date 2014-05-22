@@ -129,7 +129,16 @@ public class EventNotificationService {
                     + "[reportValues]<br/>\n"
                     + "</body>\n</html>",
             NOTIFICATION_GOOD_REQUEST_CHANGE + "." + TYPE_EMAIL_SUBJECT,
-            "Уведомление об изменении заявки [shortOrgName] - [address]"
+            "Уведомление об изменении заявки [shortOrgName] - [address]",
+            NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS + "." + TYPE_EMAIL_SUBJECT,
+            "Уведомление о состоянии подписки абоненского питания",
+            NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS + "." + TYPE_EMAIL_TEXT,
+            "<html>\n<body>\nУважаемый клиент, <br/><br/>\n\n"
+                    + "По лицевому счету [contractId] "
+                    + "Сервис АП отключен. Причина: недостаточный баланс. "
+                    + "<br/>\n<br/>\nС уважением,<br/>\nСлужба поддержки клиентов\n<br/><br/>\n"
+                    + "<p style=\"color:#cccccc;font-size:xx-small;font-weight:bold\">Вы можете отключить данные уведомления в своем личном кабинете</p>\n"
+                    + "</body>\n</html>"
     };                       // короткое имя школы
 
     String getDefaultText(String name) {
