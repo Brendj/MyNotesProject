@@ -633,6 +633,9 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
         if (sType.equalsIgnoreCase("prevMonth")) {
             type=BasicReportJob.REPORT_PERIOD_PREV_MONTH;
         }
+        else if (sType.equalsIgnoreCase("currentMonth")) {
+            type=BasicReportJob.REPORT_PERIOD_CURRENT_MONTH;
+        }
         else if (sType.equalsIgnoreCase("prevDay")) {
             type=BasicReportJob.REPORT_PERIOD_PREV_DAY;
         }
