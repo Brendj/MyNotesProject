@@ -385,7 +385,7 @@ public class AutoEnterEventReport extends BasicReportForOrgJob {
 
     @Override
     public int getDefaultReportPeriod() {
-        return REPORT_PERIOD_PREV_PREV_PREV_DAY;
+        return REPORT_PERIOD_PREV_DAY;
     }
 }
 

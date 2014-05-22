@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.report;
 import net.sf.jasperreports.engine.JasperPrint;
 
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExecutorServiceWrappedJob;
@@ -27,7 +26,7 @@ public abstract class BasicReportJob extends BasicJasperReport {
     public final static int REPORT_PERIOD_PREV_MONTH=0,
             REPORT_PERIOD_PREV_DAY=1, REPORT_PERIOD_TODAY=2,
             REPORT_PERIOD_PREV_PREV_DAY=3, REPORT_PERIOD_PREV_PREV_PREV_DAY=4,
-            REPORT_PERIOD_LAST_WEEK =5;
+            REPORT_PERIOD_LAST_WEEK =5, REPORT_PERIOD_CURRENT_MONTH =6;
     private String BASE_DOCUMENT_FILENAME;
     public Date startTime;
     public Date endTime;
@@ -404,7 +403,15 @@ public abstract class BasicReportJob extends BasicJasperReport {
         if (type==REPORT_PERIOD_PREV_MONTH) {
             if (startTime==null) startTime = calculateLastMonthFirstDay(calendar, generateTime);
             endTime = calculatePlusOneMonth(calendar, startTime);
-        } else if (type==REPORT_PERIOD_PREV_DAY) {
+        } else if (type== REPORT_PERIOD_CURRENT_MONTH) {
+            // startTime - первый день текущего месяца
+            // endTime - поледний день текущего месяца
+            if (startTime==null) startTime = calculateCurrentMonthFirstDay(calendar, generateTime);
+            endTime = calculatePlusOneMonth(calendar, startTime);
+            calendar.setTime(endTime);
+            calendar.add(Calendar.MILLISECOND, -1);
+            endTime = calendar.getTime();
+        }  else if (type==REPORT_PERIOD_PREV_DAY) {
             if (startTime==null) startTime = calculateYesterdayStart(calendar, generateTime);
             endTime = calculatePlusOneDay(calendar, startTime);
         } else if (type==REPORT_PERIOD_PREV_PREV_DAY) {
@@ -477,6 +484,12 @@ public abstract class BasicReportJob extends BasicJasperReport {
     private static Date calculateLastMonthFirstDay(Calendar calendar, Date scheduledFireTime) {
         calendar.setTime(scheduledFireTime);
         calendar.add(Calendar.MONTH, -1);
+        CalendarUtils.truncateToMonth(calendar);
+        return calendar.getTime();
+    }
+
+    private static Date calculateCurrentMonthFirstDay(Calendar calendar, Date scheduledFireTime) {
+        calendar.setTime(scheduledFireTime);
         CalendarUtils.truncateToMonth(calendar);
         return calendar.getTime();
     }
