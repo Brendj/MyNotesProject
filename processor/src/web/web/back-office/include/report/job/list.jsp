@@ -19,7 +19,7 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Идентификатор" />
         </f:facet>
-        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.idOfSchedulerJob}" action="#{mainPage.showReportJobViewPage}"
+        <a4j:commandLink reRender="reportJobGroupMenu, workspaceForm" value="#{item.idOfSchedulerJob}" action="#{mainPage.showReportJobViewPage}"
                        styleClass="command-link">
             <f:setPropertyActionListener value="#{item.idOfSchedulerJob}" target="#{mainPage.selectedIdOfReportJob}" />
         </a4j:commandLink>
@@ -28,7 +28,7 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Название" />
         </f:facet>
-        <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.jobName}" action="#{mainPage.showReportJobViewPage}" styleClass="command-link">
+        <a4j:commandLink reRender="reportJobGroupMenu, workspaceForm" value="#{item.jobName}" action="#{mainPage.showReportJobViewPage}" styleClass="command-link">
             <f:setPropertyActionListener value="#{item.idOfSchedulerJob}" target="#{mainPage.selectedIdOfReportJob}" />
         </a4j:commandLink>
     </rich:column>
@@ -54,7 +54,7 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Редактировать" />
         </f:facet>
-        <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showReportJobEditPage}" styleClass="command-link">
+        <a4j:commandLink reRender="selectedReportJobGroupMenu, workspaceForm" action="#{mainPage.showReportJobEditPage}" styleClass="command-link">
             <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
             <f:setPropertyActionListener value="#{item.idOfSchedulerJob}" target="#{mainPage.selectedIdOfReportJob}" />
         </a4j:commandLink>

@@ -35,7 +35,7 @@
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Добавить задачу" action="#{mainPage.createReportJob}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                       reRender="selectedReportJobGroupMenu, workspaceTogglePanel" styleClass="command-button" />
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>

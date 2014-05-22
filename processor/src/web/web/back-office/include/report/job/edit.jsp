@@ -37,10 +37,10 @@
     </h:panelGrid>
 </h:panelGrid>
 <h:panelGrid columns="2" styleClass="borderless-grid">
-    <a4j:commandButton value="Сохранить" action="#{mainPage.updateReportJob}" reRender="mainMenu, workspaceTogglePanel"
+    <a4j:commandButton value="Сохранить" action="#{mainPage.updateReportJob}" reRender="selectedReportJobGroupMenu, workspaceTogglePanel"
                        styleClass="command-button" />
     <a4j:commandButton value="Восстановить" action="#{mainPage.showReportJobEditPage}"
-                       reRender="mainMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
+                       reRender="selectedReportJobGroupMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"

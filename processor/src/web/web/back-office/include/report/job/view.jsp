@@ -49,9 +49,9 @@
             </h:panelGrid>
             <rich:spacer width="20"/>
             <a4j:commandButton value="Запустить сейчас" action="#{mainPage.reportJobViewPage.triggerJob}"
-            reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+            reRender="workspaceTogglePanel" styleClass="command-button" />
         </rich:simpleTogglePanel>
         <a4j:commandButton value="Редактировать" action="#{mainPage.showReportJobEditPage}"
-                           reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                           reRender="selectedReportJobGroupMenu, workspaceTogglePanel" styleClass="command-button" />
     </h:panelGrid>
 </h:panelGrid>
