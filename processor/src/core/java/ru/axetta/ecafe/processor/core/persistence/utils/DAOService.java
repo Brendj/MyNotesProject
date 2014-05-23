@@ -1487,4 +1487,12 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         Session session = (Session) entityManager.getDelegate();
         return DAOUtils.getRegions(session);
     }
+
+    public List<Org> getOrgsByDefaultSupplier(Contragent supplier) {
+        Session session = (Session) entityManager.getDelegate();
+        org.hibernate.Query q = session.createQuery("from Org where defaultSupplier = :supplier");
+        q.setParameter("supplier", supplier);
+        List<Org> list = (List<Org>) q.list();
+        return list;
+    }
 }

@@ -5,15 +5,15 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 
 import java.math.BigInteger;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -61,10 +61,37 @@ public class ClientPaymentsReport extends BasicReport {
 
     public static class Builder {
 
+        protected List<Long> receiveOrgList(List<Long> idOfOrgList) {
+            Set<Long> result = new TreeSet<Long>();
+            for(Long idOfOrg : idOfOrgList) {
+                Org o = DAOService.getInstance().getOrg(idOfOrg);
+                if(o == null) {
+                    continue;
+                }
+                if(o.getType().ordinal() == OrganizationType.SUPPLIER.ordinal()) {
+                    addContragentOrgs(result, o.getDefaultSupplier());
+                } else {
+                    result.add(idOfOrg);
+                }
+            }
+
+            idOfOrgList = new ArrayList<Long> ();
+            idOfOrgList.addAll(result);
+            return idOfOrgList;
+        }
+
+        protected void addContragentOrgs(Set<Long> idOfOrgList, Contragent contragent) {
+            List<Org> orgs = DAOService.getInstance().getOrgsByDefaultSupplier(contragent);
+            for(Org o : orgs) {
+                idOfOrgList.add(o.getIdOfOrg());
+            }
+        }
+
         public ClientPaymentsReport build(Session session, Date startDate, Date endDate, List<Long> idOfOrgList)
                 throws Exception {
             Date generateTime = new Date();
             List<ClientPaymentItem> items = new LinkedList<ClientPaymentItem>();
+            idOfOrgList = receiveOrgList(idOfOrgList);
             if (!idOfOrgList.isEmpty()) {
                 parseSales(items, executeSQL(session, SALES_SQL, startDate.getTime(), endDate.getTime(), idOfOrgList));
                 parseTransactions(items,
