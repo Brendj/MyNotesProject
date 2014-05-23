@@ -183,12 +183,22 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             Map<Long, ReportItem> map = new HashMap<Long, ReportItem>();
             String typeConditionsValue = (String)getReportProperties().get("enterEventType");
 
-            DetachedCriteria orgCriteria = DetachedCriteria.forClass(Org.class);
-            orgCriteria.add(Restrictions.eq("idOfOrg", org.getIdOfOrg()));
-            orgCriteria.setProjection(Property.forName("friendlyOrg"));
+            //DetachedCriteria orgCriteria = DetachedCriteria.forClass(Org.class);
+            //orgCriteria.add(Restrictions.eq("idOfOrg", org.getIdOfOrg()));
+            //orgCriteria.setProjection(Property.forName("friendlyOrg"));
+
+            Query query = session.createSQLQuery("SELECT friendlyorg FROM cf_friendly_organization  WHERE currentorg=:idoforg;");
+            query.setParameter("idoforg", org.getIdOfOrg());
+            List orgList = query.list();
+            List<Long> ids = new LinkedList<Long>();
+            for (Object obj: orgList){
+                ids.add(Long.getLong(obj.toString()));
+            }
+
 
             Criteria clientCriteria = session.createCriteria(Client.class);
-            clientCriteria.add(Property.forName("org.idOfOrg").in(orgCriteria));
+            //clientCriteria.add(Property.forName("org.idOfOrg").in(orgCriteria));
+            clientCriteria.add(Restrictions.in("org.idOfOrg", ids));
             clientCriteria.add(Restrictions.ne("idOfClientGroup", 1100000060L)); // Исключаем из списка Выбывших
             if (typeConditionsValue != null) {
                 // значения могут перечисляться через запятую, однако данный параметр может принимать только 1 из "все", "учащиеся", "все_без_учащихся"
