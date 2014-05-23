@@ -187,12 +187,12 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             //orgCriteria.add(Restrictions.eq("idOfOrg", org.getIdOfOrg()));
             //orgCriteria.setProjection(Property.forName("friendlyOrg"));
 
-            Query query = session.createSQLQuery("SELECT friendlyorg FROM cf_friendly_organization  WHERE currentorg=:idoforg;");
-            query.setParameter("idoforg", org.getIdOfOrg());
+            final String sql = String.format("SELECT friendlyorg FROM cf_friendly_organization WHERE currentorg=%d", org.getIdOfOrg());
+            Query query = session.createSQLQuery(sql);
             List orgList = query.list();
             List<Long> ids = new LinkedList<Long>();
             for (Object obj: orgList){
-                ids.add(Long.getLong(obj.toString()));
+                ids.add(Long.parseLong(obj.toString()));
             }
 
 
@@ -259,6 +259,14 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             for (ReportItem item: values){
                 item.buildTimeList();
             }
+            // сортируем по имени групп
+            Comparator<ReportItem> fioComparator = new Comparator<ReportItem>() {
+                @Override
+                public int compare(ReportItem o1, ReportItem o2) {
+                    return o1.getFio().compareTo(o2.getFio());
+                }
+            };
+            Collections.sort(values, fioComparator);
             // сортируем по имени групп
             Comparator<ReportItem> nameComparator = new Comparator<ReportItem>() {
                  @Override
