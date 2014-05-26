@@ -190,10 +190,13 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             final String sql = String.format("SELECT friendlyorg FROM cf_friendly_organization WHERE currentorg=%d", org.getIdOfOrg());
             Query query = session.createSQLQuery(sql);
             List orgList = query.list();
-            List<Long> ids = new LinkedList<Long>();
+            Set<Long> ids = new HashSet<Long>();
+            ids.add(org.getIdOfOrg());
             for (Object obj: orgList){
                 ids.add(Long.parseLong(obj.toString()));
             }
+
+
 
 
             Criteria clientCriteria = session.createCriteria(Client.class);
