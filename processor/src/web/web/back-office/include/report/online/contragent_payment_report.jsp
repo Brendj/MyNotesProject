@@ -48,27 +48,27 @@
                                              target="#{mainPage.classTypes}" />
             </a4j:commandButton>
         </h:panelGroup>
+    </h:panelGrid>
 
+    <h:panelGrid columns="2">
         <a4j:commandButton value="Генерировать отчет" action="#{contragentPaymentReportPage.buildReport}"
                            reRender="workspaceTogglePanel"
                            styleClass="command-button" status="reportGenerateStatus" />
-        <a4j:status id="reportGenerateStatus">
-            <f:facet name="start">
-                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
-            </f:facet>
-        </a4j:status>
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{contragentPaymentReportPage.exportToXLS}" styleClass="command-button" />
     </h:panelGrid>
+
+    <a4j:status id="reportGenerateStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+        </f:facet>
+    </a4j:status>
+
     <h:panelGrid styleClass="borderless-grid">
         <%-- не показывать пустую таблицу --%>
         <c:if test="${not empty contragentPaymentReportPage.htmlReport}" >
             <h:outputText escape="true" value="Отчет по оказанным услугам" styleClass="output-text" />
 
             <f:verbatim>
-                <style type="text/css">
-                    div.htmlReportContent :empty {
-                        display: none;
-                    }
-                </style>
                 <div class="htmlReportContent">
                         ${contragentPaymentReportPage.htmlReport}
                 </div>
@@ -76,7 +76,6 @@
 
         </c:if>
     </h:panelGrid>
-    <h:commandButton value="Выгрузить в Excel" actionListener="#{contragentPaymentReportPage.showCSVList}" styleClass="command-button" />
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>

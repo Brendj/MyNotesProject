@@ -201,28 +201,6 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
-
-        //try {
-        //    try {
-        //        persistenceSession = runtimeContext.createReportPersistenceSession();
-        //        persistenceTransaction = persistenceSession.beginTransaction();
-        //        Criteria syncHistoryCriteria = persistenceSession.createCriteria(SyncHistory.class);
-        //        syncHistoryCriteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
-        //        syncHistoryCriteria.setProjection(Projections.max("syncEndTime"));
-        //        syncHistoryCriteria.setMaxResults(1);
-        //        Object maxSyncEndTime = syncHistoryCriteria.uniqueResult();
-        //        lastGoodRequestUpdateDateTime = (Date) syncHistoryCriteria.uniqueResult();
-        //        //SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy EE HH:mm:ss", new Locale("ru"));
-        //        persistenceTransaction.commit();
-        //        persistenceTransaction = null;
-        //    } finally {
-        //        HibernateUtils.rollback(persistenceTransaction, logger);
-        //        HibernateUtils.close(persistenceSession, logger);
-        //    }
-        //} catch (Exception warn) {
-        //    logger.warn("cannot parse datetime value", warn);
-        //}
-
         try {
             try {
                 persistenceSession = runtimeContext.createReportPersistenceSession();

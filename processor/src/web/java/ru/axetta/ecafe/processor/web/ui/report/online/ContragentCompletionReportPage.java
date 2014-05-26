@@ -5,8 +5,8 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.export.JRCsvExporter;
-import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentCompletionItem;
@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentDAOServic
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ContragentCompletionReport;
 import ru.axetta.ecafe.processor.core.report.ReportDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -32,6 +33,7 @@ import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -112,23 +114,41 @@ public class ContragentCompletionReportPage extends BasicWorkspacePage implement
         builder.setContragent(defaultSupplier);
         Session session = (Session) entityManager.getDelegate();
         try {
-            ContragentCompletionReport contragentCompletionReport = (ContragentCompletionReport) builder.build(session,startDate, endDate, localCalendar);
-
+            //ContragentCompletionReport contragentCompletionReport = (ContragentCompletionReport) builder.build(session,startDate, endDate, localCalendar);
+            BasicReportJob report = builder.build(session,startDate, endDate, localCalendar);
             FacesContext facesContext = FacesContext.getCurrentInstance();
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
 
             ServletOutputStream servletOutputStream = response.getOutputStream();
 
-            facesContext.responseComplete();
-            response.setContentType("application/csv");
-            response.setHeader("Content-disposition", "inline;filename=contragent_completion.csv");
+            //facesContext.responseComplete();
+            //response.setContentType("application/csv");
+            //response.setHeader("Content-disposition", "inline;filename=contragent_completion.csv");
+            //
+            //JRCsvExporter csvExporter = new JRCsvExporter();
+            //csvExporter.setParameter(JRCsvExporterParameter.JASPER_PRINT, contragentCompletionReport.getPrint());
+            //csvExporter.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+            //csvExporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ";");
+            //csvExporter.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+            //csvExporter.exportReport();
+            //
+            //servletOutputStream.flush();
+            //servletOutputStream.close();
 
-            JRCsvExporter csvExporter = new JRCsvExporter();
-            csvExporter.setParameter(JRCsvExporterParameter.JASPER_PRINT, contragentCompletionReport.getPrint());
-            csvExporter.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
-            csvExporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ";");
-            csvExporter.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
-            csvExporter.exportReport();
+            facesContext.responseComplete();
+            response.setContentType("application/xls");
+            response.setHeader("Content-disposition", "inline;filename=contragent_completion.xls");
+
+            JRXlsExporter xlsExport = new JRXlsExporter();
+            //JRCsvExporter csvExporter = new JRCsvExporter();
+            xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
+            xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+            xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+            xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+            xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+            //xlsExport.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ";");
+            xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+            xlsExport.exportReport();
 
             servletOutputStream.flush();
             servletOutputStream.close();

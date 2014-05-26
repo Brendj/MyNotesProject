@@ -39,15 +39,21 @@
         <rich:calendar value="#{contragentCompletionReportPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
 
+    </h:panelGrid>
+
+    <h:panelGrid columns="2">
         <a4j:commandButton value="Генерировать отчет" action="#{contragentCompletionReportPage.generate}"
                            reRender="contragentCompletionReportTable"
                            styleClass="command-button" status="reportGenerateStatus" />
-        <a4j:status id="reportGenerateStatus">
-            <f:facet name="start">
-                <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
-            </f:facet>
-        </a4j:status>
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{contragentCompletionReportPage.showCSVList}" styleClass="command-button" />
     </h:panelGrid>
+
+    <a4j:status id="reportGenerateStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+        </f:facet>
+    </a4j:status>
+
     <rich:dataTable id="contragentCompletionReportTable" value="#{contragentCompletionReportPage.contragentCompletionItems}"
                     var="contragentCompletionItem" rowKeyVar="row">
         <f:facet name="header">
@@ -107,7 +113,7 @@
             </h:outputText>
         </rich:column>
     </rich:dataTable>
-    <h:commandButton value="Выгрузить в CSV" actionListener="#{contragentCompletionReportPage.showCSVList}" styleClass="command-button" />
+    <%--<h:commandButton value="Выгрузить в CSV" actionListener="#{contragentCompletionReportPage.showCSVList}" styleClass="command-button" />--%>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>
