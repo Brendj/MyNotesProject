@@ -13,23 +13,16 @@ import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentCompletionReportItem;
-import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentDAOService;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.Contract;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
 
-import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
@@ -344,11 +337,16 @@ public class ActiveClientsReport extends BasicReportForAllOrgJob {
     private static String getClientsClause(String table) {
         /*String onlyActiveClients = " AND " + table + ".idOfClientGroup>=" + ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue() +
                                    " AND " + table + ".idOfClientGroup<" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() + " ";*/
+        //String onlyActiveClients =
+        //         " AND ((" + table + ".idOfClientGroup>=" + ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue()
+        //       + "           AND " + table + ".idOfClientGroup<" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() + ") or "
+        //       + "           " + table + ".idOfClientGroup is null or "
+        //       + "           cf_clientgroups.groupname='') ";
+        //отр. client groups
         String onlyActiveClients =
-                 " AND ((" + table + ".idOfClientGroup>=" + ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue()
-               + "           AND " + table + ".idOfClientGroup<" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() + ") or "
-               + "           " + table + ".idOfClientGroup is null or "
-               + "           cf_clientgroups.groupname='') ";
+                " AND (("  + table + ".idOfClientGroup<" + ClientGroup.Predefined.CLIENT_LEAVING.getValue() + ") or "
+                        + "           " + table + ".idOfClientGroup is null or "
+                        + "           cf_clientgroups.groupname='') ";
         return onlyActiveClients;
     }
 
