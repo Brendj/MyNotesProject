@@ -165,10 +165,10 @@ public class AutoEnterEventByDaysReport extends BasicReportForOrgJob {
             parameterMap.put("orgName", org.getOfficialName());
             calendar.setTime(startTime);
             Calendar c = Calendar.getInstance();
-            Long startDate = CalendarUtils.getTimeFirstDayOfMonth(startTime.getTime());
+//            Long startDate = CalendarUtils.getTimeFirstDayOfMonth(startTime.getTime());
             for (int day = 1; day <= 31; day++) {
-                daysOfMonth.add(day - 1, String.format("%d %s", day,
-                        CalendarUtils.dayInWeekToString(startDate + (day - 1) * 1000 * 60 * 60 * 24)));
+                daysOfMonth.add((day - 1), String.format("%d %s", day, CalendarUtils.dayInWeekToString(CalendarUtils.addDays(startTime, day - 1))));
+                //daysOfMonth.add((day - 1), String.format("%d %s", day, CalendarUtils.dayInWeekToString(startDate + (day - 1) * 1000 * 60 * 60 * 24)));
             }
             parameterMap.put("days", daysOfMonth);
             parameterMap.put("monthName", calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("ru")));
