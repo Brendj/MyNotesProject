@@ -48,6 +48,7 @@ public class BIDataExportService {
     private String LOCAL_DIRECTORY = null;
     private static final ExportType oldTypes;
     private static final ExportType newTypes;
+    private static final long MILLISECONDS_IN_DAY = 86400000L;
 
     static {
         /* Новый тип */
@@ -115,7 +116,7 @@ public class BIDataExportService {
                 "select distinct cf_clientgroups.idoforg, cf_clientgroups.idofclientgroup, cf_clientgroups.groupname " +
                         "from cf_clientgroups " +
                         "left join cf_orgs on cf_clientgroups.idoforg=cf_orgs.idoforg "+
-                        "where cf_clientgroups.idofclientgroup > 0 and cf_orgs.state<>0 " +
+                        "where cf_orgs.state<>0 " + //cf_clientgroups.idofclientgroup > 0 and
                         "order by cf_clientgroups.idofclientgroup",
                 new String[]{"idoforg", "idofclientgroup", "groupname"}));
 
@@ -230,7 +231,7 @@ public class BIDataExportService {
 
 
         Calendar now = new GregorianCalendar();
-        now.setTimeInMillis(System.currentTimeMillis());
+        now.setTimeInMillis(System.currentTimeMillis()/* - MILLISECONDS_IN_DAY * 3*/);
         clearCalendar(now);
 
         buildFiles(newTypes, now);
@@ -269,11 +270,11 @@ public class BIDataExportService {
         try {
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             Session session = runtimeContext.createPersistenceSession();
-            for (long ts = last.getTimeInMillis(); ts < now.getTimeInMillis(); ts += 86400000) {
+            for (long ts = last.getTimeInMillis(); ts < now.getTimeInMillis(); ts += MILLISECONDS_IN_DAY) {
                 Calendar start = new GregorianCalendar();
                 Calendar end = new GregorianCalendar();
                 start.setTimeInMillis(ts);
-                end.setTimeInMillis(ts + 86400000);
+                end.setTimeInMillis(ts + MILLISECONDS_IN_DAY);
 
                 getUnfinishedTypes(exportType, LOCAL_DIRECTORY, typesToUpdate, end);
                 for (String t : typesToUpdate) {
@@ -509,7 +510,7 @@ public class BIDataExportService {
                 }
                 if (doAdd) {
                     last.setTimeInMillis(
-                            last.getTimeInMillis() - 86400000);  //  Если необходимо добавлять хотябы одну запись,
+                            last.getTimeInMillis() - MILLISECONDS_IN_DAY);  //  Если необходимо добавлять хотябы одну запись,
                     //  данные выбираем с предыдущего дня по сегодняшний
                     typesToUpdate.add(t);
                 }
