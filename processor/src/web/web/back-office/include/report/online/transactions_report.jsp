@@ -32,6 +32,7 @@
         <a4j:commandButton value="Генерировать отчет" action="#{transactionsReportPage.doGenerate}"
                            reRender="workspaceTogglePanel, reportPanel"
                            styleClass="command-button" status="reportGenerateStatus" />
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{transactionsReportPage.doGenerateXLS}" styleClass="command-button" />
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
                 <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
@@ -55,5 +56,4 @@
 
         </c:if>
     </h:panelGrid>
-    <h:commandButton value="Выгрузить в Excel" actionListener="#{transactionsReportPage.doGenerateXLS}" styleClass="command-button" />
 </h:panelGrid>
