@@ -166,7 +166,7 @@ public class TransactionsReport extends BasicReportForAllOrgJob {
                       + "                oo.createddate >= :startDate and "
                       + "                oo.createddate < :endDate "
                       + "      left join cf_orderdetails as od on od.idoforder=oo.idoforder "
-                      + "      where o.state<>0 and o.idoforg=181 "
+                      + "      where o.state<>0 "
                       + "      order by o.shortname "
                       + "      ) as data "
                       + "group by idoforg, shortname, address, district, isPaid, isComplex "
