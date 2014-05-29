@@ -973,6 +973,10 @@
                         action="#{mainPage.showClientsBenefitsReportPage}" reRender="workspaceForm" />
     <%--@elvariable id="referReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ReferReportPage"--%>
 
+    <rich:panelMenuItem id="transactionsReportMenuItem" binding="#{transactionsReportPage.mainMenuComponent}"
+                        label="Отчет по транзакциям" action="#{transactionsReportPage.show}"
+                        reRender="workspaceForm" />
+
     <%--@elvariable id="manualReportRunnerPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ManualReportRunnerPage"--%>
     <rich:panelMenuItem id="manualReportRunnerMenuItem" binding="#{manualReportRunnerPage.mainMenuComponent}"
                         label="Ручной запуск отчетов" action="#{manualReportRunnerPage.show}"
