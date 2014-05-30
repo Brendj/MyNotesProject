@@ -4,9 +4,6 @@
 
 package ru.axetta.ecafe.processor.web.ui.converter;
 
-import ru.axetta.ecafe.processor.web.ui.client.ClientSubAccountTransferPage;
-import ru.axetta.ecafe.processor.web.ui.report.online.PeriodTypeMenu;
-
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;

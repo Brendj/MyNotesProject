@@ -47,10 +47,10 @@
 
 </h:panelGrid>
 <h:panelGrid columns="2" styleClass="borderless-grid">
-    <a4j:commandButton value="Сохранить" action="#{userSettings.save}" reRender="mainMenu, workspaceTogglePanel"
+    <a4j:commandButton value="Сохранить" action="#{userSettings.save}" reRender="workspaceTogglePanel"
                        styleClass="command-button" />
     <a4j:commandButton value="Восстановить" action="#{userSettings.restore}"
-                       reRender="mainMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
+                       reRender="workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"

@@ -11,12 +11,13 @@ import net.sf.jasperreports.engine.export.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.UserReportSetting;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.report.*;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
+import ru.axetta.ecafe.processor.core.report.BasicReportForContragentJob;
+import ru.axetta.ecafe.processor.core.report.BasicReportJob;
+import ru.axetta.ecafe.processor.core.report.ContragentPaymentReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
@@ -26,9 +27,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -38,7 +36,9 @@ import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -48,10 +48,7 @@ import java.util.Properties;
  * Time: 16:12
  * To change this template use File | Settings | File Templates.
  */
-@Component
-@Scope(value = "session")
-public class ContragentPaymentReportPage extends OnlineReportPage
-        implements ContragentSelectPage.CompleteHandler {
+public class ContragentPaymentReportPage extends OnlineReportPage implements ContragentSelectPage.CompleteHandler {
     private ContragentPaymentReport contragentPaymentReport;
     private String htmlReport;
     private Org org;
@@ -82,6 +79,8 @@ public class ContragentPaymentReportPage extends OnlineReportPage
     }
 
     public void showContragentSelectPage (boolean isReceiver) {
+        idOfOrgList.clear();
+        filter = "Не выбрано";
         receiverSelection = isReceiver;
         MainPage.getSessionInstance().showContragentSelectPage();
     }
@@ -104,57 +103,63 @@ public class ContragentPaymentReportPage extends OnlineReportPage
         ContragentPaymentReport.Builder builder = new ContragentPaymentReport.Builder(templateFilename);
         //Date generateTime = new Date();
         //builder.setReportProperties(fillContragentReceiver());
-        builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID, Long.toString(contragentFilter.getContragent().getIdOfContragent()));
-        builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID, Long.toString(contragentReceiverFilter.getContragent().getIdOfContragent()));
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        BasicReportJob report = null;
-        try {
-            persistenceSession = runtimeContext.createReportPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            builder.setContragent(getContragent());
-            report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed export report : ", e);
-            printError("Ошибка при подготовке отчета: " + e.getMessage());
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-
-        if(report!=null){
+        if (contragentFilter.getContragent().getIdOfContragent() == null
+                || contragentReceiverFilter.getContragent().getIdOfContragent() == null) {
+            printError("Не выбран 'Агент по приему платежей' и 'Контарегент-получатель'");
+        } else {
+            builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID,
+                    Long.toString(contragentFilter.getContragent().getIdOfContragent()));
+            builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID,
+                    Long.toString(contragentReceiverFilter.getContragent().getIdOfContragent()));
+            builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            BasicReportJob report = null;
             try {
-                FacesContext facesContext = FacesContext.getCurrentInstance();
-                HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
-
-                ServletOutputStream servletOutputStream = response.getOutputStream();
-
-                facesContext.responseComplete();
-                response.setContentType("application/xls");
-                //response.setHeader("Content-disposition", String.format("inline;filename=%s.xls", filename));
-                response.setHeader("Content-disposition", "inline;filename=contragent_payment.xls");
-
-                JRXlsExporter xlsExport = new JRXlsExporter();
-                xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
-                xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
-                xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
-                xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
-                xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-                xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
-                xlsExport.exportReport();
-                servletOutputStream.flush();
-                servletOutputStream.close();
-                //printMessage("Сводный отчет по заявкам построен");
+                persistenceSession = runtimeContext.createReportPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                builder.setContragent(getContragent());
+                report = builder.build(persistenceSession, startDate, endDate, localCalendar);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
             } catch (Exception e) {
                 logger.error("Failed export report : ", e);
                 printError("Ошибка при подготовке отчета: " + e.getMessage());
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+
+            if (report != null) {
+                try {
+                    FacesContext facesContext = FacesContext.getCurrentInstance();
+                    HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext()
+                            .getResponse();
+
+                    ServletOutputStream servletOutputStream = response.getOutputStream();
+
+                    facesContext.responseComplete();
+                    response.setContentType("application/xls");
+                    //response.setHeader("Content-disposition", String.format("inline;filename=%s.xls", filename));
+                    response.setHeader("Content-disposition", "inline;filename=contragent_payment.xls");
+
+                    JRXlsExporter xlsExport = new JRXlsExporter();
+                    xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
+                    xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+                    xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+                    xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+                    xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                    xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+                    xlsExport.exportReport();
+                    servletOutputStream.flush();
+                    servletOutputStream.close();
+                    //printMessage("Сводный отчет по заявкам построен");
+                } catch (Exception e) {
+                    logger.error("Failed export report : ", e);
+                    printError("Ошибка при подготовке отчета: " + e.getMessage());
+                }
             }
         }
-
-
-
     }
 
 
@@ -213,42 +218,50 @@ public class ContragentPaymentReportPage extends OnlineReportPage
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         ContragentPaymentReport.Builder builder = new ContragentPaymentReport.Builder();
-        builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID, Long.toString(contragentFilter.getContragent().getIdOfContragent()));
-        builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID, Long.toString(contragentReceiverFilter.getContragent().getIdOfContragent()));
-        BasicReportJob report = null;
-        try {
-            persistenceSession = runtimeContext.createReportPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            builder.setContragent(getContragent());
-            report = builder.build(persistenceSession, startDate, endDate, localCalendar);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed export report : ", e);
-            printError("Ошибка при подготовке отчета: " + e.getMessage());
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-
-        if(report!=null){
+        if (contragentFilter.getContragent().getIdOfContragent() == null
+                || contragentReceiverFilter.getContragent().getIdOfContragent() == null) {
+            printError("Не выбран 'Агент по приему платежей' и 'Контарегент-получатель'");
+        } else {
+            builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID,
+                    Long.toString(contragentFilter.getContragent().getIdOfContragent()));
+            builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID,
+                    Long.toString(contragentReceiverFilter.getContragent().getIdOfContragent()));
+            builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
+            BasicReportJob report = null;
             try {
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                JRHtmlExporter exporter = new JRHtmlExporter();
-                exporter.setParameter(JRExporterParameter.JASPER_PRINT, report.getPrint());
-                exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
-                exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
-                exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
-                exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
-                exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
-                exporter.setParameter(JRHtmlExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-                exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
-                exporter.exportReport();
-                htmlReport = os.toString("UTF-8");
-                os.close();
+                persistenceSession = runtimeContext.createReportPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                builder.setContragent(getContragent());
+                report = builder.build(persistenceSession, startDate, endDate, localCalendar);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
             } catch (Exception e) {
-                printError("Ошибка при построении отчета: "+e.getMessage());
-                logger.error("Failed build report ",e);
+                logger.error("Failed export report : ", e);
+                printError("Ошибка при подготовке отчета: " + e.getMessage());
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+
+            if (report != null) {
+                try {
+                    ByteArrayOutputStream os = new ByteArrayOutputStream();
+                    JRHtmlExporter exporter = new JRHtmlExporter();
+                    exporter.setParameter(JRExporterParameter.JASPER_PRINT, report.getPrint());
+                    exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
+                    exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
+                    exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
+                    exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
+                    exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
+                    exporter.setParameter(JRHtmlExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                    exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
+                    exporter.exportReport();
+                    htmlReport = os.toString("UTF-8");
+                    os.close();
+                } catch (Exception e) {
+                    printError("Ошибка при построении отчета: " + e.getMessage());
+                    logger.error("Failed build report ", e);
+                }
             }
         }
         return null;
@@ -306,6 +319,14 @@ public class ContragentPaymentReportPage extends OnlineReportPage
                     "" + contragentFilter.getContragent().getIdOfContragent());
         }
         return props;
+    }
+
+    public Object showOrgListSelectPage () {
+        if(contragentReceiverFilter.getContragent()!=null){
+            MainPage.getSessionInstance().setIdOfContragentList(Arrays.asList(contragentReceiverFilter.getContragent().getIdOfContragent()));
+        }
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
     }
 }
 

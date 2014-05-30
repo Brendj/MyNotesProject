@@ -327,6 +327,7 @@ public class MainPage {
     private final BasicWorkspacePage goodGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage goodGroupsGroupPage = new BasicWorkspacePage();
 
+    private final ContragentPaymentReportPage contragentPaymentReportPage = new ContragentPaymentReportPage();
     private final ClientPaymentsPage clientPaymentsReportPage = new ClientPaymentsPage();
     private final GoodRequestsNewReportPage goodRequestsNewReportPage = new GoodRequestsNewReportPage();
     private final DeliveredServicesReportPage deliveredServicesReportPage = new DeliveredServicesReportPage ();
@@ -5160,6 +5161,10 @@ public class MainPage {
         return salesReportPage;
     }
 
+    public ContragentPaymentReportPage getContragentPaymentReportPage() {
+        return contragentPaymentReportPage;
+    }
+
     public ClientPaymentsPage getClientPaymentsReportPage() {
         return clientPaymentsReportPage;
     }
@@ -5492,6 +5497,20 @@ public class MainPage {
     //        HibernateUtils.close(persistenceSession, logger);
     //    }
     //}
+
+    public Object showContragentPaymentsReportPage () {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = contragentPaymentReportPage;
+        } catch (Exception e) {
+            logger.error("Failed to set payment report page", e);
+            facesContext.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Ошибка при подготовке страницы отчета по платежам: " + e.getMessage(),
+                            null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
 
     public Object showClientPaymentsReportPage () {
         FacesContext facesContext = FacesContext.getCurrentInstance();

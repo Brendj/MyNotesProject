@@ -878,8 +878,8 @@
         <%--<rich:panelMenuItem id="dailySalesByGroupsReportMenuItem" binding="#{dailySalesByGroupsReportPage.mainMenuComponent}"
                             label="Дневные продажи по категориям" action="#{dailySalesByGroupsReportPage.show}"
                             reRender="workspaceForm" />--%>
-        <rich:panelMenuItem id="contragentPaymentReportMenuItem" binding="#{contragentPaymentReportPage.mainMenuComponent}"
-                            label="Отчет по платежам" action="#{contragentPaymentReportPage.show}"
+        <rich:panelMenuItem id="contragentPaymentReportMenuItem" binding="#{mainPage.contragentPaymentReportPage.mainMenuComponent}"
+                            label="Отчет по платежам" action="#{mainPage.showContragentPaymentsReportPage}"
                             reRender="workspaceForm" />
         <rich:panelMenuItem id="clientPaymentsReportMenuItem" binding="#{mainPage.clientPaymentsReportPage.mainMenuComponent}"
                             label="Отчет по начислениям" action="#{mainPage.showClientPaymentsReportPage}"

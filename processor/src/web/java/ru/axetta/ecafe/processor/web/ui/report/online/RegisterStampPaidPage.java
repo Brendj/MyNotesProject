@@ -10,7 +10,6 @@ import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.RegisterStampPaidReport;
 import ru.axetta.ecafe.processor.core.report.ReportDAOService;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.time.DateUtils;
@@ -49,54 +48,6 @@ public class RegisterStampPaidPage extends OnlineReportPage {
     private ReportDAOService daoService;
     private String htmlReport = null;
     private Boolean includeActDiscrepancies = true;
-    private final PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu();
-
-    public void onReportPeriodChanged(ActionEvent event) {
-        htmlReport = null;
-        switch (periodTypeMenu.getPeriodType()) {
-            case ONE_DAY: {
-                setEndDate(startDate);
-            }
-            break;
-            case ONE_WEEK: {
-                setEndDate(CalendarUtils.addDays(startDate, 6));
-            }
-            break;
-            case TWO_WEEK: {
-                setEndDate(CalendarUtils.addDays(startDate, 13));
-            }
-            break;
-            case ONE_MONTH: {
-                setEndDate(CalendarUtils.addDays(CalendarUtils.addMonth(startDate, 1), -1));
-            }
-            break;
-        }
-    }
-
-    public void onEndDateSpecified(ActionEvent event) {
-        htmlReport = null;
-        Date end = CalendarUtils.truncateToDayOfMonth(endDate);
-        if (CalendarUtils.addMonth(end, -1).equals(CalendarUtils.addDays(startDate, -1))) {
-            periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
-        } else {
-            long diff = end.getTime() - startDate.getTime();
-            int noofdays = (int) (diff / (1000 * 24 * 60 * 60));
-            switch (noofdays) {
-                case 0:
-                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY);
-                    break;
-                case 6:
-                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
-                    break;
-                case 13:
-                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK);
-                    break;
-                default:
-                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY);
-                    break;
-            }
-        }
-    }
 
     @Override
     public void onShow() throws Exception {
@@ -264,10 +215,6 @@ public class RegisterStampPaidPage extends OnlineReportPage {
     public void setIncludeActDiscrepancies(Boolean includeActDiscrepancies) {
         htmlReport = null;
         this.includeActDiscrepancies = includeActDiscrepancies;
-    }
-
-    public PeriodTypeMenu getPeriodTypeMenu() {
-        return periodTypeMenu;
     }
 
     @Override

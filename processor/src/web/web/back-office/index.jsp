@@ -201,7 +201,7 @@
                             <h:outputText escape="true" value="Версия #{runtimeContext.currentDBSchemaVersion}"
                                           styleClass="output-text" /><br />
                             <a4j:commandLink value="Мои настройки" binding="#{userSettings.mainMenuComponent}"
-                                           action="#{userSettings.show}" styleClass="command-link" reRender="mainMenu, workspaceForm"/>
+                                           action="#{userSettings.show}" styleClass="command-link" reRender="workspaceForm"/>
                             &nbsp;&nbsp;&nbsp;
                             <h:outputText id="sysuser" escape="true" value="#{request.remoteUser}" styleClass="output-text" />
                             <rich:toolTip for="sysuser" followMouse="true" direction="top-right" showDelay="500" styleClass="tooltip" rendered="#{not empty mainPage.userContragentsList}">

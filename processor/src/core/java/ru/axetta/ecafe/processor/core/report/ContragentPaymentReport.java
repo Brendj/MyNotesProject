@@ -13,8 +13,11 @@ import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.*;
@@ -195,9 +198,6 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                     throw new Exception("Ошибка парсинга идентификатора контрагента-плательщика: "+idOfContragentPayer, e);
                 }
                 contragentPayer = (Contragent)session.get(Contragent.class, Long.parseLong(idOfContragentPayer));
-                if (contragentPayer==null) {
-                    throw new Exception("Контрагент-плательщик не найден: "+idOfContragentPayer);
-                }
             }
             parameterMap.put("contragentName", contragentPayer.getContragentName());
             String idOfContragentReceiver = getReportProperties().getProperty(PARAM_CONTRAGENT_RECEIVER_ID);
@@ -213,9 +213,17 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
                     throw new Exception("Контрагент-получатель не найден: "+idOfContragentReceiver);
                 }
             }
+
+            String idOfOrgs = StringUtils.trimToEmpty(getReportProperties().getProperty("idOfOrgList"));
+            List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
+            List<Long> idOfOrgList = new ArrayList<Long>(stringOrgList.size());
+            for (String idOfOrg : stringOrgList) {
+                idOfOrgList.add(Long.parseLong(idOfOrg));
+            }
+
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
                     createDataSource(session, contragentPayer, contragentReceiver, startTime, endTime, (Calendar) calendar.clone(),
-                            parameterMap));
+                            parameterMap, idOfOrgList));
             Date generateEndTime = new Date();
             if (!exportToHTML) {
                 ContragentPaymentReport report = new ContragentPaymentReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
@@ -241,8 +249,12 @@ public class ContragentPaymentReport extends BasicReportForContragentJob {
         }
 
         private JRDataSource createDataSource(Session session, Contragent contragent, Contragent contragentReceiver,
-                Date startTime, Date endTime, Calendar clone, Map<String, Object> parameterMap) {
+                Date startTime, Date endTime, Calendar clone, Map<String, Object> parameterMap, List<Long> idOfOrgList) {
             Criteria clientPaymentCriteria = session.createCriteria(ClientPayment.class);
+            if (!CollectionUtils.isEmpty(idOfOrgList)) {
+                clientPaymentCriteria.createCriteria("transaction").createCriteria("client").createCriteria("org")
+                        .add(Restrictions.in("idOfOrg", idOfOrgList));
+            }
             if (contragentReceiver!=null) {
                 clientPaymentCriteria.add(Restrictions.eq("contragentReceiver", contragentReceiver));
             }
