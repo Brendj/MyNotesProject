@@ -61,6 +61,7 @@ public class Good extends ConfigurationProviderDistributedObject {
     private String pathPart2;
     private String pathPart3;
     private String pathPart4;
+    private String[] parts;
     private Set<TradeMaterialGood> tradeMaterialGoodInternal;
     private Set<ProhibitionExclusion> prohibitionExclusionInternal;
     private Set<Prohibition> prohibitionInternal;
@@ -72,6 +73,14 @@ public class Good extends ConfigurationProviderDistributedObject {
     private Set<GoodRequestPosition> goodRequestPositionInternal;
 
     private Set<ActOfWayBillDifferencePosition> actOfWayBillDifferencePositionInternal;
+
+    public String[] getParts() {
+        return parts;
+    }
+
+    protected void setParts(String[] parts) {
+        this.parts = parts;
+    }
 
     @Override
     public void createProjections(Criteria criteria) {

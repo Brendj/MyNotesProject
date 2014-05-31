@@ -18,6 +18,7 @@ public class GoodItem implements Comparable<GoodItem>{
     private String pathPart2;
     private String pathPart3;
     private String pathPart4;
+    private String parts[];
     private String fullName;
 
     public GoodItem() {
@@ -65,6 +66,18 @@ public class GoodItem implements Comparable<GoodItem>{
 
     public void setPathPart4(String pathPart4) {
         this.pathPart4 = pathPart4;
+    }
+
+    public String[] getParts() {
+        return parts;
+    }
+
+    public void setParts(String[] parts) {
+        if(parts.length>0) pathPart1 = parts[0];
+        if(parts.length>1) pathPart2 = parts[1];
+        if(parts.length>2) pathPart3 = parts[2];
+        if(parts.length>3) pathPart4 = parts[3];
+        this.parts = parts;
     }
 
     public String getFullName() {

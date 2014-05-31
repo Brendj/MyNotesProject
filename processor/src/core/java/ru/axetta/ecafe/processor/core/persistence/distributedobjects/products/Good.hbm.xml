@@ -40,6 +40,9 @@
         <property name="pathPart3" formula="split_part(FullName, '/', 3)" lazy="true" type="java.lang.String"/>
         <property name="pathPart4" formula="split_part(FullName, '/', 4)" lazy="true" type="java.lang.String"/>
 
+        <property name="parts" formula="regexp_split_to_array(fullname, '\/')"
+                  type="ru.axetta.ecafe.processor.core.persistence.StringArrayType"/>
+
         <property name="goodsCode" column="GoodsCode" type="string" length="32" not-null="true"/>
         <!--<property name="unitsScale" column="UnitsScale" type="integer" not-null="true"/>-->
         <property name="unitsScale" column="UnitsScale">

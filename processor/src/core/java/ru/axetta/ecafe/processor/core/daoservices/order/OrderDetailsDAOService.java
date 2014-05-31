@@ -158,8 +158,10 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         orderTypeEnumTypeSet.add(OrderTypeEnumType.DAILY_SAMPLE);
         orderTypeEnumTypeSet.add(OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE);
         orderTypeEnumTypeSet.add(OrderTypeEnumType.CORRECTION_TYPE);
-        String sql = "select distinct good.globalId as globalId, good.pathPart3 as pathPart3, "
-                + "good.pathPart4 as pathPart4,good.pathPart2 as pathPart2, good.pathPart1 as pathPart1, good.fullName as fullName "
+        String sql = "select distinct good.globalId as globalId, "
+                //+ " good.pathPart3 as pathPart3, good.pathPart4 as pathPart4,good.pathPart2 as pathPart2, good.pathPart1 as pathPart1, "
+                + " good.parts as parts, "
+                + " good.fullName as fullName "
                 + " from OrderDetail details "
                 + " left join details.good good left join details.order ord left join ord.org o "
                 + " where ord.state=0 and details.state=0 and ord.orderType in :orderType and details.good is not null and o.idOfOrg=:idOfOrg and "
