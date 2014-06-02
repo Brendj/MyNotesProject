@@ -23,8 +23,8 @@
         <h:panelGroup styleClass="borderless-div">
             <h:inputText value="#{contragentCompletionReportPage.defaultSupplier.contragentName}" readonly="true"
                          styleClass="input-text" style="margin-right: 2px;" />
-            <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage}"
-                               reRender="modalContragentSelectorPanel"
+            <a4j:commandButton value="..." action="#{contragentCompletionReportPage.showContragentSelectPage}"
+                               reRender="modalContragentSelectorPanel, orgPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" >
                 <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
@@ -38,6 +38,18 @@
         <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
         <rich:calendar value="#{contragentCompletionReportPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+
+        <h:outputText styleClass="output-text" escape="true" value="Организация" />
+        <h:panelGroup id="orgPanel">
+            <a4j:commandButton value="..." action="#{contragentCompletionReportPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;">
+                <%--<f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />--%>
+                <f:setPropertyActionListener value="#{contragentCompletionReportPage.getStringIdOfOrgList}"
+                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+            </a4j:commandButton>
+            <h:outputText styleClass="output-text" escape="true" value=" {#{contragentCompletionReportPage.filter}}" />
+        </h:panelGroup>
 
     </h:panelGrid>
 
@@ -58,7 +70,8 @@
                     var="contragentCompletionItem" rowKeyVar="row">
         <f:facet name="header">
             <rich:columnGroup>
-                <rich:column colspan="4">
+                <%--colspan="4" с учетом скрытия полей "Локация", "Тэги"--%>
+                <rich:column colspan="2">
                     <h:outputText value="Организация"/>
                 </rich:column>
                 <rich:column colspan="#{contragentCompletionReportPage.contragentListCount}">
@@ -71,15 +84,15 @@
                     <h:outputText value="Итого"/>
                 </rich:column>
                 <rich:column breakBefore="true">
-                    <h:outputText value="Наименование"/>
-                </rich:column>
-                <rich:column>
                     <h:outputText value="Город"/>
                 </rich:column>
                 <rich:column>
+                    <h:outputText value="Наименование"/>
+                </rich:column>
+                <rich:column rendered="#{contragentCompletionReportPage.allHide}">
                     <h:outputText value="Локация"/>
                 </rich:column>
-                <rich:column>
+                <rich:column rendered="#{contragentCompletionReportPage.allHide}">
                     <h:outputText value="Тэги"/>
                 </rich:column>
                 <rich:columns var="contragent" value="#{contragentCompletionReportPage.contragentList}">
@@ -88,15 +101,15 @@
             </rich:columnGroup>
         </f:facet>
         <rich:column>
-            <h:outputText value="#{contragentCompletionItem.educationalInstitutionName}"/>
-        </rich:column>
-        <rich:column>
             <h:outputText value="#{contragentCompletionItem.educationalCity}"/>
         </rich:column>
         <rich:column>
+            <h:outputText value="#{contragentCompletionItem.educationalInstitutionName}"/>
+        </rich:column>
+        <rich:column rendered="#{contragentCompletionReportPage.allHide}">
             <h:outputText value="#{contragentCompletionItem.educationalLocation}"/>
         </rich:column>
-        <rich:column>
+        <rich:column rendered="#{contragentCompletionReportPage.allHide}">
             <h:outputText value="#{contragentCompletionItem.educationalTags}"/>
         </rich:column>
         <rich:columns  var="contragent" value="#{contragentCompletionReportPage.contragentList}">

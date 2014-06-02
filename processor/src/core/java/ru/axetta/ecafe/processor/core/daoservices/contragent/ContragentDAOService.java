@@ -8,14 +8,20 @@ import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.BigDecimalType;
+import org.hibernate.type.LongType;
+import org.hibernate.type.Type;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -59,7 +65,7 @@ public class ContragentDAOService extends AbstractDAOService {
     }
 
     @SuppressWarnings("unchecked")
-    public List<ContragentCompletionReportItem> generateContragentCompletionReportItems(Long idOfContragent, Date startDate, Date endDate){
+    public List<ContragentCompletionReportItem> generateContragentCompletionReportItems(List<Long> idOfOrgList, Long idOfContragent, Date startDate, Date endDate){
         Criteria criteria = getSession().createCriteria(ClientPayment.class);
         /* Условия запроса */
         criteria.createAlias("transaction", "tr")
@@ -68,11 +74,15 @@ public class ContragentDAOService extends AbstractDAOService {
                 .createAlias("o.defaultSupplier", "defaultSupplier", JoinType.LEFT_OUTER_JOIN)
                 .add(Restrictions.eq("defaultSupplier.idOfContragent", idOfContragent));
         criteria.createAlias("contragent", "c", JoinType.LEFT_OUTER_JOIN).add(Restrictions.eq("c.classId", Contragent.PAY_AGENT));
+        if (!CollectionUtils.isEmpty(idOfOrgList)) {
+            criteria.add(Restrictions.in("o.idOfOrg", idOfOrgList));
+        }
         /* отображение сгрупированных полей */
         criteria.setProjection(Projections.projectionList()
                 .add(Projections.property("o.shortName"), "educationalInstitutionName")
                 .add(Projections.property("c.contragentName"),"contragentName")
                 .add(Projections.sum("paySum"),"paySum")
+                //.add(Projections.sqlProjection("COALESCE(SUM({alias}.paySum), 0) as summaryPays", new String[]{"paySum"}, new Type[]{new LongType()}))
                 .add(Projections.groupProperty("c.idOfContragent"))
                 .add(Projections.groupProperty("o.idOfOrg"))
         );
@@ -83,7 +93,6 @@ public class ContragentDAOService extends AbstractDAOService {
         criteria.setResultTransformer(Transformers.aliasToBean(ContragentCompletionReportItem.class));
         return  (List<ContragentCompletionReportItem>) criteria.list();
     }
-
 
     @SuppressWarnings("unchecked")
     public List<Org> findDistributionOrganizationByDefaultSupplier(Contragent defaultSupplier){
@@ -97,6 +106,11 @@ public class ContragentDAOService extends AbstractDAOService {
     public List<Org> findAllDistributionOrganization(){
         Criteria criteria = getSession().createCriteria(Org.class);
         return (List<Org>) criteria.list();
+    }
+
+    public Org getOrdByOrgId(Long idOfOrg) {
+        Org org = (Org) getSession().load(Org.class, idOfOrg);
+        return org;
     }
 
 }

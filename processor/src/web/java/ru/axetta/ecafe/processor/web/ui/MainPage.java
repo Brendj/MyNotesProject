@@ -327,6 +327,7 @@ public class MainPage {
     private final BasicWorkspacePage goodGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage goodGroupsGroupPage = new BasicWorkspacePage();
 
+    private final ContragentCompletionReportPage contragentCompletionReportPage = new ContragentCompletionReportPage();
     private final ContragentPaymentReportPage contragentPaymentReportPage = new ContragentPaymentReportPage();
     private final ClientPaymentsPage clientPaymentsReportPage = new ClientPaymentsPage();
     private final GoodRequestsNewReportPage goodRequestsNewReportPage = new GoodRequestsNewReportPage();
@@ -5159,6 +5160,10 @@ public class MainPage {
 
     public SalesReportPage getSalesReportPage() {
         return salesReportPage;
+    }
+
+    public ContragentCompletionReportPage getContragentCompletionReportPage() {
+        return contragentCompletionReportPage;
     }
 
     public ContragentPaymentReportPage getContragentPaymentReportPage() {

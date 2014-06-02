@@ -5,8 +5,9 @@
 package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JRExporterParameter;
-import net.sf.jasperreports.engine.export.*;
+import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
+import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentCompletionItem;
@@ -17,9 +18,11 @@ import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ContragentCompletionReport;
 import ru.axetta.ecafe.processor.core.report.ReportDAOService;
-import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,11 +36,7 @@ import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -48,7 +47,7 @@ import java.util.List;
  */
 @Component
 @Scope("session")
-public class ContragentCompletionReportPage extends BasicWorkspacePage implements ContragentSelectPage.CompleteHandler {
+public class ContragentCompletionReportPage extends OnlineReportPage implements ContragentSelectPage.CompleteHandler {
 
     @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
@@ -90,12 +89,27 @@ public class ContragentCompletionReportPage extends BasicWorkspacePage implement
             orgItems = contragentDAOService.findAllDistributionOrganization();
         }
 
-        if(!orgItems.isEmpty()){
+        List<String> stringOrgList = Arrays.asList(StringUtils.split(getGetStringIdOfOrgList(), ','));
+        List<Long> idOfOrgList = new ArrayList<Long>(stringOrgList.size());
+        for (String idOfOrg : stringOrgList) {
+            idOfOrgList.add(Long.parseLong(idOfOrg));
+        }
+
+        if (!orgItems.isEmpty()) {
             ContragentCompletionItem total = new ContragentCompletionItem(contragentList);
-            for (Org org: orgItems){
-                ContragentCompletionItem contragentCompletionItem = contragentDAOService.generateReportItems(org.getIdOfOrg(),contragentList, this.startDate, this.endDate);
-                this.contragentCompletionItems.add(contragentCompletionItem);
-                total.addContragentPayItems(contragentCompletionItem.getContragentPayItems());
+            if (!CollectionUtils.isEmpty(idOfOrgList)) {
+                for (Long idOrg : idOfOrgList) {
+                    ContragentCompletionItem contragentCompletionItem = contragentDAOService.generateReportItems(idOrg, contragentList, this.startDate, this.endDate);
+                    this.contragentCompletionItems.add(contragentCompletionItem);
+                    total.addContragentPayItems(contragentCompletionItem.getContragentPayItems());
+                }
+            } else {
+                for (Org org : orgItems) {
+                    ContragentCompletionItem contragentCompletionItem = contragentDAOService.generateReportItems(org.getIdOfOrg(), contragentList, this.startDate,
+                            this.endDate);
+                    this.contragentCompletionItems.add(contragentCompletionItem);
+                    total.addContragentPayItems(contragentCompletionItem.getContragentPayItems());
+                }
             }
             this.contragentCompletionItems.add(total);
         }
@@ -113,6 +127,7 @@ public class ContragentCompletionReportPage extends BasicWorkspacePage implement
         ContragentCompletionReport.Builder builder = new ContragentCompletionReport.Builder(templateFilename);
         builder.setContragent(defaultSupplier);
         Session session = (Session) entityManager.getDelegate();
+        builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
         try {
             //ContragentCompletionReport contragentCompletionReport = (ContragentCompletionReport) builder.build(session,startDate, endDate, localCalendar);
             BasicReportJob report = builder.build(session,startDate, endDate, localCalendar);
@@ -207,5 +222,24 @@ public class ContragentCompletionReportPage extends BasicWorkspacePage implement
 
     public void setStartDate(Date startDate) {
         this.startDate = startDate;
+    }
+
+    public boolean isAllHide() {
+        return false;
+    }
+
+    public Object showOrgListSelectPage() {
+        if (defaultSupplier != null) {
+            MainPage.getSessionInstance().setIdOfContragentList(Arrays.asList(defaultSupplier.getIdOfContragent()));
+        }
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
+    }
+
+    public Object showContragentSelectPage() {
+        idOfOrgList.clear();
+        filter = "Не выбрано";
+        MainPage.getSessionInstance().showContragentSelectPage();
+        return null;
     }
 }

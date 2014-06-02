@@ -5,22 +5,21 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JRResultSetDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
-import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentCompletionItem;
 import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentCompletionReportItem;
 import ru.axetta.ecafe.processor.core.daoservices.contragent.ContragentDAOService;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
 import java.text.DateFormatSymbols;
 import java.util.*;
 
@@ -56,8 +55,16 @@ public class ContragentCompletionReport extends BasicReportForContragentJob {
             parameterMap.put("startDate", startTime);
             parameterMap.put("endDate", endTime);
             parameterMap.put("contragentName", contragent.getContragentName());
+
+            String idOfOrgs = StringUtils.trimToEmpty(getReportProperties().getProperty("idOfOrgList"));
+            List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
+            List<Long> idOfOrgList = new ArrayList<Long>(stringOrgList.size());
+            for (String idOfOrg : stringOrgList) {
+                idOfOrgList.add(Long.parseLong(idOfOrg));
+            }
+
             JRDataSource dataSource = createDataSource(session, contragent, startTime, endTime,
-                    (Calendar) calendar.clone(), parameterMap);
+                    (Calendar) calendar.clone(), parameterMap, idOfOrgList);
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
 
@@ -66,12 +73,46 @@ public class ContragentCompletionReport extends BasicReportForContragentJob {
                     jasperPrint, startTime, endTime, contragent.getIdOfContragent());
         }
 
-        private JRDataSource createDataSource(Session session, Contragent contragent, Date startTime, Date endTime,
-                Calendar clone, Map<String, Object> parameterMap) {
+        private JRDataSource createDataSource(Session session, Contragent contragent, Date startTime, Date endTime, Calendar clone, Map<String, Object> parameterMap, List<Long> idOfOrgList) {
             ContragentDAOService contragentDAOService = new ContragentDAOService();
             contragentDAOService.setSession(session);
-            List<ContragentCompletionReportItem> contragentCompletionReportItems = contragentDAOService.generateContragentCompletionReportItems(contragent.getIdOfContragent(),startTime,endTime);
-            return new JRBeanCollectionDataSource(contragentCompletionReportItems);
+            List<ContragentCompletionReportItem> list = new ArrayList<ContragentCompletionReportItem>();
+            //list
+            //При нулевых значениях, строиться отчет с нулевыми данными
+            List<Org> orgItems = null;
+            List<Contragent> contragentList = contragentDAOService.getPayAgentContragent();
+            if (contragent != null) {
+                orgItems = contragentDAOService.findDistributionOrganizationByDefaultSupplier(contragent);
+            } else {
+                orgItems = contragentDAOService.findAllDistributionOrganization();
+            }
+
+            if (!orgItems.isEmpty()) {
+                if (!CollectionUtils.isEmpty(idOfOrgList)) {
+                    for (Long idOrg : idOfOrgList) {
+                        Org org1 = contragentDAOService.getOrdByOrgId(idOrg);
+                        ContragentCompletionReportItem contragentCompletionReportItem = null;
+                        for (int i = 0; i < contragentList.size(); i++) {
+                            contragentCompletionReportItem = new ContragentCompletionReportItem(
+                                    contragentList.get(i).getContragentName(), org1.getShortName(), 0L);
+                            list.add(contragentCompletionReportItem);
+                        }
+                    }
+                } else {
+                    for (Org org : orgItems) {
+                        ContragentCompletionReportItem contragentCompletionReportItem = null;
+                        for (int i = 0; i < contragentList.size(); i++) {
+                            contragentCompletionReportItem = new ContragentCompletionReportItem(
+                                    contragentList.get(i).getContragentName(), org.getShortName(), 0L);
+                            list.add(contragentCompletionReportItem);
+                        }
+                    }
+                }
+            }
+
+            List<ContragentCompletionReportItem> contragentCompletionReportItems = contragentDAOService.generateContragentCompletionReportItems(idOfOrgList, contragent.getIdOfContragent(), startTime, endTime);
+            list.addAll(contragentCompletionReportItems);
+            return new JRBeanCollectionDataSource(list);
         }
     }
 

@@ -872,9 +872,9 @@
                          label="Отчеты по пополнениям" rendered="#{mainPage.eligibleToViewRefillReports}">
         <a4j:support event="onclick" action="#{mainPage.showPaymentReportsGroupMenu}" reRender="workspaceForm" />
         <%--@elvariable id="contragentCompletionReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ContragentCompletionReportPage"--%>
-        <rich:panelMenuItem id="contragentCompletionReportMenuItem"
-                            binding="#{contragentCompletionReportPage.mainMenuComponent}" label="Отчет по обороту"
-                            action="#{contragentCompletionReportPage.show}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="contragentCompletionReportMenuItem" binding="#{contragentCompletionReportPage.mainMenuComponent}"
+                            label="Отчет по обороту" action="#{contragentCompletionReportPage.show}"
+                            reRender="workspaceForm" />
         <%--<rich:panelMenuItem id="dailySalesByGroupsReportMenuItem" binding="#{dailySalesByGroupsReportPage.mainMenuComponent}"
                             label="Дневные продажи по категориям" action="#{dailySalesByGroupsReportPage.show}"
                             reRender="workspaceForm" />--%>
