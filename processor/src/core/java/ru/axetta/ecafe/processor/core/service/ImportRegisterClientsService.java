@@ -219,7 +219,7 @@ public class ImportRegisterClientsService {
         }
 
         setLastUpdateDate(new Date(System.currentTimeMillis()));
-        log("Finished all threads", null);
+        log("Finished import register", null);
     }
 
     /*public void prevRun() throws IOException {
