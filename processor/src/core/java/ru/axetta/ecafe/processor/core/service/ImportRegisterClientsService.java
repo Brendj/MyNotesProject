@@ -28,6 +28,8 @@ import java.net.SocketTimeoutException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created with IntelliJ IDEA.
@@ -54,6 +56,7 @@ public class ImportRegisterClientsService {
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private static final String ORG_SYNC_MARKER = "СИНХРОНИЗАЦИЯ_РЕЕСТРЫ";
     private static final long MILLISECONDS_IN_DAY = 86400000L;
+    private static final int MAX_THREADS = 10;
 
 
     public static boolean isOn() {
@@ -98,7 +101,128 @@ public class ImportRegisterClientsService {
     }
 
 
+    public class WorkerThread implements Runnable {
+        private String command;
+        private List<Org> orgs;
+
+        public WorkerThread(String s){
+            this.command=s;
+        }
+
+        @Override
+        public void run() {
+            //System.out.println(Thread.currentThread().getName()+" Start. Command = "+command);
+            processCommand();
+            //System.out.println(Thread.currentThread().getName()+" End.");
+        }
+
+        public List<Org> getOrgs() {
+            return orgs;
+        }
+
+        public WorkerThread setOrgs(List<Org> orgs) {
+            this.orgs = orgs;
+            return this;
+        }
+
+        private void processCommand() {
+            try {
+                int maxAttempts = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_MSK_NSI_MAX_ATTEMPTS);
+                for (Org org : orgs) {
+                    if (org.getTag() == null || !org.getTag().toUpperCase().contains(ORG_SYNC_MARKER)) {
+                        continue;
+                    }
+                    int attempt = 0;
+                    while (attempt < maxAttempts) {
+                        try {
+                            RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
+                                    .syncClientsWithRegistry(org.getIdOfOrg(), true, null, false);
+                        } catch (SocketTimeoutException ste) {
+                        } catch (Exception e) {
+                            logError("Ошибка при синхронизации с Реестрами для организации: " + org.getIdOfOrg(), e, null);
+                            break;
+                        } finally {
+                            attempt++;
+                        }
+                    }
+                    if (attempt >= maxAttempts) {
+                        logError("Неудалось подключиться к сервису, превышено максимальное количество попыток (" + maxAttempts
+                                + ")", null, null);
+                    }
+                }
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public String toString(){
+            return this.command;
+        }
+    }
+
+    protected List<List<Org>> buildOrgsPack(List<Org> orgs, int threadsCount) {
+        List<List<Org>> result = new ArrayList<List<Org>>();
+
+        int count = (int) Math.ceil((double) orgs.size() / (double) threadsCount);
+        int l = 0;
+        int i = 0;
+        Org o = orgs.get(i);
+        while(o != null) {
+            List<Org> list = null;
+            if(result.size() > l) {
+                list = result.get(l);
+            } else {
+                list = new ArrayList<Org>();
+                result.add(list);
+            }
+            list.add(o);
+
+            l++;
+            if(l >= threadsCount) {
+                l = 0;
+            }
+            i++;
+
+
+            if(orgs.size() > i) {
+                o = orgs.get(i);
+            } else {
+                o = null;
+            }
+        }
+
+        return result;
+    }
+
     public void run() throws IOException {
+        if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
+            return;
+        }
+        List<Org> orgs = DAOService.getInstance().getOrderedSynchOrgsList();
+        RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class)
+                .checkRegistryChangesValidity();
+        List<List<Org>> orgsPack = buildOrgsPack(orgs, MAX_THREADS);
+
+        log("Start import register with " + MAX_THREADS + " threads", null);
+        ExecutorService executor = Executors.newFixedThreadPool(MAX_THREADS);
+
+        for (int i = 0; i < orgsPack.size(); i++) {
+            List<Org> pack = orgsPack.get(i);
+            log(String.format("Create thread %s of %s with %s orgs", i+1, orgsPack.size(), pack.size()), null);
+            Runnable worker = new WorkerThread("" + i).setOrgs(pack);
+            executor.execute(worker);
+        }
+        executor.shutdown();
+        while (!executor.isTerminated()) {
+        }
+
+        setLastUpdateDate(new Date(System.currentTimeMillis()));
+        log("Finished all threads", null);
+    }
+
+    /*public void prevRun() throws IOException {
         if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
             return;
         }
@@ -134,7 +258,7 @@ public class ImportRegisterClientsService {
         //if (allOperationsAreFinished) {
         setLastUpdateDate(new Date(System.currentTimeMillis()));
         //}
-    }
+    }*/
 
     @Transactional
     public void checkRegistryChangesValidity() {
