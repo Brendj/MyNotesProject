@@ -38,7 +38,7 @@ public class TransactionsReportPage extends OnlineReportPage {
     private final static Logger logger = LoggerFactory.getLogger(TransactionsReportPage.class);
     private TransactionsReport report;
 
-    @PersistenceContext(unitName = "processorPU")
+    @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
 
 
