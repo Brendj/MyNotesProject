@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -34,6 +36,9 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
     protected List<Item> list;
     Logger logger = LoggerFactory.getLogger(NSIOrgRegistrySynchPageBase.class);
     protected String orgFilter = "";
+    protected boolean showOnlyUnsynch = false;
+    protected static final DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+    protected static final long OUT_OF_SYNCH_LIMIT = 86400000L * 2;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
@@ -47,6 +52,14 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
         this.orgFilter = orgFilter;
     }
 
+    public boolean isShowOnlyUnsynch() {
+        return showOnlyUnsynch;
+    }
+
+    public void setShowOnlyUnsynch(boolean showOnlyUnsynch) {
+        this.showOnlyUnsynch = showOnlyUnsynch;
+    }
+
     @Override
     public void onShow() {
         RuntimeContext.getAppContext().getBean(NSIOrgRegistrySynchOverviewPage.class).doUpdate();
@@ -58,6 +71,18 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
 
     public String getPageTitle() {
         return "История синхронизации с Реестрами";
+    }
+
+    protected boolean isUnsynch(long idoforg, long ts, List<Long> excludeOrgs) {
+        if(excludeOrgs.contains(idoforg)) {
+            return true;
+        }
+
+        if(System.currentTimeMillis() - ts < OUT_OF_SYNCH_LIMIT) {
+            excludeOrgs.add(idoforg);
+            return true;
+        }
+        return false;
     }
 
     @Transactional
@@ -74,23 +99,59 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
                 orgStatement = " where cf_orgs.shortname like '%" + orgFilter + "%' ";
             }
             Query q = session.createSQLQuery(
-                    "select cf_orgs.idoforg, cf_orgs.officialname, operation, count(cf_registrychange.operation) "
+                    "select cf_orgs.idoforg, cf_orgs.officialname, operation, cf_registrychange.createdate, count(cf_registrychange.operation) "
                     + "from cf_registrychange "
                     + "left join cf_orgs on cf_orgs.idoforg=cf_registrychange.idoforg "
                     + orgStatement
-                    + "group by cf_orgs.idoforg, cf_orgs.officialname, operation "
-                    + "order by cf_orgs.idoforg, cf_orgs.officialname, operation");
+                    + "group by cf_orgs.idoforg, cf_orgs.officialname, cf_registrychange.createdate, operation "
+                    + "order by cf_orgs.idoforg, cf_orgs.officialname, cf_registrychange.createdate desc, operation");
             List result = q.list();
+
+            long prevIdOfOrg = -1L;
+            int prevOperation = -1;
+            Long prevDate = null;
+            List<Long> excludeOrgs = null;
+            if(showOnlyUnsynch) {
+                excludeOrgs = new ArrayList<Long>();
+            }
+
             for (Object entry : result) {
                 Object o[] = (Object[]) entry;
                 long idoforg = ((BigInteger) o[0]).longValue();
                 String orgName = ((String) o[1]).trim();
                 int operation = ((Integer) o[2]).intValue();
-                long count = ((BigInteger) o[3]).longValue();
+                long ts = ((BigInteger) o[3]).longValue();
+                long count = ((BigInteger) o[4]).longValue();
+
+                if(showOnlyUnsynch && isUnsynch(idoforg, ts, excludeOrgs)) {
+                    continue;
+                }
+
+                boolean passItem = false;
+                if(prevIdOfOrg != idoforg) {
+                    passItem = true;
+                } else {
+                    if(prevOperation != operation) {
+                        if(prevDate == ts) {
+                            passItem = true;
+                        }
+                    } else {
+                        if(prevDate < ts) {
+                            passItem = true;
+                        }
+                    }
+                }
+                if(!passItem) {
+                    continue;
+                }
+
+                prevIdOfOrg = idoforg;
+                prevOperation = operation;
+                prevDate = ts;
                 
                 Item i = res.get(idoforg);
                 if (i == null) {
-                    i = new Item(idoforg, orgName);
+                    i = new Item(idoforg, orgName, ts);
                     res.put(idoforg, i);
                 }
                 switch (operation) {
@@ -136,8 +197,10 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
         protected long created;
         protected long deleted;
         protected long total;
+        protected long ts;
+        protected String date;
 
-        public Item(long idoforg, String orgName) {
+        public Item(long idoforg, String orgName, long ts) {
             this.idoforg = idoforg;
             this.orgName = orgName;
             modified = 0L;
@@ -145,6 +208,8 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
             created = 0L;
             deleted = 0L;
             total = 0L;
+            this.ts = ts;
+            date = dateFormat.format(new Date(ts));
         }
 
         public long getIdoforg() {
@@ -205,6 +270,18 @@ public class NSIOrgRegistrySynchOverviewPage extends BasicWorkspacePage {
 
         public void addTotal(long count) {
             total += count;
+        }
+
+        public long getTs() {
+            return ts;
+        }
+
+        public String getDate() {
+            return date;
+        }
+
+        public boolean isOutOfSynch() {
+            return System.currentTimeMillis() - ts > OUT_OF_SYNCH_LIMIT;
         }
     }
 }

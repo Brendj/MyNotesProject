@@ -8,16 +8,19 @@
 <%--@elvariable id="NSIOrgRegistrySynchOverviewPage" type="ru.axetta.ecafe.processor.web.ui.service.msk.NSIOrgRegistrySynchOverviewPage"--%>
 
 <h:panelGrid id="NSIOrgRegistrySynchOverviewPage" styleClass="borderless-grid" binding="#{NSIOrgRegistrySynchOverviewPage.pageComponent}">
-    <a4j:status>
+    <%--<a4j:status>
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" />
         </f:facet>
-    </a4j:status>
+    </a4j:status>--%>
 
 
     <h:panelGrid columns="2" styleClass="borderless-grid">
         <h:outputText escape="true" value="Фильтр по названию организации" styleClass="output-text" />
         <h:inputText value="#{NSIOrgRegistrySynchOverviewPage.orgFilter}" size="64" styleClass="input-text" />
+
+        <h:outputText value="Только не синхронизированные последние 2 дня" styleClass="output-text"/>
+        <h:selectBooleanCheckbox value="#{NSIOrgRegistrySynchOverviewPage.showOnlyUnsynch}"/>
     </h:panelGrid>
 
     <a4j:commandButton value="Обновить" action="#{NSIOrgRegistrySynchOverviewPage.doUpdate}"
@@ -29,49 +32,64 @@
             <f:facet name="header">
                 <h:outputText value="№"></h:outputText>
             </f:facet>
-            <h:outputText value="#{row+1}"></h:outputText>
+            <h:outputText value="#{row+1}"
+                          style="#{(e.outOfSynch) ? 'color:red' : ''}"></h:outputText>
         </rich:column>
         <rich:column>
             <f:facet name="header">
                 <h:outputText value="ID" />
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{e.idoforg}" />
+            <h:outputText styleClass="output-text" value="#{e.idoforg}"
+                          style="#{(e.outOfSynch) ? 'color:red' : ''}" />
         </rich:column>
         <rich:column>
             <f:facet name="header">
                 <h:outputText value="Наименование" />
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{e.orgName}" />
+            <h:outputText styleClass="output-text" value="#{e.orgName}"
+                          style="#{(e.outOfSynch) ? 'color:red' : ''}" />
         </rich:column>
         <rich:column>
             <f:facet name="header">
                 <h:outputText value="Всего" />
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{e.total}" />
+            <h:outputText styleClass="output-text" value="#{e.total}"
+                          style="#{(e.outOfSynch) ? 'color:red' : ''}" />
         </rich:column>
         <rich:column>
             <f:facet name="header">
                 <h:outputText value="Добавленных" />
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{e.created}" />
+            <h:outputText styleClass="output-text" value="#{e.created}"
+                          style="#{(e.outOfSynch) ? 'color:red' : ''}" />
         </rich:column>
         <rich:column>
             <f:facet name="header">
                 <h:outputText value="Измененных" />
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{e.modified}" />
+            <h:outputText styleClass="output-text" value="#{e.modified}"
+                          style="#{(e.outOfSynch) ? 'color:red' : ''}" />
         </rich:column>
         <rich:column>
             <f:facet name="header">
                 <h:outputText value="Перемещенных" />
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{e.moved}" />
+            <h:outputText styleClass="output-text" value="#{e.moved}"
+                          style="#{(e.outOfSynch) ? 'color:red' : ''}" />
         </rich:column>
         <rich:column>
             <f:facet name="header">
                 <h:outputText value="Удаленных" />
             </f:facet>
-            <h:outputText styleClass="output-text" value="#{e.deleted}" />
+            <h:outputText styleClass="output-text" value="#{e.deleted}"
+                          style="#{(e.outOfSynch) ? 'color:red' : ''}" />
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">
+                <h:outputText value="Дата сверки" />
+            </f:facet>
+            <h:outputText styleClass="output-text" value="#{e.date}"
+                          style="#{(e.outOfSynch) ? 'color:red' : ''}" />
         </rich:column>
 
         <f:facet name="footer">

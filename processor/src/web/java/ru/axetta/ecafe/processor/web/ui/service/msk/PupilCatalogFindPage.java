@@ -49,6 +49,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
     String secondName;
     
     boolean showExtendedInfo;
+    boolean showOnlyClientGoups = true;
 
     public boolean isShowExtendedInfo() {
         return showExtendedInfo;
@@ -56,6 +57,14 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
 
     public void setShowExtendedInfo(boolean showExtendedInfo) {
         this.showExtendedInfo = showExtendedInfo;
+    }
+
+    public boolean isShowOnlyClientGoups() {
+        return showOnlyClientGoups;
+    }
+
+    public void setShowOnlyClientGoups(boolean showOnlyClientGoups) {
+        this.showOnlyClientGoups = showOnlyClientGoups;
     }
 
     public void setOrgName(String orgName) {
@@ -210,6 +219,9 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
             int nItemsNotFound = 0;
             List<ImportRegisterClientsService.ExpandedPupilInfo> pis = nsiService
                     .getPupilsByOrgGUID(orgGuids==null?null:orgGuids.getOrgGuids(), familyName, firstName, secondName);
+            if(showOnlyClientGoups) {
+                pis = clearClientsByClass(pis);
+            }
             Collections.sort(pis, new PupilCatalogComparator());
             for (ImportRegisterClientsService.ExpandedPupilInfo pi : pis) {
                 Item i = new Item(pi);
@@ -225,6 +237,18 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
         } catch (Exception e) {
             super.logAndPrintMessage("Ошибка получения данных", e);
         }
+    }
+
+    protected List<ImportRegisterClientsService.ExpandedPupilInfo> clearClientsByClass(List<ImportRegisterClientsService.ExpandedPupilInfo> source) {
+        List<ImportRegisterClientsService.ExpandedPupilInfo> result = new ArrayList<ImportRegisterClientsService.ExpandedPupilInfo>();
+        for(ImportRegisterClientsService.ExpandedPupilInfo i : source) {
+            if(!i.getGroup().matches("^[a-zA-Zа-яА-Я][a-zA-Zа-яА-Я0-9.,$;]+$")) {
+                result.add(i);
+            } else {
+                //
+            }
+        }
+        return result;
     }
 
     @Transactional

@@ -44,6 +44,10 @@
             <h:selectBooleanCheckbox value="#{pupilCatalogFindPage.showExtendedInfo}"/>
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:outputText value="Включать только классы:" styleClass="output-text"/>
+            <h:selectBooleanCheckbox value="#{pupilCatalogFindPage.showOnlyClientGoups}"/>
+        </h:panelGrid>
+        <h:panelGrid columns="2" styleClass="borderless-grid">
 
             <a4j:commandButton value="Найти в реестрах" action="#{pupilCatalogFindPage.updateList}"
                                reRender="workspaceTogglePanel" styleClass="command-button" />

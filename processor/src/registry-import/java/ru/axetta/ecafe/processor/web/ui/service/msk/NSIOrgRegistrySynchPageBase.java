@@ -147,7 +147,7 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         List<SelectItem> items = new ArrayList<SelectItem>();
         for (long date : revisions) {
             if (items.size() < 1) {
-                items.add(new SelectItem(date, "Последняя"));
+                items.add(new SelectItem(date, df.format(new Date(date)) + " - Последняя"));
             } else {
                 items.add(new SelectItem(date, df.format(new Date(date))));
             }
