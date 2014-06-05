@@ -19,8 +19,8 @@
 
 <h:panelGrid id="orgDiscountReportPanelGrid" binding="#{mainPage.orgDiscountsReportPage.pageComponent}" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:panelGroup>
         <h:outputText escape="true" value="Организация" styleClass="output-text" />
+        <h:panelGroup>
             <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;" />

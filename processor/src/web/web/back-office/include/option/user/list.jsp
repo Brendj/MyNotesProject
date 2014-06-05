@@ -102,7 +102,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{mainPage.showUserEditPage}" styleClass="command-link">
+            <a4j:commandLink reRender="workspaceForm" action="#{mainPage.showUserEditPage}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{item.idOfUser}" target="#{mainPage.selectedIdOfUser}" />
             </a4j:commandLink>

@@ -4,12 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.user;
 
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.UserOrgs;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
@@ -47,26 +45,51 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
     private String contragentFilter = "Не выбрано";
     private String contragentIds;
     private String orgIds;
+    private String orgIdsCanceled;
     private Boolean blocked;
     private SelectItem[] regions;
     private String region;
     private String orgFilter = "Не выбрано";
+    private String orgFilterCanceled = "Не выбрано";
+
+    private UserNotificationType selectOrgType;
+
     protected List<OrgItem> orgItems = new ArrayList<OrgItem>(0);
+    protected List<OrgItem> orgItemsCanceled = new ArrayList<OrgItem>(0);
 
     @Override
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
-        if (orgMap != null) {
-            orgItems = new ArrayList<OrgItem>(orgMap.size());
-            if (orgMap.isEmpty()) {
-                orgFilter = "Не выбрано";
-            } else {
-                StringBuilder stringBuilder = new StringBuilder();
-                for (Long idOfOrg : orgMap.keySet()) {
-                    orgItems.add(new OrgItem(idOfOrg, orgMap.get(idOfOrg)));
-                    stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
+        switch (selectOrgType){
+            case GOOD_REQUEST_CHANGE_NOTIFY: {
+                if (orgMap != null) {
+                    orgItems = new ArrayList<OrgItem>();
+                    if (orgMap.isEmpty()) {
+                        orgFilter = "Не выбрано";
+                    } else {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for (Long idOfOrg : orgMap.keySet()) {
+                            orgItems.add(new OrgItem(idOfOrg, orgMap.get(idOfOrg)));
+                            stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
+                        }
+                        orgFilter = stringBuilder.substring(0, stringBuilder.length() - 2);
+                    }
                 }
-                orgFilter = stringBuilder.substring(0, stringBuilder.length() - 2);
-            }
+            } break;
+            case ORDER_STATE_CHANGE_NOTIFY: {
+                if (orgMap != null) {
+                    orgItemsCanceled = new ArrayList<OrgItem>();
+                    if (orgMap.isEmpty()) {
+                        orgFilterCanceled = "Не выбрано";
+                    } else {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for (Long idOfOrg : orgMap.keySet()) {
+                            orgItemsCanceled.add(new OrgItem(idOfOrg, orgMap.get(idOfOrg)));
+                            stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
+                        }
+                        orgFilterCanceled = stringBuilder.substring(0, stringBuilder.length() - 2);
+                    }
+                }
+            } break;
         }
     }
 
@@ -135,11 +158,14 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         session.flush();
         for (OrgItem orgItem : orgItems) {
             Org org = (Org) session.load(Org.class, orgItem.idOfOrg);
-            UserOrgs userOrgs = new UserOrgs(user, org);
+            UserOrgs userOrgs = new UserOrgs(user, org, UserNotificationType.GOOD_REQUEST_CHANGE_NOTIFY);
             session.save(userOrgs);
         }
-        session.refresh(user);
-        fill(session, user);
+        for (OrgItem orgItem : orgItemsCanceled) {
+            Org org = (Org) session.load(Org.class, orgItem.idOfOrg);
+            UserOrgs userOrgs = new UserOrgs(user, org, UserNotificationType.ORDER_STATE_CHANGE_NOTIFY);
+            session.save(userOrgs);
+        }
     }
 
     private void initRegions (Session session) {
@@ -171,15 +197,39 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         this.orgFilter = orgFilter;
     }
 
-    public String getGetStringIdOfOrgList() {
-        return orgItems.toString().replaceAll("[^0-9,]","");
+    public String getOrgFilterCanceled() {
+        return orgFilterCanceled;
+    }
+
+    public void setOrgFilterCanceled(String orgFilterCanceled) {
+        this.orgFilterCanceled = orgFilterCanceled;
     }
 
     @Override
     public void onShow() throws Exception {
         orgFilter = "Не выбрано";
         orgItems.clear();
+
+        orgFilterCanceled = "Не выбрано";
+        orgItemsCanceled.clear();
     }
+
+    public Object showOrgListSelectPage(){
+        selectOrgType = UserNotificationType.GOOD_REQUEST_CHANGE_NOTIFY;
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
+    }
+
+    public Object showOrgListSelectCancelPage(){
+        selectOrgType = UserNotificationType.ORDER_STATE_CHANGE_NOTIFY;
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
+    }
+
+    public void setSelectOrgType(int id) {
+        this.selectOrgType = UserNotificationType.values()[id];
+    }
+
 
     public Boolean getIsDefault(){
         User.DefaultRole role = User.DefaultRole.parse(idOfRole);
@@ -238,9 +288,29 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         orgIds = ids.toString();
     }
 
+    private void setOrgFilterCanceledInfo(List<OrgItem> orgItemsCanceled) {
+        StringBuilder str = new StringBuilder();
+        StringBuilder ids = new StringBuilder();
+        if (orgItemsCanceled.isEmpty()) {
+            orgFilterCanceled = "Не выбрано";
+        } else {
+            for (OrgItem ot : orgItemsCanceled) {
+                if (str.length() > 0) {
+                    str.append("; ");
+                    ids.append(",");
+                }
+                str.append(ot.getShortName());
+                ids.append(ot.getIdOfOrg());
+            }
+            orgFilterCanceled = str.toString();
+        }
+        orgIdsCanceled = ids.toString();
+    }
+
     private void fill(Session session, User user) throws Exception {
         this.contragentItems.clear();
         this.orgItems.clear();
+        this.orgItemsCanceled.clear();
         this.idOfUser = user.getIdOfUser();
         this.userName = user.getUserName();
         this.phone = user.getPhone();
@@ -252,10 +322,18 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         for (UserOrgs o : user.getUserOrgses()) {
             //Org org = (Org) session.load(Org.class, o.getOrg().getIdOfOrg());
             //this.orgItems.add(o.getOrg().getIdOfOrg());
-            this.orgItems.add(new OrgItem(o.getOrg()));
+            switch (o.getUserNotificationType()) {
+                case GOOD_REQUEST_CHANGE_NOTIFY: {
+                    this.orgItems.add(new OrgItem(o.getOrg()));
+                }break;
+                case ORDER_STATE_CHANGE_NOTIFY: {
+                    this.orgItemsCanceled.add(new OrgItem(o.getOrg()));
+                }break;
+            }
         }
         setContragentFilterInfo(contragentItems);
         setOrgFilterInfo(orgItems);
+        setOrgFilterCanceledInfo(orgItemsCanceled);
 
         this.idOfRole = user.getIdOfRole();
         this.roleName = user.getRoleName();
@@ -398,6 +476,14 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
 
     public void setOrgIds(String orgIds) {
         this.orgIds = orgIds;
+    }
+
+    public String getOrgIdsCanceled() {
+        return orgIdsCanceled;
+    }
+
+    public void setOrgIdsCanceled(String orgIdsCanceled) {
+        this.orgIdsCanceled = orgIdsCanceled;
     }
 
     public Integer getIdOfRole() {

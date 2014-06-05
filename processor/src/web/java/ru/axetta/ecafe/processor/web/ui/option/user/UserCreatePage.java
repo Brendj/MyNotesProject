@@ -4,12 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.user;
 
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.UserOrgs;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
@@ -48,8 +46,11 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
     private SelectItem[] regions;
     private String region;
     private String orgFilter = "Не выбрано";
+    private String orgFilterCanceled = "Не выбрано";
+    private UserNotificationType selectOrgType;
     private String orgIds;
     protected List<OrgItem> orgItems = new ArrayList<OrgItem>(0);
+    protected List<OrgItem> orgItemsCanceled = new ArrayList<OrgItem>(0);
 
     public void setIdOfRole(Integer idOfRole) {
         this.idOfRole = idOfRole;
@@ -263,9 +264,14 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
         session.save(user);
         for (OrgItem orgItem : orgItems) {
             Org org = (Org) session.load(Org.class, orgItem.idOfOrg);
-            UserOrgs userOrgs = new UserOrgs(user, org);
+            UserOrgs userOrgs = new UserOrgs(user, org, UserNotificationType.GOOD_REQUEST_CHANGE_NOTIFY);
             session.save(userOrgs);
             //user.getUserOrgses().add(new UserOrgs(orgItem.idOfOrg, user.getIdOfUser()));
+        }
+        for (OrgItem orgItem : orgItemsCanceled) {
+            Org org = (Org) session.load(Org.class, orgItem.idOfOrg);
+            UserOrgs userOrgs = new UserOrgs(user, org, UserNotificationType.ORDER_STATE_CHANGE_NOTIFY);
+            session.save(userOrgs);
         }
     }
 
@@ -284,23 +290,6 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
             contragentItems.add(contragentItem);
         }
         setContragentFilterInfo(contragentItems);
-    }
-
-    @Override
-    public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
-        if (orgMap != null) {
-            orgItems = new ArrayList<OrgItem>();
-            if (orgMap.isEmpty()) {
-                orgFilter = "Не выбрано";
-            } else {
-                StringBuilder stringBuilder = new StringBuilder();
-                for (Long idOfOrg : orgMap.keySet()) {
-                    orgItems.add(new OrgItem(idOfOrg, orgMap.get(idOfOrg)));
-                    stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
-                }
-                orgFilter = stringBuilder.substring(0, stringBuilder.length() - 2);
-            }
-        }
     }
 
     public static class ContragentItem {
@@ -357,8 +346,71 @@ public class UserCreatePage extends BasicWorkspacePage implements ContragentList
         this.orgFilter = orgFilter;
     }
 
-    public String getGetStringIdOfOrgList() {
-        return orgItems.toString().replaceAll("[^0-9,]","");
+    public String getOrgFilterCanceled() {
+        return orgFilterCanceled;
     }
 
+    public void setOrgFilterCanceled(String orgFilterCanceled) {
+        this.orgFilterCanceled = orgFilterCanceled;
+    }
+
+    public String getGetStringIdOfOrgList() {
+        switch (selectOrgType){
+            case GOOD_REQUEST_CHANGE_NOTIFY: return orgItems.toString().replaceAll("[^0-9,]","");
+            case ORDER_STATE_CHANGE_NOTIFY: return orgItemsCanceled.toString().replaceAll("[^0-9,]","");
+        }
+        return "";
+    }
+
+    @Override
+    public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
+        switch (selectOrgType){
+            case GOOD_REQUEST_CHANGE_NOTIFY: {
+                if (orgMap != null) {
+                    orgItems = new ArrayList<OrgItem>();
+                    if (orgMap.isEmpty()) {
+                        orgFilter = "Не выбрано";
+                    } else {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for (Long idOfOrg : orgMap.keySet()) {
+                            orgItems.add(new OrgItem(idOfOrg, orgMap.get(idOfOrg)));
+                            stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
+                        }
+                        orgFilter = stringBuilder.substring(0, stringBuilder.length() - 2);
+                    }
+                }
+            } break;
+            case ORDER_STATE_CHANGE_NOTIFY: {
+                if (orgMap != null) {
+                    orgItemsCanceled = new ArrayList<OrgItem>();
+                    if (orgMap.isEmpty()) {
+                        orgFilterCanceled = "Не выбрано";
+                    } else {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for (Long idOfOrg : orgMap.keySet()) {
+                            orgItemsCanceled.add(new OrgItem(idOfOrg, orgMap.get(idOfOrg)));
+                            stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
+                        }
+                        orgFilterCanceled = stringBuilder.substring(0, stringBuilder.length() - 2);
+                    }
+                }
+            } break;
+        }
+    }
+
+    public Object showOrgListSelectPage(){
+        selectOrgType = UserNotificationType.GOOD_REQUEST_CHANGE_NOTIFY;
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
+    }
+
+    public Object showOrgListSelectCancelPage(){
+        selectOrgType = UserNotificationType.ORDER_STATE_CHANGE_NOTIFY;
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
+    }
+
+    public void setSelectOrgType(int id) {
+        this.selectOrgType = UserNotificationType.values()[id];
+    }
 }

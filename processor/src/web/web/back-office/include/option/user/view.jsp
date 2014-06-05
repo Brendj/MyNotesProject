@@ -33,5 +33,5 @@
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showUserEditPage}"
-                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                       reRender="workspaceTogglePanel" styleClass="command-button" />
 </h:panelGrid>

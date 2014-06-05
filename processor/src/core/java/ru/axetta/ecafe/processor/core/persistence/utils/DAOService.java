@@ -1450,11 +1450,15 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return ri;
     }
 
-    public Map<Long, String> getUserOrgses(User currUser) {
+    public Map<Long, String> getUserOrgses(Long userId, UserNotificationType type) {
         Session session = entityManager.unwrap(Session.class);
-        session.refresh(currUser);
         Map<Long, String> map = new HashMap<Long, String>();
-        for (UserOrgs userOrgs : currUser.getUserOrgses()) {
+        Criteria criteria = session.createCriteria(UserOrgs.class);
+        criteria.add(Restrictions.eq("user.idOfUser", userId));
+        criteria.add(Restrictions.eq("userNotificationType", type));
+        List list = criteria.list();
+        for (Object obj : list) {
+            UserOrgs userOrgs = (UserOrgs) obj;
             final Org org = userOrgs.getOrg();
             map.put(org.getIdOfOrg(), org.getShortName());
             //orgList.add(org);
@@ -1462,15 +1466,21 @@ public boolean setCardStatus(long idOfCard, int state, String reason) {
         return map;
     }
 
-    public void updateInfoCurrentUser(List<Long> orgIds, User user) {
+    public void updateInfoCurrentUser(List<Long> orgIds, List<Long> orgIdsCancel, User user) {
         Session session = entityManager.unwrap(Session.class);
         session.refresh(user);
         user.getUserOrgses().clear();
         session.flush();
         for (Long orgId : orgIds) {
             Org org = (Org) session.load(Org.class, orgId);
-            UserOrgs userOrgs = new UserOrgs(user, org);
+            UserOrgs userOrgs = new UserOrgs(user, org, UserNotificationType.GOOD_REQUEST_CHANGE_NOTIFY);
             session.save(userOrgs);
+        }
+
+        for (Long orgIdCanceled: orgIdsCancel) {
+            Org org1 = (Org) session.load(Org.class, orgIdCanceled);
+            UserOrgs userOrgs1 = new UserOrgs(user , org1, UserNotificationType.ORDER_STATE_CHANGE_NOTIFY);
+            session.save(userOrgs1);
         }
     }
 

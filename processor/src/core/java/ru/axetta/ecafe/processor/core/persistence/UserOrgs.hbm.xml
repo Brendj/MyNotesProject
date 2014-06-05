@@ -16,5 +16,12 @@
                      not-null="false" fetch="select" lazy="proxy"/>
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg"
                      not-null="false"/>
+
+        <property name="userNotificationType" column="UserNotificationType">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.UserNotificationType</param>
+                <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
+            </type>
+        </property>
     </class>
 </hibernate-mapping>

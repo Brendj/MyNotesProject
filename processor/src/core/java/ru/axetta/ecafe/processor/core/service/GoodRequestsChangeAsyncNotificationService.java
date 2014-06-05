@@ -10,10 +10,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.persistence.UserOrgs;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
@@ -341,6 +338,7 @@ public class GoodRequestsChangeAsyncNotificationService {
     public void addEmailFromUser(Session persistenceSession, Long idOfOrg, List<String> addresses){
         Criteria criteria = persistenceSession.createCriteria(UserOrgs.class);
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("userNotificationType", UserNotificationType.GOOD_REQUEST_CHANGE_NOTIFY));
         List list = criteria.list();
         for (Object o: list){
             UserOrgs userOrgs = (UserOrgs) o;

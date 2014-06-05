@@ -5,8 +5,8 @@
 package ru.axetta.ecafe.processor.web.ui;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.UserNotificationType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
@@ -30,7 +30,7 @@ import java.util.Map;
 
 @Component
 @Scope("session")
-public class UserSettings extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList {
+public class UserSettings extends BasicWorkspacePage implements OrgListSelectPage.CompleteHandlerList{
 
     /* Properties */
     private String userName;
@@ -41,8 +41,15 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
     private String phone;
     private String email;
     private User currUser = null;
+
     protected List<Long> orgItems = new ArrayList<Long>(0);
+    protected List<Long> orgItemsCanceled = new ArrayList<Long>(0);
+
     private String orgFilter = "Не выбрано";
+    private String orgFilterCanceled = "Не выбрано";
+
+    private UserNotificationType selectOrgType;
+
     private String orgIds;
 
     @Autowired
@@ -70,9 +77,17 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
         userName = currUser.getUserName();
         phone = currUser.getPhone();
         email = currUser.getEmail();
+
         orgItems.clear();
-        Map<Long, String> orgList = daoService.getUserOrgses(currUser);
+        orgItemsCanceled.clear();
+
+        selectOrgType = UserNotificationType.GOOD_REQUEST_CHANGE_NOTIFY;
+        Map<Long, String> orgList = daoService.getUserOrgses(currUser.getIdOfUser(), selectOrgType);
         completeOrgListSelection(orgList);
+
+        selectOrgType = UserNotificationType.ORDER_STATE_CHANGE_NOTIFY;
+        Map<Long, String> orgListCanceled = daoService.getUserOrgses(currUser.getIdOfUser(), selectOrgType);
+        completeOrgListSelection(orgListCanceled);
     }
 
     public User getCurrentUser() throws Exception {
@@ -97,7 +112,7 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
             currUser.setEmail(email);
             currUser = daoService.setUserInfo(currUser);
 
-            daoService.updateInfoCurrentUser(this.orgItems, currUser);
+            daoService.updateInfoCurrentUser(this.orgItems, this.orgItemsCanceled, currUser);
             success = true;
         }
         return success;
@@ -196,39 +211,78 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
 
     @Override
     public void completeOrgListSelection(Map<Long, String> orgMap) throws Exception {
-        if (orgMap != null) {
-            orgItems = new ArrayList<Long>();
-            if (orgMap.isEmpty()) {
-                orgFilter = "Не выбрано";
-            } else {
-                StringBuilder stringBuilder = new StringBuilder();
-                for (Long idOfOrg : orgMap.keySet()) {
-                    //orgItems.add(new OrgItem(idOfOrg, orgMap.get(idOfOrg)));
-                    orgItems.add(idOfOrg);
-                    stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
+        switch (selectOrgType){
+            case GOOD_REQUEST_CHANGE_NOTIFY: {
+                if (orgMap != null) {
+                    orgItems = new ArrayList<Long>();
+                    if (orgMap.isEmpty()) {
+                        orgFilter = "Не выбрано";
+                    } else {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for (Long idOfOrg : orgMap.keySet()) {
+                            orgItems.add(idOfOrg);
+                            stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
+                        }
+                        orgFilter = stringBuilder.substring(0, stringBuilder.length() - 2);
+                    }
                 }
-                orgFilter = stringBuilder.substring(0, stringBuilder.length() - 2);
-            }
+            } break;
+            case ORDER_STATE_CHANGE_NOTIFY: {
+                if (orgMap != null) {
+                    orgItemsCanceled = new ArrayList<Long>();
+                    if (orgMap.isEmpty()) {
+                        orgFilterCanceled = "Не выбрано";
+                    } else {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for (Long idOfOrg : orgMap.keySet()) {
+                            orgItemsCanceled.add(idOfOrg);
+                            stringBuilder.append(orgMap.get(idOfOrg)).append("; ");
+                        }
+                        orgFilterCanceled = stringBuilder.substring(0, stringBuilder.length() - 2);
+                    }
+                }
+            } break;
         }
     }
 
+    public Object showOrgListSelectPage(){
+        selectOrgType = UserNotificationType.GOOD_REQUEST_CHANGE_NOTIFY;
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
+    }
+
+    public Object showOrgListSelectCancelPage(){
+        selectOrgType = UserNotificationType.ORDER_STATE_CHANGE_NOTIFY;
+        MainPage.getSessionInstance().showOrgListSelectPage();
+        return null;
+    }
+
     public String getGetStringIdOfOrgList() {
-        return orgItems.toString().replaceAll("[^0-9,]","");
+        switch (selectOrgType){
+            case GOOD_REQUEST_CHANGE_NOTIFY: return orgItems.toString().replaceAll("[^0-9,]","");
+            case ORDER_STATE_CHANGE_NOTIFY: return orgItemsCanceled.toString().replaceAll("[^0-9,]","");
+        }
+        return "";
+    }
+
+    public void setSelectOrgType(int id) {
+        this.selectOrgType = UserNotificationType.values()[id];
     }
 
     public String getOrgFilter() {
         return orgFilter;
     }
 
+    public String getOrgFilterCanceled() {
+        return orgFilterCanceled;
+    }
+
     public void setOrgFilter(String orgFilter) {
         this.orgFilter = orgFilter;
     }
 
-    public String getOrgIds() {
-        return orgIds;
+    public void setOrgFilterCanceled(String orgFilterCanceled) {
+        this.orgFilterCanceled = orgFilterCanceled;
     }
 
-    public void setOrgIds(String orgIds) {
-        this.orgIds = orgIds;
-    }
 }

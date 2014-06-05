@@ -64,14 +64,26 @@
         <h:outputText value=" {#{mainPage.userCreatePage.contragentFilter}}" escape="true" styleClass="output-text" />
     </h:panelGroup>
 
-    <h:outputText escape="true" value="Список организаций" styleClass="output-text" />
+    <h:outputText escape="true" value="Список организаций рассылки (заявок)" styleClass="output-text" />
     <h:panelGroup>
-        <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+        <a4j:commandButton value="..." action="#{mainPage.userCreatePage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" >
+            <f:setPropertyActionListener value="0" target="#{mainPage.userCreatePage.selectOrgType}"/>
             <f:setPropertyActionListener value="#{mainPage.userCreatePage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
         </a4j:commandButton>
         <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.userCreatePage.orgFilter}}" />
+    </h:panelGroup>
+
+    <h:outputText escape="true" value="Список организаций отмены (заказов)" styleClass="output-text" />
+    <h:panelGroup>
+        <a4j:commandButton value="..." action="#{mainPage.userCreatePage.showOrgListSelectCancelPage}" reRender="modalOrgListSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px">
+            <f:setPropertyActionListener value="1" target="#{mainPage.userCreatePage.selectOrgType}"/>
+            <f:setPropertyActionListener value="#{mainPage.userCreatePage.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+        </a4j:commandButton>
+        <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.userCreatePage.orgFilterCanceled}}" />
     </h:panelGroup>
 
     <h:outputText escape="true" value="Регион" styleClass="output-text" />

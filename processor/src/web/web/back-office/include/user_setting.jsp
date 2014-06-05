@@ -34,15 +34,27 @@
                  converter="phoneConverter" />
     <h:outputText escape="true" value="Адрес электронной почты" styleClass="output-text" />
     <h:inputText value="#{userSettings.email}" maxlength="128" styleClass="input-text"/>
-    <h:outputText escape="true" value="Список организаций рассылки" styleClass="output-text" />
+    <h:outputText escape="true" value="Список организаций рассылки (заявок)" styleClass="output-text" />
     <h:panelGroup>
-        <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
+        <a4j:commandButton value="..." action="#{userSettings.showOrgListSelectPage}" reRender="modalOrgListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;" >
+            <f:setPropertyActionListener value="0" target="#{userSettings.selectOrgType}"/>
             <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />
             <f:setPropertyActionListener value="#{userSettings.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}"/>
         </a4j:commandButton>
         <h:outputText styleClass="output-text" escape="true" value=" {#{userSettings.orgFilter}}" />
+    </h:panelGroup>
+    <h:outputText escape="true" value="Список организаций отмены (заказов)" styleClass="output-text" />
+    <h:panelGroup>
+        <a4j:commandButton value="..." action="#{userSettings.showOrgListSelectCancelPage}" reRender="modalOrgListSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px">
+            <f:setPropertyActionListener value="1" target="#{userSettings.selectOrgType}"/>
+            <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />
+            <f:setPropertyActionListener value="#{userSettings.getStringIdOfOrgList}" target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+        </a4j:commandButton>
+        <h:outputText styleClass="output-text" escape="true" value=" {#{userSettings.orgFilterCanceled}}" />
     </h:panelGroup>
 
 </h:panelGrid>

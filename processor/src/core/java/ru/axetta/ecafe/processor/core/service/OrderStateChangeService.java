@@ -42,9 +42,9 @@ public class OrderStateChangeService {
 
     public void notifyOrderStateChange() throws Exception {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        if (!runtimeContext.isMainNode()) {
-            return;
-        }
+        //if (!runtimeContext.isMainNode()) {
+        //    return;
+        //}
         Long duration = System.currentTimeMillis();
         Date currentDate = new Date();
         Date endDate = CalendarUtils.truncateToDayOfMonth(currentDate);
@@ -91,6 +91,39 @@ public class OrderStateChangeService {
         }
         supplierDictionary = supplierDictionaryUnique;
 
+        Map<Long, Set<String>> userEmailsByOrg =  new HashMap<Long, Set<String>>();
+
+        try {
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Criteria criteria = persistenceSession.createCriteria(UserOrgs.class);
+            criteria.add(Restrictions.eq("userNotificationType", UserNotificationType.ORDER_STATE_CHANGE_NOTIFY));
+            List<UserOrgs> userOrgsList = (List<UserOrgs>) criteria.list();
+
+            for (UserOrgs userO : userOrgsList) {
+                Long idOfOrg = userO.getOrg().getIdOfOrg();
+                if(userEmailsByOrg.containsKey(idOfOrg)){
+                    if(userO.getUser()!=null && StringUtils.isNotEmpty(userO.getUser().getEmail())){
+                        List<String> strings = Arrays.asList(StringUtils.split(userO.getUser().getEmail(), ";"));
+                        userEmailsByOrg.get(idOfOrg).addAll(strings);
+                    }
+                } else {
+                    Set<String> mails = new HashSet<String>();
+                    if(userO.getUser()!=null && StringUtils.isNotEmpty(userO.getUser().getEmail())){
+                        List<String> strings = Arrays.asList(StringUtils.split(userO.getUser().getEmail(), ";"));
+                        mails.addAll(strings);
+                    }
+                    userEmailsByOrg.put(idOfOrg, mails);
+                }
+            }
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, LOGGER);
+            HibernateUtils.rollback(persistenceTransaction, LOGGER);
+        }
+
+        //вытянуть все userOrgs с типом отмена заказа
+        // заполнить хеш мап ключ ид орга значение список емйлов
+
         for (Object obj: supplierDictionary.keySet()){
             ContragentItem contragentItem = (ContragentItem) obj;
             List<String> strings = Arrays.asList(StringUtils.split(contragentItem.getOrderNotifyMailList(), ";"));
@@ -100,6 +133,7 @@ public class OrderStateChangeService {
             }
             final Collection collection = supplierDictionary.getCollection(contragentItem);
             LOGGER.debug("supplierDictionary.getCollection(contragentItem) size " +collection.size());
+
             for (Object o: collection){
                 OrgItem orgItem = (OrgItem) o;
                 List<OrderItem> orderItems = (List<OrderItem>) orgDictionary.getCollection(orgItem.getIdOfOrg());
@@ -118,8 +152,12 @@ public class OrderStateChangeService {
                         writeReportDocumentTo(orderItems, stringWriter, dateTimeFormat, emailSubject, startDate, endDate);
                     } finally {
                         IOUtils.closeQuietly(stringWriter);
-                    }
-                    for (String address : addresses) {
+                    } //файл С//
+                    // создать новый список  addresses + хешмап значеничя .get(orgItem.getIdOfOrg())  .addAll
+                    Set<String> mails = new HashSet<String>();
+                    mails.addAll(addresses);
+                    mails.addAll(userEmailsByOrg.get(orgItem.getIdOfOrg()));
+                    for (String address : mails) {
                         if (StringUtils.trimToNull(address) != null) {
                             try {
                                 RuntimeContext.getInstance().getPostman().postNotificationEmail(address, emailSubject, stringWriter.toString());
@@ -474,5 +512,19 @@ public class OrderStateChangeService {
         writer.write("</html>");
         writer.flush();
         writer.close();
+    }
+
+    public void addEmailFromUser(Session persistenceSession, Long idOfOrg, List<String> addresses){
+        Criteria criteria = persistenceSession.createCriteria(UserOrgs.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("userNotificationType", UserNotificationType.ORDER_STATE_CHANGE_NOTIFY));
+        List list = criteria.list();
+        for (Object o: list){
+            UserOrgs userOrgs = (UserOrgs) o;
+            if(userOrgs.getUser()!=null && StringUtils.isNotEmpty(userOrgs.getUser().getEmail())){
+                List<String> strings = Arrays.asList(StringUtils.split(userOrgs.getUser().getEmail(), ";"));
+                addresses.addAll(strings);
+            }
+        }
     }
 }

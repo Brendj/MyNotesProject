@@ -14,13 +14,23 @@ public class UserOrgs {
     private Long idOfUserOrg;
     private User user;
     private Org org;
+    private UserNotificationType userNotificationType;
+
+    public UserNotificationType getUserNotificationType() {
+        return userNotificationType;
+    }
+
+    public void setUserNotificationType(UserNotificationType userNotificationType) {
+        this.userNotificationType = userNotificationType;
+    }
 
     public UserOrgs() {
     }
 
-    public UserOrgs(User user, Org org) {
+    public UserOrgs(User user, Org org, UserNotificationType userNotificationType) {
         this.user = user;
         this.org = org;
+        this.userNotificationType = userNotificationType;
     }
 
     public Long getIdOfUserOrg() {

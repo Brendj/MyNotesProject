@@ -1571,8 +1571,6 @@ public class MainPage {
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);
                 HibernateUtils.close(persistenceSession, logger);
-
-
             }
         }
         return null;
