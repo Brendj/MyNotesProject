@@ -42,9 +42,9 @@ public class OrderStateChangeService {
 
     public void notifyOrderStateChange() throws Exception {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        //if (!runtimeContext.isMainNode()) {
-        //    return;
-        //}
+        if (!runtimeContext.isMainNode()) {
+            return;
+        }
         Long duration = System.currentTimeMillis();
         Date currentDate = new Date();
         Date endDate = CalendarUtils.truncateToDayOfMonth(currentDate);
@@ -91,7 +91,7 @@ public class OrderStateChangeService {
         }
         supplierDictionary = supplierDictionaryUnique;
 
-        Map<Long, Set<String>> userEmailsByOrg =  new HashMap<Long, Set<String>>();
+        Map<Long, Set<String>> userEmailsByOrg = new HashMap<Long, Set<String>>();
 
         try {
             persistenceSession = runtimeContext.createReportPersistenceSession();
@@ -102,23 +102,25 @@ public class OrderStateChangeService {
 
             for (UserOrgs userO : userOrgsList) {
                 Long idOfOrg = userO.getOrg().getIdOfOrg();
-                if(userEmailsByOrg.containsKey(idOfOrg)){
-                    if(userO.getUser()!=null && StringUtils.isNotEmpty(userO.getUser().getEmail())){
+                if (userEmailsByOrg.containsKey(idOfOrg)) {
+                    if (userO.getUser() != null && StringUtils.isNotEmpty(userO.getUser().getEmail())) {
                         List<String> strings = Arrays.asList(StringUtils.split(userO.getUser().getEmail(), ";"));
                         userEmailsByOrg.get(idOfOrg).addAll(strings);
                     }
                 } else {
                     Set<String> mails = new HashSet<String>();
-                    if(userO.getUser()!=null && StringUtils.isNotEmpty(userO.getUser().getEmail())){
+                    if (userO.getUser() != null && StringUtils.isNotEmpty(userO.getUser().getEmail())) {
                         List<String> strings = Arrays.asList(StringUtils.split(userO.getUser().getEmail(), ";"));
                         mails.addAll(strings);
                     }
                     userEmailsByOrg.put(idOfOrg, mails);
                 }
             }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, LOGGER);
-            HibernateUtils.rollback(persistenceTransaction, LOGGER);
+            HibernateUtils.close(persistenceSession, LOGGER);
         }
 
         //вытянуть все userOrgs с типом отмена заказа
