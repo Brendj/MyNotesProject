@@ -736,6 +736,7 @@ public class Processor implements SyncProcessor,
         List<Long> errorClientIds = new ArrayList<Long>();
         ResultClientGuardian resultClientGuardian = null;
         ClientGuardianData clientGuardianData = null;
+        AccRegistryUpdate accRegistryUpdate = null;
 
         boolean bError = false;
 
@@ -975,7 +976,7 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, resultClientGuardian, clientGuardianData);
+                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate);
     }
 
     /* Do process full synchronization */
@@ -1005,6 +1006,7 @@ public class Processor implements SyncProcessor,
         List<Long> errorClientIds = new ArrayList<Long>();
         ResultClientGuardian resultClientGuardian = null;
         ClientGuardianData clientGuardianData = null;
+        AccRegistryUpdate accRegistryUpdate = null;
 
         boolean bError = false;
 
@@ -1053,7 +1055,7 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, resultClientGuardian, clientGuardianData);
+                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate);
     }
 
     /* Do process short synchronization for update Client parameters */
@@ -1084,6 +1086,7 @@ public class Processor implements SyncProcessor,
         List<Long> errorClientIds = new ArrayList<Long>();
         ResultClientGuardian resultClientGuardian = null;
         ClientGuardianData clientGuardianData = null;
+        AccRegistryUpdate accRegistryUpdate = null;
 
         // Build AccRegistryUpdateRequest
         try {
@@ -1147,7 +1150,7 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, resultClientGuardian, clientGuardianData);
+                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -1177,6 +1180,7 @@ public class Processor implements SyncProcessor,
         AccRegistryUpdateRequest accRegistryUpdateRequest = null;
         ResultClientGuardian resultClientGuardian = null;
         ClientGuardianData clientGuardianData = null;
+        AccRegistryUpdate accRegistryUpdate = null;
 
         // Build AccRegistryUpdateRequest
         try {
@@ -1224,7 +1228,7 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, resultClientGuardian, clientGuardianData);
+                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -1253,19 +1257,9 @@ public class Processor implements SyncProcessor,
         List<Long> errorClientIds = new ArrayList<Long>();
         ResultClientGuardian resultClientGuardian = null;
         ClientGuardianData clientGuardianData = null;
+        AccRegistryUpdate accRegistryUpdate = null;
 
         boolean bError = false;
-
-        try {
-            accIncRegistry = getAccIncRegistry(request.getOrg(),
-                    request.getAccIncRegistryRequest().dateTime);
-        } catch (Exception e) {
-            logger.error(String.format("Failed to build AccIncRegistry, IdOfOrg == %s", request.getIdOfOrg()),
-                    e);
-            accIncRegistry = new SyncResponse.AccIncRegistry();
-            accIncRegistry.setDate(request.getAccIncRegistryRequest().dateTime);
-            bError = true;
-        }
 
         // Process paymentRegistry
         try {
@@ -1290,6 +1284,25 @@ public class Processor implements SyncProcessor,
         } catch (Exception e) {
             logger.error(
                     String.format("Failed to process Payment Registry, IdOfOrg == %s", request.getIdOfOrg()), e);
+            bError = true;
+        }
+
+        try {
+            if(request.getProtoVersion()<6){
+                accIncRegistry = getAccIncRegistry(request.getOrg(), request.getAccIncRegistryRequest().dateTime);
+            } else {
+                accRegistryUpdate = getAccRegistryUpdate(request.getOrg(), request.getAccIncRegistryRequest().dateTime);
+            }
+
+        } catch (Exception e) {
+            logger.error(String.format("Failed to build AccIncRegistry, IdOfOrg == %s", request.getIdOfOrg()),
+                    e);
+            if(request.getProtoVersion()<6){
+                accIncRegistry = new SyncResponse.AccIncRegistry();
+                accIncRegistry.setDate(request.getAccIncRegistryRequest().dateTime);
+            } else {
+                accRegistryUpdate = new AccRegistryUpdate();
+            }
             bError = true;
         }
 
@@ -1333,7 +1346,7 @@ public class Processor implements SyncProcessor,
                 resPaymentRegistry, accIncRegistry, clientRegistry, resOrgStructure, resMenuExchange, resDiary, "",
                 resEnterEvents, resTempCardsOperations, tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles,
                 correctingNumbersOrdersRegistry, manager, orgOwnerData, questionaryData, goodsBasicBasketData,
-                directiveElement, resultClientGuardian, clientGuardianData);
+                directiveElement, resultClientGuardian, clientGuardianData, accRegistryUpdate);
     }
 
     private void createSyncHistory(long idOfOrg, SyncHistory syncHistory, String s) {
@@ -2418,6 +2431,31 @@ public class Processor implements SyncProcessor,
             HibernateUtils.close(persistenceSession, logger);
         }
         return accRegistry;
+    }
+
+    private AccRegistryUpdate getAccRegistryUpdate(Org org, Date fromDateTime) throws Exception {
+        AccRegistryUpdate accRegistryUpdate = new AccRegistryUpdate();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            final Date currentDate = new Date();
+            persistenceSession.refresh(org);
+            List<AccountTransaction> accountTransactionList;
+            accountTransactionList = DAOUtils.getAccountTransactionsForOrgSinceTime(persistenceSession, org,
+                    fromDateTime, currentDate);
+            for (AccountTransaction accountTransaction : accountTransactionList) {
+                accRegistryUpdate.addAccountTransactionInfo(accountTransaction);
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return accRegistryUpdate;
     }
 
     private SyncResponse.AccIncRegistry getAccIncRegistry(Org org, Date fromDateTime) throws Exception {

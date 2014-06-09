@@ -2084,7 +2084,7 @@ public class SyncRequest {
         public SyncRequest build(Node envelopeNode, NamedNodeMap namedNodeMap, Org org, String idOfSync, String remoteAddr)
                 throws Exception {
             long version = getLongValue(namedNodeMap, "Version");
-            if (3L != version && 4L != version && 5L != version) {
+            if (3L != version && 4L != version && 5L != version && 6L != version) {
                 throw new Exception(String.format("Unsupported protoVersion: %d", version));
             }
             String sSyncType = getStringValueNullSafe(namedNodeMap, "Type");
@@ -2116,10 +2116,6 @@ public class SyncRequest {
             }
 
             LoadContext loadContext = new LoadContext(menuGroups, version, timeFormat, dateOnlyFormat);
-            //loadContext.menuGroups = menuGroups;
-            //loadContext.protoVersion = version;
-            //loadContext.dateOnlyFormat = dateOnlyFormat;
-            //loadContext.timeFormat = timeFormat;
 
             Node paymentRegistryNode = findFirstChildElement(envelopeNode, "PaymentRegistry");
             PaymentRegistry paymentRegistry = null;
@@ -2178,14 +2174,6 @@ public class SyncRequest {
                 message = findFirstChildTextNode(messageNode).getTextContent();
             }
 
-            // 07.09.2011 EnterEvents
-
-            //Node enterEventsNode = findFirstChildElement(envelopeNode, "EnterEvents");
-            //EnterEvents enterEvents = null;
-            //if (enterEventsNode != null) {
-            //    enterEvents = enterEventsBuilder.build(enterEventsNode, loadContext);
-            //}
-
             enterEventsBuilder.createMainNode(envelopeNode);
             EnterEvents enterEvents = enterEventsBuilder.build(loadContext);
 
@@ -2206,28 +2194,6 @@ public class SyncRequest {
             if (roNode != null){
                 String[] doGroupNames;
                 Boolean enableSubscriptionFeeding = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_SUBSCRIPTION_FEEDING);
-                //if(syncType.equals(SyncType.TYPE_COMMODITY_ACCOUNTING)){
-                //    if(org.getCommodityAccounting()){
-                //        if(enableSubscriptionFeeding){
-                //            doGroupNames = new String[]{"ProductsGroup", "DocumentGroup", "SettingsGroup", "SubscriptionGroup"};
-                //        } else {
-                //            doGroupNames = new String[]{"ProductsGroup", "DocumentGroup", "SettingsGroup"};
-                //        }
-                //    } else {
-                //        doGroupNames = new String[]{"SettingsGroup"};
-                //    }
-                //} else {
-                //    if(org.getCommodityAccounting()){
-                //        if(enableSubscriptionFeeding){
-                //            doGroupNames = new String[]{"ProductsGroup", "DocumentGroup", "SettingsGroup", "LibraryGroup", "SubscriptionGroup"};
-                //        } else {
-                //            doGroupNames = new String[]{"ProductsGroup", "DocumentGroup", "SettingsGroup", "LibraryGroup"};
-                //        }
-                //    } else {
-                //        doGroupNames = new String[]{"SettingsGroup", "LibraryGroup"};
-                //    }
-                //}
-                //manager = new Manager(org.getIdOfOrg(), doGroupNames);
                 List<String> groups = new ArrayList<String>();
                 groups.add("SettingsGroup");
                 /* В короткой синхронизации не участвует библиотека */

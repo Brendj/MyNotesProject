@@ -1,0 +1,112 @@
+/*
+ * Copyright (c) 2014. Axetta LLC. All Rights Reserved.
+ */
+
+package ru.axetta.ecafe.processor.core.sync.response;
+
+import ru.axetta.ecafe.processor.core.persistence.AccountTransaction;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import java.text.DateFormat;
+import java.util.*;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: damir
+ * Date: 03.06.14
+ * Time: 17:17
+ * To change this template use File | Settings | File Templates.
+ */
+public class AccRegistryUpdate {
+
+    private Map<Long, AccItem> accItemMap = new HashMap<Long, AccItem>();
+    private Date maxTransactionDate; //Дата конечной выборки транзакций на процессинге
+
+    public Date getMaxTransactionDate() {
+        Date currentDate = new Date();
+        if(maxTransactionDate==null || maxTransactionDate.getTime()<currentDate.getTime()){
+            maxTransactionDate = currentDate;
+        }
+        return maxTransactionDate;
+    }
+
+    public Element toElement(Document document, DateFormat timeFormat) throws Exception {
+        Element element = document.createElement("AccRegistryUpdate");
+        element.setAttribute("Date", timeFormat.format(getMaxTransactionDate()));
+        for (AccItem item : this.accItemMap.values()) {
+            element.appendChild(item.toElement(document, timeFormat));
+        }
+        return element;
+    }
+
+    public void addAccountTransactionInfo(AccountTransaction accountTransaction) {
+        final Client client = accountTransaction.getClient();
+        AccItem accItem = accItemMap.get(client.getIdOfClient());
+        if(accItem==null){
+            accItem = new AccItem();
+            accItem.idOfClient = client.getIdOfClient();
+            if(client.getSubBalance1()==null){
+                accItem.subBalance1 = 0L;
+            }else {
+                accItem.subBalance1 = client.getSubBalance1();
+            }
+            accItem.balance = client.getBalance() - accItem.subBalance1;
+            accItemMap.put(accItem.idOfClient, accItem);
+        }
+        final TransactionItem transactionItem = new TransactionItem();
+        transactionItem.idOfTransaction = accountTransaction.getIdOfTransaction();
+        transactionItem.source = accountTransaction.getSource();
+        transactionItem.transactionDateTime = accountTransaction.getTransactionTime();
+        transactionItem.transactionType = accountTransaction.getSourceType();
+        transactionItem.sumMainBalance = accountTransaction.getTransactionSum();
+        transactionItem.sumSubBalance = accountTransaction.getTransactionSubBalance1Sum()==null?0L:accountTransaction.getTransactionSubBalance1Sum();
+        accItem.transactionItems.add(transactionItem);
+        if(maxTransactionDate==null || maxTransactionDate.getTime()<accountTransaction.getTransactionTime().getTime()){
+            maxTransactionDate = accountTransaction.getTransactionTime();
+        }
+    }
+
+    private static class AccItem{
+        private long idOfClient; //Идентификатор клиента
+        private long balance; //Размер баланса основного счета
+        private long subBalance1; //Размер баланса субсчета 1
+        private List<TransactionItem> transactionItems = new LinkedList<TransactionItem>(); // список транзакций клиента
+
+        public Element toElement(Document document,DateFormat timeFormat) throws Exception{
+            Element element = document.createElement("AI");
+            element.setAttribute("IdC", Long.toString(idOfClient));
+            element.setAttribute("B", Long.toString(balance));
+            element.setAttribute("SB1", Long.toString(subBalance1));
+            for (TransactionItem item : this.transactionItems) {
+                element.appendChild(item.toElement(document, timeFormat));
+            }
+            return element;
+        }
+
+    }
+
+    private static class TransactionItem{
+        private long idOfTransaction;       // Идентификатор транзакции
+        private String source;              // Ссылка на основание транзакции (номер клиентского заказа, номер пополнения платежа и т.п.)
+        private Date transactionDateTime;   // Дата транзакции
+        private int transactionType;        // Тип транзакции
+        private long  sumMainBalance;       // Сумма изменения основного баланса
+        private long  sumSubBalance;       // Сумма изменения основного баланса
+
+        public Element toElement(Document document, DateFormat timeFormat) throws Exception {
+            Element element = document.createElement("TI");
+            element.setAttribute("IdT", Long.toString(idOfTransaction));
+            element.setAttribute("SrcT", source);
+            element.setAttribute("D", timeFormat.format(transactionDateTime));
+            element.setAttribute("T", Integer.toString(transactionType));
+            element.setAttribute("SM", Long.toString(sumMainBalance));
+            element.setAttribute("SSB1", Long.toString(sumSubBalance));
+            return element;
+        }
+
+    }
+
+}

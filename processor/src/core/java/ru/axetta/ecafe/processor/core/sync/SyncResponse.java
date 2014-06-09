@@ -1184,20 +1184,22 @@ public class SyncResponse {
     private final DirectiveElement directiveElement;
     private final ResultClientGuardian resultClientGuardian;
     private final ClientGuardianData clientGuardians;
+    private final AccRegistryUpdate accRegistryUpdate;
 
     public CorrectingNumbersOrdersRegistry getCorrectingNumbersOrdersRegistry() {
         return correctingNumbersOrdersRegistry;
     }
 
-    public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType, Long idOfPacket, Long protoVersion, Date time,
-            String options, AccRegistry accRegistry, ResPaymentRegistry resPaymentRegistry, AccIncRegistry accIncRegistry,
+    public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
+            Long idOfPacket, Long protoVersion, Date time, String options, AccRegistry accRegistry,
+            ResPaymentRegistry resPaymentRegistry, AccIncRegistry accIncRegistry,
             ClientRegistry clientRegistry, ResOrgStructure resOrgStructure, ResMenuExchangeData resMenuExchangeData,
-            ResDiary resDiary, String message, ResEnterEvents resEnterEvents,
-            ResTempCardsOperations resTempCardsOperations, TempCardOperationData tempCardOperationData,
-            ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules, ComplexRoles complexRoles,
-            CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager, OrgOwnerData orgOwnerData,
-            QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData,
-            DirectiveElement directiveElement, ResultClientGuardian resultClientGuardian, ClientGuardianData clientGuardians) {
+            ResDiary resDiary, String message, ResEnterEvents resEnterEvents, ResTempCardsOperations resTempCardsOperations,
+            TempCardOperationData tempCardOperationData, ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules,
+            ComplexRoles complexRoles, CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry, Manager manager,
+            OrgOwnerData orgOwnerData, QuestionaryData questionaryData, GoodsBasicBasketData goodsBasicBasketData,
+            DirectiveElement directiveElement, ResultClientGuardian resultClientGuardian,
+            ClientGuardianData clientGuardians, AccRegistryUpdate accRegistryUpdate) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1227,6 +1229,7 @@ public class SyncResponse {
         this.directiveElement = directiveElement;
         this.resultClientGuardian = resultClientGuardian;
         this.clientGuardians = clientGuardians;
+        this.accRegistryUpdate = accRegistryUpdate;
     }
 
     public Document toDocument() throws Exception {
@@ -1267,6 +1270,11 @@ public class SyncResponse {
         // AccIncRegistry
         if (null != accIncRegistry) {
             ecafeEnvelopeElement.appendChild(accIncRegistry.toElement(document, dateFormat, timeFormat));
+        }
+
+        // AccRegistryUpdate
+        if (null != accRegistryUpdate) {
+            ecafeEnvelopeElement.appendChild(accRegistryUpdate.toElement(document, timeFormat));
         }
 
         // AccRegistry
@@ -1430,6 +1438,10 @@ public class SyncResponse {
 
     public GoodsBasicBasketData getGoodsBasicBasketData() {
         return goodsBasicBasketData;
+    }
+
+    public AccRegistryUpdate getAccRegistryUpdate() {
+        return accRegistryUpdate;
     }
 
     @Override
