@@ -808,6 +808,27 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    /**
+     * Возвращает список транзакций произведенных в интревале времени, для конкретной организации
+     * и с укзазанием спика необходимого типа транзакций (если список пуст то не будет оганичеваться по данному критерию)
+     * @param persistenceSession ссылка на сессию
+     * @param org ссылка на организацию
+     * @param fromDateTime время с которого учитывается >
+     * @param toDateTime время до которого учитывается <=
+     * @param sourceType список типов транзакций если путо не будет учитываться в криетрии
+     * @return возвращается список транзакций клиентов
+     */
+    @SuppressWarnings("unchecked")
+    public static List<AccountTransaction> getAccountTransactionsForOrgSinceTime(Session persistenceSession, Org org,
+            Date fromDateTime, Date toDateTime) {
+        Criteria criteria = persistenceSession.createCriteria(AccountTransaction.class);
+        criteria.add(Restrictions.in("org", org.getFriendlyOrg()));
+        criteria.add(Restrictions.gt("transactionTime", fromDateTime)); // >
+        criteria.add(Restrictions.le("transactionTime", toDateTime));   // <=
+        HibernateUtils.addAscOrder(criteria, "client.idOfClient");
+        return criteria.list();
+    }
+
     @SuppressWarnings("unchecked")
     public static List<Card> getClientsAndCardsForOrgs(Session persistenceSession, Set<Long> idOfOrgs, List<Long> clientIds) {
         Criteria clientCardsCriteria = persistenceSession.createCriteria(Card.class);
