@@ -305,5 +305,49 @@ public class CalendarUtils {
         return day != Calendar.SUNDAY;
     }
 
+    public static Date calculateYesterdayStart(Calendar calendar, Date scheduledFireTime) {
+        calendar.setTime(scheduledFireTime);
+        CalendarUtils.truncateToDayOfMonth(calendar);
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        return calendar.getTime();
+    }
+
+    public static Date calculateTodayStart(Calendar calendar, Date scheduledFireTime) {
+        calendar.setTime(scheduledFireTime);
+        CalendarUtils.truncateToDayOfMonth(calendar);
+        return calendar.getTime();
+    }
+
+    public static Date calculateMinusOneDay(Calendar calendar, Date endTime) {
+        calendar.setTime(endTime);
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        return calendar.getTime();
+    }
+
+    public static Date calculatePlusOneDay(Calendar calendar, Date endTime) {
+        calendar.setTime(endTime);
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+        return calendar.getTime();
+    }
+
+    public static Date calculateLastMonthFirstDay(Calendar calendar, Date scheduledFireTime) {
+        calendar.setTime(scheduledFireTime);
+        calendar.add(Calendar.MONTH, -1);
+        CalendarUtils.truncateToMonth(calendar);
+        return calendar.getTime();
+    }
+
+    public static Date calculateCurrentMonthFirstDay(Calendar calendar, Date scheduledFireTime) {
+        calendar.setTime(scheduledFireTime);
+        CalendarUtils.truncateToMonth(calendar);
+        return calendar.getTime();
+    }
+
+    public static Date calculatePlusOneMonth(Calendar calendar, Date endTime) {
+        calendar.setTime(endTime);
+        calendar.add(Calendar.MONTH, 1);
+        return calendar.getTime();
+    }
+
     private CalendarUtils() {}
 }

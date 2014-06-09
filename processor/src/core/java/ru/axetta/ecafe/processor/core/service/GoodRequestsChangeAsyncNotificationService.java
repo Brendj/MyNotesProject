@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.GoodRequestsNewReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -30,6 +31,7 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +56,10 @@ import java.util.*;
 @Service
 public class GoodRequestsChangeAsyncNotificationService {
 
+    //static enum NotifyType{
+    //
+    //}
+
     private final static Logger LOGGER = LoggerFactory.getLogger(GoodRequestsChangeAsyncNotificationService.class);
 
     private Map<Long, ContragentItem> contragentItems;
@@ -62,6 +68,10 @@ public class GoodRequestsChangeAsyncNotificationService {
     private int maxNumDays;
     private boolean enableNotify;
     private boolean isHideMissedCol;
+    @Autowired
+    private EventNotificationService eventNotificationService;
+    @PersistenceContext(unitName = "reportsPU")
+    private EntityManager entityManager;
 
     public static GoodRequestsChangeAsyncNotificationService getInstance() {
         return RuntimeContext.getAppContext().getBean(GoodRequestsChangeAsyncNotificationService.class);
@@ -121,20 +131,18 @@ public class GoodRequestsChangeAsyncNotificationService {
                 LOGGER.error("Failed export report : ", e);
             }
             String message = "";
+            message+="IdOfOrg: "+idOfOrg;
             message+=" current time "+(new Date());
             message+=" beginGenTime "+beginGenerateTime;
             message+=" endGenerateTime "+endGenerateTime;
             message+=" goodRequestPosition count "+goodRequestPositionList.size();
             /* если заявок на данный период нет ничего не делаем */
             if(isEmptyRequests) {
-                LOGGER.debug("IdOfOrg: "+idOfOrg+" goodRequestPosition empty: goodRequestPosition count:"+goodRequestPositionList.size());
+                LOGGER.debug(message);
                 return;
             }
 
             OrgItem item = orgItems.get(idOfOrg);
-            //AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
-            //String templateShortFileName = GoodRequestsNewReport.class.getSimpleName() + "_notify.jasper";
-            //String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
             String templateFilename = checkIsExistFile("_notify.jasper");
             if(StringUtils.isEmpty(templateFilename)){
                 LOGGER.debug("IdOfOrg: "+idOfOrg+" template not found");
@@ -143,6 +151,10 @@ public class GoodRequestsChangeAsyncNotificationService {
             GoodRequestsNewReport.Builder builder = new GoodRequestsNewReport.Builder(templateFilename);
             Properties properties = new Properties();
             properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, Long.toString(item.getIdOfOrg()));
+            if(item.getIdOfSourceMenu()!=null){
+                properties.setProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG, Long.toString(item.getIdOfSourceMenu()));
+            }
+            properties.setProperty(GoodRequestsNewReport.P_ORG_REQUEST_FILTER, "0");
             properties.setProperty(GoodRequestsNewReport.P_HIDE_GENERATE_PERIOD, Boolean.toString(true));
             properties.setProperty(GoodRequestsNewReport.P_GENERATE_BEGIN_DATE, Long.toString(beginGenerateTime.getTime()));
             properties.setProperty(GoodRequestsNewReport.P_GENERATE_END_DATE, Long.toString(endGenerateTime.getTime()));
@@ -170,8 +182,6 @@ public class GoodRequestsChangeAsyncNotificationService {
             } catch (Exception e) {
                 LOGGER.error("Failed export report : ", e);
             }
-
-            String emailSubject = String.format("Уведомление об изменении заявки \"%s\" - \"%s\"",item.getShortName(), item.getAddress());
             if (reportJob != null) {
                 try {
                     ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -193,23 +203,24 @@ public class GoodRequestsChangeAsyncNotificationService {
             } else {
                 LOGGER.debug("IdOfOrg: "+idOfOrg+" reportJob is null");
             }
-            //boolean sended = false;
+
             if(StringUtils.isNotEmpty(htmlReport)){
-                try {
-                    String fileName = getClass().getSimpleName() + "-" + System.currentTimeMillis() + ".html";
-                    File file = new File(fileName);
-                    FileOutputStream outputStream = new FileOutputStream(file);
-                    outputStream.write(htmlReport.getBytes());
-                    outputStream.flush();
-                    outputStream.close();
-                    LOGGER.debug(String.format("save report file '%s'", fileName));
-                } catch (Exception e){
-                    LOGGER.error("Cannot save report file", e);
-                }
-                //String[] values = {"address", item.address, "shortOrgName", item.shortName, "reportValues", htmlReport};
+                //try {
+                //    String fileName = getClass().getSimpleName() + "-" + System.currentTimeMillis() + ".html";
+                //    File file = new File(fileName);
+                //    FileOutputStream outputStream = new FileOutputStream(file);
+                //    outputStream.write(htmlReport.getBytes());
+                //    outputStream.flush();
+                //    outputStream.close();
+                //    LOGGER.debug(String.format("save report file '%s'", fileName));
+                //} catch (Exception e){
+                //    LOGGER.error("Cannot save report file", e);
+                //}
+                String[] values = {"address", item.address, "shortOrgName", item.shortName, "reportValues", htmlReport};
                 List<String> strings = Arrays
                         .asList(StringUtils.split(item.getDefaultSupplier().requestNotifyMailList, ";"));
-                List<String> addresses = new ArrayList<String>(strings);
+                Set<String> addresses = new HashSet<String>(strings);
+                //List<String> addresses = new ArrayList<String>();
 
                 /* Закладываем почтовые ящики ответсвенных по питанию в школе если таковые имеются */
                 try {
@@ -244,17 +255,18 @@ public class GoodRequestsChangeAsyncNotificationService {
                     LOGGER.error("Find email from user : ", e);
                 }
 
-                LOGGER.debug("addresses "+ ((ArrayList<String>) addresses).toString());
+                LOGGER.debug("addresses "+ addresses.toString());
                 //boolean sended = false;
                 for (String address : addresses) {
                     if (StringUtils.trimToNull(address) != null) {
-                         //sended |= eventNotificationService.sendEmail(address, EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
-                        try {
-                            runtimeContext.getPostman().postNotificationEmail(address, emailSubject, htmlReport);
-                            LOGGER.debug(message +" send '"+address+"'");
-                        } catch (Exception e) {
-                            LOGGER.error("Failed to post event", e);
-                        }
+                        eventNotificationService.sendEmailAsync(address,
+                                EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
+                        //try {
+                        //    runtimeContext.getPostman().postNotificationEmail(address, emailSubject, htmlReport);
+                        //    LOGGER.debug(message +" send '"+address+"'");
+                        //} catch (Exception e) {
+                        //    LOGGER.error("Failed to post event", e);
+                        //}
                     }
                 }
             } else {
@@ -299,10 +311,6 @@ public class GoodRequestsChangeAsyncNotificationService {
         orgItems = getInstance().findOrgItems();
     }
 
-    @PersistenceContext(unitName = "reportsPU")
-    private EntityManager entityManager;
-
-
     public BasicReportJob buildReport(Session persistenceSession, GoodRequestsNewReport.Builder builder, Date startDate, Date endDate, Calendar localCalendar){
         BasicReportJob reportJob = null;
         try {
@@ -313,7 +321,7 @@ public class GoodRequestsChangeAsyncNotificationService {
         return reportJob;
     }
 
-    public void addEmailFromClient(Session persistenceSession, Long idOfOrg, List<String> addresses){
+    public void addEmailFromClient(Session persistenceSession, Long idOfOrg, Set<String> addresses){
         DetachedCriteria staffClientQuery = DetachedCriteria.forClass(Staff.class);
         staffClientQuery.add(Restrictions.eq("orgOwner", idOfOrg));
         staffClientQuery.add(Restrictions.eq("idOfRole", 0L));
@@ -335,7 +343,7 @@ public class GoodRequestsChangeAsyncNotificationService {
         }
     }
 
-    public void addEmailFromUser(Session persistenceSession, Long idOfOrg, List<String> addresses){
+    public void addEmailFromUser(Session persistenceSession, Long idOfOrg, Set<String> addresses){
         Criteria criteria = persistenceSession.createCriteria(UserOrgs.class);
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
         criteria.add(Restrictions.eq("userNotificationType", UserNotificationType.GOOD_REQUEST_CHANGE_NOTIFY));
@@ -368,16 +376,22 @@ public class GoodRequestsChangeAsyncNotificationService {
     @Transactional(readOnly = true)
     public Map<Long, OrgItem> findOrgItems(){
         Map<Long, OrgItem> items = new HashMap<Long, OrgItem>();
-        Query query = entityManager.createQuery("select o.idOfOrg, o.shortName, o.officialName, o.defaultSupplier.id, o.address from Org o");
+        Query query = entityManager.createQuery("select o.idOfOrg, o.shortName, o.officialName, o.defaultSupplier.id, o.address, sm.idOfOrg from Org o join o.sourceMenuOrgs sm");
         List res = query.getResultList();
         for (Object obj: res){
             Object[] row = (Object[]) obj;
             Long idOfOrg = Long.valueOf(row[0].toString());
+            Long idOfSourceMenu = null;
+            try {
+                idOfSourceMenu = Long.valueOf(row[5].toString());
+            } catch (Exception e){
+                LOGGER.error(String.format("Organization (idOfOrg=%d) has not source menu organization", idOfOrg));
+            }
             if(!items.containsKey(idOfOrg)){
                 Long idOfContragent = Long.valueOf(row[3].toString());
                 if(contragentItems.containsKey(idOfContragent)){
                     ContragentItem contragentItem = contragentItems.get(idOfContragent);
-                    items.put(idOfOrg, new OrgItem(idOfOrg,row[1].toString(),row[2].toString(), contragentItem, row[4].toString()));
+                    items.put(idOfOrg, new OrgItem(idOfOrg,row[1].toString(),row[2].toString(), contragentItem, row[4].toString(), idOfSourceMenu));
                 }
             }
 
@@ -390,14 +404,17 @@ public class GoodRequestsChangeAsyncNotificationService {
         private String shortName;
         private String officialName;
         private ContragentItem defaultSupplier;
+        private Long idOfSourceMenu;
         private String address;
 
-        public OrgItem(long idOfOrg,  String shortName, String officialName, ContragentItem defaultSupplier, String address) {
+        public OrgItem(long idOfOrg,  String shortName, String officialName, ContragentItem defaultSupplier, String address,
+                Long idOfSourceMenu) {
             this.idOfOrg = idOfOrg;
             this.shortName = shortName;
             this.officialName = officialName;
             this.defaultSupplier = defaultSupplier;
             this.address = address;
+            this.idOfSourceMenu = idOfSourceMenu;
         }
 
         public long getIdOfOrg() {
@@ -438,6 +455,14 @@ public class GoodRequestsChangeAsyncNotificationService {
 
         public void setAddress(String address) {
             this.address = address;
+        }
+
+        public Long getIdOfSourceMenu() {
+            return idOfSourceMenu;
+        }
+
+        public void setIdOfSourceMenu(Long idOfSourceMenu) {
+            this.idOfSourceMenu = idOfSourceMenu;
         }
     }
 

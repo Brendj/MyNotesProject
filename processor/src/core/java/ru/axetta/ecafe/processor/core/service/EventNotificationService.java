@@ -124,12 +124,9 @@ public class EventNotificationService {
             NOTIFICATION_PASS_WITH_GUARDIAN + "." + TYPE_EMAIL_SUBJECT,
             "Уведомление о времени прихода и ухода",
             NOTIFICATION_GOOD_REQUEST_CHANGE + "." + TYPE_EMAIL_TEXT,
-            "<html>\n<body>"
-                    + "[address]<br/>\n"
-                    + "[reportValues]<br/>\n"
-                    + "</body>\n</html>",
+            "[reportValues]",
             NOTIFICATION_GOOD_REQUEST_CHANGE + "." + TYPE_EMAIL_SUBJECT,
-            "Уведомление об изменении заявки [shortOrgName] - [address]",
+            "Заявка [shortOrgName] (н/к)",
             NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS + "." + TYPE_EMAIL_SUBJECT,
             "Уведомление о состоянии подписки абонентского питания",
             NOTIFICATION_SUBSCRIPTION_FEEDING_WITHDRAW_NOT_SUCCESS + "." + TYPE_EMAIL_TEXT,
@@ -194,23 +191,30 @@ public class EventNotificationService {
         return true;
     }
 
-    public boolean sendEmail(String email, String type, String[] values) {
+    @Async
+    public boolean sendEmailAsync(String email, String type, String[] values) {
+        logger.trace("start");
         if (StringUtils.isEmpty(email)) {
+            logger.trace("email is empry");
             return false;
-        }
-        String emailText = getNotificationText(type, TYPE_EMAIL_TEXT), emailSubject = getNotificationText(type,
-                TYPE_EMAIL_SUBJECT);
-        if (emailText == null || emailSubject == null) {
-            logger.warn("No email text is specified for type '" + type + "'. Email is not sent");
-            return false;
-        } else {
-            emailText = formatMessage(emailText, values);
-            emailSubject = formatMessage(emailSubject, values);
-            try {
-                RuntimeContext.getInstance().getPostman().postNotificationEmail(email, emailSubject, emailText);
-            } catch (Exception e) {
-                logger.error("Failed to send email notification", e);
+        }  else {
+
+            String emailText = getNotificationText(type, TYPE_EMAIL_TEXT), emailSubject = getNotificationText(type,
+                    TYPE_EMAIL_SUBJECT);
+            logger.trace(emailSubject+" : "+emailText);
+            if (emailText == null || emailSubject == null) {
+                logger.warn(String.format("No email text is specified for type '%s'. Email is not sent", type));
                 return false;
+            } else {
+                emailText = formatMessage(emailText, values);
+                emailSubject = formatMessage(emailSubject, values);
+                try {
+                    logger.trace("run");
+                    RuntimeContext.getInstance().getPostman().postNotificationEmail(email, emailSubject, emailText);
+                } catch (Exception e) {
+                    logger.error("Failed to send email notification", e);
+                    return false;
+                }
             }
         }
         return true;

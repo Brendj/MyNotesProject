@@ -116,9 +116,10 @@ public class GoodRequestsNewReport extends BasicReportForAllOrgJob {
             // пока нет необходимости
             //parameterMap.put("overall",Long.toString(OVERALL));
             //parameterMap.put("overall_all",Long.toString(OVERALL_TOTAL));
-            GoodRequestsNewReportService service = new GoodRequestsNewReportService(session,
-                    OVERALL, OVERALL_TOTAL, OVERALL_TOTAL_TITLE, OVERALL_TITLE, hideTotalRow);
-
+            //GoodRequestsNewReportService service = new GoodRequestsNewReportService(session,
+            //        OVERALL, OVERALL_TOTAL, OVERALL_TOTAL_TITLE, OVERALL_TITLE, hideTotalRow);
+            GoodRequestsNewReportService service;
+            service = new GoodRequestsNewReportService(session,OVERALL, OVERALL_TITLE, hideTotalRow);
             return new JRBeanCollectionDataSource(service.buildRepotItems(startTime, endTime, nameFilter, orgFilter,
                     hideDailySampleValue, generateBeginTime, generateEndTime, idOfOrgList, idOfMenuSourceOrgList,
                     hideMissedColumns, hideGeneratePeriod, hideLastValue));

@@ -470,7 +470,7 @@ public class RuleProcessor implements AutoReportProcessor, EventProcessor {
                         }
                         if (basicReport instanceof BasicReportJob && currRule.getTemplateFileName() != null && !currRule
                                 .getTemplateFileName().isEmpty()) {
-                            ((BasicReportJob) basicReport).templateFilename = currRule.getTemplateFileName();
+                            ((BasicReportJob) basicReport).setTemplateFilename(currRule.getTemplateFileName());
                         }
                         String subject = "";
                         Long idOfOrg = null;

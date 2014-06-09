@@ -47,6 +47,8 @@
 	<field name="newDailySample" class="java.lang.Long"/>
 	<field name="hideDailySample" class="java.lang.Integer"/>
 	<field name="hideLastValue" class="java.lang.Integer"/>
+	<field name="feedingPlanTypeStr" class="java.lang.String"/>
+	<field name="feedingPlanTypeNum" class="java.lang.Integer"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -65,7 +67,7 @@
 	<summary>
 		<band height="70">
 			<crosstab>
-				<reportElement uuid="329e9ea5-b84b-44ec-ad10-3dc3e45bf055" mode="Transparent" x="0" y="0" width="140" height="50" forecolor="#FFFFFF"/>
+				<reportElement uuid="329e9ea5-b84b-44ec-ad10-3dc3e45bf055" style="table" mode="Transparent" x="0" y="0" width="140" height="50" forecolor="#FFFFFF"/>
 				<crosstabHeaderCell>
 					<cellContents style="table">
 						<staticText>
@@ -91,14 +93,14 @@
 						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
-				<rowGroup name="orgNum" width="78" headerPosition="Middle">
+				<rowGroup name="orgNum" width="78" totalPosition="End" headerPosition="Middle">
 					<bucket class="java.lang.Long">
 						<bucketExpression><![CDATA[$F{orgNum}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents backcolor="#FFFFFF" mode="Transparent" style="style1">
 							<textField isBlankWhenNull="true">
-								<reportElement uuid="296ecedd-7681-4642-8f78-eb8d15759642" style="table" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="78" height="48"/>
+								<reportElement uuid="296ecedd-7681-4642-8f78-eb8d15759642" style="table" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="78" height="87"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="12"/>
 								</textElement>
@@ -107,11 +109,13 @@
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents backcolor="#000000" mode="Opaque">
+						<cellContents backcolor="#000000" mode="Transparent">
 							<staticText>
-								<reportElement uuid="ec5fb42d-c797-4f56-bb08-5413aae98891" style="Crosstab Data Text" x="0" y="0" width="337" height="53" forecolor="#FFFFFF"/>
-								<textElement/>
-								<text><![CDATA[Static text]]></text>
+								<reportElement uuid="9cb16bc5-8dcf-4346-9771-0a08fb6d6c21" style="table" x="0" y="0" width="499" height="40"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="12" isBold="true"/>
+								</textElement>
+								<text><![CDATA[ВСЕГО]]></text>
 							</staticText>
 						</cellContents>
 					</crosstabTotalRowHeader>
@@ -123,7 +127,7 @@
 					<crosstabRowHeader>
 						<cellContents backcolor="#CCFFFF" mode="Transparent" style="table">
 							<textField>
-								<reportElement uuid="18dfc45b-da22-4cae-956e-0ee2faf2535a" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="207" height="40"/>
+								<reportElement uuid="18dfc45b-da22-4cae-956e-0ee2faf2535a" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="0" y="0" width="207" height="81"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="12"/>
 								</textElement>
@@ -143,7 +147,29 @@
 						</cellContents>
 					</crosstabTotalRowHeader>
 				</rowGroup>
-				<rowGroup name="goodName" width="214" totalPosition="End" headerPosition="Middle">
+				<rowGroup name="feedingPlanTypeNum" width="0">
+					<bucket class="java.lang.Integer">
+						<bucketExpression><![CDATA[$F{feedingPlanTypeNum}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents/>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="feedingPlanTypeStr" width="0" totalPosition="End">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{feedingPlanTypeStr}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents/>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents backcolor="#005FB3" mode="Opaque"/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="goodName" width="214" totalPosition="Start" headerPosition="Middle">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{goodName}]]></bucketExpression>
 					</bucket>
@@ -159,14 +185,17 @@
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents backcolor="#005FB3" mode="Opaque">
-							<staticText>
-								<reportElement uuid="aa3988b3-1215-43d5-9a9a-313fbae1771a" style="style2" x="0" y="0" width="128" height="3" forecolor="#005FB3"/>
-								<textElement>
-									<font size="12"/>
+						<cellContents backcolor="#99CCFF" mode="Opaque">
+							<textField isBlankWhenNull="false">
+								<reportElement uuid="cd96f855-dc06-47d2-ad1b-d050c7257886" style="table" x="0" y="0" width="214" height="40">
+									<printWhenExpression><![CDATA[!$V{officialName}.equals("ВСЕГО")]]></printWhenExpression>
+								</reportElement>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font size="12" isItalic="true"/>
+									<paragraph leftIndent="8"/>
 								</textElement>
-								<text><![CDATA[Static text]]></text>
-							</staticText>
+								<textFieldExpression><![CDATA[$V{feedingPlanTypeStr}]]></textFieldExpression>
+							</textField>
 						</cellContents>
 					</crosstabTotalRowHeader>
 				</rowGroup>
@@ -266,13 +295,17 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell height="53" rowTotalGroup="orgNum">
-					<cellContents backcolor="#000000" mode="Opaque">
-						<staticText>
-							<reportElement uuid="1debb2be-2115-45eb-9de5-b858558ed04f" style="Crosstab Data Text" x="0" y="0" width="70" height="53" forecolor="#FFFFFF"/>
-							<textElement/>
-							<text><![CDATA[Static text]]></text>
-						</staticText>
+				<crosstabCell height="41" rowTotalGroup="orgNum">
+					<cellContents backcolor="#000000" mode="Transparent">
+						<textField>
+							<reportElement uuid="75b7be62-4feb-4f53-b204-0e6987a61483" style="table" x="0" y="0" width="57" height="40"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="12" isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{totalCountMeasure}/2L+
+($V{hideDailySampleSum}==0L || $V{dailySampleMeasure}==0L
+    ? "" : " / "+ $V{dailySampleMeasure}/2L )]]></textFieldExpression>
+						</textField>
 					</cellContents>
 				</crosstabCell>
 				<crosstabCell width="50" columnTotalGroup="doneDateStr">
@@ -307,10 +340,10 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 				<crosstabCell rowTotalGroup="officialName" columnTotalGroup="doneDateStr">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell width="57" height="4" rowTotalGroup="goodName">
-					<cellContents backcolor="#005FB3" mode="Opaque" style="style2">
+				<crosstabCell width="57" height="40" rowTotalGroup="goodName">
+					<cellContents backcolor="#99CCFF" mode="Opaque" style="style2">
 						<staticText>
-							<reportElement uuid="59c14182-de93-4b3f-b3c9-6cca48484167" style="style2" x="0" y="0" width="40" height="3" forecolor="#005FB3" backcolor="#005FB3"/>
+							<reportElement uuid="59c14182-de93-4b3f-b3c9-6cca48484167" mode="Transparent" x="0" y="0" width="40" height="3" forecolor="#005FB3" backcolor="#005FB3"/>
 							<textElement>
 								<font size="12"/>
 							</textElement>
@@ -337,6 +370,24 @@ new Long($V{totalCountMeasure}.longValue() - $V{newTotalCountMeasure}.longValue(
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell rowTotalGroup="goodName" columnTotalGroup="doneDate">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="3" rowTotalGroup="feedingPlanTypeStr">
+					<cellContents backcolor="#005FB3" mode="Opaque"/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="feedingPlanTypeStr" columnTotalGroup="doneDate">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="feedingPlanTypeStr" columnTotalGroup="doneDateStr">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="feedingPlanTypeNum">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="feedingPlanTypeNum" columnTotalGroup="doneDate">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell rowTotalGroup="feedingPlanTypeNum" columnTotalGroup="doneDateStr">
 					<cellContents/>
 				</crosstabCell>
 			</crosstab>

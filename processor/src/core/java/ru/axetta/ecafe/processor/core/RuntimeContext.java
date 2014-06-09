@@ -70,6 +70,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
@@ -389,9 +390,9 @@ public class RuntimeContext implements ApplicationContextAware {
         }
     }
 
-    static SessionFactory sessionFactory;
+    public static SessionFactory sessionFactory;
 
-    static SessionFactory reportsSessionFactory;
+    public static SessionFactory reportsSessionFactory;
 
     public static void setSessionFactory(SessionFactory sessionFactory) {
         RuntimeContext.sessionFactory = sessionFactory;
@@ -709,8 +710,6 @@ public class RuntimeContext implements ApplicationContextAware {
             throw e;
         }
     }
-
-
 
     public void createCategoryDiscount(Long idOfCategoryDiscount, String categoryName, String discountRules,
             String description) {

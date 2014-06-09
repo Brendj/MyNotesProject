@@ -160,6 +160,7 @@
         <h:commandButton value="Генерировать отчет в Excel"
                          actionListener="#{mainPage.goodRequestsNewReportPage.exportToXLS}"
                          styleClass="command-button" />
+
     </h:panelGrid>
 
     <a4j:status id="goodRequestsNewReportGenerateStatus" onstart="onstartloading()" onstop="onstoploading()">

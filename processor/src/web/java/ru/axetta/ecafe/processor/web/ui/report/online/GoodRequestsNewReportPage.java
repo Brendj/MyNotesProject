@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.GoodRequestsNewReport;
+import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -70,7 +71,6 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
     //private String lastGoodRequestUpdateDateTiem;
     private Date lastGoodRequestUpdateDateTime;
 
-    //Метод транзакционный
     public void applyOfOrgList(ActionEvent ae) {
         if (applyUserSettings) {
             Session persistenceSession = null;
@@ -80,10 +80,11 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
                     persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
                     persistenceTransaction = persistenceSession.beginTransaction();
 
-                    persistenceSession.refresh(currentUser);
+                    //persistenceSession.refresh(currentUser);
+                    User user = (User) persistenceSession.get(User.class, currentUser.getIdOfUser());
 
                     idOfOrgList = new ArrayList<Long>();
-                    if (currentUser.getUserOrgses().isEmpty()){
+                    if (user.getUserOrgses().isEmpty()){
                         filter = "Не выбрано";
                         printMessage("Список организаций рассылки не заполнен");
                         idOfOrgList = null;
@@ -91,7 +92,7 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
                     }
                     else {
                         filter = "";
-                        for(UserOrgs userOrgs: currentUser.getUserOrgses()) {
+                        for(UserOrgs userOrgs: user.getUserOrgses()) {
                             idOfOrgList.add(userOrgs.getOrg().getIdOfOrg());
                             filter = filter.concat(userOrgs.getOrg().getShortName() + "; ");
                         }
@@ -101,7 +102,7 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
                     persistenceTransaction = null;
                 } finally {
                     HibernateUtils.rollback(persistenceTransaction, logger);
-                    //HibernateUtils.close(persistenceSession, logger);
+                    HibernateUtils.close(persistenceSession, logger);
                 }
             } catch (Exception e) {
                 logger.error("Failed export report : ", e);
@@ -189,6 +190,63 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
         return idOfContragentOrgList.toString().replaceAll("[^0-9,]", "");
     }
 
+    public Object reportHTMLSendEmail() {
+        if (validateFormData())  return null;
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String templateFilename = checkIsExistFile("_notify.jasper");
+        //String templateFilename = checkIsExistFile("_summary.jasper");
+
+        if (StringUtils.isEmpty(templateFilename)) {
+            return null;
+        }
+        GoodRequestsNewReport.Builder builder = new GoodRequestsNewReport.Builder(templateFilename);
+        builder.setReportProperties(buildProperties());
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        BasicReportJob report = null;
+        try {
+            try {
+                persistenceSession = runtimeContext.createReportPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        } catch (Exception e) {
+            logger.error("Failed export report : ", e);
+            printError("Ошибка при подготовке отчета: " + e.getMessage());
+        }
+
+        if (report != null) {
+            try {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                JRHtmlExporter exporter1 = new JRHtmlExporter();
+                exporter1.setParameter(JRExporterParameter.JASPER_PRINT, report.getPrint());
+                exporter1.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
+                exporter1.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
+                exporter1.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
+                exporter1.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
+                exporter1.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
+                //exporter1.setParameter(JRHtmlExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                exporter1.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
+                exporter1.exportReport();
+                String[] values = {"address", "Адрес орга", "shortOrgName", "vjz jhuf", "reportValues", os.toString("UTF-8")};
+                EventNotificationService eventNotificationService = RuntimeContext.getAppContext().getBean(EventNotificationService.class);
+                eventNotificationService.sendEmailAsync("kadyrov@axetta.ru",
+                        EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
+                //eventNotificationService.sendEmailAsync("dizzarg@mail.ru",
+                //        EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
+            } catch (Exception e) {
+                printError("Ошибка при построении отчета: "+e.getMessage());
+                logger.error("Failed build report ",e);
+            }
+        }
+        return null;
+    }
+
     public Object buildReportHTML() {
         if (validateFormData())  return null;
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -254,9 +312,6 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
                 logger.error("Failed build report ",e);
             }
         }
-
-
-
         return null;
     }
 
@@ -375,9 +430,6 @@ public class GoodRequestsNewReportPage extends OnlineReportWithContragentPage {
                 printError("Ошибка при подготовке отчета: " + e.getMessage());
             }
         }
-
-
-
     }
 
     public Object clear(){

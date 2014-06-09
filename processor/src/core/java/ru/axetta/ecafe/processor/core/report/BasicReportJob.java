@@ -28,11 +28,11 @@ public abstract class BasicReportJob extends BasicJasperReport {
             REPORT_PERIOD_PREV_PREV_DAY=3, REPORT_PERIOD_PREV_PREV_PREV_DAY=4,
             REPORT_PERIOD_LAST_WEEK =5, REPORT_PERIOD_CURRENT_MONTH =6;
     private String BASE_DOCUMENT_FILENAME;
-    public Date startTime;
-    public Date endTime;
-    public Calendar calendar;
-    public String templateFilename;
-    public SessionFactory sessionFactory;
+    protected Date startTime;
+    protected Date endTime;
+    protected Calendar calendar;
+    protected String templateFilename;
+    protected SessionFactory sessionFactory;
 
     {
         String fullName = this.getClass().getCanonicalName();
@@ -44,8 +44,7 @@ public abstract class BasicReportJob extends BasicJasperReport {
     public int getDefaultReportPeriod() { return REPORT_PERIOD_PREV_MONTH; }
 
     public BasicReportJob(Date generateTime, long generateDuration, JasperPrint print) {
-        super(generateTime, generateDuration,
-                print);
+        super(generateTime, generateDuration, print);
     }
 
     // call initialize after this constructor
@@ -156,8 +155,6 @@ public abstract class BasicReportJob extends BasicJasperReport {
             this.sourceMenuOrg = sourceMenuOrg;
         }
     }
-
-
 
     public abstract AutoReportRunner getAutoReportRunner();
 
@@ -393,43 +390,50 @@ public abstract class BasicReportJob extends BasicJasperReport {
         return endTime;
     }
 
+    public String getTemplateFilename() {
+        return templateFilename;
+    }
+
+    public void setTemplateFilename(String templateFilename) {
+        this.templateFilename = templateFilename;
+    }
+
     public void applyDataQueryPeriod(int period) {
         startTime = CalendarUtils.addDays(endTime, -period);
     }
 
-
     public static Date[] calculateDatesForPeriodType(Calendar calendar, Date startTime, Date generateTime, int type) {
         Date endTime=null;
         if (type==REPORT_PERIOD_PREV_MONTH) {
-            if (startTime==null) startTime = calculateLastMonthFirstDay(calendar, generateTime);
-            endTime = calculatePlusOneMonth(calendar, startTime);
+            if (startTime==null) startTime = CalendarUtils.calculateLastMonthFirstDay(calendar, generateTime);
+            endTime = CalendarUtils.calculatePlusOneMonth(calendar, startTime);
         } else if (type== REPORT_PERIOD_CURRENT_MONTH) {
             // startTime - первый день текущего месяца
             // endTime - поледний день текущего месяца
-            if (startTime==null) startTime = calculateCurrentMonthFirstDay(calendar, generateTime);
-            endTime = calculatePlusOneMonth(calendar, startTime);
+            if (startTime==null) startTime = CalendarUtils.calculateCurrentMonthFirstDay(calendar, generateTime);
+            endTime = CalendarUtils.calculatePlusOneMonth(calendar, startTime);
             calendar.setTime(endTime);
             calendar.add(Calendar.MILLISECOND, -1);
             endTime = calendar.getTime();
         }  else if (type==REPORT_PERIOD_PREV_DAY) {
-            if (startTime==null) startTime = calculateYesterdayStart(calendar, generateTime);
-            endTime = calculatePlusOneDay(calendar, startTime);
+            if (startTime==null) startTime = CalendarUtils.calculateYesterdayStart(calendar, generateTime);
+            endTime = CalendarUtils.calculatePlusOneDay(calendar, startTime);
         } else if (type==REPORT_PERIOD_PREV_PREV_DAY) {
             if (startTime==null) {
-                startTime = calculateYesterdayStart(calendar, generateTime);
-                startTime = calculateMinusOneDay(calendar, startTime);
+                startTime = CalendarUtils.calculateYesterdayStart(calendar, generateTime);
+                startTime = CalendarUtils.calculateMinusOneDay(calendar, startTime);
             }
-            endTime = calculatePlusOneDay(calendar, startTime);
+            endTime = CalendarUtils.calculatePlusOneDay(calendar, startTime);
         } else if (type==REPORT_PERIOD_PREV_PREV_PREV_DAY) {
             if (startTime==null) {
-                startTime = calculateYesterdayStart(calendar, generateTime);
-                startTime = calculateMinusOneDay(calendar, startTime);
-                startTime = calculateMinusOneDay(calendar, startTime);
+                startTime = CalendarUtils.calculateYesterdayStart(calendar, generateTime);
+                startTime = CalendarUtils.calculateMinusOneDay(calendar, startTime);
+                startTime = CalendarUtils.calculateMinusOneDay(calendar, startTime);
             }
-            endTime = calculatePlusOneDay(calendar, startTime);
+            endTime = CalendarUtils.calculatePlusOneDay(calendar, startTime);
         } else if (type==REPORT_PERIOD_TODAY) {
-            if (startTime==null) startTime = calculateTodayStart(calendar, generateTime);
-            endTime = calculatePlusOneDay(calendar, startTime);
+            if (startTime==null) startTime = CalendarUtils.calculateTodayStart(calendar, generateTime);
+            endTime = CalendarUtils.calculatePlusOneDay(calendar, startTime);
         } else if (type== REPORT_PERIOD_LAST_WEEK) {
             if (startTime==null) {
                 calendar.setTime(generateTime);
@@ -456,47 +460,4 @@ public abstract class BasicReportJob extends BasicJasperReport {
         return new Date[]{startTime, endTime};
     }
 
-    private static Date calculateYesterdayStart(Calendar calendar, Date scheduledFireTime) {
-        calendar.setTime(scheduledFireTime);
-        CalendarUtils.truncateToDayOfMonth(calendar);
-        calendar.add(Calendar.DAY_OF_MONTH, -1);
-        return calendar.getTime();
-    }
-
-    private static Date calculateTodayStart(Calendar calendar, Date scheduledFireTime) {
-        calendar.setTime(scheduledFireTime);
-        CalendarUtils.truncateToDayOfMonth(calendar);
-        return calendar.getTime();
-    }
-
-    private static Date calculateMinusOneDay(Calendar calendar, Date endTime) {
-        calendar.setTime(endTime);
-        calendar.add(Calendar.DAY_OF_MONTH, -1);
-        return calendar.getTime();
-    }
-
-    private static Date calculatePlusOneDay(Calendar calendar, Date endTime) {
-        calendar.setTime(endTime);
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-        return calendar.getTime();
-    }
-
-    private static Date calculateLastMonthFirstDay(Calendar calendar, Date scheduledFireTime) {
-        calendar.setTime(scheduledFireTime);
-        calendar.add(Calendar.MONTH, -1);
-        CalendarUtils.truncateToMonth(calendar);
-        return calendar.getTime();
-    }
-
-    private static Date calculateCurrentMonthFirstDay(Calendar calendar, Date scheduledFireTime) {
-        calendar.setTime(scheduledFireTime);
-        CalendarUtils.truncateToMonth(calendar);
-        return calendar.getTime();
-    }
-
-    private static Date calculatePlusOneMonth(Calendar calendar, Date endTime) {
-        calendar.setTime(endTime);
-        calendar.add(Calendar.MONTH, 1);
-        return calendar.getTime();
-    }
 }
