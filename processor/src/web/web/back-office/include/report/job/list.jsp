@@ -19,7 +19,7 @@
         <f:facet name="header">
             <h:outputText escape="true" value="Идентификатор" />
         </f:facet>
-        <a4j:commandLink reRender="reportJobGroupMenu, workspaceForm" value="#{item.idOfSchedulerJob}" action="#{mainPage.showReportJobViewPage}"
+        <a4j:commandLink reRender="selectedReportJobGroupMenu, workspaceForm" value="#{item.idOfSchedulerJob}" action="#{mainPage.showReportJobViewPage}"
                        styleClass="command-link">
             <f:setPropertyActionListener value="#{item.idOfSchedulerJob}" target="#{mainPage.selectedIdOfReportJob}" />
         </a4j:commandLink>
