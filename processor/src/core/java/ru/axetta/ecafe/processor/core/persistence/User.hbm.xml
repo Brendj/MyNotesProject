@@ -29,12 +29,12 @@
         <property name="lastEntryIP" column="LastEntryIP" type="string" length="15" not-null="false"/>
         <property name="lastEntryTime" column="LastEntryTime" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="false"/>
         <property name="blocked" column="IsBlocked" type="boolean" not-null="true"/>
+        <property name="region" column="Region" type="string" length="10" not-null="false"/>
 
         <set name="contragents" table="CF_UserContragents">
             <key column="IdOfUser"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Contragent" column="IdOfContragent"/>
         </set>
-        <property name="region" column="Region" type="string" length="10" not-null="false"/>
         <set name="functionsInternal" table="CF_Permissions">
             <key column="IdOfUser"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Function" column="IdOfFunction"/>
