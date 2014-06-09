@@ -5,9 +5,10 @@
 -- Пакет обновлений 2.2.65
 
 -- связка пользователи организации по рассылкам уведомлений по отмененным заказам
-ALTER TABLE cf_UserOrgs ADD UserNotificationType INT NOT NULL;
-
+ALTER TABLE cf_userorgs ADD COLUMN usernotificationtype integer;
 UPDATE cf_UserOrgs SET UserNotificationType = 0;
+ALTER TABLE cf_userorgs ALTER COLUMN usernotificationtype SET NOT NULL;
+
 
 ALTER TABLE cf_UserOrgs DROP CONSTRAINT cf_userorgs_uq;
 

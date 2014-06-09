@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -39,6 +40,11 @@ import java.util.*;
 public class OrderStateChangeService {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(OrderStateChangeService.class);
+
+    // Для тестов
+    //public static OrderStateChangeService getInstance() {
+    //    return RuntimeContext.getAppContext().getBean(OrderStateChangeService.class);
+    //}
 
     public void notifyOrderStateChange() throws Exception {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -157,8 +163,10 @@ public class OrderStateChangeService {
                     } //файл С//
                     // создать новый список  addresses + хешмап значеничя .get(orgItem.getIdOfOrg())  .addAll
                     Set<String> mails = new HashSet<String>();
-                    mails.addAll(addresses);
-                    mails.addAll(userEmailsByOrg.get(orgItem.getIdOfOrg()));
+                    if(!CollectionUtils.isEmpty(addresses)) mails.addAll(addresses);
+                    if(orgItem!=null && userEmailsByOrg!=null &&!CollectionUtils.isEmpty(userEmailsByOrg.get(orgItem.getIdOfOrg()))){
+                        mails.addAll(userEmailsByOrg.get(orgItem.getIdOfOrg()));
+                    }
                     for (String address : mails) {
                         if (StringUtils.trimToNull(address) != null) {
                             try {
@@ -516,17 +524,4 @@ public class OrderStateChangeService {
         writer.close();
     }
 
-    public void addEmailFromUser(Session persistenceSession, Long idOfOrg, List<String> addresses){
-        Criteria criteria = persistenceSession.createCriteria(UserOrgs.class);
-        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
-        criteria.add(Restrictions.eq("userNotificationType", UserNotificationType.ORDER_STATE_CHANGE_NOTIFY));
-        List list = criteria.list();
-        for (Object o: list){
-            UserOrgs userOrgs = (UserOrgs) o;
-            if(userOrgs.getUser()!=null && StringUtils.isNotEmpty(userOrgs.getUser().getEmail())){
-                List<String> strings = Arrays.asList(StringUtils.split(userOrgs.getUser().getEmail(), ";"));
-                addresses.addAll(strings);
-            }
-        }
-    }
 }
