@@ -24,7 +24,7 @@
             </module>
             <module name="javax.faces.api" slot="1.2" />
             <module name="com.sun.jsf-impl" slot="1.2" />
-            <!--<module name="org.infinispan" />-->
+            <module name="org.infinispan" />
         </dependencies>
         <exclusions>
             <module name="javax.faces.api" slot="main" />
