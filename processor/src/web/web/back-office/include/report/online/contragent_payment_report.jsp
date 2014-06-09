@@ -11,9 +11,15 @@
 
 <h:panelGrid id="contragentPaymentReportPanelGrid" binding="#{mainPage.contragentPaymentReportPage.pageComponent}" styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText styleClass="output-text" escape="true" value="Дата выборки от" />
+
+        <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
         <rich:calendar value="#{mainPage.contragentPaymentReportPage.startDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" />
+                       converter="dateConverter" inputClass="input-text"
+                       showWeeksBar="false">
+            <a4j:support event="onchanged" reRender="endDateCalendar"
+                         actionListener="#{mainPage.contragentPaymentReportPage.onReportPeriodChanged}" />
+        </rich:calendar>
+
         <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
         <h:selectOneMenu id="endDatePeriodSelect"
                          value="#{mainPage.contragentPaymentReportPage.periodTypeMenu.periodType}"
@@ -23,9 +29,9 @@
             <a4j:support event="onchange" reRender="endDateCalendar"
                          actionListener="#{mainPage.contragentPaymentReportPage.onReportPeriodChanged}" />
         </h:selectOneMenu>
-
-        <h:outputText styleClass="output-text" escape="true" value="Дата выборки до" />
-        <rich:calendar id="endDateCalendar" value="#{mainPage.contragentPaymentReportPage.endDate}" datePattern="dd.MM.yyyy" converter="dateConverter"
+        <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
+        <rich:calendar id="endDateCalendar" value="#{mainPage.contragentPaymentReportPage.endDate}"
+                       datePattern="dd.MM.yyyy" converter="dateConverter"
                        inputClass="input-text" showWeeksBar="false">
             <a4j:support event="onchanged" reRender="endDatePeriodSelect"
                          actionListener="#{mainPage.contragentPaymentReportPage.onEndDateSpecified}" />
@@ -87,6 +93,9 @@
         </f:facet>
     </a4j:status>
 
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
+
     <h:panelGrid styleClass="borderless-grid">
         <%-- не показывать пустую таблицу --%>
         <c:if test="${not empty mainPage.contragentPaymentReportPage.htmlReport}" >
@@ -100,6 +109,5 @@
 
         </c:if>
     </h:panelGrid>
-    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                   warnClass="warn-messages" />
+
 </h:panelGrid>

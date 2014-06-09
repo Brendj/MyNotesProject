@@ -57,7 +57,7 @@
         <a4j:commandButton value="Генерировать отчет" action="#{contragentCompletionReportPage.generate}"
                            reRender="contragentCompletionReportTable"
                            styleClass="command-button" status="reportGenerateStatus" />
-        <h:commandButton value="Выгрузить в Excel" actionListener="#{contragentCompletionReportPage.showCSVList}" styleClass="command-button" />
+        <h:commandButton value="Генерировать отчет в Excel" actionListener="#{contragentCompletionReportPage.showCSVList}" styleClass="command-button" />
     </h:panelGrid>
 
     <a4j:status id="reportGenerateStatus">

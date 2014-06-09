@@ -82,6 +82,7 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
 
     public Object generate(){
         contragentCompletionItems = new ArrayList<ContragentCompletionItem>();
+        if (validateFormData()) return null;
         List<Org> orgItems = null;
         if(defaultSupplier!=null) {
             orgItems = contragentDAOService.findDistributionOrganizationByDefaultSupplier(defaultSupplier);
@@ -121,7 +122,28 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
     @Autowired
     private ReportDAOService daoService;
 
+    private boolean validateFormData() {
+        if(startDate==null){
+            printError("Не указано дата выборки от");
+            return true;
+        }
+        if(endDate==null){
+            printError("Не указано дата выборки до");
+            return true;
+        }
+        if(startDate.after(endDate)){
+            printError("Дата выборки от меньше дата выборки до");
+            return true;
+        }
+        if(defaultSupplier==null){
+            printError("Не выбран 'Поставщик'");
+            return true;
+        }
+        return false;
+    }
+
     public void showCSVList(ActionEvent actionEvent){
+        if (validateFormData()) return;
         AutoReportGenerator autoReportGenerator = runtimeContext.getAutoReportGenerator();
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + ContragentCompletionReport.class.getSimpleName() + ".jasper";
         ContragentCompletionReport.Builder builder = new ContragentCompletionReport.Builder(templateFilename);
@@ -213,7 +235,6 @@ public class ContragentCompletionReportPage extends OnlineReportPage implements 
         localCalendar.add(Calendar.DAY_OF_MONTH,1);
         localCalendar.add(Calendar.SECOND, -1);
         this.endDate = localCalendar.getTime();
-        this.endDate = endDate;
     }
 
     public Date getStartDate() {

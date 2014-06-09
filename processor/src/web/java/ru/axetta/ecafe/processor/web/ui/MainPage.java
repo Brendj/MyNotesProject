@@ -1236,8 +1236,6 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-
-
         }
         updateSelectedMainMenu();
         return null;
@@ -2369,7 +2367,7 @@ public class MainPage {
         Transaction persistenceTransaction = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             clientListPage.fill(persistenceSession);
             persistenceTransaction.commit();
@@ -4779,8 +4777,6 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-
-
         }
         updateSelectedMainMenu();
         return null;
@@ -5531,6 +5527,9 @@ public class MainPage {
 
     public Object buildClientPaymentsReport() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
+        if(clientPaymentsReportPage.validateFormData()){
+            return null;
+        }
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -7288,6 +7287,8 @@ public class MainPage {
                 currentUser = DAOUtils.findUser(persistenceSession, userName);
                 /// perform lazy load of function
                 currentUser.hasFunction(Function.FUNCD_ORG_VIEW);
+                //currentUser.getContragents().size();
+                //currentUser.getUserOrgses().size();
                 ///
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -7535,8 +7536,6 @@ public class MainPage {
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
-
-
         }
         return null;
     }
@@ -7703,6 +7702,7 @@ public class MainPage {
         try {
             return ContextDAOServices.getInstance().getContragentsListForTooltip (getCurrentUser().getIdOfUser());
         } catch (Exception e) {
+            logger.error("getContragentsListForTooltip Error",e);
             return "";
         }
     }
@@ -7711,6 +7711,7 @@ public class MainPage {
         try {
             return getCurrentUser().getRegion();
         } catch (Exception e) {
+            logger.error("getContragentsListForTooltip Error",e);
             return "";
         }
     }

@@ -19,7 +19,7 @@ import java.util.Map;
  * Time: 15:55
  * To change this template use File | Settings | File Templates.
  */
-public class OnlineReportWithContragentPage extends OnlineReportPage {
+public abstract class OnlineReportWithContragentPage extends OnlineReportPage {
     protected boolean selectIdOfOrgList = true;                         //  Флаг того какой массив сейчас заполнять: оргов (true) или контрагетов (false)
     protected String contragentFilter = "Не выбрано";
     protected List<Long> idOfContragentOrgList = new ArrayList<Long>();
@@ -89,7 +89,7 @@ public class OnlineReportWithContragentPage extends OnlineReportPage {
     public String getFilter() {
         final List<Long> oldIdOfContragentOrgList1 = MainPage.getSessionInstance().getIdOfContragentOrgList();
         if(oldIdOfContragentOrgList1 !=null && !oldIdOfContragentOrgList1.containsAll(idOfContragentOrgList)){
-            idOfOrgList.clear();
+            idOfOrgList = new ArrayList<Long>();
             filter = "Не выбрано";
         }
         return super.getFilter();

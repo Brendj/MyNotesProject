@@ -26,6 +26,22 @@ public class ClientPaymentsPage extends OnlineReportPage {
         return clientPaymentsReport;
     }
 
+    public boolean validateFormData() {
+        if(startDate==null){
+            printError("Не указано дата выборки от");
+            return true;
+        }
+        if(endDate==null){
+            printError("Не указано дата выборки до");
+            return true;
+        }
+        if(startDate.after(endDate)){
+            printError("Дата выборки от меньше дата выборки до");
+            return true;
+        }
+        return false;
+    }
+
     public void buildReport(Session session) throws Exception {
         this.clientPaymentsReport = new ClientPaymentsReport();
         ClientPaymentsReport.Builder reportBuilder = new ClientPaymentsReport.Builder();

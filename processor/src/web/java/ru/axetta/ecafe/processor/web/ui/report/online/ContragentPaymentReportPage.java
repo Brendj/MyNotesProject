@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportForContragentJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ContragentPaymentReport;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -36,10 +37,7 @@ import javax.persistence.PersistenceContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -57,6 +55,48 @@ public class ContragentPaymentReportPage extends OnlineReportPage implements Con
     private final CCAccountFilter contragentReceiverFilter = new CCAccountFilter();
     private final CCAccountFilter contragentFilter = new CCAccountFilter();
     private boolean receiverSelection;
+    private final PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu();
+
+    public PeriodTypeMenu getPeriodTypeMenu() {
+        return periodTypeMenu;
+    }
+
+    public void onReportPeriodChanged(ActionEvent event) {
+        switch (periodTypeMenu.getPeriodType()){
+            case ONE_DAY: {
+                setEndDate(startDate);
+            } break;
+            case ONE_WEEK: {
+                setEndDate(CalendarUtils.addDays(startDate, 6));
+            } break;
+            case TWO_WEEK: {
+                setEndDate(CalendarUtils.addDays(startDate, 13));
+            } break;
+            case ONE_MONTH: {
+                setEndDate(CalendarUtils.addDays(CalendarUtils.addMonth(startDate, 1), -1));
+            } break;
+        }
+    }
+
+    public void onEndDateSpecified(ActionEvent event) {
+        Date end = CalendarUtils.truncateToDayOfMonth(endDate);
+        if(CalendarUtils.addMonth(CalendarUtils.addDays(end, -1), -1).equals(startDate)){
+            periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
+        } else {
+            long diff=end.getTime()-startDate.getTime();
+            int noofdays=(int)(diff/(24*60*60*1000));
+            switch (noofdays){
+                case 0: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY); break;
+                case 6: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK); break;
+                case 13: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK); break;
+                default: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY); break;
+            }
+        }
+        if(startDate.after(endDate)){
+            printError("Дата выборки от меньше дата выборки до");
+        }
+    }
+
 
     public String getPageFilename() {
         return "report/online/contragent_payment_report";
@@ -96,6 +136,7 @@ public class ContragentPaymentReportPage extends OnlineReportPage implements Con
     private final static Logger logger = LoggerFactory.getLogger(GoodRequestsNewReportPage.class);
 
     public void exportToXLS(ActionEvent actionEvent){
+        if (validateFormData()) return;
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + ContragentPaymentReport.class.getSimpleName() + ".jasper";
@@ -105,7 +146,7 @@ public class ContragentPaymentReportPage extends OnlineReportPage implements Con
         //builder.setReportProperties(fillContragentReceiver());
         if (contragentFilter.getContragent().getIdOfContragent() == null
                 || contragentReceiverFilter.getContragent().getIdOfContragent() == null) {
-            printError("Не выбран 'Агент по приему платежей' и 'Контарегент-получатель'");
+            printError("Не выбран 'Агент по приему платежей' или 'Контрагент-получатель'");
         } else {
             builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID,
                     Long.toString(contragentFilter.getContragent().getIdOfContragent()));
@@ -115,19 +156,21 @@ public class ContragentPaymentReportPage extends OnlineReportPage implements Con
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
             BasicReportJob report = null;
-            try {
-                persistenceSession = runtimeContext.createReportPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                builder.setContragent(getContragent());
-                report = builder.build(persistenceSession, startDate, endDate, localCalendar);
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
+            try{
+                try {
+                    persistenceSession = runtimeContext.createReportPersistenceSession();
+                    persistenceTransaction = persistenceSession.beginTransaction();
+                    builder.setContragent(getContragent());
+                    report = builder.build(persistenceSession, startDate, endDate, localCalendar);
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
+                }  finally {
+                    HibernateUtils.rollback(persistenceTransaction, logger);
+                    HibernateUtils.close(persistenceSession, logger);
+                }
             } catch (Exception e) {
                 logger.error("Failed export report : ", e);
                 printError("Ошибка при подготовке отчета: " + e.getMessage());
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
             }
 
             if (report != null) {
@@ -162,8 +205,8 @@ public class ContragentPaymentReportPage extends OnlineReportPage implements Con
         }
     }
 
-
     public void showCSVList(ActionEvent actionEvent){
+        if (validateFormData()) return;
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -212,71 +255,75 @@ public class ContragentPaymentReportPage extends OnlineReportPage implements Con
         }
     }
 
-    //@Transactional
+    private boolean validateFormData() {
+        if(startDate==null){
+            printError("Не указано дата выборки от");
+            return true;
+        }
+        if(endDate==null){
+            printError("Не указано дата выборки до");
+            return true;
+        }
+        if(startDate.after(endDate)){
+            printError("Дата выборки от меньше дата выборки до");
+            return true;
+        }
+        if (contragentFilter.getContragent().getIdOfContragent() == null
+                || contragentReceiverFilter.getContragent().getIdOfContragent() == null) {
+            printError("Не выбран 'Агент по приему платежей' и 'Контарегент-получатель'");
+        }
+        return false;
+    }
+
     public Object buildReport() {
+        htmlReport="";
+        if (validateFormData()) return null;
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         ContragentPaymentReport.Builder builder = new ContragentPaymentReport.Builder();
-        if (contragentFilter.getContragent().getIdOfContragent() == null
-                || contragentReceiverFilter.getContragent().getIdOfContragent() == null) {
-            printError("Не выбран 'Агент по приему платежей' и 'Контарегент-получатель'");
-        } else {
-            builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID,
-                    Long.toString(contragentFilter.getContragent().getIdOfContragent()));
-            builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID,
-                    Long.toString(contragentReceiverFilter.getContragent().getIdOfContragent()));
-            builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
-            BasicReportJob report = null;
-            try {
-                persistenceSession = runtimeContext.createReportPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                builder.setContragent(getContragent());
-                report = builder.build(persistenceSession, startDate, endDate, localCalendar);
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-            } catch (Exception e) {
-                logger.error("Failed export report : ", e);
-                printError("Ошибка при подготовке отчета: " + e.getMessage());
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
-            }
+        builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_PAYER_ID,
+                Long.toString(contragentFilter.getContragent().getIdOfContragent()));
+        builder.getReportProperties().setProperty(BasicReportForContragentJob.PARAM_CONTRAGENT_RECEIVER_ID,
+                Long.toString(contragentReceiverFilter.getContragent().getIdOfContragent()));
+        builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
+        BasicReportJob report = null;
+        try {
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            builder.setContragent(getContragent());
+            report = builder.build(persistenceSession, startDate, endDate, localCalendar);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed export report : ", e);
+            printError("Ошибка при подготовке отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
 
-            if (report != null) {
-                try {
-                    ByteArrayOutputStream os = new ByteArrayOutputStream();
-                    JRHtmlExporter exporter = new JRHtmlExporter();
-                    exporter.setParameter(JRExporterParameter.JASPER_PRINT, report.getPrint());
-                    exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
-                    exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
-                    exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
-                    exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
-                    exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
-                    exporter.setParameter(JRHtmlExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-                    exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
-                    exporter.exportReport();
-                    htmlReport = os.toString("UTF-8");
-                    os.close();
-                } catch (Exception e) {
-                    printError("Ошибка при построении отчета: " + e.getMessage());
-                    logger.error("Failed build report ", e);
-                }
+        if (report != null) {
+            try {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                JRHtmlExporter exporter = new JRHtmlExporter();
+                exporter.setParameter(JRExporterParameter.JASPER_PRINT, report.getPrint());
+                exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
+                exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
+                exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
+                exporter.setParameter(JRHtmlExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
+                exporter.exportReport();
+                htmlReport = os.toString("UTF-8");
+                os.close();
+            } catch (Exception e) {
+                printError("Ошибка при построении отчета: " + e.getMessage());
+                logger.error("Failed build report ", e);
             }
         }
         return null;
-        //FacesContext facesContext = FacesContext.getCurrentInstance();
-        //Session persistenceSession = null;
-        //try {
-        //    persistenceSession = (Session) em.getDelegate();
-        //    buildReport(persistenceSession, getContragent());
-        //} catch (Exception e) {
-        //    getLogger().error("Failed to build sales report", e);
-        //    facesContext.addMessage(null,
-        //            new FacesMessage(FacesMessage.SEVERITY_ERROR, e.getMessage(), null));
-        //}/* finally {
-        //    HibernateUtils.close(persistenceSession, getLogger());
-        //}*/
     }
 
     public void buildReport(Session session, Contragent contragent) throws Exception {
